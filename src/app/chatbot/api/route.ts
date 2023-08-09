@@ -28,6 +28,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(data);
   } catch (error) {
     console.log("Error in chatbot route", error);
+    return NextResponse.json({ error: "Error error" });
   }
 }
 
