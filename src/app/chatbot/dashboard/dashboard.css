@@ -1,0 +1,14 @@
+.dashboard-container .title {
+    font-size: 30px;
+    font-weight: bold;
+    font-family: 'Times New Roman', Times, serif;
+    margin-bottom: 20px;
+}
+
+.ant-radio-group {
+    margin-left: 10px;
+}
+
+.ant-radio-wrapper {
+    font-size: 20px;
+}

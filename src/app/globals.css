@@ -1,0 +1,31 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+Header {
+  background-color: white !important;
+  display: flex;
+  justify-content: space-between;
+}
+
+Header .logo a {
+  font-size: 30px;
+  font-weight: lighter;
+  font-family: 'Times New Roman', Times, serif;
+}
+
+Header a {
+  font-size: 20px;
+  font-weight: bolder;
+  color: black;
+}
+
+.ant-btn-primary {
+  background-color: black;
+}
+
+.ant-btn-primary:hover {
+  background-color: rgba(10, 10, 10, 0.856) !important;
+}
