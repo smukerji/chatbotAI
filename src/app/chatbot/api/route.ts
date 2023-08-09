@@ -6,6 +6,7 @@ export async function GET(request: NextRequest) {
     headers: {
       accept: "application/json",
       Authorization: `Bearer ${process.env.NEXT_PUBLIC_AUTHORIZATION}`,
+      cache: "no-store",
     },
   };
 
@@ -27,6 +28,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(data);
   } catch (error) {
     console.log("Error in chatbot route", error);
+    return NextResponse.json({ error: "Error error" });
   }
 }
 
