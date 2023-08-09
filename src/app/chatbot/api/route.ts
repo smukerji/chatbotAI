@@ -8,6 +8,7 @@ export async function GET(request: NextRequest) {
       Authorization: `Bearer ${process.env.NEXT_PUBLIC_AUTHORIZATION}`,
       cache: "no-store",
     },
+    next: { revalidate: 0 },
   };
 
   try {
