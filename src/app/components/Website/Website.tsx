@@ -76,6 +76,7 @@ function Website({
       setProgress(100);
     } catch (error) {
       setProgress(0);
+      console.log("Error while fetching ", error);
       alert(`Error while fetching ${error}`);
     } finally {
       setLoading(false);
@@ -107,7 +108,7 @@ function Website({
       </span>
       {crawledList?.map((item: any, index: number) => {
         return (
-          <>
+          <React.Fragment key={index}>
             <div className="fetched-links">
               <div className="link">
                 <Input value={item.url} /> <span>{item.size}</span>{" "}
@@ -118,7 +119,7 @@ function Website({
                 onClick={() => deleteLink(index)}
               />
             </div>
-          </>
+          </React.Fragment>
         );
       })}
     </div>

@@ -6,6 +6,7 @@ export async function GET(request: NextRequest) {
     headers: {
       accept: "application/json",
       Authorization: `Bearer ${process.env.NEXT_PUBLIC_AUTHORIZATION}`,
+      cache: "no-store",
     },
   };
 
