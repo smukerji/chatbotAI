@@ -14,10 +14,12 @@ function ChatBot() {
     const fetchData = async () => {
       try {
         /// get chatbot details
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/api`
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/api`,
+          { cache: "no-store" }
         );
-        setChatbotData(response.data.chatbots);
+        const data = await response.json();
+        setChatbotData(data.chatbots);
       } catch (error) {
         console.error("Error fetching chatbot data:", error);
       }
