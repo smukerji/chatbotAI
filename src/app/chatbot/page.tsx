@@ -15,7 +15,9 @@ function ChatBot() {
       try {
         /// get chatbot details
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/api`,
+          `${
+            process.env.NEXT_PUBLIC_WEBSITE_URL
+          }chatbot/api?t=${new Date().getTime()}`,
           {
             cache: "no-store",
             headers: { Authorization: new Date().toString() },
