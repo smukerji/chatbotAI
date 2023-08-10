@@ -19,8 +19,9 @@ function ChatBot() {
             process.env.NEXT_PUBLIC_WEBSITE_URL
           }chatbot/api?t=${new Date().getTime()}`,
           {
-            cache: "no-store",
+            // cache: "no-store",
             headers: { Authorization: new Date().toString() },
+            next: { revalidate: 0 },
           }
         );
         const data = await response.json();

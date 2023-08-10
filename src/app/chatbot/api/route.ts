@@ -34,3 +34,4 @@ export async function GET(request: NextRequest) {
 }
 
 export const fetchCache = "force-no-store";
+export const revalidate = 0;
