@@ -56,6 +56,7 @@ export default function Home() {
           chatbotName: chatbotName,
           urlsToScrape: crawledUrls,
         }),
+        next: { revalidate: 0 },
       };
 
       console.log(options);
@@ -70,16 +71,22 @@ export default function Home() {
           options
         );
         const data = await res.json();
-        console.log(data);
-
-        messageApi
-          .open({
-            type: "success",
-            content: "Chabot trained successfully",
-          })
-          .then(() => {
-            window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot`;
+        console.log("create bot", data);
+        if (data.chatbotId) {
+          messageApi
+            .open({
+              type: "success",
+              content: "Chabot trained successfully",
+            })
+            .then(() => {
+              window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot`;
+            });
+        } else {
+          messageApi.open({
+            type: "error",
+            content: data.message,
           });
+        }
       } catch (error) {
         console.log("Error while creating chatbot", error);
 
