@@ -3,7 +3,6 @@ import { Button } from "antd";
 import React, { useEffect, useState } from "react";
 import "./chatbot.css";
 import { MessageOutlined } from "@ant-design/icons";
-import axios from "axios";
 import Link from "next/link";
 
 function ChatBot() {
@@ -15,12 +14,8 @@ function ChatBot() {
       try {
         /// get chatbot details
         const response = await fetch(
-          `${
-            process.env.NEXT_PUBLIC_WEBSITE_URL
-          }chatbot/api?t=${new Date().getTime()}`,
+          `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/api`,
           {
-            // cache: "no-store",
-            headers: { Authorization: new Date().toString() },
             next: { revalidate: 0 },
           }
         );
