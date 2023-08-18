@@ -3,6 +3,8 @@ import { useCookies } from "react-cookie";
 import "./chat.css";
 import { SendOutlined } from "@ant-design/icons";
 import { getSimilarityResults } from "../../../../../helper/pinecone";
+import { createEmbedding } from "../../../../../helper/embeddings";
+const { PineconeClient } = require("pinecone-client");
 
 function Chat({ chatbot }: any) {
   const [cookies, setCookies] = useCookies(["userId"]);
@@ -94,12 +96,34 @@ function Chat({ chatbot }: any) {
           }
         } else {
           /// get similarity search
-          const similarityResult = await getSimilarityResults(
-            userQuery,
-            cookies.userId,
-            chatbot?.id
+          // const similarityResult = await getSimilarityResults(
+          //   userQuery,
+          //   cookies.userId,
+          //   chatbot?.id
+          // );
+          // const embedding = createEmbedding(userQuery);
+          // const pinecone = new PineconeClient({
+          //   apiKey: process.env.NEXT_PUBLIC_PINECONE_KEY,
+          //   baseUrl:
+          //     "https://sapahk-chatbot-2e36a9f.svc.asia-southeast1-gcp-free.pinecone.io",
+          //   namespace: process.env.NEXT_PUBLIC_PINECONE_INDEX,
+          // });
+
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/pinecone`,
+            {
+              method: "POST",
+              body: JSON.stringify({ userQuery }),
+            }
           );
-          console.log(similarityResult);
+
+          console.log("Response.", response);
+
+          // const result = await pinecone.query({
+          //   vector: embedding,
+          //   topK: 1,
+          // });
+          // console.log(result?.matches);
         }
       }
     }
