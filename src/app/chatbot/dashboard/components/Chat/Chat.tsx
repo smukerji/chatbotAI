@@ -1,8 +1,11 @@
 import React, { Suspense, useState } from "react";
+import { useCookies } from "react-cookie";
 import "./chat.css";
 import { SendOutlined } from "@ant-design/icons";
+import { getSimilarityResults } from "../../../../../helper/pinecone";
 
 function Chat({ chatbot }: any) {
+  const [cookies, setCookies] = useCookies(["userId"]);
   /// messages
   const [messages, setMessages] = useState(
     chatbot.initial_message == null
@@ -27,65 +30,76 @@ function Chat({ chatbot }: any) {
       } else {
         /// clear the response
         setUserQuery("");
-
-        const options = {
-          method: "POST",
-          headers: {
-            accept: "application/json",
-            "content-type": "application/json",
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_AUTHORIZATION}`,
-            cache: "no-store",
-          },
-          body: JSON.stringify({
-            stream: true,
-            temperature: 0,
-            chatId: chatbot.id,
-            messages:[...messages,{ role: "user", content: userQuery }],
-          }),
-        };
-
         /// set the user query
         setMessages((prev) => [...prev, { role: "user", content: userQuery }]);
-        /// get the response from chatbase api
-        let resptext = "";
-        try {
-          setLoading(true);
-          const response: any = await fetch(
-            "https://www.chatbase.co/api/v1/chat",
-            options
-          );
-          // Read the response as a stream of data
-          const reader = response.body.getReader();
-          const decoder = new TextDecoder("utf-8");
+        /// check which chatbot to interact with i.e. chatbase bot or custom bot
+        const chatbotIdLength = chatbot?.id.length;
+        if (chatbotIdLength !== 36) {
+          const options = {
+            method: "POST",
+            headers: {
+              accept: "application/json",
+              "content-type": "application/json",
+              Authorization: `Bearer ${process.env.NEXT_PUBLIC_AUTHORIZATION}`,
+              cache: "no-store",
+            },
+            body: JSON.stringify({
+              stream: true,
+              temperature: 0,
+              chatId: chatbot.id,
+              messages: [...messages, { role: "user", content: userQuery }],
+            }),
+          };
 
-          /// decode the chunks
-          while (true) {
-            const { done, value } = await reader.read();
+          /// get the response from chatbase api
+          let resptext = "";
+          try {
+            setLoading(true);
+            const response: any = await fetch(
+              "https://www.chatbase.co/api/v1/chat",
+              options
+            );
+            // Read the response as a stream of data
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder("utf-8");
 
-            if (done) {
-              /// setting the response when completed
-              setMessages((prev) => [
-                ...prev,
-                { role: "assistant", content: resptext },
-              ]);
-              // setMessages(messagesArray);
-              setResponse("");
-              break;
+            /// decode the chunks
+            while (true) {
+              const { done, value } = await reader.read();
+
+              if (done) {
+                /// setting the response when completed
+                setMessages((prev) => [
+                  ...prev,
+                  { role: "assistant", content: resptext },
+                ]);
+                // setMessages(messagesArray);
+                setResponse("");
+                break;
+              }
+
+              // Massage and parse the chunk of data
+              const chunk = decoder.decode(value);
+              resptext += chunk;
+              setResponse(resptext);
             }
 
-            // Massage and parse the chunk of data
-            const chunk = decoder.decode(value);
-            resptext += chunk;
-            setResponse(resptext);
+            if (!response.ok) {
+              throw new Error(` when getting user query response `);
+            }
+          } catch (error) {
+            console.log(error);
+          } finally {
+            setLoading(false);
           }
-
-          if (!response.ok) {
-            throw new Error(` when getting user query response `);
-          }
-        } catch (error) {
-          console.log(error);
-        } finally {
-          setLoading(false);
+        } else {
+          /// get similarity search
+          const similarityResult = await getSimilarityResults(
+            userQuery,
+            cookies.userId,
+            chatbot?.id
+          );
+          console.log(similarityResult);
         }
       }
     }

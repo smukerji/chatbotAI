@@ -47,7 +47,7 @@ function Website({
         method: "GET",
         headers: {
           accept: "application/json",
-          authorization: "Bearer 9adf1c1b-5790-4ed8-8b0d-652742d4de25",
+          authorization: `Bearer ${process.env.NEXT_PUBLIC_AUTHORIZATION}`,
           cache: "no-store",
         },
         next: { revalidate: 0 },
