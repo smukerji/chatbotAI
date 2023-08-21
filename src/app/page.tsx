@@ -2,9 +2,18 @@
 import { Button, Layout, Radio, RadioChangeEvent, message } from "antd";
 import "./app.css";
 import { useState } from "react";
+import { useCookies } from "react-cookie";
 import Website from "./components/Website/Website";
+import SourceUpload from "./components/Source-Upload/SourceUpload";
+import { v4 as uuid } from "uuid";
+import ChatbotName from "../helper/ChatbotName";
 
 export default function Home() {
+  const [cookies, setCookie] = useCookies(["userId"]);
+  /// check if the unique id of the user exists else set the cookie with expiration of 1 year
+  if (cookies?.userId == undefined)
+    setCookie("userId", uuid(), { path: "/", maxAge: 31536000 });
+
   /// hadling event of radio buttons
   const [source, setSource] = useState("document");
   const onChange = (e: RadioChangeEvent) => {
@@ -20,13 +29,21 @@ export default function Home() {
     setCharCount(count);
   }
 
+  /// uploaded sources
+  const [defaultFileList, setDefaultFileList] = useState([]);
+
   /// crawledLinks
   const [crawledList, setCrawledList] = useState([]);
 
   const [messageApi, contextHolder] = message.useMessage();
 
-  /// create the chatbot
-  async function createChatbot() {
+  /// create the chatbase chatbot
+  async function createChatBaseBot() {
+    if (crawledList.length != 0 && defaultFileList.length !== 0) {
+      alert("Please keep only one i.e. document or website");
+      return;
+    }
+
     if (crawledList.length != 0) {
       let headers = {
         Authorization: `Bearer ${process.env.NEXT_PUBLIC_AUTHORIZATION}`,
@@ -35,18 +52,8 @@ export default function Home() {
       };
       /// filtering the crawledUrls
       let crawledUrls = crawledList.map((item: any) => item.url);
-      /// setting chatbot name
-      const now = new Date();
-      const month = String(now.getMonth() + 1).padStart(2, "0");
-      const day = String(now.getDate()).padStart(2, "0");
-      const year = now.getFullYear();
-      const hours = String(now.getHours()).padStart(2, "0");
-      const minutes = String(now.getMinutes()).padStart(2, "0");
-      const seconds = String(now.getSeconds()).padStart(2, "0");
 
-      const dateString = `${month}/${day}/${year}, ${hours}:${minutes}:${seconds}`;
-
-      let chatbotName = `Chatbot ${dateString}`;
+      let chatbotName = `Chatbot ${ChatbotName()}`;
 
       /// creating bot through urls
       const options = {
@@ -58,8 +65,6 @@ export default function Home() {
         }),
         next: { revalidate: 0 },
       };
-
-      console.log(options);
 
       try {
         messageApi.open({
@@ -103,6 +108,29 @@ export default function Home() {
     }
   }
 
+  /// creating custom chatbot
+  async function createCustomBot() {
+    if (crawledList.length != 0 && defaultFileList.length !== 0) {
+      alert("Please keep only one i.e. document or website");
+      return;
+    }
+    if (defaultFileList.length !== 0) {
+      /// send the file data
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/store`,
+        {
+          method: "POST",
+          body: JSON.stringify({ defaultFileList, userId: cookies.userId }),
+        }
+      );
+      message.success(await response.text()).then(() => {
+        window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot`;
+      });
+    } else {
+      message.error(`Please upload the files first`);
+    }
+  }
+
   return (
     <>
       {contextHolder}
@@ -118,7 +146,14 @@ export default function Home() {
               Website
             </Radio>
           </Radio.Group>
-          {source == "document" && <h1>Document</h1>}
+          {source == "document" && (
+            <SourceUpload
+              defaultFileList={defaultFileList}
+              setDefaultFileList={setDefaultFileList}
+              updateCharCount={updateCharCount}
+              getCharCount={charCount}
+            />
+          )}
           {source == "website" && (
             <Website
               updateCharCount={updateCharCount}
@@ -139,11 +174,21 @@ export default function Home() {
               Included Sources:
             </span>
             {/* <p>1 File (1,076 chars) | 126 Links (360,488 detected chars)</p> */}
-            {crawledList.length > 0 && (
+            {(crawledList.length > 0 && (
               <p>
                 {crawledList.length} Links ({charCount} detected chars)
               </p>
-            )}
+            )) ||
+              (defaultFileList.length == 1 && (
+                <p>
+                  {defaultFileList.length} File ({charCount} detected chars)
+                </p>
+              )) ||
+              (defaultFileList.length > 1 && (
+                <p>
+                  {defaultFileList.length} Files ({charCount} detected chars)
+                </p>
+              ))}
             <span
               style={{
                 fontSize: "15px",
@@ -171,10 +216,13 @@ export default function Home() {
               </span>
             </span>
             <Button
-              style={{ width: "400px" }}
+              style={{ width: "100%" }}
               type="primary"
               disabled={loading}
-              onClick={createChatbot}
+              onClick={
+                (crawledList.length != 0 && createChatBaseBot) ||
+                createCustomBot
+              }
             >
               Create Chatbot
             </Button>

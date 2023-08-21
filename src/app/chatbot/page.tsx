@@ -4,10 +4,11 @@ import React, { useEffect, useState } from "react";
 import "./chatbot.css";
 import { MessageOutlined } from "@ant-design/icons";
 import Link from "next/link";
-
+import { useCookies } from "react-cookie";
 function ChatBot() {
   /// chatbots details state
   const [chatbotData, setChatbotData] = useState([]);
+  const [cookies, setCookie] = useCookies(["userId"]);
   /// retrive the chatbots details
   useEffect(() => {
     const fetchData = async () => {
@@ -16,6 +17,8 @@ function ChatBot() {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/api`,
           {
+            method: "POST",
+            body: JSON.stringify({ userId: cookies.userId }),
             next: { revalidate: 0 },
           }
         );
