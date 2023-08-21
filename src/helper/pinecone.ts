@@ -2,6 +2,7 @@ import { PineconeClient } from "@pinecone-database/pinecone";
 // import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { v4 as uuid } from "uuid";
 import { createEmbedding } from "./embeddings";
+import { connectDatabase } from "../db";
 // import { encode } from 'gpt-3-encoder';
 // import {
 //   PINECONE_API_KEY,
@@ -40,30 +41,20 @@ export const upsert = async (vectors: any, userId: string) => {
   } catch (error) {
     console.error("Error during upsert:", error);
     return error;
-    throw new Error("Failed to perform upsert operation");
   }
 };
 
-// export const deletevecotrs = async () => {
-//   const index = pinecone.Index(PINECONE_INDEX);
-//   // const me=   await index._delete({deleteRequest: {namespace: "decb98b4-f891-48ad-bcd9-91aa97d9a15a", filter: {
-//   //   'file_name':"resume-259247065.docx"
-//   // },}} )
-//   // console.log(me);
+export const deletevectors = async (vectorIDs: [], namespace: string) => {
+  const index = pinecone.Index(
+    process.env.NEXT_PUBLIC_PINECONE_INDEX as string
+  );
 
-//   //  await index._delete({{
-//   //   filter: {
-//   //     genre: { $eq: "documentary" },
-//   //     year: 2019,
-//   //   },
-//   // }});
-
-//   await index.delete1({
-//     deleteAll: true,
-//     namespace: "39c8d7a0-a595-47a1-9bcf-df4184bbfae8",
-//   });
-//   // return embed
-// };
+  await index.delete1({
+    ids: vectorIDs,
+    deleteAll:false,
+    namespace: namespace,
+  });
+};
 
 // export const deleteFileVectorsByMetadata = async (
 //   userid,
@@ -105,48 +96,6 @@ export const upsert = async (vectors: any, userId: string) => {
 //   });
 //   return deleteVec;
 // };
-
-export const getSimilarityResults = async (
-  query: string,
-  userId: string,
-  chatbotId: string
-) => {
-  const index = pinecone.Index(
-    process.env.NEXT_PUBLIC_PINECONE_INDEX as string
-  );
-  /// create the query embedding
-  const embed = await createEmbedding(query);
-  const queryRequest = {
-    vector: embed,
-    topK: 10,
-    includeValues: false,
-    includeMetadata: true,
-    filter: {
-      chatbotId: chatbotId,
-    },
-    namespace: userId,
-  };
-
-  try {
-    const response = await index.query(
-      { queryRequest },
-      {
-        mode: "no-cors",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const extractedContents = response?.matches?.map(
-      (item: any) => item.metadata["content"]
-    );
-    console.log(extractedContents);
-    return extractedContents;
-  } catch (error: any) {
-    console.error("Error during queryfetch:", error);
-    return { error: error.message };
-  }
-};
 
 // export const deleteChatbotData = async (chatbotid, userid) => {
 //   const index = pinecone.Index(PINECONE_INDEX);

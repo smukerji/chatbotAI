@@ -38,6 +38,7 @@ export async function generateChunksNEmbedd(
   /// creating chunks with batch size 2000
   const batchSize = 2000;
   let data: any = [];
+  let dataIDs: any = [];
   /// creating embeddings
   for (let i = 0; i < chunks.length; i += batchSize) {
     const batch = chunks.slice(i, i + batchSize);
@@ -45,18 +46,19 @@ export async function generateChunksNEmbedd(
       model: "text-embedding-ada-002",
       input: batch,
     });
-
     batchEmbedding.data.data.map((embeddingData, index) => {
+      const id = uuidv4();
+      dataIDs.push(id);
       /// storing in response data
       data.push({
         metadata: { content: chunks[index], filename, chatbotId },
         values: embeddingData.embedding,
-        id: uuidv4(),
+        id: id,
       });
     });
   }
 
-  return data;
+  return { data, dataIDs };
 }
 
 export async function createEmbedding(query: string) {

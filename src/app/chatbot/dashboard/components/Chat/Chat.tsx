@@ -2,9 +2,12 @@ import React, { Suspense, useState } from "react";
 import { useCookies } from "react-cookie";
 import "./chat.css";
 import { SendOutlined } from "@ant-design/icons";
-import { getSimilarityResults } from "../../../../../helper/pinecone";
-import { createEmbedding } from "../../../../../helper/embeddings";
-const { PineconeClient } = require("pinecone-client");
+import { Configuration, OpenAIApi } from "openai";
+/// creating the openai object for fetching completion
+const configuration = new Configuration({
+  apiKey: process.env.NEXT_PUBLIC_OPENAI_KEY,
+});
+const openai = new OpenAIApi(configuration);
 
 function Chat({ chatbot }: any) {
   const [cookies, setCookies] = useCookies(["userId"]);
@@ -75,7 +78,6 @@ function Chat({ chatbot }: any) {
                   ...prev,
                   { role: "assistant", content: resptext },
                 ]);
-                // setMessages(messagesArray);
                 setResponse("");
                 break;
               }
@@ -95,35 +97,95 @@ function Chat({ chatbot }: any) {
             setLoading(false);
           }
         } else {
-          /// get similarity search
-          // const similarityResult = await getSimilarityResults(
-          //   userQuery,
-          //   cookies.userId,
-          //   chatbot?.id
-          // );
-          // const embedding = createEmbedding(userQuery);
-          // const pinecone = new PineconeClient({
-          //   apiKey: process.env.NEXT_PUBLIC_PINECONE_KEY,
-          //   baseUrl:
-          //     "https://sapahk-chatbot-2e36a9f.svc.asia-southeast1-gcp-free.pinecone.io",
-          //   namespace: process.env.NEXT_PUBLIC_PINECONE_INDEX,
-          // });
+          try {
+            /// get similarity search
+            const response: any = await fetch(
+              `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/pinecone`,
+              {
+                method: "POST",
+                body: JSON.stringify({
+                  userQuery,
+                  chatbotId: chatbot?.id,
+                  userId: cookies.userId,
+                }),
+              }
+            );
 
-          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/pinecone`,
-            {
-              method: "POST",
-              body: JSON.stringify({ userQuery }),
+            /// parse the response and extract the similarity results
+            const respText = await response.text();
+            const similaritySearchResults = JSON.parse(respText).join("\n");
+
+            // Fetch the response from the OpenAI API
+            const responseOpenAI: any = await fetch(
+              "https://api.openai.com/v1/chat/completions",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENAI_KEY}`,
+                },
+                body: JSON.stringify({
+                  model: "gpt-3.5-turbo",
+                  temperature: 0.5,
+                  top_p: 1,
+                  messages: [
+                    {
+                      role: "system",
+                      content: `Use the following pieces of context to answer the users question.
+              If you don't know the answer, just say that you don't know, don't try to make up an answer.
+              ----------------
+              ${similaritySearchResults}`,
+                    },
+                    // ...messages,
+                    { role: "user", content: userQuery },
+                  ],
+                  stream: true,
+                }),
+              }
+            );
+
+            // Read the response as a stream of data
+            let resptext = "";
+            const reader = responseOpenAI.body.getReader();
+            const decoder = new TextDecoder("utf-8");
+
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) {
+                /// setting the response when completed
+                setMessages((prev) => [
+                  ...prev,
+                  { role: "assistant", content: resptext },
+                ]);
+                setResponse("");
+                break;
+              }
+              // Massage and parse the chunk of data
+              const chunk = decoder.decode(value);
+              const lines = chunk.split("\n");
+              const parsedLines = lines
+                .map((line) => line.replace(/^data: /, "").trim()) // Remove the "data: " prefix
+                .filter((line) => line !== "" && line !== "[DONE]") // Remove empty lines and "[DONE]"
+                .map((line, index) => JSON.parse(line)); // Parse the JSON string
+
+              for (const parsedLine of parsedLines) {
+                const { choices } = parsedLine;
+                const { delta } = choices[0];
+                const { content } = delta;
+                // Update the UI with the new content
+                if (content) {
+                  resptext += content;
+                  setResponse(resptext);
+                }
+              }
             }
-          );
-
-          console.log("Response.", response);
-
-          // const result = await pinecone.query({
-          //   vector: embedding,
-          //   topK: 1,
-          // });
-          // console.log(result?.matches);
+            // console.log("Response.", model.data);
+          } catch (e: any) {
+            console.log(
+              "Error while getting completion from custom chatbot",
+              e.message
+            );
+          }
         }
       }
     }

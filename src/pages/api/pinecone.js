@@ -1,21 +1,16 @@
 import { readContent } from "../../helper/ReadContent";
 import { PineconeClient } from "@pinecone-database/pinecone";
 
-import {
-  createEmbedding,
-  generateChunksNEmbedd,
-} from "../../helper/embeddings";
+import { createEmbedding } from "../../helper/embeddings";
 import { connectDatabase } from "../../db";
-import { v4 as uuid } from "uuid";
-import ChatbotName from "../../helper/ChatbotName";
-import { upsert } from "../../helper/pinecone";
+import { deletevectors } from "../../helper/pinecone";
 
 export const pinecone = new PineconeClient();
 try {
-  // pinecone.init({
-  //   environment: process.env.NEXT_PUBLIC_PINECONE_ENV,
-  //   apiKey: process.env.NEXT_PUBLIC_PINECONE_KEY,
-  // });
+  pinecone.init({
+    environment: process.env.NEXT_PUBLIC_PINECONE_ENV,
+    apiKey: process.env.NEXT_PUBLIC_PINECONE_KEY,
+  });
 } catch (error) {
   console.error("Error initializing Pinecone client:", error);
   throw new Error("Failed to initialize Pinecone client");
@@ -23,52 +18,74 @@ try {
 
 export default async function handler(req, res) {
   if (req.method === "POST") {
-    /// parse the files object
+    // console.log("fd");
+    // await pinecone.init({
+    //   environment: process.env.NEXT_PUBLIC_PINECONE_ENV,
+    //   apiKey: process.env.NEXT_PUBLIC_PINECONE_KEY,
+    // });
+    // const index = pinecone.Index(process.env.NEXT_PUBLIC_PINECONE_INDEX);
+    // const tr = await index.delete1({
+    //   deleteAll: true,
+    //   namespace: "ae9100ec-d127-4291-bba3-19e4369d7094",
+    // });
+    // return res.status(200).send(tr);
+    /// parse the request object
     const body = JSON.parse(req.body);
     const userQuery = body?.userQuery;
-    // const embedding = createEmbedding(userQuery);
-    // const pinecone = new PineconeClient({
-    //   apiKey: process.env.NEXT_PUBLIC_PINECONE_KEY,
-    //   baseUrl:
-    //     "https://sapahk-chatbot-2e36a9f.svc.asia-southeast1-gcp-free.pinecone.io",
-    //   namespace: process.env.NEXT_PUBLIC_PINECONE_INDEX,
-    // });
+    const chatbotId = body?.chatbotId;
+    const userId = body?.userId;
 
-    // const result = await pinecone.query({
-    //   vector: embedding,
-    //   topK: 1,
-    // });
-    // console.log(userQuery);
-
-    /// create the query embedding
+    /// create the embedding of user query
     const embed = await createEmbedding(userQuery);
+
+    /// set the params of pinecone embeddings retrival
     const queryRequest = {
       vector: embed,
       topK: 10,
       includeValues: false,
       includeMetadata: true,
-      // filter: {
-      //   chatbotId: chatbotId,
-      // },
-      // namespace: userId,
+      filter: {
+        chatbotId: chatbotId,
+      },
+      namespace: userId,
     };
 
     try {
       const index = pinecone.Index(process.env.NEXT_PUBLIC_PINECONE_INDEX);
 
+      /// query embeddings
       const response = await index.query({ queryRequest });
-      console.log("Respinse", response);
+      /// extract the content
       const extractedContents = response?.matches?.map(
         (item) => item.metadata["content"]
       );
-      console.log(extractedContents);
-      return extractedContents;
+      return res.status(200).send(extractedContents);
     } catch (error) {
       console.error("Error during queryfetch:", error);
-      return { error: error.message };
+      return res.status(200).send(error.message);
     }
-    // console.log(result?.matches);
+  } else {
+    /// deleting the chatbot data from pinecone
+    /// parse the request object
+    const body = JSON.parse(req.body);
+    const chatbotId = body?.chatbotId;
 
-    return res.status(200).send("result?.matches");
+    /// fetch the IDs and user namespace from the DB
+    const db = await connectDatabase();
+    const collection = db.collection("user-details");
+    const cursor = collection.find({ chatbotId: chatbotId });
+
+    let vectorId = [];
+    let namespace = "";
+    for await (const doc of cursor) {
+      vectorId.push(doc.dataID);
+      namespace = doc.userId;
+    }
+    vectorId = [].concat(...vectorId);
+    console.log(vectorId);
+    /// delete the vectors
+    const deleteData = await collection.deleteMany({ chatbotId: chatbotId });
+    deletevectors(vectorId, namespace);
+    return res.status(200).send({ text: "Deleted successfully" });
   }
 }

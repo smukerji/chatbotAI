@@ -30,23 +30,36 @@ export default async function handler(req, res) {
     });
 
     const valuesPromise = await Promise.all(fileData);
-    /// get the filenames
-    const fileNames = valuesPromise.map((values) => {
-      return values[0]?.metadata?.filename;
+    /// get the filenames and vectors created ID
+    const fileSource = valuesPromise.map((values) => {
+      return {
+        name: values.data[0]?.metadata?.filename,
+        dataID: values?.dataIDs,
+      };
     });
+
     const values = [].concat(...valuesPromise);
 
     /// store the emebeddings in pinecone database
-    const upsertReq = await upsert(values, userId);
+    let upserData = values.map((value) => {
+      return value.data;
+    });
+    upserData = [].concat(...upserData);
+    await upsert(upserData, userId);
 
     /// store the details in database
     const db = await connectDatabase();
     const collection = db.collection("user-details");
     /// iterate and store each user filename as per chatbot
-    fileNames.forEach((file) => {
-      collection.insertOne({ userId, chatbotId, chatbotName, fileName: file });
+    fileSource.forEach((file) => {
+      collection.insertOne({
+        userId,
+        chatbotId,
+        chatbotName,
+        fileName: file.name,
+        dataID: file.dataID,
+      });
     });
-    console.log(fileNames);
-    return res.status(200).send(upsertReq);
+    return res.status(200).send("Chabot trained successfully");
   }
 }

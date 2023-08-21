@@ -39,6 +39,11 @@ export default function Home() {
 
   /// create the chatbase chatbot
   async function createChatBaseBot() {
+    if (crawledList.length != 0 && defaultFileList.length !== 0) {
+      alert("Please keep only one i.e. document or website");
+      return;
+    }
+
     if (crawledList.length != 0) {
       let headers = {
         Authorization: `Bearer ${process.env.NEXT_PUBLIC_AUTHORIZATION}`,
@@ -105,6 +110,10 @@ export default function Home() {
 
   /// creating custom chatbot
   async function createCustomBot() {
+    if (crawledList.length != 0 && defaultFileList.length !== 0) {
+      alert("Please keep only one i.e. document or website");
+      return;
+    }
     if (defaultFileList.length !== 0) {
       /// send the file data
       const response = await fetch(
@@ -114,7 +123,9 @@ export default function Home() {
           body: JSON.stringify({ defaultFileList, userId: cookies.userId }),
         }
       );
-      message.success(`Chabot trained successfully`)
+      message.success(await response.text()).then(() => {
+        window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot`;
+      });
     } else {
       message.error(`Please upload the files first`);
     }
@@ -208,7 +219,10 @@ export default function Home() {
               style={{ width: "100%" }}
               type="primary"
               disabled={loading}
-              onClick={createCustomBot}
+              onClick={
+                (crawledList.length != 0 && createChatBaseBot) ||
+                createCustomBot
+              }
             >
               Create Chatbot
             </Button>
