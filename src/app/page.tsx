@@ -119,8 +119,12 @@ export default function Home() {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/store`,
         {
+          headers: {
+            cache: "no-store",
+          },
           method: "POST",
           body: JSON.stringify({ defaultFileList, userId: cookies.userId }),
+          next: { revalidate: 0 },
         }
       );
       message.success(await response.text()).then(() => {
