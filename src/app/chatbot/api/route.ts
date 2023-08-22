@@ -12,41 +12,55 @@ export async function POST(request: any) {
     next: { revalidate: 0 },
   };
 
-  /// read the body from request
+  // Read the body from the request
   const { userId } = await request.json();
 
   try {
-    /// fetch the chatbot data from chatbase
-    const response = await fetch(
-      "https://www.chatbase.co/api/v1/get-chatbots",
-      options
-    );
+    // Fetch the chatbot data from chatbase and custom chatbots from the database concurrently
+    const [chatbaseResponse, customBots] = await Promise.all([
+      fetch("https://www.chatbase.co/api/v1/get-chatbots", options),
+      fetchCustomBots(userId),
+    ]);
 
-    if (!response.ok) {
-      throw new Error("Error while retriving chatbots");
+    if (!chatbaseResponse.ok) {
+      throw new Error("Error while retrieving chatbots from chatbase");
     }
 
-    const data = await response.json();
-    /// fetch the custom created chatbots
-    const db = await connectDatabase();
-    const collection = db.collection("user-details");
-    const customeBots: any = collection.find({ userId: userId });
-    for await (const doc of customeBots) {
-      // console.log(doc.chatbotId, doc.chatbotName);
-      const element = { id: doc.chatbotId, name: doc.chatbotName };
-      if (!objectExists(data.chatbots, element)) {
-        data.chatbots.push(element);
-      }
-    }
+    const chatbaseData = await chatbaseResponse.json();
 
-    return NextResponse.json(data);
+    // Process custom chatbots and merge them with chatbase data
+    const mergedChatbots = mergeCustomBots(chatbaseData.chatbots, customBots);
+
+    return NextResponse.json({ chatbots: mergedChatbots });
   } catch (error) {
     console.log("Error in chatbot route", error);
     return NextResponse.json({ error: "Error error" });
   }
 }
 
-/// check if the chatbot entry already exist in array
+// Fetch custom chatbots from the database
+async function fetchCustomBots(userId: string) {
+  const db = await connectDatabase();
+  const collection = db.collection("user-details");
+  const customBots = await collection.find({ userId: userId }).toArray();
+  return customBots.map((doc) => ({
+    id: doc.chatbotId,
+    name: doc.chatbotName,
+  }));
+}
+
+// Merge custom chatbots with chatbase chatbots
+function mergeCustomBots(chatbaseChatbots: any[], customBots: any[]) {
+  const mergedChatbots = [...chatbaseChatbots];
+  for (const customBot of customBots) {
+    if (!objectExists(mergedChatbots, customBot)) {
+      mergedChatbots.push(customBot);
+    }
+  }
+  return mergedChatbots;
+}
+
+// Check if the chatbot entry already exists in the array
 function objectExists(array: any, targetObject: any) {
   return array.some(
     (obj: any) => JSON.stringify(obj) === JSON.stringify(targetObject)
