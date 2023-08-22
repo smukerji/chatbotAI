@@ -84,3 +84,5 @@ function ChatBot() {
 }
 
 export default ChatBot;
+
+export const runtime = "edge";

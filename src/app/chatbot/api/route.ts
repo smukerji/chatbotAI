@@ -39,7 +39,7 @@ export async function POST(request: any) {
 }
 
 // Fetch custom chatbots from the database
-async function fetchCustomBots(userId: string) {
+export async function fetchCustomBots(userId: string) {
   const db = await connectDatabase();
   const collection = db.collection("user-details");
   const customBots = await collection.find({ userId: userId }).toArray();
@@ -69,3 +69,4 @@ function objectExists(array: any, targetObject: any) {
 
 export const fetchCache = "force-no-store";
 export const revalidate = 0;
+// Set the runtime to edge for best performance
