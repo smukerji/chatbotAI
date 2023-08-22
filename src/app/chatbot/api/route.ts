@@ -13,23 +13,7 @@ export async function POST(request: any) {
   };
 
   /// read the body from request
-
-  const reader = request.body.getReader();
-  const decoder = new TextDecoder("utf-8");
-
-  /// decode the chunks to get userId
-  let userId;
-  while (true) {
-    const { done, value } = await reader.read();
-
-    if (done) {
-      break;
-    }
-
-    // Massage and parse the chunk of data
-    const chunk = decoder.decode(value);
-    userId = JSON.parse(chunk).userId;
-  }
+  const { userId } = await request.json();
 
   try {
     /// fetch the chatbot data from chatbase
@@ -43,9 +27,6 @@ export async function POST(request: any) {
     }
 
     const data = await response.json();
-    // console.log("Called", data);
-
-    // console.log("Data...........", data);
     /// fetch the custom created chatbots
     const db = await connectDatabase();
     const collection = db.collection("user-details");
@@ -54,15 +35,9 @@ export async function POST(request: any) {
       // console.log(doc.chatbotId, doc.chatbotName);
       const element = { id: doc.chatbotId, name: doc.chatbotName };
       if (!objectExists(data.chatbots, element)) {
-        console.log("fre");
-
         data.chatbots.push(element);
       }
     }
-
-    // console.log(data);
-
-    // console.log("Custom bots", customeBots);
 
     return NextResponse.json(data);
   } catch (error) {
