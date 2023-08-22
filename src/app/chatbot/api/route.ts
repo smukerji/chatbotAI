@@ -53,9 +53,9 @@ async function fetchCustomBots(userId: string) {
 function mergeCustomBots(chatbaseChatbots: any[], customBots: any[]) {
   const mergedChatbots = [...chatbaseChatbots];
   for (const customBot of customBots) {
-    if (!objectExists(mergedChatbots, customBot)) {
-      mergedChatbots.push(customBot);
-    }
+    // if (!objectExists(mergedChatbots, customBot)) {
+    mergedChatbots.push(customBot);
+    // }
   }
   return mergedChatbots;
 }
