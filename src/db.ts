@@ -1,5 +1,4 @@
-// import { MongoClient } from "mongodb";
-const MongoClient = require("mongodb").MongoClient;
+import { MongoClient } from "mongodb";
 
 const uri: any = process.env.NEXT_PUBLIC_MONGO_URI;
 const client = new MongoClient(uri);
