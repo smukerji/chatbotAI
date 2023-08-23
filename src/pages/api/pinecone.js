@@ -6,15 +6,6 @@ import { connectDatabase } from "../../db";
 import { deletevectors } from "../../helper/pinecone";
 
 export const pinecone = new PineconeClient();
-try {
-  pinecone.init({
-    environment: process.env.NEXT_PUBLIC_PINECONE_ENV,
-    apiKey: process.env.NEXT_PUBLIC_PINECONE_KEY,
-  });
-} catch (error) {
-  console.error("Error initializing Pinecone client:", error);
-  throw new Error("Failed to initialize Pinecone client");
-}
 
 export default async function handler(req, res) {
   if (req.method === "POST") {
@@ -51,6 +42,16 @@ export default async function handler(req, res) {
     };
 
     try {
+      try {
+        await pinecone.init({
+          environment: process.env.NEXT_PUBLIC_PINECONE_ENV,
+          apiKey: process.env.NEXT_PUBLIC_PINECONE_KEY,
+        });
+      } catch (error) {
+        console.error("Error initializing Pinecone client:", error);
+        throw new Error("Failed to initialize Pinecone client");
+      }
+
       const index = pinecone.Index(process.env.NEXT_PUBLIC_PINECONE_INDEX);
 
       /// query embeddings
