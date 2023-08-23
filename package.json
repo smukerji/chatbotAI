@@ -32,6 +32,7 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "@types/mongodb": "^4.0.7",
     "@types/uuid": "^9.0.2",
     "encoding": "^0.1.13"
   }
