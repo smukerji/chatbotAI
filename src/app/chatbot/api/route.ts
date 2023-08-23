@@ -34,7 +34,7 @@ export async function POST(request: any) {
     return NextResponse.json({ chatbots: mergedChatbots });
   } catch (error) {
     console.log("Error in chatbot route", error);
-    return NextResponse.json({ error: "Error error" });
+    return NextResponse.json({ error: `Error ${error}` });
   }
 }
 
