@@ -43,7 +43,7 @@ async function fetchCustomBots(userId: string) {
   const db = await connectDatabase();
   const collection = db.collection("user-details");
   const customBots = await collection.find({ userId: userId }).toArray();
-  return customBots.map((doc) => ({
+  return customBots.map((doc: any) => ({
     id: doc.chatbotId,
     name: doc.chatbotName,
   }));
@@ -70,3 +70,4 @@ function objectExists(array: any, targetObject: any) {
 export const fetchCache = "force-no-store";
 export const revalidate = 0;
 // Set the runtime to edge for best performance
+// export const runtime = "edge";
