@@ -10,6 +10,7 @@ function SourceUpload({
   setDefaultFileList,
   updateCharCount,
   getCharCount,
+  setLoadingPage,
 }: any) {
   //   const [defaultFileList, setDefaultFileList]: any = useState([]);
   const props: UploadProps = {
@@ -17,6 +18,7 @@ function SourceUpload({
     multiple: true,
     action: `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/upload`,
     onChange(info) {
+      setLoadingPage(true);
       let { status, response } = info.file;
 
       if (response?.charLength) {
@@ -26,9 +28,15 @@ function SourceUpload({
           ...defaultFileList,
           { name: info.file.name, ...response },
         ]);
-        message.success(`${info.file.name} file uploaded successfully.`);
+        message
+          .success(`${info.file.name} file uploaded successfully.`)
+          .then(() => {
+            setLoadingPage(false);
+          });
       } else if (status === "error") {
-        message.error(`${response}`);
+        message.error(`${response}`).then(() => {
+          setLoadingPage(false);
+        });
       }
     },
     onDrop(e) {
