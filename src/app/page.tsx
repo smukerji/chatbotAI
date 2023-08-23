@@ -156,6 +156,7 @@ export default function Home() {
               setDefaultFileList={setDefaultFileList}
               updateCharCount={updateCharCount}
               getCharCount={charCount}
+              setLoadingPage={setLoading}
             />
           )}
           {source == "website" && (
