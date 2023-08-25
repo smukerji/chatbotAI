@@ -50,9 +50,10 @@
     border: 1px solid red;
     border-radius: 5px;
     display: flex;
-    align-items: center;
     margin-left: 25px;
     margin-top: 10px;
+    text-align: left;
+    word-break: break-word;
     margin-bottom: 10px;
 }
 

@@ -51,7 +51,7 @@ export const deletevectors = async (vectorIDs: [], namespace: string) => {
 
   await index.delete1({
     ids: vectorIDs,
-    deleteAll:false,
+    deleteAll: false,
     namespace: namespace,
   });
 };

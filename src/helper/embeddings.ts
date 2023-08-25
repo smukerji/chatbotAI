@@ -12,8 +12,9 @@ export function openaiObj(): OpenAIApi {
 
 export async function generateChunksNEmbedd(
   content: string,
-  filename: string,
-  chatbotId: string
+  source: string,
+  chatbotId: string,
+  filename: string = "none"
 ) {
   /// split the content in 1000 characters
   let start = 0;
@@ -48,10 +49,10 @@ export async function generateChunksNEmbedd(
     });
     batchEmbedding.data.data.map((embeddingData, index) => {
       const id = uuidv4();
-      dataIDs.push(id);
+      dataIDs.push(id); 
       /// storing in response data
       data.push({
-        metadata: { content: chunks[index], filename, chatbotId },
+        metadata: { content: chunks[index], source, filename, chatbotId },
         values: embeddingData.embedding,
         id: id,
       });

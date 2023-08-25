@@ -140,9 +140,9 @@ export default function Home() {
       return;
     }
     for await (const item of qaList) {
-      if (item.question.length < 20 || item.answer.length < 20) {
+      if (item.question.length < 10 || item.answer.length < 20) {
         message.error(
-          "Question/Answer length too short in Q&A section. Min length : q = 20, a = 20"
+          "Question/Answer length too short in Q&A section. Min length : q = 10, a = 20"
         );
         return;
       }
@@ -150,7 +150,7 @@ export default function Home() {
     /// send the file data
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/stor`,
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/store`,
         {
           headers: {
             cache: "no-store",
@@ -172,9 +172,9 @@ export default function Home() {
           content: "Something went wrong while creating custom bot",
         });
       }
-      // message.success(await response.text()).then(() => {
-      //   window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot`;
-      // });
+      message.success(await response.text()).then(() => {
+        window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot`;
+      });
     } catch (e: any) {
       message.error(e.message);
     }

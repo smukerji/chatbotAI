@@ -27,6 +27,7 @@
     "react": "18.2.0",
     "react-cookie": "^5.0.0",
     "react-dom": "18.2.0",
+    "saslprep": "^1.0.3",
     "twilio": "^4.14.1",
     "typeorm": "^0.3.17",
     "typescript": "5.1.6",

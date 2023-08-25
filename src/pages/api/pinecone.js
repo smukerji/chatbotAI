@@ -60,6 +60,7 @@ export default async function handler(req, res) {
       const extractedContents = response?.matches?.map(
         (item) => item.metadata["content"]
       );
+      console.log(extractedContents);
       return res.status(200).send(extractedContents);
     } catch (error) {
       console.error("Error during queryfetch:", error);
@@ -80,7 +81,7 @@ export default async function handler(req, res) {
     let namespace = "";
     for await (const doc of cursor) {
       vectorId.push(doc.dataID);
-      namespace = doc.userId; 
+      namespace = doc.userId;
     }
     vectorId = [].concat(...vectorId);
     console.log(vectorId);

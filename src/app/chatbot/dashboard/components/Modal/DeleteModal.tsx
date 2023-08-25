@@ -1,6 +1,5 @@
 import { Modal, message } from "antd";
 import React, { useEffect, useState } from "react";
-import { deletevectors } from "../../../../../helper/pinecone";
 
 function DeleteModal({ open, setOpen, chatbotId }: any) {
   /// states to handle modal
