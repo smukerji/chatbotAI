@@ -1,0 +1,30 @@
+.question {
+    justify-content: start;
+}
+
+.question p,
+.answer p {
+    text-align: left;
+    width: 780px;
+}
+
+.question textarea {
+    width: 780px;
+    height: 80px;
+    padding-inline: 10px;
+    padding-block: 10px;
+}
+
+.answer textarea {
+    width: 780px;
+    height: 120px;
+    margin-bottom: 10px;
+    padding-inline: 10px;
+    padding-block: 10px;
+}
+
+textarea:focus {
+    border: 0.5px solid rgb(63, 7, 81);
+    outline: none;
+    box-shadow: 2px 2px 2px 1px rgb(63, 7, 81);
+}

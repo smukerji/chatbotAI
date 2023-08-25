@@ -23,3 +23,11 @@
     padding: 20px 20px;
     margin-bottom: 20px;
 }
+
+.items-character-count-container {
+    display: flex;
+}
+
+.margin-pipe {
+    margin: 0 10px;
+}

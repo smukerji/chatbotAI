@@ -40,3 +40,26 @@
 .delete .anticon {
     color: red;
 }
+
+.item-list-container .text {
+    margin: 10px 0;
+    display: flex;
+    align-content: center;
+}
+
+.item-list-container .text h1 {
+    font-size: 17px;
+    font-family: 'Times New Roman', Times, serif;
+    font-weight: bold;
+    margin-right: 10px;
+
+}
+
+.item-list-container .text p {
+    font-size: 17px;
+    font-family: 'Times New Roman', Times, serif;
+    font-weight: bold;
+    color: #858585;
+    margin-right: 10px;
+
+}

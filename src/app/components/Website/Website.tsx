@@ -9,6 +9,8 @@ function Website({
   setLoadingPage,
   setCrawledList,
   crawledList,
+  websiteCharCount,
+  setWebsiteCharCount,
 }: any) {
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -22,6 +24,7 @@ function Website({
     let deletedItem: any = updatedList.splice(index, 1);
     /// update the count
     updateCharCount(getCharCount - deletedItem[0].size);
+    setWebsiteCharCount(websiteCharCount - deletedItem[0].size);
     /// update the list
     setCrawledList(updatedList);
   };
@@ -71,6 +74,7 @@ function Website({
 
       // Update charCount in the parent component
       updateCharCount(getCharCount + totalCharCount);
+      setWebsiteCharCount(websiteCharCount + totalCharCount);
 
       /// set the fecthed links
       setCrawledList([...crawledList, ...data.fetchedLinks]);

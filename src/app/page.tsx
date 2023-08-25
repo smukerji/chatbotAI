@@ -7,6 +7,8 @@ import Website from "./components/Website/Website";
 import SourceUpload from "./components/Source-Upload/SourceUpload";
 import { v4 as uuid } from "uuid";
 import ChatbotName from "../helper/ChatbotName";
+import Text from "./components/Text/Text";
+import QA from "./components/QA/QA";
 
 export default function Home() {
   const [cookies, setCookie] = useCookies(["userId"]);
@@ -28,19 +30,40 @@ export default function Home() {
   function updateCharCount(count: number) {
     setCharCount(count);
   }
+  /// file cahracter count
+  const [fileTextLength, setFileTextLength] = useState(0);
+
+  /// text cahracter count and text
+  const [textLength, setTextLength] = useState(0);
+  const [text, setText] = useState("");
+
+  /// QA cahracter count
+  const [qaCount, setQACount] = useState(0);
+  const [qaCharCount, setQACharCount] = useState(0);
+  /// QA state array
+  const [qaList, setQAList]: any = useState([]);
 
   /// uploaded sources
   const [defaultFileList, setDefaultFileList] = useState([]);
 
-  /// crawledLinks
+  /// crawledLinks count
   const [crawledList, setCrawledList] = useState([]);
+  const [websiteCharCount, setWebsiteCharCount] = useState(0);
 
   const [messageApi, contextHolder] = message.useMessage();
 
   /// create the chatbase chatbot
   async function createChatBaseBot() {
-    if (crawledList.length != 0 && defaultFileList.length !== 0) {
-      alert("Please keep only one i.e. document or website");
+    if (
+      (crawledList.length != 0 && defaultFileList.length !== 0) ||
+      (crawledList.length != 0 && textLength !== 0) ||
+      (crawledList.length != 0 && qaCount !== 0)
+    ) {
+      messageApi.open({
+        type: "info",
+        content:
+          "Sorry!!! currently you cannot upload other documents when crawling for websites...",
+      });
       return;
     }
 
@@ -93,8 +116,6 @@ export default function Home() {
           });
         }
       } catch (error) {
-        console.log("Error while creating chatbot", error);
-
         messageApi.open({
           type: "error",
           content: "Error while creating chatbot",
@@ -110,28 +131,52 @@ export default function Home() {
 
   /// creating custom chatbot
   async function createCustomBot() {
-    if (crawledList.length != 0 && defaultFileList.length !== 0) {
-      alert("Please keep only one i.e. document or website");
+    if (qaCount === 0 && textLength === 0 && defaultFileList.length === 0) {
+      message.error("Please add some content to create the bot");
       return;
     }
-    if (defaultFileList.length !== 0) {
-      /// send the file data
+    if (charCount < 100) {
+      message.error("Not enough content to create the bot");
+      return;
+    }
+    for await (const item of qaList) {
+      if (item.question.length < 20 || item.answer.length < 20) {
+        message.error(
+          "Question/Answer length too short in Q&A section. Min length : q = 20, a = 20"
+        );
+        return;
+      }
+    }
+    /// send the file data
+    try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/store`,
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/stor`,
         {
           headers: {
             cache: "no-store",
           },
           method: "POST",
-          body: JSON.stringify({ defaultFileList, userId: cookies.userId }),
+          body: JSON.stringify({
+            defaultFileList,
+            userId: cookies.userId,
+            qaList,
+            text,
+          }),
           next: { revalidate: 0 },
         }
       );
-      message.success(await response.text()).then(() => {
-        window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot`;
-      });
-    } else {
-      message.error(`Please upload the files first`);
+
+      if (!response.ok) {
+        messageApi.open({
+          type: "error",
+          content: "Something went wrong while creating custom bot",
+        });
+      }
+      // message.success(await response.text()).then(() => {
+      //   window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot`;
+      // });
+    } catch (e: any) {
+      message.error(e.message);
     }
   }
 
@@ -146,6 +191,12 @@ export default function Home() {
             <Radio name="source" value={"document"}>
               Document
             </Radio>
+            <Radio name="source" value={"text"}>
+              Text
+            </Radio>
+            <Radio name="source" value={"qa"}>
+              Q&A
+            </Radio>
             <Radio name="source" value={"website"}>
               Website
             </Radio>
@@ -157,6 +208,8 @@ export default function Home() {
               updateCharCount={updateCharCount}
               getCharCount={charCount}
               setLoadingPage={setLoading}
+              fileTextLength={fileTextLength}
+              setFileTextLength={setFileTextLength}
             />
           )}
           {source == "website" && (
@@ -166,6 +219,30 @@ export default function Home() {
               setLoadingPage={setLoading}
               setCrawledList={setCrawledList}
               crawledList={crawledList}
+              websiteCharCount={websiteCharCount}
+              setWebsiteCharCount={setWebsiteCharCount}
+            />
+          )}
+          {source == "text" && (
+            <Text
+              text={text}
+              setText={setText}
+              textLength={textLength}
+              setTextLength={setTextLength}
+              updateCharCount={updateCharCount}
+              getCharCount={charCount}
+            />
+          )}
+          {source == "qa" && (
+            <QA
+              qaList={qaList}
+              setQAList={setQAList}
+              qaCount={qaCount}
+              setQACount={setQACount}
+              qaCharCount={qaCharCount}
+              setQACharCount={setQACharCount}
+              updateCharCount={updateCharCount}
+              getCharCount={charCount}
             />
           )}
           <div className="included-source">
@@ -179,21 +256,47 @@ export default function Home() {
               Included Sources:
             </span>
             {/* <p>1 File (1,076 chars) | 126 Links (360,488 detected chars)</p> */}
-            {(crawledList.length > 0 && (
+            {/* {(crawledList.length > 0 && (
               <p>
                 {crawledList.length} Links ({charCount} detected chars)
               </p>
-            )) ||
-              (defaultFileList.length == 1 && (
+            )) || */}
+            <div className="items-character-count-container">
+              {(defaultFileList.length == 1 && (
                 <p>
-                  {defaultFileList.length} File ({charCount} detected chars)
+                  {defaultFileList.length} File ({fileTextLength} detected
+                  chars)
                 </p>
               )) ||
-              (defaultFileList.length > 1 && (
+                (defaultFileList.length > 1 && (
+                  <p>
+                    {defaultFileList.length} Files ({fileTextLength} detected
+                    chars)
+                  </p>
+                ))}
+              {textLength > 0 && defaultFileList.length > 0 && (
+                <p className="margin-pipe">|</p>
+              )}
+              {textLength > 0 && <p>{textLength} text input chars</p>}
+              {qaCount > 0 &&
+                (defaultFileList.length > 0 || textLength > 0) && (
+                  <p className="margin-pipe">|</p>
+                )}
+              {qaCount > 0 && (
                 <p>
-                  {defaultFileList.length} Files ({charCount} detected chars)
+                  {qaCount} Q&A ({qaCharCount} chars)
                 </p>
-              ))}
+              )}
+              {crawledList.length > 0 &&
+                (defaultFileList.length > 0 ||
+                  textLength > 0 ||
+                  qaCount > 0) && <p className="margin-pipe">|</p>}
+              {crawledList.length > 0 && (
+                <p>
+                  {crawledList.length} Links ({websiteCharCount} detected chars)
+                </p>
+              )}
+            </div>
             <span
               style={{
                 fontSize: "15px",

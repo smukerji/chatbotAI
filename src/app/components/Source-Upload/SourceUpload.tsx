@@ -11,6 +11,8 @@ function SourceUpload({
   updateCharCount,
   getCharCount,
   setLoadingPage,
+  fileTextLength,
+  setFileTextLength,
 }: any) {
   //   const [defaultFileList, setDefaultFileList]: any = useState([]);
   const props: UploadProps = {
@@ -24,6 +26,8 @@ function SourceUpload({
       if (response?.charLength) {
         /// updating the character count
         updateCharCount(getCharCount + response.charLength);
+        setFileTextLength(fileTextLength + response.charLength);
+
         setDefaultFileList([
           ...defaultFileList,
           { name: info.file.name, ...response },
@@ -60,6 +64,11 @@ function SourceUpload({
         </p>
       </Dragger>
       <div className="item-list-container">
+        {defaultFileList.length > 0 && (
+          <div className="text">
+            <h1>Attached Files</h1> <p>({fileTextLength}) chars</p>
+          </div>
+        )}
         {defaultFileList.map((file: any, index: number) => {
           return (
             <React.Fragment key={index}>
