@@ -5,14 +5,26 @@ import "./chatbot.css";
 import { MessageOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import { useCookies } from "react-cookie";
+import { LoadingOutlined } from "@ant-design/icons";
+import { Spin } from "antd";
+
+const antIcon = (
+  <LoadingOutlined style={{ fontSize: 24, color: "black" }} spin />
+);
+
 function ChatBot() {
   /// chatbots details state
   const [chatbotData, setChatbotData] = useState([]);
   const [cookies, setCookie] = useCookies(["userId"]);
+
+  /// loading state
+  const [loading, setLoading] = useState(false);
+
   /// retrive the chatbots details
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
         /// get chatbot details
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/api`,
@@ -24,13 +36,17 @@ function ChatBot() {
         );
         const data = await response.json();
         setChatbotData(data.chatbots);
+        setLoading(false);
       } catch (error) {
+        setLoading(false);
         console.error("Error fetching chatbot data:", error);
       }
     };
 
     fetchData();
   }, []);
+
+  console.log(chatbotData);
 
   /// view chatbot
   function openChatbot(id: any) {
@@ -73,11 +89,12 @@ function ChatBot() {
             );
           })}
         </div>
-        {chatbotData.length == 0 && (
+        {!loading && chatbotData.length == 0 && (
           <p style={{ color: "red" }}>
             No chatbots available please create one
           </p>
         )}
+        {loading && <Spin indicator={antIcon} />}
       </div>
     </center>
   );

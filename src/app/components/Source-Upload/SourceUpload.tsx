@@ -13,8 +13,12 @@ function SourceUpload({
   setLoadingPage,
   fileTextLength,
   setFileTextLength,
+  updateChatbot,
+  newFileList,
+  setNewFileList,
+  deleteFileList,
+  setDeleteFileList,
 }: any) {
-  //   const [defaultFileList, setDefaultFileList]: any = useState([]);
   const props: UploadProps = {
     name: "file",
     multiple: true,
@@ -28,10 +32,19 @@ function SourceUpload({
         updateCharCount(getCharCount + response.charLength);
         setFileTextLength(fileTextLength + response.charLength);
 
+        /// add the file
         setDefaultFileList([
           ...defaultFileList,
           { name: info.file.name, ...response },
         ]);
+
+        /// add the file to new file list if the chatbot is getting updated
+        if (updateChatbot) {
+          setNewFileList([
+            ...newFileList,
+            { name: info.file.name, ...response },
+          ]);
+        }
         message
           .success(`${info.file.name} file uploaded successfully.`)
           .then(() => {
@@ -48,10 +61,32 @@ function SourceUpload({
     },
   };
 
+  /// remove the files
+  function removeFile(fileToRemove: any) {
+    const newDefaultFileList = defaultFileList.filter((file: any) => {
+      return file !== fileToRemove;
+    });
+    /// add the file to be deleted while retraining
+    if (updateChatbot && fileToRemove?.filepath === undefined) {
+      setDeleteFileList([...deleteFileList, fileToRemove]);
+    } else if (updateChatbot) {
+      /// update the newFileList so that we know if we have removed the new file or not
+      const updatedNewFileList = newFileList.filter((file: any) => {
+        return JSON.stringify(file) !== JSON.stringify(fileToRemove);
+      });
+      setNewFileList(updatedNewFileList);
+    }
+    /// updating the character count
+    updateCharCount(getCharCount - fileToRemove.charLength);
+    setFileTextLength(fileTextLength - fileToRemove.charLength);
+    setDefaultFileList(newDefaultFileList);
+  }
+  // return <h1>"d</h1>;
+
   return (
     <div>
       {" "}
-      <Dragger {...props} defaultFileList={defaultFileList}>
+      <Dragger {...props}>
         <p className="ant-upload-drag-icon">
           <InboxOutlined />
         </p>
@@ -78,7 +113,7 @@ function SourceUpload({
                   <div>({file.charLength} chars)</div>
                 </div>
                 <div className="delete">
-                  <DeleteOutlined />
+                  <DeleteOutlined onClick={() => removeFile(file)} />
                 </div>
               </div>
             </React.Fragment>

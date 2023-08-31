@@ -5,11 +5,15 @@ import React, { useEffect, useState } from "react";
 import "./dashboard.css";
 import Chat from "./components/Chat/Chat";
 import DeleteModal from "./components/Modal/DeleteModal";
+import Home from "../../page";
+import { useCookies } from "react-cookie";
 
 function Dashboard() {
   /// fetch the params
   const params: any = useSearchParams();
   const chatbot = JSON.parse(decodeURIComponent(params.get("chatbot")));
+
+  const [cookies, setCookies] = useCookies(["userId"]);
 
   /// hadling event of radio buttons
   const [source, setSource] = useState("chatbot");
@@ -17,11 +21,58 @@ function Dashboard() {
     if (e.target.value != "delete") setSource(e.target.value);
   };
 
+  /// data sources state
+  const [qaData, setQaData]: any = useState();
+  const [textData, setTextData]: any = useState();
+  const [fileData, setFileData]: any = useState();
+  // const [qaCharCount, setQACharCount] = useState(0);
+
   /// managing delete chatbot
   const [open, setOpen] = useState(false);
   const showModal = () => {
     setOpen(true);
   };
+
+  // useEffect(() => {
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      /// get chatbot details
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard/api`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            chatbotId: chatbot.id,
+            userId: cookies.userId,
+          }),
+          next: { revalidate: 0 },
+        }
+      );
+      const content = await response.json();
+      /// set the default state for loading the data in home
+      setQaData({
+        qaList: content.qaList,
+        qaCount: content.qaCount,
+        qaCharCount: content.qaCharCount,
+      });
+      setTextData({
+        text: content.text,
+        textLength: content.textLength,
+      });
+      setFileData({
+        defaultFileList: content.defaultFileList,
+        fileTextLength: content.fileTextLength,
+      });
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.error("Error retriving chatbot details:", error);
+    }
+  };
+
+  // fetchData();
+  // }, []);
 
   const [loading, setLoading] = useState(false);
   return (
@@ -35,7 +86,7 @@ function Dashboard() {
           <Radio name="source" value={"settings"}>
             Settings
           </Radio>
-          <Radio name="source" value={"sources"}>
+          <Radio name="source" value={"sources"} onClick={fetchData}>
             Sources
           </Radio>
           <Radio name="source" value={"delete"} onClick={showModal}>
@@ -56,9 +107,16 @@ function Dashboard() {
             <DeleteModal open={open} setOpen={setOpen} chatbotId={chatbot.id} />
           </>
         )}
-        {source == "sources" && (
+        {source == "sources" && !loading && (
           <>
-            <h1>Settings</h1>
+            <Home
+              updateChatbot="true"
+              qaData={qaData}
+              textData={textData}
+              fileData={fileData}
+              chatbotId={chatbot.id}
+              chatbotName={chatbot.name}
+            />
             <DeleteModal open={open} setOpen={setOpen} chatbotId={chatbot.id} />
           </>
         )}

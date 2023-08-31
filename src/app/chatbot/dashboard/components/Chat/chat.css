@@ -52,7 +52,7 @@
     display: flex;
     margin-left: 25px;
     margin-top: 10px;
-    text-align: left;
+    text-align: justify;
     word-break: break-word;
     margin-bottom: 10px;
 }
@@ -72,4 +72,41 @@
     margin-bottom: 10px;
     margin-left: auto;
     margin-right: 25px;
+}
+
+
+.typing-indicator {
+    display: flex;
+    justify-content: space-between;
+    width: 60px;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    background-color: black;
+    border-radius: 50%;
+    animation: bounce 1.0s infinite;
+    opacity: 0.6;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.dot:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.dot:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-5px);
+    }
 }

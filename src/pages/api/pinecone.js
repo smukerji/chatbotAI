@@ -60,7 +60,6 @@ export default async function handler(req, res) {
       const extractedContents = response?.matches?.map(
         (item) => item.metadata["content"]
       );
-      console.log(extractedContents);
       return res.status(200).send(extractedContents);
     } catch (error) {
       console.error("Error during queryfetch:", error);
@@ -84,7 +83,6 @@ export default async function handler(req, res) {
       namespace = doc.userId;
     }
     vectorId = [].concat(...vectorId);
-    console.log(vectorId);
     /// delete the vectors
     const deleteData = await collection.deleteMany({ chatbotId: chatbotId });
     deletevectors(vectorId, namespace);

@@ -48,6 +48,7 @@ function DeleteModal({ open, setOpen, chatbotId }: any) {
             body: JSON.stringify({
               chatbotId: chatbotId,
             }),
+            next: { revalidate: 0 },
           }
         );
         /// displaying status

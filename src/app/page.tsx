@@ -9,8 +9,30 @@ import { v4 as uuid } from "uuid";
 import ChatbotName from "../helper/ChatbotName";
 import Text from "./components/Text/Text";
 import QA from "./components/QA/QA";
+const crypto = require("crypto");
 
-export default function Home() {
+export default function Home({
+  updateChatbot = false,
+  qaData,
+  textData,
+  fileData,
+  chatbotId,
+  chatbotName,
+}: any) {
+  /// creating the hash of initial text to compare it later with current text hash
+  const initialTextData = textData ? textData.text : "";
+  const initialTextHash = crypto
+    .createHash("sha1")
+    .update(initialTextData)
+    .digest("hex");
+
+  /// creating the hash of initial Q&A to compare it later with current Q&A hash
+  const initialQAData = qaData ? qaData.qaList : [];
+  const initialQAHash = crypto
+    .createHash("sha1")
+    .update(JSON.stringify(initialQAData))
+    .digest("hex");
+
   const [cookies, setCookie] = useCookies(["userId"]);
   /// check if the unique id of the user exists else set the cookie with expiration of 1 year
   if (cookies?.userId == undefined)
@@ -26,25 +48,44 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
 
   /// total characters count
-  const [charCount, setCharCount] = useState(0);
+  const tempQaCharCount = qaData ? qaData.qaCharCount : 0;
+  const tempTextCharCount = textData ? textData.textLength : 0;
+  const tempFileTextCount = fileData ? fileData.fileTextLength : 0;
+  const [charCount, setCharCount] = useState(
+    tempQaCharCount + tempTextCharCount + tempFileTextCount
+  );
   function updateCharCount(count: number) {
     setCharCount(count);
   }
-  /// file cahracter count
-  const [fileTextLength, setFileTextLength] = useState(0);
 
   /// text cahracter count and text
-  const [textLength, setTextLength] = useState(0);
-  const [text, setText] = useState("");
+  const [textLength, setTextLength] = useState(tempTextCharCount);
+  const [text, setText] = useState(initialTextData);
+  /// creating the hash of latest text
+  const currentTextHash = crypto.createHash("sha1").update(text).digest("hex");
 
   /// QA cahracter count
-  const [qaCount, setQACount] = useState(0);
-  const [qaCharCount, setQACharCount] = useState(0);
+  const [qaCount, setQACount] = useState(qaData ? qaData.qaCount : 0);
+  const [qaCharCount, setQACharCount] = useState(tempQaCharCount);
   /// QA state array
-  const [qaList, setQAList]: any = useState([]);
+  const [qaList, setQAList]: any = useState(initialQAData);
+  /// creating the hash of latest QA
+  const currentQAHash = crypto
+    .createHash("sha1")
+    .update(JSON.stringify(qaList))
+    .digest("hex");
+  /// state for maintaining file when updating the sources
+  const [deleteQAList, setDeleteQAList] = useState([]);
 
-  /// uploaded sources
-  const [defaultFileList, setDefaultFileList] = useState([]);
+  /// file sources
+  const [defaultFileList, setDefaultFileList] = useState(
+    fileData ? fileData.defaultFileList : []
+  );
+  /// state for maintaining file when updating the sources
+  const [deleteFileList, setDeleteFileList] = useState([]);
+  const [newFileList, setNewFileList] = useState([]);
+  /// file cahracter count
+  const [fileTextLength, setFileTextLength] = useState(tempFileTextCount);
 
   /// crawledLinks count
   const [crawledList, setCrawledList] = useState([]);
@@ -149,6 +190,10 @@ export default function Home() {
     }
     /// send the file data
     try {
+      messageApi.open({
+        type: "info",
+        content: "Please wait while your chatbot is getting trained",
+      });
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/store`,
         {
@@ -157,7 +202,11 @@ export default function Home() {
           },
           method: "POST",
           body: JSON.stringify({
+            updateChatbot,
+            chatbotId,
             defaultFileList,
+            deleteFileList,
+            deleteQAList,
             userId: cookies.userId,
             qaList,
             text,
@@ -171,14 +220,46 @@ export default function Home() {
           type: "error",
           content: "Something went wrong while creating custom bot",
         });
+        return;
       }
-      message.success(await response.text()).then(() => {
-        window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot`;
-      });
+
+      if (response.status == 200) {
+        message.success(await response.text()).then(() => {
+          window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot`;
+        });
+      } else if (response.status == 201) {
+        message.success(await response.text()).then(() => {
+          window.location.href = `${
+            process.env.NEXT_PUBLIC_WEBSITE_URL
+          }chatbot/dashboard?${encodeURIComponent(
+            "chatbot"
+          )}=${encodeURIComponent(
+            JSON.stringify({
+              id: chatbotId,
+              name: chatbotName,
+            })
+          )}`;
+        });
+      } else {
+        message.error(await response.text()).then(() => {
+          window.location.href = `${
+            process.env.NEXT_PUBLIC_WEBSITE_URL
+          }chatbot/dashboard?${encodeURIComponent(
+            "chatbot"
+          )}=${encodeURIComponent(
+            JSON.stringify({
+              id: chatbotId,
+              name: chatbotName,
+            })
+          )}`;
+        });
+      }
     } catch (e: any) {
       message.error(e.message);
     }
   }
+  // console.log("File to be removed", deleteFileList.length);
+  // console.log("new file ", newFileList.length);
 
   return (
     <>
@@ -186,7 +267,7 @@ export default function Home() {
 
       <div className="data-source-container">
         <center>
-          <p className="title">Data Sources</p>
+          {!updateChatbot && <p className="title">Data Sources</p>}
           <Radio.Group onChange={onChange} value={source} disabled={loading}>
             <Radio name="source" value={"document"}>
               Document
@@ -210,6 +291,11 @@ export default function Home() {
               setLoadingPage={setLoading}
               fileTextLength={fileTextLength}
               setFileTextLength={setFileTextLength}
+              updateChatbot={updateChatbot}
+              newFileList={newFileList}
+              setNewFileList={setNewFileList}
+              deleteFileList={deleteFileList}
+              setDeleteFileList={setDeleteFileList}
             />
           )}
           {source == "website" && (
@@ -243,6 +329,9 @@ export default function Home() {
               setQACharCount={setQACharCount}
               updateCharCount={updateCharCount}
               getCharCount={charCount}
+              deleteQAList={deleteQAList}
+              setDeleteQAList={setDeleteQAList}
+              updateChatbot={updateChatbot}
             />
           )}
           <div className="included-source">
@@ -255,12 +344,6 @@ export default function Home() {
             >
               Included Sources:
             </span>
-            {/* <p>1 File (1,076 chars) | 126 Links (360,488 detected chars)</p> */}
-            {/* {(crawledList.length > 0 && (
-              <p>
-                {crawledList.length} Links ({charCount} detected chars)
-              </p>
-            )) || */}
             <div className="items-character-count-container">
               {(defaultFileList.length == 1 && (
                 <p>
@@ -326,13 +409,24 @@ export default function Home() {
             <Button
               style={{ width: "100%" }}
               type="primary"
-              disabled={loading}
+              disabled={
+                loading ||
+                (updateChatbot && currentTextHash === initialTextHash)
+                  ? deleteFileList.length + newFileList.length
+                    ? false
+                    : initialQAHash === currentQAHash
+                    ? crawledList.length > 0
+                      ? false
+                      : true
+                    : false
+                  : false
+              }
               onClick={
                 (crawledList.length != 0 && createChatBaseBot) ||
                 createCustomBot
               }
             >
-              Create Chatbot
+              {(!updateChatbot && "Create Chatbot") || "Retrain Chatbot"}
             </Button>
           </div>
         </center>

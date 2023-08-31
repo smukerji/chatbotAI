@@ -13,6 +13,9 @@ export default function QA({
   setQACharCount,
   updateCharCount,
   getCharCount,
+  deleteQAList,
+  setDeleteQAList,
+  updateChatbot,
 }: any) {
   /// Adding QA
   function addQA() {
@@ -25,6 +28,11 @@ export default function QA({
     const newQa = qaList.filter((qa: any, index: number) => {
       return index !== indexToRemove;
     });
+
+    /// add the qa that need to be deleted while updating the chatbot
+    if (updateChatbot && qaList[indexToRemove]?.id) {
+      setDeleteQAList([...deleteQAList, qaList[indexToRemove]]);
+    }
 
     /// update the overall count
     updateCharCount(
@@ -50,7 +58,14 @@ export default function QA({
     const updatedQAList = [...qaList];
     const prev =
       updatedQAList[index].question.length + updatedQAList[index].answer.length;
-    updatedQAList[index] = { question: newQuestion, answer: newAnswer };
+    if (updatedQAList[index]?.id) {
+      updatedQAList[index] = {
+        question: newQuestion,
+        answer: newAnswer,
+        id: updatedQAList[index]?.id,
+        updated: true,
+      };
+    } else updatedQAList[index] = { question: newQuestion, answer: newAnswer };
     /// update the state
     setQAList(updatedQAList);
     /// update the count of qa
@@ -61,23 +76,24 @@ export default function QA({
   }
   return (
     <>
-      {qaList.map((qa: any, index: number) => {
-        return (
-          <div className="add-qa-container" key={index}>
-            <QAAdd
-              onQuestionChange={(newQuestion: any) => {
-                updateQA(index, newQuestion, qa.answer);
-              }}
-              onAnswerChange={(newAnswer: any) =>
-                updateQA(index, qa.question, newAnswer)
-              }
-              onDelete={() => removeQA(index)}
-              question={qa.question}
-              answer={qa.answer}
-            />
-          </div>
-        );
-      })}
+      {qaList &&
+        qaList.map((qa: any, index: number) => {
+          return (
+            <div className="add-qa-container" key={index}>
+              <QAAdd
+                onQuestionChange={(newQuestion: any) => {
+                  updateQA(index, newQuestion, qa.answer);
+                }}
+                onAnswerChange={(newAnswer: any) =>
+                  updateQA(index, qa.question, newAnswer)
+                }
+                onDelete={() => removeQA(index)}
+                question={qa.question}
+                answer={qa.answer}
+              />
+            </div>
+          );
+        })}
       <div className="qa-source-btn-container">
         <Button
           className="add-button"

@@ -15,17 +15,18 @@ const CHUNK_MINIMAL = 100;
 // import { PineconeClient } from '@pinecone-database/pinecone';
 
 export const pinecone = new PineconeClient();
-try {
-  pinecone.init({
-    environment: process.env.NEXT_PUBLIC_PINECONE_ENV as string,
-    apiKey: process.env.NEXT_PUBLIC_PINECONE_KEY as string,
-  });
-} catch (error) {
-  console.error("Error initializing Pinecone client:", error);
-  throw new Error("Failed to initialize Pinecone client");
-}
 
 export const upsert = async (vectors: any, userId: string) => {
+  try {
+    await pinecone.init({
+      environment: process.env.NEXT_PUBLIC_PINECONE_ENV as string,
+      apiKey: process.env.NEXT_PUBLIC_PINECONE_KEY as string,
+    });
+  } catch (error) {
+    console.error("Error initializing Pinecone client:", error);
+    throw new Error("Failed to initialize Pinecone client");
+  }
+
   const index = pinecone.Index(
     process.env.NEXT_PUBLIC_PINECONE_INDEX as string
   );
@@ -45,6 +46,15 @@ export const upsert = async (vectors: any, userId: string) => {
 };
 
 export const deletevectors = async (vectorIDs: [], namespace: string) => {
+  try {
+    await pinecone.init({
+      environment: process.env.NEXT_PUBLIC_PINECONE_ENV as string,
+      apiKey: process.env.NEXT_PUBLIC_PINECONE_KEY as string,
+    });
+  } catch (error) {
+    console.error("Error initializing Pinecone client:", error);
+    throw new Error("Failed to initialize Pinecone client");
+  }
   const index = pinecone.Index(
     process.env.NEXT_PUBLIC_PINECONE_INDEX as string
   );
@@ -56,28 +66,44 @@ export const deletevectors = async (vectorIDs: [], namespace: string) => {
   });
 };
 
-// export const deleteFileVectorsByMetadata = async (
-//   userid,
-//   fileid,
-//   chatbotid,
-//   filename
-// ) => {
-//   const index = pinecone.Index(PINECONE_INDEX);
-//   //  await index.delete1({
-//   //   deleteAll:true,
-//   //   namespace:'713bb86b-2c3f-412f-a110-a20bd32abe55'
-//   // })
-//   const deleteVec = await index._delete({
-//     deleteRequest: {
-//       namespace: userid,
-//       filter: {
-//         file_name: filename,
-//         chatbot_id: chatbotid,
-//       },
-//     },
-//   });
-//   return deleteVec;
-// };
+export const deleteFileVectorsById = async (userid: any, vectorIDs: any) => {
+  try {
+    await pinecone.init({
+      environment: process.env.NEXT_PUBLIC_PINECONE_ENV as string,
+      apiKey: process.env.NEXT_PUBLIC_PINECONE_KEY as string,
+    });
+  } catch (error) {
+    console.error("Error initializing Pinecone client:", error);
+    throw new Error("Failed to initialize Pinecone client");
+  }
+  const index = pinecone.Index(
+    process.env.NEXT_PUBLIC_PINECONE_INDEX as string
+  );
+  // await pinecone.init({
+  //   environment: process.env.NEXT_PUBLIC_PINECONE_ENV as string,
+  //   apiKey: process.env.NEXT_PUBLIC_PINECONE_KEY as string,
+  // });
+  // const index = pinecone.Index(
+  //   process.env.NEXT_PUBLIC_PINECONE_INDEX as string
+  // );
+  // const tr = await index.delete1({
+  //   deleteAll: true,
+  //   namespace: "cf588580-b69f-4894-b87e-0f0b723d8e81",
+  // });
+
+  //  await index.delete1({
+  //   deleteAll:true,
+  //   namespace:'713bb86b-2c3f-412f-a110-a20bd32abe55'
+  // })
+  // console.log(filename, chatbotid, userid);
+
+  const deleteVec = await index.delete1({
+    ids: vectorIDs,
+    deleteAll: false,
+    namespace: userid,
+  });
+  return deleteVec;
+};
 
 // export const deleteRawVectorsByMetadata = async (userid, chatbotid) => {
 //   const index = pinecone.Index(PINECONE_INDEX);

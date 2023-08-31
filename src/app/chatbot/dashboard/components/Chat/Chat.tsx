@@ -98,6 +98,7 @@ function Chat({ chatbot }: any) {
           }
         } else {
           try {
+            setLoading(true);
             /// get similarity search
             const response: any = await fetch(
               `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/pinecone`,
@@ -185,6 +186,8 @@ function Chat({ chatbot }: any) {
               "Error while getting completion from custom chatbot",
               e.message
             );
+          } finally {
+            setLoading(false);
           }
         }
       }
@@ -208,6 +211,15 @@ function Chat({ chatbot }: any) {
               </div>
             );
         })}
+        {loading && response.length == 0 && (
+          <div className="assistant-message">
+            <div className="typing-indicator">
+              <div className="dot"></div>
+              <div className="dot"></div>
+              <div className="dot"></div>
+            </div>
+          </div>
+        )}
         {response && <div className="assistant-message">{response}</div>}
       </div>
       <div className="chat-question">

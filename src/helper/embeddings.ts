@@ -19,6 +19,7 @@ export async function generateChunksNEmbedd(
   /// split the content in 1000 characters
   let start = 0;
   let end = content.length;
+  const contentLength = content.length;
 
   /// storing the chunks
   const chunks: any = [];
@@ -49,7 +50,7 @@ export async function generateChunksNEmbedd(
     });
     batchEmbedding.data.data.map((embeddingData, index) => {
       const id = uuidv4();
-      dataIDs.push(id); 
+      dataIDs.push(id);
       /// storing in response data
       data.push({
         metadata: { content: chunks[index], source, filename, chatbotId },
@@ -59,7 +60,7 @@ export async function generateChunksNEmbedd(
     });
   }
 
-  return { data, dataIDs };
+  return { data, dataIDs, contentLength };
 }
 
 export async function createEmbedding(query: string) {
