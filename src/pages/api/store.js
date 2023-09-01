@@ -13,7 +13,6 @@ export default async function handler(req, res) {
     const files = body?.defaultFileList;
     const userId = body?.userId;
     const chatbotId = body?.chatbotId ? body?.chatbotId : uuid();
-    const chatbotName = "Chatbot " + ChatbotName();
     const qaList = body?.qaList;
     const text = body?.text;
 
@@ -27,7 +26,17 @@ export default async function handler(req, res) {
 
     /// db connection
     const db = await connectDatabase();
-    const collection = db.collection("user-details");
+    /// if new chatbot is being created the new chatbot entry
+    let collection = db.collection("chatbots-data");
+    if (!updateChatbot) {
+      const chatbotName = body?.chatbotText;
+      let userChatbotsCollection = db.collection("user-chatbots");
+      userChatbotsCollection.insertOne({
+        userId,
+        chatbotId,
+        chatbotName,
+      });
+    }
 
     /// deleting files that needs to be deleted
     if (deleteFileList.length > 0) {
@@ -120,9 +129,7 @@ export default async function handler(req, res) {
       /// iterate and store each user filename as per chatbot
       fileSource.forEach((file) => {
         collection.insertOne({
-          userId,
           chatbotId,
-          chatbotName,
           fileName: file.name,
           dataID: file.dataID,
           contentLength: file.contentLength,
@@ -137,18 +144,18 @@ export default async function handler(req, res) {
       if (updateChatbot) {
         /// fetch the file to get the data IDs of vector stores
         const dbText = await collection.findOne({
-          userId: userId,
           chatbotId: chatbotId,
           source: "text",
         });
-        /// deleting the files by id
-        await deleteFileVectorsById(userId, dbText?.dataID);
-        /// delete the id from db
-        await collection.deleteOne({
-          userId: userId,
-          chatbotId: chatbotId,
-          source: "text",
-        });
+        if (dbText != null) {
+          /// deleting the files by id
+          await deleteFileVectorsById(userId, dbText?.dataID);
+          /// delete the id from db
+          await collection.deleteOne({
+            chatbotId: chatbotId,
+            source: "text",
+          });
+        }
       }
       /// generating chunks and embedding
       const chunks = await generateChunksNEmbedd(text, "text", chatbotId);
@@ -159,9 +166,7 @@ export default async function handler(req, res) {
       /// store the details in database
       /// iterate and store each user filename as per chatbot
       collection.insertOne({
-        userId,
         chatbotId,
-        chatbotName,
         dataID: chunks.dataIDs,
         content: text,
         source: "text",
@@ -238,9 +243,7 @@ export default async function handler(req, res) {
       /// iterate and store each user filename as per chatbot
       qaSource.forEach((qa, index) => {
         collection.insertOne({
-          userId,
           chatbotId,
-          chatbotName,
           dataID: qa.dataID,
           content: qaList[qaListEmbbedingIndex[index]]?.id
             ? {

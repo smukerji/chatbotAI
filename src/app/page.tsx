@@ -9,6 +9,7 @@ import { v4 as uuid } from "uuid";
 import ChatbotName from "../helper/ChatbotName";
 import Text from "./components/Text/Text";
 import QA from "./components/QA/QA";
+import ChatbotNameModal from "./components/Modal/ChatbotNameModal";
 const crypto = require("crypto");
 
 export default function Home({
@@ -93,6 +94,10 @@ export default function Home({
 
   const [messageApi, contextHolder] = message.useMessage();
 
+  /// chatbot name pop up state
+  const [open, setOpen] = useState(false);
+  const [chatbotText, setChatbotText] = useState("");
+
   /// create the chatbase chatbot
   async function createChatBaseBot() {
     if (
@@ -140,7 +145,6 @@ export default function Home({
           options
         );
         const data = await res.json();
-        console.log("create bot", data);
         if (data.chatbotId) {
           messageApi
             .open({
@@ -172,19 +176,28 @@ export default function Home({
 
   /// creating custom chatbot
   async function createCustomBot() {
+    setLoading(true);
     if (qaCount === 0 && textLength === 0 && defaultFileList.length === 0) {
-      message.error("Please add some content to create the bot");
+      message.error("Please add some content to create the bot").then(() => {
+        setLoading(false);
+      });
       return;
     }
     if (charCount < 100) {
-      message.error("Not enough content to create the bot");
+      message.error("Not enough content to create the bot").then(() => {
+        setLoading(false);
+      });
       return;
     }
     for await (const item of qaList) {
       if (item.question.length < 10 || item.answer.length < 20) {
-        message.error(
-          "Question/Answer length too short in Q&A section. Min length : q = 10, a = 20"
-        );
+        message
+          .error(
+            "Question/Answer length too short in Q&A section. Min length : q = 10, a = 20"
+          )
+          .then(() => {
+            setLoading(false);
+          });
         return;
       }
     }
@@ -210,16 +223,21 @@ export default function Home({
             userId: cookies.userId,
             qaList,
             text,
+            chatbotText,
           }),
           next: { revalidate: 0 },
         }
       );
 
       if (!response.ok) {
-        messageApi.open({
-          type: "error",
-          content: "Something went wrong while creating custom bot",
-        });
+        messageApi
+          .open({
+            type: "error",
+            content: "Something went wrong while creating custom bot",
+          })
+          .then(() => {
+            setLoading(false);
+          });
         return;
       }
 
@@ -256,10 +274,28 @@ export default function Home({
       }
     } catch (e: any) {
       message.error(e.message);
+    } finally {
+      setLoading(false);
     }
   }
-  // console.log("File to be removed", deleteFileList.length);
-  // console.log("new file ", newFileList.length);
+
+  /// chatbot name giver
+  async function openChatbotModal() {
+    /// open the chatbot naming dialog box when creating bot
+    setOpen(true);
+  }
+
+  /// handling the chatbot ok action
+  const handleOk = async () => {
+    if (chatbotText.length < 5) {
+      message.error("Please provide a valid chatbot name");
+      return;
+    }
+    setOpen(false);
+    createCustomBot();
+  };
+
+  console.log(loading);
 
   return (
     <>
@@ -410,8 +446,9 @@ export default function Home({
               style={{ width: "100%" }}
               type="primary"
               disabled={
-                loading ||
-                (updateChatbot && currentTextHash === initialTextHash)
+                loading == true
+                  ? true
+                  : updateChatbot && currentTextHash === initialTextHash
                   ? deleteFileList.length + newFileList.length
                     ? false
                     : initialQAHash === currentQAHash
@@ -423,6 +460,7 @@ export default function Home({
               }
               onClick={
                 (crawledList.length != 0 && createChatBaseBot) ||
+                (!updateChatbot && openChatbotModal) ||
                 createCustomBot
               }
             >
@@ -431,6 +469,13 @@ export default function Home({
           </div>
         </center>
       </div>
+      <ChatbotNameModal
+        open={open}
+        setOpen={setOpen}
+        chatbotText={chatbotText}
+        setChatbotText={setChatbotText}
+        handleOk={handleOk}
+      />
     </>
   );
 }

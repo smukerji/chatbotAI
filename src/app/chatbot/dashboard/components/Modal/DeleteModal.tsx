@@ -1,19 +1,18 @@
 import { Modal, message } from "antd";
 import React, { useEffect, useState } from "react";
+import { useCookies } from "react-cookie";
 
 function DeleteModal({ open, setOpen, chatbotId }: any) {
   /// states to handle modal
   const [confirmLoading, setConfirmLoading] = useState(false);
-  const [modalText, setModalText] = useState(
-    "Are you sure you want to delete your chatbot? This action cannot be undone."
-  );
+  const modalText =
+    "Are you sure you want to delete your chatbot? This action cannot be undone.";
+
   const [okText, setOkText] = useState("Delete");
   const [messageApi, contextHolder] = message.useMessage();
+  const [cookies, setCookies] = useCookies(["userId"]);
 
   const handleOk = async () => {
-    // setModalText(
-    //   "Are you sure you want to delete your chatbot? This action cannot be undone."
-    // );
     setConfirmLoading(true);
     setOkText("Deleting...");
 
@@ -47,6 +46,7 @@ function DeleteModal({ open, setOpen, chatbotId }: any) {
             method: "DELETE",
             body: JSON.stringify({
               chatbotId: chatbotId,
+              userId: cookies?.userId,
             }),
             next: { revalidate: 0 },
           }

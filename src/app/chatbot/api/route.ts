@@ -41,7 +41,7 @@ export async function POST(request: any) {
 // Fetch custom chatbots from the database
 async function fetchCustomBots(userId: string) {
   const db = await connectDatabase();
-  const collection = db.collection("user-details");
+  const collection = db.collection("user-chatbots");
   const customBots = await collection.find({ userId: userId }).toArray();
   return customBots.map((doc: any) => ({
     id: doc.chatbotId,

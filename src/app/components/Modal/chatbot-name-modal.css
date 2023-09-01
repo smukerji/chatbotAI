@@ -1,0 +1,17 @@
+.ant-modal {
+    top: 186px
+}
+
+.chatbot-text {
+    border: 0.5px solid grey;
+}
+
+.chatbot-text:focus {
+    border: 0.5px solid rgb(63, 7, 81) !important;
+    outline: none;
+    box-shadow: 2px 2px 2px 1px rgb(63, 7, 81);
+}
+
+.chatbot-text .ant-input:focus {
+    border: none !important;
+}

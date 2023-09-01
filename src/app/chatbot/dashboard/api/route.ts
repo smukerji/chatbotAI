@@ -6,10 +6,8 @@ export async function POST(request: any) {
 
   /// fetch the data sources of the chabot
   const db = await connectDatabase();
-  const collection = db.collection("user-details");
-  const cursor = await collection
-    .find({ chatbotId: chatbotId, userId: userId })
-    .toArray();
+  const collection = db.collection("chatbots-data");
+  const cursor = await collection.find({ chatbotId: chatbotId }).toArray();
 
   /// filter the source as per home component
   let qaCount = 0;

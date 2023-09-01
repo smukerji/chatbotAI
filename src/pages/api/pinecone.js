@@ -70,21 +70,25 @@ export default async function handler(req, res) {
     /// parse the request object
     const body = JSON.parse(req.body);
     const chatbotId = body?.chatbotId;
+    const userId = body?.userId;
 
     /// fetch the IDs and user namespace from the DB
     const db = await connectDatabase();
-    const collection = db.collection("user-details");
+    const collection = db.collection("chatbots-data");
+    const userChatbots = db.collection("user-chatbots");
     const cursor = collection.find({ chatbotId: chatbotId });
 
     let vectorId = [];
     let namespace = "";
     for await (const doc of cursor) {
       vectorId.push(doc.dataID);
-      namespace = doc.userId;
+      namespace = userId;
     }
     vectorId = [].concat(...vectorId);
     /// delete the vectors
     const deleteData = await collection.deleteMany({ chatbotId: chatbotId });
+    /// delete the chatbot
+    await userChatbots.deleteOne({ chatbotId: chatbotId });
     deletevectors(vectorId, namespace);
     return res.status(200).send({ text: "Deleted successfully" });
   }

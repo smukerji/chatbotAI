@@ -3,11 +3,6 @@ import { useCookies } from "react-cookie";
 import "./chat.css";
 import { SendOutlined } from "@ant-design/icons";
 import { Configuration, OpenAIApi } from "openai";
-/// creating the openai object for fetching completion
-const configuration = new Configuration({
-  apiKey: process.env.NEXT_PUBLIC_OPENAI_KEY,
-});
-const openai = new OpenAIApi(configuration);
 
 function Chat({ chatbot }: any) {
   const [cookies, setCookies] = useCookies(["userId"]);
