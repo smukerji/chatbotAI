@@ -1,0 +1,20 @@
+What is Sell on Amazon or SOA?
+Sell on Amazon is a program that enables you to list and sell your product on Amazon.in.
+
+How does selling on Amazon.in work?
+Selling on Amazon.in is easy. First you list the products that you want to sell on Amazon.in marketplace. Customer sees your product and makes a purchase. You will receive a notification to ship the product. You deliver the product to the customer and confirm shipment or let Amazon fulfill the order for you through FBA or Easy ship. Amazon will deposit the funds into your bank account after deducting our fees.
+
+Who takes care of shipping?
+This depends on which fulfillment option you use to deliver your products. With FBA & Easy Ship, Amazon will handle the delivery of products to customers (and returns). When you choose Self-ship, you will deliver the products yourself where you can use third party courier services or your own delivery associates (for Local Shops)
+
+What are different fees that Amazon charges?
+Click here to know the different types of fees applicable for an Amazon Seller.
+
+
+How do I list my products on Amazon.in?
+You can use our Web-based interface to list products one at a time, or excel-based inventory files to list your products in bulk. The procedure and information required will vary depending on whether your products are already in the Amazon.in catalogue. Once you complete your registration for selling on Amazon, you will be guided on the steps needed to list your products. Learn more about the listing process here.
+Please note that currently it is mandatory to have ISBN/bar codes to list on Amazon. If you are a manufacturer or do not have these, you can request for an exception by contacting seller support through your Seller Central account. Some product categories might require additional information to list your products.
+
+
+Does Amazon.in offer protection against fraud?
+Yes. Amazon helps you protect against fraudulent orders placed on your products and payment fraud.

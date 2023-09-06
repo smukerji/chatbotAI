@@ -1,17 +1,17 @@
-import React, { Suspense, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import "./chat.css";
 import { SendOutlined } from "@ant-design/icons";
-import { Configuration, OpenAIApi } from "openai";
+import Image from "next/image";
 
-function Chat({ chatbot }: any) {
+function Chat({
+  chatbot,
+  messages,
+  setMessages,
+  messageImages,
+  setMessageImages,
+}: any) {
   const [cookies, setCookies] = useCookies(["userId"]);
-  /// messages
-  const [messages, setMessages] = useState(
-    chatbot.initial_message == null
-      ? [{ role: "assistant", content: `Hi! What can I help you with?` }]
-      : [{ role: "assistant", content: chatbot.initial_message }]
-  );
 
   /// storing the input value
   const [userQuery, setUserQuery] = useState("");
@@ -31,7 +31,11 @@ function Chat({ chatbot }: any) {
         /// clear the response
         setUserQuery("");
         /// set the user query
-        setMessages((prev) => [...prev, { role: "user", content: userQuery }]);
+        setMessages((prev: any) => [
+          ...prev,
+          { role: "user", content: userQuery },
+        ]);
+        setMessageImages((prev: any) => [...prev, { role: "user" }]);
         /// check which chatbot to interact with i.e. chatbase bot or custom bot
         const chatbotIdLength = chatbot?.id.length;
         if (chatbotIdLength !== 36) {
@@ -69,7 +73,7 @@ function Chat({ chatbot }: any) {
 
               if (done) {
                 /// setting the response when completed
-                setMessages((prev) => [
+                setMessages((prev: any) => [
                   ...prev,
                   { role: "assistant", content: resptext },
                 ]);
@@ -111,6 +115,67 @@ function Chat({ chatbot }: any) {
             const respText = await response.text();
             const similaritySearchResults = JSON.parse(respText).join("\n");
 
+            const responseOpenAIFunction: any = await fetch(
+              "https://api.openai.com/v1/chat/completions",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENAI_KEY}`,
+                },
+                body: JSON.stringify({
+                  model: "gpt-3.5-turbo",
+                  temperature: 0.5,
+                  top_p: 1,
+                  messages: [
+                    {
+                      role: "system",
+                      content: `Use the following pieces of context to answer the users question.
+                    If you don't know the answer, just say that you don't know, don't try to make up an answer.
+                    ----------------
+                    ${similaritySearchResults}`,
+                    },
+                    // ...messages,
+                    {
+                      role: "user",
+                      content: `Give me the file name, corresponding to user question: ${userQuery}`,
+                    },
+                  ],
+                  functions: [
+                    {
+                      name: "getFileName",
+                      description: "Get the filename of the question",
+                      parameters: {
+                        type: "object",
+                        properties: {
+                          filename: {
+                            type: "string",
+                            description:
+                              "File name if available and has .png,.jpeg,etc image format in text. else write null",
+                          },
+                        },
+                        required: ["location"],
+                      },
+                    },
+                  ],
+                }),
+              }
+            );
+            const fileName = await responseOpenAIFunction.json();
+            const args = JSON.parse(
+              fileName.choices[0].message.function_call.arguments
+            );
+
+            console.log("Funtion calling", args);
+
+            // if (args && args?.filename && args?.filename != null) {
+            setMessageImages((prev: any) => [
+              ...prev,
+              { role: "assistant", image: args?.filename },
+            ]);
+            // }
+            // Read the response as a stream of data
+
             // Fetch the response from the OpenAI API
             const responseOpenAI: any = await fetch(
               "https://api.openai.com/v1/chat/completions",
@@ -132,7 +197,7 @@ function Chat({ chatbot }: any) {
               ----------------
               ${similaritySearchResults}`,
                     },
-                    // ...messages,
+                    ...messages,
                     { role: "user", content: userQuery },
                   ],
                   stream: true,
@@ -140,7 +205,9 @@ function Chat({ chatbot }: any) {
               }
             );
 
-            // Read the response as a stream of data
+            console.log(similaritySearchResults);
+            
+
             let resptext = "";
             const reader = responseOpenAI.body.getReader();
             const decoder = new TextDecoder("utf-8");
@@ -149,11 +216,27 @@ function Chat({ chatbot }: any) {
               const { done, value } = await reader.read();
               if (done) {
                 /// setting the response when completed
-                setMessages((prev) => [
+                setMessages((prev: any) => [
                   ...prev,
                   { role: "assistant", content: resptext },
                 ]);
+                /// store the chathistory
                 setResponse("");
+                //   setLoading(false);
+                //   const store = await fetch(
+                //     `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/chathistory`,
+                //     {
+                //       method: "POST",
+                //       body: JSON.stringify({
+                //         chatHistory: messages,
+                //         chatbotId: chatbot.id,
+                //       }),
+                //     }
+                //   );
+
+                //   if (!store.ok) {
+                //     alert(await store.text());
+                //   }
                 break;
               }
               // Massage and parse the chunk of data
@@ -189,15 +272,29 @@ function Chat({ chatbot }: any) {
     }
   }
 
+  // console.log(messageImages);
+
   return (
     <div className="chat-container">
       <div className="conversation-container">
-        {messages.map((message, index) => {
+        {messages.map((message: any, index: any) => {
           if (message.role == "assistant")
             return (
-              <div className="assistant-message" key={index}>
-                {message.content}
-              </div>
+              <React.Fragment key={index}>
+                <div className="assistant-message">
+                  {message.content}
+                  {messageImages[index]?.image &&
+                    messageImages[index].image != null && (
+                      <Image
+                        style={{ width: "100%", height: "fit-content" }}
+                        src={`/qa-images/${messageImages[index]?.image}`}
+                        alt="me"
+                        width="604"
+                        height="604"
+                      />
+                    )}
+                </div>
+              </React.Fragment>
             );
           else
             return (

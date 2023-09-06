@@ -28,3 +28,29 @@ textarea:focus {
     outline: none;
     box-shadow: 2px 2px 2px 1px rgb(63, 7, 81);
 }
+
+.qa-image-container {
+    display: flex;
+    width: 780px;
+    padding-bottom: 10px;
+    flex-direction: column;
+}
+
+.qa-image-container p {
+    text-align: left;
+    width: 780px;
+    color: red;
+    font-size: 16px;
+}
+
+.qa-image-container .file-input {
+    text-align: left;
+    border: 1px solid;
+    background-color: #E5E5E5;
+    width: fit-content;
+    font-size: 13.33px;
+    border-radius: 5px;
+    font-family: Arial, Helvetica, sans-serif;
+    padding: 5px 5px;
+    cursor: pointer;
+}

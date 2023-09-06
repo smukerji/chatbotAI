@@ -25,6 +25,7 @@ export async function POST(request: any) {
       qaList.push({
         question: data.content.question,
         answer: data.content.answer,
+        image: data.content.image,
         id: data._id,
       });
     } else if (data.source == "text") {

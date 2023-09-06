@@ -53,7 +53,6 @@ function DeleteModal({ open, setOpen, chatbotId }: any) {
         );
         /// displaying status
         const data = await res.json();
-        console.log(data.text);
 
         messageApi
           .open({

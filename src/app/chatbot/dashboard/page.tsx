@@ -21,6 +21,18 @@ function Dashboard() {
     if (e.target.value != "delete") setSource(e.target.value);
   };
 
+  /// messages
+  const [messages, setMessages] = useState(
+    chatbot.initial_message == null
+      ? [{ role: "assistant", content: `Hi! What can I help you with?` }]
+      : [{ role: "assistant", content: chatbot.initial_message }]
+  );
+  const [messageImages, setMessageImages] = useState(
+    chatbot.initial_message == null
+      ? [{ role: "assistant" }]
+      : [{ role: "assistant" }]
+  );
+
   /// data sources state
   const [qaData, setQaData]: any = useState();
   const [textData, setTextData]: any = useState();
@@ -97,7 +109,13 @@ function Dashboard() {
         {/* managing the component rendering */}
         {source == "chatbot" && (
           <>
-            <Chat chatbot={chatbot} />{" "}
+            <Chat
+              chatbot={chatbot}
+              messages={messages}
+              setMessages={setMessages}
+              messageImages={messageImages}
+              setMessageImages={setMessageImages}
+            />{" "}
             <DeleteModal open={open} setOpen={setOpen} chatbotId={chatbot.id} />
           </>
         )}

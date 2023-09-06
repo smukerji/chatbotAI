@@ -70,20 +70,21 @@ export default function Home({
   const [qaCharCount, setQACharCount] = useState(tempQaCharCount);
   /// QA state array
   const [qaList, setQAList]: any = useState(initialQAData);
+
   /// creating the hash of latest QA
   const currentQAHash = crypto
     .createHash("sha1")
     .update(JSON.stringify(qaList))
     .digest("hex");
   /// state for maintaining file when updating the sources
-  const [deleteQAList, setDeleteQAList] = useState([]);
+  const [deleteQAList, setDeleteQAList]: any = useState([]);
 
   /// file sources
   const [defaultFileList, setDefaultFileList] = useState(
     fileData ? fileData.defaultFileList : []
   );
   /// state for maintaining file when updating the sources
-  const [deleteFileList, setDeleteFileList] = useState([]);
+  const [deleteFileList, setDeleteFileList]: any = useState([]);
   const [newFileList, setNewFileList] = useState([]);
   /// file cahracter count
   const [fileTextLength, setFileTextLength] = useState(tempFileTextCount);
@@ -201,12 +202,41 @@ export default function Home({
         return;
       }
     }
-    /// send the file data
+    /// send the data
     try {
       messageApi.open({
         type: "info",
         content: "Please wait while your chatbot is getting trained",
       });
+      const formData = new FormData();
+
+      // // Append the QA image to the formData object if it exists
+      // if (qaImage) {
+      //   formData.append("qaImage", qaImage);
+      // }
+
+      // console.log(JSON.stringify(qaList));
+      // console.log("QA list", qaList);
+      // Append the QA data including images to the formData object
+      for (const [index, qa] of qaList.entries()) {
+        // formData.append(`qaList[${index}].question`, qa.question);
+        // formData.append(`qaList[${index}].answer`, qa.answer);
+        if (qa.image && typeof qa.image != "string") {
+          formData.append(`qaList[${index}].image`, qa.image);
+        }
+      }
+
+      // Append other data to the formData object
+      formData.append("updateChatbot", updateChatbot);
+      formData.append("chatbotId", chatbotId);
+      formData.append("defaultFileList", JSON.stringify(defaultFileList));
+      formData.append("deleteFileList", JSON.stringify(deleteFileList));
+      formData.append("deleteQAList", JSON.stringify(deleteQAList));
+      formData.append("userId", cookies.userId);
+      formData.append("qaList", JSON.stringify(qaList));
+      formData.append("text", text);
+      formData.append("chatbotText", chatbotText);
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/store`,
         {
@@ -214,17 +244,7 @@ export default function Home({
             cache: "no-store",
           },
           method: "POST",
-          body: JSON.stringify({
-            updateChatbot,
-            chatbotId,
-            defaultFileList,
-            deleteFileList,
-            deleteQAList,
-            userId: cookies.userId,
-            qaList,
-            text,
-            chatbotText,
-          }),
+          body: formData,
           next: { revalidate: 0 },
         }
       );
@@ -242,9 +262,9 @@ export default function Home({
       }
 
       if (response.status == 200) {
-        message.success(await response.text()).then(() => {
-          window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot`;
-        });
+        // message.success(await response.text()).then(() => {
+        //   window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot`;
+        // });
       } else if (response.status == 201) {
         message.success(await response.text()).then(() => {
           window.location.href = `${
@@ -295,7 +315,7 @@ export default function Home({
     createCustomBot();
   };
 
-  console.log(loading);
+  // console.log(qaImage);
 
   return (
     <>
