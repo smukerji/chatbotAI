@@ -45,6 +45,7 @@ export default function Home({
     setSource(e.target.value);
   };
 
+
   /// loading state
   const [loading, setLoading] = useState(false);
 
@@ -237,6 +238,7 @@ export default function Home({
       formData.append("text", text);
       formData.append("chatbotText", chatbotText);
 
+      
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/store`,
         {
@@ -262,9 +264,9 @@ export default function Home({
       }
 
       if (response.status == 200) {
-        // message.success(await response.text()).then(() => {
-        //   window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot`;
-        // });
+        message.success(await response.text()).then(() => {
+          window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot`;
+        });
       } else if (response.status == 201) {
         message.success(await response.text()).then(() => {
           window.location.href = `${

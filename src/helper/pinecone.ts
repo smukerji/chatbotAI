@@ -106,6 +106,35 @@ export const deleteFileVectorsById = async (userid: any, vectorIDs: any) => {
   return deleteVec;
 };
 
+export const updateVectorsById = async (vectors: any, userId: any) => {
+  try {
+    await pinecone.init({
+      environment: process.env.NEXT_PUBLIC_PINECONE_ENV as string,
+      apiKey: process.env.NEXT_PUBLIC_PINECONE_KEY as string,
+    });
+  } catch (error) {
+    console.error("Error initializing Pinecone client:", error);
+    throw new Error("Failed to initialize Pinecone client");
+  }
+
+  const index = pinecone.Index(
+    process.env.NEXT_PUBLIC_PINECONE_INDEX as string
+  );
+
+  try {
+    const upsertReq = await index.upsert({
+      upsertRequest: {
+        vectors,
+        namespace: userId,
+      },
+    });
+    return upsertReq;
+  } catch (error) {
+    console.error("Error during upsert:", error);
+    return error;
+  }
+};
+
 // export const deleteRawVectorsByMetadata = async (userid, chatbotid) => {
 //   const index = pinecone.Index(PINECONE_INDEX);
 //   //  await index.delete1({
