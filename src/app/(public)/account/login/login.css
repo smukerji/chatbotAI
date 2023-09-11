@@ -1,0 +1,19 @@
+.login-container {
+    margin-top: 100px;
+}
+
+.login-register-conatiner {
+    display: flex;
+    flex-direction: column;
+}
+
+.login-register-conatiner .ant-btn {
+    width: fit-content;
+    margin: auto;
+}
+
+.login-register-conatiner a {
+    margin-top: 10px;
+    font-size: 18px;
+    text-decoration: underline;
+}
