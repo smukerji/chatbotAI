@@ -56,7 +56,7 @@ function Login() {
                 Login
               </Button>
               <Link href="/account/register" className="btn btn-link">
-                Create an account
+                Dont&apos;t have an account? Create one
               </Link>
             </div>
           </Form.Item>

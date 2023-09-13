@@ -23,15 +23,18 @@ async function login(request: any) {
     if (password === user?.password) {
       // create a jwt token that is valid for 7 days
       const token = jwt.sign(
-        { sub: user.id },
+        { sub: user?._id?.toString() },
         process.env.NEXT_PUBLIC_JWT_SECRET!,
         {
-          expiresIn: "7d",
+          expiresIn: "1h",
         }
       );
 
       // return jwt token in http only cookie
-      cookies().set("authorization", token);
+      cookies().set("authorization", token, { httpOnly: true });
+
+      /// set the userId cookie
+      cookies().set("userId", user?._id?.toString());
       //   return { message: "Login successfull..." };
       return user;
     } else {

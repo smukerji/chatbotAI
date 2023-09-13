@@ -3,13 +3,13 @@ import { Button, Layout, Radio, RadioChangeEvent, message } from "antd";
 import "./app.css";
 import { useState } from "react";
 import { useCookies } from "react-cookie";
-import Website from "./components/Website/Website";
-import SourceUpload from "./components/Source-Upload/SourceUpload";
-import { v4 as uuid } from "uuid";
-import ChatbotName from "../helper/ChatbotName";
-import Text from "./components/Text/Text";
-import QA from "./components/QA/QA";
-import ChatbotNameModal from "./components/Modal/ChatbotNameModal";
+import Website from "../_components/Website/Website";
+import SourceUpload from "../_components/Source-Upload/SourceUpload";
+
+import Text from "../_components/Text/Text";
+import QA from "../_components/QA/QA";
+import ChatbotNameModal from "../_components/Modal/ChatbotNameModal";
+import ChatbotName from "../_helpers/server/ChatbotName";
 const crypto = require("crypto");
 
 export default function Home({
@@ -36,15 +36,14 @@ export default function Home({
 
   const [cookies, setCookie] = useCookies(["userId"]);
   /// check if the unique id of the user exists else set the cookie with expiration of 1 year
-  if (cookies?.userId == undefined)
-    setCookie("userId", uuid(), { path: "/", maxAge: 31536000 });
+  // if (cookies?.userId == undefined)
+  //   setCookie("userId", cookies.userId, { path: "/", maxAge: 31536000 });
 
   /// hadling event of radio buttons
   const [source, setSource] = useState("document");
   const onChange = (e: RadioChangeEvent) => {
     setSource(e.target.value);
   };
-
 
   /// loading state
   const [loading, setLoading] = useState(false);
@@ -238,7 +237,6 @@ export default function Home({
       formData.append("text", text);
       formData.append("chatbotText", chatbotText);
 
-      
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/store`,
         {

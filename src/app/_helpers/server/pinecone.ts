@@ -2,7 +2,6 @@ import { PineconeClient } from "@pinecone-database/pinecone";
 // import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { v4 as uuid } from "uuid";
 import { createEmbedding } from "./embeddings";
-import { connectDatabase } from "../db";
 // import { encode } from 'gpt-3-encoder';
 // import {
 //   PINECONE_API_KEY,

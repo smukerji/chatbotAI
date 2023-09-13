@@ -46,8 +46,6 @@ function ChatBot() {
     fetchData();
   }, []);
 
-  console.log(chatbotData);
-
   /// view chatbot
   function openChatbot(id: any) {
     /// send the user to dashboard page

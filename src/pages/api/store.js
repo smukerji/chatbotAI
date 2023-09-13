@@ -1,16 +1,15 @@
-import { readContent } from "../../helper/ReadContent";
-import { generateChunksNEmbedd } from "../../helper/embeddings";
+import { readContent } from "../../app/_helpers/server/ReadContent";
+import { generateChunksNEmbedd } from "../../app/_helpers/server/embeddings";
 import { connectDatabase } from "../../db";
 import { v4 as uuid } from "uuid";
-import ChatbotName from "../../helper/ChatbotName";
+
 import {
   deleteFileVectorsById,
   updateVectorsById,
   upsert,
-} from "../../helper/pinecone";
+} from "../../app/_helpers/server/pinecone";
 import { ObjectId } from "mongodb";
 import mv from "mv";
-const fs = require("fs");
 const formidable = require("formidable");
 
 export default async function handler(req, res) {

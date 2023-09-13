@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { connectDatabase } from "../../../db";
+import { connectDatabase } from "../../../../db";
+import { apiHandler } from "../../../_helpers/server/api/api-handler";
 
-export async function POST(request: any) {
+module.exports = apiHandler({
+  POST: fetchBots,
+});
+
+async function fetchBots(request: any) {
   const options = {
     method: "GET",
     headers: {
@@ -31,10 +36,10 @@ export async function POST(request: any) {
     // Process custom chatbots and merge them with chatbase data
     const mergedChatbots = mergeCustomBots(chatbaseData.chatbots, customBots);
 
-    return NextResponse.json({ chatbots: mergedChatbots });
+    return { chatbots: mergedChatbots };
   } catch (error) {
     console.log("Error in chatbot route", error);
-    return NextResponse.json({ error: `Error ${error}` });
+    return { error: `Error ${error}` };
   }
 }
 

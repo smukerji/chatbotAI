@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
-import { connectDatabase } from "../../../../db";
+import { connectDatabase } from "../../../../../db";
+import { apiHandler } from "../../../../_helpers/server/api/api-handler";
 
-export async function POST(request: any) {
+module.exports = apiHandler({
+  POST: dataSources,
+});
+
+async function dataSources(request: any) {
   const { chatbotId, userId } = await request.json();
 
   /// fetch the data sources of the chabot
@@ -17,7 +22,7 @@ export async function POST(request: any) {
   let textLength = 0;
   let fileTextLength = 0;
   const defaultFileList: any = [];
-  cursor.forEach((data) => {
+  cursor.forEach((data: any) => {
     /// extract the QA object
     if (data.source == "qa") {
       qaCount += 1;
@@ -41,7 +46,7 @@ export async function POST(request: any) {
     }
   });
 
-  return NextResponse.json({
+  return {
     qaList,
     qaCount,
     qaCharCount,
@@ -49,5 +54,5 @@ export async function POST(request: any) {
     textLength,
     defaultFileList,
     fileTextLength,
-  });
+  };
 }

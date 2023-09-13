@@ -5,8 +5,8 @@ import React, { useEffect, useState } from "react";
 import "./dashboard.css";
 import Chat from "./components/Chat/Chat";
 import DeleteModal from "./components/Modal/DeleteModal";
-import Home from "../../page";
 import { useCookies } from "react-cookie";
+import Home from "../../page";
 
 function Dashboard() {
   /// fetch the params

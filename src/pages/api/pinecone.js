@@ -1,9 +1,8 @@
-import { readContent } from "../../helper/ReadContent";
 import { PineconeClient } from "@pinecone-database/pinecone";
 
-import { createEmbedding } from "../../helper/embeddings";
+import { createEmbedding } from "../../app/_helpers/server/embeddings";
 import { connectDatabase } from "../../db";
-import { deletevectors } from "../../helper/pinecone";
+import { deletevectors } from "../../app/_helpers/server/pinecone";
 
 export const pinecone = new PineconeClient();
 
