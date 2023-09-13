@@ -13,7 +13,10 @@
 }
 
 .login-register-conatiner a {
-    margin-top: 10px;
-    font-size: 18px;
     text-decoration: underline;
+}
+
+.link-to-signup {
+    font-size: 18px;
+    margin-top: 10px;
 }

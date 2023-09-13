@@ -62,11 +62,11 @@ function Register() {
           <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
             <div className="login-register-conatiner">
               <Button type="primary" htmlType="submit">
-                Register
+                Create account
               </Button>
-              <Link href="/account/login" className="btn btn-link">
-                Already have an account? Login here
-              </Link>
+              <div className="link-to-login">
+                Have an account? <a href="/account/login">Log in</a>
+              </div>
             </div>
           </Form.Item>
         </Form>
