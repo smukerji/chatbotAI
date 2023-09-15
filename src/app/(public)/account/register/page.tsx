@@ -1,11 +1,19 @@
 "use client";
 import { Button, Form, Input, message } from "antd";
-import Link from "next/link";
+import Image from "next/image";
 import React from "react";
 import "./register.css";
 import { useUserService } from "../../../_services/useUserService";
+import googlelogo from "../../../../../public/google-logo.svg";
+import { signIn, useSession } from "next-auth/react";
+import { redirect } from "next/navigation";
 
 function Register() {
+  const { status } = useSession();
+
+  if (status === "authenticated") {
+    redirect("/");
+  }
   const userService = useUserService();
 
   const onFinish = async (values: any) => {
@@ -61,8 +69,39 @@ function Register() {
 
           <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
             <div className="login-register-conatiner">
-              <Button type="primary" htmlType="submit">
+              <Button
+                type="primary"
+                htmlType="submit"
+                style={{
+                  width: "200px",
+                  marginBottom: "10px",
+                }}
+              >
                 Create account
+              </Button>
+              <hr />
+              <Button
+                type="primary"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  width: "200px",
+                  marginTop: "10px",
+                }}
+                onClick={() => {
+                  signIn("google");
+                }}
+              >
+                <span
+                  style={{
+                    justifyContent: "center",
+                    display: "flex",
+                    marginRight: "20px",
+                  }}
+                >
+                  <Image src={googlelogo} alt=""></Image>
+                </span>
+                Sign up with Google
               </Button>
               <div className="link-to-login">
                 Have an account? <a href="/account/login">Log in</a>

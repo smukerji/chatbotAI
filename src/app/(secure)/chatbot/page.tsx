@@ -7,12 +7,16 @@ import Link from "next/link";
 import { useCookies } from "react-cookie";
 import { LoadingOutlined } from "@ant-design/icons";
 import { Spin } from "antd";
+import { useSession } from "next-auth/react";
+import { redirect } from "next/navigation";
 
 const antIcon = (
   <LoadingOutlined style={{ fontSize: 24, color: "black" }} spin />
 );
 
 function ChatBot() {
+  const { status } = useSession();
+
   /// chatbots details state
   const [chatbotData, setChatbotData] = useState([]);
   const [cookies, setCookie] = useCookies(["userId"]);
@@ -60,42 +64,46 @@ function ChatBot() {
     )}`;
   }
 
-  return (
-    <center>
-      <div className="chatbot-container">
-        <div className="chatbot-container-title">
-          <span className="title-text">My Chatbots</span>
-          <Link href={`${process.env.NEXT_PUBLIC_WEBSITE_URL}`}>
-            <Button style={{ width: "150px" }} type="primary">
-              New Chatbot
-            </Button>
-          </Link>
-        </div>
-        <div className="chatbots">
-          {chatbotData.map((data: any) => {
-            return (
-              <div
-                className="chatbot"
-                key={data.id}
-                onClick={() => openChatbot(data.id)}
-              >
-                <div className="icon">
-                  <MessageOutlined />
+  if (status === "authenticated" || cookies?.userId) {
+    return (
+      <center>
+        <div className="chatbot-container">
+          <div className="chatbot-container-title">
+            <span className="title-text">My Chatbots</span>
+            <Link href={`${process.env.NEXT_PUBLIC_WEBSITE_URL}`}>
+              <Button style={{ width: "150px" }} type="primary">
+                New Chatbot
+              </Button>
+            </Link>
+          </div>
+          <div className="chatbots">
+            {chatbotData?.map((data: any) => {
+              return (
+                <div
+                  className="chatbot"
+                  key={data.id}
+                  onClick={() => openChatbot(data.id)}
+                >
+                  <div className="icon">
+                    <MessageOutlined />
+                  </div>
+                  <div className="name">{data.name}</div>
                 </div>
-                <div className="name">{data.name}</div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+          {!loading && chatbotData.length == 0 && (
+            <p style={{ color: "red" }}>
+              No chatbots available please create one
+            </p>
+          )}
+          {loading && <Spin indicator={antIcon} />}
         </div>
-        {!loading && chatbotData.length == 0 && (
-          <p style={{ color: "red" }}>
-            No chatbots available please create one
-          </p>
-        )}
-        {loading && <Spin indicator={antIcon} />}
-      </div>
-    </center>
-  );
+      </center>
+    );
+  } else if (status === "unauthenticated") {
+    redirect("/account/login");
+  }
 }
 
 export default ChatBot;

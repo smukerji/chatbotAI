@@ -1,15 +1,17 @@
 "use client";
-import { Button, Layout, Radio, RadioChangeEvent, message } from "antd";
+import { Button, Spin, Radio, RadioChangeEvent, message } from "antd";
 import "./app.css";
 import { useState } from "react";
 import { useCookies } from "react-cookie";
 import Website from "../_components/Website/Website";
 import SourceUpload from "../_components/Source-Upload/SourceUpload";
-
 import Text from "../_components/Text/Text";
 import QA from "../_components/QA/QA";
 import ChatbotNameModal from "../_components/Modal/ChatbotNameModal";
 import ChatbotName from "../_helpers/server/ChatbotName";
+import { useSession } from "next-auth/react";
+import { redirect } from "next/navigation";
+import { LoadingOutlined } from "@ant-design/icons";
 const crypto = require("crypto");
 
 export default function Home({
@@ -20,6 +22,14 @@ export default function Home({
   chatbotId,
   chatbotName,
 }: any) {
+  const { status } = useSession();
+  // const status = "authenticated";
+
+  /// loading icon
+  const antIcon = (
+    <LoadingOutlined style={{ fontSize: 24, color: "black" }} spin />
+  );
+
   /// creating the hash of initial text to compare it later with current text hash
   const initialTextData = textData ? textData.text : "";
   const initialTextHash = crypto
@@ -315,187 +325,198 @@ export default function Home({
     createCustomBot();
   };
 
-  // console.log(qaImage);
+  if (status === "loading") {
+    return (
+      <center>
+        <Spin indicator={antIcon} />
+      </center>
+    );
+  } else if (status === "authenticated" || cookies?.userId) {
+    return (
+      <>
+        {contextHolder}
 
-  return (
-    <>
-      {contextHolder}
-
-      <div className="data-source-container">
-        <center>
-          {!updateChatbot && <p className="title">Data Sources</p>}
-          <Radio.Group onChange={onChange} value={source} disabled={loading}>
-            <Radio name="source" value={"document"}>
-              Document
-            </Radio>
-            <Radio name="source" value={"text"}>
-              Text
-            </Radio>
-            <Radio name="source" value={"qa"}>
-              Q&A
-            </Radio>
-            <Radio name="source" value={"website"}>
-              Website
-            </Radio>
-          </Radio.Group>
-          {source == "document" && (
-            <SourceUpload
-              defaultFileList={defaultFileList}
-              setDefaultFileList={setDefaultFileList}
-              updateCharCount={updateCharCount}
-              getCharCount={charCount}
-              setLoadingPage={setLoading}
-              fileTextLength={fileTextLength}
-              setFileTextLength={setFileTextLength}
-              updateChatbot={updateChatbot}
-              newFileList={newFileList}
-              setNewFileList={setNewFileList}
-              deleteFileList={deleteFileList}
-              setDeleteFileList={setDeleteFileList}
-            />
-          )}
-          {source == "website" && (
-            <Website
-              updateCharCount={updateCharCount}
-              getCharCount={charCount}
-              setLoadingPage={setLoading}
-              setCrawledList={setCrawledList}
-              crawledList={crawledList}
-              websiteCharCount={websiteCharCount}
-              setWebsiteCharCount={setWebsiteCharCount}
-            />
-          )}
-          {source == "text" && (
-            <Text
-              text={text}
-              setText={setText}
-              textLength={textLength}
-              setTextLength={setTextLength}
-              updateCharCount={updateCharCount}
-              getCharCount={charCount}
-            />
-          )}
-          {source == "qa" && (
-            <QA
-              qaList={qaList}
-              setQAList={setQAList}
-              qaCount={qaCount}
-              setQACount={setQACount}
-              qaCharCount={qaCharCount}
-              setQACharCount={setQACharCount}
-              updateCharCount={updateCharCount}
-              getCharCount={charCount}
-              deleteQAList={deleteQAList}
-              setDeleteQAList={setDeleteQAList}
-              updateChatbot={updateChatbot}
-            />
-          )}
-          <div className="included-source">
-            <span
-              style={{
-                fontSize: "20px",
-                fontFamily: "sans-serif",
-                marginBottom: "10px",
-              }}
-            >
-              Included Sources:
-            </span>
-            <div className="items-character-count-container">
-              {(defaultFileList.length == 1 && (
-                <p>
-                  {defaultFileList.length} File ({fileTextLength} detected
-                  chars)
-                </p>
-              )) ||
-                (defaultFileList.length > 1 && (
+        <div className="data-source-container">
+          <center>
+            {!updateChatbot && <p className="title">Data Sources</p>}
+            <Radio.Group onChange={onChange} value={source} disabled={loading}>
+              <Radio name="source" value={"document"}>
+                Document
+              </Radio>
+              <Radio name="source" value={"text"}>
+                Text
+              </Radio>
+              <Radio name="source" value={"qa"}>
+                Q&A
+              </Radio>
+              <Radio name="source" value={"website"}>
+                Website
+              </Radio>
+            </Radio.Group>
+            {source == "document" && (
+              <SourceUpload
+                defaultFileList={defaultFileList}
+                setDefaultFileList={setDefaultFileList}
+                updateCharCount={updateCharCount}
+                getCharCount={charCount}
+                setLoadingPage={setLoading}
+                fileTextLength={fileTextLength}
+                setFileTextLength={setFileTextLength}
+                updateChatbot={updateChatbot}
+                newFileList={newFileList}
+                setNewFileList={setNewFileList}
+                deleteFileList={deleteFileList}
+                setDeleteFileList={setDeleteFileList}
+              />
+            )}
+            {source == "website" && (
+              <Website
+                updateCharCount={updateCharCount}
+                getCharCount={charCount}
+                setLoadingPage={setLoading}
+                setCrawledList={setCrawledList}
+                crawledList={crawledList}
+                websiteCharCount={websiteCharCount}
+                setWebsiteCharCount={setWebsiteCharCount}
+              />
+            )}
+            {source == "text" && (
+              <Text
+                text={text}
+                setText={setText}
+                textLength={textLength}
+                setTextLength={setTextLength}
+                updateCharCount={updateCharCount}
+                getCharCount={charCount}
+              />
+            )}
+            {source == "qa" && (
+              <QA
+                qaList={qaList}
+                setQAList={setQAList}
+                qaCount={qaCount}
+                setQACount={setQACount}
+                qaCharCount={qaCharCount}
+                setQACharCount={setQACharCount}
+                updateCharCount={updateCharCount}
+                getCharCount={charCount}
+                deleteQAList={deleteQAList}
+                setDeleteQAList={setDeleteQAList}
+                updateChatbot={updateChatbot}
+              />
+            )}
+            <div className="included-source">
+              <span
+                style={{
+                  fontSize: "20px",
+                  fontFamily: "sans-serif",
+                  marginBottom: "10px",
+                }}
+              >
+                Included Sources:
+              </span>
+              <div className="items-character-count-container">
+                {(defaultFileList.length == 1 && (
                   <p>
-                    {defaultFileList.length} Files ({fileTextLength} detected
+                    {defaultFileList.length} File ({fileTextLength} detected
                     chars)
                   </p>
-                ))}
-              {textLength > 0 && defaultFileList.length > 0 && (
-                <p className="margin-pipe">|</p>
-              )}
-              {textLength > 0 && <p>{textLength} text input chars</p>}
-              {qaCount > 0 &&
-                (defaultFileList.length > 0 || textLength > 0) && (
+                )) ||
+                  (defaultFileList.length > 1 && (
+                    <p>
+                      {defaultFileList.length} Files ({fileTextLength} detected
+                      chars)
+                    </p>
+                  ))}
+                {textLength > 0 && defaultFileList.length > 0 && (
                   <p className="margin-pipe">|</p>
                 )}
-              {qaCount > 0 && (
-                <p>
-                  {qaCount} Q&A ({qaCharCount} chars)
-                </p>
-              )}
-              {crawledList.length > 0 &&
-                (defaultFileList.length > 0 ||
-                  textLength > 0 ||
-                  qaCount > 0) && <p className="margin-pipe">|</p>}
-              {crawledList.length > 0 && (
-                <p>
-                  {crawledList.length} Links ({websiteCharCount} detected chars)
-                </p>
-              )}
-            </div>
-            <span
-              style={{
-                fontSize: "15px",
-                fontFamily: "sans-serif",
-                marginTop: "20px",
-                marginBottom: "10px",
-              }}
-            >
-              Total detected characters:{" "}
+                {textLength > 0 && <p>{textLength} text input chars</p>}
+                {qaCount > 0 &&
+                  (defaultFileList.length > 0 || textLength > 0) && (
+                    <p className="margin-pipe">|</p>
+                  )}
+                {qaCount > 0 && (
+                  <p>
+                    {qaCount} Q&A ({qaCharCount} chars)
+                  </p>
+                )}
+                {crawledList.length > 0 &&
+                  (defaultFileList.length > 0 ||
+                    textLength > 0 ||
+                    qaCount > 0) && <p className="margin-pipe">|</p>}
+                {crawledList.length > 0 && (
+                  <p>
+                    {crawledList.length} Links ({websiteCharCount} detected
+                    chars)
+                  </p>
+                )}
+              </div>
               <span
                 style={{
                   fontSize: "15px",
                   fontFamily: "sans-serif",
-                  fontWeight: "bold",
+                  marginTop: "20px",
+                  marginBottom: "10px",
                 }}
               >
-                {charCount}
-              </span>{" "}
-              <span
-                style={{
-                  color: "#a39999",
-                }}
-              >
-                / 11,000,000 limit
+                Total detected characters:{" "}
+                <span
+                  style={{
+                    fontSize: "15px",
+                    fontFamily: "sans-serif",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {charCount}
+                </span>{" "}
+                <span
+                  style={{
+                    color: "#a39999",
+                  }}
+                >
+                  / 11,000,000 limit
+                </span>
               </span>
-            </span>
-            <Button
-              style={{ width: "100%" }}
-              type="primary"
-              disabled={
-                loading == true
-                  ? true
-                  : updateChatbot && currentTextHash === initialTextHash
-                  ? deleteFileList.length + newFileList.length
-                    ? false
-                    : initialQAHash === currentQAHash
-                    ? crawledList.length > 0
+              <Button
+                style={{ width: "100%" }}
+                type="primary"
+                disabled={
+                  loading == true
+                    ? true
+                    : updateChatbot && currentTextHash === initialTextHash
+                    ? deleteFileList.length + newFileList.length
                       ? false
-                      : true
+                      : initialQAHash === currentQAHash
+                      ? crawledList.length > 0
+                        ? false
+                        : true
+                      : false
                     : false
-                  : false
-              }
-              onClick={
-                (crawledList.length != 0 && createChatBaseBot) ||
-                (!updateChatbot && openChatbotModal) ||
-                createCustomBot
-              }
-            >
-              {(!updateChatbot && "Create Chatbot") || "Retrain Chatbot"}
-            </Button>
-          </div>
-        </center>
-      </div>
-      <ChatbotNameModal
-        open={open}
-        setOpen={setOpen}
-        chatbotText={chatbotText}
-        setChatbotText={setChatbotText}
-        handleOk={handleOk}
-      />
-    </>
-  );
+                }
+                onClick={
+                  (crawledList.length != 0 && createChatBaseBot) ||
+                  (!updateChatbot && openChatbotModal) ||
+                  createCustomBot
+                }
+              >
+                {(!updateChatbot && "Create Chatbot") || "Retrain Chatbot"}
+              </Button>
+            </div>
+          </center>
+        </div>
+        <ChatbotNameModal
+          open={open}
+          setOpen={setOpen}
+          chatbotText={chatbotText}
+          setChatbotText={setChatbotText}
+          handleOk={handleOk}
+        />
+      </>
+    );
+  } else if (status === "unauthenticated") {
+    redirect("/account/login");
+  } else {
+    return <></>;
+  }
 }

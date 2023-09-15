@@ -93,7 +93,7 @@ export async function POST(request: any) {
   } else {
     try {
       /// fecth the userId from database
-      const db = await connectDatabase();
+      const db = (await connectDatabase()).db();
       const collection = db.collection("user-chatbots");
       const cursor = await collection.findOne({ chatbotId: chatbotId });
 

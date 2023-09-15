@@ -7,19 +7,20 @@ if (!uri) {
 }
 
 let client: any;
+let clientPromise: Promise<MongoClient>;
 
 async function connectDatabase() {
   if (client) {
-    return client.db();
+    return clientPromise;
   }
   try {
     client = new MongoClient(uri);
-    await client.connect();
+    clientPromise = await client.connect();
     console.log("Connected to MongoDB");
   } catch (error) {
     console.error("Error connecting to MongoDB:", error);
   }
-  return client.db();
+  return clientPromise;
 }
 
 export { connectDatabase };

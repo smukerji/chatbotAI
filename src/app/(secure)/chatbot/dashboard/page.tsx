@@ -1,14 +1,17 @@
 "use client";
 import { Button, Modal, Radio, RadioChangeEvent } from "antd";
-import { useSearchParams } from "next/navigation";
+import { redirect, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import "./dashboard.css";
 import Chat from "./components/Chat/Chat";
 import DeleteModal from "./components/Modal/DeleteModal";
 import { useCookies } from "react-cookie";
 import Home from "../../page";
+import { useSession } from "next-auth/react";
 
 function Dashboard() {
+  const { status } = useSession();
+
   /// fetch the params
   const params: any = useSearchParams();
   const chatbot = JSON.parse(decodeURIComponent(params.get("chatbot")));
@@ -87,60 +90,76 @@ function Dashboard() {
   // }, []);
 
   const [loading, setLoading] = useState(false);
-  return (
-    <div className="dashboard-container">
-      <center>
-        <h1 className="title">{chatbot.name}</h1>
-        <Radio.Group onChange={onChange} value={source} disabled={loading}>
-          <Radio name="source" value={"chatbot"}>
-            Chatbot
-          </Radio>
-          <Radio name="source" value={"settings"}>
-            Settings
-          </Radio>
-          <Radio name="source" value={"sources"} onClick={fetchData}>
-            Sources
-          </Radio>
-          <Radio name="source" value={"delete"} onClick={showModal}>
-            Delete
-          </Radio>
-        </Radio.Group>
+  if (status === "authenticated" || cookies?.userId) {
+    return (
+      <div className="dashboard-container">
+        <center>
+          <h1 className="title">{chatbot.name}</h1>
+          <Radio.Group onChange={onChange} value={source} disabled={loading}>
+            <Radio name="source" value={"chatbot"}>
+              Chatbot
+            </Radio>
+            <Radio name="source" value={"settings"}>
+              Settings
+            </Radio>
+            <Radio name="source" value={"sources"} onClick={fetchData}>
+              Sources
+            </Radio>
+            <Radio name="source" value={"delete"} onClick={showModal}>
+              Delete
+            </Radio>
+          </Radio.Group>
 
-        {/* managing the component rendering */}
-        {source == "chatbot" && (
-          <>
-            <Chat
-              chatbot={chatbot}
-              messages={messages}
-              setMessages={setMessages}
-              messageImages={messageImages}
-              setMessageImages={setMessageImages}
-            />{" "}
-            <DeleteModal open={open} setOpen={setOpen} chatbotId={chatbot.id} />
-          </>
-        )}
-        {source == "settings" && (
-          <>
-            <h1>Settings</h1>
-            <DeleteModal open={open} setOpen={setOpen} chatbotId={chatbot.id} />
-          </>
-        )}
-        {source == "sources" && !loading && (
-          <>
-            <Home
-              updateChatbot="true"
-              qaData={qaData}
-              textData={textData}
-              fileData={fileData}
-              chatbotId={chatbot.id}
-              chatbotName={chatbot.name}
-            />
-            <DeleteModal open={open} setOpen={setOpen} chatbotId={chatbot.id} />
-          </>
-        )}
-      </center>
-    </div>
-  );
+          {/* managing the component rendering */}
+          {source == "chatbot" && (
+            <>
+              <Chat
+                chatbot={chatbot}
+                messages={messages}
+                setMessages={setMessages}
+                messageImages={messageImages}
+                setMessageImages={setMessageImages}
+              />{" "}
+              <DeleteModal
+                open={open}
+                setOpen={setOpen}
+                chatbotId={chatbot.id}
+              />
+            </>
+          )}
+          {source == "settings" && (
+            <>
+              <h1>Settings</h1>
+              <DeleteModal
+                open={open}
+                setOpen={setOpen}
+                chatbotId={chatbot.id}
+              />
+            </>
+          )}
+          {source == "sources" && !loading && (
+            <>
+              <Home
+                updateChatbot="true"
+                qaData={qaData}
+                textData={textData}
+                fileData={fileData}
+                chatbotId={chatbot.id}
+                chatbotName={chatbot.name}
+              />
+              <DeleteModal
+                open={open}
+                setOpen={setOpen}
+                chatbotId={chatbot.id}
+              />
+            </>
+          )}
+        </center>
+      </div>
+    );
+  } else if (status === "unauthenticated") {
+    redirect("/account/login");
+  }
 }
 
 export default Dashboard;

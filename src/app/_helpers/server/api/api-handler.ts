@@ -19,9 +19,14 @@ function apiHandler(handler: any) {
       } catch {}
 
       try {
-        /// global middleware
-        await jwtMiddleware(req);
-        await validateMiddleware(req, handler[method].schema);
+        /// check if it is custom system user
+        const customUser = req.headers.get("cookie")?.includes("authorization");
+
+        if (customUser) {
+          /// global middleware
+          await jwtMiddleware(req);
+          await validateMiddleware(req, handler[method].schema);
+        }
 
         /// route handler
         const responseBody = await handler[method](req, ...args);

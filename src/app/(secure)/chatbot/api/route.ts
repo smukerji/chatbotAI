@@ -45,7 +45,7 @@ async function fetchBots(request: any) {
 
 // Fetch custom chatbots from the database
 async function fetchCustomBots(userId: string) {
-  const db = await connectDatabase();
+  const db = (await connectDatabase()).db();
   const collection = db.collection("user-chatbots");
   const customBots = await collection.find({ userId: userId }).toArray();
   return customBots.map((doc: any) => ({

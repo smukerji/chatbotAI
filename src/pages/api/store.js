@@ -76,7 +76,7 @@ export default async function handler(req, res) {
       // console.log(qaList);
 
       /// db connection
-      const db = await connectDatabase();
+      const db = (await connectDatabase()).db();
       /// if new chatbot is being created the new chatbot entry
       let collection = db.collection("chatbots-data");
       if (!updateChatbot) {
@@ -352,7 +352,7 @@ export default async function handler(req, res) {
   //   // return res.status(200).send({ deleteQAList });
 
   //   /// db connection
-  //   const db = await connectDatabase();
+  //   const db = await connectDatabase().db();
   //   /// if new chatbot is being created the new chatbot entry
   //   let collection = db.collection("chatbots-data");
   //   if (!updateChatbot) {

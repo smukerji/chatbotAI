@@ -10,7 +10,7 @@ async function dataSources(request: any) {
   const { chatbotId, userId } = await request.json();
 
   /// fetch the data sources of the chabot
-  const db = await connectDatabase();
+  const db = (await connectDatabase()).db();
   const collection = db.collection("chatbots-data");
   const cursor = await collection.find({ chatbotId: chatbotId }).toArray();
 

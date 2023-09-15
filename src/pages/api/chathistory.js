@@ -8,7 +8,7 @@ export default async function handler(req, res) {
     const chatbotId = body?.chatbotId;
 
     /// db connection
-    const db = await connectDatabase();
+    const db = (await connectDatabase()).db();
     /// get the collection to store chat history
     let collection = db.collection("user-chatbots");
 

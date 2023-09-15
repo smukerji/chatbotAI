@@ -21,7 +21,10 @@ function useUserService(): IUserService {
         console.log("Error while logging", error);
       }
     },
-    logout: async () => {},
+    logout: async () => {
+      await fetch.post("/api/account/logout");
+      router.push("/account/login");
+    },
     register: async (user) => {
       try {
         await fetch.post(

@@ -12,11 +12,11 @@ async function login(request: any) {
   const body = await request.json();
   const { username, password } = body;
 
-  const db = await connectDatabase();
+  const db = (await connectDatabase()).db();
   const collection = db.collection("users");
   /// check if user is valid
   const user: any = await collection.findOne({
-    username: username,
+    email: username,
   });
 
   if (user) {
