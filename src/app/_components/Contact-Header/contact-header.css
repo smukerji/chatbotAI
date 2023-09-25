@@ -1,0 +1,33 @@
+.contact-header-container {
+    padding: 14px 100px;
+    display: flex;
+    background: #F0FFFD;
+}
+
+.contact-info {
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 120%;
+    height: 25px;
+    margin-right: auto;
+}
+
+.contact-info ul {
+    display: flex;
+    list-style: none;
+    gap: 9px;
+}
+
+.social-media-icons-container {
+    height: 25px;
+}
+
+.social-media-icons-container ul {
+    display: flex;
+    list-style: none;
+}
+
+.social-media-icons-container li {
+    margin-left: 25px;
+}

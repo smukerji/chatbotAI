@@ -1,0 +1,52 @@
+.header-container {
+    padding: 20px 100px;
+    display: flex;
+    gap: 105px;
+    align-items: center;
+}
+
+.logo {
+    width: 210px;
+    color: black;
+    font-size: 36px;
+    font-style: normal;
+    font-weight: 700;
+    font-family: 'Josefin Sans', sans-serif;
+    line-height: 78px;
+    text-align: center;
+}
+
+.logo span:nth-child(2) {
+    color: #15C3A7;
+}
+
+.navbar {
+    font-size: 20px;
+    margin-right: auto;
+}
+
+.navbar ul {
+    list-style: none;
+    display: flex;
+    gap: 40px;
+}
+
+.navbar ul a {
+    font-style: normal;
+    text-decoration: unset;
+}
+
+.navbar ul a:hover {
+    color: #15C3A7;
+}
+
+
+.login-signup {
+    padding: 13px 35px;
+    border-radius: 10px;
+    background-color: #15C3A7;
+    color: #fff;
+    line-height: 120%;
+    font-size: 20px;
+    cursor: pointer;
+}

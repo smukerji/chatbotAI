@@ -1,0 +1,128 @@
+.compatibility-section-container {
+    margin-top: 70px;
+}
+
+/* ------------------------------top section------------------------------- */
+
+.compatibility-section-container .top {
+    position: relative;
+}
+
+.compatibility-section-container .top .ellipse-img {
+    position: absolute;
+    top: 235px;
+    right: 220px;
+}
+
+.compatibility-text {
+    position: relative;
+    height: 220px;
+    font-size: 220px;
+    font-style: normal;
+    font-weight: 800;
+    line-height: 120%;
+    color: transparent;
+    -webkit-text-stroke: 1px #33E0C4;
+    z-index: -1;
+}
+
+.compatibility-section-container .compatibility-welcome-text {
+    color: #000;
+    font-size: 64px;
+    font-style: normal;
+    width: 704px;
+    font-weight: 700;
+    line-height: 134%;
+    text-transform: uppercase;
+    position: absolute;
+    top: 195px;
+    left: 95px;
+    -webkit-text-stroke: transparent;
+    z-index: 10;
+}
+
+.compatibility-section-container .compatibility-welcome-text::before {
+    content: '';
+    position: absolute;
+    left: 30%;
+    transform: translateX(-50%);
+    top: 59px;
+    width: 420px;
+    height: 30px;
+    background: #15C3A7;
+    border-radius: 20px;
+    z-index: -1;
+}
+
+
+.compatibility-section-container .section-text {
+    margin-top: 156px;
+    font-size: 20px;
+
+    margin-left: 100px;
+    color: #232932;
+    width: 929px;
+    font-size: 32px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 54px;
+}
+
+
+
+/* ------------------------------bottom section------------------------------- */
+
+.compatibility-section-container .bottom {
+    display: flex;
+    position: relative;
+}
+
+.compatibility-section-container .contact-demo-button {
+    display: flex;
+    width: 400px;
+    padding: 20px 30px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border-radius: 15px;
+    background: #15C3A7;
+    color: #FFF;
+    font-size: 29px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 130%;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+}
+
+.compatibility-section-container .bottom .left {
+    margin-left: 100px;
+}
+
+.compatibility-section-container .bottom .left ul {
+    list-style: none;
+    margin-top: 41px;
+    margin-bottom: 49px;
+}
+
+.compatibility-section-container .bottom .left ul li {
+    display: flex;
+    text-align: center;
+    gap: 10px;
+    width: fit-content;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 211%;
+}
+
+.compatibility-section-container .bottom .left ul li span {
+    display: flex;
+    align-items: center;
+}
+
+.compatibility-section-container .bottom .right {
+    margin-top: -110px;
+
+}
