@@ -24,7 +24,7 @@ async function register(request: any) {
     password,
   });
 
-  return { message: "Registered successfully..." };
+  return { message: "Registered successfully... Please login to continue" };
 }
 
 register.schema = joi.object({

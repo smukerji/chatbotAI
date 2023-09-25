@@ -8,6 +8,7 @@ import DeleteModal from "./components/Modal/DeleteModal";
 import { useCookies } from "react-cookie";
 import Home from "../../page";
 import { useSession } from "next-auth/react";
+import dynamic from "next/dynamic";
 
 function Dashboard() {
   const { status } = useSession();
@@ -162,4 +163,4 @@ function Dashboard() {
   }
 }
 
-export default Dashboard;
+export default dynamic((): any => Promise.resolve(Dashboard), { ssr: false });

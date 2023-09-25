@@ -10,15 +10,18 @@ function useUserService(): IUserService {
   return {
     login: async (username, password) => {
       try {
-        await fetch.post(
+        const user = await fetch.post(
           `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/account/login`,
           { username, password }
         );
+
         // get return url from query parameters or default to '/'
         const returnUrl = searchParams?.get("returnUrl") || "/";
         router.push(process.env.NEXT_PUBLIC_WEBSITE_URL + returnUrl);
+        return user;
       } catch (error: any) {
         console.log("Error while logging", error);
+        return error;
       }
     },
     logout: async () => {
@@ -27,13 +30,15 @@ function useUserService(): IUserService {
     },
     register: async (user) => {
       try {
-        await fetch.post(
+        const data = await fetch.post(
           `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/account/register`,
           user
         );
         router.push("/account/login");
+        return data;
       } catch (error: any) {
         console.log("Error while registering user", error);
+        return error;
       }
     },
   };

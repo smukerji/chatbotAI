@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useUserService } from "../_services/useUserService";
 import { signOut, useSession } from "next-auth/react";
-import { Cookies, useCookies } from "react-cookie";
+import { useCookies } from "react-cookie";
 import jwt from "jsonwebtoken";
 
 export default function AuthBtn() {
@@ -28,15 +28,6 @@ export default function AuthBtn() {
 
   const isLoggedIn = session?.user || userId !== undefined;
 
-  // const temp = jwt.verify(
-  //   cookies?.authorization,
-  //   process.env.NEXT_PUBLIC_JWT_SECRET!
-  // );
-  // console.log(temp);
-
-  // console.log("user id", cookies.userId !== undefined);
-  // console.log("session id", session?.user, isLoggedIn);
-
   return (
     <>
       <a
@@ -47,7 +38,7 @@ export default function AuthBtn() {
           textDecoration: "underline",
           marginLeft: "10px",
         }}
-        onClick={(e) => {
+        onClick={async (e) => {
           if (session?.user || userId) {
             logout();
             signOut();

@@ -9,6 +9,7 @@ import { LoadingOutlined } from "@ant-design/icons";
 import { Spin } from "antd";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
+import dynamic from "next/dynamic";
 
 const antIcon = (
   <LoadingOutlined style={{ fontSize: 24, color: "black" }} spin />
@@ -92,7 +93,7 @@ function ChatBot() {
               );
             })}
           </div>
-          {!loading && chatbotData.length == 0 && (
+          {!loading && chatbotData?.length == 0 && (
             <p style={{ color: "red" }}>
               No chatbots available please create one
             </p>
@@ -106,4 +107,4 @@ function ChatBot() {
   }
 }
 
-export default ChatBot;
+export default dynamic((): any => Promise.resolve(ChatBot), { ssr: false });

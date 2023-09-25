@@ -1,30 +1,47 @@
 "use client";
-import { Button, Form, Input, message } from "antd";
-import React from "react";
+import { Button, Form, Input, Spin, message } from "antd";
+import React, { useState } from "react";
 import "./login.css";
 import Image from "next/image";
 import { useUserService } from "../../../_services/useUserService";
 import googlelogo from "../../../../../public/google-logo.svg";
+import githublogo from "../../../../../public/github-logo.svg";
 import { signIn, useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
+import { LoadingOutlined } from "@ant-design/icons";
 
 function Login() {
   const { status } = useSession();
+  const [loading, setLoading] = useState(false);
+  const antIcon = (
+    <LoadingOutlined
+      style={{ fontSize: 24, color: "black", margin: "10px 0" }}
+      spin
+    />
+  );
 
   if (status === "authenticated") {
     redirect("/");
   }
 
   const userService = useUserService();
+  /// when the form is submitted
   const onFinish = (values: any) => {
-    userService.login(values?.username, values?.password).then(() => {
-      window.location.reload(); // Refresh the page
+    setLoading(true);
+    userService.login(values?.username, values?.password).then((data: any) => {
+      if (!data?.username) {
+        message.error(data);
+      } else {
+        message.success(`Welcome back ${data?.username}`);
+        window.location.reload(); // Refresh the page
+      }
+      setLoading(false);
     });
   };
 
-  const onFinishFailed = (errorInfo: any) => {
-    message.error(errorInfo.errorFields[0].errors[0]);
-  };
+  // const onFinishFailed = (errorInfo: any) => {
+  //   message.error(errorInfo.errorFields[0].errors[0]);
+  // };
 
   type FieldType = {
     username?: string;
@@ -33,21 +50,29 @@ function Login() {
 
   return (
     <div className="login-container">
-      <center>
+      <div className="login-form-container">
+        <h2 className="login-title">Login</h2>
         <Form
           name="basic"
           labelCol={{ span: 8 }}
+          layout="vertical"
           wrapperCol={{ span: 16 }}
           style={{ maxWidth: 600 }}
           initialValues={{ remember: true }}
           onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
+          // onFinishFailed={onFinishFailed}
           autoComplete="off"
         >
           <Form.Item<FieldType>
             label="Email"
             name="username"
-            rules={[{ required: true, message: "Please input your username!" }]}
+            rules={[
+              { required: true, message: "Please input your email!" },
+              {
+                pattern: /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/,
+                message: "Invalid email address format",
+              },
+            ]}
           >
             <Input />
           </Form.Item>
@@ -60,49 +85,43 @@ function Login() {
             <Input.Password />
           </Form.Item>
 
-          <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-            <div className="login-register-conatiner">
+          <div className="login-register-container">
+            <Button
+              type="primary"
+              htmlType="submit"
+              style={{
+                width: "191.46px",
+                marginBottom: "10px",
+              }}
+            >
+              Log in
+            </Button>
+            {loading && <Spin indicator={antIcon} />}
+            <hr />
+            <div className="social-login-buttons">
               <Button
                 type="primary"
-                htmlType="submit"
-                style={{
-                  width: "200px",
-                  marginBottom: "10px",
-                }}
+                className="social-login-button"
+                onClick={() => signIn("google")}
               >
-                Log in
-              </Button>
-              <hr />
-              <Button
-                type="primary"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  width: "200px",
-                  marginTop: "10px",
-                }}
-                onClick={() => {
-                  signIn("google");
-                }}
-              >
-                <span
-                  style={{
-                    justifyContent: "center",
-                    display: "flex",
-                    marginRight: "20px",
-                  }}
-                >
-                  <Image src={googlelogo} alt=""></Image>
-                </span>
+                <Image src={googlelogo} alt="" />
                 Sign in with Google
               </Button>
-              <div className="link-to-signup">
-                No account? <a href="/account/register">Sign up</a>
-              </div>
+              <Button
+                type="primary"
+                className="social-login-button"
+                onClick={() => signIn("github")}
+              >
+                <Image src={githublogo} alt="" height={24} width={24} />
+                Sign in with Github
+              </Button>
             </div>
-          </Form.Item>
+            <div className="link-to-signup">
+              No account? <a href="/account/register">Sign up</a>
+            </div>
+          </div>
         </Form>
-      </center>
+      </div>
     </div>
   );
 }
