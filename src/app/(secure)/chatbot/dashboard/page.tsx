@@ -6,7 +6,7 @@ import "./dashboard.css";
 import Chat from "./components/Chat/Chat";
 import DeleteModal from "./components/Modal/DeleteModal";
 import { useCookies } from "react-cookie";
-import Home from "../../page";
+import Home from "../../home/page";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 

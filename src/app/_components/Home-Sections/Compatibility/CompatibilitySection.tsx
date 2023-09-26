@@ -35,8 +35,8 @@ function CompatibilitySection() {
                 <span>
                   <Image src={RightArrowImg} alt="right-arrow-img" />
                 </span>
-                Integrate accessibility solutions into the overall "look and
-                feel".
+                Integrate accessibility solutions into the overall &quot;look
+                and feel&quot;.
               </li>
               <li>
                 <span>

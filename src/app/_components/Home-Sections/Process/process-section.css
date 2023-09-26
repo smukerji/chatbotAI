@@ -2,8 +2,6 @@
     margin-top: 50px;
     background-image: url("../../../../../public/sections-images/process-section/Vector-background.svg");
     background-repeat: no-repeat;
-    /* position: relative; */
-    /* background-position: left; */
     background-position: left 0 top 110px;
     background-size: 50%;
 }
@@ -40,16 +38,11 @@
     line-height: 134%;
     /* 88.44px */
     text-transform: uppercase;
-    /* right: 0; */
-    /* position: absolute; */
-    /* top: 125px; */
     margin-right: 130px;
     margin-left: auto;
     margin-top: -106px;
     -webkit-text-stroke: 1px #000;
-
     font-family: 'Poppins', sans-serif !important;
-    /* z-index: 10; */
 }
 
 .process-text-decorator {
@@ -154,6 +147,7 @@
     height: 3px;
     background: #F68C28;
     margin-top: 15.5px;
+    border-color: transparent;
 }
 
 .left-first-rectangle-container img {
@@ -266,6 +260,7 @@
     height: 3px;
     background: #7463EC;
     margin-top: 15.5px;
+    border-color: transparent;
 }
 
 .left-second-rectangle-text {
@@ -375,6 +370,7 @@
     height: 3px;
     background: #F54BA6;
     margin-top: 15.5px;
+    border-color: transparent;
 }
 
 .left-third-rectangle-text {
@@ -487,6 +483,7 @@
     height: 3px;
     background: #FB4F6A;
     margin-top: 15.5px;
+    border-color: transparent;
 }
 
 .left-fourth-rectangle-text {
@@ -501,4 +498,221 @@
 
 .left-fourth-rectangle-container img {
     z-index: 10;
+}
+
+
+
+/*------------------------------------css for secreen less than 1440---------------------------------*/
+@media only screen and (max-width: 1440px) {
+    .top .process-text {
+        font-size: 190px;
+    }
+
+    .top .process-welcome-text {
+        font-size: 58px;
+        margin-right: 99px;
+        margin-left: auto;
+    }
+
+    .process-text-decorator {
+        margin-top: -128px;
+        margin-right: 95px;
+    }
+
+    .process-section-container .contact-demo-button {
+        width: 330px;
+        font-size: 19px;
+        margin-right: 110px;
+        margin-top: 115px;
+    }
+
+    .process-section-container .bottom {
+        padding-left: 76px;
+    }
+
+
+    /* ------------------------------left first rectangle------------------------------- */
+    .left-first-rectangle-container .left-first-rectangle {
+        width: 150px;
+        height: 170px;
+    }
+
+    .left-first-rectangle-background {
+        width: 165px;
+        height: 65px;
+    }
+
+    .left-first-rectangle-image-text {
+        left: 90px;
+        top: 135px;
+        font-size: 35px;
+    }
+
+    .left-first-rectangle-title-underline {
+        width: 130px;
+    }
+
+    .left-first-rectangle-text {
+        width: 205px;
+        font-size: 15px;
+    }
+
+    .left-first-rectangle-first-line {
+        margin-top: 176px;
+        margin-left: 376px;
+        width: 331.936px;
+        transform: rotate(26deg);
+    }
+
+    .left-first-rectangle-second-line {
+        margin-top: 197px;
+        margin-left: 435px;
+        width: 390.936px;
+        transform: rotate(26deg);
+
+    }
+
+    .left-first-rectangle-third-line {
+        margin-top: 196px;
+        margin-left: 404px;
+        width: 383.936px;
+        transform: rotate(26deg);
+    }
+
+
+    /* ------------------------------left second rectangle------------------------------- */
+    .left-second-rectangle-container {
+        margin-left: 150px;
+    }
+
+
+    .left-second-rectangle-container .left-second-rectangle {
+        width: 150px;
+        height: 170px;
+    }
+
+    .left-second-rectangle-background {
+        width: 165px;
+        height: 65px;
+    }
+
+    .left-second-rectangle-image-text {
+        left: 90px;
+        top: 135px;
+        font-size: 35px;
+    }
+
+    .left-second-rectangle-title-underline {
+        width: 130px;
+    }
+
+    .left-second-rectangle-text {
+        width: 205px;
+        font-size: 15px;
+    }
+
+    .left-second-rectangle-first-line {
+        margin-top: -22px;
+        margin-left: 462px;
+        width: 383.936px;
+        transform: rotate(332deg);
+    }
+
+    .left-second-rectangle-second-line {
+        margin-top: -25px;
+        margin-left: 447px;
+        width: 392.936px;
+        transform: rotate(332deg);
+    }
+
+    .left-second-rectangle-third-line {
+
+        margin-top: -33px;
+        margin-left: 449px;
+        width: 393.936px;
+        transform: rotate(332deg);
+    }
+
+    /* ------------------------------left third rectangle------------------------------- */
+    .left-third-rectangle-container {
+        margin-left: 150px;
+    }
+
+    .left-third-rectangle-container .left-third-rectangle {
+        width: 150px;
+        height: 170px;
+    }
+
+    .left-third-rectangle-background {
+        width: 165px;
+        height: 65px;
+    }
+
+    .left-third-rectangle-image-text {
+        left: 83px;
+        top: 135px;
+        font-size: 35px;
+    }
+
+    .left-third-rectangle-title-underline {
+        width: 130px;
+    }
+
+    .left-third-rectangle-text {
+        width: 205px;
+        font-size: 15px;
+    }
+
+    .left-third-rectangle-first-line {
+        margin-top: 176px;
+        margin-left: 376px;
+        width: 331.936px;
+        transform: rotate(26deg);
+    }
+
+    .left-third-rectangle-second-line {
+        margin-top: 197px;
+        margin-left: 435px;
+        width: 390.936px;
+        transform: rotate(26deg);
+
+    }
+
+    .left-third-rectangle-third-line {
+        margin-top: 196px;
+        margin-left: 404px;
+        width: 383.936px;
+        transform: rotate(26deg);
+    }
+
+
+    /* ------------------------------left fourth rectangle------------------------------- */
+    .left-fourth-rectangle-container {
+        margin-left: 150px;
+    }
+
+    .left-fourth-rectangle-container .left-fourth-rectangle {
+        width: 150px;
+        height: 170px;
+    }
+
+    .left-fourth-rectangle-background {
+        width: 165px;
+        height: 65px;
+    }
+
+    .left-fourth-rectangle-image-text {
+        left: 83px;
+        top: 135px;
+        font-size: 35px;
+    }
+
+    .left-fourth-rectangle-title-underline {
+        width: 130px;
+    }
+
+    .left-fourth-rectangle-text {
+        width: 205px;
+        font-size: 15px;
+    }
 }

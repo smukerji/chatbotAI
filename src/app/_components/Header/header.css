@@ -50,3 +50,25 @@
     font-size: 20px;
     cursor: pointer;
 }
+
+
+/*------------------------------------css for secreen less than 1440---------------------------------*/
+@media only screen and (max-width: 1440px) {
+    .header-container {
+        padding: 20px 67px;
+        gap: 105px;
+    }
+
+    .logo {
+        font-size: 32px;
+    }
+
+    .navbar {
+        font-size: 18px;
+    }
+
+    .login-signup {
+        padding: 10px 25px;
+        font-size: 18px;
+    }
+}

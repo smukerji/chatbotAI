@@ -136,3 +136,45 @@
     border-top: 2px dashed #D9D9D9;
     height: 0;
 }
+
+/*------------------------------------css for secreen less than 1440---------------------------------*/
+.service-text {
+    font-size: 190px;
+}
+
+.service-section-container .service-welcome-text {
+    font-size: 62px;
+    top: 162px;
+    left: 75px;
+}
+
+.service-section-container .contact-demo-button {
+    width: 330px;
+    font-size: 19px;
+}
+
+.service-section-container .section-text {
+    width: 800px;
+    line-height: 35px;
+    margin-left: 75px;
+    margin-top: 80px;
+}
+
+.services-connector {
+    width: 910px;
+    left: 265px;
+    top: 60px
+}
+
+.services-container>div .text {
+    font-size: 20px;
+}
+
+.services-container>div .img {
+    width: 120px;
+    height: 120px;
+}
+
+.services-container>div .img img {
+    padding: 19px;
+}

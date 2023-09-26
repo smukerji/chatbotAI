@@ -1,5 +1,5 @@
 .ai-chatbot-section-container {
-    position: relative;
+    display: flex;
 }
 
 .ai-chatbot-text {
@@ -8,7 +8,7 @@
     font-style: normal;
     font-weight: 800;
     line-height: 120%;
-    position: absolute;
+    position: relative;
     color: transparent;
     -webkit-text-stroke: 1px #33E0C4;
     z-index: -1;
@@ -24,26 +24,25 @@
     height: 176px;
     text-transform: uppercase;
     margin-left: 99px;
-    position: absolute;
-    margin-top: 106px;
-    z-index: 10;
-
+    margin-top: -114px;
+    position: relative;
 }
 
-.ai-chatbot-section-container .welcome-text-decorator {
-    width: 407px;
-    height: 29px;
-    border-radius: 39px;
+.ai-chatbot-section-container .welcome-text::before {
+    content: '';
+    position: absolute;
+    top: 139px;
+    left: 2px;
+    width: 420px;
+    height: 30px;
     background: #15C3A7;
-    position: absolute;
-    margin-top: 250px;
-    margin-left: 99px;
-    z-index: 1;
+    border-radius: 20px;
+    z-index: -1;
 }
+
 
 .ai-chatbot-section-container .section-text {
-    position: absolute;
-    margin-top: 320px;
+    margin-top: 90px;
     margin-left: 100px;
     font-size: 25px;
     font-style: normal;
@@ -54,67 +53,13 @@
     height: 149px;
 }
 
-.image-container {
-    width: 988px;
-    height: 778px;
-    /* margin-top: -259px; */
-    border: 1px solid transparent;
-    border-radius: 236px;
-    margin-right: 83px;
+
+.ai-chatbot-section-container .right {
+    margin-top: -186px;
+    margin-right: 9px;
     margin-left: auto;
 }
 
-.image-container .image-polygon {
-    /* width: 750px;
-    height: 750px;
-    margin-right: 22px; */
-    /* border: 1px solid; */
-    /* margin-left: 298px;
-    margin-top: 28px; */
-
-    width: 718px;
-    height: 750px;
-    margin-right: 22px;
-    border: 1px solid transparent;
-    margin-left: 268px;
-    margin-top: 26px;
-}
-
-.image-container .image-polygon img {
-    border-radius: 50%;
-    background: lightgray 50% / cover no-repeat;
-    width: 718px;
-
-    /* margin-top: 32px;
-    margin-left: 50px; */
-}
-
-.ellipse-1 {
-    width: 656px;
-    height: 677px;
-    margin-right: -26px;
-    margin-left: 112px;
-    margin-top: -657px;
-    border: 5px solid #15C3A726;
-    border-radius: 50%;
-
-}
-
-.ellipse-1 .ellipse-2 {
-    width: 611px !important;
-    height: 621px !important;
-    border: 5px solid #15C3A726 !important;
-    margin: 28px 23px;
-    border-radius: 50%;
-}
-
-.ellipse-1 .ellipse-2 .ellipse-3 {
-    width: 566px !important;
-    height: 562px !important;
-    border: 5px solid #15C3A726 !important;
-    margin: 28px 23px;
-    border-radius: 50%;
-}
 
 .request-demo-email-container {
     width: 801px;
@@ -123,8 +68,7 @@
     background: #F6FFFE;
     box-shadow: 0px 10px 20px 0px #E7ECFD;
     margin-left: 100px;
-    margin-top: 520px;
-    position: absolute;
+    margin-top: 67px;
 }
 
 .request-demo-email-container button {
@@ -161,28 +105,54 @@
     outline: none;
 }
 
-.ellipse-bottom-left-outer-image {
-    position: absolute;
-    margin-top: -178px;
-    margin-left: 65px;
-    width: fit-content !important;
-}
+/*------------------------------------css for secreen less than 1440---------------------------------*/
+@media only screen and (max-width: 1440px) {
+    .ai-chatbot-text {
+        font-size: 190px;
+    }
 
-.ellipse-bottom-left-inner-image {
-    position: absolute;
-    margin-top: -61px;
-    margin-left: 236px;
-    width: fit-content !important;
-}
+    .ai-chatbot-section-container .right {
+        margin-top: -220px;
+        margin-right: 0;
+        margin-left: 2px;
 
-.ellipse-top-right-image {
-    position: absolute;
-    margin-top: -733px;
-    margin-left: 555px;
-    width: fit-content !important;
-}
+    }
 
+    .ai-chatbot-section-container .right img {
+        width: 498px;
+        height: 590px;
+    }
 
-.image-polygon img {
-    background: transparent !important;
+    .ai-chatbot-section-container .welcome-text {
+        font-size: 62px;
+        margin-left: 85px;
+        margin-top: -129px;
+    }
+
+    .ai-chatbot-section-container .section-text {
+        margin-top: 63px;
+        margin-left: 85px;
+        font-size: 20px;
+        line-height: 32px;
+    }
+
+    .request-demo-email-container {
+        margin-left: 85px;
+        height: 75px;
+        margin-top: 0;
+        width: 670px;
+    }
+
+    .request-demo-email-container input {
+        font-size: 17px;
+        height: 75px;
+        width: 430px;
+    }
+
+    .request-demo-email-container button {
+        height: 75px;
+        font-size: 19px;
+        width: 240px;
+    }
+
 }

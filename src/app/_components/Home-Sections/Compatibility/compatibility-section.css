@@ -57,8 +57,6 @@
 
 .compatibility-section-container .section-text {
     margin-top: 156px;
-    font-size: 20px;
-
     margin-left: 100px;
     color: #232932;
     width: 929px;
@@ -125,4 +123,50 @@
 .compatibility-section-container .bottom .right {
     margin-top: -110px;
 
+}
+
+/*------------------------------------css for secreen less than 1440---------------------------------*/
+@media only screen and (max-width: 1440px) {
+
+    .compatibility-text {
+        font-size: 190px;
+    }
+
+    .compatibility-section-container .compatibility-welcome-text {
+        font-size: 62px;
+        top: 166px;
+    }
+
+
+    .compatibility-section-container .top .ellipse-img {
+        right: 60px;
+        width: 150px;
+        height: 150px;
+    }
+
+
+    .compatibility-section-container .section-text {
+        font-size: 20px;
+        width: 800px;
+        line-height: 35px;
+    }
+
+    .compatibility-section-container .bottom .left ul li {
+        font-size: 17px;
+        width: max-content;
+    }
+
+    .compatibility-section-container .contact-demo-button {
+        width: 330px;
+        font-size: 19px;
+    }
+
+    .compatibility-section-container .bottom .right {
+        margin-left: 50px;
+    }
+
+    .compatibility-section-container .bottom .right img {
+        height: 590px;
+        width: 94%;
+    }
 }

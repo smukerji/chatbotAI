@@ -129,8 +129,8 @@
 }
 
 .contact-us-form .right input,
-textarea,
-button {
+.contact-us-form .right textarea,
+.contact-us-form .right button {
     display: flex;
     width: 684px;
     padding: 20px;
