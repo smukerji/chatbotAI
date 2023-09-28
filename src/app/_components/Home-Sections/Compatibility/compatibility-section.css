@@ -21,8 +21,10 @@
     font-style: normal;
     font-weight: 800;
     line-height: 120%;
-    color: transparent;
-    -webkit-text-stroke: 1px #33E0C4;
+    /* color: transparent;
+    -webkit-text-stroke: 1px #33E0C4; */
+    text-shadow: -1px 1px 0px #33E0C4, 0px 1px 0px #33E0C4, 1px 1px 0px #33E0C4, 0px -1px 0px #33E0C4;
+    color: #fff;
     z-index: -1;
 }
 
@@ -37,7 +39,8 @@
     position: absolute;
     top: 195px;
     left: 95px;
-    -webkit-text-stroke: transparent;
+    /* -webkit-text-stroke: transparent; */
+    text-shadow: none;
     z-index: 10;
 }
 
@@ -163,10 +166,14 @@
 
     .compatibility-section-container .bottom .right {
         margin-left: 50px;
+        position: absolute;
+        top: 0;
+        right: 8px;
+        width: 50%;
     }
 
     .compatibility-section-container .bottom .right img {
-        height: 590px;
-        width: 94%;
+        height: 100%;
+        width: 100%;
     }
 }

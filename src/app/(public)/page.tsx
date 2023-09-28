@@ -14,8 +14,6 @@ import Testimonials from "../_components/Testimonials/Testimonials";
 export default function Home() {
   return (
     <>
-      <ContactHeader />
-      <Header />
       <AIChatbotSection />
       <PorcessSection />
       <FacilitiesSection />

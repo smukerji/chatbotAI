@@ -5,13 +5,16 @@ import { Layout } from "antd";
 import { SessionProvider } from "next-auth/react";
 // import AuthBtn from "./_components/AuthBtn";
 import dynamic from "next/dynamic";
+import { useEffect } from "react";
+import ContactHeader from "./_components/Contact-Header/Contact-Header";
+import Header from "./_components/Header/Header";
 const AuthBtn = dynamic(() => import("./_components/AuthBtn"), { ssr: false });
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { Header } = Layout;
+  // const { Header } = Layout;
 
   return (
     <html lang="en">
@@ -23,9 +26,12 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
+
       <body>
         <SessionProvider>
-          <Header>
+          <ContactHeader />
+          <Header />
+          {/* <Header>
             <span className="logo">
               <Link href={process.env.NEXT_PUBLIC_WEBSITE_URL + ""}>
                 ChatbotAI
@@ -37,7 +43,7 @@ export default function RootLayout({
               </Link>
               <AuthBtn />
             </div>
-          </Header>
+          </Header> */}
           {children}
         </SessionProvider>
       </body>

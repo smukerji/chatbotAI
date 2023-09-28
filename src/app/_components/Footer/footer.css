@@ -7,13 +7,27 @@
 
 .footer-container .logo {
     text-align: start;
+    font-size: 29px;
+    width: 210px;
+    color: black;
+    font-style: normal;
+    font-weight: 700;
+    font-family: 'Josefin Sans', sans-serif;
 }
 
-.footer-container>div {
+
+
+.description-container {
+    flex: 1.5;
+}
+
+.footer-container>div:not(:first-child) {
     flex: 1;
+    margin-top: 6px;
 }
 
 .description-container .description {
+    margin-top: 19px;
     color: #000;
     font-size: 20px;
     font-style: normal;
@@ -35,9 +49,9 @@
 
 .other-container h2 {
     color: #000;
-    font-size: 29px;
+    font-size: 22px;
     font-style: normal;
-    font-weight: 500;
+    font-weight: 700;
     line-height: 120%;
     /* 34.8px */
 }
@@ -89,9 +103,12 @@
     font-style: normal;
     font-weight: 400;
     line-height: 120%;
+    display: flex;
     border: none;
     cursor: pointer;
     justify-content: center;
+    align-items: center;
+    gap: 25px;
 }
 
 .copyright-section {
@@ -103,4 +120,26 @@
     font-style: normal;
     font-weight: 400;
     line-height: 120%;
+}
+
+
+/*------------------------------------css for secreen less than 1440---------------------------------*/
+@media only screen and (max-width: 1440px) {
+    .description-container .description {
+        font-size: 17px;
+    }
+
+    .other-container li {
+        font-size: 15px;
+        line-height: 35px;
+    }
+
+    .get-direction-btn {
+        width: 330px;
+        font-size: 19px;
+    }
+
+    .copyright-section {
+        font-size: 20px;
+    }
 }

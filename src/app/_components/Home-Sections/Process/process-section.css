@@ -17,8 +17,10 @@
     right: 0;
     /* 264px */
     text-transform: uppercase;
-    -webkit-text-stroke: 1px #33E0C4;
-    color: transparent;
+    /* -webkit-text-stroke: 1px #33E0C4;
+    color: transparent; */
+    text-shadow: -1px 1px 0px #33E0C4, 0px 1px 0px #33E0C4, 1px 1px 0px #33E0C4, 0px -1px 0px #33E0C4;
+    color: #fff;
 }
 
 .process-section-container .bottom {
@@ -41,7 +43,8 @@
     margin-right: 130px;
     margin-left: auto;
     margin-top: -106px;
-    -webkit-text-stroke: 1px #000;
+    /* -webkit-text-stroke: 1px #000; */
+    text-shadow: none;
     font-family: 'Poppins', sans-serif !important;
 }
 

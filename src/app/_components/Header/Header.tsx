@@ -1,5 +1,9 @@
+"use client";
 import React from "react";
 import "./header.css";
+import dynamic from "next/dynamic";
+
+const AuthBtn = dynamic(() => import("../AuthBtn"), { ssr: false });
 
 function Header() {
   return (
@@ -28,7 +32,9 @@ function Header() {
             </li>
 
             <li>
-              <a href="">AI Chatbot</a>
+              <a href={`${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot`}>
+                AI Chatbot
+              </a>
             </li>
 
             <li>
@@ -36,6 +42,9 @@ function Header() {
             </li>
           </ul>
         </div>
+        {/* <AuthBtn /> */}
+
+        {/* neeed to chanhe here */}
         <div className="login-signup">Sign up / Login</div>
       </div>
     </>

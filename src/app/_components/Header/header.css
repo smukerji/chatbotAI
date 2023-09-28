@@ -5,7 +5,7 @@
     align-items: center;
 }
 
-.logo {
+.header-container .logo {
     width: 210px;
     color: black;
     font-size: 36px;

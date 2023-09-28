@@ -30,23 +30,24 @@ export default function AuthBtn() {
 
   return (
     <>
-      <a
-        href={!isLoggedIn ? "/account/login" : ""}
-        style={{
-          fontWeight: "normal",
-          color: "black",
-          textDecoration: "underline",
-          marginLeft: "10px",
-        }}
-        onClick={async (e) => {
-          if (session?.user || userId) {
-            logout();
-            signOut();
-          }
-        }}
-      >
-        {isLoggedIn ? "Sign out" : "Sign in"}
-      </a>
+      <div className="login-signup">
+        <a
+          href={!isLoggedIn ? "/account/login" : ""}
+          style={{
+            fontWeight: "normal",
+            color: "white",
+            textDecoration: "none",
+          }}
+          onClick={async (e) => {
+            if (session?.user || userId) {
+              logout();
+              signOut();
+            }
+          }}
+        >
+          {isLoggedIn ? "Log out" : "Sign up / Login"}
+        </a>
+      </div>
     </>
   );
 }

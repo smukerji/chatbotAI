@@ -18,8 +18,10 @@
     font-style: normal;
     font-weight: 800;
     line-height: 120%;
-    color: transparent;
-    -webkit-text-stroke: 1px #33E0C4;
+    /* color: transparent;
+    -webkit-text-stroke: 1px #33E0C4; */
+    text-shadow: -1px 1px 0px #33E0C4, 0px 1px 0px #33E0C4, 1px 1px 0px #33E0C4, 0px -1px 0px #33E0C4;
+    color: #fff;
     padding: 0 213px;
     text-align: center;
     z-index: -1;
@@ -38,7 +40,8 @@
     text-transform: uppercase;
     position: absolute;
     top: 150px;
-    -webkit-text-stroke: transparent;
+    /* -webkit-text-stroke: transparent; */
+    text-shadow: none;
     z-index: 10;
 }
 

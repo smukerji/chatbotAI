@@ -31,8 +31,10 @@
     font-style: normal;
     font-weight: 800;
     line-height: 120%;
-    color: transparent;
-    -webkit-text-stroke: 1px #33E0C4;
+    /* color: transparent;
+    -webkit-text-stroke: 1px #33E0C4; */
+    text-shadow: -1px 1px 0px #33E0C4, 0px 1px 0px #33E0C4, 1px 1px 0px #33E0C4, 0px -1px 0px #33E0C4;
+    color: #fff;
     z-index: -1;
 }
 
@@ -50,7 +52,8 @@
     position: absolute;
     margin-top: -71px;
     z-index: 10;
-    -webkit-text-stroke: transparent
+    /* -webkit-text-stroke: transparent */
+    text-shadow: none;
 }
 
 .facility-section-container .facility-welcome-text-decorator {

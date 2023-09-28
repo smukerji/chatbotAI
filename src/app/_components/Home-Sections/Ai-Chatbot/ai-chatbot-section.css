@@ -4,13 +4,16 @@
 
 .ai-chatbot-text {
     height: 220px;
-    font-size: 220px;
+    /* font-size: 220px; */
+    font-size: 12vw;
     font-style: normal;
     font-weight: 800;
     line-height: 120%;
     position: relative;
-    color: transparent;
-    -webkit-text-stroke: 1px #33E0C4;
+    /* color: transparent; */
+    /* -webkit-text-stroke: 1px #33E0C4; */
+    text-shadow: -1px 1px 0px #33E0C4, 0px 1px 0px #33E0C4, 1px 1px 0px #33E0C4, 0px -1px 0px #33E0C4;
+    color: #fff;
     z-index: -1;
 }
 
