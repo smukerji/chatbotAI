@@ -35,39 +35,47 @@ function CompatibilitySection() {
                 <span>
                   <Image src={RightArrowImg} alt="right-arrow-img" />
                 </span>
-                Integrate accessibility solutions into the overall &quot;look
-                and feel&quot;.
+                <span>
+                  Integrate accessibility solutions into the overall &quot;look
+                  and feel&quot;.
+                </span>
               </li>
               <li>
                 <span>
                   <Image src={RightArrowImg} alt="right-arrow-img" />
                 </span>
-                Promote accessibility in help and documentation.
+                <span>Promote accessibility in help and documentation.</span>
               </li>
               <li>
                 <span>
                   <Image src={RightArrowImg} alt="right-arrow-img" />
                 </span>
-                Ensure that the authoring tool is accessible to authors with
-                disabilities.
+                <span>
+                  Ensure that the authoring tool is accessible to authors with
+                  disabilities.
+                </span>
               </li>
               <li>
                 <span>
                   <Image src={RightArrowImg} alt="right-arrow-img" />
                 </span>
-                Accessible templates and documentation.
+                <span>Accessible templates and documentation.</span>
               </li>
               <li>
                 <span>
                   <Image src={RightArrowImg} alt="right-arrow-img" />
                 </span>
-                Generate standard markup and creation of accessible content.
+                <span>
+                  Generate standard markup and creation of accessible content.
+                </span>
               </li>
               <li>
                 <span>
                   <Image src={RightArrowImg} alt="right-arrow-img" />
                 </span>
-                Define ways of checking and correcting inaccessible content.
+                <span>
+                  Define ways of checking and correcting inaccessible content.
+                </span>
               </li>
             </ul>
           </div>

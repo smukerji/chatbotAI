@@ -26,7 +26,7 @@
     margin-top: 6px;
 }
 
-.description-container .description {
+.footer-container .description-container .description {
     margin-top: 19px;
     color: #000;
     font-size: 20px;
@@ -94,12 +94,12 @@
 }
 
 .get-direction-btn {
-    width: 332px;
+    padding: 20px 30px;
     height: 73px;
     border-radius: 44.5px;
     background: #15C3A7;
     color: #fff;
-    font-size: 23px;
+    font-size: 1.4vw;
     font-style: normal;
     font-weight: 400;
     line-height: 120%;
@@ -125,18 +125,13 @@
 
 /*------------------------------------css for secreen less than 1440---------------------------------*/
 @media only screen and (max-width: 1440px) {
-    .description-container .description {
+    .footer-container .description-container .description {
         font-size: 17px;
     }
 
     .other-container li {
         font-size: 15px;
         line-height: 35px;
-    }
-
-    .get-direction-btn {
-        width: 330px;
-        font-size: 19px;
     }
 
     .copyright-section {

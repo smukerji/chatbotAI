@@ -16,8 +16,7 @@
 
 .compatibility-text {
     position: relative;
-    height: 220px;
-    font-size: 220px;
+    font-size: 12vw;
     font-style: normal;
     font-weight: 800;
     line-height: 120%;
@@ -30,15 +29,15 @@
 
 .compatibility-section-container .compatibility-welcome-text {
     color: #000;
-    font-size: 64px;
+    font-size: 3.4vw;
     font-style: normal;
-    width: 704px;
+    width: 39vw;
     font-weight: 700;
     line-height: 134%;
     text-transform: uppercase;
     position: absolute;
-    top: 195px;
-    left: 95px;
+    top: 74.8%;
+    left: 5.5%;
     /* -webkit-text-stroke: transparent; */
     text-shadow: none;
     z-index: 10;
@@ -47,11 +46,10 @@
 .compatibility-section-container .compatibility-welcome-text::before {
     content: '';
     position: absolute;
-    left: 30%;
-    transform: translateX(-50%);
-    top: 59px;
-    width: 420px;
-    height: 30px;
+    left: 1%;
+    top: 36%;
+    width: 23.2vw;
+    height: 4vh;
     background: #15C3A7;
     border-radius: 20px;
     z-index: -1;
@@ -59,11 +57,11 @@
 
 
 .compatibility-section-container .section-text {
-    margin-top: 156px;
-    margin-left: 100px;
-    color: #232932;
-    width: 929px;
-    font-size: 32px;
+    margin-top: 6%;
+    margin-left: 5.5%;
+    color: #000;
+    width: 51.6vw;
+    font-size: 1.8rem;
     font-style: normal;
     font-weight: 400;
     line-height: 54px;
@@ -76,11 +74,11 @@
 .compatibility-section-container .bottom {
     display: flex;
     position: relative;
+    padding: 0 50px 0 100px;
 }
 
 .compatibility-section-container .contact-demo-button {
     display: flex;
-    width: 400px;
     padding: 20px 30px;
     justify-content: center;
     align-items: center;
@@ -88,7 +86,7 @@
     border-radius: 15px;
     background: #15C3A7;
     color: #FFF;
-    font-size: 29px;
+    font-size: 1.4vw;
     font-style: normal;
     font-weight: 400;
     line-height: 130%;
@@ -98,47 +96,48 @@
 }
 
 .compatibility-section-container .bottom .left {
-    margin-left: 100px;
+    /* margin-left: 100px; */
+    flex: 1;
 }
 
 .compatibility-section-container .bottom .left ul {
     list-style: none;
     margin-top: 41px;
-    margin-bottom: 49px;
+    margin-bottom: 39px;
 }
 
 .compatibility-section-container .bottom .left ul li {
     display: flex;
-    text-align: center;
     gap: 10px;
     width: fit-content;
     font-size: 20px;
     font-style: normal;
     font-weight: 400;
     line-height: 211%;
+    margin-bottom: 10px;
 }
 
 .compatibility-section-container .bottom .left ul li span {
     display: flex;
-    align-items: center;
+    /* align-items: center; */
+}
+
+.compatibility-section-container .bottom .left ul li span:nth-child(2) {
+    margin-top: -13px;
 }
 
 .compatibility-section-container .bottom .right {
     margin-top: -110px;
+    flex: 1;
+}
 
+.compatibility-section-container .bottom .right img {
+    width: 100%;
+    height: 100%;
 }
 
 /*------------------------------------css for secreen less than 1440---------------------------------*/
 @media only screen and (max-width: 1440px) {
-
-    .compatibility-text {
-        font-size: 190px;
-    }
-
-    .compatibility-section-container .compatibility-welcome-text {
-        font-size: 62px;
-        top: 166px;
-    }
 
 
     .compatibility-section-container .top .ellipse-img {
@@ -149,9 +148,7 @@
 
 
     .compatibility-section-container .section-text {
-        font-size: 20px;
-        width: 800px;
-        line-height: 35px;
+        line-height: 45px;
     }
 
     .compatibility-section-container .bottom .left ul li {
@@ -159,21 +156,4 @@
         width: max-content;
     }
 
-    .compatibility-section-container .contact-demo-button {
-        width: 330px;
-        font-size: 19px;
-    }
-
-    .compatibility-section-container .bottom .right {
-        margin-left: 50px;
-        position: absolute;
-        top: 0;
-        right: 8px;
-        width: 50%;
-    }
-
-    .compatibility-section-container .bottom .right img {
-        height: 100%;
-        width: 100%;
-    }
 }

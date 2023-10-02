@@ -1,11 +1,12 @@
 .faq-section-container {
     display: flex;
     position: relative;
+    padding: 0 50px 0 100px;
 }
 
 /* ------------------------------accordion------------------------------- */
 .accordion {
-    width: 870px;
+    width: 48vw;
     border-radius: 8px;
 }
 
@@ -23,10 +24,6 @@
     line-height: 180%;
 }
 
-.accordion.open {
-    height: 266px;
-}
-
 .accordion .accordion-header {
     cursor: pointer;
     margin-top: 28px;
@@ -34,8 +31,8 @@
 }
 
 .accordion .accordion-content {
-    width: 740px;
-    margin: 17px auto auto 80px;
+    width: 41vw;
+    margin: 17px auto 40px 80px;
 }
 
 .accordion h3 {
@@ -49,8 +46,7 @@
 
 
 .faq-list-container {
-    padding-left: 100px;
-    padding-top: 54px;
+    padding-top: 3%;
     display: flex;
     flex-direction: column;
     gap: 25px;
@@ -58,9 +54,10 @@
 }
 
 .faq-list-container hr {
-    width: 570px;
+    width: 28.6vw;
     height: 0.5px;
     background: #D9D9D9;
+    border-color: transparent;
     margin-left: 30px !important
 }
 
@@ -86,8 +83,7 @@
 
 .faq-text {
     position: relative;
-    height: 220px;
-    font-size: 220px;
+    font-size: 12vw;
     font-style: normal;
     font-weight: 800;
     line-height: 120%;
@@ -100,18 +96,19 @@
     flex-direction: column;
     text-transform: uppercase;
     z-index: 1;
+    margin-left: -100px;
 }
 
 .faq-section-container .faq-welcome-text {
     color: #000;
-    font-size: 64px;
+    font-size: 3.4vw;
     font-style: normal;
     font-weight: 700;
     line-height: 134%;
     text-transform: uppercase;
     position: absolute;
-    top: 141px;
-    left: 110px;
+    top: 52%;
+    left: 11.5%;
     /* -webkit-text-stroke: transparent; */
     text-shadow: none;
     z-index: 10;
@@ -120,9 +117,9 @@
 .faq-section-container .faq-welcome-text::before {
     content: '';
     position: absolute;
-    top: 47px;
-    width: 420px;
-    height: 30px;
+    top: 60%;
+    width: 23.2vw;
+    height: 4vh;
     background: #15C3A7;
     border-radius: 20px;
     z-index: -1;
@@ -130,7 +127,6 @@
 
 .faq-section-container .contact-demo-button {
     display: flex;
-    width: 400px;
     padding: 20px 30px;
     justify-content: center;
     align-items: center;
@@ -138,14 +134,13 @@
     border-radius: 15px;
     background: #15C3A7;
     color: #FFF;
-    font-size: 29px;
+    font-size: 1.4vw;
     font-style: normal;
     font-weight: 400;
     line-height: 130%;
     text-transform: uppercase;
     border: none;
     cursor: pointer;
-    margin-left: 100px;
     margin-top: 68px;
 
 }
@@ -160,36 +155,15 @@
     flex: 1;
 }
 
+
+.faq-section-container .right img {
+    width: 100%;
+}
+
 /*------------------------------------css for secreen less than 1440---------------------------------*/
 @media only screen and (max-width: 1440px) {
-    .faq-text {
-        font-size: 190px;
-    }
-
-    .faq-section-container .faq-welcome-text {
-        font-size: 62px;
-        left: 91px
-    }
-
-    .faq-section-container .contact-demo-button {
-        width: 330px;
-        font-size: 19px;
-    }
-
-    .faq-section-container .right img {
-        width: 498px;
-        height: 590px;
-    }
-
-    .accordion {
-        width: 740px;
-    }
 
     .faq-list-container {
         gap: 15px;
-    }
-
-    .accordion .accordion-content {
-        width: 620px;
     }
 }

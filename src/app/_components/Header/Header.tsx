@@ -42,10 +42,10 @@ function Header() {
             </li>
           </ul>
         </div>
-        {/* <AuthBtn /> */}
+        <AuthBtn />
 
         {/* neeed to chanhe here */}
-        <div className="login-signup">Sign up / Login</div>
+        {/* <div className="login-signup">Sign up / Login</div> */}
       </div>
     </>
   );

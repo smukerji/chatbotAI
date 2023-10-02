@@ -10,8 +10,7 @@
 
 .service-text {
     position: relative;
-    height: 220px;
-    font-size: 220px;
+    font-size: 12vw;
     font-style: normal;
     font-weight: 800;
     line-height: 120%;
@@ -24,14 +23,14 @@
 
 .service-section-container .service-welcome-text {
     color: #000;
-    font-size: 64px;
+    font-size: 3.4vw;
     font-style: normal;
     font-weight: 700;
     line-height: 134%;
     text-transform: uppercase;
     position: absolute;
-    top: 183px;
-    left: 95px;
+    top: 71%;
+    left: 5%;
     /* -webkit-text-stroke: transparent; */
     text-shadow: none;
     z-index: 10;
@@ -40,32 +39,30 @@
 .service-section-container .service-welcome-text::before {
     content: '';
     position: absolute;
-    left: 35%;
-    transform: translateX(-50%);
-    top: 58px;
-    width: 420px;
-    height: 30px;
+    top: 66%;
+    width: 23.2vw;
+    height: 4vh;
     background: #15C3A7;
     border-radius: 20px;
     z-index: -1;
 }
 
+/*    left with service ......................................  to add cccsssss*/
 
 .service-section-container .section-text {
-    margin-top: 100px;
+    margin-top: 3%;
     font-size: 20px;
     font-style: normal;
     font-weight: 400;
     line-height: 45px;
-    margin-left: 100px;
+    margin-left: 5%;
     color: #232932;
-    width: 863px;
+    width: 47vw;
 }
 
 
 .service-section-container .contact-demo-button {
     display: flex;
-    width: 400px;
     padding: 20px 30px;
     justify-content: center;
     align-items: center;
@@ -73,7 +70,7 @@
     border-radius: 15px;
     background: #15C3A7;
     color: #FFF;
-    font-size: 29px;
+    font-size: 1.4vw;
     font-style: normal;
     font-weight: 400;
     line-height: 130%;
@@ -82,7 +79,7 @@
     cursor: pointer;
     position: absolute;
     top: 50%;
-    right: 145px;
+    right: 8.3%;
 }
 
 
@@ -143,26 +140,11 @@
 /*------------------------------------css for secreen less than 1440---------------------------------*/
 @media only screen and (max-width: 1440px) {
 
-    .service-text {
-        font-size: 190px;
-    }
-
-    .service-section-container .service-welcome-text {
-        font-size: 62px;
-        top: 162px;
-        left: 75px;
-    }
-
-    .service-section-container .contact-demo-button {
-        width: 330px;
-        font-size: 19px;
-    }
-
     .service-section-container .section-text {
-        width: 800px;
+        /* width: 800px; */
         line-height: 35px;
-        margin-left: 75px;
-        margin-top: 80px;
+        /* margin-left: 75px;
+        margin-top: 80px; */
     }
 
     .services-connector {

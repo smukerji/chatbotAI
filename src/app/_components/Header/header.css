@@ -1,14 +1,13 @@
 .header-container {
     padding: 20px 100px;
     display: flex;
-    gap: 105px;
     align-items: center;
+    justify-content: space-between;
 }
 
 .header-container .logo {
-    width: 210px;
     color: black;
-    font-size: 36px;
+    font-size: 2.2vw;
     font-style: normal;
     font-weight: 700;
     font-family: 'Josefin Sans', sans-serif;
@@ -21,14 +20,14 @@
 }
 
 .navbar {
-    font-size: 20px;
-    margin-right: auto;
+    font-size: 1.2vw;
+    width: 58%;
 }
 
 .navbar ul {
     list-style: none;
     display: flex;
-    gap: 40px;
+    justify-content: space-between;
 }
 
 .navbar ul a {
@@ -47,7 +46,7 @@
     background-color: #15C3A7;
     color: #fff;
     line-height: 120%;
-    font-size: 20px;
+    font-size: 1.2vw;
     cursor: pointer;
 }
 
@@ -56,19 +55,10 @@
 @media only screen and (max-width: 1440px) {
     .header-container {
         padding: 20px 67px;
-        gap: 105px;
-    }
-
-    .logo {
-        font-size: 32px;
-    }
-
-    .navbar {
-        font-size: 18px;
     }
 
     .login-signup {
         padding: 10px 25px;
-        font-size: 18px;
+        /* font-size: 18px; */
     }
 }

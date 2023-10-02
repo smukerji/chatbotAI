@@ -19,8 +19,9 @@ export default function Home() {
       <FacilitiesSection />
       <IndustrySection />
       <ServicesSection />
-      <CompatibilitySection />
+      <CompatibilitySection /> 
       <Testimonials />
+      {/* responsive almost done till 1200px*/}
       <FAQ />
       <ContactSection />
       <Footer />

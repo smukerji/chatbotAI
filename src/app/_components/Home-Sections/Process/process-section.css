@@ -10,7 +10,8 @@
 
 .top .process-text {
     text-align: right;
-    font-size: 220px;
+    /* font-size: 220px; */
+    font-size: 12vw;
     font-style: normal;
     font-weight: 800;
     line-height: 120%;
@@ -21,6 +22,7 @@
     color: transparent; */
     text-shadow: -1px 1px 0px #33E0C4, 0px 1px 0px #33E0C4, 1px 1px 0px #33E0C4, 0px -1px 0px #33E0C4;
     color: #fff;
+    position: relative;
 }
 
 .process-section-container .bottom {
@@ -31,49 +33,44 @@
 .top .process-welcome-text {
     color: #000;
     text-align: right;
-    font-family: Poppins;
-    font-size: 66px;
-    width: 760px;
-    height: 176px;
+    font-size: 3.4vw;
+    width: 42vw;
+    height: 31vh;
     font-style: normal;
     font-weight: 700;
     line-height: 134%;
     /* 88.44px */
     text-transform: uppercase;
-    margin-right: 130px;
-    margin-left: auto;
-    margin-top: -106px;
+    position: absolute;
+    right: 9%;
+    top: 58%;
     /* -webkit-text-stroke: 1px #000; */
     text-shadow: none;
-    font-family: 'Poppins', sans-serif !important;
 }
 
-.process-text-decorator {
-    width: 407px;
-    height: 29px;
+.top .process-welcome-text::before {
+    position: absolute;
+    content: "";
+    width: 23.2vw;
+    height: 4vh;
     border-radius: 39px;
     background: #15C3A7;
-    margin-top: -119px;
-    margin-left: auto;
-    z-index: 1;
-    right: 126px;
-    margin-right: 126px;
-    bottom: 55px;
-
+    z-index: -1;
+    right: 0;
+    bottom: 57%;
 }
+
 
 .process-section-container .contact-demo-button {
     display: flex;
-    width: 415px;
     padding: 20px 30px;
     justify-content: center;
     align-items: center;
     gap: 10px;
     border-radius: 15px;
     background: #15C3A7;
-
     color: #FFF;
-    font-size: 29px;
+    font-size: 1.4vw;
     font-style: normal;
     font-weight: 400;
     line-height: 130%;
@@ -100,13 +97,13 @@
 }
 
 .left-first-rectangle-container .left-first-rectangle {
-    width: 177.777px;
+    width: 9.87vw;
     height: 177.63px;
     border: 1px solid;
 }
 
 .left-first-rectangle-background {
-    width: 191px;
+    width: 10.6vw;
     height: 80px;
     border-radius: 56px;
     background: #ffc791;
@@ -121,14 +118,13 @@
 .left-first-rectangle-image-text {
     color: #F68C28;
     text-align: center;
-    font-size: 48px;
+    font-size: 2.66vw;
     font-style: normal;
     font-weight: 400;
     line-height: 126%;
-    margin-top: -70px;
     position: absolute;
-    left: 110px;
-    top: 128px;
+    left: 42%;
+    top: 8.6%;
     z-index: 10;
 }
 
@@ -136,7 +132,7 @@
     color: #F68C28;
     text-align: center;
     font-family: Poppins;
-    font-size: 35px;
+    font-size: 1.94vw;
     font-style: normal;
     font-weight: 800;
     line-height: 120%;
@@ -146,7 +142,7 @@
 }
 
 .left-first-rectangle-title-underline {
-    width: 145.003px;
+    width: 8vw;
     height: 3px;
     background: #F68C28;
     margin-top: 15.5px;
@@ -158,7 +154,7 @@
 }
 
 .left-first-rectangle-text {
-    width: 267px;
+    width: 14.83vw;
     text-align: center;
     font-size: 20px;
     font-style: normal;
@@ -172,18 +168,19 @@
     position: absolute;
     margin-top: 183px;
     margin-left: 462px;
-    width: 383.936px;
+    width: 25vw;
     transform: rotate(20.227deg);
     z-index: -1;
     background: #F68C28;
     border-color: transparent;
+
 }
 
 .left-first-rectangle-second-line {
     position: absolute;
     margin-top: 187px;
     margin-left: 447px;
-    width: 392.936px;
+    width: 25vw;
     transform: rotate(20.227deg);
     z-index: -1;
     background: #F68C28;
@@ -194,7 +191,7 @@
     position: absolute;
     margin-top: 193px;
     margin-left: 440px;
-    width: 383.936px;
+    width: 25vw;
     transform: rotate(20.227deg);
     z-index: -1;
     background: #F68C28;
@@ -204,9 +201,9 @@
 
 /* ------------------------------left second rectangle------------------------------- */
 .left-second-rectangle-container {
-    margin-left: 189px;
+    margin-left: 11.5%;
     position: relative;
-    margin-top: 200px;
+    margin-top: 13%;
     width: fit-content;
     align-items: center;
     display: flex;
@@ -214,13 +211,13 @@
 }
 
 .left-second-rectangle-container .left-second-rectangle {
-    width: 177.777px;
+    width: 9.87vw;
     height: 177.63px;
     border: 1px solid;
 }
 
 .left-second-rectangle-background {
-    width: 191px;
+    width: 10.6vw;
     height: 80px;
     border-radius: 56px;
     background: #9B9DF5;
@@ -234,22 +231,21 @@
 .left-second-rectangle-image-text {
     color: #7463EC;
     text-align: center;
-    font-size: 48px;
+    font-size: 2.66vw;
     font-style: normal;
     font-weight: 400;
-    z-index: 10;
     line-height: 126%;
-    margin-top: -70px;
     position: absolute;
-    left: 110px;
-    top: 128px;
+    left: 40%;
+    top: 11.6%;
+    z-index: 10;
 }
 
 .left-second-rectangle-title {
     color: #7463EC;
     text-align: center;
     font-family: Poppins;
-    font-size: 35px;
+    font-size: 1.94vw;
     font-style: normal;
     font-weight: 800;
     line-height: 120%;
@@ -259,7 +255,7 @@
 }
 
 .left-second-rectangle-title-underline {
-    width: 145.003px;
+    width: 8vw;
     height: 3px;
     background: #7463EC;
     margin-top: 15.5px;
@@ -267,7 +263,7 @@
 }
 
 .left-second-rectangle-text {
-    width: 267px;
+    width: 14.83vw;
     text-align: center;
     font-size: 20px;
     font-style: normal;
@@ -284,7 +280,7 @@
     position: absolute;
     margin-top: -6px;
     margin-left: 462px;
-    width: 383.936px;
+    width: 25vw;
     transform: rotate(338deg);
     z-index: -1;
     background: #7463EC;
@@ -295,7 +291,7 @@
     position: absolute;
     margin-top: -10px;
     margin-left: 447px;
-    width: 392.936px;
+    width: 25vw;
     transform: rotate(338deg);
     z-index: -1;
     background: #7463EC;
@@ -306,7 +302,7 @@
     position: absolute;
     margin-top: -20px;
     margin-left: 462px;
-    width: 393.936px;
+    width: 25vw;
     transform: rotate(338deg);
     z-index: -1;
     background: #7463EC;
@@ -315,7 +311,7 @@
 
 /* ------------------------------left third rectangle------------------------------- */
 .left-third-rectangle-container {
-    margin-left: 189px;
+    margin-left: 11.5%;
     position: relative;
     width: fit-content;
     align-items: center;
@@ -324,13 +320,13 @@
 }
 
 .left-third-rectangle-container .left-third-rectangle {
-    width: 177.777px;
+    width: 9.87vw;
     height: 177.63px;
     border: 1px solid;
 }
 
 .left-third-rectangle-background {
-    width: 191px;
+    width: 10.6vw;
     height: 80px;
     z-index: 10;
     border-radius: 56px;
@@ -342,24 +338,23 @@
 }
 
 .left-third-rectangle-image-text {
-    z-index: 10;
     color: #F54BA6;
     text-align: center;
-    font-size: 48px;
+    font-size: 2.66vw;
     font-style: normal;
     font-weight: 400;
     line-height: 126%;
-    margin-top: -70px;
     position: absolute;
-    left: 110px;
-    top: 128px;
+    left: 39%;
+    top: 8.6%;
+    z-index: 10;
 }
 
 .left-third-rectangle-title {
     color: #F54BA6;
     text-align: center;
     font-family: Poppins;
-    font-size: 35px;
+    font-size: 1.94vw;
     font-style: normal;
     font-weight: 800;
     line-height: 120%;
@@ -369,7 +364,7 @@
 }
 
 .left-third-rectangle-title-underline {
-    width: 145.003px;
+    width: 8vw;
     height: 3px;
     background: #F54BA6;
     margin-top: 15.5px;
@@ -377,7 +372,7 @@
 }
 
 .left-third-rectangle-text {
-    width: 267px;
+    width: 14.83vw;
     text-align: center;
     font-size: 20px;
     font-style: normal;
@@ -395,7 +390,7 @@
     position: absolute;
     margin-top: 183px;
     margin-left: 462px;
-    width: 383.936px;
+    width: 25vw;
     transform: rotate(20.227deg);
     z-index: -1;
     background: #F54BA6;
@@ -406,7 +401,7 @@
     position: absolute;
     margin-top: 187px;
     margin-left: 447px;
-    width: 392.936px;
+    width: 25vw;
     transform: rotate(20.227deg);
     z-index: -1;
     background: #F54BA6;
@@ -417,7 +412,7 @@
     position: absolute;
     margin-top: 193px;
     margin-left: 440px;
-    width: 383.936px;
+    width: 25vw;
     transform: rotate(20.227deg);
     z-index: -1;
     background: #F54BA6;
@@ -427,9 +422,9 @@
 
 /* ------------------------------left fourth rectangle------------------------------- */
 .left-fourth-rectangle-container {
-    margin-left: 189px;
+    margin-left: 11.5%;
     position: relative;
-    margin-top: 200px;
+    margin-top: 13%;
     width: fit-content;
     align-items: center;
     display: flex;
@@ -437,14 +432,14 @@
 }
 
 .left-fourth-rectangle-container .left-fourth-rectangle {
-    width: 177.777px;
+    width: 9.87vw;
     height: 177.63px;
     border: 1px solid;
 }
 
 .left-fourth-rectangle-background {
     z-index: 10;
-    width: 191px;
+    width: 10.6vw;
     height: 80px;
     border-radius: 56px;
     background: #F9A;
@@ -455,24 +450,23 @@
 }
 
 .left-fourth-rectangle-image-text {
-    z-index: 10;
     color: #FB4F6A;
     text-align: center;
-    font-size: 48px;
+    font-size: 2.66vw;
     font-style: normal;
     font-weight: 400;
     line-height: 126%;
-    margin-top: -70px;
     position: absolute;
-    left: 110px;
-    top: 128px;
+    left: 39%;
+    top: 12.6%;
+    z-index: 10;
 }
 
 .left-fourth-rectangle-title {
     color: #FB4F6A;
     text-align: center;
     font-family: Poppins;
-    font-size: 35px;
+    font-size: 1.94vw;
     font-style: normal;
     font-weight: 800;
     line-height: 120%;
@@ -482,7 +476,7 @@
 }
 
 .left-fourth-rectangle-title-underline {
-    width: 145.003px;
+    width: 8vw;
     height: 3px;
     background: #FB4F6A;
     margin-top: 15.5px;
@@ -490,7 +484,7 @@
 }
 
 .left-fourth-rectangle-text {
-    width: 267px;
+    width: 14.83vw;
     text-align: center;
     font-size: 20px;
     font-style: normal;
@@ -503,31 +497,94 @@
     z-index: 10;
 }
 
+/*------------------------------------css for screen less than > 2000px---------------------------------*/
+@media only screen and (min-width : 2000px) {
 
-
-/*------------------------------------css for secreen less than 1440---------------------------------*/
-@media only screen and (max-width: 1440px) {
-    .top .process-text {
-        font-size: 190px;
-    }
-
-    .top .process-welcome-text {
-        font-size: 58px;
-        margin-right: 99px;
+    /* ------------------------------left first rectangle lines------------------------------- */
+    .left-first-rectangle-first-line {
+        margin-top: 213px;
         margin-left: auto;
+        margin-right: -624px;
+        width: 28vw;
+        transform: rotate(21.227deg);
     }
 
-    .process-text-decorator {
-        margin-top: -128px;
-        margin-right: 95px;
+    .left-first-rectangle-second-line {
+        margin-top: 220px;
+        margin-left: 625px;
+        width: 28vw;
+        transform: rotate(21.227deg);
     }
 
-    .process-section-container .contact-demo-button {
-        width: 330px;
-        font-size: 19px;
-        margin-right: 110px;
-        margin-top: 115px;
+    .left-first-rectangle-third-line {
+        margin-top: 227px;
+        margin-left: 625px;
+        width: 28vw;
+        transform: rotate(21.227deg);
     }
+
+
+    /* ------------------------------left second rectangle lines------------------------------- */
+    .left-second-rectangle-first-line {
+        margin-top: -43px;
+        margin-left: 654px;
+        width: 28vw;
+    }
+
+    .left-second-rectangle-second-line {
+        margin-top: -50px;
+        margin-left: 654px;
+        width: 28vw;
+    }
+
+    .left-second-rectangle-third-line {
+        margin-top: -57px;
+        margin-left: 654px;
+        width: 28vw;
+    }
+
+
+    /* ------------------------------left third rectangle lines------------------------------- */
+    .left-third-rectangle-first-line {
+        margin-top: 219px;
+        margin-left: 665px;
+        width: 28vw;
+    }
+
+    .left-third-rectangle-second-line {
+        margin-top: 226px;
+        margin-left: 665px;
+        width: 28vw;
+    }
+
+    .left-third-rectangle-third-line {
+        margin-top: 233px;
+        margin-left: 665px;
+        width: 28vw;
+    }
+
+
+    .left-first-rectangle-image-text {
+        top: 6%;
+    }
+
+    .left-second-rectangle-image-text {
+        top: 10%;
+    }
+
+    .left-third-rectangle-image-text {
+        top: 6%;
+    }
+
+    .left-fourth-rectangle-image-text {
+        top: 10%;
+    }
+
+}
+
+/*------------------------------------css for screen less than 1440---------------------------------*/
+@media only screen and (max-width: 1440px) {
+
 
     .process-section-container .bottom {
         padding-left: 76px;
@@ -536,12 +593,12 @@
 
     /* ------------------------------left first rectangle------------------------------- */
     .left-first-rectangle-container .left-first-rectangle {
-        width: 150px;
+        width: 9.87vw;
         height: 170px;
     }
 
     .left-first-rectangle-background {
-        width: 165px;
+        width: 10.6vw;
         height: 65px;
     }
 

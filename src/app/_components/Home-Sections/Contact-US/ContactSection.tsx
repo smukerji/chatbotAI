@@ -4,11 +4,14 @@ import Image from "next/image";
 import PhoneImg from "../../../../../public/svgs/whitephone.svg";
 import PinImg from "../../../../../public/svgs/whitepin.svg";
 import TimeImg from "../../../../../public/svgs/clock.svg";
+import ContactText from "../../../../../public/sections-images/common/conatct-text.svg";
 
 function ContactSection() {
   return (
     <div className="contact-us-section-container">
-      <div className="contact-text">Contact</div>
+      <div className="contact-text">
+        <Image src={ContactText} alt="contact-img" />
+      </div>
       <div className="contact-us-form">
         {/* ------------------------------left section------------------------------- */}
         <div className="left">
@@ -44,7 +47,7 @@ function ContactSection() {
             <input type="text" placeholder="MOBILE" />
             <input type="text" placeholder="EMAIL" />
             <textarea placeholder="MESSAGE" />
-            <button >SUBMIT</button>
+            <button>SUBMIT</button>
           </div>
         </div>
       </div>

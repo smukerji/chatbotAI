@@ -13,12 +13,12 @@ function FAQ() {
         "Lorem ipsum dolor sit amet, consectetur ad consectetur adipiscing elit ut aliquam, purus. Lorem ipsum dolor sit amet, consectetur ad consectetur adipiscing elit ut aliquam, purus.Lorem ipsum dolor sit amet, consectetur ad consectetur adipiscing elit ut aliquam, purus.",
     },
     {
-      title: "What is web/mobile app AI-chatbot?",
+      title: "Lorem ipsum dolor sit amet, consectetur ad consectetur ?",
       content:
         "Lorem ipsum dolor sit amet, consectetur ad consectetur adipiscing elit ut aliquam, purus. Lorem ipsum dolor sit amet, consectetur ad consectetur adipiscing elit ut aliquam, purus.Lorem ipsum dolor sit amet, consectetur ad consectetur adipiscing elit ut aliquam, purus.",
     },
     {
-      title: "What is web/mobile app AI-chatbot?",
+      title: "Does “ai chatbot” apply to more than the look of a website?",
       content:
         "Lorem ipsum dolor sit amet, consectetur ad consectetur adipiscing elit ut aliquam, purus. Lorem ipsum dolor sit amet, consectetur ad consectetur adipiscing elit ut aliquam, purus.Lorem ipsum dolor sit amet, consectetur ad consectetur adipiscing elit ut aliquam, purus.",
     },

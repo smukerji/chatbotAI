@@ -15,7 +15,6 @@ function PorcessSection() {
           <div className="process-welcome-text">
             Our Service Process that we apply
           </div>
-          <hr className="process-text-decorator" />
         </div>
         <button className="contact-demo-button">Contact for demo</button>
       </div>
@@ -106,7 +105,6 @@ function PorcessSection() {
         </div>
       </div>
     </div>
-
   );
 }
 

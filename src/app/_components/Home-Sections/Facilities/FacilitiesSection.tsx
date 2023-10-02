@@ -14,7 +14,6 @@ function FacilitiesSection() {
         <div className="facility-text">
           FACILITIES
           <div className="facility-welcome-text">AI CHATBOT FACILITIES</div>
-          <hr className="facility-welcome-text-decorator" />
         </div>
 
         <div className="section-text">
@@ -29,11 +28,11 @@ function FacilitiesSection() {
         {/* ------------------------------facilities-list-start------------------------------- */}
         <div className="facilities-list-container">
           {/* ------------------------------facility 1------------------------------- */}
-          <div className="facility-1">
+          <div className="facility">
             <Image
               className="icon"
               src={FacilityOneImage}
-              alt="facility-one-image"
+              alt="facilityimage"
             />
             <div className="description-container">
               <div className="title">Key Accessibility Choice</div>
@@ -45,11 +44,11 @@ function FacilitiesSection() {
           </div>
 
           {/* ------------------------------facility 2------------------------------- */}
-          <div className="facility-2">
+          <div className="facility">
             <Image
               className="icon"
               src={FacilityTwoImage}
-              alt="facility-two-image"
+              alt="facilityimage"
             />
             <div className="description-container">
               <div className="title">Key Accessibility Choice</div>
@@ -61,11 +60,11 @@ function FacilitiesSection() {
           </div>
 
           {/* ------------------------------facility 3------------------------------- */}
-          <div className="facility-3">
+          <div className="facility">
             <Image
               className="icon"
               src={FacilityThreeImage}
-              alt="facility-three-image"
+              alt="facility-image"
             />
             <div className="description-container">
               <div className="title">Key Accessibility Choice</div>

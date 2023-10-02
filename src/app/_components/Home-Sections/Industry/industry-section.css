@@ -13,8 +13,7 @@
 
 .industry-text {
     position: relative;
-    height: 220px;
-    font-size: 220px;
+    font-size: 12vw;
     font-style: normal;
     font-weight: 800;
     line-height: 120%;
@@ -33,13 +32,13 @@
 
 .industry-section-container .industry-welcome-text {
     color: #000;
-    font-size: 64px;
+    font-size: 3.4vw;
     font-style: normal;
     font-weight: 700;
     line-height: 134%;
     text-transform: uppercase;
     position: absolute;
-    top: 150px;
+    top: 68%;
     /* -webkit-text-stroke: transparent; */
     text-shadow: none;
     z-index: 10;
@@ -50,9 +49,9 @@
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    top: 50px;
-    width: 420px;
-    height: 30px;
+    top: 29%;
+    width: 23.2vw;
+    height: 4vh;
     background: #15C3A7;
     border-radius: 20px;
     z-index: -1;
@@ -67,13 +66,12 @@
     font-weight: 400;
     line-height: 45px;
     color: #232932;
-    width: 949px;
+    width: 52.7vw;
 }
 
 
 .industry-section-container .contact-demo-button {
     display: flex;
-    width: 400px;
     padding: 20px 30px;
     justify-content: center;
     align-items: center;
@@ -81,7 +79,7 @@
     border-radius: 15px;
     background: #15C3A7;
     color: #FFF;
-    font-size: 29px;
+    font-size: 1.4vw;
     font-style: normal;
     font-weight: 400;
     line-height: 130%;
@@ -449,37 +447,6 @@
 
 /*------------------------------------css for secreen less than 1440---------------------------------*/
 @media only screen and (max-width: 1440px) {
-    .industry-text {
-        font-size: 190px;
-    }
-
-    .industry-section-container .industry-welcome-text {
-        font-size: 62px;
-        top: 142px;
-    }
-
-    .industry-section-container .industry-welcome-text::before {
-        content: '';
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        top: 50px;
-        width: 420px;
-        height: 30px;
-        background: #15C3A7;
-        border-radius: 20px;
-        z-index: -1;
-    }
-
-    .industry-section-container .section-text {
-        width: 800px;
-    }
-
-    .industry-section-container .contact-demo-button {
-        width: 330px;
-        font-size: 19px;
-        margin-top: 50px;
-    }
 
     .sector {
         width: 250px;
