@@ -31,14 +31,15 @@ export default function Home({
   );
 
   /// creating the hash of initial text to compare it later with current text hash
-  const initialTextData = textData ? textData.text : "";
+  const initialTextData = textData?.text ? textData.text : "";
+
   const initialTextHash = crypto
     .createHash("sha1")
     .update(initialTextData)
     .digest("hex");
 
   /// creating the hash of initial Q&A to compare it later with current Q&A hash
-  const initialQAData = qaData ? qaData.qaList : [];
+  const initialQAData = qaData?.qaList ? qaData.qaList : [];
   const initialQAHash = crypto
     .createHash("sha1")
     .update(JSON.stringify(initialQAData))
@@ -416,13 +417,13 @@ export default function Home({
                 Included Sources:
               </span>
               <div className="items-character-count-container">
-                {(defaultFileList.length == 1 && (
+                {(defaultFileList?.length == 1 && (
                   <p>
                     {defaultFileList.length} File ({fileTextLength} detected
                     chars)
                   </p>
                 )) ||
-                  (defaultFileList.length > 1 && (
+                  (defaultFileList?.length > 1 && (
                     <p>
                       {defaultFileList.length} Files ({fileTextLength} detected
                       chars)

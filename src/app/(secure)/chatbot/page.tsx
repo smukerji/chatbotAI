@@ -71,7 +71,7 @@ function ChatBot() {
         <div className="chatbot-container">
           <div className="chatbot-container-title">
             <span className="title-text">My Chatbots</span>
-            <Link href={`${process.env.NEXT_PUBLIC_WEBSITE_URL}`}>
+            <Link href={`${process.env.NEXT_PUBLIC_WEBSITE_URL}home`}>
               <Button style={{ width: "150px" }} type="primary">
                 New Chatbot
               </Button>

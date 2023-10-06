@@ -16,7 +16,7 @@ function Header() {
         <div className="navbar">
           <ul>
             <li>
-              <a href="">Home</a>
+              <a href="/">Home</a>
             </li>
 
             <li>

@@ -2,7 +2,6 @@ import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "../_helpers/server/auth";
 
-
 export default function HomeLayout({
   children,
 }: {

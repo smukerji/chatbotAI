@@ -104,6 +104,10 @@ hr {
     position: relative;
 }
 
+#basic_username {
+    height: 60px;
+}
+
 .ant-input {
     height: 50px;
     font-size: 17px !important;
@@ -220,11 +224,12 @@ hr {
     background-color: #fafafa !important;
 }
 
-.login-register-container { 
+.login-register-container {
     display: flex;
     flex-direction: column;
     margin-top: 20px;
 }
+
 
 /* {
     border-radius: 8px;

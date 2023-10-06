@@ -99,7 +99,7 @@ function SourceUpload({
         </p>
       </Dragger>
       <div className="item-list-container">
-        {defaultFileList.length > 0 && (
+        {defaultFileList?.length > 0 && (
           <div className="text">
             <h1>Attached Files</h1> <p>({fileTextLength}) chars</p>
           </div>

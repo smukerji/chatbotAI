@@ -98,7 +98,7 @@
 
 .left-first-rectangle-container .left-first-rectangle {
     width: 9.87vw;
-    height: 177.63px;
+    height: 9.87vw;
     border: 1px solid;
 }
 
@@ -156,7 +156,7 @@
 .left-first-rectangle-text {
     width: 14.83vw;
     text-align: center;
-    font-size: 20px;
+    font-size: 1.11vw;
     font-style: normal;
     font-weight: 400;
     line-height: normal;
@@ -166,8 +166,8 @@
 
 .left-first-rectangle-first-line {
     position: absolute;
-    margin-top: 183px;
-    margin-left: 462px;
+    margin-top: 66%;
+    margin-left: 166%;
     width: 25vw;
     transform: rotate(20.227deg);
     z-index: -1;
@@ -178,8 +178,8 @@
 
 .left-first-rectangle-second-line {
     position: absolute;
-    margin-top: 187px;
-    margin-left: 447px;
+    margin-top: 68.5%;
+    margin-left: 164%;
     width: 25vw;
     transform: rotate(20.227deg);
     z-index: -1;
@@ -189,8 +189,8 @@
 
 .left-first-rectangle-third-line {
     position: absolute;
-    margin-top: 193px;
-    margin-left: 440px;
+    margin-top: 71%;
+    margin-left: 161%;
     width: 25vw;
     transform: rotate(20.227deg);
     z-index: -1;
@@ -212,7 +212,7 @@
 
 .left-second-rectangle-container .left-second-rectangle {
     width: 9.87vw;
-    height: 177.63px;
+    height: 9.87vw;
     border: 1px solid;
 }
 
@@ -265,7 +265,7 @@
 .left-second-rectangle-text {
     width: 14.83vw;
     text-align: center;
-    font-size: 20px;
+    font-size: 1.11vw;
     font-style: normal;
     font-weight: 400;
     line-height: normal;
@@ -278,8 +278,8 @@
 
 .left-second-rectangle-first-line {
     position: absolute;
-    margin-top: -6px;
-    margin-left: 462px;
+    margin-top: -1.7%;
+    margin-left: 168%;
     width: 25vw;
     transform: rotate(338deg);
     z-index: -1;
@@ -289,8 +289,8 @@
 
 .left-second-rectangle-second-line {
     position: absolute;
-    margin-top: -10px;
-    margin-left: 447px;
+    margin-top: -3.5%;
+    margin-left: 164%;
     width: 25vw;
     transform: rotate(338deg);
     z-index: -1;
@@ -300,8 +300,8 @@
 
 .left-second-rectangle-third-line {
     position: absolute;
-    margin-top: -20px;
-    margin-left: 462px;
+    margin-top: -6.8%;
+    margin-left: 168%;
     width: 25vw;
     transform: rotate(338deg);
     z-index: -1;
@@ -321,7 +321,7 @@
 
 .left-third-rectangle-container .left-third-rectangle {
     width: 9.87vw;
-    height: 177.63px;
+    height: 9.87vw;
     border: 1px solid;
 }
 
@@ -374,7 +374,7 @@
 .left-third-rectangle-text {
     width: 14.83vw;
     text-align: center;
-    font-size: 20px;
+    font-size: 1.11vw;
     font-style: normal;
     font-weight: 400;
     line-height: normal;
@@ -388,8 +388,8 @@
 
 .left-third-rectangle-first-line {
     position: absolute;
-    margin-top: 183px;
-    margin-left: 462px;
+    margin-top: 66.5%;
+    margin-left: 169%;
     width: 25vw;
     transform: rotate(20.227deg);
     z-index: -1;
@@ -399,8 +399,8 @@
 
 .left-third-rectangle-second-line {
     position: absolute;
-    margin-top: 187px;
-    margin-left: 447px;
+    margin-top: 68.5%;
+    margin-left: 164%;
     width: 25vw;
     transform: rotate(20.227deg);
     z-index: -1;
@@ -410,8 +410,8 @@
 
 .left-third-rectangle-third-line {
     position: absolute;
-    margin-top: 193px;
-    margin-left: 440px;
+    margin-top: 70.5%;
+    margin-left: 161%;
     width: 25vw;
     transform: rotate(20.227deg);
     z-index: -1;
@@ -433,7 +433,7 @@
 
 .left-fourth-rectangle-container .left-fourth-rectangle {
     width: 9.87vw;
-    height: 177.63px;
+    height: 9.87vw;
     border: 1px solid;
 }
 
@@ -486,7 +486,7 @@
 .left-fourth-rectangle-text {
     width: 14.83vw;
     text-align: center;
-    font-size: 20px;
+    font-size: 1.11vw;
     font-style: normal;
     font-weight: 400;
     line-height: normal;
@@ -501,7 +501,7 @@
 @media only screen and (min-width : 2000px) {
 
     /* ------------------------------left first rectangle lines------------------------------- */
-    .left-first-rectangle-first-line {
+    /* .left-first-rectangle-first-line {
         margin-top: 213px;
         margin-left: auto;
         margin-right: -624px;
@@ -521,11 +521,11 @@
         margin-left: 625px;
         width: 28vw;
         transform: rotate(21.227deg);
-    }
+    } */
 
 
     /* ------------------------------left second rectangle lines------------------------------- */
-    .left-second-rectangle-first-line {
+    /* .left-second-rectangle-first-line {
         margin-top: -43px;
         margin-left: 654px;
         width: 28vw;
@@ -541,11 +541,11 @@
         margin-top: -57px;
         margin-left: 654px;
         width: 28vw;
-    }
+    } */
 
 
     /* ------------------------------left third rectangle lines------------------------------- */
-    .left-third-rectangle-first-line {
+    /* .left-third-rectangle-first-line {
         margin-top: 219px;
         margin-left: 665px;
         width: 28vw;
@@ -578,7 +578,7 @@
 
     .left-fourth-rectangle-image-text {
         top: 10%;
-    }
+    } */
 
 }
 
@@ -586,13 +586,13 @@
 @media only screen and (max-width: 1440px) {
 
 
-    .process-section-container .bottom {
+    /* .process-section-container .bottom {
         padding-left: 76px;
-    }
+    } */
 
 
     /* ------------------------------left first rectangle------------------------------- */
-    .left-first-rectangle-container .left-first-rectangle {
+    /* .left-first-rectangle-container .left-first-rectangle {
         width: 9.87vw;
         height: 170px;
     }
@@ -637,11 +637,11 @@
         margin-left: 404px;
         width: 383.936px;
         transform: rotate(26deg);
-    }
+    } */
 
 
     /* ------------------------------left second rectangle------------------------------- */
-    .left-second-rectangle-container {
+    /* .left-second-rectangle-container {
         margin-left: 150px;
     }
 
@@ -691,10 +691,10 @@
         margin-left: 449px;
         width: 393.936px;
         transform: rotate(332deg);
-    }
+    } */
 
     /* ------------------------------left third rectangle------------------------------- */
-    .left-third-rectangle-container {
+    /* .left-third-rectangle-container {
         margin-left: 150px;
     }
 
@@ -743,11 +743,11 @@
         margin-left: 404px;
         width: 383.936px;
         transform: rotate(26deg);
-    }
+    } */
 
 
     /* ------------------------------left fourth rectangle------------------------------- */
-    .left-fourth-rectangle-container {
+    /* .left-fourth-rectangle-container {
         margin-left: 150px;
     }
 
@@ -774,5 +774,5 @@
     .left-fourth-rectangle-text {
         width: 205px;
         font-size: 15px;
-    }
+    } */
 }

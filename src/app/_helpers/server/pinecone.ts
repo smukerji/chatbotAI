@@ -2,6 +2,8 @@ import { PineconeClient } from "@pinecone-database/pinecone";
 // import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { v4 as uuid } from "uuid";
 import { createEmbedding } from "./embeddings";
+import dotenv from "dotenv";
+dotenv.config();
 // import { encode } from 'gpt-3-encoder';
 // import {
 //   PINECONE_API_KEY,
@@ -68,16 +70,14 @@ export const deletevectors = async (vectorIDs: [], namespace: string) => {
 export const deleteFileVectorsById = async (userid: any, vectorIDs: any) => {
   try {
     await pinecone.init({
-      environment: process.env.NEXT_PUBLIC_PINECONE_ENV as string,
-      apiKey: process.env.NEXT_PUBLIC_PINECONE_KEY as string,
+      environment: process.env.NEXT_PUBLIC_PINECONE_ENV!,
+      apiKey: process.env.NEXT_PUBLIC_PINECONE_KEY!,
     });
   } catch (error) {
     console.error("Error initializing Pinecone client:", error);
     throw new Error("Failed to initialize Pinecone client");
   }
-  const index = pinecone.Index(
-    process.env.NEXT_PUBLIC_PINECONE_INDEX as string
-  );
+  const index = pinecone.Index(process.env.NEXT_PUBLIC_PINECONE_INDEX!);
   // await pinecone.init({
   //   environment: process.env.NEXT_PUBLIC_PINECONE_ENV as string,
   //   apiKey: process.env.NEXT_PUBLIC_PINECONE_KEY as string,
@@ -121,12 +121,16 @@ export const updateVectorsById = async (vectors: any, userId: any) => {
   );
 
   try {
+    console.log("Update data ", vectors);
+
     const upsertReq = await index.upsert({
       upsertRequest: {
         vectors,
         namespace: userId,
       },
     });
+    console.log("Upsert request when updating", upsertReq);
+
     return upsertReq;
   } catch (error) {
     console.error("Error during upsert:", error);

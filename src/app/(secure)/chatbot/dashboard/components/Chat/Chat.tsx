@@ -150,8 +150,7 @@ function Chat({
                         properties: {
                           filename: {
                             type: "string",
-                            description:
-                              "File name if available and has .png,.jpeg,etc image format in text. else write null",
+                            description: "File name if N.A write null",
                           },
                         },
                         required: ["location"],
@@ -206,7 +205,6 @@ function Chat({
             );
 
             console.log(similaritySearchResults);
-            
 
             let resptext = "";
             const reader = responseOpenAI.body.getReader();
@@ -285,12 +283,17 @@ function Chat({
                   {message.content}
                   {messageImages[index]?.image &&
                     messageImages[index].image != null && (
-                      <Image
-                        style={{ width: "100%", height: "fit-content" }}
-                        src={`/qa-images/${messageImages[index]?.image}`}
-                        alt="me"
-                        width="604"
-                        height="604"
+                      // <Image
+                      //   style={{ width: "100%", height: "fit-content" }}
+                      //   src={`/qa-images/${messageImages[index]?.image}`}
+                      //   alt="me"
+                      //   width="604"
+                      //   height="604"
+                      // />
+                      <img
+                        width={"100%"}
+                        src={`https://drive.google.com/uc?export=view&id=${messageImages[index]?.image}`}
+                        alt="assistant-image"
                       />
                     )}
                 </div>

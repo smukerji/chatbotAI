@@ -13,6 +13,7 @@ export async function GET(req: any) {
       console.log("Message", e.message);
       cookies().delete("authorization");
       cookies().delete("userId");
+      return NextResponse.json({ message: "jwt expired" });
     }
   }
 

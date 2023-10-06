@@ -1,6 +1,6 @@
 "use client";
 import { Button, Form, Input, Spin, message } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./login.css";
 import Image from "next/image";
 import { useUserService } from "../../../_services/useUserService";
@@ -19,7 +19,7 @@ function Login() {
       spin
     />
   );
-
+  
   if (status === "authenticated") {
     redirect("/");
   }

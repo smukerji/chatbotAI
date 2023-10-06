@@ -8,6 +8,7 @@ import QuoteImg from "../../../../public/sections-images/testimonials-section/Gr
 import ProfileImg from "../../../../public/sections-images/testimonials-section/Ellipse 1.svg";
 import SlideLeftImg from "../../../../public/sections-images/common/slide-left.svg";
 import SlideRightImg from "../../../../public/sections-images/common/slide-right.svg";
+import TestimonialsText from "../../../../public/sections-images/common/testimonials-text.svg";
 
 function Testimonials() {
   const [mySwiper, setSwiper]: any = useState({});
@@ -16,7 +17,7 @@ function Testimonials() {
       {/* ------------------------------top section------------------------------- */}
       <div className="top">
         <div className="testimonials-text">
-          testimonials
+          <Image src={TestimonialsText} alt="testimonials-text" />
           <h1 className="testimonials-welcome-text">
             SOME OF OUR TESTIMONIALS
           </h1>

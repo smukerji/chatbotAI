@@ -104,8 +104,8 @@
     background: #fff;
     stroke-width: 15px;
     border-radius: 50%;
-    width: 150px;
-    height: 150px;
+    width: 8.33vw;
+    height: 8.33vw;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -113,25 +113,27 @@
 
 .services-container>div .img img {
     padding: 9px;
+    height: 6.33vw;
+    width: 6.33vw;
 }
 
 .services-container>div .text {
     margin-top: 30px;
     color: #000;
     text-align: center;
-    width: 100%;
-    font-size: 25px;
+    width: 9.4vw;
+    font-size: 1.38vw;
     font-style: normal;
     font-weight: 400;
     line-height: normal;
 }
 
 .services-connector {
-    width: 1209px;
+    width: 67.16vw;
     z-index: -1;
     position: absolute;
-    top: 75px;
-    left: 312px;
+    top: 30%;
+    left: 17%;
     border: none;
     border-top: 2px dashed #D9D9D9;
     height: 0;
@@ -140,14 +142,14 @@
 /*------------------------------------css for secreen less than 1440---------------------------------*/
 @media only screen and (max-width: 1440px) {
 
-    .service-section-container .section-text {
-        /* width: 800px; */
-        line-height: 35px;
-        /* margin-left: 75px;
+    /* .service-section-container .section-text { */
+    /* width: 800px; */
+    /* line-height: 35px; */
+    /* margin-left: 75px;
         margin-top: 80px; */
-    }
+    /* } */
 
-    .services-connector {
+    /* .services-connector {
         width: 910px;
         left: 265px;
         top: 60px
@@ -164,5 +166,5 @@
 
     .services-container>div .img img {
         padding: 19px;
-    }
+    } */
 }
