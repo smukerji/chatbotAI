@@ -1,5 +1,6 @@
 import { OpenAIApi, Configuration } from "openai";
 import { v4 as uuidv4 } from "uuid";
+import { upsert } from "./pinecone";
 
 /// getting the openai obj
 export function openaiObj(): OpenAIApi {
@@ -8,6 +9,51 @@ export function openaiObj(): OpenAIApi {
   });
   const openai = new OpenAIApi(configuration);
   return openai;
+}
+
+export async function generateChunksNEmbeddForLinks(
+  crwaledLinkUpsertData: any[],
+  source: string,
+  chatbotId: string,
+  userId: string,
+  filename: string = "none"
+) {
+  const crawlData = crwaledLinkUpsertData.map((item) => item.element);
+  const crawlDataId = crwaledLinkUpsertData.map((item) => item.id);
+
+  /// creating chunks with batch size 250
+  const batchSize = 150;
+  /// creating embeddings
+  for (let i = 0; i < crawlData.length; i += batchSize) {
+    const upsertData: any = [];
+    const batch = crawlData.slice(i, i + batchSize);
+    const batchId = crawlDataId.slice(i, i + batchSize);
+    try {
+      const batchEmbedding = await openaiObj().createEmbedding({
+        model: "text-embedding-ada-002",
+        input: batch,
+      });
+      batchEmbedding.data.data.map((embeddingData, index) => {
+        upsertData.push({
+          metadata: {
+            content: batch[index],
+            source,
+            filename,
+            chatbotId,
+          },
+          values: embeddingData.embedding,
+          id: batchId[index],
+        });
+      });
+
+      await upsert(upsertData, userId);
+    } catch (error: any) {
+      console.log(
+        "Error while creating embedding for website crawling",
+        error?.response?.data
+      );
+    }
+  }
 }
 
 export async function generateChunksNEmbedd(
@@ -28,7 +74,6 @@ export async function generateChunksNEmbedd(
     while (start < end) {
       const subStr = content.substring(start, start + 1000);
       chunks.push(subStr);
-
       start += 900;
     }
 
@@ -58,6 +103,8 @@ export async function generateChunksNEmbedd(
         id: id,
       });
     });
+
+    console.log(data.length);
   }
 
   return { data, dataIDs, contentLength };

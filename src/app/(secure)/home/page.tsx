@@ -19,6 +19,7 @@ export default function Home({
   qaData,
   textData,
   fileData,
+  crawlingData,
   chatbotId,
   chatbotName,
 }: any) {
@@ -45,6 +46,16 @@ export default function Home({
     .update(JSON.stringify(initialQAData))
     .digest("hex");
 
+  /// creating the hash of initial website data to compare it later with current website hash
+  const initialCrawlData = crawlingData?.crawledData[0]
+    ? crawlingData?.crawledData[0]
+    : [];
+
+  const initialCrawlDataHash = crypto
+    .createHash("sha1")
+    .update(JSON.stringify(initialCrawlData))
+    .digest("hex");
+
   const [cookies, setCookie] = useCookies(["userId"]);
   /// check if the unique id of the user exists else set the cookie with expiration of 1 year
   // if (cookies?.userId == undefined)
@@ -63,8 +74,9 @@ export default function Home({
   const tempQaCharCount = qaData ? qaData.qaCharCount : 0;
   const tempTextCharCount = textData ? textData.textLength : 0;
   const tempFileTextCount = fileData ? fileData.fileTextLength : 0;
+  const tempCrawlDataCount = crawlingData ? crawlingData?.crawledDataLength : 0;
   const [charCount, setCharCount] = useState(
-    tempQaCharCount + tempTextCharCount + tempFileTextCount
+    tempQaCharCount + tempTextCharCount + tempFileTextCount + tempCrawlDataCount
   );
   function updateCharCount(count: number) {
     setCharCount(count);
@@ -87,7 +99,7 @@ export default function Home({
     .createHash("sha1")
     .update(JSON.stringify(qaList))
     .digest("hex");
-  /// state for maintaining file when updating the sources
+  /// state for maintaining qa when updating the sources
   const [deleteQAList, setDeleteQAList]: any = useState([]);
 
   /// file sources
@@ -101,8 +113,10 @@ export default function Home({
   const [fileTextLength, setFileTextLength] = useState(tempFileTextCount);
 
   /// crawledLinks count
-  const [crawledList, setCrawledList] = useState([]);
-  const [websiteCharCount, setWebsiteCharCount] = useState(0);
+  const [crawledList, setCrawledList] = useState(initialCrawlData);
+  const [websiteCharCount, setWebsiteCharCount] = useState(tempCrawlDataCount);
+  /// state for maintaining qa when updating the sources
+  const [deleteCrawlList, setDeleteCrawlList]: any = useState([]);
 
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -125,58 +139,144 @@ export default function Home({
       return;
     }
 
+    // if (crawledList.length != 0) {
+    //   let headers = {
+    //     Authorization: `Bearer ${process.env.NEXT_PUBLIC_AUTHORIZATION}`,
+    //     "Content-Type": "application/json",
+    //     cache: "no-store",
+    //   };
+    //   /// filtering the crawledUrls
+    //   let crawledUrls = crawledList.map((item: any) => item.url);
+
+    //   let chatbotName = `Chatbot ${ChatbotName()}`;
+
+    //   /// creating bot through urls
+    //   const options = {
+    //     method: "POST",
+    //     headers,
+    //     body: JSON.stringify({
+    //       chatbotName: chatbotName,
+    //       urlsToScrape: crawledUrls,
+    //     }),
+    //     next: { revalidate: 0 },
+    //   };
+
+    //   try {
+    //     messageApi.open({
+    //       type: "info",
+    //       content: "Please wait while your chatbot is getting trained",
+    //     });
+    //     const res = await fetch(
+    //       "https://www.chatbase.co/api/v1/create-chatbot",
+    //       options
+    //     );
+    //     const data = await res.json();
+    //     if (data.chatbotId) {
+    //       messageApi
+    //         .open({
+    //           type: "success",
+    //           content: "Chabot trained successfully",
+    //         })
+    //         .then(() => {
+    //           window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot`;
+    //         });
+    //     } else {
+    //       messageApi.open({
+    //         type: "error",
+    //         content: data.message,
+    //       });
+    //     }
+    //   } catch (error) {
+    //     messageApi.open({
+    //       type: "error",
+    //       content: "Error while creating chatbot",
+    //     });
+    //   }
+    // } else {
+    //   messageApi.open({
+    //     type: "error",
+    //     content: "No links found to create chatbot",
+    //   });
+    // }
+
     if (crawledList.length != 0) {
-      let headers = {
-        Authorization: `Bearer ${process.env.NEXT_PUBLIC_AUTHORIZATION}`,
-        "Content-Type": "application/json",
-        cache: "no-store",
-      };
-      /// filtering the crawledUrls
-      let crawledUrls = crawledList.map((item: any) => item.url);
-
-      let chatbotName = `Chatbot ${ChatbotName()}`;
-
-      /// creating bot through urls
-      const options = {
-        method: "POST",
-        headers,
-        body: JSON.stringify({
-          chatbotName: chatbotName,
-          urlsToScrape: crawledUrls,
-        }),
-        next: { revalidate: 0 },
-      };
-
+      setLoading(true);
+      /// send the data
       try {
         messageApi.open({
           type: "info",
           content: "Please wait while your chatbot is getting trained",
         });
-        const res = await fetch(
-          "https://www.chatbase.co/api/v1/create-chatbot",
-          options
+        const formData = new FormData();
+
+        // Append other data to the formData object
+        formData.append("crawledList", JSON.stringify(crawledList));
+        formData.append("updateChatbot", updateChatbot);
+        formData.append("chatbotId", chatbotId);
+        formData.append("userId", cookies.userId);
+        formData.append("updateChatbot", updateChatbot);
+        formData.append("chatbotText", "crawling-ichefpos");
+        formData.append("deleteCrawlList", JSON.stringify(deleteCrawlList));
+
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/store2`,
+          {
+            headers: {
+              cache: "no-store",
+            },
+            method: "POST",
+            body: formData,
+            next: { revalidate: 0 },
+          }
         );
-        const data = await res.json();
-        if (data.chatbotId) {
+
+        if (!response.ok) {
           messageApi
             .open({
-              type: "success",
-              content: "Chabot trained successfully",
+              type: "error",
+              content: "Something went wrong while creating bot",
             })
             .then(() => {
-              window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot`;
+              setLoading(false);
             });
+          return;
+        }
+
+        if (response.status == 200) {
+          message.success(await response.text()).then(() => {
+            // window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot`;
+          });
+        } else if (response.status == 201) {
+          message.success(await response.text()).then(() => {
+            // window.location.href = `${
+            //   process.env.NEXT_PUBLIC_WEBSITE_URL
+            // }chatbot/dashboard?${encodeURIComponent(
+            //   "chatbot"
+            // )}=${encodeURIComponent(
+            //   JSON.stringify({
+            //     id: chatbotId,
+            //     name: chatbotName,
+            //   })
+            // )}`;
+          });
         } else {
-          messageApi.open({
-            type: "error",
-            content: data.message,
+          message.error(await response.text()).then(() => {
+            window.location.href = `${
+              process.env.NEXT_PUBLIC_WEBSITE_URL
+            }chatbot/dashboard?${encodeURIComponent(
+              "chatbot"
+            )}=${encodeURIComponent(
+              JSON.stringify({
+                id: chatbotId,
+                name: chatbotName,
+              })
+            )}`;
           });
         }
-      } catch (error) {
-        messageApi.open({
-          type: "error",
-          content: "Error while creating chatbot",
-        });
+      } catch (e: any) {
+        message.error(e.message);
+      } finally {
+        setLoading(false);
       }
     } else {
       messageApi.open({
@@ -189,7 +289,12 @@ export default function Home({
   /// creating custom chatbot
   async function createCustomBot() {
     setLoading(true);
-    if (qaCount === 0 && textLength === 0 && defaultFileList.length === 0) {
+    if (
+      qaCount === 0 &&
+      textLength === 0 &&
+      defaultFileList.length === 0 &&
+      crawledList.length === 0
+    ) {
       message.error("Please add some content to create the bot").then(() => {
         setLoading(false);
       });
@@ -221,13 +326,6 @@ export default function Home({
       });
       const formData = new FormData();
 
-      // // Append the QA image to the formData object if it exists
-      // if (qaImage) {
-      //   formData.append("qaImage", qaImage);
-      // }
-
-      // console.log(JSON.stringify(qaList));
-      // console.log("QA list", qaList);
       // Append the QA data including images to the formData object
       for (const [index, qa] of qaList.entries()) {
         // formData.append(`qaList[${index}].question`, qa.question);
@@ -243,6 +341,8 @@ export default function Home({
       formData.append("defaultFileList", JSON.stringify(defaultFileList));
       formData.append("deleteFileList", JSON.stringify(deleteFileList));
       formData.append("deleteQAList", JSON.stringify(deleteQAList));
+      formData.append("crawledList", JSON.stringify(crawledList));
+      formData.append("deleteCrawlList", JSON.stringify(deleteCrawlList));
       formData.append("userId", cookies.userId);
       formData.append("qaList", JSON.stringify(qaList));
       formData.append("text", text);
@@ -379,6 +479,9 @@ export default function Home({
                 crawledList={crawledList}
                 websiteCharCount={websiteCharCount}
                 setWebsiteCharCount={setWebsiteCharCount}
+                updateChatbot={updateChatbot}
+                deleteCrawlList={deleteCrawlList}
+                setDeleteCrawlList={setDeleteCrawlList}
               />
             )}
             {source == "text" && (
@@ -489,16 +592,16 @@ export default function Home({
                     ? deleteFileList.length + newFileList.length
                       ? false
                       : initialQAHash === currentQAHash
-                      ? crawledList.length > 0
+                      ? deleteCrawlList.length > 0
                         ? false
                         : true
                       : false
                     : false
                 }
                 onClick={
-                  (crawledList.length != 0 && createChatBaseBot) ||
-                  (!updateChatbot && openChatbotModal) ||
-                  createCustomBot
+                  // createChatBaseBot
+                  // (crawledList.length != 0 && createChatBaseBot) ||
+                  (!updateChatbot && openChatbotModal) || createCustomBot
                 }
               >
                 {(!updateChatbot && "Create Chatbot") || "Retrain Chatbot"}

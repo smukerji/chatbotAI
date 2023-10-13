@@ -1,5 +1,8 @@
 import { readContent } from "../../app/_helpers/server/ReadContent";
-import { generateChunksNEmbedd } from "../../app/_helpers/server/embeddings";
+import {
+  generateChunksNEmbedd,
+  generateChunksNEmbeddForLinks,
+} from "../../app/_helpers/server/embeddings";
 import { connectDatabase } from "../../db";
 import { v4 as uuid } from "uuid";
 import { authorize, uploadFile } from "../../app/_services/googleFileUpload";
@@ -10,7 +13,6 @@ import {
   upsert,
 } from "../../app/_helpers/server/pinecone";
 import { ObjectId } from "mongodb";
-import mv from "mv";
 const formidable = require("formidable");
 
 export default async function handler(req, res) {
@@ -31,6 +33,8 @@ export default async function handler(req, res) {
         fields?.chatbotId[0] !== "undefined" ? fields?.chatbotId[0] : uuid();
       const qaList = JSON.parse(fields?.qaList);
       const text = fields?.text[0];
+      const crawledList = JSON.parse(fields?.crawledList[0]);
+      const deleteCrawlList = JSON.parse(fields?.deleteCrawlList[0]);
       // return;
       // console.log(chatbotId);
       // return;
@@ -59,7 +63,6 @@ export default async function handler(req, res) {
             qa.image = uuid() + "-" + imageFile[0].originalFilename;
             /// store the images
             var oldPath = imageFile[0].filepath;
-            var newPath = `./public/qa-images/${qa.image}`;
 
             /// store the file on google drive
             authorize()
@@ -136,12 +139,6 @@ export default async function handler(req, res) {
 
       /// deleting QA that needs to be deleted
       if (deleteQAList.length > 0) {
-        /// delete all the qa embedding of user
-        // const cursor = await collection
-        //   .find({ chatbotId: chatbotId, source: "qa" })
-        //   .toArray();
-        // console.log("To be deleted ", cursor);
-
         /// delete all the QA from DB
         deleteQAList.forEach(async (qa) => {
           /// get the QA id
@@ -159,9 +156,42 @@ export default async function handler(req, res) {
         });
       }
 
-      // // return res
-      // //   .status(200)
-      // //   .send({ updateChatbot, updatedQASource, updatedTextSource });
+      /// deleting weblinks that needs to be deleted
+      if (deleteCrawlList.length > 0) {
+        /// get all the links to remove to match the links to delete
+        const cursor = await collection.findOne({
+          chatbotId: chatbotId,
+          source: "crawling",
+        });
+        const currentCrawlList = cursor?.content;
+
+        /// array to delete all the vectors from pinecone
+        let vectorIDs = [];
+
+        /// filtering the links to be deleted from DB and pinecone
+        const updatedCrawltList = currentCrawlList.filter((item) => {
+          return !deleteCrawlList.some((deleteItem) => {
+            if (item.crawlLink === deleteItem.crawlLink) {
+              vectorIDs.push(item.dataID);
+              return true;
+            }
+            return false;
+          });
+        });
+        vectorIDs = [].concat(...vectorIDs);
+        /// delete links from pinecone
+        await deleteFileVectorsById(userId, vectorIDs);
+        /// update the link in DB
+        await collection.updateOne(
+          {
+            chatbotId: chatbotId,
+            source: "crawling",
+          },
+          {
+            $set: { content: updatedCrawltList },
+          }
+        );
+      }
 
       /// prcessing the file data
       if (files.length > 0) {
@@ -337,12 +367,6 @@ export default async function handler(req, res) {
         const valuesPromise = valuesPromiseContainer.filter(
           (result) => result.status === "fulfilled"
         );
-        /// get the vectors created ID
-        // const qaSource = valuesPromise.map((values) => {
-        //   return {
-        //     dataID: values?.value?.dataIDs,
-        //   };
-        // });
         const values = [].concat(...valuesPromise);
         /// store the emebeddings in pinecone database
         let upserData = values.map((value) => {
@@ -351,22 +375,45 @@ export default async function handler(req, res) {
         upserData = [].concat(...upserData);
         // console.log(upserData);
         if (upserData.length > 0) await upsert(upserData, userId);
-        /// store the details in database
-        /// iterate and store each user qa as per chatbot
-        // qaSource.forEach((qa, index) => {
-        //   collection.insertOne({
-        //     chatbotId,
-        //     dataID: qa.dataID,
-        //     content: qaList[qaListEmbbedingIndex[index]]?.id
-        //       ? {
-        //           question: qaList[qaListEmbbedingIndex[index]]?.question,
-        //           answer: qaList[qaListEmbbedingIndex[index]]?.answer,
-        //           image: qaList[qaListEmbbedingIndex[index]]?.image,
-        //         }
-        //       : qaList[qaListEmbbedingIndex[index]],
-        //     source: "qa",
-        //   });
-        // });
+      }
+
+      /// processing the links
+      if (crawledList.length > 0 && !updateChatbot) {
+        /// geenrated the ID's for each chunks and storing in DB before upserting in pinecone
+        const dbCrawlSource = [];
+        let crwaledLinkUpsertData = crawledList.map((obj) => {
+          const tempIds = [];
+          const tempData = [];
+          obj.cleanedText?.forEach((element) => {
+            const id = uuid();
+            /// map the chunks to id
+            tempData.push({ element, id });
+            tempIds.push(id);
+          });
+
+          /// add the link data to array
+          dbCrawlSource.push({
+            crawlLink: obj?.crawlLink,
+            dataID: tempIds,
+            charCount: obj.charCount,
+          });
+
+          return tempData;
+        });
+        crwaledLinkUpsertData = [].concat(...crwaledLinkUpsertData);
+
+        await generateChunksNEmbeddForLinks(
+          crwaledLinkUpsertData,
+          "crawling",
+          chatbotId,
+          userId
+        );
+
+        collection.insertOne({
+          chatbotId,
+          content: dbCrawlSource,
+          source: "crawling",
+        });
       }
       /// send the response
       const responseCode = updateChatbot ? 201 : 200;

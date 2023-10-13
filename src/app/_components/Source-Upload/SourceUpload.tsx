@@ -104,7 +104,7 @@ function SourceUpload({
             <h1>Attached Files</h1> <p>({fileTextLength}) chars</p>
           </div>
         )}
-        {defaultFileList.map((file: any, index: number) => {
+        {defaultFileList?.map((file: any, index: number) => {
           return (
             <React.Fragment key={index}>
               <div className="item">

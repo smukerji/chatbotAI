@@ -21,7 +21,7 @@ function Register() {
   );
 
   if (status === "authenticated") {
-    redirect("/");
+    redirect("/home");
   }
   const userService = useUserService();
 

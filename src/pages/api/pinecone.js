@@ -16,7 +16,7 @@ export default async function handler(req, res) {
     // const index = pinecone.Index(process.env.NEXT_PUBLIC_PINECONE_INDEX);
     // const tr = await index.delete1({
     //   deleteAll: true,
-    //   namespace: "ae9100ec-d127-4291-bba3-19e4369d7094",
+    //   namespace: "651d111b8158397ebd0e65fb",
     // });
     // return res.status(200).send(tr);
     /// parse the request object
@@ -31,7 +31,7 @@ export default async function handler(req, res) {
     /// set the params of pinecone embeddings retrival
     const queryRequest = {
       vector: embed,
-      topK: 10,
+      topK: 5,
       includeValues: false,
       includeMetadata: true,
       filter: {
@@ -80,6 +80,12 @@ export default async function handler(req, res) {
     let vectorId = [];
     let namespace = "";
     for await (const doc of cursor) {
+      /// get the vector id's of website crawling list
+      if (Array.isArray(doc.content)) {
+        doc.content.forEach((content) => {
+          vectorId.push(content.dataID);
+        });
+      }
       vectorId.push(doc.dataID);
       namespace = userId;
     }
@@ -88,7 +94,13 @@ export default async function handler(req, res) {
     const deleteData = await collection.deleteMany({ chatbotId: chatbotId });
     /// delete the chatbot
     await userChatbots.deleteOne({ chatbotId: chatbotId });
-    deletevectors(vectorId, namespace);
+
+    /// deleting the chunks to avoid  Request Header Fields Too Large error
+    const deleteBatchSize = 250;
+    for (let i = 0; i <= vectorId.length; i += deleteBatchSize) {
+      const deleteBatch = vectorId.slice(i, i + deleteBatchSize);
+      deletevectors(deleteBatch, namespace);
+    }
     return res.status(200).send({ text: "Deleted successfully" });
   }
 }

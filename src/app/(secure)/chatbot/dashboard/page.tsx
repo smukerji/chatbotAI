@@ -9,6 +9,7 @@ import { useCookies } from "react-cookie";
 import Home from "../../home/page";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
+import { v4 as uuid } from "uuid";
 
 function Dashboard() {
   const { status } = useSession();
@@ -41,7 +42,14 @@ function Dashboard() {
   const [qaData, setQaData]: any = useState();
   const [textData, setTextData]: any = useState();
   const [fileData, setFileData]: any = useState();
+  const [crawlData, setCrawlData]: any = useState();
   // const [qaCharCount, setQACharCount] = useState(0);
+
+  /// session id
+  const [sessionID, setSessionID]: any = useState();
+  useEffect(() => {
+    setSessionID(uuid());
+  }, []);
 
   /// managing delete chatbot
   const [open, setOpen] = useState(false);
@@ -79,6 +87,10 @@ function Dashboard() {
       setFileData({
         defaultFileList: content.defaultFileList,
         fileTextLength: content.fileTextLength,
+      });
+      setCrawlData({
+        crawledData: content.crawlData,
+        crawledDataLength: content.crawlDataLength,
       });
       setLoading(false);
     } catch (error) {
@@ -145,6 +157,7 @@ function Dashboard() {
                 qaData={qaData}
                 textData={textData}
                 fileData={fileData}
+                crawlingData={crawlData}
                 chatbotId={chatbot.id}
                 chatbotName={chatbot.name}
               />

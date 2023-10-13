@@ -13,7 +13,6 @@ export default function HomeLayout({
   // if user is not logged in redirect to login
   if (userId && authorization && !auth.isAuthenticated()) {
     const returnUrl = encodeURIComponent(headers().get("x-invoke-path") || "/");
-
     redirect(`/account/login?returnUrl=${returnUrl}`);
   }
   return <>{children}</>;

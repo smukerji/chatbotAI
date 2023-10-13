@@ -22,10 +22,10 @@
 
 .fetched-links .link {
     display: flex;
+    flex: 1;
 }
 
 .fetched-links .link .ant-input {
-    width: 470px;
     margin-right: 20px;
 }
 
@@ -64,4 +64,11 @@
 .ant-progress-inner .ant-progress-bg {
     position: absolute;
     left: 0;
+}
+
+.fetched-links-container {
+    width: 100%;
+    overflow-y: auto;
+    max-height: 60vh;
+    height: fit-content;
 }

@@ -19,9 +19,9 @@ function Login() {
       spin
     />
   );
-  
+
   if (status === "authenticated") {
-    redirect("/");
+    redirect("/home");
   }
 
   const userService = useUserService();

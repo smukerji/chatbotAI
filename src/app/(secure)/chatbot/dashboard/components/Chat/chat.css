@@ -54,8 +54,25 @@
     margin-top: 10px;
     text-align: justify;
     word-break: break-word;
+    /* position: relative; */
     margin-bottom: 10px;
 }
+
+.conversation-container .assistant-message div {
+    gap: 4px;
+    display: flex;
+    margin-top: 6px;
+}
+
+.conversation-container .assistant-message div span {
+    cursor: pointer;
+}
+
+.conversation-container .assistant-message div span:hover {
+    background: #d6d6d6;
+
+}
+
 
 .conversation-container .user-message {
     font-size: 20px;

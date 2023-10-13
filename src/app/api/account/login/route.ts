@@ -26,7 +26,7 @@ async function login(request: any) {
         { sub: user?._id?.toString() },
         process.env.NEXT_PUBLIC_JWT_SECRET!,
         {
-          expiresIn: 60,
+          expiresIn: "1h",
         }
       );
 

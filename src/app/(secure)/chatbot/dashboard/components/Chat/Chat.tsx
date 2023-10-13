@@ -1,7 +1,7 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import "./chat.css";
-import { SendOutlined } from "@ant-design/icons";
+import { DislikeOutlined, SendOutlined, LikeOutlined } from "@ant-design/icons";
 import Image from "next/image";
 
 function Chat({
@@ -113,65 +113,113 @@ function Chat({
 
             /// parse the response and extract the similarity results
             const respText = await response.text();
+
             const similaritySearchResults = JSON.parse(respText).join("\n");
+            console.log(similaritySearchResults);
 
-            const responseOpenAIFunction: any = await fetch(
-              "https://api.openai.com/v1/chat/completions",
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENAI_KEY}`,
-                },
-                body: JSON.stringify({
-                  model: "gpt-3.5-turbo",
-                  temperature: 0.5,
-                  top_p: 1,
-                  messages: [
-                    {
-                      role: "system",
-                      content: `Use the following pieces of context to answer the users question.
-                    If you don't know the answer, just say that you don't know, don't try to make up an answer.
-                    ----------------
-                    ${similaritySearchResults}`,
-                    },
-                    // ...messages,
-                    {
-                      role: "user",
-                      content: `Give me the file name, corresponding to user question: ${userQuery}`,
-                    },
-                  ],
-                  functions: [
-                    {
-                      name: "getFileName",
-                      description: "Get the filename of the question",
-                      parameters: {
-                        type: "object",
-                        properties: {
-                          filename: {
-                            type: "string",
-                            description: "File name if N.A write null",
-                          },
-                        },
-                        required: ["location"],
-                      },
-                    },
-                  ],
-                }),
-              }
-            );
-            const fileName = await responseOpenAIFunction.json();
-            const args = JSON.parse(
-              fileName.choices[0].message.function_call.arguments
-            );
+            // const responseOpenAIFunction: any = await fetch(
+            //   "https://api.openai.com/v1/chat/completions",
+            //   {
+            //     method: "POST",
+            //     headers: {
+            //       "Content-Type": "application/json",
+            //       Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENAI_KEY}`,
+            //     },
+            //     body: JSON.stringify({
+            //       model: "gpt-3.5-turbo-16k",
+            //       temperature: 0.5,
+            //       top_p: 1,
+            //       messages: [
+            //         {
+            //           role: "system",
+            //           content: `Use the following pieces of context to answer the users question.
+            //         If you don't know the answer, just say that you don't know, don't try to make up an answer.
+            //         ----------------
+            //         ${similaritySearchResults}`,
+            //         },
+            //         // ...messages,
+            //         {
+            //           role: "user",
+            //           content: `Give me the file name, corresponding to user question: ${userQuery}`,
+            //         },
+            //       ],
+            //       functions: [
+            //         {
+            //           name: "getFileName",
+            //           description: "Get the filename of the question",
+            //           parameters: {
+            //             type: "object",
+            //             properties: {
+            //               filename: {
+            //                 type: "string",
+            //                 description: "File name if N.A write null",
+            //               },
+            //             },
+            //             required: ["filename"],
+            //           },
+            //         },
+            //       ],
+            //     }),
+            //   }
+            // );
 
-            console.log("Funtion calling", args);
+            // const responseOpenAIFunction: any = await fetch(
+            //   "https://api.openai.com/v1/chat/completions",
+            //   {
+            //     method: "POST",
+            //     headers: {
+            //       "Content-Type": "application/json",
+            //       Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENAI_KEY}`,
+            //     },
+            //     body: JSON.stringify({
+            //       model: "gpt-3.5-turbo-16k",
+            //       temperature: 0.5,
+            //       top_p: 1,
+            //       messages: [
+            //         {
+            //           role: "system",
+            //           content: `Use the following pieces of context to answer the users question.
+            //         If you don't know the answer, just say that you don't know, don't try to make up an answer.
+            //         ----------------
+            //         ${similaritySearchResults}`,
+            //         },
+            //         // ...messages,
+            //         {
+            //           role: "user",
+            //           content: `Give me the relevant http image link, corresponding to user question: ${userQuery}`,
+            //         },
+            //       ],
+            //       functions: [
+            //         {
+            //           name: "getImages",
+            //           description: "Get relevant images of the question",
+            //           parameters: {
+            //             type: "object",
+            //             properties: {
+            //               filename: {
+            //                 type: "string",
+            //                 description: "File name if N.A write null",
+            //               },
+            //             },
+            //             required: ["filename"],
+            //           },
+            //         },
+            //       ],
+            //     }),
+            //   }
+            // );
+            // const fileName = await responseOpenAIFunction.json();
+            // const args = JSON.parse(
+            //   fileName.choices[0].message.function_call.arguments
+            // );
+
+            // console.log("Funtion calling", args);
 
             // if (args && args?.filename && args?.filename != null) {
-            setMessageImages((prev: any) => [
-              ...prev,
-              { role: "assistant", image: args?.filename },
-            ]);
+            // setMessageImages((prev: any) => [
+            //   ...prev,
+            //   { role: "assistant", image: args?.filename },
+            // ]);
             // }
             // Read the response as a stream of data
 
@@ -185,26 +233,38 @@ function Chat({
                   Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENAI_KEY}`,
                 },
                 body: JSON.stringify({
-                  model: "gpt-3.5-turbo",
-                  temperature: 0.5,
+                  model: "gpt-3.5-turbo-16k",
+                  temperature: 0,
                   top_p: 1,
                   messages: [
+                    // {
+                    //   role: "system",
+                    //   content: `Use the following pieces of context to answer the users question.
+                    // If you don't know the answer, just say that you don't know, don't try to make up an answer.
+                    // ----------------
+                    // ${similaritySearchResults}
+
+                    // Answer user query with and include images write respect to each line if available`,
+                    // },
+                    // ...messages,
                     {
-                      role: "system",
+                      role: "user",
                       content: `Use the following pieces of context to answer the users question.
-              If you don't know the answer, just say that you don't know, don't try to make up an answer.
-              ----------------
-              ${similaritySearchResults}`,
+                      If you don't know the answer, just say that you don't know, don't try to make up an answer.
+                      ----------------
+                      ${similaritySearchResults}
+                      
+                      Answer user query with and include images write respect to each line if available
+  
+                      query: ${userQuery}`,
                     },
-                    ...messages,
-                    { role: "user", content: userQuery },
                   ],
                   stream: true,
                 }),
               }
             );
 
-            console.log(similaritySearchResults);
+            // console.log(similaritySearchResults);
 
             let resptext = "";
             const reader = responseOpenAI.body.getReader();
@@ -260,6 +320,7 @@ function Chat({
           } catch (e: any) {
             console.log(
               "Error while getting completion from custom chatbot",
+              e,
               e.message
             );
           } finally {
@@ -296,6 +357,10 @@ function Chat({
                         alt="assistant-image"
                       />
                     )}
+                  <div style={{}}>
+                    <LikeOutlined />
+                    <DislikeOutlined />
+                  </div>
                 </div>
               </React.Fragment>
             );

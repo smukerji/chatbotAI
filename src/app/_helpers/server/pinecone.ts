@@ -19,52 +19,57 @@ export const pinecone = new PineconeClient();
 
 export const upsert = async (vectors: any, userId: string) => {
   try {
-    await pinecone.init({
-      environment: process.env.NEXT_PUBLIC_PINECONE_ENV as string,
-      apiKey: process.env.NEXT_PUBLIC_PINECONE_KEY as string,
-    });
+    await pinecone
+      .init({
+        environment: process.env.NEXT_PUBLIC_PINECONE_ENV as string,
+        apiKey: process.env.NEXT_PUBLIC_PINECONE_KEY as string,
+      })
+      .then(async () => {
+        const index = pinecone.Index(
+          process.env.NEXT_PUBLIC_PINECONE_INDEX as string
+        );
+
+        try {
+          const upsertReq = await index.upsert({
+            upsertRequest: {
+              vectors,
+              namespace: userId,
+            },
+          });
+          return upsertReq;
+        } catch (error) {
+          console.error("Error during upsert:", error);
+          return error;
+        }
+      });
   } catch (error) {
     console.error("Error initializing Pinecone client:", error);
     throw new Error("Failed to initialize Pinecone client");
-  }
-
-  const index = pinecone.Index(
-    process.env.NEXT_PUBLIC_PINECONE_INDEX as string
-  );
-
-  try {
-    const upsertReq = await index.upsert({
-      upsertRequest: {
-        vectors,
-        namespace: userId,
-      },
-    });
-    return upsertReq;
-  } catch (error) {
-    console.error("Error during upsert:", error);
-    return error;
   }
 };
 
 export const deletevectors = async (vectorIDs: [], namespace: string) => {
   try {
-    await pinecone.init({
-      environment: process.env.NEXT_PUBLIC_PINECONE_ENV as string,
-      apiKey: process.env.NEXT_PUBLIC_PINECONE_KEY as string,
-    });
+    await pinecone
+      .init({
+        environment: process.env.NEXT_PUBLIC_PINECONE_ENV as string,
+        apiKey: process.env.NEXT_PUBLIC_PINECONE_KEY as string,
+      })
+      .then(async () => {
+        const index = pinecone.Index(
+          process.env.NEXT_PUBLIC_PINECONE_INDEX as string
+        );
+
+        await index.delete1({
+          ids: vectorIDs,
+          deleteAll: false,
+          namespace: namespace,
+        });
+      });
   } catch (error) {
     console.error("Error initializing Pinecone client:", error);
     throw new Error("Failed to initialize Pinecone client");
   }
-  const index = pinecone.Index(
-    process.env.NEXT_PUBLIC_PINECONE_INDEX as string
-  );
-
-  await index.delete1({
-    ids: vectorIDs,
-    deleteAll: false,
-    namespace: namespace,
-  });
 };
 
 export const deleteFileVectorsById = async (userid: any, vectorIDs: any) => {

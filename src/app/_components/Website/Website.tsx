@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./website.css";
-import { Input, Progress } from "antd";
+import { Input, Progress, message } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 const { Search } = Input;
 function Website({
@@ -11,6 +11,9 @@ function Website({
   crawledList,
   websiteCharCount,
   setWebsiteCharCount,
+  updateChatbot,
+  deleteCrawlList,
+  setDeleteCrawlList,
 }: any) {
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -22,12 +25,81 @@ function Website({
     /// remove the selected item from array
     let updatedList = [...crawledList];
     let deletedItem: any = updatedList.splice(index, 1);
+
+    /// add the link that need to be deleted while updating the chatbot
+    if (updateChatbot && deletedItem[0]?.dataID) {
+      setDeleteCrawlList([...deleteCrawlList, ...deletedItem]);
+    }
+
     /// update the count
-    updateCharCount(getCharCount - deletedItem[0].size);
-    setWebsiteCharCount(websiteCharCount - deletedItem[0].size);
+    updateCharCount(getCharCount - deletedItem[0].charCount);
+    setWebsiteCharCount(websiteCharCount - deletedItem[0].charCount);
     /// update the list
     setCrawledList(updatedList);
   };
+
+  // /// menthod to handle the fetching
+  // const onFetch = async (value: string) => {
+  //   let intervalId;
+  //   try {
+  //     /// start the progress bar
+  //     let count = 0;
+  //     setLoading(true);
+  //     setLoadingPage(true);
+  //     intervalId = setInterval(() => {
+  //       if (count != 100) setProgress(count++);
+  //     }, 2000);
+  //     /// send the request
+  //     // const response = await fetch(
+  //     //   `${process.env.NEXT_PUBLIC_WEBSITE_URL}api?source=website&sourceURL=${value}`,
+  //     //   {
+  //     //     method: "GET",
+  //     //   }
+  //     // );
+  //     const options = {
+  //       method: "GET",
+  //       headers: {
+  //         accept: "application/json",
+  //         authorization: `Bearer ${process.env.NEXT_PUBLIC_AUTHORIZATION}`,
+  //         cache: "no-store",
+  //       },
+  //       next: { revalidate: 0 },
+  //     };
+
+  //     const response = await fetch(
+  //       `https://www.chatbase.co/api/v1/fetch-links?sourceURL=${value}`,
+  //       options
+  //     );
+  //     const data = await response.json();
+  //     console.log("Fetched links", data);
+
+  //     /// if there is any error show error
+  //     if (data.error) return alert(data.error);
+
+  //     // Calculate total character count
+  //     let totalCharCount = 0;
+  //     data?.fetchedLinks.forEach((item: any) => {
+  //       totalCharCount += item.size;
+  //     });
+
+  //     // Update charCount in the parent component
+  //     updateCharCount(getCharCount + totalCharCount);
+  //     setWebsiteCharCount(websiteCharCount + totalCharCount);
+
+  //     /// set the fecthed links
+  //     setCrawledList([...crawledList, ...data.fetchedLinks]);
+  //     setProgress(100);
+  //   } catch (error) {
+  //     setProgress(0);
+  //     console.log("Error while fetching ", error);
+  //     alert(`Error while fetching ${error}`);
+  //   } finally {
+  //     setLoading(false);
+  //     setLoadingPage(false);
+  //     clearInterval(intervalId);
+  //   }
+  // };
+
   /// menthod to handle the fetching
   const onFetch = async (value: string) => {
     let intervalId;
@@ -50,17 +122,21 @@ function Website({
         method: "GET",
         headers: {
           accept: "application/json",
-          authorization: `Bearer ${process.env.NEXT_PUBLIC_AUTHORIZATION}`,
+          // authorization: `Bearer ${process.env.NEXT_PUBLIC_AUTHORIZATION}`,
           cache: "no-store",
         },
         next: { revalidate: 0 },
       };
 
       const response = await fetch(
-        `https://www.chatbase.co/api/v1/fetch-links?sourceURL=${value}`,
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/fetch-links/api?sourceURL=${value}`,
         options
       );
       const data = await response.json();
+      if (data?.error) {
+        message.error(data.error);
+        return;
+      }
       console.log("Fetched links", data);
 
       /// if there is any error show error
@@ -69,7 +145,7 @@ function Website({
       // Calculate total character count
       let totalCharCount = 0;
       data?.fetchedLinks.forEach((item: any) => {
-        totalCharCount += item.size;
+        totalCharCount += parseInt(item.charCount);
       });
 
       // Update charCount in the parent component
@@ -111,22 +187,25 @@ function Website({
       <span style={{ marginTop: "50px" }} className="website-text">
         Included links
       </span>
-      {crawledList?.map((item: any, index: number) => {
-        return (
-          <React.Fragment key={index}>
-            <div className="fetched-links">
-              <div className="link">
-                <Input value={item.url} /> <span>{item.size}</span>{" "}
+      <div className="fetched-links-container">
+        {crawledList?.map((item: any, index: number) => {
+          return (
+            <React.Fragment key={index}>
+              <div className="fetched-links">
+                <div className="link">
+                  {/* <Input value={item.url} /> <span>{item.size}</span>{" "} */}
+                  <Input value={item.crawlLink} /> <span>{item.charCount}</span>{" "}
+                </div>
+                <DeleteOutlined
+                  style={{ color: "red", marginLeft: "5px" }}
+                  value={index}
+                  onClick={() => deleteLink(index)}
+                />
               </div>
-              <DeleteOutlined
-                style={{ color: "red", marginLeft: "5px" }}
-                value={index}
-                onClick={() => deleteLink(index)}
-              />
-            </div>
-          </React.Fragment>
-        );
-      })}
+            </React.Fragment>
+          );
+        })}
+      </div>
     </div>
   );
 }
