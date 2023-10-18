@@ -1,8 +1,10 @@
-import React, { Suspense, useEffect, useState } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 import { useCookies } from "react-cookie";
 import "./chat.css";
 import { DislikeOutlined, SendOutlined, LikeOutlined } from "@ant-design/icons";
 import Image from "next/image";
+import { message } from "antd";
+import ChatbotNameModal from "../../../../../_components/Modal/ChatbotNameModal";
 
 function Chat({
   chatbot,
@@ -21,6 +23,66 @@ function Chat({
 
   /// loading state
   const [loading, setLoading] = useState(false);
+
+  const chatWindowRef: any = useRef(null);
+
+  /// chatbot messages feedback pop up state
+  const [open, setOpen] = useState(false);
+  const [feedbackText, setfeedbackText] = useState("");
+  const [feedbackIndex, setFeedbackIndex] = useState(0);
+  const [feedbackStatus, setfeedbackStatus] = useState("");
+
+  /// handling the chatbot ok action
+  const handleOk = async () => {
+    if (feedbackText.length < 10) {
+      message.error("Please provide add more feeback");
+      return;
+    }
+    setOpen(false);
+
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard/feedback/api`,
+      {
+        headers: {
+          cache: "no-store",
+        },
+        method: "POST",
+        body: JSON.stringify({
+          chatbotId: chatbot.id,
+          messages: [...messages.slice(0, feedbackIndex + 1)],
+          feedback: { text: feedbackText, status: feedbackStatus },
+        }),
+        next: { revalidate: 0 },
+      }
+    );
+
+    /// if response is ok then clear the feeback text
+    if (!response.ok) throw new Error(await response.json());
+    else {
+      setfeedbackText("");
+    }
+
+    const body = await response.json();
+    message.success(body?.message);
+  };
+
+  /// Messages feedback opener
+  async function openChatbotModal(index: number, status: string) {
+    /// set the like/dislike btn check and the index to store the message history
+    setFeedbackIndex(index);
+    setfeedbackStatus(status);
+    /// open the chatbot naming dialog box when creating bot
+    setOpen(true);
+  }
+
+  useEffect(() => {
+    if (chatWindowRef.current) {
+      // Scroll to the bottom of the chat window
+      setTimeout(() => {
+        chatWindowRef.current?.scrollTo(0, chatWindowRef.current.scrollHeight);
+      }, 50);
+    }
+  }, [response]);
 
   /// get the chatbase response
   async function getReply(event: any) {
@@ -106,7 +168,12 @@ function Chat({
                 body: JSON.stringify({
                   userQuery,
                   chatbotId: chatbot?.id,
-                  userId: cookies.userId,
+                  // userId: cookies.userId,
+                  //// default chatbot set
+                  userId:
+                    chatbot?.id === "123d148a-be02-4749-a612-65be9d96266c"
+                      ? "651d111b8158397ebd0e65fb"
+                      : cookies.userId,
                 }),
               }
             );
@@ -237,24 +304,21 @@ function Chat({
                   temperature: 0,
                   top_p: 1,
                   messages: [
-                    // {
-                    //   role: "system",
-                    //   content: `Use the following pieces of context to answer the users question.
-                    // If you don't know the answer, just say that you don't know, don't try to make up an answer.
-                    // ----------------
-                    // ${similaritySearchResults}
+                    {
+                      role: "system",
+                      content: `Use the following pieces of context to answer the users question.
+                    If you don't know the answer, just say that you don't know, don't try to make up an answer.
+                    ----------------
+                    ${similaritySearchResults}
 
-                    // Answer user query with and include images write respect to each line if available`,
-                    // },
-                    // ...messages,
+                    Answer user query with and include images write respect to each line if available`,
+                    },
+                    ...messages,
                     {
                       role: "user",
-                      content: `Use the following pieces of context to answer the users question.
-                      If you don't know the answer, just say that you don't know, don't try to make up an answer.
-                      ----------------
-                      ${similaritySearchResults}
-                      
-                      Answer user query with and include images write respect to each line if available
+                      content: `
+                      Strictly write all the response in html format and strictly don't add any characters apart from html elements.
+                      Answer user query with and include images in responseT if available
   
                       query: ${userQuery}`,
                     },
@@ -335,13 +399,29 @@ function Chat({
 
   return (
     <div className="chat-container">
-      <div className="conversation-container">
+      <div className="conversation-container" ref={chatWindowRef}>
         {messages.map((message: any, index: any) => {
           if (message.role == "assistant")
             return (
               <React.Fragment key={index}>
-                <div className="assistant-message">
-                  {message.content}
+                {/* <div className="assistant-message"> */}
+
+                <div
+                  className="assistant-message"
+                  style={{ display: "flex", flexDirection: "column" }}
+                  dangerouslySetInnerHTML={{
+                    __html: message.content,
+                  }}
+                ></div>
+                <div className="like-dislike-container">
+                  <LikeOutlined
+                    onClick={() => openChatbotModal(index, "like")}
+                  />
+                  <DislikeOutlined
+                    onClick={() => openChatbotModal(index, "dislike")}
+                  />
+                </div>
+                {/* {}
                   {messageImages[index]?.image &&
                     messageImages[index].image != null && (
                       // <Image
@@ -358,10 +438,30 @@ function Chat({
                       />
                     )}
                   <div style={{}}>
-                    <LikeOutlined />
-                    <DislikeOutlined />
+                    <LikeOutlined
+                      onClick={() => openChatbotModal(index, "like")}
+                    />
+                    <DislikeOutlined
+                      onClick={() => openChatbotModal(index, "dislike")}
+                    />
                   </div>
-                </div>
+                  <ChatbotNameModal
+                    open={open}
+                    setOpen={setOpen}
+                    chatbotText={feedbackText}
+                    setChatbotText={setfeedbackText}
+                    handleOk={handleOk}
+                    forWhat="feedback"
+                  />
+                </div> */}
+                <ChatbotNameModal
+                  open={open}
+                  setOpen={setOpen}
+                  chatbotText={feedbackText}
+                  setChatbotText={setfeedbackText}
+                  handleOk={handleOk}
+                  forWhat="feedback"
+                />
               </React.Fragment>
             );
           else
@@ -380,7 +480,13 @@ function Chat({
             </div>
           </div>
         )}
-        {response && <div className="assistant-message">{response}</div>}
+        {response && (
+          <div
+            className="assistant-message"
+            style={{ display: "flex", flexDirection: "column" }}
+            dangerouslySetInnerHTML={{ __html: response }}
+          />
+        )}
       </div>
       <div className="chat-question">
         <input

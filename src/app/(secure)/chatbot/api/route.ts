@@ -22,21 +22,24 @@ async function fetchBots(request: any) {
 
   try {
     // Fetch the chatbot data from chatbase and custom chatbots from the database concurrently
-    const [chatbaseResponse, customBots] = await Promise.all([
-      fetch("https://www.chatbase.co/api/v1/get-chatbots", options),
-      fetchCustomBots(userId),
-    ]);
+    // const [chatbaseResponse, customBots] = await Promise.all([
+    //   fetch("https://www.chatbase.co/api/v1/get-chatbots", options),
+    //   fetchCustomBots(userId),
+    // ]);
 
-    if (!chatbaseResponse.ok) {
-      throw new Error("Error while retrieving chatbots from chatbase");
-    }
+    /// Fetch the chatbot data of custom chatbots from the database concurrently
+    const [customBots] = await Promise.all([fetchCustomBots(userId)]);
 
-    const chatbaseData = await chatbaseResponse.json();
+    // if (!chatbaseResponse.ok) {
+    //   throw new Error("Error while retrieving chatbots from chatbase");
+    // }
+
+    // const chatbaseData = await chatbaseResponse.json();
 
     // Process custom chatbots and merge them with chatbase data
-    const mergedChatbots = mergeCustomBots(chatbaseData.chatbots, customBots);
+    // const mergedChatbots = mergeCustomBots(chatbaseData.chatbots, customBots);
 
-    return { chatbots: mergedChatbots };
+    return { chatbots: customBots };
   } catch (error) {
     console.log("Error in chatbot route", error);
     return { error: `Error ${error}` };
@@ -51,7 +54,17 @@ async function fetchCustomBots(userId: string) {
   const collection = db?.collection("user-chatbots");
   // console.log("Collection ", collection);
 
-  const customBots = await collection?.find({ userId: userId }).toArray();
+  //// default chatbot set temporary
+  const customBots = await collection
+    ?.find({
+      $or: [
+        { userId: userId },
+        {
+          chatbotId: "123d148a-be02-4749-a612-65be9d96266c",
+        },
+      ],
+    })
+    .toArray();
   return customBots.map((doc: any) => ({
     id: doc.chatbotId,
     name: doc.chatbotName,

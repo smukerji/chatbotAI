@@ -19,9 +19,9 @@ function ServicesSection() {
         </div>
 
         <div className="section-text">
-          Lorem ipsum dolor sit amet, consectetur ad Lorem ipsum dolor sit amet,
-          consectetur ad consectetur adipiscing elit ut aliquam,
-          purus.consectetur adipiscing elit ut aliquam, purus.
+          Lucifer.ai is the AI chatbot that takes your digital presence to the
+          next level. Join us on this extraordinary journey, where conversation
+          meets innovation. Experience Lucifer.ai today, and never look back.
         </div>
 
         <button className="contact-demo-button">Contact for demo</button>
@@ -35,8 +35,8 @@ function ServicesSection() {
             <div className="img">
               <Image alt="img" src={Service1} />
             </div>
-            <hr className="services-connector"/>
-            <div className="text">AI-Based Audit Tools</div>
+            <hr className="services-connector" />
+            <div className="text">Multi- language Support</div>
           </div>
 
           {/* ------------------------------service 2------------------------------- */}
@@ -44,7 +44,7 @@ function ServicesSection() {
             <div className="img">
               <Image alt="img" src={Service2} />
             </div>
-            <div className="text">Web Chatbot Remediation</div>
+            <div className="text">Web Chatbot Integration</div>
           </div>
 
           {/* ------------------------------service 3------------------------------- */}
@@ -60,7 +60,7 @@ function ServicesSection() {
             <div className="img">
               <Image alt="img" src={Service4} />
             </div>
-            <div className="text">Responsiblity Consulting</div>
+            <div className="text">Natural Language Processing</div>
           </div>
 
           {/* ------------------------------service 5------------------------------- */}
@@ -68,7 +68,7 @@ function ServicesSection() {
             <div className="img">
               <Image alt="img" src={Service5} />
             </div>
-            <div className="text">Multimedia chatbot</div>
+            <div className="text">Text-Image-Audio chatbot</div>
           </div>
 
           {/* ------------------------------service 6------------------------------- */}

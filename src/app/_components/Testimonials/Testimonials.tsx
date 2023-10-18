@@ -63,9 +63,10 @@ function Testimonials() {
               </div>
               <h3 className="profile-name">Ankita Roy</h3>
               <div className="profile-note">
-                In publishing and graphic design, Lorem ipsum is a placeholder
-                text commonly used to demonstrate the visual form of a document
-                or a typeface without relying on meaningful content.
+                In publishing and graphic design, used Lucifer.AI to read
+                briefing documents. The chatbot helped to summarise all the
+                brief documents. This helped us to increase the team performance
+                by 70%.
               </div>
             </div>
           </SwiperSlide>
@@ -77,9 +78,10 @@ function Testimonials() {
               </div>
               <h3 className="profile-name">Ankita Roy</h3>
               <div className="profile-note">
-                In publishing and graphic design, Lorem ipsum is a placeholder
-                text commonly used to demonstrate the visual form of a document
-                or a typeface without relying on meaningful content.
+                In publishing and graphic design, used Lucifer.AI to read
+                briefing documents. The chatbot helped to summarise all the
+                brief documents. This helped us to increase the team performance
+                by 70%.
               </div>
             </div>
           </SwiperSlide>
@@ -91,9 +93,10 @@ function Testimonials() {
               </div>
               <h3 className="profile-name">Ankita Roy</h3>
               <div className="profile-note">
-                In publishing and graphic design, Lorem ipsum is a placeholder
-                text commonly used to demonstrate the visual form of a document
-                or a typeface without relying on meaningful content.
+                In publishing and graphic design, used Lucifer.AI to read
+                briefing documents. The chatbot helped to summarise all the
+                brief documents. This helped us to increase the team performance
+                by 70%.
               </div>
             </div>
           </SwiperSlide>

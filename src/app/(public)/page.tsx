@@ -18,12 +18,17 @@ export default function Home() {
       <PorcessSection />
       <FacilitiesSection />
       <IndustrySection />
-      <ServicesSection />
-      <CompatibilitySection /> 
-      <Testimonials />
-      {/* responsive almost done till 1200px*/}
+      <div id="service">
+        <ServicesSection />
+      </div>
+      <CompatibilitySection />
+      <div id="testimonials">
+        <Testimonials />
+      </div>
       <FAQ />
+      <div id="contact">
       <ContactSection />
+      </div>
       <Footer />
     </>
   );

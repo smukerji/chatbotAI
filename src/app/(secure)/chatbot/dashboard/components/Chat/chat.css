@@ -42,6 +42,7 @@
 }
 
 .conversation-container .assistant-message {
+    white-space: pre-line;
     font-size: 20px;
     background-color: ghostwhite;
     max-width: 400px;
@@ -58,20 +59,22 @@
     margin-bottom: 10px;
 }
 
-.conversation-container .assistant-message div {
-    gap: 4px;
+.like-dislike-container {
     display: flex;
-    margin-top: 6px;
+    gap: 4px;
+    margin-left: 3%;
+    margin-top: -1%;
+    margin-bottom: 1%;
 }
 
-.conversation-container .assistant-message div span {
+.like-dislike-container span {
     cursor: pointer;
 }
 
-.conversation-container .assistant-message div span:hover {
-    background: #d6d6d6;
-
+.like-dislike-container span:hover {
+    background-color: #d6d6d6;
 }
+
 
 
 .conversation-container .user-message {

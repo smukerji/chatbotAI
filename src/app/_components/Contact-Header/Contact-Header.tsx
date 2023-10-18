@@ -23,7 +23,7 @@ function ContactHeader() {
             <li>
               <Image src={Phoneimg} alt={"phone-image"} />{" "}
             </li>
-            <li>895 569 0000</li>
+            <li>+85255445532</li>
             <li>
               <Image src={Pinimg} alt={"pin-image"} />{" "}
             </li>

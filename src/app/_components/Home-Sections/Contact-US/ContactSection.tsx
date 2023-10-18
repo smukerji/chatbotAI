@@ -20,21 +20,22 @@ function ContactSection() {
             <li>
               <>
                 <Image src={PhoneImg} alt="phone-img" />
-                +1-503-928-5984
+                +852 55445532
               </>
             </li>
 
             <li>
               <Image src={PinImg} alt="pin-img" />
-              121 Street Drive, Newyork 45478
+              Unit F, 18/F, Worldtech centre. 95 How Ming Street, Kwun Tong,
+              Hong Kong.
             </li>
 
-            <li>
+            {/* <li>
               <Image src={TimeImg} alt="time-img" />
               MONDAY - SUNDAY
               <br />
               09:00am - 5:00pm
-            </li>
+            </li> */}
           </ul>
         </div>
 

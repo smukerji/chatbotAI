@@ -1,12 +1,7 @@
 import React from "react";
 import "./ai-chatbot-section.css";
 import Image from "next/image";
-// import Sectionimg from "../../../../../public/sections-images/ai-chatbot-section/image 52.png";
 import Sectionimg from "../../../../../public/sections-images/ai-chatbot-section/ai-chatbot-section-bg.svg";
-
-import BottomLeftOuterEllipse from "../../../../../public/sections-images/common/Ellipse 98.svg";
-import BottomLeftInnerEllipse from "../../../../../public/sections-images/common/Ellipse 15.svg";
-import TopRightEllipse from "../../../../../public/sections-images/common/Ellipse 62.svg";
 
 function AIChatbotSection() {
   return (
@@ -16,13 +11,12 @@ function AIChatbotSection() {
         {/* ------------------------------left section------------------------------- */}
         <div className="left">
           <div className="welcome-text">Wel Come to AI CHATBOT</div>
-          {/* <div className="ai-chatbot-text">AI CHATBOT</div>
-          <div className="welcome-text">Wel Come to AI CHATBOT</div>
-          <hr className="welcome-text-decorator" /> */}
           <div className="section-text">
-            Lorem ipsum dolor sit amet, consectetur ad consectetur adipiscing
-            elit ut aliquam, purus sit amet luctus venenatis ipiscing elit ut
-            aliquam, purus sit amet luctus venenatis
+            At Lucifer.ai, we bring you the future of AI-driven conversations.
+            Step into a world where your online interactions are powered by
+            intelligent machines. We are thrilled to welcome you to a new era of
+            conversational excellence. Say Hello to Lucifer.AI, your intelligent
+            companion in the digital realm
           </div>
           <div className="request-demo-email-container">
             <input type="text" placeholder="Enter your email" />
@@ -33,34 +27,6 @@ function AIChatbotSection() {
         {/* ------------------------------right section------------------------------- */}
         <div className="right">
           <Image src={Sectionimg} alt="ai-chatbot-section-image" />
-
-          {/* <div className="image-container">
-            <div className="image-polygon">
-              <Image src={Sectionimg} alt="ai-chatbot-section-image" />
-              <div className="ellipse-1">
-                <div className="ellipse-2">
-                  <div className="ellipse-3"></div>
-                </div>
-              </div>
-              <Image
-                className="ellipse-bottom-left-outer-image"
-                src={BottomLeftOuterEllipse}
-                alt="Bottom Left Outer Ellipse"
-              />
-
-              <Image
-                className="ellipse-bottom-left-inner-image"
-                src={BottomLeftInnerEllipse}
-                alt="Bottom Left Inner Ellipse"
-              />
-
-              <Image
-                className="ellipse-top-right-image"
-                src={TopRightEllipse}
-                alt="Top right Ellipse"
-              />
-            </div>
-          </div> */}
         </div>
       </div>
     </>

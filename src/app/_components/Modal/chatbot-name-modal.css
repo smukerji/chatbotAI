@@ -6,6 +6,10 @@
     border: 0.5px solid grey;
 }
 
+.ant-modal .ant-modal-footer {
+    margin-top: 25px;
+}
+
 .chatbot-text:focus {
     border: 0.5px solid rgb(63, 7, 81) !important;
     outline: none;

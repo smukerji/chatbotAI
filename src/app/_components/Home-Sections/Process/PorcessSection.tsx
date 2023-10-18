@@ -30,12 +30,12 @@ function PorcessSection() {
             alt={"left-first-rectangle-image"}
           />
           <span className="left-first-rectangle-image-text">01</span>
-          <div className="left-first-rectangle-title">AUDIT</div>
+          <div className="left-first-rectangle-title">DISCOVERY</div>
           <hr className="left-first-rectangle-title-underline" />
           <div className="left-first-rectangle-text">
-            Lorem ipsum dolor sit amet, consectetur ad consectetur adipiscing
-            elit ut aliquam, purus sit amet luctus venenatis ipiscing elit ut
-            aliquam, purus sit amet luctus venenatis
+            Our in-depth discovery phase, where we collaborate closely to
+            understand your unique needs and objectives, ensuring a personalised
+            approach.
           </div>
           <hr className="left-first-rectangle-first-line" />
           <hr className="left-first-rectangle-second-line" />
@@ -54,9 +54,9 @@ function PorcessSection() {
           <div className="left-second-rectangle-title">Integration</div>
           <hr className="left-second-rectangle-title-underline" />
           <div className="left-second-rectangle-text">
-            Lorem ipsum dolor sit amet, consectetur ad consectetur adipiscing
-            elit ut aliquam, purus sit amet luctus venenatis ipiscing elit ut
-            aliquam, purus sit amet luctus venenatis
+            Effortlessly embed Lucifer.AI into your digital ecosystem as we
+            create a seamless connection with your platforms, making it an
+            integral part of your online presence.
           </div>
 
           <hr className="left-second-rectangle-first-line" />
@@ -76,9 +76,9 @@ function PorcessSection() {
           <div className="left-third-rectangle-title">Analysis</div>
           <hr className="left-third-rectangle-title-underline" />
           <div className="left-third-rectangle-text">
-            Lorem ipsum dolor sit amet, consectetur ad consectetur adipiscing
-            elit ut aliquam, purus sit amet luctus venenatis ipiscing elit ut
-            aliquam, purus sit amet luctus venenatis
+            Leverage our AI chatbot’s data-rich insights to gain a deep
+            understanding of your audience and optimise interactions, driving
+            measurable results
           </div>
 
           <hr className="left-third-rectangle-first-line" />
@@ -98,9 +98,9 @@ function PorcessSection() {
           <div className="left-fourth-rectangle-title">Results</div>
           <hr className="left-fourth-rectangle-title-underline" />
           <div className="left-fourth-rectangle-text">
-            Lorem ipsum dolor sit amet, consectetur ad consectetur adipiscing
-            elit ut aliquam, purus sit amet luctus venenatis ipiscing elit ut
-            aliquam, purus sit amet luctus venenatis
+            Watch engagement, satisfaction, and conversations soar as Lucifer.ai
+            enhances user experiences, boosts efficiency, and delivers the
+            exceptional outcomes you desire.
           </div>
         </div>
       </div>

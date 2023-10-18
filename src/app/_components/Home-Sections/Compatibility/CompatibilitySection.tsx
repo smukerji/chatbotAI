@@ -13,13 +13,12 @@ function CompatibilitySection() {
         <div className="compatibility-text">
           COMPATIBILITY
           <div className="compatibility-welcome-text">
-            COMPATIBILITY WITH CMS AND PLATFORMS
+            COMPATIBILITY WITH Whatsapp AND PLATFORMS
           </div>
         </div>
 
         <div className="section-text">
-          We are offering an accessible interface to CMS or other platforms
-          friendly for disabilities.
+          We are offering an accessible interface to website or other platforms.
         </div>
 
         <Image className="ellipse-img" src={EllipseImg} alt="ellipse-img" />

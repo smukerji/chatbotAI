@@ -22,9 +22,9 @@ function IndustrySection() {
         </div>
 
         <div className="section-text">
-          Lorem ipsum dolor sit amet, consectetur ad consectetur adipiscing elit
-          ut aliquam, purus sit amet luctus venenatis ipiscing elit ut aliquam,
-          purus sit amet luctus venenatis
+          Discover the future of conversational excellence with Lucifer.ai, your
+          intelligent AI companion. Elevate your online interactions with
+          natural and intuitive conversations.
         </div>
 
         <button className="contact-demo-button">Contact for demo</button>
@@ -43,8 +43,8 @@ function IndustrySection() {
                 </div>
                 <div className="title green">Healthcare and Wellness</div>
                 <div className="sub-title">
-                  Lorem ipsum dolor sit amet, consectetur ad consectetur
-                  adipiscing elit ut aliquam, purus.
+                  Use conversational AI to create patient summary, read
+                  appointments & providing medical FAQs to patients
                 </div>
               </div>
             </div>
@@ -60,8 +60,8 @@ function IndustrySection() {
                 </div>
                 <div className="title purple">Hotels and Hospitality</div>
                 <div className="sub-title">
-                  Lorem ipsum dolor sit amet, consectetur ad consectetur
-                  adipiscing elit ut aliquam, purus.
+                  Contract management, supplier list creation, managing customer
+                  queries can be transformed using Lucifer.ai
                 </div>
               </div>
             </div>
@@ -80,8 +80,8 @@ function IndustrySection() {
                 </div>
                 <div className="title blue">Education and Institutes</div>
                 <div className="sub-title">
-                  Lorem ipsum dolor sit amet, consectetur ad consectetur
-                  adipiscing elit ut aliquam, purus.
+                  Build your own AI tutor using Lucifer.ai. Creating
+                  personalised content for personalised learning.
                 </div>
               </div>
             </div>
@@ -91,7 +91,7 @@ function IndustrySection() {
           {/*--------center of all sectors--------*/}
           <div className="center-of-sectors-holder">
             <div className="center-sector">
-              <h2 className="center-content">AI CHATBOT</h2>
+              <h2 className="center-content">LLM CHATBOT</h2>
             </div>
             <div className="center-sector-outer"></div>
           </div>
@@ -105,8 +105,8 @@ function IndustrySection() {
                 </div>
                 <div className="title pink">Nonprofits or B2C</div>
                 <div className="sub-title">
-                  Lorem ipsum dolor sit amet, consectetur ad consectetur
-                  adipiscing elit ut aliquam, purus.
+                  Gen-AI can support in enhancing Contract summarisation,
+                  customer enquiries and call center management
                 </div>
               </div>
             </div>
@@ -123,10 +123,10 @@ function IndustrySection() {
                 <div className="img-wrapper left darkpink">
                   <Image alt="img" src={BankImg} />
                 </div>
-                <div className="title darkpink">Banks and Credit Unions</div>
+                <div className="title darkpink">Small Medium Businesses</div>
                 <div className="sub-title">
-                  Lorem ipsum dolor sit amet, consectetur ad consectetur
-                  adipiscing elit ut aliquam, purus.
+                  Building AI agents and chat interfaces to support business
+                  operations. AI helps SMEs reduce cost and gain productivity
                 </div>
               </div>
             </div>

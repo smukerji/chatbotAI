@@ -18,15 +18,16 @@ function Footer() {
         {/*------------------------------------------description container----------------------------------------------*/}
         <div className="description-container">
           <div className="logo">
-            <span>LUICIFER.</span>
+            <span>LUCIFER.</span>
             <span>AI</span>
           </div>
 
           <div className="description">
-            Lorem ipsum dolor sit amet, consectetur ad consectetur adipiscing
-            elit ut aliquam, purus. vLorem ipsum dolor sit amet, consectetur ad
-            consectetur adipiscing elit ut aliquam, purus.Lorem ipsum dolor sit
-            amet, consectetur ad consectetur adipiscing elit ut aliquam, purus.
+            Experience the brilliance of Lucifer.ai with natural language
+            processing, personalized engagement, multilingual support, and easy
+            integrations. Where technology meets humanity. Ready to witness the
+            future of conversations? Schedule a personalized Lucifer.ai demo and
+            boost user satisfaction and conversions today.
           </div>
 
           <div className="social-media-icons-container">
@@ -72,10 +73,7 @@ function Footer() {
               <a href="">Contact Us </a>
             </li>
             <li>
-              <a href="">Cost Calculator </a>
-            </li>
-            <li>
-              <a href="">Our locations</a>
+              <a href="">AI Chatbot </a>
             </li>
           </ul>
         </div>
@@ -111,27 +109,30 @@ function Footer() {
           <ul>
             <li>
               <Image src={BlackPinImg} alt="black-pin-img" />
-              <a href="">808 Platinum Avenue, Essex Baltimore, Odisha 21221</a>
+              <a href="">
+                Unit F, 18/F Wordtech centre. 95 How Ming Street, Kwun Tong,
+                Hong Kong
+              </a>
             </li>
             <li>
               <Image src={BlackPhoneImg} alt="black-phone-img" />
-              <a href="">503-928-0000</a>
+              <a href="">+852 55 445532</a>
             </li>
             <li>
               <Image src={BlackEnvelopImg} alt="black-envelop-img" />
-              <a href="">info@aichatbot.com</a>
+              <a href="">saptarshi@sapahk.ai</a>
             </li>
-            <li>
+            {/* <li>
               <button className="get-direction-btn">
                 Get directions
                 <Image src={RightArrow} alt="right-arrow-img" />
               </button>
-            </li>
+            </li> */}
           </ul>
         </div>
       </div>
-      
-      <div className="copyright-section">Copyright © 2023 LUCIFER AI</div>
+
+      <div className="copyright-section">Copyright © 2023 SAP Alliance</div>
     </div>
   );
 }

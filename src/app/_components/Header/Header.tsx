@@ -10,7 +10,7 @@ function Header() {
     <>
       <div className="header-container">
         <div className="logo">
-          <span>LUICIFER.</span>
+          <span>LUCIFER.</span>
           <span>AI</span>
         </div>
         <div className="navbar">
@@ -20,15 +20,11 @@ function Header() {
             </li>
 
             <li>
-              <a href="">Company</a>
+              <a href="/#service">Services</a>
             </li>
 
             <li>
-              <a href="">Services</a>
-            </li>
-
-            <li>
-              <a href="">Testimonials</a>
+              <a href="/#testimonials">Testimonials</a>
             </li>
 
             <li>
@@ -38,7 +34,7 @@ function Header() {
             </li>
 
             <li>
-              <a href="">Contact</a>
+              <a href="/#contact">Contact</a>
             </li>
           </ul>
         </div>

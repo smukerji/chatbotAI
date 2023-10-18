@@ -397,7 +397,6 @@ export default async function handler(req, res) {
             dataID: tempIds,
             charCount: obj.charCount,
           });
-
           return tempData;
         });
         crwaledLinkUpsertData = [].concat(...crwaledLinkUpsertData);
@@ -408,6 +407,10 @@ export default async function handler(req, res) {
           chatbotId,
           userId
         );
+
+        // setTimeout(() => {
+        //   console.log("db crawl source", dbCrawlSource);
+        // }, 5000);
 
         collection.insertOne({
           chatbotId,

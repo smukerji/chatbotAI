@@ -17,12 +17,11 @@ function FacilitiesSection() {
         </div>
 
         <div className="section-text">
-          Lorem ipsum dolor sit amet, consectetur ad consectetur adipiscing elit
-          ut aliquam, purus sit amet luctus venenatis ipiscing elit ut aliquam,
-          purus sit amet luctus venenatis Lorem ipsum dolor sit amet,
-          consectetur ad consectetur adipiscing elit ut aliquam, purus sit amet
-          luctus venenatis ipiscing elit ut aliquam, purus sit amet luctus
-          venenatis.
+          Unlock the Power of Conversation with Lucifer.ai. Lucifer.ai
+          understands and responds in human-like language, making interactions
+          effortless and enjoyable. We invite you to explore the power of
+          Lucifer.ai through a personalised demo. Let us show you how our AI
+          chatbot can transform your digital conversations.
         </div>
 
         {/* ------------------------------facilities-list-start------------------------------- */}
@@ -35,10 +34,11 @@ function FacilitiesSection() {
               alt="facilityimage"
             />
             <div className="description-container">
-              <div className="title">Key Accessibility Choice</div>
+              <div className="title">Seamless Conversations</div>
               <div className="description">
-                Lorem ipsum dolor sit amet, consectetur ad consectetur
-                adipiscing elit ut aliquam, purus.
+                Engage your website visitors, customers, and clients with
+                natural, intuitive conversations. Lucifer.ai ensures every
+                interaction is personalized, relevant, and memorable.
               </div>
             </div>
           </div>
@@ -51,10 +51,10 @@ function FacilitiesSection() {
               alt="facilityimage"
             />
             <div className="description-container">
-              <div className="title">Key Accessibility Choice</div>
+              <div className="title">Integrations made easy</div>
               <div className="description">
-                Lorem ipsum dolor sit amet, consectetur ad consectetur
-                adipiscing elit ut aliquam, purus.
+                Seamlessly integrate Lucifer.ai with your website, whatsapp, or
+                preferred tools for a unified experience.
               </div>
             </div>
           </div>
@@ -67,10 +67,11 @@ function FacilitiesSection() {
               alt="facility-image"
             />
             <div className="description-container">
-              <div className="title">Key Accessibility Choice</div>
+              <div className="title">Data-Driven Insights</div>
               <div className="description">
-                Lorem ipsum dolor sit amet, consectetur ad consectetur
-                adipiscing elit ut aliquam, purus.
+                Understand your audience better with powerful analytics.
+                Lucifer.ai offers in-depth data to help you optimize your
+                interactions and drive results.
               </div>
             </div>
           </div>

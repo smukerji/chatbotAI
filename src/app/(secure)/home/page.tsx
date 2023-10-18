@@ -343,7 +343,13 @@ export default function Home({
       formData.append("deleteQAList", JSON.stringify(deleteQAList));
       formData.append("crawledList", JSON.stringify(crawledList));
       formData.append("deleteCrawlList", JSON.stringify(deleteCrawlList));
-      formData.append("userId", cookies.userId);
+      //// default chatbot set
+      formData.append(
+        "userId",
+        chatbotId === "123d148a-be02-4749-a612-65be9d96266c"
+          ? "651d111b8158397ebd0e65fb"
+          : cookies.userId
+      );
       formData.append("qaList", JSON.stringify(qaList));
       formData.append("text", text);
       formData.append("chatbotText", chatbotText);
