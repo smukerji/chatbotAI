@@ -1,0 +1,31 @@
+.add-button {
+    background-color: rgb(212 212 216);
+    color: black;
+    border-radius: 5px !important;
+    margin: 20px 0;
+}
+
+.add-button:hover {
+    background-color: rgba(6, 3, 3, 0.294) !important;
+    color: black !important;
+}
+
+.qa-source-btn-container {
+    width: 800px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.add-qa-container {
+    border: 0.5px solid grey;
+    width: 800px;
+    border-radius: 5px;
+    margin: 20px 0;
+}
+
+.add-qa-container .delete {
+    display: flex;
+    justify-content: end;
+    width: 780px;
+    margin: 10px 0;
+}

@@ -2,9 +2,11 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+  color: #000;
 }
 
-Header {
+/* Header {
   background-color: white !important;
   display: flex;
   justify-content: space-between;
@@ -20,12 +22,12 @@ Header a {
   font-size: 20px;
   font-weight: bolder;
   color: black;
-}
+} */
 
-.ant-btn-primary {
+/* .ant-btn-primary {
   background-color: black;
 }
 
 .ant-btn-primary:hover {
   background-color: rgba(10, 10, 10, 0.856) !important;
-}
+} */

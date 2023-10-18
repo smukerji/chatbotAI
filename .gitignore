@@ -11,6 +11,7 @@
 # next.js
 /.next/
 /out/
+/.cache
 
 # production
 /build
@@ -26,6 +27,7 @@ yarn-error.log*
 
 # local env files
 .env*.local
+.env
 
 # vercel
 .vercel
@@ -33,3 +35,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/public/qa-images/*.png
+/public/qa-images/*.jpg
+/public/qa-images/*.jpeg

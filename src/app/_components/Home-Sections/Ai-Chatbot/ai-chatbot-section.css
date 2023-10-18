@@ -1,0 +1,191 @@
+.ai-chatbot-section-container {
+    display: flex;
+    padding: 0 0 0 90px;
+    justify-content: space-between;
+
+}
+
+.ai-chatbot-text {
+    height: 220px;
+    /* font-size: 220px; */
+    font-size: 12vw;
+    font-style: normal;
+    font-weight: 800;
+    line-height: 120%;
+    position: relative;
+    /* color: transparent; */
+    /* -webkit-text-stroke: 1px #33E0C4; */
+    text-shadow: -1px 1px 0px #33E0C4, 0px 1px 0px #33E0C4, 1px 1px 0px #33E0C4, 0px -1px 0px #33E0C4;
+    color: #fff;
+    z-index: -1;
+}
+
+.ai-chatbot-section-container .welcome-text {
+    color: #000;
+    font-size: 3.5vw;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 134%;
+    width: 27vw;
+    /* height: 176px; */
+    text-transform: uppercase;
+    /* margin-left: 99px; */
+    margin-top: -14%;
+    position: relative;
+}
+
+.ai-chatbot-section-container .welcome-text::before {
+    content: '';
+    position: absolute;
+    top: 86%;
+    left: 0;
+    width: 23.2vw;
+    height: 4vh;
+    background: #15C3A7;
+    border-radius: 20px;
+    z-index: -1;
+}
+
+
+.ai-chatbot-section-container .section-text {
+    margin-top: 63px;
+    /* margin-left: 100px; */
+    font-size: 25px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 45px;
+    color: #232932;
+    width: 46vw;
+    /* height: 149px; */
+}
+
+.ai-chatbot-section-container .left {
+    flex: 1;
+}
+
+.ai-chatbot-section-container .right {
+    margin-top: -186px;
+    flex: 1;
+}
+
+
+.ai-chatbot-section-container .right img {
+    width: 100%;
+}
+
+
+.request-demo-email-container {
+    width: 44.3vw;
+    height: 89px;
+    border-radius: 44.5px;
+    background: #F6FFFE;
+    box-shadow: 0px 10px 20px 0px #E7ECFD;
+    /* margin-left: 100px; */
+    margin-top: 67px;
+}
+
+.request-demo-email-container button {
+    width: 14.5vw;
+    height: 89px;
+    border-radius: 44.5px;
+    background: #15C3A7;
+    color: #fff;
+    font-size: 23px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 120%;
+    margin-right: 0;
+    margin-left: auto;
+    border: none;
+    cursor: pointer;
+}
+
+.request-demo-email-container input {
+    width: 29.8vw;
+    height: 87px;
+    color: #8A8A8A;
+    font-size: 19px;
+    padding-inline: 40px;
+    border: none;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 120%;
+    border-radius: 44.5px
+}
+
+.request-demo-email-container input:focus-visible {
+    border: none;
+    outline: none;
+}
+
+/*------------------------------------css for secreen less than 1600---------------------------------*/
+/* @media only screen and (max-width: 1600px) {} */
+
+/*------------------------------------css for secreen less than 1440---------------------------------*/
+@media only screen and (max-width: 1440px) {
+    .ai-chatbot-section-container .welcome-text {
+        margin-top: -20%;
+    }
+
+
+    .ai-chatbot-section-container {
+        padding: 0px 0 0 74px;
+    }
+
+    .ai-chatbot-section-container .section-text {
+        /* margin-top: 63px; */
+        /* margin-left: 85px; */
+        font-size: 20px;
+        line-height: 35px;
+    }
+
+    .request-demo-email-container {
+        width: 39.3vw;
+    }
+
+    .request-demo-email-container input {
+        width: 24.8vw;
+    }
+
+}
+
+
+/*------------------------------------css for secreen less than 1199---------------------------------*/
+@media only screen and (max-width: 1199px) {
+    .ai-chatbot-section-container .welcome-text {
+        margin-top: -27%;
+    }
+
+    .ai-chatbot-section-container {
+        padding: 0px 0 0 60px;
+    }
+
+    .ai-chatbot-section-container .section-text {
+        /* margin-top: 63px; */
+        /* margin-left: 85px; */
+        font-size: 17px;
+        line-height: 30px;
+    }
+
+    .request-demo-email-container {
+        width: 37.3vw;
+        height: 70px;
+    }
+
+    .request-demo-email-container input {
+        width: 22.8vw;
+        font-size: 15px;
+        height: 70px;
+    }
+
+    .request-demo-email-container button {
+        height: 70px;
+        font-size: 17px;
+    }
+
+    .ai-chatbot-section-container .right img {
+        width: 95%;
+        margin-top: -104px;
+    }
+
+}

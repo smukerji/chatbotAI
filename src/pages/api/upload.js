@@ -1,4 +1,4 @@
-import { readContent } from "../../helper/ReadContent";
+import { readContent } from "../../app/_helpers/server/ReadContent";
 
 const formidable = require("formidable");
 

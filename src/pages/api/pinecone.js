@@ -1,9 +1,8 @@
-import { readContent } from "../../helper/ReadContent";
 import { PineconeClient } from "@pinecone-database/pinecone";
 
-import { createEmbedding } from "../../helper/embeddings";
+import { createEmbedding } from "../../app/_helpers/server/embeddings";
 import { connectDatabase } from "../../db";
-import { deletevectors } from "../../helper/pinecone";
+import { deletevectors } from "../../app/_helpers/server/pinecone";
 
 export const pinecone = new PineconeClient();
 
@@ -17,7 +16,7 @@ export default async function handler(req, res) {
     // const index = pinecone.Index(process.env.NEXT_PUBLIC_PINECONE_INDEX);
     // const tr = await index.delete1({
     //   deleteAll: true,
-    //   namespace: "ae9100ec-d127-4291-bba3-19e4369d7094",
+    //   namespace: "651d111b8158397ebd0e65fb",
     // });
     // return res.status(200).send(tr);
     /// parse the request object
@@ -32,7 +31,7 @@ export default async function handler(req, res) {
     /// set the params of pinecone embeddings retrival
     const queryRequest = {
       vector: embed,
-      topK: 10,
+      topK: 5,
       includeValues: false,
       includeMetadata: true,
       filter: {
@@ -70,23 +69,38 @@ export default async function handler(req, res) {
     /// parse the request object
     const body = JSON.parse(req.body);
     const chatbotId = body?.chatbotId;
+    const userId = body?.userId;
 
     /// fetch the IDs and user namespace from the DB
-    const db = await connectDatabase();
-    const collection = db.collection("user-details");
+    const db = (await connectDatabase()).db();
+    const collection = db.collection("chatbots-data");
+    const userChatbots = db.collection("user-chatbots");
     const cursor = collection.find({ chatbotId: chatbotId });
 
     let vectorId = [];
     let namespace = "";
     for await (const doc of cursor) {
+      /// get the vector id's of website crawling list
+      if (Array.isArray(doc.content)) {
+        doc.content.forEach((content) => {
+          vectorId.push(content.dataID);
+        });
+      }
       vectorId.push(doc.dataID);
-      namespace = doc.userId; 
+      namespace = userId;
     }
     vectorId = [].concat(...vectorId);
-    console.log(vectorId);
     /// delete the vectors
     const deleteData = await collection.deleteMany({ chatbotId: chatbotId });
-    deletevectors(vectorId, namespace);
+    /// delete the chatbot
+    await userChatbots.deleteOne({ chatbotId: chatbotId });
+
+    /// deleting the chunks to avoid  Request Header Fields Too Large error
+    const deleteBatchSize = 250;
+    for (let i = 0; i <= vectorId.length; i += deleteBatchSize) {
+      const deleteBatch = vectorId.slice(i, i + deleteBatchSize);
+      deletevectors(deleteBatch, namespace);
+    }
     return res.status(200).send({ text: "Deleted successfully" });
   }
 }
