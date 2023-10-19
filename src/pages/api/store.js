@@ -205,6 +205,7 @@ export default async function handler(req, res) {
                 content,
                 "file",
                 chatbotId,
+                userId,
                 file.name
               );
               resolve(chunks);
@@ -236,7 +237,7 @@ export default async function handler(req, res) {
           return value?.value?.data;
         });
         upserData = [].concat(...upserData);
-        if (upserData.length > 0) await upsert(upserData, userId);
+        // if (upserData.length > 0) await upsert(upserData, userId);
 
         /// store the details in database
         /// iterate and store each user filename as per chatbot
@@ -272,7 +273,7 @@ export default async function handler(req, res) {
       }
       if (text.length > 0) {
         /// generating chunks and embedding
-        const chunks = await generateChunksNEmbedd(text, "text", chatbotId);
+        const chunks = await generateChunksNEmbedd(text, "text", chatbotId, "");
 
         /// store the emebeddings in pinecone database
         await upsert(chunks.data, userId);
@@ -305,13 +306,22 @@ export default async function handler(req, res) {
               });
               /// generating chunks and embedding
               const chunks = await generateChunksNEmbedd(
-                JSON.stringify({
-                  question: qa.question,
-                  answer: qa.answer,
-                  filename: qa.image,
-                }),
+                qa.image
+                  ? JSON.stringify({
+                      question: qa.question,
+                      answer:
+                        `${qa.answer}` +
+                        `image: https://drive.google.com/uc?export=view&id=${qa.image}`,
+                      // filename: qa.image,
+                    })
+                  : JSON.stringify({
+                      question: qa.question,
+                      answer: qa.answer,
+                      // filename: qa.image,
+                    }),
                 "qa",
-                chatbotId
+                chatbotId,
+                ""
               );
 
               chunks.data[0].id = dbQA?.dataID[0];
@@ -326,7 +336,7 @@ export default async function handler(req, res) {
                     content: {
                       question: qa.question,
                       answer: qa.answer,
-                      image: qa.image,
+                      filename: qa.image,
                     },
                   },
                 }
@@ -335,16 +345,24 @@ export default async function handler(req, res) {
             } else if (qa?.id == undefined) {
               /// generating chunks and embedding
               const chunks = await generateChunksNEmbedd(
-                JSON.stringify({
-                  question: qa.question,
-                  answer: qa.answer,
-                  filename: qa.image,
-                }),
+                qa.image
+                  ? JSON.stringify({
+                      question: qa.question,
+                      answer:
+                        `${qa.answer}` +
+                        `image: https://drive.google.com/uc?export=view&id=${qa.image}`,
+                      // filename: qa.image,
+                    })
+                  : JSON.stringify({
+                      question: qa.question,
+                      answer: qa.answer,
+                      // filename: qa.image,
+                    }),
                 "qa",
-                chatbotId
+                chatbotId,
+                ""
               );
               // qaListEmbbedingIndex.push(index);
-
               /// insert the data to DB
               await collection.insertOne({
                 chatbotId,
@@ -374,7 +392,9 @@ export default async function handler(req, res) {
         });
         upserData = [].concat(...upserData);
         // console.log(upserData);
-        if (upserData.length > 0) await upsert(upserData, userId);
+        if (upserData.length > 0) {
+          await upsert(upserData, userId);
+        }
       }
 
       /// processing the links

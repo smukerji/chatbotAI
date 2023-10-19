@@ -33,7 +33,7 @@ async function dataSources(request: any) {
       qaList.push({
         question: data.content.question,
         answer: data.content.answer,
-        image: data.content.image,
+        image: data.content.filename,
         id: data._id,
       });
     } else if (data.source == "text") {

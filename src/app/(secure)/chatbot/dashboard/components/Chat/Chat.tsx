@@ -317,8 +317,8 @@ function Chat({
                   {
                     role: "user",
                     content: `
-                      Strictly write all the response in html format and keep the font-size same for all element. Also don't specify any css just outline text with html elements and strictly don't add any characters apart from html elements.
-                      Answer user query with and include images in responseT if available
+                      Strictly write all the response in html format with only raw text and img tags.
+                      Answer user query and include images in response if available in the context 
   
                       query: ${userQuery}`,
                   },

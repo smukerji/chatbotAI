@@ -60,6 +60,7 @@ export async function generateChunksNEmbedd(
   content: string,
   source: string,
   chatbotId: string,
+  userId: string,
   filename: string = "none"
 ) {
   /// split the content in 1000 characters
@@ -83,11 +84,12 @@ export async function generateChunksNEmbedd(
   });
 
   /// creating chunks with batch size 2000
-  const batchSize = 2000;
+  const batchSize = 250;
   let data: any = [];
   let dataIDs: any = [];
   /// creating embeddings
   for (let i = 0; i < chunks.length; i += batchSize) {
+    let tempData: any = [];
     const batch = chunks.slice(i, i + batchSize);
     const batchEmbedding = await openaiObj().createEmbedding({
       model: "text-embedding-ada-002",
@@ -102,9 +104,18 @@ export async function generateChunksNEmbedd(
         values: embeddingData.embedding,
         id: id,
       });
+
+      tempData.push({
+        metadata: { content: chunks[index], source, filename, chatbotId },
+        values: embeddingData.embedding,
+        id: id,
+      });
     });
 
-    console.log(data.length);
+    /// currently being used to upsert on files data
+    if (userId != "") {
+      await upsert(tempData, userId);
+    }
   }
 
   return { data, dataIDs, contentLength };

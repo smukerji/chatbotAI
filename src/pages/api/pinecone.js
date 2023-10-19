@@ -16,7 +16,7 @@ export default async function handler(req, res) {
     // const index = pinecone.Index(process.env.NEXT_PUBLIC_PINECONE_INDEX);
     // const tr = await index.delete1({
     //   deleteAll: true,
-    //   namespace: "651d111b8158397ebd0e65fb",
+    //   namespace: undefined,
     // });
     // return res.status(200).send(tr);
     /// parse the request object

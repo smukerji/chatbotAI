@@ -71,6 +71,10 @@
     margin-bottom: 10px;
 }
 
+.conversation-container .assistant-message img {
+    width: 100%;
+}
+
 .like-dislike-container {
     display: flex;
     gap: 4px;
