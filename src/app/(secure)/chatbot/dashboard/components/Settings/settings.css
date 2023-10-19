@@ -1,0 +1,32 @@
+.settings-container {
+    display: flex;
+    width: 500px;
+}
+
+.settings-container .left .ant-radio-group {
+    display: flex;
+    flex-direction: column;
+    background-color: #15C3A7;
+    padding: 10px;
+}
+
+.settings-container .left .ant-radio-group .ant-radio-wrapper {
+    border-bottom: 1px solid;
+    margin-inline-end: 0;
+    cursor: pointer;
+    color: white;
+}
+
+.settings-container .left .ant-radio-group .ant-radio-wrapper:hover {
+    background-color: #0d8672;
+
+}
+
+.settings-container .left .ant-radio-group .ant-radio-wrapper .ant-radio {
+    display: none;
+}
+
+.settings-container .right {
+    background-color: #c6c6c6;
+    width: 57%;
+}

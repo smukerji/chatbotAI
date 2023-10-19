@@ -10,6 +10,7 @@ import Home from "../../home/page";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import { v4 as uuid } from "uuid";
+import Settings from "./components/Settings/Settings";
 
 function Dashboard() {
   const { status } = useSession();
@@ -142,7 +143,7 @@ function Dashboard() {
           )}
           {source == "settings" && (
             <>
-              <h1>Settings</h1>
+              <Settings chatbotId={chatbot.id} />
               <DeleteModal
                 open={open}
                 setOpen={setOpen}

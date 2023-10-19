@@ -41,6 +41,18 @@
     height: 600px;
 }
 
+.conversation-container::-webkit-scrollbar {
+    width: 0.5em;
+}
+
+.conversation-container::-webkit-scrollbar-thumb {
+    background-color: transparent;
+}
+
+.conversation-container::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
 .conversation-container .assistant-message {
     white-space: pre-line;
     font-size: 20px;
