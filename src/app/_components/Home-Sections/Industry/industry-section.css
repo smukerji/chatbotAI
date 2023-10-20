@@ -115,7 +115,9 @@
 /* ------------------------------sector-row-three-container------------------------------- */
 .sector-row-three-container {
     display: flex;
-    justify-content: center;
+    /* justify-content: center; */
+    /* temporary fix */
+    margin-left: 21.6%;
     align-items: center;
     gap: 17.77vw;
 }
@@ -377,7 +379,8 @@
 }
 
 .sector-row-one-container .sector-holder:nth-child(1)::after {
-    width: 34.8vw;
+    /* width: 34.8vw; */
+    width: 9.8vw;
     height: 5px;
     background: #000;
     position: absolute;

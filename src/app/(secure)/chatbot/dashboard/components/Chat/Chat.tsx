@@ -309,6 +309,7 @@ function Chat({
                     content: `Use the following pieces of context to answer the users question.
                     If you don't know the answer, just say that you don't know, don't try to make up an answer.
                     ----------------
+                    context:
                     ${similaritySearchResults}
 
                     Answer user query and include images write respect to each line if available`,
@@ -318,7 +319,7 @@ function Chat({
                     role: "user",
                     content: `
                       Strictly write all the response in html format with only raw text and img tags.
-                      Answer user query and include images in response if available in the context 
+                      Answer user query and include images in response if available in the given context 
   
                       query: ${userQuery}`,
                   },

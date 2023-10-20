@@ -134,7 +134,7 @@ function IndustrySection() {
           </div>
 
           {/*--------sector-6--------*/}
-          <div className="sector-holder right">
+          {/* <div className="sector-holder right">
             <div className="sector">
               <div className="content">
                 <div className="img-wrapper yellow right">
@@ -148,7 +148,7 @@ function IndustrySection() {
               </div>
             </div>
             <div className="sector-outer yellow"></div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

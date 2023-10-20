@@ -19,8 +19,6 @@ export const pinecone = new PineconeClient();
 
 export const upsert = async (vectors: any, userId: string) => {
   try {
-    console.log("FDSFDSFDSFSD fj sdfhgjh", userId);
-
     await pinecone
       .init({
         environment: process.env.NEXT_PUBLIC_PINECONE_ENV as string,

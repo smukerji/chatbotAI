@@ -45,9 +45,11 @@ export async function generateChunksNEmbeddForLinks(
           id: batchId[index],
         });
       });
-
       await upsert(upsertData, userId);
     } catch (error: any) {
+      console.log("Upsert data of links error", error);
+      throw new Error(error?.message);
+
       console.log(
         "Error while creating embedding for website crawling",
         error?.response?.data

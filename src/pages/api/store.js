@@ -421,22 +421,25 @@ export default async function handler(req, res) {
         });
         crwaledLinkUpsertData = [].concat(...crwaledLinkUpsertData);
 
-        await generateChunksNEmbeddForLinks(
-          crwaledLinkUpsertData,
-          "crawling",
-          chatbotId,
-          userId
-        );
-
+        try {
+          await generateChunksNEmbeddForLinks(
+            crwaledLinkUpsertData,
+            "crawling",
+            chatbotId,
+            userId
+          ).then(() => {
+            collection.insertOne({
+              chatbotId,
+              content: dbCrawlSource,
+              source: "crawling",
+            });
+          });
+        } catch (err) {
+          return res.status(400).send(err);
+        }
         // setTimeout(() => {
         //   console.log("db crawl source", dbCrawlSource);
         // }, 5000);
-
-        collection.insertOne({
-          chatbotId,
-          content: dbCrawlSource,
-          source: "crawling",
-        });
       }
       /// send the response
       const responseCode = updateChatbot ? 201 : 200;
