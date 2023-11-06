@@ -1,13 +1,10 @@
-import { OpenAIApi, Configuration } from "openai";
+import { OpenAI } from "openai";
 import { v4 as uuidv4 } from "uuid";
 import { upsert } from "./pinecone";
 
 /// getting the openai obj
-export function openaiObj(): OpenAIApi {
-  const configuration = new Configuration({
-    apiKey: process.env.NEXT_PUBLIC_OPENAI_KEY,
-  });
-  const openai = new OpenAIApi(configuration);
+export function openaiObj(): OpenAI {
+  const openai = new OpenAI({ apiKey: process.env.NEXT_PUBLIC_OPENAI_KEY });
   return openai;
 }
 
@@ -29,11 +26,11 @@ export async function generateChunksNEmbeddForLinks(
     const batch = crawlData.slice(i, i + batchSize);
     const batchId = crawlDataId.slice(i, i + batchSize);
     try {
-      const batchEmbedding = await openaiObj().createEmbedding({
+      const batchEmbedding: any = await openaiObj().embeddings.create({
         model: "text-embedding-ada-002",
         input: batch,
       });
-      batchEmbedding.data.data.map((embeddingData, index) => {
+      batchEmbedding.data.map((embeddingData: any, index: number) => {
         upsertData.push({
           metadata: {
             content: batch[index],
@@ -93,11 +90,11 @@ export async function generateChunksNEmbedd(
   for (let i = 0; i < chunks.length; i += batchSize) {
     let tempData: any = [];
     const batch = chunks.slice(i, i + batchSize);
-    const batchEmbedding = await openaiObj().createEmbedding({
+    const batchEmbedding: any = await openaiObj().embeddings.create({
       model: "text-embedding-ada-002",
       input: batch,
     });
-    batchEmbedding.data.data.map((embeddingData, index) => {
+    batchEmbedding.data.map((embeddingData: any, index: number) => {
       const id = uuidv4();
       dataIDs.push(id);
       /// storing in response data
@@ -124,10 +121,10 @@ export async function generateChunksNEmbedd(
 }
 
 export async function createEmbedding(query: string) {
-  const batchEmbedding = await openaiObj().createEmbedding({
+  const batchEmbedding: any = await openaiObj().embeddings.create({
     model: "text-embedding-ada-002",
     input: query,
   });
 
-  return batchEmbedding.data.data[0].embedding;
+  return batchEmbedding.data[0].embedding;
 }

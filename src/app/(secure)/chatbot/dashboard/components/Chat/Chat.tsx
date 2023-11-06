@@ -97,67 +97,6 @@ function Chat({
           ...prev,
           { role: "user", content: userQuery },
         ]);
-        // setMessageImages((prev: any) => [...prev, { role: "user" }]);
-        /// check which chatbot to interact with i.e. chatbase bot or custom bot
-        // const chatbotIdLength = chatbot?.id.length;
-        // if (chatbotIdLength !== 36) {
-        //   const options = {
-        //     method: "POST",
-        //     headers: {
-        //       accept: "application/json",
-        //       "content-type": "application/json",
-        //       Authorization: `Bearer ${process.env.NEXT_PUBLIC_AUTHORIZATION}`,
-        //       cache: "no-store",
-        //     },
-        //     body: JSON.stringify({
-        //       stream: true,
-        //       temperature: 0,
-        //       chatId: chatbot.id,
-        //       messages: [...messages, { role: "user", content: userQuery }],
-        //     }),
-        //   };
-
-        //   /// get the response from chatbase api
-        //   let resptext = "";
-        //   try {
-        //     setLoading(true);
-        //     const response: any = await fetch(
-        //       "https://www.chatbase.co/api/v1/chat",
-        //       options
-        //     );
-        //     // Read the response as a stream of data
-        //     const reader = response.body.getReader();
-        //     const decoder = new TextDecoder("utf-8");
-
-        //     /// decode the chunks
-        //     while (true) {
-        //       const { done, value } = await reader.read();
-
-        //       if (done) {
-        //         /// setting the response when completed
-        //         setMessages((prev: any) => [
-        //           ...prev,
-        //           { role: "assistant", content: resptext },
-        //         ]);
-        //         setResponse("");
-        //         break;
-        //       }
-
-        //       // Massage and parse the chunk of data
-        //       const chunk = decoder.decode(value);
-        //       resptext += chunk;
-        //       setResponse(resptext);
-        //     }
-
-        //     if (!response.ok) {
-        //       throw new Error(` when getting user query response `);
-        //     }
-        //   } catch (error) {
-        //     console.log(error);
-        //   } finally {
-        //     setLoading(false);
-        //   }
-        // } else {
         try {
           setLoading(true);
           /// get similarity search
@@ -184,159 +123,31 @@ function Chat({
           const similaritySearchResults = JSON.parse(respText).join("\n");
           console.log(similaritySearchResults);
 
-          // const responseOpenAIFunction: any = await fetch(
-          //   "https://api.openai.com/v1/chat/completions",
-          //   {
-          //     method: "POST",
-          //     headers: {
-          //       "Content-Type": "application/json",
-          //       Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENAI_KEY}`,
-          //     },
-          //     body: JSON.stringify({
-          //       model: "gpt-3.5-turbo-16k",
-          //       temperature: 0.5,
-          //       top_p: 1,
-          //       messages: [
-          //         {
-          //           role: "system",
-          //           content: `Use the following pieces of context to answer the users question.
-          //         If you don't know the answer, just say that you don't know, don't try to make up an answer.
-          //         ----------------
-          //         ${similaritySearchResults}`,
-          //         },
-          //         // ...messages,
-          //         {
-          //           role: "user",
-          //           content: `Give me the file name, corresponding to user question: ${userQuery}`,
-          //         },
-          //       ],
-          //       functions: [
-          //         {
-          //           name: "getFileName",
-          //           description: "Get the filename of the question",
-          //           parameters: {
-          //             type: "object",
-          //             properties: {
-          //               filename: {
-          //                 type: "string",
-          //                 description: "File name if N.A write null",
-          //               },
-          //             },
-          //             required: ["filename"],
-          //           },
-          //         },
-          //       ],
-          //     }),
-          //   }
-          // );
-
-          // const responseOpenAIFunction: any = await fetch(
-          //   "https://api.openai.com/v1/chat/completions",
-          //   {
-          //     method: "POST",
-          //     headers: {
-          //       "Content-Type": "application/json",
-          //       Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENAI_KEY}`,
-          //     },
-          //     body: JSON.stringify({
-          //       model: "gpt-3.5-turbo-16k",
-          //       temperature: 0.5,
-          //       top_p: 1,
-          //       messages: [
-          //         {
-          //           role: "system",
-          //           content: `Use the following pieces of context to answer the users question.
-          //         If you don't know the answer, just say that you don't know, don't try to make up an answer.
-          //         ----------------
-          //         ${similaritySearchResults}`,
-          //         },
-          //         // ...messages,
-          //         {
-          //           role: "user",
-          //           content: `Give me the relevant http image link, corresponding to user question: ${userQuery}`,
-          //         },
-          //       ],
-          //       functions: [
-          //         {
-          //           name: "getImages",
-          //           description: "Get relevant images of the question",
-          //           parameters: {
-          //             type: "object",
-          //             properties: {
-          //               filename: {
-          //                 type: "string",
-          //                 description: "File name if N.A write null",
-          //               },
-          //             },
-          //             required: ["filename"],
-          //           },
-          //         },
-          //       ],
-          //     }),
-          //   }
-          // );
-          // const fileName = await responseOpenAIFunction.json();
-          // const args = JSON.parse(
-          //   fileName.choices[0].message.function_call.arguments
-          // );
-
-          // console.log("Funtion calling", args);
-
-          // if (args && args?.filename && args?.filename != null) {
-          // setMessageImages((prev: any) => [
-          //   ...prev,
-          //   { role: "assistant", image: args?.filename },
-          // ]);
-          // }
-          // Read the response as a stream of data
-
-          // Fetch the response from the OpenAI API
-          const responseOpenAI: any = await fetch(
-            "https://api.openai.com/v1/chat/completions",
+          /// trying to get response from backend in streaming
+          const responseFromBackend: any = await fetch(
+            `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/chat`,
             {
               method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENAI_KEY}`,
-              },
               body: JSON.stringify({
-                model: "gpt-3.5-turbo-16k",
-                temperature: 0,
-                top_p: 1,
-                messages: [
-                  {
-                    role: "system",
-                    content: `Use the following pieces of context to answer the users question.
-                    If you don't know the answer, just say that you don't know, don't try to make up an answer.
-                    ----------------
-                    context:
-                    ${similaritySearchResults}
-
-                    Answer user query and include images write respect to each line if available`,
-                  },
-                  ...messages,
-                  {
-                    role: "user",
-                    content: `
-                      Strictly write all the response in html format with only raw text and img tags.
-                      Answer user query and include images in response if available in the given context 
-  
-                      query: ${userQuery}`,
-                  },
-                ],
-                stream: true,
+                similaritySearchResults,
+                messages,
+                userQuery,
               }),
+              headers: {
+                "Content-Type": "text/event-stream",
+              },
             }
           );
-
-          // console.log(similaritySearchResults);
-
+          // console.log("respnse", responseFromBackend);
           let resptext = "";
-          const reader = responseOpenAI.body.getReader();
-          const decoder = new TextDecoder("utf-8");
+          // const reader = responseFromBackend.body.getReader();
+          // const decoder = new TextDecoder("utf-8");
 
+          const reader = responseFromBackend.body
+            .pipeThrough(new TextDecoderStream())
+            .getReader();
           while (true) {
-            const { done, value } = await reader.read();
+            const { value, done } = await reader.read();
             if (done) {
               /// setting the response when completed
               setMessages((prev: any) => [
@@ -345,42 +156,105 @@ function Chat({
               ]);
               /// store the chathistory
               setResponse("");
-              //   setLoading(false);
-              //   const store = await fetch(
-              //     `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/chathistory`,
-              //     {
-              //       method: "POST",
-              //       body: JSON.stringify({
-              //         chatHistory: messages,
-              //         chatbotId: chatbot.id,
-              //       }),
-              //     }
-              //   );
-
-              //   if (!store.ok) {
-              //     alert(await store.text());
-              //   }
+              setLoading(false);
               break;
             }
-            // Massage and parse the chunk of data
-            const chunk = decoder.decode(value);
-            const lines = chunk.split("\n");
-            const parsedLines = lines
-              .map((line) => line.replace(/^data: /, "").trim()) // Remove the "data: " prefix
-              .filter((line) => line !== "" && line !== "[DONE]") // Remove empty lines and "[DONE]"
-              .map((line, index) => JSON.parse(line)); // Parse the JSON string
 
-            for (const parsedLine of parsedLines) {
-              const { choices } = parsedLine;
-              const { delta } = choices[0];
-              const { content } = delta;
-              // Update the UI with the new content
-              if (content) {
-                resptext += content;
-                setResponse(resptext);
-              }
-            }
+            resptext += value;
+            setResponse(resptext);
           }
+
+          // // Fetch the response from the OpenAI API
+          // const responseOpenAI: any = await fetch(
+          //   "https://api.openai.com/v1/chat/completions",
+          //   {
+          //     method: "POST",
+          //     headers: {
+          //       "Content-Type": "application/json",
+          //       Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENAI_KEY}`,
+          //     },
+          //     body: JSON.stringify({
+          //       model: "gpt-3.5-turbo-16k",
+          //       temperature: 0,
+          //       top_p: 1,
+          //       messages: [
+          //         {
+          //           role: "system",
+          //           content: `Use the following pieces of context to answer the users question.
+          //           If you don't know the answer, just say that you don't know, don't try to make up an answer.
+          //           ----------------
+          //           context:
+          //           ${similaritySearchResults}
+
+          //           Answer user query and include images write respect to each line if available`,
+          //         },
+          //         ...messages,
+          //         {
+          //           role: "user",
+          //           content: `
+          //             Strictly write all the response in html format with only raw text and img tags.
+          //             Answer user query and include images in response if available in the given context
+
+          //             query: ${userQuery}`,
+          //         },
+          //       ],
+          //       stream: true,
+          //     }),
+          //   }
+          // );
+
+          // console.log(similaritySearchResults);
+
+          // let resptext = "";
+          // const reader = responseOpenAI.body.getReader();
+          // const decoder = new TextDecoder("utf-8");
+
+          // while (true) {
+          //   const { done, value } = await reader.read();
+          //   if (done) {
+          //     /// setting the response when completed
+          //     setMessages((prev: any) => [
+          //       ...prev,
+          //       { role: "assistant", content: resptext },
+          //     ]);
+          //     /// store the chathistory
+          //     setResponse("");
+          //     //   setLoading(false);
+          //     //   const store = await fetch(
+          //     //     `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/chathistory`,
+          //     //     {
+          //     //       method: "POST",
+          //     //       body: JSON.stringify({
+          //     //         chatHistory: messages,
+          //     //         chatbotId: chatbot.id,
+          //     //       }),
+          //     //     }
+          //     //   );
+
+          //     //   if (!store.ok) {
+          //     //     alert(await store.text());
+          //     //   }
+          //     break;
+          //   }
+          //   // Massage and parse the chunk of data
+          //   const chunk = decoder.decode(value);
+          //   const lines = chunk.split("\n");
+          //   const parsedLines = lines
+          //     .map((line) => line.replace(/^data: /, "").trim()) // Remove the "data: " prefix
+          //     .filter((line) => line !== "" && line !== "[DONE]") // Remove empty lines and "[DONE]"
+          //     .map((line, index) => JSON.parse(line)); // Parse the JSON string
+
+          //   for (const parsedLine of parsedLines) {
+          //     const { choices } = parsedLine;
+          //     const { delta } = choices[0];
+          //     const { content } = delta;
+          //     // Update the UI with the new content
+          //     if (content) {
+          //       resptext += content;
+          //       setResponse(resptext);
+          //     }
+          //   }
+          // }
           // console.log("Response.", model.data);
         } catch (e: any) {
           console.log(

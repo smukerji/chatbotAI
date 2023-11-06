@@ -1,39 +1,5 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## Replace the code
-
-Goto chatbotAI/node_modules/domino/lib/sloppy.js and pasete the following code
-
-````
-module.exports = {
-Window_run: function \_run(code, file) {
-if (file) code += '\n//@ sourceURL=' + file;
-eval.call(this, code);
-},
-EventHandlerBuilder_build: function build() {
-try {
-const documentView = this.document.defaultView || Object.create(null);
-const currentDocument = this.document;
-const currentForm = this.form;
-const currentElement = this.element;
-
-      return function (event) {
-        return eval("(function(event){" + currentElement.body + "})").call({
-          document: currentDocument,
-          form: currentForm,
-          element: currentElement,
-        }, event);
-      };
-    }
-    catch (err) {
-      return function() {
-        throw err;
-      };
-    }
-
-}
-};
-
 ## Getting Started
 
 First, run the development server:
@@ -44,7 +10,7 @@ npm run dev
 yarn dev
 # or
 pnpm dev
-````
+```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
