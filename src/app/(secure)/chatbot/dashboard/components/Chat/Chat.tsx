@@ -123,7 +123,7 @@ function Chat({
           const similaritySearchResults = JSON.parse(respText).join("\n");
           console.log(similaritySearchResults);
 
-          /// trying to get response from backend in streaming
+          /// get response from backend in streaming
           const responseFromBackend: any = await fetch(
             `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/chat`,
             {
@@ -133,16 +133,9 @@ function Chat({
                 messages,
                 userQuery,
               }),
-              headers: {
-                "Content-Type": "text/event-stream",
-              },
             }
           );
-          // console.log("respnse", responseFromBackend);
           let resptext = "";
-          // const reader = responseFromBackend.body.getReader();
-          // const decoder = new TextDecoder("utf-8");
-
           const reader = responseFromBackend.body
             .pipeThrough(new TextDecoderStream())
             .getReader();
