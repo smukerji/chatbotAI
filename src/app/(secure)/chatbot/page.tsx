@@ -2,7 +2,7 @@
 import { Button } from "antd";
 import React, { useEffect, useState } from "react";
 import "./chatbot.css";
-import { MessageOutlined } from "@ant-design/icons";
+import { MessageOutlined, MoreOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import { useCookies } from "react-cookie";
 import { LoadingOutlined } from "@ant-design/icons";
@@ -10,6 +10,8 @@ import { Spin } from "antd";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import dynamic from "next/dynamic";
+import DeleteModal from "./dashboard/components/Modal/DeleteModal";
+import ShareModal from "./dashboard/components/Modal/ShareModal";
 
 const antIcon = (
   <LoadingOutlined style={{ fontSize: 24, color: "black" }} spin />
@@ -22,8 +24,24 @@ function ChatBot() {
   const [chatbotData, setChatbotData] = useState([]);
   const [cookies, setCookie] = useCookies(["userId"]);
 
+  /// sate for opening menu for the chabot list
+  const [openMenu, setOpenMenu]: any = useState({});
+
   /// loading state
   const [loading, setLoading] = useState(false);
+
+  /// managing delete chatbot
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const showDeleteModal = () => {
+    setOpenDeleteModal(true);
+  };
+  const [chatbotId, setChatbotId] = useState("");
+
+  /// managing share chatbot
+  const [openShareModal, setOpenShareModal] = useState(false);
+  const showShareModal = () => {
+    setOpenShareModal(true);
+  };
 
   /// retrive the chatbots details
   useEffect(() => {
@@ -78,21 +96,49 @@ function ChatBot() {
             </Link>
           </div>
           <div className="chatbots">
-            {chatbotData?.map((data: any) => {
+            {chatbotData?.map((data: any, index: number) => {
               return (
                 <div
                   className="chatbot"
                   key={data.id}
-                  onClick={() => openChatbot(data.id)}
+                  // onClick={() => openChatbot(data.id)}
                 >
-                  <div className="icon">
+                  <div className="icon" onClick={() => openChatbot(data.id)}>
                     <MessageOutlined />
                   </div>
-                  <div className="name">{data.name}</div>
+                  <div className="name" onClick={() => openChatbot(data.id)}>
+                    {data.name}
+                  </div>
+                  <MoreOutlined
+                    onClick={() => {
+                      setOpenMenu({ [index]: !openMenu[index] });
+                      setChatbotId(data.id);
+                    }}
+                  />
+                  {/* opening the menue for chatbot actions */}
+                  {openMenu[index] ? (
+                    <div className={`menu ${openMenu[index] && "active"}`}>
+                      <ul>
+                        <li>Duplicate</li>
+                        <li onClick={showShareModal}>Share</li>
+                        <li onClick={showDeleteModal}>Delete</li>
+                      </ul>
+                    </div>
+                  ) : null}
                 </div>
               );
             })}
           </div>
+          <DeleteModal
+            open={openDeleteModal}
+            setOpen={setOpenDeleteModal}
+            chatbotId={chatbotId}
+          />
+          <ShareModal
+            open={openShareModal}
+            setOpen={setOpenShareModal}
+            chatbotId={chatbotId}
+          />
           {!loading && chatbotData?.length == 0 && (
             <p style={{ color: "red" }}>
               No chatbots available please create one

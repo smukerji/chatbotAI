@@ -1,0 +1,50 @@
+.main-header {
+    background-color: #000;
+    background: url('../.././../../public/sections-images/header-background/header-bg.png');
+    height: 722px;
+    background-repeat: no-repeat;
+    background-size: cover;
+
+}
+
+.main-header .header-text {
+    color: var(--Neutral-1, #FCFCFD);
+    text-align: center;
+
+    /* Heading/H1 */
+    font-family: General Sans;
+    font-size: 60px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 72px;
+    /* 120% */
+}
+
+
+.main-header .header-sub-text {
+    color: var(--Neutral-4, #B1B5C3);
+    text-align: center;
+    width: 80vw;
+    margin: auto;
+    /* Subtitle/Large */
+    font-family: General Sans;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 28px;
+    /* 140% */
+}
+
+.main-header .request-demo {
+
+    display: flex;
+    /* width: 465px; */
+    padding: 8px 8px 8px 16px;
+    /* justify-content: space-between; */
+    align-items: center;
+}
+
+.main-header .request-demo .email-input {
+    border-radius: 16px;
+    background: #FCFCFD;
+}

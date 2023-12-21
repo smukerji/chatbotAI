@@ -112,6 +112,10 @@ function Chat({
                 userId:
                   chatbot?.id === "123d148a-be02-4749-a612-65be9d96266c"
                     ? "651d111b8158397ebd0e65fb"
+                    : chatbot?.id === "34cceb84-07b9-4b3e-ad6f-567a1c8f3557"
+                    ? "65795294269d08529b8cd743"
+                    : chatbot?.id === "ebb79df8-c72f-40d1-b84e-99c59b49ee35"
+                    ? "65795294269d08529b8cd743"
                     : cookies.userId,
               }),
             }
@@ -367,6 +371,7 @@ function Chat({
         />
         <SendOutlined className="icon" onClick={() => getReply("click")} />
       </div>
+      <center>Powered by Lucifer.AI</center>
     </div>
   );
 }
