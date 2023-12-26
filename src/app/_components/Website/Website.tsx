@@ -119,17 +119,20 @@ function Website({
       //   }
       // );
       const options = {
-        method: "GET",
+        method: "POST",
         headers: {
           accept: "application/json",
           // authorization: `Bearer ${process.env.NEXT_PUBLIC_AUTHORIZATION}`,
           cache: "no-store",
         },
+        body: JSON.stringify({
+          sourceURL: value,
+        }),
         next: { revalidate: 0 },
       };
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/fetch-links/api?sourceURL=${value}`,
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/fetch-links/api`,
         options
       );
       const data = await response.json();

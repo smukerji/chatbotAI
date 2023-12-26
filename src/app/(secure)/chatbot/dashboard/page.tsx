@@ -11,6 +11,7 @@ import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import { v4 as uuid } from "uuid";
 import Settings from "./components/Settings/Settings";
+import { getDate, getTime } from "../../../_helpers/client/getTime";
 
 function Dashboard() {
   const { status } = useSession();
@@ -33,9 +34,15 @@ function Dashboard() {
       ? [{ role: "assistant", content: `Hi! What can I help you with?` }]
       : [{ role: "assistant", content: chatbot.initial_message }]
   );
-  const [messageImages, setMessageImages] = useState(
+  const [messagesTime, setMessagesTime] = useState(
     chatbot.initial_message == null
-      ? [{ role: "assistant" }]
+      ? [
+          {
+            role: "assistant",
+            content: `Hi! What can I help you with?`,
+            messageTime: getTime(),
+          },
+        ]
       : [{ role: "assistant" }]
   );
 
@@ -46,10 +53,12 @@ function Dashboard() {
   const [crawlData, setCrawlData]: any = useState();
   // const [qaCharCount, setQACharCount] = useState(0);
 
-  /// session id
+  /// sesstion Id and date for current chat window
   const [sessionID, setSessionID]: any = useState();
+  const [sessionStartDate, setSessionStartDate]: any = useState();
   useEffect(() => {
     setSessionID(uuid());
+    setSessionStartDate(getDate());
   }, []);
 
   /// managing delete chatbot
@@ -100,9 +109,6 @@ function Dashboard() {
     }
   };
 
-  // fetchData();
-  // }, []);
-
   const [loading, setLoading] = useState(false);
   if (status === "authenticated" || cookies?.userId) {
     return (
@@ -131,8 +137,10 @@ function Dashboard() {
                 chatbot={chatbot}
                 messages={messages}
                 setMessages={setMessages}
-                messageImages={messageImages}
-                setMessageImages={setMessageImages}
+                messagesTime={messagesTime}
+                setMessagesTime={setMessagesTime}
+                sessionID={sessionID}
+                sessionStartDate={sessionStartDate}
               />{" "}
               <DeleteModal
                 open={open}

@@ -350,8 +350,8 @@ export default function Home({
           ? "651d111b8158397ebd0e65fb"
           : chatbotId === "34cceb84-07b9-4b3e-ad6f-567a1c8f3557"
           ? "65795294269d08529b8cd743"
-          : chatbotId === "ebb79df8-c72f-40d1-b84e-99c59b49ee35"
-          ? "65795294269d08529b8cd743"
+          : chatbotId === "f0893732-3302-46b2-922a-95e79ef3524c"
+          ? "651d111b8158397ebd0e65fb"
           : cookies.userId
       );
       formData.append("qaList", JSON.stringify(qaList));

@@ -203,7 +203,7 @@ import * as puppeteer from "puppeteer";
 import { parse } from "node-html-parser";
 
 module.exports = apiHandler({
-  GET: fetchLinks,
+  POST: fetchLinks,
 });
 
 const imageLinkRegex =
@@ -239,8 +239,10 @@ function extractTextAndImageSrc(element: any) {
 
 async function fetchLinks(request: NextRequest) {
   /// get the website to crawl
-  const params = request.nextUrl.searchParams;
-  const sourceUrl: string = params?.get("sourceURL")!;
+  // const params = request.nextUrl.searchParams;
+  // const sourceUrl: string = params?.get("sourceURL")!;
+  const data = await request.json();
+  const sourceUrl = data?.sourceURL;
 
   /// check if valid URl
   const urlRegex = /^https?:\/\/[^\s/$.?#].[^\s]*$/;
@@ -318,6 +320,8 @@ async function fetchLinks(request: NextRequest) {
 }
 
 async function extractUrls(page: any, baseUrl: any) {
+  console.log(baseUrl);
+
   // console.log('user input', baseUrl);
   const hrefs = await page.$$eval(
     "a",

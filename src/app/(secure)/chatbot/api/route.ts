@@ -66,7 +66,7 @@ async function fetchCustomBots(userId: string) {
           chatbotId: "34cceb84-07b9-4b3e-ad6f-567a1c8f3557",
         },
         {
-          chatbotId: "ebb79df8-c72f-40d1-b84e-99c59b49ee35",
+          chatbotId: "f0893732-3302-46b2-922a-95e79ef3524c",
         },
       ],
     })

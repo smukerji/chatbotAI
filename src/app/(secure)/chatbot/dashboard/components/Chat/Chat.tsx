@@ -5,13 +5,16 @@ import { DislikeOutlined, SendOutlined, LikeOutlined } from "@ant-design/icons";
 import Image from "next/image";
 import { message } from "antd";
 import ChatbotNameModal from "../../../../../_components/Modal/ChatbotNameModal";
+import { getDate, getTime } from "../../../../../_helpers/client/getTime";
 
 function Chat({
   chatbot,
   messages,
   setMessages,
-  messageImages,
-  setMessageImages,
+  messagesTime,
+  setMessagesTime,
+  sessionID,
+  sessionStartDate,
 }: any) {
   const [cookies, setCookies] = useCookies(["userId"]);
 
@@ -84,6 +87,30 @@ function Chat({
     }
   }, [response]);
 
+  useEffect(() => {
+    const storeHistory = async () => {
+      /// store/update the chathistory
+      const store = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/chathistory`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            chatbotId: chatbot.id,
+            messages: messagesTime,
+            userId: cookies.userId,
+            sessionID,
+            sessionStartDate,
+            sessionEndDate: getDate(),
+          }),
+        }
+      );
+    };
+
+    /// check if assistant replied with the user message then only store the data
+    const conversationLength = messages.length;
+    if (conversationLength > 1 && conversationLength & 1) storeHistory();
+  }, [messages]);
+
   /// get the chatbase response
   async function getReply(event: any) {
     if (event.key === "Enter" || event === "click") {
@@ -96,6 +123,10 @@ function Chat({
         setMessages((prev: any) => [
           ...prev,
           { role: "user", content: userQuery },
+        ]);
+        setMessagesTime((prev: any) => [
+          ...prev,
+          { role: "user", content: userQuery, messageTime: getTime() },
         ]);
         try {
           setLoading(true);
@@ -114,8 +145,8 @@ function Chat({
                     ? "651d111b8158397ebd0e65fb"
                     : chatbot?.id === "34cceb84-07b9-4b3e-ad6f-567a1c8f3557"
                     ? "65795294269d08529b8cd743"
-                    : chatbot?.id === "ebb79df8-c72f-40d1-b84e-99c59b49ee35"
-                    ? "65795294269d08529b8cd743"
+                    : chatbot?.id === "f0893732-3302-46b2-922a-95e79ef3524c"
+                    ? "651d111b8158397ebd0e65fb"
                     : cookies.userId,
               }),
             }
@@ -151,7 +182,18 @@ function Chat({
                 ...prev,
                 { role: "assistant", content: resptext },
               ]);
-              /// store the chathistory
+              /// setting the response time when completed
+              setMessagesTime((prev: any) => [
+                ...prev,
+                {
+                  role: "assistant",
+                  content: resptext,
+                  messageTime: getTime(),
+                },
+              ]);
+              // if (!store.ok) {
+              //   alert(await store.text());
+              // }
               setResponse("");
               setLoading(false);
               break;
@@ -276,40 +318,16 @@ function Chat({
           if (message.role == "assistant")
             return (
               <React.Fragment key={index}>
-                {/* <div className="assistant-message"> */}
-
-                <div
-                  className="assistant-message"
-                  style={{ display: "flex", flexDirection: "column" }}
-                  dangerouslySetInnerHTML={{
-                    __html: message.content,
-                  }}
-                ></div>
-                <div className="like-dislike-container">
-                  <LikeOutlined
-                    onClick={() => openChatbotModal(index, "like")}
-                  />
-                  <DislikeOutlined
-                    onClick={() => openChatbotModal(index, "dislike")}
-                  />
-                </div>
-                {/* {}
-                  {messageImages[index]?.image &&
-                    messageImages[index].image != null && (
-                      // <Image
-                      //   style={{ width: "100%", height: "fit-content" }}
-                      //   src={`/qa-images/${messageImages[index]?.image}`}
-                      //   alt="me"
-                      //   width="604"
-                      //   height="604"
-                      // />
-                      <img
-                        width={"100%"}
-                        src={`https://drive.google.com/uc?export=view&id=${messageImages[index]?.image}`}
-                        alt="assistant-image"
-                      />
-                    )}
-                  <div style={{}}>
+                <div className="assistant-message-container">
+                  <div
+                    className="assistant-message"
+                    style={{ display: "flex", flexDirection: "column" }}
+                    dangerouslySetInnerHTML={{
+                      __html: message.content,
+                    }}
+                  ></div>
+                  <div className="time">{messagesTime[index]?.messageTime}</div>
+                  <div className="like-dislike-container">
                     <LikeOutlined
                       onClick={() => openChatbotModal(index, "like")}
                     />
@@ -317,15 +335,7 @@ function Chat({
                       onClick={() => openChatbotModal(index, "dislike")}
                     />
                   </div>
-                  <ChatbotNameModal
-                    open={open}
-                    setOpen={setOpen}
-                    chatbotText={feedbackText}
-                    setChatbotText={setfeedbackText}
-                    handleOk={handleOk}
-                    forWhat="feedback"
-                  />
-                </div> */}
+                </div>
                 <ChatbotNameModal
                   open={open}
                   setOpen={setOpen}
@@ -338,26 +348,33 @@ function Chat({
             );
           else
             return (
-              <div className="user-message" key={index}>
-                {message.content}
+              <div className="user-message-container">
+                <div className="user-message" key={index}>
+                  {message.content}
+                </div>
+                <div className="time">{messagesTime[index]?.messageTime}</div>
               </div>
             );
         })}
         {loading && response.length == 0 && (
-          <div className="assistant-message">
-            <div className="typing-indicator">
-              <div className="dot"></div>
-              <div className="dot"></div>
-              <div className="dot"></div>
+          <div className="assistant-message-container">
+            <div className="assistant-message">
+              <div className="typing-indicator">
+                <div className="dot"></div>
+                <div className="dot"></div>
+                <div className="dot"></div>
+              </div>
             </div>
           </div>
         )}
         {response && (
-          <div
-            className="assistant-message"
-            style={{ display: "flex", flexDirection: "column" }}
-            dangerouslySetInnerHTML={{ __html: response }}
-          />
+          <div className="assistant-message-container">
+            <div
+              className="assistant-message"
+              style={{ display: "flex", flexDirection: "column" }}
+              dangerouslySetInnerHTML={{ __html: response }}
+            />
+          </div>
         )}
       </div>
       <div className="chat-question">
