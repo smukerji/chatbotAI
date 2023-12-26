@@ -35,6 +35,8 @@ export default async function handler(req, res) {
       const text = fields?.text[0];
       const crawledList = JSON.parse(fields?.crawledList[0]);
       const deleteCrawlList = JSON.parse(fields?.deleteCrawlList[0]);
+      const isTextUpdated = JSON.parse(fields?.isTextUpdated[0]);
+      console.log("Text", text, text.length, isTextUpdated);
       // return;
       // console.log(chatbotId);
       // return;
@@ -255,8 +257,8 @@ export default async function handler(req, res) {
 
       /// prcessing the text data
       /// if text has been updated then delete the old data from pinecone and mongo db
-      if (updateChatbot) {
-        /// fetch the file to get the data IDs of vector stores
+      if (updateChatbot && isTextUpdated) {
+        /// fetch the text to get the data IDs of vector stores
         const dbText = await collection.findOne({
           chatbotId: chatbotId,
           source: "text",
@@ -271,7 +273,22 @@ export default async function handler(req, res) {
           });
         }
       }
-      if (text.length > 0) {
+      if (text.length > 0 && !updateChatbot) {
+        /// generating chunks and embedding
+        const chunks = await generateChunksNEmbedd(text, "text", chatbotId, "");
+
+        /// store the emebeddings in pinecone database
+        await upsert(chunks.data, userId);
+
+        /// store the details in database
+        /// iterate and store each user filename as per chatbot
+        collection.insertOne({
+          chatbotId,
+          dataID: chunks.dataIDs,
+          content: text,
+          source: "text",
+        });
+      } else if (text.length > 0 && updateChatbot && isTextUpdated) {
         /// generating chunks and embedding
         const chunks = await generateChunksNEmbedd(text, "text", chatbotId, "");
 
@@ -440,6 +457,64 @@ export default async function handler(req, res) {
         // setTimeout(() => {
         //   console.log("db crawl source", dbCrawlSource);
         // }, 5000);
+      } else if (crawledList.length > 0 && updateChatbot) {
+        /// geenrated the ID's for each chunks and storing in DB before upserting in pinecone
+        const dbCrawlSource = [];
+        let crwaledLinkUpsertData = crawledList.map((obj) => {
+          const tempIds = [];
+          const tempData = [];
+          obj.cleanedText?.forEach((element) => {
+            const id = uuid();
+            /// map the chunks to id
+            tempData.push({ element, id });
+            tempIds.push(id);
+          });
+
+          /// add the link data to array
+          if (obj?.cleanedText?.length > 0) {
+            dbCrawlSource.push({
+              crawlLink: obj?.crawlLink,
+              dataID: tempIds,
+              charCount: obj.charCount,
+            });
+          }
+          return tempData;
+        });
+        crwaledLinkUpsertData = [].concat(...crwaledLinkUpsertData);
+
+        try {
+          await generateChunksNEmbeddForLinks(
+            crwaledLinkUpsertData,
+            "crawling",
+            chatbotId,
+            userId
+          ).then(async () => {
+            /// get the previous content
+
+            const previousLinksContent = await collection.findOne({
+              chatbotId: chatbotId,
+              source: "crawling",
+            });
+
+            console.log("Db crawlinfg source", dbCrawlSource);
+
+            collection.findOneAndUpdate(
+              { chatbotId: chatbotId, source: "crawling" },
+              {
+                $set: {
+                  content:
+                    previousLinksContent?.content?.length > 0
+                      ? [...previousLinksContent?.content, ...dbCrawlSource]
+                      : dbCrawlSource,
+                },
+              },
+              { upsert: true }
+            );
+          });
+        } catch (err) {
+          console.log("Error while processing links", err);
+          return res.status(400).send(err);
+        }
       }
       /// send the response
       const responseCode = updateChatbot ? 201 : 200;

@@ -12,6 +12,7 @@
     "@ant-design/icons": "^5.2.6",
     "@auth/mongodb-adapter": "^2.0.0",
     "@pinecone-database/pinecone": "^0.1.6",
+    "@sparticuz/chromium-min": "^119.0.2",
     "@types/node": "20.4.6",
     "@types/react": "18.2.18",
     "@types/react-dom": "18.2.7",

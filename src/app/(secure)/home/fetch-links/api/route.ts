@@ -201,10 +201,13 @@ import { apiHandler } from "../../../../_helpers/server/api/api-handler";
 // import { chromium } from "playwright";
 import * as puppeteer from "puppeteer";
 import { parse } from "node-html-parser";
+import chromium from "@sparticuz/chromium-min";
 
 module.exports = apiHandler({
   POST: fetchLinks,
 });
+
+export const maxDuration = 300;
 
 const imageLinkRegex =
   /^https?:\/\/(?:[\w\-]+\.)+[a-zA-Z]{2,20}(?:\/[^\s?]+)*(?:\.(?:jpg|jpeg|png|gif|bmp|svg|webp|tiff))(?:\?.*)?$/i;
@@ -247,7 +250,19 @@ async function fetchLinks(request: NextRequest) {
   /// check if valid URl
   const urlRegex = /^https?:\/\/[^\s/$.?#].[^\s]*$/;
   if (urlRegex.test(sourceUrl)) {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({
+      /// this code only run for vercel dvelopment
+      // args: [...chromium.args, "--hide-scrollbars", "--disable-web-security"],
+      // defaultViewport: chromium.defaultViewport,
+      // executablePath: await chromium.executablePath(
+      //   `https://github.com/Sparticuz/chromium/releases/download/v119.0.2/chromium-v119.0.2-pack.tar`
+      // ),
+      // headless: chromium.headless,
+      // ignoreHTTPSErrors: true,
+
+      /// to run puppeteer on local
+      headless: true,
+    });
     // const context = await browser.newContext();
     const page = await browser.newPage();
 

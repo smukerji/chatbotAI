@@ -106,7 +106,7 @@ export const deleteFileVectorsById = async (userid: any, vectorIDs: any) => {
     deleteAll: false,
     namespace: userid,
   });
-  console.log(vectorIDs, deleteVec);
+  console.log("delete file vectors", vectorIDs, deleteVec);
   return deleteVec;
 };
 

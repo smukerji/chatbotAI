@@ -51,10 +51,7 @@ export default function Home({
     ? crawlingData?.crawledData[0]
     : [];
 
-  const initialCrawlDataHash = crypto
-    .createHash("sha1")
-    .update(JSON.stringify(initialCrawlData))
-    .digest("hex");
+  const initialCrawlDataHash = initialCrawlData.length;
 
   const [cookies, setCookie] = useCookies(["userId"]);
   /// check if the unique id of the user exists else set the cookie with expiration of 1 year
@@ -337,6 +334,10 @@ export default function Home({
 
       // Append other data to the formData object
       formData.append("updateChatbot", updateChatbot);
+      formData.append(
+        "isTextUpdated",
+        initialTextHash === currentTextHash ? "false" : "true"
+      );
       formData.append("chatbotId", chatbotId);
       formData.append("defaultFileList", JSON.stringify(defaultFileList));
       formData.append("deleteFileList", JSON.stringify(deleteFileList));
@@ -603,6 +604,8 @@ export default function Home({
                       ? false
                       : initialQAHash === currentQAHash
                       ? deleteCrawlList.length > 0
+                        ? false
+                        : initialCrawlDataHash != crawledList.length
                         ? false
                         : true
                       : false
