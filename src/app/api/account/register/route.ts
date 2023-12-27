@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { connectDatabase } from "../../../../db";
 import { apiHandler } from "../../../_helpers/server/api/api-handler";
 import joi from "joi";
+import bcrypt from "bcrypt";
 
 module.exports = apiHandler({
   POST: register,
@@ -17,11 +18,15 @@ async function register(request: any) {
     throw 'Email "' + email + '" is already in use';
   }
 
+  /// generate the password hash
+  const saltRounds = 10;
+  const hashPassword = await bcrypt.hash(password, saltRounds);
+
   /// register new user
   await collection.insertOne({
     username,
     email,
-    password,
+    password: hashPassword,
   });
 
   return { message: "Registered successfully... Please login to continue" };

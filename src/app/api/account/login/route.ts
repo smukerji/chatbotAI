@@ -3,6 +3,7 @@ import { connectDatabase } from "../../../../db";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
 import { apiHandler } from "../../../_helpers/server/api/api-handler";
+import bcrypt from "bcrypt";
 
 module.exports = apiHandler({
   POST: login,
@@ -20,7 +21,9 @@ async function login(request: any) {
   });
 
   if (user) {
-    if (password === user?.password) {
+    const isPasswordValid = await bcrypt.compare(password, user?.password);
+
+    if (isPasswordValid) {
       // create a jwt token that is valid for 7 days
       const token = jwt.sign(
         { sub: user?._id?.toString() },

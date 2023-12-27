@@ -252,16 +252,16 @@ async function fetchLinks(request: NextRequest) {
   if (urlRegex.test(sourceUrl)) {
     const browser = await puppeteer.launch({
       /// this code only run for vercel dvelopment
-      // args: [...chromium.args, "--hide-scrollbars", "--disable-web-security"],
-      // defaultViewport: chromium.defaultViewport,
-      // executablePath: await chromium.executablePath(
-      //   `https://github.com/Sparticuz/chromium/releases/download/v119.0.2/chromium-v119.0.2-pack.tar`
-      // ),
-      // headless: chromium.headless,
-      // ignoreHTTPSErrors: true,
+      args: [...chromium.args, "--hide-scrollbars", "--disable-web-security"],
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(
+        `https://github.com/Sparticuz/chromium/releases/download/v119.0.2/chromium-v119.0.2-pack.tar`
+      ),
+      headless: chromium.headless,
+      ignoreHTTPSErrors: true,
 
       /// to run puppeteer on local
-      headless: true,
+      // headless: true,
     });
     // const context = await browser.newContext();
     const page = await browser.newPage();
