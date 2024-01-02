@@ -35,7 +35,7 @@ function HeroHeader() {
           <div
             className="login-btn"
             onClick={() => {
-              router.push("/account/login");
+              window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot`;
             }}
           >
             Log In

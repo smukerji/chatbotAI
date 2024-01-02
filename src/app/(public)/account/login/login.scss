@@ -1,0 +1,141 @@
+.login-container {
+    display: flex;
+    flex-wrap: wrap;
+    height: 100vh;
+    overflow: hidden;
+    /* --------------------------left section------------------------------ */
+    .left {
+        flex: 1;
+        img {
+            width: 100%;
+            height: 100vh;
+            // object-fit: cover;
+        }
+    }
+
+    /* --------------------------right section------------------------------ */
+    .right {
+        flex: 2;
+        padding: 3.2vw 10.2vw;
+        overflow-y: auto;
+        max-height: 100vh;
+
+        .login-form {
+            h1 {
+                margin-top: 137px;
+                color: #141416;
+                font-size: 48px;
+                font-style: normal;
+                font-weight: 600;
+                line-height: 68px;
+            }
+
+            /* --------------------------input fields------------------------------ */
+            .input-container {
+                margin-top: 40px;
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+                input {
+                    display: flex;
+                    height: 56px;
+                    width: 400px;
+                    padding: 10px 15px;
+                    align-items: center;
+                    gap: 10px;
+                    align-self: stretch;
+                    border-radius: 12px;
+                    border: 1px solid #b1b5c3;
+                    background: #fff;
+                    outline: none;
+
+                    &:focus-visible {
+                        border: 1px solid #0035f0;
+                    }
+
+                    &:active {
+                        border: 1px solid #0035f0;
+                    }
+                }
+
+                a {
+                    color: #777e90;
+                    font-size: 16px;
+                    font-style: normal;
+                    font-weight: 500;
+                    line-height: 24px; /* 150% */
+                    text-decoration: none;
+                }
+            }
+
+            /* --------------------------login-register-actions------------------------------ */
+            .login-register-cotainer {
+                display: flex;
+                flex-direction: column;
+                gap: 40px;
+                margin-top: 40px;
+
+                .login-btn {
+                    display: flex;
+                    padding: 16px;
+                    align-items: center;
+                    gap: 10px;
+                    border-radius: 12px;
+                    background: #0035f0;
+                    border: none;
+                    cursor: pointer;
+                    color: #fff;
+                    text-align: center;
+                    font-size: 20px;
+                    font-style: normal;
+                    font-weight: 600;
+                    line-height: 28px;
+                    width: 20%;
+                    justify-content: center;
+                    /* 140% */
+                }
+
+                .section {
+                    display: flex;
+                    gap: 24px;
+                    label {
+                        color: #777e90;
+                        text-align: center;
+                        font-size: 16px;
+                        font-style: normal;
+                        font-weight: 500;
+                        line-height: 24px; /* 150% */
+                    }
+
+                    button {
+                        color: #2e58ea;
+                        text-align: center;
+                        font-size: 16px;
+                        font-style: normal;
+                        font-weight: 500;
+                        line-height: 24px; /* 150% */
+                        background: transparent;
+                        border: none;
+                        display: flex;
+                        align-items: center;
+                        gap: 5px;
+
+                        &:hover {
+                            cursor: pointer;
+                        }
+                    }
+
+                    a {
+                        color: #2e58ea;
+                        text-align: center;
+                        font-size: 16px;
+                        font-style: normal;
+                        font-weight: 500;
+                        line-height: 24px; /* 150% */
+                        text-decoration: none;
+                    }
+                }
+            }
+        }
+    }
+}
