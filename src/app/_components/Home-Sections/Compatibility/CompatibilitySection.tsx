@@ -1,89 +1,63 @@
 import React from "react";
-import "./compatibility-section.css";
 import Image from "next/image";
-import RightArrowImg from "../../../../../public/sections-images/common/arrow-right-circle.svg";
-import LadyImg from "../../../../../public/sections-images/compatibility-section/lady 1.png";
-import EllipseImg from "../../../../../public/sections-images/compatibility-section/Group 1.svg";
+import backImg from "../../../../../public/sections-images/compatibility-section/compaatibility-section-img.png";
+import arrowIcon from "../../../../../public/sections-images/compatibility-section/arrow-circle-right.svg";
+import "./compatibility-section.scss";
 
 function CompatibilitySection() {
   return (
     <div className="compatibility-section-container">
-      {/* ------------------------------top section------------------------------- */}
-      <div className="top">
-        <div className="compatibility-text">
-          COMPATIBILITY
-          <div className="compatibility-welcome-text">
-            COMPATIBILITY WITH Whatsapp AND PLATFORMS
-          </div>
-        </div>
-
-        <div className="section-text">
+      {/* --------------------------left section------------------------------ */}
+      <div className="left">
+        <h1>Compatibility with WhatsApp and any platforms</h1>
+        <p>
           We are offering an accessible interface to website or other platforms.
-        </div>
-
-        <Image className="ellipse-img" src={EllipseImg} alt="ellipse-img" />
+        </p>
+        <Image src={backImg} alt="img-backgorund" />
       </div>
 
-      {/* ------------------------------bottom section------------------------------- */}
-      <div className="bottom">
-        {/* ------------------------------bottom-left section------------------------------- */}
-        <div className="left">
-          <div className="points-container">
-            <ul>
-              <li>
-                <span>
-                  <Image src={RightArrowImg} alt="right-arrow-img" />
-                </span>
-                <span>
-                  Integrate accessibility solutions into the overall &quot;look
-                  and feel&quot;.
-                </span>
-              </li>
-              <li>
-                <span>
-                  <Image src={RightArrowImg} alt="right-arrow-img" />
-                </span>
-                <span>Promote accessibility in help and documentation.</span>
-              </li>
-              <li>
-                <span>
-                  <Image src={RightArrowImg} alt="right-arrow-img" />
-                </span>
-                <span>
-                  Ensure that the authoring tool is accessible to authors with
-                  disabilities.
-                </span>
-              </li>
-              <li>
-                <span>
-                  <Image src={RightArrowImg} alt="right-arrow-img" />
-                </span>
-                <span>Accessible templates and documentation.</span>
-              </li>
-              <li>
-                <span>
-                  <Image src={RightArrowImg} alt="right-arrow-img" />
-                </span>
-                <span>
-                  Generate standard markup and creation of accessible content.
-                </span>
-              </li>
-              <li>
-                <span>
-                  <Image src={RightArrowImg} alt="right-arrow-img" />
-                </span>
-                <span>
-                  Define ways of checking and correcting inaccessible content.
-                </span>
-              </li>
-            </ul>
+      {/* --------------------------right section------------------------------ */}
+      <div className="right">
+        <div className="points-container">
+          <div className="point">
+            <Image src={arrowIcon} alt="point-icon" />
+            <h3>
+              Integrate accessibility solutions into the overall &quot;look and
+              feel&quot;.
+            </h3>
           </div>
-          <button className="contact-demo-button">Contact for demo</button>
-        </div>
 
-        {/* ------------------------------bottom-right section------------------------------- */}
-        <div className="right">
-          <Image src={LadyImg} alt="lady-arrow-img" />
+          <div className="point">
+            <Image src={arrowIcon} alt="point-icon" />
+            <h3>Promote accessibility in help and documentation.</h3>
+          </div>
+
+          <div className="point">
+            <Image src={arrowIcon} alt="point-icon" />
+            <h3>
+              Ensure that the authoring tool is accessible to authors with
+              disabilities.
+            </h3>
+          </div>
+
+          <div className="point">
+            <Image src={arrowIcon} alt="point-icon" />
+            <h3>Accessible templates and documentation.</h3>
+          </div>
+
+          <div className="point">
+            <Image src={arrowIcon} alt="point-icon" />
+            <h3>
+              Generate standard markup and creation of accessible content.
+            </h3>
+          </div>
+
+          <div className="point">
+            <Image src={arrowIcon} alt="point-icon" />
+            <h3>
+              Define ways of checking and correcting inaccessible content.
+            </h3>
+          </div>
         </div>
       </div>
     </div>

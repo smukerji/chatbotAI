@@ -29,8 +29,8 @@ export default function RootLayout({
 
       <body>
         <SessionProvider>
-          <ContactHeader />
-          <Header />
+          {/* <ContactHeader />
+          <Header /> */}
           {/* <Header>
             <span className="logo">
               <Link href={process.env.NEXT_PUBLIC_WEBSITE_URL + ""}>

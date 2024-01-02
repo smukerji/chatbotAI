@@ -1,0 +1,24 @@
+<svg width="40" height="38" viewBox="0 0 40 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Human">
+<circle id="Body" cx="20" cy="44" r="19.5" fill="url(#paint0_linear_952_847)" stroke="url(#paint1_linear_952_847)"/>
+<circle id="Head" cx="20" cy="10" r="9.5" fill="url(#paint2_linear_952_847)" stroke="url(#paint3_linear_952_847)"/>
+</g>
+<defs>
+<linearGradient id="paint0_linear_952_847" x1="-20" y1="44" x2="20" y2="84" gradientUnits="userSpaceOnUse">
+<stop stop-color="white"/>
+<stop offset="1" stop-color="white" stop-opacity="0.01"/>
+</linearGradient>
+<linearGradient id="paint1_linear_952_847" x1="-20" y1="44" x2="20" y2="84" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" stop-opacity="0.482818"/>
+<stop offset="1" stop-color="white" stop-opacity="0.01"/>
+</linearGradient>
+<linearGradient id="paint2_linear_952_847" x1="40" y1="10" x2="20" y2="-10" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" stop-opacity="0.01"/>
+<stop offset="1" stop-color="white"/>
+</linearGradient>
+<linearGradient id="paint3_linear_952_847" x1="0.622369" y1="11.2447" x2="20.6224" y2="30" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" stop-opacity="0.473612"/>
+<stop offset="1" stop-color="white" stop-opacity="0.01"/>
+</linearGradient>
+</defs>
+</svg>

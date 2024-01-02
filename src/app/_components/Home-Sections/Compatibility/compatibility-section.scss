@@ -1,0 +1,46 @@
+.compatibility-section-container {
+    display: flex;
+    padding: 5.2vw 12.2vw;
+
+    /* --------------------------left section------------------------------ */
+    .left {
+        flex: 1;
+        h1 {
+            color: #141416;
+            font-size: 60px;
+            font-style: normal;
+            font-weight: 600;
+            line-height: 72px; /* 120% */
+        }
+
+        p {
+            margin-top: 24px;
+            color: #777e90;
+            font-size: 20px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: normal;
+        }
+
+        img {
+            margin-top: 40px;
+            width: 100%;
+        }
+    }
+
+    /* --------------------------right section------------------------------ */
+    .right {
+        .points-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            margin-left: 66px;
+            justify-content: space-between;
+            .point {
+                display: flex;
+                align-items: center;
+                gap: 22px;
+            }
+        }
+    }
+}

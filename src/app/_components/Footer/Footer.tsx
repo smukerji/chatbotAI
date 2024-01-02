@@ -1,134 +1,131 @@
-import Image from "next/image";
 import React from "react";
-import Twitterimg from "../../../../public/svgs/twitter.svg";
-import Linkedinimg from "../../../../public/svgs/linkedin.svg";
-import Instagramimg from "../../../../public/svgs/instagram.svg";
-import Facebookimg from "../../../../public/svgs/facebook.svg";
-import BlackPhoneImg from "../../../../public/svgs/blackphone.svg";
-import BlackPinImg from "../../../../public/svgs/blackpin.svg";
-import BlackEnvelopImg from "../../../../public/svgs/blackenvelope.svg";
-import RightArrow from "../../../../public/svgs/white-arrow-right.svg";
-
-import "./footer.css";
+import Image from "next/image";
+import logoWhite from "../../../../public/svgs/lucifer-ai-logo-white.svg";
+import bluePhone from "../../../../public/svgs/bluephone.svg";
+import bluePin from "../../../../public/svgs/bluepin.svg";
+import blueEnvelopImg from "../../../../public/svgs/bluesms.svg";
+import Twitterimg from "../../../../public/svgs/twitter-icon-white.svg";
+import Linkedinimg from "../../../../public/svgs/linkedin-icon-white.svg";
+import Instagramimg from "../../../../public/svgs/instagram-icon-white.svg";
+import Facebookimg from "../../../../public/svgs/facebook-icon-white.svg";
+import "./footer.scss";
 
 function Footer() {
   return (
     <div className="footer-section">
       <div className="footer-container">
-        {/*------------------------------------------description container----------------------------------------------*/}
-        <div className="description-container">
-          <div className="logo">
-            <span>LUCIFER.</span>
-            <span>AI</span>
-          </div>
-
-          <div className="description">
-            Experience the brilliance of Lucifer.ai with natural language
-            processing, personalized engagement, multilingual support, and easy
-            integrations. Where technology meets humanity. Ready to witness the
-            future of conversations? Schedule a personalized Lucifer.ai demo and
-            boost user satisfaction and conversions today.
-          </div>
-
-          <div className="social-media-icons-container">
-            <ul>
-              <li>
-                <a href="">
-                  <Image src={Twitterimg} alt={"twitter-image"} />
-                </a>
-              </li>
-              <li>
-                <a href="">
-                  <Image src={Facebookimg} alt={"facebook-image"} />
-                </a>
-              </li>
-              <li>
-                <a href="">
-                  <Image src={Instagramimg} alt={"instagram-image"} />
-                </a>
-              </li>
-              <li>
-                <a href="">
-                  <Image src={Linkedinimg} alt={"linked-image"} />
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        {/*------------------------------------------useful-links container----------------------------------------------*/}
-        <div className="other-container">
-          <h2>Usefull Links</h2>
-          <ul>
+        {/*------------------------------------------company address container----------------------------------------------*/}
+        <div className="company-details-container">
+          <Image src={logoWhite} alt="logo-white" />
+          <ul className="info">
             <li>
-              <a href="">Home</a>
-            </li>
-            <li>
-              <a href="">Service</a>
-            </li>
-            <li>
-              <a href="">Testimonials</a>
-            </li>
-            <li>
-              <a href="">Contact Us </a>
-            </li>
-            <li>
-              <a href="">AI Chatbot </a>
-            </li>
-          </ul>
-        </div>
-
-        {/*------------------------------------------our-service container----------------------------------------------*/}
-        <div className="other-container">
-          <h2>Usefull Links</h2>
-          <ul>
-            <li>
-              <a href="">Web AI CHATBOT Tool</a>
-            </li>
-            <li>
-              <a href="">AI CHATBOT Remediation </a>
-            </li>
-            <li>
-              <a href="">AI CHATBOT Monitoring</a>
-            </li>
-            <li>
-              <a href="">Our philosophy and process</a>
-            </li>
-            <li>
-              <a href="">Web AI CHATBOT Consulting</a>
-            </li>
-            <li>
-              <a href="">Multimedia CHATBOT</a>
-            </li>
-          </ul>
-        </div>
-
-        {/*------------------------------------------contact-us container----------------------------------------------*/}
-        <div className="other-container">
-          <h2>Contact Us</h2>
-          <ul>
-            <li>
-              <Image src={BlackPinImg} alt="black-pin-img" />
+              <Image src={bluePin} alt="blue-pin-img" />
               <a href="">
                 Unit F, 18/F Wordtech centre. 95 How Ming Street, Kwun Tong,
                 Hong Kong
               </a>
             </li>
             <li>
-              <Image src={BlackPhoneImg} alt="black-phone-img" />
+              <Image src={bluePhone} alt="blue-phone-img" />
               <a href="">+852 55 445532</a>
             </li>
             <li>
-              <Image src={BlackEnvelopImg} alt="black-envelop-img" />
-              <a href="">saptarshi@sapahk.ai</a>
+              <Image src={blueEnvelopImg} alt="blue-envelop-img" />
+              <a href="">info@sapahk.ai</a>
             </li>
-            {/* <li>
-              <button className="get-direction-btn">
-                Get directions
-                <Image src={RightArrow} alt="right-arrow-img" />
-              </button>
-            </li> */}
           </ul>
+
+          {/* <div className="social-media-icons-container"> */}
+          <ul className="social-media-icons-container">
+            <li>
+              <a href="">
+                <Image src={Twitterimg} alt={"twitter-image"} />
+              </a>
+            </li>
+            <li>
+              <a href="">
+                <Image src={Facebookimg} alt={"facebook-image"} />
+              </a>
+            </li>
+            <li>
+              <a href="">
+                <Image src={Instagramimg} alt={"instagram-image"} />
+              </a>
+            </li>
+            <li>
+              <a href="">
+                <Image src={Linkedinimg} alt={"linked-image"} />
+              </a>
+            </li>
+          </ul>
+        </div>
+        {/* </div> */}
+
+        {/*------------------------------------------company links container----------------------------------------------*/}
+        <div className="links-container">
+          <h2>Company</h2>
+          <ul>
+            <li>
+              <a href="">About</a>
+            </li>
+            <li>
+              <a href="">Contact Us </a>
+            </li>
+            <li>
+              <a href="">News</a>
+            </li>
+            <li>
+              <a href="">Terms & Conditions</a>
+            </li>
+            <li>
+              <a href="">Book a Demo</a>
+            </li>
+          </ul>
+        </div>
+
+        {/*------------------------------------------quick links container----------------------------------------------*/}
+        <div className="links-container">
+          <h2>Quick Links</h2>
+          <ul>
+            <li>
+              <a href="">How It Works</a>
+            </li>
+            <li>
+              <a href="">API</a>
+            </li>
+            <li>
+              <a href="">Pricing</a>
+            </li>
+            <li>
+              <a href="">Support</a>
+            </li>
+          </ul>
+        </div>
+
+        {/*------------------------------------------legal links container----------------------------------------------*/}
+        <div className="links-container">
+          <h2>Legal</h2>
+          <ul>
+            <li>
+              <a href="">Terms & Conditions</a>
+            </li>
+            <li>
+              <a href="">Privacy Policy</a>
+            </li>
+            <li>
+              <a href="">License</a>
+            </li>
+            <li>
+              <a href="">Security</a>
+            </li>
+          </ul>
+        </div>
+
+        <div className="links-container">
+          <select name="" id="" className="temp">
+            <option value="english">English</option>
+            <option value="chinese">Chinese</option>
+          </select>
         </div>
       </div>
 

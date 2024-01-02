@@ -1,35 +1,32 @@
-import ContactHeader from "../_components/Contact-Header/Contact-Header";
-import Footer from "../_components/Footer/Footer";
-import Header from "../_components/Header/Header";
-import AIChatbotSection from "../_components/Home-Sections/Ai-Chatbot/AIChatbotSection";
-import CompatibilitySection from "../_components/Home-Sections/Compatibility/CompatibilitySection";
-import ContactSection from "../_components/Home-Sections/Contact-US/ContactSection";
-import FAQ from "../_components/Home-Sections/FAQ/FAQ";
+import React from "react";
+import HeroHeader from "../_components/Hero-Header/HeroHeader";
+import ServiceSection from "../_components/Home-Sections/Services/ServiceSection";
 import FacilitiesSection from "../_components/Home-Sections/Facilities/FacilitiesSection";
 import IndustrySection from "../_components/Home-Sections/Industry/IndustrySection";
-import PorcessSection from "../_components/Home-Sections/Process/PorcessSection";
-import ServicesSection from "../_components/Home-Sections/Services/ServicesSection";
-import Testimonials from "../_components/Testimonials/Testimonials";
+import ServicesOffered from "../_components/Home-Sections/Services-Offered/ServicesOffered";
+import CompatibilitySection from "../_components/Home-Sections/Compatibility/CompatibilitySection";
+import Testimonials from "../_components/Home-Sections/Testimonials/Testimonials";
+import PlansSection from "../_components/Home-Sections/Plans-Section/PlansSection";
+import FAQ from "../_components/Home-Sections/FAQ/FAQ";
+import ContactSection from "../_components/Home-Sections/Contact-US/ContactSection";
+import Footer from "../_components/Footer/Footer";
 
-export default function Home() {
+function Home() {
   return (
     <>
-      <AIChatbotSection />
-      <PorcessSection />
+      <HeroHeader />
+      <ServiceSection />
       <FacilitiesSection />
       <IndustrySection />
-      <div id="service">
-        <ServicesSection />
-      </div>
+      <ServicesOffered />
       <CompatibilitySection />
-      <div id="testimonials">
-        <Testimonials />
-      </div>
+      <Testimonials />
+      <PlansSection />
       <FAQ />
-      <div id="contact">
-        <ContactSection />
-      </div>
+      <ContactSection />
       <Footer />
     </>
   );
 }
+
+export default Home;

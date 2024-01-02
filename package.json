@@ -55,6 +55,7 @@
     "@types/js-cookie": "^3.0.3",
     "@types/jsonwebtoken": "^9.0.2",
     "@types/uuid": "^9.0.2",
-    "encoding": "^0.1.13"
+    "encoding": "^0.1.13",
+    "sass": "^1.69.5"
   }
 }

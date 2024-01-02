@@ -1,0 +1,170 @@
+.service-section-container {
+    margin-top: 70px;
+}
+
+/* ------------------------------top section------------------------------- */
+
+.service-section-container .top {
+    position: relative;
+}
+
+.service-text {
+    position: relative;
+    font-size: 12vw;
+    font-style: normal;
+    font-weight: 800;
+    line-height: 120%;
+    /* color: transparent;
+    -webkit-text-stroke: 1px #33E0C4; */
+    text-shadow: -1px 1px 0px #33E0C4, 0px 1px 0px #33E0C4, 1px 1px 0px #33E0C4, 0px -1px 0px #33E0C4;
+    color: #fff;
+    z-index: -1;
+}
+
+.service-section-container .service-welcome-text {
+    color: #000;
+    font-size: 3.4vw;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 134%;
+    text-transform: uppercase;
+    position: absolute;
+    top: 71%;
+    left: 5%;
+    /* -webkit-text-stroke: transparent; */
+    text-shadow: none;
+    z-index: 10;
+}
+
+.service-section-container .service-welcome-text::before {
+    content: '';
+    position: absolute;
+    top: 66%;
+    width: 23.2vw;
+    height: 4vh;
+    background: #15C3A7;
+    border-radius: 20px;
+    z-index: -1;
+}
+
+/*    left with service ......................................  to add cccsssss*/
+
+.service-section-container .section-text {
+    margin-top: 3%;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 45px;
+    margin-left: 5%;
+    color: #232932;
+    width: 47vw;
+}
+
+
+.service-section-container .contact-demo-button {
+    display: flex;
+    padding: 20px 30px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border-radius: 15px;
+    background: #15C3A7;
+    color: #FFF;
+    font-size: 1.4vw;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 130%;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    right: 8.3%;
+}
+
+
+/* ------------------------------bottom section------------------------------- */
+
+.services-container {
+    padding: 0 100px;
+    display: flex;
+    margin-top: 69px;
+    position: relative;
+}
+
+.services-container>div {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.services-container>div .img {
+    outline: 5px solid #F9F9F9;
+    background: #fff;
+    stroke-width: 15px;
+    border-radius: 50%;
+    width: 8.33vw;
+    height: 8.33vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.services-container>div .img img {
+    padding: 9px;
+    height: 6.33vw;
+    width: 6.33vw;
+}
+
+.services-container>div .text {
+    margin-top: 30px;
+    color: #000;
+    text-align: center;
+    width: 9.4vw;
+    font-size: 1vw;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.services-connector {
+    width: 67.16vw;
+    z-index: -1;
+    position: absolute;
+    top: 30%;
+    left: 17%;
+    border: none;
+    border-top: 2px dashed #D9D9D9;
+    height: 0;
+}
+
+/*------------------------------------css for secreen less than 1440---------------------------------*/
+@media only screen and (max-width: 1440px) {
+
+    /* .service-section-container .section-text { */
+    /* width: 800px; */
+    /* line-height: 35px; */
+    /* margin-left: 75px;
+        margin-top: 80px; */
+    /* } */
+
+    /* .services-connector {
+        width: 910px;
+        left: 265px;
+        top: 60px
+    }
+
+    .services-container>div .text {
+        font-size: 20px;
+    }
+
+    .services-container>div .img {
+        width: 120px;
+        height: 120px;
+    }
+
+    .services-container>div .img img {
+        padding: 19px;
+    } */
+}

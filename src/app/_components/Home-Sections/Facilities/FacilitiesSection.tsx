@@ -1,91 +1,73 @@
 import React from "react";
-import "./facilities-section.css";
 import Image from "next/image";
-import FacilityOneImage from "../../../../../public/sections-images/facilities-section/consulting 1.png";
-import FacilityTwoImage from "../../../../../public/sections-images/facilities-section/communication 1.png";
-import FacilityThreeImage from "../../../../../public/sections-images/facilities-section/report 1.png";
-import SectionImg from "../../../../../public/sections-images/facilities-section/Group 50.svg";
+import sectionImage from "../../../../../public/sections-images/facilities-section/facilities-section-img.png";
+import "./facilities-section.scss";
 
 function FacilitiesSection() {
   return (
-    <div className="facility-section-container">
-      {/* ------------------------------left section------------------------------- */}
-      <div className="left">
-        <div className="facility-text">
-          FACILITIES
-          <div className="facility-welcome-text">AI CHATBOT FACILITIES</div>
-        </div>
+    <>
+      <div className="facilities-section-container">
+        {/* --------------------------left section------------------------------ */}
+        <div className="left">
+          {/* --------------------------description ------------------------------ */}
+          <div className="description">
+            <h1 className="title">AI Chatbot Facilities</h1>
+            <p className="text">
+              Unlock the Power of Conversation with Lucifer.AI. Lucifer.AI
+              understands and responds in human-like language, making
+              interactions effortless and enjoyable. We invite you to explore
+              the power of Lucifer.AI through a personalised demo. Let us show
+              you how our AI chatbot can transform your digital conversations.
+            </p>
+          </div>
 
-        <div className="section-text">
-          Unlock the Power of Conversation with Lucifer.ai. Lucifer.ai
-          understands and responds in human-like language, making interactions
-          effortless and enjoyable. We invite you to explore the power of
-          Lucifer.ai through a personalised demo. Let us show you how our AI
-          chatbot can transform your digital conversations.
-        </div>
-
-        {/* ------------------------------facilities-list-start------------------------------- */}
-        <div className="facilities-list-container">
-          {/* ------------------------------facility 1------------------------------- */}
-          <div className="facility">
-            <Image
-              className="icon"
-              src={FacilityOneImage}
-              alt="facilityimage"
-            />
-            <div className="description-container">
-              <div className="title">Seamless Conversations</div>
+          {/* --------------------------points ------------------------------ */}
+          <div className="points-container">
+            <div className="point">
+              <div className="number">1</div>
               <div className="description">
-                Engage your website visitors, customers, and clients with
-                natural, intuitive conversations. Lucifer.ai ensures every
-                interaction is personalized, relevant, and memorable.
+                <h3>Seamless Conversations</h3>
+                <p>
+                  Engage your website visitors, customers, and clients with
+                  natural, intuitive conversations. Lucifer.AI ensures every
+                  interaction is personalized, relevant, and memorable.
+                </p>
+              </div>
+            </div>
+
+            <div className="point">
+              <div className="number">2</div>
+              <div className="description">
+                <h3>Integrations made easy</h3>
+                <p>
+                  Seamlessly integrate Lucifer.AI with your website, whatsapp,
+                  or preferred tools for a unified experience.
+                </p>
+              </div>
+            </div>
+
+            <div className="point">
+              <div className="number">3</div>
+              <div className="description">
+                <h3>Data-Driven Insights</h3>
+                <p>
+                  Understand your audience better with powerful analytics.
+                  Lucifer.AI offers in-depth data to help you optimize your
+                  interactions and drive results.
+                </p>
               </div>
             </div>
           </div>
 
-          {/* ------------------------------facility 2------------------------------- */}
-          <div className="facility">
-            <Image
-              className="icon"
-              src={FacilityTwoImage}
-              alt="facilityimage"
-            />
-            <div className="description-container">
-              <div className="title">Integrations made easy</div>
-              <div className="description">
-                Seamlessly integrate Lucifer.ai with your website, whatsapp, or
-                preferred tools for a unified experience.
-              </div>
-            </div>
-          </div>
-
-          {/* ------------------------------facility 3------------------------------- */}
-          <div className="facility">
-            <Image
-              className="icon"
-              src={FacilityThreeImage}
-              alt="facility-image"
-            />
-            <div className="description-container">
-              <div className="title">Data-Driven Insights</div>
-              <div className="description">
-                Understand your audience better with powerful analytics.
-                Lucifer.ai offers in-depth data to help you optimize your
-                interactions and drive results.
-              </div>
-            </div>
-          </div>
+          {/* --------------------------demo button------------------------------ */}
+          <button className="request-demo-btn">Book a Demo</button>
         </div>
-        {/* ------------------------------facilities-list-end------------------------------- */}
-
-        <button className="contact-demo-button">Contact for demo</button>
+        {/* --------------------------right section------------------------------ */}
+        <div className="right">
+          <Image src={sectionImage} alt="section-img" />
+        </div>
       </div>
-
-      {/* ------------------------------right section------------------------------- */}
-      <div className="right">
-        <Image src={SectionImg} alt="facilities-section-image" />
-      </div>
-    </div>
+    </>
   );
 }
 
