@@ -16,7 +16,7 @@ function useUserService(): IUserService {
         );
 
         // get return url from query parameters or default to '/home'
-        const returnUrl = searchParams?.get("returnUrl") || "/home";
+        const returnUrl = searchParams?.get("returnUrl") || "/chatbot";
         router.push(process.env.NEXT_PUBLIC_WEBSITE_URL + returnUrl);
         return user;
       } catch (error: any) {
