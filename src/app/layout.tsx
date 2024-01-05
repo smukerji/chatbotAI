@@ -8,7 +8,12 @@ import dynamic from "next/dynamic";
 import { useEffect } from "react";
 import ContactHeader from "./_components/Contact-Header/Contact-Header";
 import Header from "./_components/Header/Header";
+
 const AuthBtn = dynamic(() => import("./_components/AuthBtn"), { ssr: false });
+const AuthHeader = dynamic(() => import("./_components/AuthHeader"), {
+  ssr: false,
+});
+
 export default function RootLayout({
   children,
 }: {
@@ -44,6 +49,8 @@ export default function RootLayout({
               <AuthBtn />
             </div>
           </Header> */}
+          {/* <Header /> */}
+          <AuthHeader />
           {children}
         </SessionProvider>
       </body>

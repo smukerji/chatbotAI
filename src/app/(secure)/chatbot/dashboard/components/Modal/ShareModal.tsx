@@ -1,5 +1,11 @@
 import { message } from "antd";
 import Modal from "antd/es/modal";
+import "./share-modal.scss";
+import closeIcon from "../../../../../../../public/svgs/close-circle.svg";
+import redirectIcon from "../../../../../../../public/svgs/redirect-icon.svg";
+import copyIcon from "../../../../../../../public/svgs/copy-icon.svg";
+
+import Image from "next/image";
 
 function ShareModal({ open, setOpen, chatbotId }: any) {
   const script = `<script
@@ -30,14 +36,31 @@ function ShareModal({ open, setOpen, chatbotId }: any) {
   };
   return (
     <Modal
+      centered
       title="Share Chatbot"
       open={open}
       onOk={handleOk}
+      closeIcon={<Image src={closeIcon} alt="close-icon" />}
       // confirmLoading={confirmLoading}
       onCancel={handleCancel}
-      okText={"Copy"}
+      footer={
+        <div className="share-btn-wrapper">
+          <button onClick={() => handleOk()}>
+            <Image src={copyIcon} alt="copy-icon" />
+            Copy
+          </button>
+          <button>
+            <Image src={redirectIcon} alt="redirect-icon" />
+            Visit
+          </button>
+        </div>
+      }
     >
-      <p>{script}</p>
+      <p className="share-note">
+        To add the chatbot any where on your website, add this script to your
+        html code
+      </p>
+      <p className="script-container">{script}</p>
     </Modal>
   );
 }

@@ -6,6 +6,7 @@ import { getDate } from "../../../../../_helpers/client/getTime";
 
 module.exports = apiHandler({
   POST: retriveChatbotSettings,
+  PUT: updateChatbotSettings,
 });
 
 type ChatData = {
@@ -60,4 +61,31 @@ async function retriveChatbotSettings(request: NextRequest) {
   // console.log("Flier>>", filteredChats);
 
   return { chatHistory: data?.chats };
+}
+
+async function updateChatbotSettings(request: NextRequest) {
+  const body = await request.json();
+  // Accessing chatbotId from body
+  const chatbotId = body?.chatbotId;
+  // Accessing userId from body
+  const userId = body?.userId;
+  /// Chatbot name if renaming is present
+  const chatbotRename = body?.chatbotRename;
+
+  /// if rename is not ""
+  if (chatbotRename !== "") {
+    const db = (await connectDatabase())?.db();
+    const collection = db.collection("user-chatbots");
+
+    /// update the name
+    await collection.updateOne(
+      {
+        userId: userId,
+        chatbotId: chatbotId,
+      },
+      { $set: { chatbotName: chatbotRename } }
+    );
+  }
+
+  return { message: "Chatbot Updated successfully..." };
 }

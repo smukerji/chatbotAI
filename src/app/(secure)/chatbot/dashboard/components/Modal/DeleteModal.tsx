@@ -1,12 +1,13 @@
 import { Modal, message } from "antd";
 import React, { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
+import "./delete-modal.scss";
 
 function DeleteModal({ open, setOpen, chatbotId }: any) {
   /// states to handle modal
   const [confirmLoading, setConfirmLoading] = useState(false);
   const modalText =
-    "Are you sure you want to delete your chatbot? This action cannot be undone.";
+    "Deleting a chatbot will also remove all the training data, conversations and leads associated to it.";
 
   const [okText, setOkText] = useState("Delete");
   const [messageApi, contextHolder] = message.useMessage();
@@ -102,12 +103,24 @@ function DeleteModal({ open, setOpen, chatbotId }: any) {
     <>
       {contextHolder}
       <Modal
+        centered
         title="Delete Chatbot"
         open={open}
-        onOk={handleOk}
         confirmLoading={confirmLoading}
+        closeIcon={null}
         onCancel={handleCancel}
-        okText={okText}
+        footer={
+          <div className="delete-btn-wrapper">
+            <button onClick={() => handleCancel()}>Cancel</button>
+            <button
+              onClick={() => {
+                handleOk();
+              }}
+            >
+              {okText}
+            </button>
+          </div>
+        }
       >
         <p>{modalText}</p>
       </Modal>

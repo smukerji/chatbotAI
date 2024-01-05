@@ -1,0 +1,75 @@
+.ant-modal {
+    .ant-modal-title {
+        color: #141416;
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 28px; /* 140% */
+    }
+
+    input {
+        display: flex;
+        padding: 16px;
+        align-items: center;
+        gap: 10px;
+        align-self: stretch;
+        border-radius: 12px;
+        border: 1px solid #b1b5c3;
+        background: #fff;
+
+        color: #141416;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 24px; /* 150% */
+
+        width: 100%;
+
+        &:focus-visible {
+            border: none;
+            outline: 1px solid #b1b5c3;
+        }
+
+        &:focus {
+            outline: none;
+        }
+    }
+
+    .ant-input:focus {
+        border: none !important;
+    }
+
+    .rename-btn-wrapper {
+        margin-top: 24px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        button {
+            cursor: pointer;
+            display: flex;
+            padding: 12px 24px;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            border-radius: 12px;
+
+            text-align: center;
+            font-size: 16px;
+            font-style: normal;
+            font-weight: 600;
+            line-height: 28px;
+
+            border: none;
+
+            &:first-child {
+                background: #e6e8ec;
+                color: #141416;
+            }
+
+            &:last-child {
+                background: #2e58ea;
+                color: #fcfcfd;
+            }
+        }
+    }
+}

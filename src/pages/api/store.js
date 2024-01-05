@@ -36,7 +36,6 @@ export default async function handler(req, res) {
       const crawledList = JSON.parse(fields?.crawledList[0]);
       const deleteCrawlList = JSON.parse(fields?.deleteCrawlList[0]);
       const isTextUpdated = JSON.parse(fields?.isTextUpdated[0]);
-      console.log("Text", text, text.length, isTextUpdated);
       // return;
       // console.log(chatbotId);
       // return;

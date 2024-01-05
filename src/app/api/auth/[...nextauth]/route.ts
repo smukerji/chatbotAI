@@ -25,6 +25,7 @@ const authOptions: NextAuthOptions = {
 
   callbacks: {
     async session({ session, user, token }) {
+      cookies().set("profile-img", user.image!);
       cookies().set("userId", user.id);
       return session;
     },

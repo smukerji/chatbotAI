@@ -1,49 +1,47 @@
-"use client";
 import React from "react";
-import "./header.css";
-import dynamic from "next/dynamic";
-
-const AuthBtn = dynamic(() => import("../AuthBtn"), { ssr: false });
+import LuciferLogo from "../../../../public/svgs/lucifer-ai-logo.svg";
+import Image from "next/image";
+import { Progress } from "antd";
+import "./header.scss";
+import { useCookies } from "react-cookie";
 
 function Header() {
+  const [cookies, setCookie] = useCookies(["profile-img"]);
   return (
-    <>
-      <div className="header-container">
-        <div className="logo">
-          <span>LUCIFER.</span>
-          <span>AI</span>
+    <div className="header-container">
+      {/*------------------------------------------logo----------------------------------------------*/}
+      <Image className="logo" src={LuciferLogo} alt="img-logo" />
+
+      <div className="header-content">
+        {/*------------------------------------------messages limit----------------------------------------------*/}
+        <div className="messages-limit-container">
+          <span>Messages</span>
+          <Progress strokeLinecap="butt" percent={75} showInfo={false} />
+          <span>
+            <span style={{ color: "#141416" }}>24</span>/100
+          </span>
         </div>
-        <div className="navbar">
-          <ul>
-            <li>
-              <a href="/">Home</a>
-            </li>
 
-            <li>
-              <a href="/#service">Services</a>
-            </li>
+        {/*------------------------------------------feedback-btn----------------------------------------------*/}
+        <button className="feedback-btn">Feedback</button>
+        {/*------------------------------------------Profile Image----------------------------------------------*/}
 
-            <li>
-              <a href="/#testimonials">Testimonials</a>
-            </li>
-
-            <li>
-              <a href={`${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot`}>
-                AI Chatbot
-              </a>
-            </li>
-
-            <li>
-              <a href="/#contact">Contact</a>
-            </li>
-          </ul>
-        </div>
-        <AuthBtn />
-
-        {/* neeed to chanhe here */}
-        {/* <div className="login-signup">Sign up / Login</div> */}
+        {cookies?.["profile-img"] ? (
+          <Image
+            width={40}
+            height={40}
+            // style={{ borderRadius: "50%" }}
+            className="profile-img"
+            src={cookies?.["profile-img"]}
+            alt="profile-img"
+          />
+        ) : (
+          <div className="profile-img">
+            <span>SS</span>
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 }
 

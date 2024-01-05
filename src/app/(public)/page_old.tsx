@@ -1,6 +1,6 @@
 import ContactHeader from "../_components/Contact-Header/Contact-Header";
 import Footer from "../_components/Footer/OldFooter";
-import Header from "../_components/Header/Header";
+import Header from "../_components/Header/OldHeader";
 import AIChatbotSection from "../_components/Home-Sections/Ai-Chatbot/AIChatbotSection";
 import CompatibilitySection from "../_components/Home-Sections/Compatibility/OldCompatibilitySection";
 import ContactSection from "../_components/Home-Sections/Contact-US/OldContactSection";

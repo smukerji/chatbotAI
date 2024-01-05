@@ -1,47 +1,67 @@
 "use client";
-import { Button } from "antd";
-import React, { useEffect, useState } from "react";
-import "./chatbot.css";
-import { MessageOutlined, MoreOutlined } from "@ant-design/icons";
-import Link from "next/link";
-import { useCookies } from "react-cookie";
-import { LoadingOutlined } from "@ant-design/icons";
+import {
+  LoadingOutlined,
+  MessageOutlined,
+  MoreOutlined,
+} from "@ant-design/icons";
 import { Spin } from "antd";
-import { useSession } from "next-auth/react";
-import { redirect } from "next/navigation";
-import dynamic from "next/dynamic";
+import React, { Suspense, useEffect, useState } from "react";
+import { useCookies } from "react-cookie";
+import "./chatbot.scss";
+import Image from "next/image";
+import chatbotBg from "../../../../public/sections-images/common/chatbot-bg-img.svg";
+import chatbotOpenIcon from "../../../../public/sections-images/common/chatbot-open-icon.svg";
+import chatbotMenuIcon from "../../../../public/sections-images/common/chatbot-menu-icon.svg";
+import shareIcon from "../../../../public/sections-images/common/share.svg";
+import duplicateIcon from "../../../../public/sections-images/common/document-copy.svg";
+import renameIcon from "../../../../public/sections-images/common/edit.svg";
+import deleteIcon from "../../../../public/sections-images/common/trash.svg";
+import noChatbotBg from "../../../../public/sections-images/common/no-chatbot-icon.svg";
+import menuIcon from "../../../../public/svgs/menu-icon.svg";
+import gridIcon from "../../../../public/svgs/grid-icon.svg";
+import GridLayout from "./_components/GridLayout";
+import TableLayout from "./_components/TableLayout";
 import DeleteModal from "./dashboard/components/Modal/DeleteModal";
 import ShareModal from "./dashboard/components/Modal/ShareModal";
+import { redirect } from "next/navigation";
+import { useSession } from "next-auth/react";
+import dynamic from "next/dynamic";
+import Link from "next/link";
+import RenameModal from "./dashboard/components/Modal/RenameModal";
 
 const antIcon = (
   <LoadingOutlined style={{ fontSize: 24, color: "black" }} spin />
 );
 
-function ChatBot() {
+function Chatbot() {
   const { status } = useSession();
 
   /// chatbots details state
   const [chatbotData, setChatbotData] = useState([]);
   const [cookies, setCookie] = useCookies(["userId"]);
 
-  /// sate for opening menu for the chabot list
-  const [openMenu, setOpenMenu]: any = useState({});
-
   /// loading state
   const [loading, setLoading] = useState(false);
 
-  /// managing delete chatbot
-  const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const showDeleteModal = () => {
-    setOpenDeleteModal(true);
-  };
+  /// state for showing the chabot list
+  const [listType, setListType]: any = useState("grid");
+
   const [chatbotId, setChatbotId] = useState("");
 
   /// managing share chatbot
   const [openShareModal, setOpenShareModal] = useState(false);
-  const showShareModal = () => {
-    setOpenShareModal(true);
+
+  /// state for opening menu for the chabot list
+  const [openMenu, setOpenMenu]: any = useState(null);
+  const changeMenu = (value: any) => {
+    setOpenMenu(value);
   };
+
+  /// managing delete chatbot
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+
+  /// managing renaming chatbot
+  const [openRenameModal, setOpenRenameModal] = useState(false);
 
   /// retrive the chatbots details
   useEffect(() => {
@@ -85,72 +105,94 @@ function ChatBot() {
 
   if (status === "authenticated" || cookies?.userId) {
     return (
-      <center>
-        <div className="chatbot-container">
-          <div className="chatbot-container-title">
-            <span className="title-text">My Chatbots</span>
+      <div
+        className="chatbot-list-container"
+        onClick={() => openMenu && setOpenMenu(null)}
+      >
+        {/*------------------------------------------title----------------------------------------------*/}
+        <div className="title-container">
+          <h1 className="title">My Chatbots</h1>
+          <div className="action-container">
+            <div className="chatbot-list-action">
+              <Image
+                className={listType == "grid" ? "active" : ""}
+                src={gridIcon}
+                alt="grid-icon"
+                onClick={() => setListType("grid")}
+              />
+              <Image
+                className={listType == "table" ? "active" : ""}
+                src={menuIcon}
+                alt="menu-icon"
+                onClick={() => setListType("table")}
+              />
+            </div>
             <Link href={`${process.env.NEXT_PUBLIC_WEBSITE_URL}home`}>
-              <Button style={{ width: "150px" }} type="primary">
-                New Chatbot
-              </Button>
+              <button>New Chatbot</button>
             </Link>
           </div>
-          <div className="chatbots">
-            {chatbotData?.map((data: any, index: number) => {
-              return (
-                <div
-                  className="chatbot"
-                  key={data.id}
-                  // onClick={() => openChatbot(data.id)}
-                >
-                  <div className="icon" onClick={() => openChatbot(data.id)}>
-                    <MessageOutlined />
-                  </div>
-                  <div className="name" onClick={() => openChatbot(data.id)}>
-                    {data.name}
-                  </div>
-                  <MoreOutlined
-                    onClick={() => {
-                      setOpenMenu({ [index]: !openMenu[index] });
-                      setChatbotId(data.id);
-                    }}
-                  />
-                  {/* opening the menue for chatbot actions */}
-                  {openMenu[index] ? (
-                    <div className={`menu ${openMenu[index] && "active"}`}>
-                      <ul>
-                        <li>Duplicate</li>
-                        <li onClick={showShareModal}>Share</li>
-                        <li onClick={showDeleteModal}>Delete</li>
-                      </ul>
-                    </div>
-                  ) : null}
-                </div>
-              );
-            })}
-          </div>
-          <DeleteModal
-            open={openDeleteModal}
-            setOpen={setOpenDeleteModal}
-            chatbotId={chatbotId}
-          />
-          <ShareModal
-            open={openShareModal}
-            setOpen={setOpenShareModal}
-            chatbotId={chatbotId}
-          />
-          {!loading && chatbotData?.length == 0 && (
-            <p style={{ color: "red" }}>
-              No chatbots available please create one
-            </p>
-          )}
-          {loading && <Spin indicator={antIcon} />}
         </div>
-      </center>
+
+        {/*------------------------------------------chatbot-list-grid----------------------------------------------*/}
+        {listType === "grid" && (
+          <>
+            <GridLayout
+              chatbotData={chatbotData}
+              changeMenu={changeMenu}
+              openMenu={openMenu}
+              openChatbot={openChatbot}
+              setOpenShareModal={setOpenShareModal}
+              chatbotId={chatbotId}
+              setChatbotId={setChatbotId}
+              setOpenDeleteModal={setOpenDeleteModal}
+              setOpenRenameModal={setOpenRenameModal}
+            />
+          </>
+        )}
+
+        {/*------------------------------------------chatbot-list-table----------------------------------------------*/}
+        {listType === "table" && (
+          <TableLayout
+            chatbotData={chatbotData}
+            changeMenu={changeMenu}
+            openMenu={openMenu}
+            openChatbot={openChatbot}
+            setOpenShareModal={setOpenShareModal}
+            chatbotId={chatbotId}
+            setChatbotId={setChatbotId}
+            setOpenDeleteModal={setOpenDeleteModal}
+            setOpenRenameModal={setOpenRenameModal}
+          />
+        )}
+        <DeleteModal
+          open={openDeleteModal}
+          setOpen={setOpenDeleteModal}
+          chatbotId={chatbotId}
+        />
+        <ShareModal
+          open={openShareModal}
+          setOpen={setOpenShareModal}
+          chatbotId={chatbotId}
+        />
+        <RenameModal
+          open={openRenameModal}
+          setOpen={setOpenRenameModal}
+          chatbotId={chatbotId}
+        />
+
+        {/*------------------------------------------loading/no-chatbots----------------------------------------------*/}
+        {!loading && chatbotData?.length == 0 && (
+          <div className="no-chatbots-container">
+            <Image src={noChatbotBg} alt="no-chatbot-bg" />
+            <p>You haven't created any Chatbots. Go ahead and create New</p>
+          </div>
+        )}
+        {loading && <Spin indicator={antIcon} />}
+      </div>
     );
   } else if (status === "unauthenticated") {
     redirect("/account/login");
   }
 }
 
-export default dynamic((): any => Promise.resolve(ChatBot), { ssr: false });
+export default dynamic((): any => Promise.resolve(Chatbot), { ssr: false });
