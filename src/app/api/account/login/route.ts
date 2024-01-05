@@ -38,6 +38,10 @@ async function login(request: any) {
 
       /// set the userId cookie
       cookies().set("userId", user?._id?.toString());
+
+      /// set the username
+      cookies().set("username", user?.username?.toString());
+
       //   return { message: "Login successfull..." };
       return user;
     } else {

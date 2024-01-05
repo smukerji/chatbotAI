@@ -34,7 +34,8 @@ function TableLayout({
     // Handle menu-icon click event
     const handleChatbotMenuClick = (event: any) => {
       // Check if the event target is the chatbot or any of its children
-      const menuClick = event.target.closest("li");
+
+      const menuClick = event.target.closest(".chatbot-actions");
 
       if (menuClick?.value == 0) {
         /// if share is clicked
@@ -149,18 +150,18 @@ function TableLayout({
                   {openMenu?.[index] ? (
                     <div className={`menu ${openMenu?.[index] && "active"}`}>
                       <ul>
-                        <li value={0}>
+                        <li className="chatbot-actions" value={0}>
                           <Image src={shareIcon} alt={"share-icon"} /> Share
                         </li>
-                        <li value={1}>
+                        <li className="chatbot-actions" value={1}>
                           <Image src={duplicateIcon} alt={"duplicate-icon"} />
                           Duplicate
                         </li>
 
-                        <li value={2}>
+                        <li className="chatbot-actions" value={2}>
                           <Image src={renameIcon} alt={"rename-icon"} /> Rename
                         </li>
-                        <li value={3}>
+                        <li className="chatbot-actions" value={3}>
                           <Image src={deleteIcon} alt={"delete-icon"} />
                           Delete
                         </li>

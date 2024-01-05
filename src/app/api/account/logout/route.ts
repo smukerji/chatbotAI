@@ -8,4 +8,6 @@ module.exports = apiHandler({
 function logout() {
   cookies().delete("authorization");
   cookies().delete("userId");
+  cookies().delete("username");
+  cookies().delete("profile-img");
 }

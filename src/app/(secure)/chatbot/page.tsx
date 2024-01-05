@@ -18,7 +18,7 @@ import renameIcon from "../../../../public/sections-images/common/edit.svg";
 import deleteIcon from "../../../../public/sections-images/common/trash.svg";
 import noChatbotBg from "../../../../public/sections-images/common/no-chatbot-icon.svg";
 import menuIcon from "../../../../public/svgs/menu-icon.svg";
-import gridIcon from "../../../../public/svgs/grid-icon.svg";
+// import gridIcon from "../../../../public/svgs/grid-icon.svg";
 import GridLayout from "./_components/GridLayout";
 import TableLayout from "./_components/TableLayout";
 import DeleteModal from "./dashboard/components/Modal/DeleteModal";
@@ -28,6 +28,10 @@ import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import RenameModal from "./dashboard/components/Modal/RenameModal";
+import Icon from "../../_components/Icon/Icon";
+import GridIcon from "../../../assets/svg/GridIcon";
+import MenuIcon from "../../../assets/svg/MenuIcon";
+// import GridIcon from "../../as";
 
 const antIcon = (
   <LoadingOutlined style={{ fontSize: 24, color: "black" }} spin />
@@ -114,7 +118,17 @@ function Chatbot() {
           <h1 className="title">My Chatbots</h1>
           <div className="action-container">
             <div className="chatbot-list-action">
-              <Image
+              <Icon
+                className={listType == "grid" ? "active" : ""}
+                Icon={GridIcon}
+                click={() => setListType("grid")}
+              />
+              <Icon
+                className={listType == "table" ? "active" : ""}
+                Icon={MenuIcon}
+                click={() => setListType("table")}
+              />
+              {/* <Image
                 className={listType == "grid" ? "active" : ""}
                 src={gridIcon}
                 alt="grid-icon"
@@ -125,7 +139,7 @@ function Chatbot() {
                 src={menuIcon}
                 alt="menu-icon"
                 onClick={() => setListType("table")}
-              />
+              /> */}
             </div>
             <Link href={`${process.env.NEXT_PUBLIC_WEBSITE_URL}home`}>
               <button>New Chatbot</button>

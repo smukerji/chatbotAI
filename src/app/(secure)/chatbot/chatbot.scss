@@ -27,14 +27,22 @@
                 gap: 4px;
                 border-radius: 8px;
                 background: #e6e8ec;
-
-                img {
+                .icon {
                     display: flex;
+                    align-items: center;
+                    justify-content: center;
                     padding: 4px;
-                    align-items: flex-start;
                     border-radius: 4px;
-                    cursor: pointer;
-
+                    cursor: pointer !important;
+                    svg {
+                        width: 24px;
+                        height: 24px;
+                        cursor: pointer !important;
+                        stroke-width: 0.1;
+                        path {
+                            cursor: pointer !important;
+                        }
+                    }
                     &.active {
                         background: #fcfcfd;
                     }
