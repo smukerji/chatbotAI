@@ -31,7 +31,7 @@ function Login() {
   );
 
   if (status === "authenticated") {
-    redirect("/home");
+    redirect("/chatbot");
   }
 
   const userService = useUserService();
