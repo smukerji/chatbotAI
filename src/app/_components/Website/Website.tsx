@@ -1,24 +1,21 @@
-import React, { useState } from "react";
-import "./website.css";
-import { Input, Progress, message } from "antd";
-import { DeleteOutlined } from "@ant-design/icons";
-const { Search } = Input;
-function Website({
-  updateCharCount,
-  getCharCount,
-  setLoadingPage,
-  setCrawledList,
-  crawledList,
-  websiteCharCount,
-  setWebsiteCharCount,
-  updateChatbot,
-  deleteCrawlList,
-  setDeleteCrawlList,
-}: any) {
-  const [loading, setLoading] = useState(false);
+import React, { useContext, useState } from "react";
+import { CreateBotContext } from "../../_helpers/client/Context/CreateBotContext";
+import { Progress, message } from "antd";
+import Image from "next/image";
+import "./website.scss";
+import deleteIcon from "../../../../public/create-chatbot-svgs/delete-icon.svg";
+
+function Website({ websiteCharCount, totalCharCount, isUpdateChatbot }: any) {
   const [progress, setProgress] = useState(0);
-  /// list of crawled urls
-  // const [crawledList, setCrawledList]: any = useState([]);
+
+  const botContext: any = useContext(CreateBotContext);
+  const botDetails = botContext?.createBotInfo;
+
+  /// get the crawledlist & deleteCrawlList from context
+  const crawledList = botDetails?.crawledList;
+  const deleteCrawlList = botDetails?.deleteCrawlList;
+
+  const isLoading = botDetails?.isLoading;
 
   /// deleting the link
   const deleteLink = (index: number) => {
@@ -27,87 +24,34 @@ function Website({
     let deletedItem: any = updatedList.splice(index, 1);
 
     /// add the link that need to be deleted while updating the chatbot
-    if (updateChatbot && deletedItem[0]?.dataID) {
-      setDeleteCrawlList([...deleteCrawlList, ...deletedItem]);
+    if (isUpdateChatbot && deletedItem[0]?.dataID) {
+      botContext?.handleChange("deleteCrawlList")([
+        ...deleteCrawlList,
+        ...deletedItem,
+      ]);
     }
 
     /// update the count
-    updateCharCount(getCharCount - deletedItem[0].charCount);
-    setWebsiteCharCount(websiteCharCount - deletedItem[0].charCount);
+    botContext?.handleChange("totalCharCount")(
+      totalCharCount - deletedItem[0].charCount
+    );
+    botContext?.handleChange("websiteCharCount")(
+      websiteCharCount - deletedItem[0].charCount
+    );
     /// update the list
-    setCrawledList(updatedList);
+    botContext?.handleChange("crawledList")(updatedList);
   };
 
-  // /// menthod to handle the fetching
-  // const onFetch = async (value: string) => {
-  //   let intervalId;
-  //   try {
-  //     /// start the progress bar
-  //     let count = 0;
-  //     setLoading(true);
-  //     setLoadingPage(true);
-  //     intervalId = setInterval(() => {
-  //       if (count != 100) setProgress(count++);
-  //     }, 2000);
-  //     /// send the request
-  //     // const response = await fetch(
-  //     //   `${process.env.NEXT_PUBLIC_WEBSITE_URL}api?source=website&sourceURL=${value}`,
-  //     //   {
-  //     //     method: "GET",
-  //     //   }
-  //     // );
-  //     const options = {
-  //       method: "GET",
-  //       headers: {
-  //         accept: "application/json",
-  //         authorization: `Bearer ${process.env.NEXT_PUBLIC_AUTHORIZATION}`,
-  //         cache: "no-store",
-  //       },
-  //       next: { revalidate: 0 },
-  //     };
-
-  //     const response = await fetch(
-  //       `https://www.chatbase.co/api/v1/fetch-links?sourceURL=${value}`,
-  //       options
-  //     );
-  //     const data = await response.json();
-  //     console.log("Fetched links", data);
-
-  //     /// if there is any error show error
-  //     if (data.error) return alert(data.error);
-
-  //     // Calculate total character count
-  //     let totalCharCount = 0;
-  //     data?.fetchedLinks.forEach((item: any) => {
-  //       totalCharCount += item.size;
-  //     });
-
-  //     // Update charCount in the parent component
-  //     updateCharCount(getCharCount + totalCharCount);
-  //     setWebsiteCharCount(websiteCharCount + totalCharCount);
-
-  //     /// set the fecthed links
-  //     setCrawledList([...crawledList, ...data.fetchedLinks]);
-  //     setProgress(100);
-  //   } catch (error) {
-  //     setProgress(0);
-  //     console.log("Error while fetching ", error);
-  //     alert(`Error while fetching ${error}`);
-  //   } finally {
-  //     setLoading(false);
-  //     setLoadingPage(false);
-  //     clearInterval(intervalId);
-  //   }
-  // };
-
   /// menthod to handle the fetching
-  const onFetch = async (value: string) => {
+  const onFetch = async () => {
+    /// get the link from context to fetch data
+    const value: string = botDetails?.crawlLink;
     let intervalId;
     try {
       /// start the progress bar
       let count = 0;
-      setLoading(true);
-      setLoadingPage(true);
+      botContext?.handleChange("isLoading")(true);
+
       intervalId = setInterval(() => {
         if (count != 100) setProgress(count++);
       }, 2000);
@@ -146,50 +90,84 @@ function Website({
       if (data.error) return alert(data.error);
 
       // Calculate total character count
-      let totalCharCount = 0;
+      let retotalCharCount = 0;
       data?.fetchedLinks.forEach((item: any) => {
-        totalCharCount += parseInt(item.charCount);
+        retotalCharCount += parseInt(item.charCount);
       });
 
       // Update charCount in the parent component
-      updateCharCount(getCharCount + totalCharCount);
-      setWebsiteCharCount(websiteCharCount + totalCharCount);
+      botContext?.handleChange("totalCharCount")(
+        totalCharCount + retotalCharCount
+      );
+      botContext?.handleChange("websiteCharCount")(
+        websiteCharCount + retotalCharCount
+      );
 
       /// set the fecthed links
-      setCrawledList([...crawledList, ...data.fetchedLinks]);
+      botContext?.handleChange("crawledList")([
+        ...crawledList,
+        ...data.fetchedLinks,
+      ]);
       setProgress(100);
     } catch (error) {
       setProgress(0);
       console.log("Error while fetching ", error);
       alert(`Error while fetching ${error}`);
     } finally {
-      setLoading(false);
-      setLoadingPage(false);
+      botContext?.handleChange("isLoading")(false);
       clearInterval(intervalId);
     }
   };
 
+  //   const handleCrawlLinkChange = (event: any) => {
+  //     botContext?.handleChange("crawlLink")(event.target.value);
+  //   };
   return (
     <div className="website-source-container">
-      <Search
+      {/* <Search
         placeholder="https://www.example.com"
         enterButton="Fetch Links"
         size="large"
         onSearch={onFetch}
         disabled={loading}
-      />
+      /> */}
+      <div className="input-container">
+        <input
+          type="text"
+          className={`${isLoading ? "disabled" : ""}`}
+          placeholder="https://example.com"
+          onChange={(event) =>
+            botContext?.handleChange("crawlLink")(event?.target.value)
+          }
+          disabled={isLoading}
+          value={botDetails?.crawlLink}
+        />
+        <button
+          type="button"
+          className={`${isLoading ? "disabled" : ""}`}
+          onClick={() => onFetch()}
+          disabled={isLoading}
+        >
+          Fetch links
+        </button>
+      </div>
       <Progress
         status="active"
         percent={progress}
-        strokeColor={{ "0%": "#108ee9", "100%": "#87d068" }}
+        strokeColor={{ "0%": "#335df3", "100%": "#335df3" }}
       />
-      <span style={{ marginTop: "15px" }}>
+      <span className="text-note">
         This will crawl all the links starting with the URL (not including files
         on the website).
+        <span>
+          {crawledList.length}
+          <span>/10 links</span>
+        </span>
       </span>
-      <span style={{ marginTop: "50px" }} className="website-text">
-        Included links
-      </span>
+      <hr />
+      {crawledList.length > 0 && (
+        <h2 className="website-text">Included links</h2>
+      )}
       <div className="fetched-links-container">
         {crawledList?.map((item: any, index: number) => {
           return (
@@ -197,11 +175,14 @@ function Website({
               <div className="fetched-links">
                 <div className="link">
                   {/* <Input value={item.url} /> <span>{item.size}</span>{" "} */}
-                  <Input value={item.crawlLink} /> <span>{item.charCount}</span>{" "}
+                  <input value={item.crawlLink} disabled />
+                  <span>{item.charCount}</span>{" "}
                 </div>
-                <DeleteOutlined
-                  style={{ color: "red", marginLeft: "5px" }}
-                  value={index}
+                <Image
+                  //   style={{ color: "red", marginLeft: "5px" }}
+                  //   value={index}
+                  src={deleteIcon}
+                  alt="delete-icon"
                   onClick={() => deleteLink(index)}
                 />
               </div>
@@ -214,5 +195,4 @@ function Website({
 }
 
 export default Website;
-
 export const revalidate = 10;

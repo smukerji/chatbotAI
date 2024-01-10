@@ -24,9 +24,9 @@
 }
 
 textarea:focus {
-    border: 0.5px solid rgb(63, 7, 81);
+    /* border: 0.5px solid rgb(63, 7, 81); */
     outline: none;
-    box-shadow: 2px 2px 2px 1px rgb(63, 7, 81);
+    /* box-shadow: 2px 2px 2px 1px rgb(63, 7, 81); */
 }
 
 .qa-image-container {

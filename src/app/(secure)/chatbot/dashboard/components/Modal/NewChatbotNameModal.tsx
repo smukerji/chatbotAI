@@ -1,56 +1,37 @@
 import { Input, Modal, message } from "antd";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useCookies } from "react-cookie";
 import "./rename-modal.scss";
+import { CreateBotContext } from "../../../../../_helpers/client/Context/CreateBotContext";
 
-function RenameModal({ open, setOpen, chatbotId }: any) {
+function NewChatbotNameModal({ open, setOpen, chatbotId }: any) {
+  const botContext: any = useContext(CreateBotContext);
+  const botDetails = botContext?.createBotInfo;
+  const chatbotText = botDetails?.chatbotName;
+
   /// states to handle modal
   const [confirmLoading, setConfirmLoading] = useState(false);
   const modalText =
     "Deleting a chatbot will also remove all the training data, conversations and leads associated to it.";
 
-  const [okText, setOkText] = useState("Save");
+  const [okText, setOkText] = useState("Create");
   const [messageApi, contextHolder] = message.useMessage();
-  const [cookies, setCookies] = useCookies(["userId"]);
-
-  const [chatbotText, setChatbotText] = useState("");
 
   const handleOk = async () => {
-    setConfirmLoading(true);
     if (chatbotText == "") {
       messageApi.open({
         type: "error",
-        content: "Please enter new name for Chatbot",
+        content: "Please enter name for Chatbot",
       });
       return;
     }
 
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/api/setting/api`,
-        {
-          method: "PUT",
-          body: JSON.stringify({
-            chatbotId: chatbotId,
-            userId: cookies?.userId,
-            chatbotRename: chatbotText,
-          }),
-          next: { revalidate: 0 },
-        }
-      );
-      /// displaying status
-      const data = await res.json();
+    setConfirmLoading(true);
 
-      messageApi
-        .open({
-          type: "success",
-          content: data?.message,
-        })
-        .then(() => {
-          window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot`;
-        });
+    try {
+      window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}home?chatbotName=${chatbotText}`;
     } catch (error) {
-      console.log("Error while renaming chatbot", error);
+      console.log("Error while naming the chatbot", error);
     } finally {
       setOpen(false);
       setConfirmLoading(false);
@@ -66,7 +47,7 @@ function RenameModal({ open, setOpen, chatbotId }: any) {
       {contextHolder}
       <Modal
         centered
-        title="Rename Chatbot"
+        title="New Chatbot"
         open={open}
         confirmLoading={confirmLoading}
         closeIcon={null}
@@ -85,12 +66,12 @@ function RenameModal({ open, setOpen, chatbotId }: any) {
         }
       >
         <Input
-          placeholder="Chatbot Name"
+          placeholder="Enter your chatbot name..."
           showCount
           maxLength={20}
           value={chatbotText}
           onChange={(e) => {
-            setChatbotText(e.target.value);
+            botContext?.handleChange("chatbotName")(e.target.value);
           }}
         />
       </Modal>
@@ -98,4 +79,4 @@ function RenameModal({ open, setOpen, chatbotId }: any) {
   );
 }
 
-export default RenameModal;
+export default NewChatbotNameModal;

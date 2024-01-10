@@ -1,6 +1,7 @@
 import { cookies, headers } from "next/headers";
 import { auth } from "../../_helpers/server/auth";
 import { redirect } from "next/navigation";
+import { CreateBotDataProvider } from "../../_helpers/client/Context/CreateBotContext";
 
 export default function ChatbotsLayout({
   children,
@@ -16,5 +17,5 @@ export default function ChatbotsLayout({
 
     redirect(`/account/login?returnUrl=${returnUrl}`);
   }
-  return <>{children}</>;
+  return <CreateBotDataProvider>{children}</CreateBotDataProvider>;
 }

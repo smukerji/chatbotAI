@@ -1,0 +1,102 @@
+.source-upload-container {
+    height: 580px;
+    width: 100%;
+    border-radius: 16px;
+    border: 1px solid #e6e8ec;
+    background: #fcfcfd;
+    margin-top: 20px;
+
+    .dragger-wrapper {
+        max-height: 50%;
+        background: #fcfcfd;
+
+        .ant-upload-drag-icon {
+            margin-top: 40px;
+        }
+
+        .ant-upload-text {
+            color: #000;
+            margin-top: 51px !important;
+            font-size: 20px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 28px; /* 140% */
+            margin-top: 40px;
+        }
+
+        .ant-upload-hint {
+            margin-top: 16px;
+            color: #777e90;
+            text-align: center;
+            font-size: 16px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 24px; /* 150% */
+
+            &:last-child {
+                margin-bottom: 40px;
+            }
+        }
+    }
+
+    .ant-upload-wrapper .ant-upload-drag {
+        border: none;
+        .ant-upload {
+            padding: 0;
+        }
+
+        .ant-upload-drag-container {
+            background: #fcfcfd;
+        }
+    }
+
+    .ant-upload-list {
+        display: none;
+    }
+
+    .attached-files-container {
+        padding: 0 18px;
+        .text {
+            margin-top: 16px;
+            h1 {
+                color: #777e90;
+                font-size: 16px;
+                font-style: normal;
+                font-weight: 500;
+                line-height: 24px; /* 150% */
+            }
+        }
+
+        .item-list-container {
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            overflow: auto;
+            gap: 20px;
+            height: 215px;
+            .item {
+                display: flex;
+                justify-content: space-between;
+                .file {
+                    display: flex;
+                    gap: 8px;
+                    text-align: center;
+                    font-size: 16px;
+                    font-style: normal;
+                    font-weight: 500;
+                    line-height: 24px; /* 150% */
+                    p {
+                        color: #141416;
+                    }
+                    div {
+                        color: #777e90;
+                    }
+                }
+
+                .delete {
+                    cursor: pointer;
+                }
+            }
+        }
+    }
+}

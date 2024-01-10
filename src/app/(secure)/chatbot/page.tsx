@@ -31,6 +31,7 @@ import RenameModal from "./dashboard/components/Modal/RenameModal";
 import Icon from "../../_components/Icon/Icon";
 import GridIcon from "../../../assets/svg/GridIcon";
 import MenuIcon from "../../../assets/svg/MenuIcon";
+import NewChatbotNameModal from "./dashboard/components/Modal/NewChatbotNameModal";
 // import GridIcon from "../../as";
 
 const antIcon = (
@@ -66,6 +67,9 @@ function Chatbot() {
 
   /// managing renaming chatbot
   const [openRenameModal, setOpenRenameModal] = useState(false);
+
+  /// managing new chatbot name modal
+  const [openNewChatbotNameModal, setOpenNewChatbotNameModal] = useState(false);
 
   /// retrive the chatbots details
   useEffect(() => {
@@ -141,9 +145,11 @@ function Chatbot() {
                 onClick={() => setListType("table")}
               /> */}
             </div>
-            <Link href={`${process.env.NEXT_PUBLIC_WEBSITE_URL}home`}>
-              <button>New Chatbot</button>
-            </Link>
+            {/* <Link href={`${process.env.NEXT_PUBLIC_WEBSITE_URL}home`}> */}
+            <button onClick={() => setOpenNewChatbotNameModal(true)}>
+              New Chatbot
+            </button>
+            {/* </Link> */}
           </div>
         </div>
 
@@ -191,6 +197,11 @@ function Chatbot() {
         <RenameModal
           open={openRenameModal}
           setOpen={setOpenRenameModal}
+          chatbotId={chatbotId}
+        />
+        <NewChatbotNameModal
+          open={openNewChatbotNameModal}
+          setOpen={setOpenNewChatbotNameModal}
           chatbotId={chatbotId}
         />
 
