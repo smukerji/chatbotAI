@@ -1,8 +1,8 @@
 "use client";
 import { Button, Modal, Radio, RadioChangeEvent } from "antd";
 import { redirect, useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
-import "./dashboard.css";
+import React, { useContext, useEffect, useState } from "react";
+import "./dashboard.scss";
 import Chat from "./components/Chat/Chat";
 import DeleteModal from "./components/Modal/DeleteModal";
 import { useCookies } from "react-cookie";
@@ -12,9 +12,19 @@ import dynamic from "next/dynamic";
 import { v4 as uuid } from "uuid";
 import Settings from "./components/Settings/Settings";
 import { getDate, getTime } from "../../../_helpers/client/getTime";
+import Image from "next/image";
+
+import arrowIcon from "../../../../../public/svgs/Feather Icon.svg";
+import { CreateBotContext } from "../../../_helpers/client/Context/CreateBotContext";
 
 function Dashboard() {
   const { status } = useSession();
+
+  const botContext: any = useContext(CreateBotContext);
+  const botDetails = botContext?.createBotInfo;
+
+  /// check which action is active
+  const editChatbot = botDetails?.editChatbot;
 
   /// fetch the params
   const params: any = useSearchParams();
@@ -112,26 +122,79 @@ function Dashboard() {
   const [loading, setLoading] = useState(false);
   if (status === "authenticated" || cookies?.userId) {
     return (
-      <div className="dashboard-container">
-        <center>
-          <h1 className="title">{chatbot.name}</h1>
-          <Radio.Group onChange={onChange} value={source} disabled={loading}>
-            <Radio name="source" value={"chatbot"}>
-              Chatbot
-            </Radio>
-            <Radio name="source" value={"settings"}>
-              Settings
-            </Radio>
-            <Radio name="source" value={"sources"} onClick={fetchData}>
-              Sources
-            </Radio>
-            <Radio name="source" value={"delete"} onClick={showModal}>
-              Delete
-            </Radio>
-          </Radio.Group>
+      <div className="edit-chatbot-container">
+        {/*------------------------------------------top-section----------------------------------------------*/}
+        <div className="top">
+          {/*------------------------------------------header----------------------------------------------*/}
+          <div className="sources-header">
+            <div className="title">
+              <Image
+                src={arrowIcon}
+                alt="arrow-icon"
+                style={{ transform: "rotate(180deg)", cursor: "pointer" }}
+                onClick={() => {
+                  window.history.back();
+                }}
+              />
+              <h1>{chatbot?.name}</h1>
+            </div>
 
-          {/* managing the component rendering */}
-          {source == "chatbot" && (
+            {/*------------------------------------------options-container----------------------------------------------*/}
+            <ul className="options-container">
+              <li
+                className={`${editChatbot === "chatbot" ? "active" : ""}`}
+                value={"chatbot"}
+                onClick={() =>
+                  botContext?.handleChange("editChatbot")("chatbot")
+                }
+              >
+                <h3 className="option">chatbot</h3>
+              </li>
+              <li
+                className={`${editChatbot === "settings" ? "active" : ""}`}
+                value={"settings"}
+                onClick={() =>
+                  botContext?.handleChange("editChatbot")("settings")
+                }
+              >
+                <h3 className="option">settings</h3>
+              </li>
+              <li
+                className={`${editChatbot === "sources" ? "active" : ""}`}
+                value={"sources"}
+                onClick={() => {
+                  fetchData();
+                  botContext?.handleChange("editChatbot")("sources");
+                }}
+              >
+                <h3 className="option">sources</h3>
+              </li>
+              <li
+                className={`${editChatbot === "integrations" ? "active" : ""}`}
+                value={"integrations"}
+                onClick={() =>
+                  botContext?.handleChange("editChatbot")("integrations")
+                }
+              >
+                <h3 className="option">Integrations</h3>
+              </li>
+              <li
+                className={`${editChatbot === "embedSite" ? "active" : ""}`}
+                value={"embedSite"}
+                onClick={() =>
+                  botContext?.handleChange("editChatbot")("embedSite")
+                }
+              >
+                <h3 className="option">Embed on site</h3>
+              </li>
+            </ul>
+
+            <hr />
+          </div>
+        </div>
+
+        <div className="bottom">
+          {editChatbot == "chatbot" && (
             <>
               <Chat
                 chatbot={chatbot}
@@ -141,25 +204,15 @@ function Dashboard() {
                 setMessagesTime={setMessagesTime}
                 sessionID={sessionID}
                 sessionStartDate={sessionStartDate}
-              />{" "}
-              <DeleteModal
-                open={open}
-                setOpen={setOpen}
-                chatbotId={chatbot.id}
               />
             </>
           )}
-          {source == "settings" && (
-            <>
-              <Settings chatbotId={chatbot.id} />
-              <DeleteModal
-                open={open}
-                setOpen={setOpen}
-                chatbotId={chatbot.id}
-              />
-            </>
+
+          {editChatbot == "settings" && (
+            <>{/* <Settings chatbotId={chatbot.id} /> */}</>
           )}
-          {source == "sources" && !loading && (
+
+          {editChatbot == "sources" && !loading && (
             <>
               <Home
                 updateChatbot="true"
@@ -170,15 +223,78 @@ function Dashboard() {
                 chatbotId={chatbot.id}
                 chatbotName={chatbot.name}
               />
-              <DeleteModal
-                open={open}
-                setOpen={setOpen}
-                chatbotId={chatbot.id}
-              />
             </>
           )}
-        </center>
+        </div>
       </div>
+
+      //   <div className="dashboard-container">
+      //     <center>
+      //       <h1 className="title">{chatbot.name}</h1>
+      //       <Radio.Group onChange={onChange} value={source} disabled={loading}>
+      //         <Radio name="source" value={"chatbot"}>
+      //           Chatbot
+      //         </Radio>
+      //         <Radio name="source" value={"settings"}>
+      //           Settings
+      //         </Radio>
+      //         <Radio name="source" value={"sources"} onClick={fetchData}>
+      //           Sources
+      //         </Radio>
+      //         <Radio name="source" value={"delete"} onClick={showModal}>
+      //           Delete
+      //         </Radio>
+      //       </Radio.Group>
+
+      //       {/* managing the component rendering */}
+      //       {source == "chatbot" && (
+      //         <>
+      //           <Chat
+      //             chatbot={chatbot}
+      //             messages={messages}
+      //             setMessages={setMessages}
+      //             messagesTime={messagesTime}
+      //             setMessagesTime={setMessagesTime}
+      //             sessionID={sessionID}
+      //             sessionStartDate={sessionStartDate}
+      //           />{" "}
+      //           <DeleteModal
+      //             open={open}
+      //             setOpen={setOpen}
+      //             chatbotId={chatbot.id}
+      //           />
+      //         </>
+      //       )}
+      //       {source == "settings" && (
+      //         <>
+      //           <Settings chatbotId={chatbot.id} />
+      //           <DeleteModal
+      //             open={open}
+      //             setOpen={setOpen}
+      //             chatbotId={chatbot.id}
+      //           />
+      //         </>
+      //       )}
+      //       {source == "sources" && !loading && (
+      //         <>
+      //           <Home
+      //             updateChatbot="true"
+      //             qaData={qaData}
+      //             textData={textData}
+      //             fileData={fileData}
+      //             crawlingData={crawlData}
+      //             chatbotId={chatbot.id}
+      //             chatbotName={chatbot.name}
+      //           />
+      //           <DeleteModal
+      //             open={open}
+      //             setOpen={setOpen}
+      //             chatbotId={chatbot.id}
+      //           />
+      //         </>
+      //       )}
+      //     </center>
+      //   </div>
     );
   } else if (status === "unauthenticated") {
     redirect("/account/login");

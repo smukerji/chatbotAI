@@ -324,7 +324,7 @@ function Home({
                   window.history.back();
                 }}
               />
-              <h1>Create Chatbot</h1>
+              <h1>{botDetails?.chatbotName}</h1>
             </div>
 
             <p>Add your data sources to train your chatbot</p>
@@ -332,33 +332,37 @@ function Home({
             {/*------------------------------------------options-container----------------------------------------------*/}
             <ul className="options-container">
               <li
-                className={`${activeSource === 0 ? "active" : ""}`}
-                value={0}
-                onClick={() => botContext?.handleChange("activeSource")(0)}
+                className={`${activeSource === "document" ? "active" : ""}`}
+                value={"document"}
+                onClick={() =>
+                  botContext?.handleChange("activeSource")("document")
+                }
               >
                 <Icon Icon={DocumentIcon} />
                 <h3>Document</h3>
               </li>
               <li
-                className={`${activeSource === 1 ? "active" : ""}`}
-                value={1}
-                onClick={() => botContext?.handleChange("activeSource")(1)}
+                className={`${activeSource === "text" ? "active" : ""}`}
+                value={"text"}
+                onClick={() => botContext?.handleChange("activeSource")("text")}
               >
                 <Icon Icon={TextIcon} />
                 <h3>Text</h3>
               </li>
               <li
-                className={`${activeSource === 2 ? "active" : ""}`}
-                value={2}
-                onClick={() => botContext?.handleChange("activeSource")(2)}
+                className={`${activeSource === "qa" ? "active" : ""}`}
+                value={"qa"}
+                onClick={() => botContext?.handleChange("activeSource")("qa")}
               >
                 <Icon Icon={QAIcon} />
                 <h3>Q&A</h3>
               </li>
               <li
-                className={`${activeSource === 3 ? "active" : ""}`}
-                value={3}
-                onClick={() => botContext?.handleChange("activeSource")(3)}
+                className={`${activeSource === "website" ? "active" : ""}`}
+                value={"website"}
+                onClick={() =>
+                  botContext?.handleChange("activeSource")("website")
+                }
               >
                 <Icon Icon={WebsiteIcon} />
                 <h3>Website</h3>
@@ -370,26 +374,26 @@ function Home({
         {/*------------------------------------------bottom-section----------------------------------------------*/}
         <div className="bottom">
           <div className="left">
-            {activeSource === 0 && (
+            {activeSource === "document" && (
               <SourceUpload
                 totalCharCount={totalCharCount}
                 filesCharCount={filesCharCount}
               />
             )}
-            {activeSource === 1 && (
+            {activeSource === "text" && (
               <Text
                 totalCharCount={totalCharCount}
                 textCharCount={textCharCount}
               />
             )}
-            {activeSource === 2 && (
+            {activeSource === "qa" && (
               <QA
                 isUpdateChatbot={isUpdateChatbot}
                 totalCharCount={totalCharCount}
                 qaCharCount={qaCharCount}
               />
             )}
-            {activeSource === 3 && (
+            {activeSource === "website" && (
               <Website
                 websiteCharCount={websiteCharCount}
                 totalCharCount={totalCharCount}

@@ -1,0 +1,98 @@
+.edit-chatbot-container {
+    padding: 2.4vw 5.2vw;
+    /*------------------------------------------top-section----------------------------------------------*/
+    .top {
+        /*------------------------------------------header----------------------------------------------*/
+        .sources-header {
+            .title {
+                display: flex;
+                gap: 20px;
+                align-items: center;
+
+                h1 {
+                    color: #000;
+                    font-size: 30px;
+                    font-style: normal;
+                    font-weight: 600;
+                    line-height: 40px; /* 133.333% */
+                }
+            }
+
+            .options-container {
+                margin-top: 20px;
+                padding-left: 30px;
+                list-style: none;
+                display: flex;
+                gap: 12px;
+                li {
+                    display: flex;
+                    padding: 8px 16px;
+                    align-items: center;
+                    gap: 12px;
+                    .option {
+                        font-size: 16px;
+                        font-style: normal;
+                        font-weight: 500;
+                        line-height: 24px; /* 150% */
+                        text-transform: capitalize;
+                        color: #777e90;
+                    }
+                    cursor: pointer;
+
+                    &.active {
+                        .option {
+                            color: #2e58ea;
+                            position: relative;
+                            &::before {
+                                content: "";
+                                position: absolute;
+                                width: 100%;
+                                top: 32px;
+                                left: 0;
+                                border: 1px solid #2e58ea;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        hr {
+            border-color: transparent;
+            background: #e6e8ec;
+            margin-left: 45px;
+            margin-right: 45px;
+        }
+    }
+
+    /*------------------------------------------bottom-section----------------------------------------------*/
+    .bottom {
+        margin-left: 0px;
+        .create-chatbot-container {
+            padding: 0px;
+            .sources-header {
+                .options-container {
+                    padding: 0;
+                    margin-left: 45px;
+                    margin-right: 45px;
+                }
+                .title {
+                    display: none;
+
+                    h1 {
+                        display: none;
+                    }
+                }
+
+                p {
+                    display: none;
+                }
+            }
+
+            .bottom {
+                margin-left: 45px;
+                margin-right: 45px;
+            }
+        }
+    }
+}

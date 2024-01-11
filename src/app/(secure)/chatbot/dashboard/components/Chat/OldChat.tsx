@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect, useRef, useState } from "react";
 import { useCookies } from "react-cookie";
-import "./chat.scss";
+import "./chat.css";
 import { DislikeOutlined, SendOutlined, LikeOutlined } from "@ant-design/icons";
 import Image from "next/image";
 import { message } from "antd";
@@ -203,6 +203,98 @@ function Chat({
             setResponse(resptext);
           }
 
+          // // Fetch the response from the OpenAI API
+          // const responseOpenAI: any = await fetch(
+          //   "https://api.openai.com/v1/chat/completions",
+          //   {
+          //     method: "POST",
+          //     headers: {
+          //       "Content-Type": "application/json",
+          //       Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENAI_KEY}`,
+          //     },
+          //     body: JSON.stringify({
+          //       model: "gpt-3.5-turbo-16k",
+          //       temperature: 0,
+          //       top_p: 1,
+          //       messages: [
+          //         {
+          //           role: "system",
+          //           content: `Use the following pieces of context to answer the users question.
+          //           If you don't know the answer, just say that you don't know, don't try to make up an answer.
+          //           ----------------
+          //           context:
+          //           ${similaritySearchResults}
+
+          //           Answer user query and include images write respect to each line if available`,
+          //         },
+          //         ...messages,
+          //         {
+          //           role: "user",
+          //           content: `
+          //             Strictly write all the response in html format with only raw text and img tags.
+          //             Answer user query and include images in response if available in the given context
+
+          //             query: ${userQuery}`,
+          //         },
+          //       ],
+          //       stream: true,
+          //     }),
+          //   }
+          // );
+
+          // console.log(similaritySearchResults);
+
+          // let resptext = "";
+          // const reader = responseOpenAI.body.getReader();
+          // const decoder = new TextDecoder("utf-8");
+
+          // while (true) {
+          //   const { done, value } = await reader.read();
+          //   if (done) {
+          //     /// setting the response when completed
+          //     setMessages((prev: any) => [
+          //       ...prev,
+          //       { role: "assistant", content: resptext },
+          //     ]);
+          //     /// store the chathistory
+          //     setResponse("");
+          //     //   setLoading(false);
+          //     //   const store = await fetch(
+          //     //     `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/chathistory`,
+          //     //     {
+          //     //       method: "POST",
+          //     //       body: JSON.stringify({
+          //     //         chatHistory: messages,
+          //     //         chatbotId: chatbot.id,
+          //     //       }),
+          //     //     }
+          //     //   );
+
+          //     //   if (!store.ok) {
+          //     //     alert(await store.text());
+          //     //   }
+          //     break;
+          //   }
+          //   // Massage and parse the chunk of data
+          //   const chunk = decoder.decode(value);
+          //   const lines = chunk.split("\n");
+          //   const parsedLines = lines
+          //     .map((line) => line.replace(/^data: /, "").trim()) // Remove the "data: " prefix
+          //     .filter((line) => line !== "" && line !== "[DONE]") // Remove empty lines and "[DONE]"
+          //     .map((line, index) => JSON.parse(line)); // Parse the JSON string
+
+          //   for (const parsedLine of parsedLines) {
+          //     const { choices } = parsedLine;
+          //     const { delta } = choices[0];
+          //     const { content } = delta;
+          //     // Update the UI with the new content
+          //     if (content) {
+          //       resptext += content;
+          //       setResponse(resptext);
+          //     }
+          //   }
+          // }
+          // console.log("Response.", model.data);
         } catch (e: any) {
           console.log(
             "Error while getting completion from custom chatbot",

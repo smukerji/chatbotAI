@@ -1,110 +1,59 @@
-import React, { useEffect, useState } from "react";
-import "./settings.css";
-import { Radio, RadioChangeEvent } from "antd";
-import { useCookies } from "react-cookie";
+import React, { useContext } from "react";
+import { CreateBotContext } from "../../../../../_helpers/client/Context/CreateBotContext";
+import Icon from "../../../../../_components/Icon/Icon";
 
-function Settings({ chatbotId }: any) {
-  const [cookies, setCookies] = useCookies(["userId"]);
+function Settings() {
+  const botContext: any = useContext(CreateBotContext);
+  const botDetails = botContext?.createBotInfo;
 
-  const onChange = (e: RadioChangeEvent) => {
-    setSource(e.target.value);
-  };
-
-  const [chatHistory, setChatHistory] = useState([]);
-
-  useEffect(() => {
-    /// retrive the chatbot data
-    const retriveData = async () => {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/api/setting/api`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            chatbotId: chatbotId,
-            userId: cookies?.userId,
-          }),
-          // next: { revalidate: 0 },
-        }
-      );
-      const content = await response.json();
-      setChatHistory(content?.chatHistory);
-    };
-
-    retriveData();
-  }, []);
-
-  /// state to store the state of the current active list
-  const [source, setSource] = useState("general");
-
+  /// check which setting tab is active
+  const chabotSettings = botDetails?.chabotSettings;
   return (
     <div className="settings-container">
-      <div className="left">
-        {/* ----------------- list of settigs ------------------ */}
-        <Radio.Group onChange={onChange} value={source}>
-          <Radio name="source" value={"general"}>
-            General
-          </Radio>
-          <Radio name="source" value={"chatbot-settings"}>
-            Chatbot Settings
-          </Radio>
-          <Radio name="source" value={"embed"}>
-            Embed on site
-          </Radio>
-          <Radio name="source" value={"integration"}>
-            Integrations
-          </Radio>
-          <Radio name="source" value={"chat-history"}>
-            Chat History
-          </Radio>
-        </Radio.Group>
-      </div>
-
-      <div className="right">
-        {source === "embed" && (
-          <>
-            <div
-              style={{
-                textAlign: "start",
-                wordBreak: "break-word",
-                padding: "10px",
-              }}
+      {/*------------------------------------------top-section----------------------------------------------*/}
+      <div className="top">
+        {/*------------------------------------------header----------------------------------------------*/}
+        <div className="sources-header">
+          {/*------------------------------------------options-container----------------------------------------------*/}
+          <ul className="options-container">
+            <li
+              className={`${chabotSettings === "document" ? "active" : ""}`}
+              value={"document"}
+              onClick={() =>
+                botContext?.handleChange("chabotSettings")("document")
+              }
             >
-              {`<script
-                    src="${process.env.NEXT_PUBLIC_WEBSITE_URL}embed-bot.js"
-                    chatbotID=${chatbotId}
-                    ></script>`}
-            </div>
-          </>
-        )}
-
-        {source === "chat-history" && (
-          <>
-            {Object.entries(chatHistory).map((data: any, index) => {
-              return (
-                <React.Fragment key={index}>
-                  <div className="session-data-container">
-                    <div className="customer-message">
-                      Customer: {data[1]?.messages[1]?.content}
-                    </div>
-                    <div className="bot-message">
-                      Bot:&nbsp;
-                      <span
-                        dangerouslySetInnerHTML={{
-                          __html: data[1]?.messages[2]?.content,
-                        }}
-                      ></span>
-                    </div>
-
-                    {/* {data[1]?.messages[1]?.content} */}
-                  </div>
-                </React.Fragment>
-              );
-            })}
-          </>
-        )}
+              {/* <Icon Icon={DocumentIcon} /> */}
+              <h3>Document</h3>
+            </li>
+            <li
+              className={`${chabotSettings === "text" ? "active" : ""}`}
+              value={"text"}
+              onClick={() => botContext?.handleChange("chabotSettings")("text")}
+            >
+              {/* <Icon Icon={TextIcon} /> */}
+              <h3>Text</h3>
+            </li>
+            <li
+              className={`${chabotSettings === "qa" ? "active" : ""}`}
+              value={"qa"}
+              onClick={() => botContext?.handleChange("chabotSettings")("qa")}
+            >
+              {/* <Icon Icon={QAIcon} /> */}
+              <h3>Q&A</h3>
+            </li>
+            <li
+              className={`${chabotSettings === "website" ? "active" : ""}`}
+              value={"website"}
+              onClick={() =>
+                botContext?.handleChange("chabotSettings")("website")
+              }
+            >
+              {/* <Icon Icon={WebsiteIcon} /> */}
+              <h3>Website</h3>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   );

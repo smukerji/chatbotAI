@@ -91,22 +91,22 @@ function GridLayout({
               //   onClick={() => openMenu && setOpenMenu(null)}
             >
               <Image src={chatbotBg} alt={"chatbot-img"} />
-              <div className="name">
+              <div className="name" onClick={() => openChatbot(data.id)}>
                 {data.name}
                 <Image
-                  style={{
-                    visibility: `${
-                      data.id === chatbotId
-                        ? "visible"
-                        : openMenu?.[index]
-                        ? "visible"
-                        : "hidden"
-                    }`,
-                  }}
+                  // style={{
+                  //   visibility: `${
+                  //     data.id === chatbotId
+                  //       ? "visible"
+                  //       : openMenu?.[index]
+                  //       ? "visible"
+                  //       : "hidden"
+                  //   }`,
+                  // }}
                   className="open-icon"
                   src={chatbotOpenIcon}
                   alt={"chatbot-open-icon"}
-                  onClick={() => openChatbot(data.id)}
+                  // onClick={() => openChatbot(data.id)}
                 />
               </div>
 

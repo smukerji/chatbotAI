@@ -5,7 +5,10 @@ export const CreateBotContext = createContext({});
 
 export const CreateBotDataProvider = ({ children }: any) => {
   const [createBotInfo, setCreateBotInfo] = useState({
-    activeSource: 0,
+    activeSource: "document",
+    editChatbot: "chatbot",
+    chabotSettings:"general",
+
     isLoading: false,
     totalCharCount: 0,
     /// document upload data
