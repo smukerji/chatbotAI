@@ -14,6 +14,7 @@ import SourceUpload from "../../_components/Source-Upload/SourceUpload";
 import Text from "../../_components/Text/Text";
 import QA from "../../_components/QA/QA";
 import Website from "../../_components/Website/Website";
+import Hubspot from "../../_components/Hubspot/Hubspot";
 import { useSession } from "next-auth/react";
 import { Spin, message } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
@@ -367,6 +368,16 @@ function Home({
                 <Icon Icon={WebsiteIcon} />
                 <h3>Website</h3>
               </li>
+              <li
+                className={`${activeSource === "hubspot" ? "active" : ""}`}
+                value={"hubspot"}
+                onClick={() =>
+                  botContext?.handleChange("activeSource")("hubspot")
+                }
+              >
+                <Icon Icon={WebsiteIcon} />
+                <h3>Hubspot CRM</h3>
+              </li>
             </ul>
           </div>
         </div>
@@ -400,6 +411,7 @@ function Home({
                 isUpdateChatbot={isUpdateChatbot}
               />
             )}
+            {activeSource === "hubspot" && <Hubspot />}
           </div>
           <div className="right" style={{ marginTop: "20px" }}>
             <div className="character-count-container">

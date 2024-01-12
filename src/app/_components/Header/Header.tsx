@@ -89,7 +89,7 @@ function Header() {
               alt="profile-img"
             />
           ) : (
-            <span>{shortUserName.toUpperCase()}</span>
+            <span>{shortUserName?.toUpperCase()}</span>
           )}
 
           {openMenu && (
