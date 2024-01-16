@@ -7,7 +7,7 @@ export const CreateBotDataProvider = ({ children }: any) => {
   const [createBotInfo, setCreateBotInfo] = useState({
     activeSource: "document",
     editChatbot: "chatbot",
-    chabotSettings:"general",
+    chabotSettings: "general",
 
     isLoading: false,
     totalCharCount: 0,
@@ -32,6 +32,9 @@ export const CreateBotDataProvider = ({ children }: any) => {
     deleteCrawlList: [],
     websiteCharCount: 0,
     crawlLink: "",
+
+    //hubspot data
+    isHubspotConnected: false,
 
     isUpdateChatbot: false,
 

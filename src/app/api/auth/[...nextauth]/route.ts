@@ -27,7 +27,7 @@ const authOptions: NextAuthOptions = {
       clientSecret: process.env.NEXT_PUBLIC_HUBSPOT_CLIENT_SECRET!,
       authorization: {
         params: {
-          scope: `oauth crm.objects.contacts.read crm.objects.contacts.write`,
+          scope: process.env.NEXT_PUBLIC_HUBSPOT_CLIENT_SCOPES,
         },
       },
     }),
@@ -35,7 +35,7 @@ const authOptions: NextAuthOptions = {
 
   callbacks: {
     async jwt({ token, account }) {
-      if (account) {
+      if (account?.provider === "hubspot") {
         token.accessToken = account.access_token;
       }
       return token;
@@ -43,6 +43,7 @@ const authOptions: NextAuthOptions = {
     async session({ session, user, token }) {
       // cookies().set("profile-img", user.image!);
       // cookies().set("userId", user.id);
+
       session.accessToken = token.accessToken;
       cookies().set("profile-img", token.picture!);
       cookies().set("userId", token.sub!);
