@@ -138,7 +138,7 @@ function Chat({
         ]);
         setMessagesTime((prev: any) => [
           ...prev,
-          { role: "user", content: userQuery, messageTime: getTime() },
+          { role: "user", content: userQuery, messageTime: getDate() },
         ]);
         try {
           setLoading(true);
@@ -200,7 +200,7 @@ function Chat({
                 {
                   role: "assistant",
                   content: resptext,
-                  messageTime: getTime(),
+                  messageTime: getDate(),
                 },
               ]);
               // if (!store.ok) {
@@ -282,6 +282,10 @@ function Chat({
             value={typeof inputValue === "number" ? inputValue : 0}
             step={0.1}
           />
+          <div className="slider-bottom">
+            <div>Reserved</div>
+            <div>Creative</div>
+          </div>
         </div>
 
         <div className="detail">

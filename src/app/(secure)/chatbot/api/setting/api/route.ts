@@ -29,11 +29,13 @@ async function retriveChatbotSettings(request: NextRequest) {
   const db = (await connectDatabase())?.db();
   const collection = db.collection("chat-history");
 
-  const data = await collection.findOne({
-    userId: userId,
-    chatbotId: chatbotId,
-    date: getDate().split(" ")[0],
-  });
+  const data = await collection
+    .find({
+      userId: userId,
+      chatbotId: chatbotId,
+      // date: getDate().split(" ")[0],
+    })
+    .toArray();
 
   // const chatHistory: Chats = data?.chats;
   // console.log(chatHistory);
@@ -60,7 +62,41 @@ async function retriveChatbotSettings(request: NextRequest) {
   // //   return filteredChats;
   // console.log("Flier>>", filteredChats);
 
-  return { chatHistory: data?.chats };
+  /// filter data
+  let today: any = {};
+  let yesterday: any = {};
+  let lastSevenDay: any = {};
+  let moreThanLastSevenDay: any = {};
+
+  const todaysDate: any = new Date(getDate().split(" ")[0].replace(/-/g, "/"));
+
+  ///  the number of milliseconds in a yesterday
+  const yesterDayInMillis = 24 * 60 * 60 * 1000 * 1;
+
+  ///  the number of milliseconds in a last 7 days
+  const sevenDayInMillis = 24 * 60 * 60 * 1000 * 6;
+
+  ///  the number of milliseconds in a more than last 7 days
+  const moreThanSevenDayInMillis = 24 * 60 * 60 * 1000 * 7;
+  data?.forEach((obj: any) => {
+    const date: any = new Date(obj.date.replace(/-/g, "/"));
+    // Calculate the difference in milliseconds
+    const timeDiff = Math.abs(date - todaysDate);
+
+    /// get today chat conversation
+    if (timeDiff == 0) today = { ...obj };
+    /// get yesterday chat conversation
+    else if (timeDiff == yesterDayInMillis) yesterday = { ...obj };
+    /// get last 7 days chat conversation
+    else if (timeDiff == sevenDayInMillis) lastSevenDay = { ...obj };
+    /// get more than last 7 days chat conversation
+    else if (timeDiff == moreThanSevenDayInMillis)
+      moreThanLastSevenDay = { ...obj };
+  });
+
+  return {
+    chatHistory: { today, yesterday, lastSevenDay, moreThanLastSevenDay },
+  };
 }
 
 async function updateChatbotSettings(request: NextRequest) {

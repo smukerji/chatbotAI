@@ -17,7 +17,7 @@ export function getDate() {
   const minutes = addLeadingZero(currentDate.getMinutes());
   const seconds = addLeadingZero(currentDate.getSeconds());
 
-  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
 }
 
 function addLeadingZero(num: number) {

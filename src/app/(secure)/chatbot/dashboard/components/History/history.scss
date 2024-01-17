@@ -1,0 +1,113 @@
+.chat-container {
+    display: flex;
+    gap: 40px;
+    margin-left: 45px;
+    margin-right: 45px;
+    margin-top: 28px;
+
+    /*------------------------------------------left-section----------------------------------------------*/
+    .chatbot-history-details {
+        display: flex;
+        flex: 1;
+        padding: 16px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+        flex-shrink: 0;
+        border-radius: 16px;
+        border: 1px solid #e6e8ec;
+        background: #fcfcfd;
+
+        .detail {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            width: 100%;
+
+            .time {
+                color: #777e90;
+                font-size: 16px;
+                font-style: normal;
+                font-weight: 500;
+                line-height: 24px; /* 150% */
+                padding: 4px 8px;
+            }
+
+            .first-message {
+                color: #141416;
+                font-size: 16px;
+                font-style: normal;
+                font-weight: 500;
+                line-height: 24px; /* 150% */
+                cursor: pointer;
+                border-radius: 8px;
+                text-transform: capitalize;
+                padding: 4px 8px;
+
+                &:hover {
+                    background: #e6e8ec;
+                }
+
+                &.active {
+                    background: #e6e8ec;
+                }
+            }
+        }
+    }
+
+    /*------------------------------------------right-section----------------------------------------------*/
+    .messages-section {
+        flex: 3;
+        display: flex;
+        padding: 8px 16px 8px 16px;
+        border-radius: 16px;
+        border: 1px solid #e6e8ec;
+        flex-direction: column;
+        height: 100%;
+        background: #fff;
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            span {
+                color: #777e90;
+                text-align: center;
+                font-size: 12px;
+                font-style: normal;
+                font-weight: 500;
+                line-height: 24px; /* 200% */
+            }
+
+            .action-btns {
+                display: flex;
+                gap: 24px;
+            }
+        }
+
+        hr {
+            margin-top: 12px;
+            border-color: transparent;
+            background: #e6e8ec;
+        }
+
+        .conversation-container {
+            overflow-y: auto;
+
+            height: 510px;
+            margin-top: 17px;
+
+            &::-webkit-scrollbar {
+                width: 0.5em;
+            }
+
+            &::-webkit-scrollbar-thumb {
+                background-color: transparent;
+            }
+
+            &::-webkit-scrollbar-track {
+                background-color: transparent;
+            }
+        }
+    }
+}

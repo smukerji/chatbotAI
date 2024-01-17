@@ -16,6 +16,7 @@ import Image from "next/image";
 
 import arrowIcon from "../../../../../public/svgs/Feather Icon.svg";
 import { CreateBotContext } from "../../../_helpers/client/Context/CreateBotContext";
+import History from "./components/History/History";
 
 function Dashboard() {
   const { status } = useSession();
@@ -187,6 +188,16 @@ function Dashboard() {
               >
                 <h3 className="option">Embed on site</h3>
               </li>
+
+              <li
+                className={`${editChatbot === "history" ? "active" : ""}`}
+                value={"history"}
+                onClick={() =>
+                  botContext?.handleChange("editChatbot")("history")
+                }
+              >
+                <h3 className="option">Conversation History</h3>
+              </li>
             </ul>
 
             <hr />
@@ -225,6 +236,8 @@ function Dashboard() {
               />
             </>
           )}
+
+          {editChatbot == "history" && <History chatbotId={chatbot.id} />}
         </div>
       </div>
 
