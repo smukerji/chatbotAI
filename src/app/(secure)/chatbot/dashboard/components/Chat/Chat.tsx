@@ -3,9 +3,15 @@ import { useCookies } from "react-cookie";
 import "./chat.scss";
 import { DislikeOutlined, SendOutlined, LikeOutlined } from "@ant-design/icons";
 import Image from "next/image";
-import { message } from "antd";
+import { Slider, message } from "antd";
 import ChatbotNameModal from "../../../../../_components/Modal/ChatbotNameModal";
 import { getDate, getTime } from "../../../../../_helpers/client/getTime";
+import copyIcon from "../../../../../../../public/svgs/copy-icon.svg";
+import exportBtn from "../../../../../../../public/svgs/export-btn.svg";
+import refreshBtn from "../../../../../../../public/svgs/refreshbtn.svg";
+import likeIcon from "../../../../../../../public/svgs/like.svg";
+import dislikeIcon from "../../../../../../../public/svgs/dislike.svg";
+import sendChatIcon from "../../../../../../../public/svgs/send.svg";
 
 function Chat({
   chatbot,
@@ -111,6 +117,12 @@ function Chat({
     if (conversationLength > 1 && conversationLength & 1) storeHistory();
   }, [messages]);
 
+  const [inputValue, setInputValue] = useState(0);
+
+  const onChange = (newValue: number) => {
+    setInputValue(newValue);
+  };
+
   /// get the chatbase response
   async function getReply(event: any) {
     if (event.key === "Enter" || event === "click") {
@@ -202,7 +214,6 @@ function Chat({
             resptext += value;
             setResponse(resptext);
           }
-
         } catch (e: any) {
           console.log(
             "Error while getting completion from custom chatbot",
@@ -221,82 +232,162 @@ function Chat({
 
   return (
     <div className="chat-container">
-      <div className="conversation-container" ref={chatWindowRef}>
-        {messages.map((message: any, index: any) => {
-          if (message.role == "assistant")
-            return (
-              <React.Fragment key={index}>
-                <div className="assistant-message-container">
-                  <div
-                    className="assistant-message"
-                    style={{ display: "flex", flexDirection: "column" }}
-                    dangerouslySetInnerHTML={{
-                      __html: message.content,
-                    }}
-                  ></div>
-                  <div className="time">{messagesTime[index]?.messageTime}</div>
-                  <div className="like-dislike-container">
-                    <LikeOutlined
-                      onClick={() => openChatbotModal(index, "like")}
-                    />
-                    <DislikeOutlined
-                      onClick={() => openChatbotModal(index, "dislike")}
-                    />
+      {/*------------------------------------------left-section----------------------------------------------*/}
+      <div className="chatbot-details">
+        <div className="detail">
+          <span>Chatbot ID</span>
+          <div className="chatbot-id">
+            <span>{chatbot?.id}</span> <Image src={copyIcon} alt="copy-icon" />
+          </div>
+        </div>
+
+        <div className="detail">
+          <span>Status</span>
+          <div className="status">
+            <div className="dot"></div> <span>Trained</span>
+          </div>
+        </div>
+
+        <div className="detail">
+          <span>Model</span>
+          <div className="model">
+            <span>gpt 3.5 - turbo</span>
+          </div>
+        </div>
+
+        <div className="detail">
+          <span>Number of characters</span>
+          <div className="characters">
+            <span>12</span>
+          </div>
+        </div>
+
+        <div className="detail">
+          <span>Visibility</span>
+          <div className="visibility">
+            <span>Public</span>
+          </div>
+        </div>
+
+        <div className="detail">
+          <div className="temperature">
+            <span>Temperature</span>
+            <span>{inputValue}</span>
+          </div>
+
+          <Slider
+            min={0}
+            max={1}
+            onChange={onChange}
+            value={typeof inputValue === "number" ? inputValue : 0}
+            step={0.1}
+          />
+        </div>
+
+        <div className="detail">
+          <span>Last trained at</span>
+          <div className="trained">
+            <span>December 18,2023 at 03:17 PM </span>
+          </div>
+        </div>
+      </div>
+
+      {/*------------------------------------------right-section----------------------------------------------*/}
+      <div className="messages-section">
+        <div className="header">
+          <span>Powered by Lucifer.AI</span>
+          <div className="action-btns">
+            <Image src={refreshBtn} alt="refresh-btn" />
+            <Image src={exportBtn} alt="export-btn" />
+          </div>
+        </div>
+
+        <hr />
+
+        <div className="conversation-container" ref={chatWindowRef}>
+          {messages.map((message: any, index: any) => {
+            if (message.role == "assistant")
+              return (
+                <React.Fragment key={index}>
+                  <div className="assistant-message-container">
+                    <div
+                      className="assistant-message"
+                      style={{ display: "flex", flexDirection: "column" }}
+                      dangerouslySetInnerHTML={{
+                        __html: message.content,
+                      }}
+                    ></div>
+                    <div className="time">
+                      {messagesTime[index]?.messageTime}
+                    </div>
+                    <div className="like-dislike-container">
+                      <Image
+                        src={likeIcon}
+                        alt="like-icon"
+                        onClick={() => openChatbotModal(index, "like")}
+                      />
+                      <Image
+                        src={dislikeIcon}
+                        alt="dislike-icon"
+                        onClick={() => openChatbotModal(index, "dislike")}
+                      />
+                    </div>
                   </div>
+                  <ChatbotNameModal
+                    open={open}
+                    setOpen={setOpen}
+                    chatbotText={feedbackText}
+                    setChatbotText={setfeedbackText}
+                    handleOk={handleOk}
+                    forWhat="feedback"
+                  />
+                </React.Fragment>
+              );
+            else
+              return (
+                <div className="user-message-container">
+                  <div className="user-message" key={index}>
+                    {message.content}
+                  </div>
+                  <div className="time">{messagesTime[index]?.messageTime}</div>
                 </div>
-                <ChatbotNameModal
-                  open={open}
-                  setOpen={setOpen}
-                  chatbotText={feedbackText}
-                  setChatbotText={setfeedbackText}
-                  handleOk={handleOk}
-                  forWhat="feedback"
-                />
-              </React.Fragment>
-            );
-          else
-            return (
-              <div className="user-message-container">
-                <div className="user-message" key={index}>
-                  {message.content}
+              );
+          })}
+          {loading && response.length == 0 && (
+            <div className="assistant-message-container">
+              <div className="assistant-message">
+                <div className="typing-indicator">
+                  <div className="dot"></div>
+                  <div className="dot"></div>
+                  <div className="dot"></div>
                 </div>
-                <div className="time">{messagesTime[index]?.messageTime}</div>
-              </div>
-            );
-        })}
-        {loading && response.length == 0 && (
-          <div className="assistant-message-container">
-            <div className="assistant-message">
-              <div className="typing-indicator">
-                <div className="dot"></div>
-                <div className="dot"></div>
-                <div className="dot"></div>
               </div>
             </div>
-          </div>
-        )}
-        {response && (
-          <div className="assistant-message-container">
-            <div
-              className="assistant-message"
-              style={{ display: "flex", flexDirection: "column" }}
-              dangerouslySetInnerHTML={{ __html: response }}
-            />
-          </div>
-        )}
+          )}
+          {response && (
+            <div className="assistant-message-container">
+              <div
+                className="assistant-message"
+                style={{ display: "flex", flexDirection: "column" }}
+                dangerouslySetInnerHTML={{ __html: response }}
+              />
+            </div>
+          )}
+        </div>
+        <div className="chat-question">
+          <input
+            type="text"
+            onKeyDown={getReply}
+            onChange={(event) => {
+              setUserQuery(event.target.value);
+            }}
+            value={userQuery}
+          />
+          <button className="icon" onClick={() => getReply("click")}>
+            <Image src={sendChatIcon} alt="send-chat-icon" />
+          </button>
+        </div>
       </div>
-      <div className="chat-question">
-        <input
-          type="text"
-          onKeyDown={getReply}
-          onChange={(event) => {
-            setUserQuery(event.target.value);
-          }}
-          value={userQuery}
-        />
-        <SendOutlined className="icon" onClick={() => getReply("click")} />
-      </div>
-      <center>Powered by Lucifer.AI</center>
     </div>
   );
 }
