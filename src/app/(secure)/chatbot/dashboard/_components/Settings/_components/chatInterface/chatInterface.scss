@@ -1,6 +1,5 @@
 .chat-interface-parent {
   .training-container {
-   
     display: flex;
     // width: 1208px;
     padding: 24px;
@@ -13,9 +12,7 @@
     background: #fcfcfd;
 
     .training-left-container {
-
       display: flex;
-      flex: 2;
       // width: 560px;
       width: 50%;
       flex-direction: column;
@@ -58,10 +55,10 @@
           font-weight: 500;
           line-height: 24px; /* 150% */
         }
-        .initial-message-button:hover{
+        .initial-message-button:hover {
           background: none;
         }
-        .ant-btn{
+        .ant-btn {
           padding-right: 0px;
         }
       }
@@ -302,7 +299,7 @@
           align-items: center;
           align-self: stretch;
         }
-        .profile-image-container :nth-child(2) :hover{
+        .profile-image-container :nth-child(2) :hover {
           cursor: pointer;
         }
       }
@@ -338,10 +335,10 @@
             font-weight: 500;
             line-height: 24px; /* 150% */
           }
-          .user-message-color-top-btn:hover{
+          .user-message-color-top-btn:hover {
             background: none;
           }
-          .ant-btn{
+          .ant-btn {
             padding-right: 0px;
           }
         }
@@ -366,7 +363,6 @@
       .update-chat-icon-container {
         width: 100%;
         .update-chat-icon-text {
-
           color: #353945;
           text-align: left;
 
@@ -377,14 +373,13 @@
           line-height: 24px; /* 150% */
         }
         .update-chat-icon-image-container {
-          
           display: flex;
           padding-bottom: 12px;
           justify-content: space-between;
           align-items: center;
           align-self: stretch;
         }
-        .update-chat-icon-image-container :nth-child(2):hover{
+        .update-chat-icon-image-container :nth-child(2):hover {
           cursor: pointer;
         }
       }
@@ -525,10 +520,10 @@
             font-weight: 500;
             line-height: 24px; /* 150% */
           }
-          .auto-show-btn:hover{
+          .auto-show-btn:hover {
             background: none;
           }
-          .ant-btn{
+          .ant-btn {
             padding-right: 0px;
           }
         }
@@ -594,14 +589,13 @@
           line-height: 28px; /* 175% */
         }
       }
-      .save-btn:hover{
+      .save-btn:hover {
         cursor: pointer;
       }
     }
     .training-right-container {
-      flex: 1;
-      max-width: 560px;
-      width: 100%;
+      // max-width: 560px;
+      width: 50%;
       display: flex;
       flex-direction: column;
       align-items: flex-start;

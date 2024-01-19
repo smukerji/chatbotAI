@@ -3,15 +3,16 @@ import { Button, Modal, Radio, RadioChangeEvent } from "antd";
 import { redirect, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import "./dashboard.css";
-import Chat from "./components/Chat/OldChat";
-import DeleteModal from "./components/Modal/DeleteModal";
+
+import DeleteModal from "./_components/Modal/DeleteModal";
 import { useCookies } from "react-cookie";
 import Home from "../../home/page";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import { v4 as uuid } from "uuid";
-import Settings from "./components/Settings/OldSettings";
+import Settings from "./_components/Settings/OldSettings";
 import { getDate, getTime } from "../../../_helpers/client/getTime";
+import Chat from "./_components/Chat/Chat";
 
 function Dashboard() {
   const { status } = useSession();
