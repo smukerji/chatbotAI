@@ -9,6 +9,10 @@ declare module "next-auth" {
       /** The user's postal address. */
       address: string;
     };
-    accessToken: string | unknown;
+    accessToken: string;
+    refreshToken: string;
+    provider: string;
+    providerAccountId: string;
+    expiresAt: string;
   }
 }

@@ -35,19 +35,33 @@ const authOptions: NextAuthOptions = {
 
   callbacks: {
     async jwt({ token, account }) {
+      console.log("token", token);
+      console.log("account", account);
       if (account?.provider === "hubspot") {
         token.accessToken = account.access_token;
+        token.provider = account.provider;
+        token.providerAccountId = account.providerAccountId;
+        token.refreshToken = account.refresh_token;
+        token.expiresAt = account.expires_at;
       }
       return token;
     },
     async session({ session, user, token }) {
       // cookies().set("profile-img", user.image!);
       // cookies().set("userId", user.id);
-
-      session.accessToken = token.accessToken;
+      console.log("session", session);
+      console.log("user", user);
       cookies().set("profile-img", token.picture!);
       cookies().set("userId", token.sub!);
-      return session;
+      if (token?.provider === "hubspot") {
+        cookies().set("provider", String(token.provider!));
+        cookies().set("providerAccountId", String(token.providerAccountId!));
+        cookies().set("haccessToken", String(token.accessToken!));
+        cookies().set("hrefreshToken", String(token.refreshToken!));
+        cookies().set("hexpiresAt", String(token.expiresAt!));
+      }
+
+      return Promise.resolve(session);
     },
   },
 };

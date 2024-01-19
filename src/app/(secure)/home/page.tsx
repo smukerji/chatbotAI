@@ -368,7 +368,7 @@ function Home({
                 <Icon Icon={WebsiteIcon} />
                 <h3>Website</h3>
               </li>
-              <li
+              {/* <li
                 className={`${activeSource === "hubspot" ? "active" : ""}`}
                 value={"hubspot"}
                 onClick={() =>
@@ -377,7 +377,7 @@ function Home({
               >
                 <Icon Icon={WebsiteIcon} />
                 <h3>Hubspot CRM</h3>
-              </li>
+              </li> */}
             </ul>
           </div>
         </div>
@@ -411,7 +411,7 @@ function Home({
                 isUpdateChatbot={isUpdateChatbot}
               />
             )}
-            {activeSource === "hubspot" && <Hubspot />}
+            {/* {activeSource === "hubspot" && <Hubspot />} */}
           </div>
           <div className="right" style={{ marginTop: "20px" }}>
             <div className="character-count-container">

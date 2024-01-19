@@ -16,6 +16,7 @@ import Image from "next/image";
 
 import arrowIcon from "../../../../../public/svgs/Feather Icon.svg";
 import { CreateBotContext } from "../../../_helpers/client/Context/CreateBotContext";
+import Hubspot from "@/app/_components/Hubspot/Hubspot";
 
 function Dashboard() {
   const { status } = useSession();
@@ -40,12 +41,12 @@ function Dashboard() {
 
   /// messages
   const [messages, setMessages] = useState(
-    chatbot.initial_message == null
+    chatbot?.initial_message == null
       ? [{ role: "assistant", content: `Hi! What can I help you with?` }]
-      : [{ role: "assistant", content: chatbot.initial_message }]
+      : [{ role: "assistant", content: chatbot?.initial_message }]
   );
   const [messagesTime, setMessagesTime] = useState(
-    chatbot.initial_message == null
+    chatbot?.initial_message == null
       ? [
           {
             role: "assistant",
@@ -62,6 +63,7 @@ function Dashboard() {
   const [fileData, setFileData]: any = useState();
   const [crawlData, setCrawlData]: any = useState();
   // const [qaCharCount, setQACharCount] = useState(0);
+  const [hubspotToken, setHubspotToken]: any = useState();
 
   /// sesstion Id and date for current chat window
   const [sessionID, setSessionID]: any = useState();
@@ -87,8 +89,8 @@ function Dashboard() {
         {
           method: "POST",
           body: JSON.stringify({
-            chatbotId: chatbot.id,
-            userId: cookies.userId,
+            chatbotId: chatbot?.id,
+            userId: cookies?.userId,
           }),
           next: { revalidate: 0 },
         }
@@ -96,21 +98,21 @@ function Dashboard() {
       const content = await response.json();
       /// set the default state for loading the data in home
       setQaData({
-        qaList: content.qaList,
-        qaCount: content.qaCount,
-        qaCharCount: content.qaCharCount,
+        qaList: content?.qaList,
+        qaCount: content?.qaCount,
+        qaCharCount: content?.qaCharCount,
       });
       setTextData({
-        text: content.text,
-        textLength: content.textLength,
+        text: content?.text,
+        textLength: content?.textLength,
       });
       setFileData({
-        defaultFileList: content.defaultFileList,
-        fileTextLength: content.fileTextLength,
+        defaultFileList: content?.defaultFileList,
+        fileTextLength: content?.fileTextLength,
       });
       setCrawlData({
-        crawledData: content.crawlData,
-        crawledDataLength: content.crawlDataLength,
+        crawledData: content?.crawlData,
+        crawledDataLength: content?.crawlDataLength,
       });
       setLoading(false);
     } catch (error) {
@@ -220,8 +222,17 @@ function Dashboard() {
                 textData={textData}
                 fileData={fileData}
                 crawlingData={crawlData}
-                chatbotId={chatbot.id}
-                chatbotName={chatbot.name}
+                chatbotId={chatbot?.id}
+                chatbotName={chatbot?.name}
+              />
+            </>
+          )}
+          {editChatbot == "integrations" && !loading && (
+            <>
+              <Hubspot
+                chatbotId={chatbot?.id}
+                chatbotName={chatbot?.name}
+                hubspotToken={hubspotToken}
               />
             </>
           )}

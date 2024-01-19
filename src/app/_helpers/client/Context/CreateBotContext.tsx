@@ -35,6 +35,7 @@ export const CreateBotDataProvider = ({ children }: any) => {
 
     //hubspot data
     isHubspotConnected: false,
+    hubspotAccessToken: "",
 
     isUpdateChatbot: false,
 
