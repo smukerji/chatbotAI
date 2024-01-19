@@ -12,6 +12,7 @@ import refreshBtn from "../../../../../../../public/svgs/refreshbtn.svg";
 import likeIcon from "../../../../../../../public/svgs/like.svg";
 import dislikeIcon from "../../../../../../../public/svgs/dislike.svg";
 import sendChatIcon from "../../../../../../../public/svgs/send.svg";
+import { v4 as uuid } from "uuid";
 
 function Chat({
   chatbot,
@@ -21,6 +22,8 @@ function Chat({
   setMessagesTime,
   sessionID,
   sessionStartDate,
+  setSessionID,
+  setSessionStartDate,
 }: any) {
   const [cookies, setCookies] = useCookies(["userId"]);
 
@@ -228,6 +231,29 @@ function Chat({
     // }
   }
 
+  /// refresh the chat window
+  const refreshChat = () => {
+    setMessages(
+      chatbot.initial_message == null
+        ? [{ role: "assistant", content: `Hi! What can I help you with?` }]
+        : [{ role: "assistant", content: chatbot.initial_message }]
+    );
+    setMessagesTime(
+      chatbot.initial_message == null
+        ? [
+            {
+              role: "assistant",
+              content: `Hi! What can I help you with?`,
+              messageTime: getTime(),
+            },
+          ]
+        : [{ role: "assistant" }]
+    );
+
+    setSessionID(uuid());
+    setSessionStartDate(getDate());
+  };
+
   // console.log(messageImages);
 
   return (
@@ -301,7 +327,7 @@ function Chat({
         <div className="header">
           <span>Powered by Lucifer.AI</span>
           <div className="action-btns">
-            <Image src={refreshBtn} alt="refresh-btn" />
+            <Image src={refreshBtn} alt="refresh-btn" onClick={refreshChat} />
             <Image src={exportBtn} alt="export-btn" />
           </div>
         </div>

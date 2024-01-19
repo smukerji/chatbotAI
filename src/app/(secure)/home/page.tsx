@@ -98,10 +98,10 @@ function Home({
   const initialCrawlData =
     crawlingData != undefined &&
     crawlingData?.crawledData != undefined &&
-    crawlingData?.crawledData.length >= 0
+    crawlingData?.crawledData.length > 0
       ? crawlingData?.crawledData[0]
       : [];
-  const initialCrawlDataHash = initialCrawlData.length;
+  const initialCrawlDataHash = initialCrawlData?.length;
 
   /// total characters count
   const tempQaCharCount = qaData ? qaData.qaCharCount : 0;
@@ -119,7 +119,6 @@ function Home({
     const searchParams = new URLSearchParams(window.location.search);
     const paramValue = searchParams.get("chatbotName");
 
-    console.log(paramValue);
 
     /// return the use to chatbot screen if chatbot name is empty
     if ((paramValue == "" || !paramValue) && !chatbotName) {
@@ -128,13 +127,13 @@ function Home({
     }
     botContext.handleChange("chatbotName")(paramValue);
 
-    /// total characters count
-    botContext.handleChange("totalCharCount")(
-      tempQaCharCount +
-        tempTextCharCount +
-        tempFileTextCount +
-        tempCrawlDataCount
-    );
+    // /// total characters count
+    // botContext.handleChange("totalCharCount")(
+    //   tempQaCharCount +
+    //     tempTextCharCount +
+    //     tempFileTextCount +
+    //     tempCrawlDataCount
+    // );
 
     /// text cahracter count and text
     botContext.handleChange("textCharCount")(tempTextCharCount);
@@ -498,7 +497,7 @@ function Home({
                     : initialQAHash === currentQAHash
                     ? botDetails?.deleteCrawlList.length > 0
                       ? false
-                      : initialCrawlDataHash != crawledList.length
+                      : initialCrawlDataHash != crawledList?.length
                       ? false
                       : true
                     : false

@@ -152,6 +152,16 @@ function Register() {
                 type="text"
                 placeholder="Enter your First Name"
                 onChange={checkFirstName}
+                onKeyDown={(e) => {
+                  if (e.key == "Enter")
+                    if (
+                      emailMessage == "" &&
+                      passwordMessage == "" &&
+                      firstNameMessage == "" &&
+                      lastNameMessage == ""
+                    )
+                      register();
+                }}
               />
               <span>{firstNameMessage}</span>
             </div>
@@ -160,6 +170,16 @@ function Register() {
                 type="text"
                 placeholder="Enter your Last Name"
                 onChange={checklastName}
+                onKeyDown={(e) => {
+                  if (e.key == "Enter")
+                    if (
+                      emailMessage == "" &&
+                      passwordMessage == "" &&
+                      firstNameMessage == "" &&
+                      lastNameMessage == ""
+                    )
+                      register();
+                }}
               />
               <span>{lastNameMessage}</span>
             </div>
@@ -168,6 +188,16 @@ function Register() {
                 type="text"
                 placeholder="Enter your email"
                 onChange={checkEmail}
+                onKeyDown={(e) => {
+                  if (e.key == "Enter")
+                    if (
+                      emailMessage == "" &&
+                      passwordMessage == "" &&
+                      firstNameMessage == "" &&
+                      lastNameMessage == ""
+                    )
+                      register();
+                }}
               />
               <span>{emailMessage}</span>
             </div>
@@ -176,6 +206,16 @@ function Register() {
                 type="password"
                 placeholder="Enter your password"
                 onChange={checkPassword}
+                onKeyDown={(e) => {
+                  if (e.key == "Enter")
+                    if (
+                      emailMessage == "" &&
+                      passwordMessage == "" &&
+                      firstNameMessage == "" &&
+                      lastNameMessage == ""
+                    )
+                      register();
+                }}
               />
               <span>{passwordMessage}</span>
             </div>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import "./../general/general.scss";
 import Icon from "@/app/_components/Icon/Icon";
 import DocumentIcon from "@/assets/svg/DocumentIcon";
@@ -6,9 +6,41 @@ import DeleteIcon from "@/assets/svg/DeleteIcon";
 import { useCookies } from "react-cookie";
 import { message } from "antd";
 import DeleteModal from "../../../Modal/DeleteModal";
+import { CreateBotContext } from "../../../../../../../_helpers/client/Context/CreateBotContext";
 
-function General({ chatbotId }: any) {
+function General({ chatbotId, chatbotName }: any) {
+  const botContext: any = useContext(CreateBotContext);
+  const botDetails = botContext?.createBotInfo;
+
   const [cookies, setCookies]: any = useCookies(["userId"]);
+
+  /// this is use to check if chatbot name has been changed or not
+  const [currentChatbotName, setCurrentChatbotName] = useState(chatbotName);
+
+  const changeName = async () => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/api/setting/api`,
+        {
+          method: "PUT",
+          body: JSON.stringify({
+            chatbotId: chatbotId,
+            userId: cookies?.userId,
+            chatbotRename: currentChatbotName,
+          }),
+          next: { revalidate: 0 },
+        }
+      );
+      /// displaying status
+      const data = await res.json();
+
+      message.success(data?.message).then(() => {
+        window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot`;
+      });
+    } catch (error) {
+      console.log("Error while renaming chatbot", error);
+    }
+  };
 
   /// managing delete chatbot
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
@@ -41,17 +73,28 @@ function General({ chatbotId }: any) {
       <div className="characters-container">
         <div className="characters-details">Characters Used</div>
         <div>
-          1023<span className="span">/12000</span>
+          {botDetails?.totalCharCount}
+          <span className="span">/12000</span>
         </div>
       </div>
       <div className="parent-name-btn">
         <div className="name-container">
           <div className="name-container-details">Name</div>
           <div>
-            <input className="input-box"></input>
+            <input
+              className="input-box"
+              value={currentChatbotName}
+              onChange={(e) => {
+                setCurrentChatbotName(e.target.value);
+              }}
+            ></input>
           </div>
         </div>
-        <button className="save-btn">
+        <button
+          className="save-btn"
+          disabled={currentChatbotName == chatbotName}
+          onClick={() => changeName()}
+        >
           <div className="save-btn-content">Save</div>
         </button>
       </div>

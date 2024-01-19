@@ -160,12 +160,12 @@ function Website({ websiteCharCount, totalCharCount, isUpdateChatbot }: any) {
         This will crawl all the links starting with the URL (not including files
         on the website).
         <span>
-          {crawledList.length}
+          {crawledList?.length}
           <span>/10 links</span>
         </span>
       </span>
       <hr />
-      {crawledList.length > 0 && (
+      {crawledList?.length > 0 && (
         <h2 className="website-text">Included links</h2>
       )}
       <div className="fetched-links-container">

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import loginBg from "../../../../../public/sections-images/common/contact-us-bg-cover.png";
 import luciferIcon from "../../../../../public/svgs/lucifer-ai-logo.svg";
@@ -109,6 +109,10 @@ function Login() {
                 type="text"
                 placeholder="Enter your email"
                 onChange={checkEmail}
+                onKeyDown={(e) => {
+                  if (e.key == "Enter")
+                    if (emailMessage == "" && passwordMessage == "") login();
+                }}
               />
               <span>{emailMessage}</span>
             </div>
@@ -117,6 +121,10 @@ function Login() {
                 type="password"
                 placeholder="Enter your password"
                 onChange={checkPassword}
+                onKeyDown={(e) => {
+                  if (e.key == "Enter")
+                    if (emailMessage == "" && passwordMessage == "") login();
+                }}
               />
               <span>{passwordMessage}</span>
             </div>

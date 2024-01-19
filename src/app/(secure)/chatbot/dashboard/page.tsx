@@ -80,47 +80,67 @@ function Dashboard() {
     setOpen(true);
   };
 
-  // useEffect(() => {
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      /// get chatbot details
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard/api`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            chatbotId: chatbot.id,
-            userId: cookies.userId,
-          }),
-          next: { revalidate: 0 },
-        }
-      );
-      const content = await response.json();
-      /// set the default state for loading the data in home
-      setQaData({
-        qaList: content.qaList,
-        qaCount: content.qaCount,
-        qaCharCount: content.qaCharCount,
-      });
-      setTextData({
-        text: content.text,
-        textLength: content.textLength,
-      });
-      setFileData({
-        defaultFileList: content.defaultFileList,
-        fileTextLength: content.fileTextLength,
-      });
-      setCrawlData({
-        crawledData: content.crawlData,
-        crawledDataLength: content.crawlDataLength,
-      });
-      setLoading(false);
-    } catch (error) {
-      setLoading(false);
-      console.error("Error retriving chatbot details:", error);
-    }
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        /// get chatbot details
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard/api`,
+          {
+            method: "POST",
+            body: JSON.stringify({
+              chatbotId: chatbot.id,
+              userId: cookies.userId,
+            }),
+            next: { revalidate: 0 },
+          }
+        );
+        const content = await response.json();
+
+        /// total characters count
+        // const tempQaCharCount = qaData ? qaData.qaCharCount : 0;
+        // const tempTextCharCount = textData ? textData.textLength : 0;
+        // const tempFileTextCount = fileData ? fileData.fileTextLength : 0;
+        // const tempCrawlDataCount = crawlingData
+        //   ? crawlingData?.crawledDataLength
+        //   : 0;
+
+        /// total characters count
+        botContext.handleChange("totalCharCount")(
+          content.qaCharCount +
+            content.textLength +
+            content.fileTextLength +
+            content.crawlDataLength
+        );
+
+        /// set the default state for loading the data in home
+        setQaData({
+          qaList: content.qaList,
+          qaCount: content.qaCount,
+          qaCharCount: content.qaCharCount,
+        });
+        setTextData({
+          text: content.text,
+          textLength: content.textLength,
+        });
+        setFileData({
+          defaultFileList: content.defaultFileList,
+          fileTextLength: content.fileTextLength,
+        });
+        setCrawlData({
+          crawledData: content.crawlData,
+          crawledDataLength: content.crawlDataLength,
+        });
+        setLoading(false);
+      } catch (error) {
+        setLoading(false);
+        console.error("Error retriving chatbot details:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const [loading, setLoading] = useState(false);
   if (status === "authenticated" || cookies?.userId) {
@@ -166,7 +186,7 @@ function Dashboard() {
                 className={`${editChatbot === "sources" ? "active" : ""}`}
                 value={"sources"}
                 onClick={() => {
-                  fetchData();
+                  // fetchData();
                   botContext?.handleChange("editChatbot")("sources");
                 }}
               >
@@ -218,13 +238,15 @@ function Dashboard() {
                 setMessagesTime={setMessagesTime}
                 sessionID={sessionID}
                 sessionStartDate={sessionStartDate}
+                setSessionID={setSessionID}
+                setSessionStartDate={setSessionStartDate}
               />
             </>
           )}
           {/*------------------------------------------settings-component----------------------------------------------*/}
           {editChatbot == "settings" && (
             <>
-              <Settings chatbotId={chatbot.id} />
+              <Settings chatbotId={chatbot.id} chatbotName={chatbot.name} />
             </>
           )}
 

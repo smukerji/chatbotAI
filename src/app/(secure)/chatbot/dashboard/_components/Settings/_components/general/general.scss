@@ -144,6 +144,10 @@
       border-radius: 12px;
       border: 0px;
       background: #2e58ea;
+
+      &:disabled {
+        background: #2e57ea81;
+      }
       .save-btn-content {
         color: #fcfcfd;
         text-align: center;
