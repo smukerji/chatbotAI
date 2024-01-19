@@ -150,35 +150,34 @@ function History({ chatbotId }: any) {
             </>
           )}
         </div>
-      </div>
-
-      {/*------------------------------------------last-7-days-chat----------------------------------------------*/}
-      <div className="detail">
-        {chatHistoryList?.lastSevenDay?.chats && (
-          <>
-            <div className="time">Last 7 days</div>
-            {Object.entries(chatHistoryList?.lastSevenDay?.chats)?.map(
-              (data: any, index: any) => {
-                return (
-                  <div
-                    className={`first-message ${
-                      activeCurrentChatHistory === `lastSevenDay${index}`
-                        ? "active"
-                        : ""
-                    }`}
-                    key={index}
-                    onClick={() => {
-                      setCurrentChatHistory(data[1]?.messages);
-                      setActiveCurrentChatHistory("lastSevenDay" + index);
-                    }}
-                  >
-                    {data[1]?.messages[1]?.content}
-                  </div>
-                );
-              }
-            )}
-          </>
-        )}
+        {/*------------------------------------------last-7-days-chat----------------------------------------------*/}
+        <div className="detail">
+          {chatHistoryList?.lastSevenDay?.chats && (
+            <>
+              <div className="time">Last 7 days</div>
+              {Object.entries(chatHistoryList?.lastSevenDay?.chats)?.map(
+                (data: any, index: any) => {
+                  return (
+                    <div
+                      className={`first-message ${
+                        activeCurrentChatHistory === `lastSevenDay${index}`
+                          ? "active"
+                          : ""
+                      }`}
+                      key={index}
+                      onClick={() => {
+                        setCurrentChatHistory(data[1]?.messages);
+                        setActiveCurrentChatHistory("lastSevenDay" + index);
+                      }}
+                    >
+                      {data[1]?.messages[1]?.content}
+                    </div>
+                  );
+                }
+              )}
+            </>
+          )}
+        </div>
       </div>
 
       {/*------------------------------------------right-section----------------------------------------------*/}

@@ -18,7 +18,7 @@ import { useSession } from "next-auth/react";
 import { Spin, message } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import { useCookies } from "react-cookie";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 const crypto = require("crypto");
 
 function Home({
@@ -31,6 +31,7 @@ function Home({
   chatbotName,
 }: any) {
   const { status } = useSession();
+  const router = useRouter();
 
   /// loading icon
   const antIcon = (
@@ -93,9 +94,13 @@ function Home({
     .digest("hex");
 
   /// creating the hash of initial website data to compare it later with current website hash
-  const initialCrawlData = crawlingData?.crawledData[0]
-    ? crawlingData?.crawledData[0]
-    : [];
+
+  const initialCrawlData =
+    crawlingData != undefined &&
+    crawlingData?.crawledData != undefined &&
+    crawlingData?.crawledData.length >= 0
+      ? crawlingData?.crawledData[0]
+      : [];
   const initialCrawlDataHash = initialCrawlData.length;
 
   /// total characters count
@@ -113,6 +118,14 @@ function Home({
     // Accessing search parameters using window.location.search to get chatbotname
     const searchParams = new URLSearchParams(window.location.search);
     const paramValue = searchParams.get("chatbotName");
+
+    console.log(paramValue);
+
+    /// return the use to chatbot screen if chatbot name is empty
+    if ((paramValue == "" || !paramValue) && !chatbotName) {
+      router.push("/chatbot");
+      return;
+    }
     botContext.handleChange("chatbotName")(paramValue);
 
     /// total characters count

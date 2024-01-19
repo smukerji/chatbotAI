@@ -3,20 +3,22 @@ import { Button, Modal, Radio, RadioChangeEvent } from "antd";
 import { redirect, useSearchParams } from "next/navigation";
 import React, { useContext, useEffect, useState } from "react";
 import "./dashboard.scss";
-import Chat from "./components/Chat/Chat";
-import DeleteModal from "./components/Modal/DeleteModal";
+import Chat from "./_components/Chat/Chat";
+import DeleteModal from "./_components/Modal/DeleteModal";
 import { useCookies } from "react-cookie";
 import Home from "../../home/page";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import { v4 as uuid } from "uuid";
-import Settings from "./components/Settings/Settings";
+import Settings from "./_components/Settings/Settings";
 import { getDate, getTime } from "../../../_helpers/client/getTime";
 import Image from "next/image";
 
 import arrowIcon from "../../../../../public/svgs/Feather Icon.svg";
 import { CreateBotContext } from "../../../_helpers/client/Context/CreateBotContext";
-import History from "./components/History/History";
+import History from "./_components/History/History";
+import EmbedSite from "./_components/EmbedSite/EmbedSite";
+import Integration from "./_components/Integration/Integration";
 
 function Dashboard() {
   const { status } = useSession();
@@ -205,6 +207,7 @@ function Dashboard() {
         </div>
 
         <div className="bottom">
+          {/*------------------------------------------chatbot-component----------------------------------------------*/}
           {editChatbot == "chatbot" && (
             <>
               <Chat
@@ -218,11 +221,14 @@ function Dashboard() {
               />
             </>
           )}
-
+          {/*------------------------------------------settings-component----------------------------------------------*/}
           {editChatbot == "settings" && (
-            <>{/* <Settings chatbotId={chatbot.id} /> */}</>
+            <>
+              <Settings chatbotId={chatbot.id} />
+            </>
           )}
 
+          {/*------------------------------------------sources-component----------------------------------------------*/}
           {editChatbot == "sources" && !loading && (
             <>
               <Home
@@ -237,6 +243,21 @@ function Dashboard() {
             </>
           )}
 
+          {/*------------------------------------------integrations-component----------------------------------------------*/}
+          {editChatbot == "integrations" && !loading && (
+            <>
+              <Integration />
+            </>
+          )}
+
+          {/*------------------------------------------embed-on-site-component----------------------------------------------*/}
+          {editChatbot == "embedSite" && !loading && (
+            <>
+              <EmbedSite chatbotId={chatbot.id} />
+            </>
+          )}
+
+          {/*------------------------------------------history-component----------------------------------------------*/}
           {editChatbot == "history" && <History chatbotId={chatbot.id} />}
         </div>
       </div>

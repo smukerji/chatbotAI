@@ -11,8 +11,11 @@ import "./header.scss";
 import { useCookies } from "react-cookie";
 import { useUserService } from "../../_services/useUserService";
 import { signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 function Header() {
+  const router = useRouter();
+
   /// create a ref for menu to close it when user click outside of the mene-container
   const menuRef: any = useRef(null);
   const [cookies, setCookie] = useCookies([
@@ -62,7 +65,14 @@ function Header() {
   return (
     <div className="header-container">
       {/*------------------------------------------logo----------------------------------------------*/}
-      <Image className="logo" src={LuciferLogo} alt="img-logo" />
+      <Image
+        className="logo"
+        src={LuciferLogo}
+        alt="img-logo"
+        onClick={() => {
+          window.location.href = "/";
+        }}
+      />
 
       <div className="header-content">
         {/*------------------------------------------messages limit----------------------------------------------*/}
@@ -105,7 +115,7 @@ function Header() {
               {/*------------------------------------------account actions menu----------------------------------------------*/}
               <div className="account-actions-container">
                 <ul>
-                  <li onClick={() => alert("Account settings")}>
+                  <li onClick={() => router.push("/home/account-settings")}>
                     <Image src={profileIcon} alt="profile-icon" />
                     Account settings
                   </li>

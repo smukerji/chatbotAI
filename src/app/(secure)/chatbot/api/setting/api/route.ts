@@ -88,7 +88,7 @@ async function retriveChatbotSettings(request: NextRequest) {
     /// get yesterday chat conversation
     else if (timeDiff == yesterDayInMillis) yesterday = { ...obj };
     /// get last 7 days chat conversation
-    else if (timeDiff == sevenDayInMillis) lastSevenDay = { ...obj };
+    else if (timeDiff > yesterDayInMillis) lastSevenDay = { ...obj };
     /// get more than last 7 days chat conversation
     else if (timeDiff == moreThanSevenDayInMillis)
       moreThanLastSevenDay = { ...obj };

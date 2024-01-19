@@ -16,6 +16,7 @@ export default function AuthBtn() {
     await userService.logout();
   }
 
+  /// check if the the user has an active session
   useEffect(() => {
     // Make a request to the server to get the data you need
     const verifyJwt = async () => {
@@ -35,7 +36,7 @@ export default function AuthBtn() {
 
   return (
     <>
-      <div
+      {/* <div
         className="login-signup"
         onClick={async (e) => {
           if (!isLoggedIn) {
@@ -55,7 +56,29 @@ export default function AuthBtn() {
         >
           {isLoggedIn ? "Log out" : "Sign up / Login"}
         </span>
-      </div>
+      </div> */}
+      {isLoggedIn ? (
+        <div
+          className="try-free-btn"
+          onClick={() => {
+            window.location.href = "/chatbot";
+          }}
+        >
+          My Chatbots
+        </div>
+      ) : (
+        <>
+          <div
+            className="login-btn"
+            onClick={() => {
+              window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot`;
+            }}
+          >
+            Log In
+          </div>
+          <div className="try-free-btn">Try for Free</div>
+        </>
+      )}
     </>
   );
 }

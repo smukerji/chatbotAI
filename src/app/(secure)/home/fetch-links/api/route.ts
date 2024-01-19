@@ -311,6 +311,12 @@ async function fetchLinks(request: NextRequest) {
           charCount: text.length,
         });
 
+        if (crawledData.length === 50) {
+          return {
+            fetchedLinks: crawledData,
+          };
+        }
+
         const newUrls = await extractUrls(page, sourceUrl);
         newUrls.forEach((newUrl: any) => {
           if (!visitedUrls.get(newUrl)) {

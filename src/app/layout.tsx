@@ -5,11 +5,11 @@ import { Layout } from "antd";
 import { SessionProvider } from "next-auth/react";
 // import AuthBtn from "./_components/AuthBtn";
 import dynamic from "next/dynamic";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import ContactHeader from "./_components/Contact-Header/Contact-Header";
 import Header from "./_components/Header/Header";
 
-const AuthBtn = dynamic(() => import("./_components/AuthBtn"), { ssr: false });
+// const AuthBtn = dynamic(() => import("./_components/AuthBtn"), { ssr: false });
 const AuthHeader = dynamic(() => import("./_components/AuthHeader"), {
   ssr: false,
 });
@@ -20,6 +20,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   // const { Header } = Layout;
+  const [path, setPath] = useState("");
+
+  /// usestate to check whether to display header or not
+  useEffect(() => {
+    setPath(window.location.pathname);
+  });
 
   return (
     <html lang="en">
@@ -34,23 +40,7 @@ export default function RootLayout({
 
       <body>
         <SessionProvider>
-          {/* <ContactHeader />
-          <Header /> */}
-          {/* <Header>
-            <span className="logo">
-              <Link href={process.env.NEXT_PUBLIC_WEBSITE_URL + ""}>
-                ChatbotAI
-              </Link>
-            </span>
-            <div>
-              <Link href={`${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot`}>
-                My Chatbots
-              </Link>
-              <AuthBtn />
-            </div>
-          </Header> */}
-          {/* <Header /> */}
-          <AuthHeader />
+          {path !== "/" && <AuthHeader />}
           {children}
         </SessionProvider>
       </body>

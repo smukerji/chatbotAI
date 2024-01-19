@@ -1,15 +1,18 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import "./hero-header.scss";
 import { Button, Input, Space } from "antd";
 import Image from "next/image";
 import LuciferLogo from "../../../../public/svgs/lucifer-ai-logo.svg";
 import smsIcon from "../../../../public/svgs/sms.svg";
 import { useRouter } from "next/navigation";
+import { useCookies } from "react-cookie";
+import { useSession } from "next-auth/react";
+import dynamic from "next/dynamic";
+const AuthBtn = dynamic(() => import("../AuthBtn"), { ssr: false });
 
 function HeroHeader() {
-  const router = useRouter();
   return (
     <div className="hero-header">
       <div className="header-title-container">
@@ -32,15 +35,8 @@ function HeroHeader() {
         </div>
 
         <div className="login-register-container">
-          <div
-            className="login-btn"
-            onClick={() => {
-              window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot`;
-            }}
-          >
-            Log In
-          </div>
-          <div className="try-free-btn">Try for Free</div>
+          {/* If user is logged in display my Chatbot else try for free */}
+          <AuthBtn />
         </div>
       </div>
 

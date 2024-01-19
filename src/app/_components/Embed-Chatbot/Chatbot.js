@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import "./chatbot.css"; // You can style it with CSS
 import { MessageOutlined, CloseOutlined } from "@ant-design/icons";
-import Chat from "@/app/(secure)/chatbot/dashboard/components/Chat/Chat";
+import Chat from "@/app/(secure)/chatbot/dashboard/_components/Chat/Chat";
 import { useSearchParams } from "next/navigation";
 
 function Chatbot() {

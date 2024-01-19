@@ -10,8 +10,8 @@ import { Spin } from "antd";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import dynamic from "next/dynamic";
-import DeleteModal from "./dashboard/components/Modal/DeleteModal";
-import ShareModal from "./dashboard/components/Modal/ShareModal";
+import DeleteModal from "./dashboard/_components/Modal/DeleteModal";
+import ShareModal from "./dashboard/_components/Modal/ShareModal";
 
 const antIcon = (
   <LoadingOutlined style={{ fontSize: 24, color: "black" }} spin />

@@ -21,17 +21,17 @@ import menuIcon from "../../../../public/svgs/menu-icon.svg";
 // import gridIcon from "../../../../public/svgs/grid-icon.svg";
 import GridLayout from "./_components/GridLayout";
 import TableLayout from "./_components/TableLayout";
-import DeleteModal from "./dashboard/components/Modal/DeleteModal";
-import ShareModal from "./dashboard/components/Modal/ShareModal";
+import DeleteModal from "./dashboard/_components/Modal/DeleteModal";
+import ShareModal from "./dashboard/_components/Modal/ShareModal";
 import { redirect } from "next/navigation";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import RenameModal from "./dashboard/components/Modal/RenameModal";
+import RenameModal from "./dashboard/_components/Modal/RenameModal";
 import Icon from "../../_components/Icon/Icon";
 import GridIcon from "../../../assets/svg/GridIcon";
 import MenuIcon from "../../../assets/svg/MenuIcon";
-import NewChatbotNameModal from "./dashboard/components/Modal/NewChatbotNameModal";
+import NewChatbotNameModal from "./dashboard/_components/Modal/NewChatbotNameModal";
 // import GridIcon from "../../as";
 
 const antIcon = (
