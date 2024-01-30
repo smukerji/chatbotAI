@@ -79,6 +79,9 @@ function GridLayout({
               onMouseLeave={() => {
                 setCurrentChatbotId(null);
               }}
+              onClick={() => {
+                openChatbot(data.id);
+              }}
               style={{
                 background: `${
                   data.id === currentChatbotId
@@ -91,23 +94,13 @@ function GridLayout({
               //   onClick={() => openMenu && setOpenMenu(null)}
             >
               <Image src={chatbotBg} alt={"chatbot-img"} />
-              <div className="name" onClick={() => openChatbot(data.id)}>
+              <div className="name">
                 {data.name}
-                <Image
-                  // style={{
-                  //   visibility: `${
-                  //     data.id === chatbotId
-                  //       ? "visible"
-                  //       : openMenu?.[index]
-                  //       ? "visible"
-                  //       : "hidden"
-                  //   }`,
-                  // }}
+                {/* <Image
                   className="open-icon"
                   src={chatbotOpenIcon}
                   alt={"chatbot-open-icon"}
-                  // onClick={() => openChatbot(data.id)}
-                />
+                /> */}
               </div>
 
               {/* opening the menu for chatbot actions */}
@@ -124,7 +117,8 @@ function GridLayout({
                 className="menu-icon"
                 src={chatbotMenuIcon}
                 alt={"chatbot-menu-icon"}
-                onClick={() => {
+                onClick={(event) => {
+                  event.stopPropagation();
                   changeMenu({ [index]: !openMenu?.[index] });
                   setChatbotId(data.id);
                 }}

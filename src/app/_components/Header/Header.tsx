@@ -151,6 +151,7 @@ function Header() {
                   } else if (session?.user || userId) {
                     logout();
                     signOut();
+                    window.location.href = "/";
                   }
                 }}
               >

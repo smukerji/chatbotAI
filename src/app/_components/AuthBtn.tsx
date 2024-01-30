@@ -71,7 +71,8 @@ export default function AuthBtn() {
           <div
             className="login-btn"
             onClick={() => {
-              window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot`;
+              // window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot`;
+              window.location.href = `/account/login`;
             }}
           >
             Log In

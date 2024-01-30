@@ -2,6 +2,7 @@ import { message } from "antd";
 import React from "react";
 import deleteIcon from "../../../../public/create-chatbot-svgs/delete-icon.svg";
 import uploadIcon from "../../../../public/create-chatbot-svgs/image-upload-icon.svg";
+import deleteImgIcon from "../../../../public/create-chatbot-svgs/img-delete-icon.svg";
 import Image from "next/image";
 import "./qa-add.scss";
 
@@ -25,6 +26,10 @@ function QAAdd({
       message.error("Invalid file format. Please select an image.");
       return;
     }
+  };
+
+  const removeImage = () => {
+    onImageChange("");
   };
 
   // Function to check if a file is an image
@@ -72,11 +77,30 @@ function QAAdd({
               Upload Image
             </label>
             <span className="file-name">
-              {typeof fileName == "string"
-                ? fileName
-                : fileName
-                ? fileName.name
-                : "No file chosen"}
+              {typeof fileName == "string" ? (
+                <>
+                  {fileName}{" "}
+                  {fileName.toLowerCase() !=
+                    "No file uploaded".toLowerCase() && (
+                    <Image
+                      src={deleteImgIcon}
+                      alt="img-delete-icon"
+                      onClick={removeImage}
+                    />
+                  )}
+                </>
+              ) : fileName ? (
+                <>
+                  {fileName.name}{" "}
+                  <Image
+                    src={deleteImgIcon}
+                    alt="img-delete-icon"
+                    onClick={removeImage}
+                  />
+                </>
+              ) : (
+                "No file chosen"
+              )}
             </span>
           </div>
         </div>

@@ -14,6 +14,12 @@ async function dataSources(request: any) {
   const collection = db?.collection("chatbots-data");
   const cursor = await collection?.find({ chatbotId: chatbotId }).toArray();
 
+  /// get the chatbot name from ID (needed if user has updated the chatbot name)
+  const chatbotCollection = db?.collection("user-chatbots");
+  const chatbotDetails = await chatbotCollection?.findOne({
+    chatbotId: chatbotId,
+  });
+
   /// filter the source as per home component
   let qaCount = 0;
   let qaCharCount = 0;
@@ -67,5 +73,6 @@ async function dataSources(request: any) {
     fileTextLength,
     crawlData,
     crawlDataLength,
+    chatbotName: chatbotDetails?.chatbotName,
   };
 }

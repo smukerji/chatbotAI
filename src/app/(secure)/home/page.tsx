@@ -119,13 +119,14 @@ function Home({
     const searchParams = new URLSearchParams(window.location.search);
     const paramValue = searchParams.get("chatbotName");
 
-
     /// return the use to chatbot screen if chatbot name is empty
     if ((paramValue == "" || !paramValue) && !chatbotName) {
       router.push("/chatbot");
       return;
     }
-    botContext.handleChange("chatbotName")(paramValue);
+
+    if (botDetails?.chatbotName == "")
+      botContext.handleChange("chatbotName")(paramValue);
 
     // /// total characters count
     // botContext.handleChange("totalCharCount")(
@@ -267,7 +268,8 @@ function Home({
         messageApi
           .open({
             type: "error",
-            content: "Something went wrong while creating custom bot",
+            content:
+              "Something went wrong while creating custom bot. Please refresh the page and try again!",
           })
           .then(() => {
             botContext?.handleChange("isLoading")(false);
@@ -346,9 +348,16 @@ function Home({
               <li
                 className={`${activeSource === "document" ? "active" : ""}`}
                 value={"document"}
-                onClick={() =>
-                  botContext?.handleChange("activeSource")("document")
-                }
+                onClick={() => {
+                  if (
+                    botDetails?.activeSource === "website" &&
+                    botDetails?.isLoading
+                  ) {
+                    alert("Crawling in progress. Cannot interrupt");
+                    return;
+                  }
+                  botContext?.handleChange("activeSource")("document");
+                }}
               >
                 <Icon Icon={DocumentIcon} />
                 <h3>Document</h3>
@@ -356,7 +365,16 @@ function Home({
               <li
                 className={`${activeSource === "text" ? "active" : ""}`}
                 value={"text"}
-                onClick={() => botContext?.handleChange("activeSource")("text")}
+                onClick={() => {
+                  if (
+                    botDetails?.activeSource === "website" &&
+                    botDetails?.isLoading
+                  ) {
+                    alert("Crawling in progress. Cannot interrupt");
+                    return;
+                  }
+                  botContext?.handleChange("activeSource")("text");
+                }}
               >
                 <Icon Icon={TextIcon} />
                 <h3>Text</h3>
@@ -364,7 +382,16 @@ function Home({
               <li
                 className={`${activeSource === "qa" ? "active" : ""}`}
                 value={"qa"}
-                onClick={() => botContext?.handleChange("activeSource")("qa")}
+                onClick={() => {
+                  if (
+                    botDetails?.activeSource === "website" &&
+                    botDetails?.isLoading
+                  ) {
+                    alert("Crawling in progress. Cannot interrupt");
+                    return;
+                  }
+                  botContext?.handleChange("activeSource")("qa");
+                }}
               >
                 <Icon Icon={QAIcon} />
                 <h3>Q&A</h3>
@@ -419,8 +446,9 @@ function Home({
               <div className="items-character-count-container">
                 {defaultFileList?.length > 0 && (
                   <p>
-                    {defaultFileList.length} Files ({filesCharCount} detected
-                    chars)
+                    {defaultFileList.length}{" "}
+                    {defaultFileList.length > 1 ? "Files" : "File"} (
+                    {filesCharCount} detected chars)
                   </p>
                 )}
                 {/* {(defaultFileList?.length == 1 && (
@@ -458,12 +486,15 @@ function Home({
                     {qaCount} Q&A ({qaCharCount} chars)
                   </p>
                 )}
-                {textCharCount > 0 && <p>{textCharCount} text input chars</p>}
+                {textCharCount > 0 && (
+                  <p>Text ({textCharCount} detected chars)</p>
+                )}
 
                 {crawledList?.length > 0 && (
                   <p>
-                    {crawledList.length} Links ({websiteCharCount} detected
-                    chars)
+                    {crawledList.length}{" "}
+                    {crawledList.length > 1 ? "Links" : "Link"} (
+                    {websiteCharCount} detected chars)
                   </p>
                 )}
               </div>

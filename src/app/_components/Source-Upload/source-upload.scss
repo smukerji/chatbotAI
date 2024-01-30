@@ -9,6 +9,7 @@
     .dragger-wrapper {
         max-height: 50%;
         background: #fcfcfd;
+        border-radius: 16px;
 
         .ant-upload-drag-icon {
             margin-top: 40px;
@@ -47,13 +48,13 @@
 
         .ant-upload-drag-container {
             background: #fcfcfd;
+            border-radius: 16px;
         }
     }
 
     .ant-upload-list {
         display: none;
     }
-
     .attached-files-container {
         padding: 0 18px;
         .text {

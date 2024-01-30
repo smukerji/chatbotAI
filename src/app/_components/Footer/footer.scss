@@ -75,8 +75,10 @@
                 align-items: center;
                 gap: 11px;
                 border-radius: 12px;
-                background: #23262f;
-                // appearance: none;
+                appearance: none;
+                background: #23262f url(/_next/static/media/arrow-down.83167121.svg) no-repeat;
+                background-position: center right 10px;
+                padding-right: 35px;
 
                 color: #fff;
                 font-size: 16px;

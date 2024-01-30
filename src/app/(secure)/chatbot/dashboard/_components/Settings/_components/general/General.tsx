@@ -34,9 +34,9 @@ function General({ chatbotId, chatbotName }: any) {
       /// displaying status
       const data = await res.json();
 
-      message.success(data?.message).then(() => {
-        window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot`;
-      });
+      message.success(data?.message);
+      botContext.handleChange("chatbotName")(currentChatbotName);
+      // window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot`;
     } catch (error) {
       console.log("Error while renaming chatbot", error);
     }

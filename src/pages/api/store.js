@@ -109,15 +109,6 @@ export default async function handler(req, res) {
       const db = (await connectDatabase()).db();
       /// if new chatbot is being created the new chatbot entry
       let collection = db.collection("chatbots-data");
-      if (!updateChatbot) {
-        const chatbotName = fields?.chatbotText[0];
-        let userChatbotsCollection = db.collection("user-chatbots");
-        userChatbotsCollection.insertOne({
-          userId,
-          chatbotId,
-          chatbotName,
-        });
-      }
 
       /// deleting files that needs to be deleted
       if (deleteFileList.length > 0) {
@@ -520,6 +511,16 @@ export default async function handler(req, res) {
       const responseText = updateChatbot
         ? "Chatbot re-trained successfully"
         : "Chabot trained successfully";
+
+      if (!updateChatbot) {
+        const chatbotName = fields?.chatbotText[0];
+        let userChatbotsCollection = db.collection("user-chatbots");
+        userChatbotsCollection.insertOne({
+          userId,
+          chatbotId,
+          chatbotName,
+        });
+      }
       return res.status(responseCode).send(responseText);
     });
   } else {

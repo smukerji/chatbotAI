@@ -84,6 +84,8 @@ function Dashboard() {
     const fetchData = async () => {
       try {
         setLoading(true);
+        botContext.handleChange("chatbotName")(chatbot?.name);
+
         /// get chatbot details
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard/api`,
@@ -113,6 +115,8 @@ function Dashboard() {
             content.fileTextLength +
             content.crawlDataLength
         );
+
+        botContext.handleChange("chatbotName")(content?.chatbotName);
 
         /// set the default state for loading the data in home
         setQaData({
@@ -159,7 +163,8 @@ function Dashboard() {
                   window.history.back();
                 }}
               />
-              <h1>{chatbot?.name}</h1>
+              {/* <h1>{chatbot?.name}</h1> */}
+              <h1>{botDetails?.chatbotName}</h1>
             </div>
 
             {/*------------------------------------------options-container----------------------------------------------*/}
@@ -246,7 +251,10 @@ function Dashboard() {
           {/*------------------------------------------settings-component----------------------------------------------*/}
           {editChatbot == "settings" && (
             <>
-              <Settings chatbotId={chatbot.id} chatbotName={chatbot.name} />
+              <Settings
+                chatbotId={chatbot.id}
+                chatbotName={botDetails?.chatbotName}
+              />
             </>
           )}
 

@@ -108,7 +108,7 @@ function Model() {
           <div className="temperature-container">
             <div className="temperature-top-section">
               <p className="temperature-title">Temperature</p>
-              <span>0.5</span>
+              <span>1</span>
             </div>
             <div className="progress-bar">
               <div className="progress-bar-top-section">

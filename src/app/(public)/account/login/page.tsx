@@ -99,7 +99,12 @@ function Login() {
       </div>
       {/* --------------------------right section------------------------------ */}
       <div className="right">
-        <Image src={luciferIcon} alt="lucifer-logo" />
+        <Image
+          src={luciferIcon}
+          alt="lucifer-logo"
+          onClick={() => (window.location.href = "/")}
+          style={{cursor:"pointer"}}
+        />
         <div className="login-form">
           <h1>Welcome back! Glad to see you, Again!</h1>
 
@@ -107,7 +112,7 @@ function Login() {
             <div>
               <input
                 type="text"
-                placeholder="Enter your email"
+                placeholder="Enter your Email"
                 onChange={checkEmail}
                 onKeyDown={(e) => {
                   if (e.key == "Enter")
@@ -119,7 +124,7 @@ function Login() {
             <div>
               <input
                 type="password"
-                placeholder="Enter your password"
+                placeholder="Enter your Password"
                 onChange={checkPassword}
                 onKeyDown={(e) => {
                   if (e.key == "Enter")

@@ -1,4 +1,10 @@
-import React, { Suspense, useEffect, useRef, useState } from "react";
+import React, {
+  Suspense,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useCookies } from "react-cookie";
 import "./chat.scss";
 import { DislikeOutlined, SendOutlined, LikeOutlined } from "@ant-design/icons";
@@ -13,6 +19,7 @@ import likeIcon from "../../../../../../../public/svgs/like.svg";
 import dislikeIcon from "../../../../../../../public/svgs/dislike.svg";
 import sendChatIcon from "../../../../../../../public/svgs/send.svg";
 import { v4 as uuid } from "uuid";
+import { CreateBotContext } from "../../../../../_helpers/client/Context/CreateBotContext";
 
 function Chat({
   chatbot,
@@ -25,6 +32,9 @@ function Chat({
   setSessionID,
   setSessionStartDate,
 }: any) {
+  const botContext: any = useContext(CreateBotContext);
+  const botDetails = botContext?.createBotInfo;
+
   const [cookies, setCookies] = useCookies(["userId"]);
 
   /// storing the input value
@@ -411,6 +421,7 @@ function Chat({
             onChange={(event) => {
               setUserQuery(event.target.value);
             }}
+            placeholder={`Message ${botDetails?.chatbotName}`}
             value={userQuery}
           />
           <button className="icon" onClick={() => getReply("click")}>

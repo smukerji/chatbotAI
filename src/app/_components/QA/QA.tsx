@@ -7,8 +7,6 @@ function QA({ totalCharCount, qaCharCount, isUpdateChatbot }: any) {
   const botContext: any = useContext(CreateBotContext);
   const botDetails = botContext?.createBotInfo;
 
-  console.log(botDetails);
-
   /// get the qaList from context and qa count
   const qaList = botDetails?.qaList;
   const qaCount = botDetails?.qaCount;
@@ -155,7 +153,9 @@ function QA({ totalCharCount, qaCharCount, isUpdateChatbot }: any) {
           <span>{qaCharCount} characters</span>
           <div className="action-btns">
             <button onClick={addQA}>Add</button>
-            <button onClick={removeAllQA}>Delete All</button>
+            <button onClick={removeAllQA} disabled={qaCount > 0 ? false : true}>
+              Delete All
+            </button>
           </div>
         </div>
       </div>

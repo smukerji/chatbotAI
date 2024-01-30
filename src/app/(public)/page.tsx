@@ -25,6 +25,7 @@ function Home() {
       <FAQ />
       <ContactSection />
       <Footer />
+      
     </>
   );
 }

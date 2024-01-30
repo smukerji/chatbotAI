@@ -142,7 +142,12 @@ function Register() {
       </div>
       {/* --------------------------right section------------------------------ */}
       <div className="right">
-        <Image src={luciferIcon} alt="lucifer-logo" />
+        <Image
+          src={luciferIcon}
+          alt="lucifer-logo"
+          onClick={() => (window.location.href = "/")}
+          style={{ cursor: "pointer" }}
+        />
         <div className="register-form">
           <h1>Welcome! Get Started for Free!</h1>
 
@@ -186,7 +191,7 @@ function Register() {
             <div>
               <input
                 type="text"
-                placeholder="Enter your email"
+                placeholder="Enter your Email"
                 onChange={checkEmail}
                 onKeyDown={(e) => {
                   if (e.key == "Enter")
@@ -204,7 +209,7 @@ function Register() {
             <div>
               <input
                 type="password"
-                placeholder="Enter your password"
+                placeholder="Enter your Password"
                 onChange={checkPassword}
                 onKeyDown={(e) => {
                   if (e.key == "Enter")
@@ -257,7 +262,7 @@ function Register() {
             </div>
 
             <div className="section">
-              <label>already have an account?</label>
+              <label>Already have an account?</label>
 
               <a href="/account/login">Log In</a>
             </div>
