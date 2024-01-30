@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import "./../model/model.scss";
 import { Select, Slider } from "antd";
 import DocumentIcon from "@/assets/svg/DocumentIcon";
 
 function Model() {
+  const initialInstruction =
+    'I want you to act as a support agent. Your name is "AI Assistant". You will provide me with answers from the given info. If the answer is not included, say exactly "Hmm, I am not sure." and stop after that. Refuse to answer any question not about the info. Never break character.';
+  const [modelInstruction, setModelInstruction] = useState(initialInstruction);
   return (
     <div className="model-settings-parent">
       {/* --------------------------------Training Section---------------------------------------------------------- */}
@@ -22,13 +25,11 @@ function Model() {
           <div className="model-child-left">
             <p className="instruction-heading">Instructions</p>
             <div className="instruction-description">
-              <p className="instruction-description-text">
-                I want you to act as a support agent. Your name is &quot;AI
-                Assistant&quot;. You will provide me with answers from the given
-                info. If the answer is not included, say exactly &quot;Hmm, I am
-                not sure.&quot; and stop after that. Refuse to answer any
-                question not about the info. Never break character.
-              </p>
+              <textarea
+                className="instruction-description-text"
+                value={modelInstruction}
+                onChange={(e) => setModelInstruction(e.target.value)}
+              />
             </div>
             <div className="instruction-sub-decscription">
               The instructions allows you to customize your chatbot&lsquo;s

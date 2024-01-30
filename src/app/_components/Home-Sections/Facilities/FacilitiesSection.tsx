@@ -60,7 +60,12 @@ function FacilitiesSection() {
           </div>
 
           {/* --------------------------demo button------------------------------ */}
-          <button className="request-demo-btn">Book a Demo</button>
+          <a
+            style={{ color: "white", textDecoration: "none" }}
+            href="#contact-us"
+          >
+            <button className="request-demo-btn">Book a Demo</button>
+          </a>
         </div>
         {/* --------------------------right section------------------------------ */}
         <div className="right">

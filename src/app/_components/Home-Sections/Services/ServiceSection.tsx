@@ -11,7 +11,12 @@ function ServiceSection() {
       {/* --------------------------top section------------------------------ */}
       <div className="top">
         <h1 className="title">Our service process that we apply</h1>
-        <button className="request-demo-btn">Book a Demo</button>
+        <a
+          style={{ color: "white", textDecoration: "none" }}
+          href="#contact-us"
+        >
+          <button className="request-demo-btn">Book a Demo</button>
+        </a>
       </div>
 
       {/* --------------------------bottom section------------------------------ */}

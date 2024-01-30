@@ -2,8 +2,16 @@ import { Input, Modal, message } from "antd";
 import React, { useState } from "react";
 import { useCookies } from "react-cookie";
 import "./rename-modal.scss";
+import { useRouter } from "next/navigation";
 
-function RenameModal({ open, setOpen, chatbotId }: any) {
+function RenameModal({
+  open,
+  setOpen,
+  chatbotId,
+  setChangeFlag,
+  changeFlag,
+}: any) {
+  const router = useRouter();
   /// states to handle modal
   const [confirmLoading, setConfirmLoading] = useState(false);
   const modalText =
@@ -41,14 +49,11 @@ function RenameModal({ open, setOpen, chatbotId }: any) {
       /// displaying status
       const data = await res.json();
 
-      messageApi
-        .open({
-          type: "success",
-          content: data?.message,
-        })
-        .then(() => {
-          window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot`;
-        });
+      messageApi.open({
+        type: "success",
+        content: data?.message,
+      });
+      setChangeFlag(!changeFlag);
     } catch (error) {
       console.log("Error while renaming chatbot", error);
     } finally {

@@ -78,7 +78,7 @@ function Footer() {
               <a href="">Terms & Conditions</a>
             </li>
             <li>
-              <a href="">Book a Demo</a>
+              <a href="#contact-us">Book a Demo</a>
             </li>
           </ul>
         </div>

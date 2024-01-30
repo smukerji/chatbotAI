@@ -11,8 +11,10 @@ import { LoadingOutlined } from "@ant-design/icons";
 import { redirect } from "next/navigation";
 import { useUserService } from "../../../_services/useUserService";
 import { Spin, message } from "antd";
+import { useRouter } from "next/navigation";
 
 function Login() {
+  const router = useRouter();
   /// email and password messages state
   const [emailMessage, setEmailMessage]: any = useState("");
   const [passwordMessage, setPasswordMessage]: any = useState("");
@@ -31,7 +33,8 @@ function Login() {
   );
 
   if (status === "authenticated") {
-    redirect("/chatbot");
+    // redirect("/chatbot");
+    router.push("/chatbot");
   }
 
   const userService = useUserService();
@@ -103,7 +106,7 @@ function Login() {
           src={luciferIcon}
           alt="lucifer-logo"
           onClick={() => (window.location.href = "/")}
-          style={{cursor:"pointer"}}
+          style={{ cursor: "pointer" }}
         />
         <div className="login-form">
           <h1>Welcome back! Glad to see you, Again!</h1>

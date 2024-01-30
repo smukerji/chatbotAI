@@ -8,11 +8,13 @@ import githubIcon from "../../../../../public/github-icon-blue.svg";
 import "./register.scss";
 import { signIn, useSession } from "next-auth/react";
 import { LoadingOutlined } from "@ant-design/icons";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useUserService } from "../../../_services/useUserService";
 import { Spin, message } from "antd";
 
 function Register() {
+  const router = useRouter();
+
   /// irst name, last name, email and password messages state
   const [emailMessage, setEmailMessage]: any = useState("");
   const [passwordMessage, setPasswordMessage]: any = useState("");
@@ -35,7 +37,8 @@ function Register() {
   );
 
   if (status === "authenticated") {
-    redirect("/chatbot");
+    // redirect("/chatbot");
+    router.push("/chatbot");
   }
   const userService = useUserService();
 

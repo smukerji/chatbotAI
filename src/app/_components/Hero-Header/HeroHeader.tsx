@@ -56,7 +56,12 @@ function HeroHeader() {
             <Image src={smsIcon} alt="sms-icon" />
             <input type="text" placeholder="Email Address" />
           </div>
-          <button className="request-demo-btn">Book a Demo</button>
+          <a
+            style={{ color: "white", textDecoration: "none" }}
+            href="#contact-us"
+          >
+            <button className="request-demo-btn">Book a Demo</button>
+          </a>
         </div>
       </div>
     </div>

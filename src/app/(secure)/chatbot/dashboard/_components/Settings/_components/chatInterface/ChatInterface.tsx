@@ -9,34 +9,96 @@ import ChatBotIcon from "../../../../../../../../../public/create-chatbot-svgs/C
 import like from "../../../../../../../../../public/svgs/like.svg";
 import dislike from "../../../../../../../../../public/svgs/dislike.svg";
 import ChatBubbleButton from "../../../../../../../../../public/create-chatbot-svgs/ChatBubbleButton.svg";
-
+import deleteImgIcon from "../../../../../../../../../public/create-chatbot-svgs/delete-icon.svg";
+import { message } from "antd";
+import chatbubble from "../../../../../../../../../public/create-chatbot-svgs/message-2.svg";
 function ChatInterface() {
   const [userMessageColor, setUserMessageColor] = useState<string>("#fe632f");
+  const [bubbleIconColor, setBubbleIconColor] = useState<string>("#9B00FB");
   const [theme, setTheme] = useState<string>("Light");
   const [iconPlacement, setIconPlacement] = useState<string>("Left");
   const [displayName, setDisplayName] = useState<string>("Super Bot");
   const [initialMessage, setInitialMessage] = useState<string>(
     "Hello! What can I help you today?"
   );
-  const [suggestedMessage, setSuggestedMessage] = useState<string>(
-    "This is suggested message"
-  );
+  const [suggestedMessage, setSuggestedMessage] = useState<string[]>([
+    "This is suggested message",
+  ]);
+
+  const [messagePlaceholder, setMessagePlaceholder] = useState<string>();
 
   const [popupCount, setPopupCount] = useState<number>(10);
+
+  const [fileName, setFileName] = useState<any>("");
+
+  const [fileNameChat, setFileNameChat] = useState<any>("");
+
+  const [iconImage, setIconImage] = useState<any>();
+  const [chatBubbleImage, setChatBubbleImage] = useState<any>("");
 
   // for reset input button
 
   const [initialMessageReset, setInitialMessageReset] = useState<string>(
     "Hello! What can I help you today?"
   );
-  const [suggestedMessageReset, setSuggestedMessageReset] = useState<string>(
-    "This is suggested message "
-  );
+  const [suggestedMessageReset, setSuggestedMessageReset] = useState<string[]>([
+    "This is suggested message ",
+  ]);
   const [popupCountReset, setPopupCountReset] = useState<number>(10);
 
   const [userMessageColorReset, setUserMessageColorReset] =
     useState<string>("#fe632f");
 
+  const imageHandler = (e: any) => {
+    const selectedFile = e.target.files[0];
+
+    // Check if a file is selected and it's an image
+    if (selectedFile && isImageFile(selectedFile)) {
+      setFileName(selectedFile);
+      // preview image
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        setIconImage(e.target.result);
+      };
+      if (selectedFile) {
+        reader.readAsDataURL(selectedFile);
+      }
+    } else {
+      // Display an error message or handle the invalid file selection as needed
+      message.error("Invalid file format. Please select an image.");
+      return;
+    }
+  };
+  const imageHandlerChat = (e: any) => {
+    const selectedFile = e.target.files[0];
+    // Check if a file is selected and it's an image
+
+    if (selectedFile && isImageFile(selectedFile)) {
+      setFileNameChat(selectedFile);
+      // preview image
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        setChatBubbleImage(e.target.result);
+      };
+      if (selectedFile) {
+        reader.readAsDataURL(selectedFile);
+      }
+    } else {
+      // Display an error message or handle the invalid file selection as needed
+      message.error("Invalid file format. Please select an image.");
+      return;
+    }
+  };
+  // Function to check if a file is an image
+  const isImageFile = (file: any) => {
+    const acceptedImageTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "image/svg+xml",
+    ];
+    return acceptedImageTypes.includes(file.type);
+  };
   return (
     <div className="chat-interface-parent">
       <div className="training-container">
@@ -82,14 +144,14 @@ function ChatInterface() {
             </Button>
           </div>
 
-          <input
+          <textarea
             className="input-container"
-            defaultValue={suggestedMessage}
-            value={suggestedMessage}
+            defaultValue={suggestedMessage.join("\n")}
+            value={suggestedMessage.join("\n")}
             onChange={(e) => {
-              setSuggestedMessage(e.target.value);
+              setSuggestedMessage(e.target.value.split("\n"));
             }}
-          ></input>
+          ></textarea>
 
           <p className="helper-text">Enter each message in a new line.</p>
           {/* ------------for message placeholder */}
@@ -99,6 +161,9 @@ function ChatInterface() {
               type="text"
               className="message-input"
               placeholder="Enter your message here"
+              onChange={(e) => {
+                setMessagePlaceholder(e.target.value);
+              }}
             />
             <p className="message-helper-text">
               Enter each message in a new line.
@@ -158,8 +223,41 @@ function ChatInterface() {
           <div className="update-chatbot-profile-pic">
             <p className="profile-pic-title">Update Chatbot Profile Picture</p>
             <div className="profile-image-container">
-              <input type="file" />
-              <Icon Icon={DeleteIcon} />
+              <div className="profile-image-child">
+                <input
+                  type="file"
+                  id="profileImageId"
+                  style={{ display: "none" }}
+                  accept="image/*"
+                  onChange={imageHandler}
+                />
+                <label htmlFor="profileImageId" className="file-label">
+                  <Image src={uploadIcon} alt="upload-icon" />
+                  Upload Image
+                </label>
+                <span className="file-name">
+                  {typeof fileName == "string" ? (
+                    <>
+                      {fileName}{" "}
+                      {fileName.toLowerCase() !=
+                        "No file uploaded".toLowerCase() && <></>}
+                    </>
+                  ) : fileName ? (
+                    <>{fileName.name} </>
+                  ) : (
+                    "No file chosen"
+                  )}
+                </span>
+              </div>
+              <div
+                onClick={() => {
+                  setFileName("");
+                  setIconImage("");
+                }}
+                style={{ display: fileName === "" ? "none" : "" }}
+              >
+                <Icon Icon={DeleteIcon} />
+              </div>
             </div>
           </div>
 
@@ -194,8 +292,40 @@ function ChatInterface() {
           <div className="update-chat-icon-container">
             <p className="update-chat-icon-text">Update chat icon</p>
             <div className="update-chat-icon-image-container">
-              <input type="image" />
-              <Icon Icon={DeleteIcon} />
+              <div className="chat-image-child">
+                <input
+                  type="file"
+                  id="profileChatId"
+                  style={{ display: "none" }}
+                  onChange={imageHandlerChat}
+                />
+                <label htmlFor="profileChatId" className="file-label">
+                  <Image src={uploadIcon} alt="upload-icon" />
+                  Upload Image
+                </label>
+                <span className="file-name">
+                  {typeof fileNameChat == "string" ? (
+                    <>
+                      {fileNameChat}{" "}
+                      {fileNameChat.toLowerCase() !=
+                        "No file uploaded".toLowerCase() && <></>}
+                    </>
+                  ) : fileNameChat ? (
+                    <>{fileNameChat.name} </>
+                  ) : (
+                    "No file chosen"
+                  )}
+                </span>
+              </div>
+              <div
+                onClick={() => {
+                  setFileNameChat("");
+                  setChatBubbleImage("");
+                }}
+                style={{ display: fileNameChat === "" ? "none" : "" }}
+              >
+                <Icon Icon={DeleteIcon} />
+              </div>
             </div>
           </div>
 
@@ -204,7 +334,10 @@ function ChatInterface() {
             <p className="chat-bubble-title"> Chat Bubble Button Color </p>
             <ColorPicker
               className="chat-bubble-color-picker"
-              onChange={(value, hex) => {}}
+              onChange={(value, hex) => {
+                setBubbleIconColor(hex);
+              }}
+              value={bubbleIconColor}
             />
           </div>
 
@@ -266,7 +399,7 @@ function ChatInterface() {
               }}
             />
 
-            <p className="auto-show-helper">Seconds (Negative to disabel)</p>
+            <p className="auto-show-helper">Seconds (Negative to disable)</p>
           </div>
 
           {/* ------------- save button */}
@@ -283,7 +416,13 @@ function ChatInterface() {
           >
             <div className="chat-box-header">
               <div className="chat-box-image-container">
-                <Image src={ChatBotIcon} alt="chatBotIcon" />
+                <Image
+                  src={iconImage ? iconImage : ChatBotIcon}
+                  alt="chatBotIcon"
+                  width={40}
+                  height={40}
+                  style={{ borderRadius: "50%" }}
+                />
               </div>
               <p
                 className="chat-box-header-title"
@@ -325,14 +464,21 @@ function ChatInterface() {
               </div>
             </div>
             <div className="suggested-container">
-              <div
-                className="suggested-msg"
-                style={{
-                  backgroundColor: theme === "Dark" ? "#353945" : "",
-                  color: theme === "Dark" ? "#FCFCFD" : "",
-                }}
-              >
-                {suggestedMessage}
+              <div className="suggested-messages"> 
+
+              {suggestedMessage.map((message, index) => (
+                message.trim() !== '' &&
+                (<div
+                  className="suggested-msg"
+                  key={index}
+                  style={{
+                    backgroundColor: theme === "Dark" ? "#353945" : "",
+                    color: theme === "Dark" ? "#FCFCFD" : "",
+                  }}
+                >
+                  {message}
+                </div>)
+              ))}
               </div>
               <div
                 className="powered-by"
@@ -347,7 +493,12 @@ function ChatInterface() {
             >
               <input
                 type="text"
-                placeholder="Enter your message here"
+                // value={messagePlaceholder}
+                placeholder={
+                  messagePlaceholder
+                    ? messagePlaceholder
+                    : "Enter your message here"
+                }
                 style={{ backgroundColor: theme === "Dark" ? "#353945" : "" }}
               />
               <span
@@ -385,7 +536,18 @@ function ChatInterface() {
               justifyContent: iconPlacement === "Right" ? "flex-end" : "",
             }}
           >
-            <Image src={ChatBubbleButton} alt="chat-bubble" />
+            <div
+              className="message-icon-child"
+              style={{ backgroundColor: bubbleIconColor }}
+            >
+              <Image
+                src={chatBubbleImage ? chatBubbleImage : chatbubble}
+                alt="icon"
+                height={32}
+                width={32}
+              />
+            </div>
+            {/* <Image src={ChatBubbleButton} alt="chat-bubble" /> */}
           </div>
         </div>
       </div>

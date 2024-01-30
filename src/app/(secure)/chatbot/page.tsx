@@ -62,6 +62,8 @@ function Chatbot() {
     setOpenMenu(value);
   };
 
+  const [changeFlag, setChangeFlag] = useState(false);
+
   /// managing delete chatbot
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
@@ -95,7 +97,7 @@ function Chatbot() {
     };
 
     fetchData();
-  }, []);
+  }, [changeFlag]);
 
   /// view chatbot
   function openChatbot(id: any) {
@@ -198,6 +200,8 @@ function Chatbot() {
           open={openRenameModal}
           setOpen={setOpenRenameModal}
           chatbotId={chatbotId}
+          setChangeFlag={setChangeFlag}
+          changeFlag={changeFlag}
         />
         <NewChatbotNameModal
           open={openNewChatbotNameModal}

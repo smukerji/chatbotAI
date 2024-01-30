@@ -24,7 +24,12 @@ function ServicesOffered() {
         </div>
 
         <div className="right-part">
-          <button className="request-demo-btn">Book a Demo</button>
+          <a
+            style={{ color: "white", textDecoration: "none" }}
+            href="#contact-us"
+          >
+            <button className="request-demo-btn">Book a Demo</button>
+          </a>
         </div>
       </div>
       {/* --------------------------bottom section------------------------------ */}

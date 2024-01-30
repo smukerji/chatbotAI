@@ -5,7 +5,7 @@ import "./contact-section.scss";
 
 function ContactSection() {
   return (
-    <div className="contact-section">
+    <div className="contact-section" id="contact-us">
       {/* --------------------------left section------------------------------ */}
       <div className="left">
         <h1>Let&rsquo;s Connect!</h1>
