@@ -15,6 +15,8 @@ import {
 import { ObjectId } from "mongodb";
 const formidable = require("formidable");
 
+export const maxDuration = 300;
+
 export default async function handler(req, res) {
   if (req.method === "POST") {
     const form = new formidable.IncomingForm();
