@@ -30,6 +30,8 @@ export async function readContent(filePath, fileType) {
   if (fileType === "application/pdf") {
     // Read the PDF file
     const bufferData = fs.readFileSync(filePath);
+    fs.writeFileSync(`/tmp/${file.name}`, bufferData);
+
     const pdfExtract = await pdfParse(bufferData);
     return pdfExtract.text;
   } else if (fileType === "text/plain") {
