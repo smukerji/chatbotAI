@@ -515,7 +515,7 @@ export default async function handler(req, res) {
       if (!updateChatbot) {
         const chatbotName = fields?.chatbotText[0];
         let userChatbotsCollection = db.collection("user-chatbots");
-        userChatbotsCollection.insertOne({
+        await userChatbotsCollection.insertOne({
           userId,
           chatbotId,
           chatbotName,
