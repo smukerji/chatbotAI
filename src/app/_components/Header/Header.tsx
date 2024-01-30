@@ -149,7 +149,7 @@ function Header() {
                   if (!isLoggedIn) {
                     window.location.href = "/account/login";
                   } else if (session?.user || userId) {
-                    logout();
+                    await logout();
                     signOut();
                     window.location.href = "/";
                   }
