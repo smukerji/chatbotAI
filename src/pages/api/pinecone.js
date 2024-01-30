@@ -48,7 +48,9 @@ export default async function handler(req, res) {
         });
       } catch (error) {
         console.error("Error initializing Pinecone client:", error);
-        throw new Error("Failed to initialize Pinecone client");
+        throw new Error(
+          "Failed to initialize Pinecone client while retriving the similarity results"
+        );
       }
 
       const index = pinecone.Index(process.env.NEXT_PUBLIC_PINECONE_INDEX);

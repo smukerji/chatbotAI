@@ -5,7 +5,6 @@ import csvParser from "csv-parser";
 import * as xlsx from "xlsx";
 import xlsToJson from "xls-to-json";
 
-
 export async function readContent(filePath, fileType) {
   // if (fileType === "application/pdf") {
   //   /// read the pdf file
@@ -25,6 +24,8 @@ export async function readContent(filePath, fileType) {
   //   });
   //   return result.value;
   // }
+
+  console.log("File path >>>>>>>>>>", filePath);
 
   if (fileType === "application/pdf") {
     // Read the PDF file
@@ -56,7 +57,9 @@ export async function readContent(filePath, fileType) {
     });
 
     // Convert the CSV data to text
-    const csvText = csvData.map((row) => Object.values(row).join(",")).join("\n");
+    const csvText = csvData
+      .map((row) => Object.values(row).join(","))
+      .join("\n");
     return csvText;
   } else if (
     fileType ===
@@ -75,5 +78,4 @@ export async function readContent(filePath, fileType) {
 
   // Handle unsupported file types
   throw new Error(`Unsupported file type: ${fileType}`);
-
 }

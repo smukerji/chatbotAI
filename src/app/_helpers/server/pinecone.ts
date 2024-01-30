@@ -44,7 +44,7 @@ export const upsert = async (vectors: any, userId: string) => {
       });
   } catch (error) {
     console.error("Error initializing Pinecone client:", error);
-    throw new Error("Failed to initialize Pinecone client");
+    throw new Error("Failed to initialize Pinecone client while upserting");
   }
 };
 
@@ -68,7 +68,7 @@ export const deletevectors = async (vectorIDs: [], namespace: string) => {
       });
   } catch (error) {
     console.error("Error initializing Pinecone client:", error);
-    throw new Error("Failed to initialize Pinecone client");
+    throw new Error("Failed to initialize Pinecone client while deleting");
   }
 };
 
@@ -80,7 +80,9 @@ export const deleteFileVectorsById = async (userid: any, vectorIDs: any) => {
     });
   } catch (error) {
     console.error("Error initializing Pinecone client:", error);
-    throw new Error("Failed to initialize Pinecone client");
+    throw new Error(
+      "Failed to initialize Pinecone client while deleting vectors by id"
+    );
   }
   const index = pinecone.Index(process.env.NEXT_PUBLIC_PINECONE_INDEX!);
   // await pinecone.init({
@@ -118,7 +120,9 @@ export const updateVectorsById = async (vectors: any, userId: any) => {
     });
   } catch (error) {
     console.error("Error initializing Pinecone client:", error);
-    throw new Error("Failed to initialize Pinecone client");
+    throw new Error(
+      "Failed to initialize Pinecone client while updating vectors by id"
+    );
   }
 
   const index = pinecone.Index(
