@@ -19,7 +19,7 @@ export default async function handler(req, res) {
       const pdfPath = files.file[0].filepath;
 
       // Move the file to a permanent location
-      const destinationPath = path.join(process.cwd(), "file" + Date.now());
+      const destinationPath = path.join("/tmp/", "file" + Date.now());
       // fs.renameSync(pdfPath, destinationPath);
       mv(pdfPath, destinationPath, function (err) {
         if (err) {
