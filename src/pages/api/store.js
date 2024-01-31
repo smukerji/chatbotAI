@@ -15,7 +15,7 @@ import {
 import { ObjectId } from "mongodb";
 const formidable = require("formidable");
 
-// export const maxDuration = 300;
+export const maxDuration = 300;
 
 export default async function handler(req, res) {
   if (req.method === "POST") {
@@ -190,7 +190,6 @@ export default async function handler(req, res) {
       /// prcessing the file data
       if (files.length > 0) {
         const fileData = files.map(async (file, index) => {
-          console.log("File >>>>>>>>>", index);
           return new Promise(async (resolve, reject) => {
             if (file?.filepath) {
               /// read the file contents from the files object

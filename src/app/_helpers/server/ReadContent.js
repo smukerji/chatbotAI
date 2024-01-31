@@ -6,9 +6,6 @@ import * as xlsx from "xlsx";
 import xlsToJson from "xls-to-json";
 
 export async function readContent(filePath, fileType) {
-
-  console.log("File path >>>>>>>>>>", filePath);
-
   if (fileType === "application/pdf") {
     // Read the PDF file
     const bufferData = fs.readFileSync(filePath);

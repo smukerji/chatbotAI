@@ -23,7 +23,7 @@ export default async function handler(req, res) {
       // fs.renameSync(pdfPath, destinationPath);
       mv(pdfPath, destinationPath, function (err) {
         if (err) {
-          console.log('> FileServer.jsx | route: "/files/upload" | err:', err);
+          console.log("Error while moving file", err);
           throw err;
         }
       });
