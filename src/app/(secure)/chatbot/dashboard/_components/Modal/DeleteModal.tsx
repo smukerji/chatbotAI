@@ -3,7 +3,13 @@ import React, { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import "./delete-modal.scss";
 
-function DeleteModal({ open, setOpen, chatbotId }: any) {
+function DeleteModal({
+  open,
+  setOpen,
+  chatbotId,
+  setChangeFlag,
+  changeFlag,
+}: any) {
   /// states to handle modal
   const [confirmLoading, setConfirmLoading] = useState(false);
   const modalText =
@@ -79,14 +85,14 @@ function DeleteModal({ open, setOpen, chatbotId }: any) {
       /// displaying status
       const data = await res.json();
 
-      messageApi
-        .open({
-          type: "error",
-          content: data.text,
-        })
-        .then(() => {
-          window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot`;
-        });
+      messageApi.open({
+        type: "error",
+        content: data.text,
+      });
+      // .then(() => {
+      //   window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot`;
+      // });
+      setChangeFlag(!changeFlag);
     } catch (error) {
       console.log("Error while deleting chatbot", error);
     } finally {

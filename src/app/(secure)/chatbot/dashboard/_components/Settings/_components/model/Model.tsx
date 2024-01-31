@@ -7,6 +7,12 @@ function Model() {
   const initialInstruction =
     'I want you to act as a support agent. Your name is "AI Assistant". You will provide me with answers from the given info. If the answer is not included, say exactly "Hmm, I am not sure." and stop after that. Refuse to answer any question not about the info. Never break character.';
   const [modelInstruction, setModelInstruction] = useState(initialInstruction);
+
+  const [inputValue, setInputValue] = useState(0);
+
+  const onChange = (newValue: number) => {
+    setInputValue(newValue);
+  };
   return (
     <div className="model-settings-parent">
       {/* --------------------------------Training Section---------------------------------------------------------- */}
@@ -109,15 +115,15 @@ function Model() {
           <div className="temperature-container">
             <div className="temperature-top-section">
               <p className="temperature-title">Temperature</p>
-              <span>1</span>
+              <span>{inputValue}</span>
             </div>
             <div className="progress-bar">
               <div className="progress-bar-top-section">
                 <Slider
                   min={0}
                   max={1}
-                  // onChange={onChange}
-                  // value={typeof inputValue === "number" ? inputValue : 0}
+                  onChange={onChange}
+                  value={typeof inputValue === "number" ? inputValue : 0}
                   step={0.1}
                 />
               </div>

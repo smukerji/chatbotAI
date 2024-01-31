@@ -2,6 +2,7 @@ import path from "path";
 import { readContent } from "../../app/_helpers/server/ReadContent";
 import fs from "fs";
 import mv from "mv";
+import os from "os";
 
 const formidable = require("formidable");
 
@@ -18,9 +19,34 @@ export default async function handler(req, res) {
       /// get the tmp path of file
       const pdfPath = files.file[0].filepath;
 
+      const tempDir = os.tmpdir();
+
+      // Create a path within the temporary directory (e.g., '/tmp/myfolder')
+      const tempFolderPath = path.join(tempDir, "/");
+
       // Move the file to a permanent location
       const destinationPath = path.join("/tmp/", "file" + Date.now());
       // fs.renameSync(pdfPath, destinationPath);
+
+      // Function to list all files in a folder
+      const listFilesInFolder = (folderPath) => {
+        // Use fs.readdir to read the contents of the folder
+        fs.readdir(folderPath, (err, files) => {
+          // Handle errors
+          if (err) {
+            console.error("Error reading folder:", err);
+            return;
+          }
+
+          // Log the list of files
+          console.log("Files in folder:", files);
+
+          // You can perform additional operations with the file list here
+        });
+      };
+
+      console.log("Temp folder path >>>>>", tempFolderPath);
+      listFilesInFolder(tempFolderPath);
       mv(pdfPath, destinationPath, async function (err) {
         if (err) {
           console.log("Error while moving file", err);

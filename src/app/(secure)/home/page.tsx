@@ -483,7 +483,7 @@ function Home({
                     qaCount > 0) && <p className="margin-pipe">|</p>} */}
                 {qaCount > 0 && (
                   <p>
-                    {qaCount} Q&A ({qaCharCount} chars)
+                    {qaCount} Q&A ({qaCharCount} detected chars)
                   </p>
                 )}
                 {textCharCount > 0 && (

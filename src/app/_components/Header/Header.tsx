@@ -84,6 +84,10 @@ function Header() {
           </span>
         </div>
 
+        {/*------------------------------------------chatbot-btn----------------------------------------------*/}
+        <a href="/chatbot" style={{ textDecoration: "none" }}>
+          <button className="feedback-btn">My Chatbots</button>
+        </a>
         {/*------------------------------------------feedback-btn----------------------------------------------*/}
         <button className="feedback-btn">Feedback</button>
         {/*------------------------------------------Profile Image----------------------------------------------*/}

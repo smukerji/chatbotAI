@@ -190,6 +190,8 @@ function Chatbot() {
           open={openDeleteModal}
           setOpen={setOpenDeleteModal}
           chatbotId={chatbotId}
+          setChangeFlag={setChangeFlag}
+          changeFlag={changeFlag}
         />
         <ShareModal
           open={openShareModal}
