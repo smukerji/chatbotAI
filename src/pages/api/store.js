@@ -41,6 +41,29 @@ export default async function handler(req, res) {
       const crawledList = JSON.parse(fields?.crawledList[0]);
       const deleteCrawlList = JSON.parse(fields?.deleteCrawlList[0]);
       const isTextUpdated = JSON.parse(fields?.isTextUpdated[0]);
+
+      const tempDir = os.tmpdir();
+
+      // Create a path within the temporary directory (e.g., '/tmp/myfolder')
+      const tempFolderPath = path.join(tempDir, "/");
+
+      // Function to list all files in a folder
+      const listFilesInFolder = (folderPath) => {
+        // Use fs.readdir to read the contents of the folder
+        fs.readdir(folderPath, (err, files) => {
+          // Handle errors
+          if (err) {
+            console.error("Error reading folder:", err);
+            return;
+          }
+
+          // Log the list of files
+          console.log("Files in folder when creation: ", files);
+
+          // You can perform additional operations with the file list here
+        });
+      };
+      listFilesInFolder(tempFolderPath);
       // return;
       // console.log(chatbotId);
       // return;
@@ -190,32 +213,9 @@ export default async function handler(req, res) {
         );
       }
 
-      const tempDir = os.tmpdir();
-
-      // Create a path within the temporary directory (e.g., '/tmp/myfolder')
-      const tempFolderPath = path.join(tempDir, "/");
-
-      // Function to list all files in a folder
-      const listFilesInFolder = (folderPath) => {
-        // Use fs.readdir to read the contents of the folder
-        fs.readdir(folderPath, (err, files) => {
-          // Handle errors
-          if (err) {
-            console.error("Error reading folder:", err);
-            return;
-          }
-
-          // Log the list of files
-          console.log("Files in folder when creation: ", files);
-
-          // You can perform additional operations with the file list here
-        });
-      };
       /// prcessing the file data
       if (files.length > 0) {
         const fileData = files.map(async (file, index) => {
-          listFilesInFolder(tempFolderPath);
-
           return new Promise(async (resolve, reject) => {
             if (file?.filepath) {
               /// read the file contents from the files object
