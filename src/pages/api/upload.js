@@ -1,4 +1,6 @@
+import path from "path";
 import { readContent } from "../../app/_helpers/server/ReadContent";
+import fs from "fs";
 
 const formidable = require("formidable");
 
@@ -13,13 +15,24 @@ export default async function handler(req, res) {
         return;
       }
       /// get the tmp path of file
-      const pdfPath = files.file[0].filepath;
+      const uploadedFilePath = files.file[0].filepath;
+
+      // Move the file to a permanent location
+      const destinationPath = path.join(
+        __dirname,
+        "../../",
+        "file" + Date.now() + path.extname(uploadedFilePath)
+      );
+      fs.renameSync(uploadedFilePath, destinationPath);
 
       try {
-        const pdfText = await readContent(pdfPath, files.file[0].mimetype);
+        const pdfText = await readContent(
+          destinationPath,
+          files.file[0].mimetype
+        );
         res.status(200).send({
           charLength: pdfText.length,
-          filepath: pdfPath,
+          filepath: destinationPath,
           fileType: files.file[0].mimetype,
         });
       } catch (error) {
