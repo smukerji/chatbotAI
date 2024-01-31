@@ -21,27 +21,26 @@ export default async function handler(req, res) {
       // Move the file to a permanent location
       const destinationPath = path.join("/tmp/", "file" + Date.now());
       // fs.renameSync(pdfPath, destinationPath);
-      mv(pdfPath, destinationPath, function (err) {
+      mv(pdfPath, destinationPath, async function (err) {
         if (err) {
           console.log("Error while moving file", err);
           throw err;
         }
+        try {
+          const pdfText = await readContent(
+            destinationPath,
+            files.file[0].mimetype
+          );
+          res.status(200).send({
+            charLength: pdfText.length,
+            filepath: destinationPath,
+            fileType: files.file[0].mimetype,
+          });
+        } catch (error) {
+          console.error(error);
+          res.status(500).send("Error reading file content");
+        }
       });
-
-      try {
-        const pdfText = await readContent(
-          destinationPath,
-          files.file[0].mimetype
-        );
-        res.status(200).send({
-          charLength: pdfText.length,
-          filepath: destinationPath,
-          fileType: files.file[0].mimetype,
-        });
-      } catch (error) {
-        console.error(error);
-        res.status(500).send("Error reading file content");
-      }
     });
   } else {
     res.status(405).send("Method not allowed");
