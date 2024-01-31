@@ -6,6 +6,9 @@ import {
 import { connectDatabase } from "../../db";
 import { v4 as uuid } from "uuid";
 import { authorize, uploadFile } from "../../app/_services/googleFileUpload";
+import os from "os";
+import fs from "fs";
+import path from "path";
 
 import {
   deleteFileVectorsById,
