@@ -1,6 +1,7 @@
 import path from "path";
 import { readContent } from "../../app/_helpers/server/ReadContent";
 import fs from "fs";
+import mv from "mv";
 
 const formidable = require("formidable");
 
@@ -19,7 +20,13 @@ export default async function handler(req, res) {
 
       // Move the file to a permanent location
       const destinationPath = path.join(process.cwd(), "file" + Date.now());
-      fs.renameSync(pdfPath, destinationPath);
+      // fs.renameSync(pdfPath, destinationPath);
+      mv(pdfPath, destinationPath, function (err) {
+        if (err) {
+          console.log('> FileServer.jsx | route: "/files/upload" | err:', err);
+          throw err;
+        }
+      });
 
       try {
         const pdfText = await readContent(
