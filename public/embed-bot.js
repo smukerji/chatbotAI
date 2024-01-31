@@ -7,7 +7,7 @@
 
   // Get the script element
   const scriptElement = document.querySelector(
-    'script[src="https://chatbot-ai-eight.vercel.app/embed-bot.js"]'
+    'script[src="https://chatbot-ai-silk.vercel.app/embed-bot.js"]'
   );
 
   console.log(scriptElement);
@@ -27,7 +27,7 @@
   document.body.insertAdjacentHTML(
     "beforeend",
     `<iframe
-      src="https://chatbot-ai-eight.vercel.app/embed-bot?chatbotID=${param1}"
+      src="https://chatbot-ai-silk.vercel.app/embed-bot?chatbotID=${param1}"
       frameborder="0"
       width="100%"
       height="100%"
