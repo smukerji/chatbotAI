@@ -179,6 +179,7 @@ function ChatInterface() {
                   type="radio"
                   name="Theme"
                   value="Light"
+                  id="Light"
                   onChange={(e) => {
                     setTheme(e.target.value);
                   }}
@@ -191,6 +192,7 @@ function ChatInterface() {
                   type="radio"
                   name="Theme"
                   value="Dark"
+                  id="Dark"
                   onChange={(e) => {
                     setTheme(e.target.value);
                   }}
@@ -331,13 +333,21 @@ function ChatInterface() {
 
           {/* ----------for chat bubble */}
           <div className="chat-bubble-container">
-            <p className="chat-bubble-title"> Chat Bubble Button Color </p>
+            <p
+              className="chat-bubble-title"
+              style={{ color: chatBubbleImage ? "#B1B5C3" : "" }}
+            >
+              {" "}
+              Chat Bubble Button Color{" "}
+            </p>
             <ColorPicker
               className="chat-bubble-color-picker"
               onChange={(value, hex) => {
                 setBubbleIconColor(hex);
               }}
-              value={bubbleIconColor}
+              value={chatBubbleImage ? "#FCFCFD" : bubbleIconColor}
+              disabled={chatBubbleImage ? true : false}
+              style={{ backgroundColor: "white" }}
             />
           </div>
 
@@ -350,6 +360,7 @@ function ChatInterface() {
                   type="radio"
                   name="chat"
                   value="Left"
+                  id="Left"
                   onChange={(e) => {
                     setIconPlacement(e.target.value);
                   }}
@@ -362,6 +373,7 @@ function ChatInterface() {
                   type="radio"
                   name="chat"
                   value="Right"
+                  id="Right"
                   onChange={(e) => {
                     setIconPlacement(e.target.value);
                   }}
@@ -464,21 +476,22 @@ function ChatInterface() {
               </div>
             </div>
             <div className="suggested-container">
-              <div className="suggested-messages"> 
-
-              {suggestedMessage.map((message, index) => (
-                message.trim() !== '' &&
-                (<div
-                  className="suggested-msg"
-                  key={index}
-                  style={{
-                    backgroundColor: theme === "Dark" ? "#353945" : "",
-                    color: theme === "Dark" ? "#FCFCFD" : "",
-                  }}
-                >
-                  {message}
-                </div>)
-              ))}
+              <div className="suggested-messages">
+                {suggestedMessage.map(
+                  (message, index) =>
+                    message.trim() !== "" && (
+                      <div
+                        className="suggested-msg"
+                        key={index}
+                        style={{
+                          backgroundColor: theme === "Dark" ? "#353945" : "",
+                          color: theme === "Dark" ? "#FCFCFD" : "",
+                        }}
+                      >
+                        {message}
+                      </div>
+                    )
+                )}
               </div>
               <div
                 className="powered-by"
@@ -538,13 +551,16 @@ function ChatInterface() {
           >
             <div
               className="message-icon-child"
-              style={{ backgroundColor: bubbleIconColor }}
+              style={{
+                backgroundColor: chatBubbleImage ? "" : bubbleIconColor,
+              }}
             >
               <Image
                 src={chatBubbleImage ? chatBubbleImage : chatbubble}
                 alt="icon"
-                height={32}
-                width={32}
+                height={chatBubbleImage ? "64" : 32}
+                width={chatBubbleImage ? "64" : 32}
+                style={{ borderRadius: "50%" }}
               />
             </div>
             {/* <Image src={ChatBubbleButton} alt="chat-bubble" /> */}

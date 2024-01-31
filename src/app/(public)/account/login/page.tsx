@@ -109,7 +109,10 @@ function Login() {
           style={{ cursor: "pointer" }}
         />
         <div className="login-form">
-          <h1>Welcome back! Glad to see you, Again!</h1>
+          <h1>
+            <span>Welcome back!</span>
+            <span>Glad to see you, Again!</span>
+          </h1>
 
           <div className="input-container">
             <div>

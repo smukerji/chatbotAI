@@ -152,7 +152,10 @@ function Register() {
           style={{ cursor: "pointer" }}
         />
         <div className="register-form">
-          <h1>Welcome! Get Started for Free!</h1>
+          <h1>
+            <span>Welcome! </span>
+            <span>Get Started for Free!</span>
+          </h1>
 
           <div className="input-container">
             <div>

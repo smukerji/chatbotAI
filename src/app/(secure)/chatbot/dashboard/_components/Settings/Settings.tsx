@@ -12,6 +12,7 @@ import NotificationsIcon from "@/assets/svg/NotificationsIcon";
 import "./../Settings/settings.scss";
 import Model from "./_components/model/Model";
 import ChatInterface from "./_components/chatInterface/ChatInterface";
+import Security from "./_components/security/Security";
 
 function Settings({ chatbotId, chatbotName }: any) {
   const botContext: any = useContext(CreateBotContext);
@@ -100,7 +101,7 @@ function Settings({ chatbotId, chatbotName }: any) {
           )}
           {chabotSettings === "model" && <Model />}
           {chabotSettings === "chatInterface" && <ChatInterface />}
-          {chabotSettings === "security" && <h1>security</h1>}
+          {chabotSettings === "security" && <Security/>}
           {chabotSettings === "lead" && <h1>lead</h1>}
           {chabotSettings === "notifications" && <h1>notifications</h1>}
         </div>
