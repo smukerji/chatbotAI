@@ -1,7 +1,6 @@
 import path from "path";
 import { readContent } from "../../app/_helpers/server/ReadContent";
 import fs from "fs";
-import mv from "mv";
 
 const formidable = require("formidable");
 
@@ -16,23 +15,11 @@ export default async function handler(req, res) {
         return;
       }
       /// get the tmp path of file
-      const uploadedFilePath = files.file[0].filepath;
+      const pdfPath = files.file[0].filepath;
 
       // Move the file to a permanent location
-      const destinationPath = path.join(
-        __dirname,
-        "../../",
-        "file" + Date.now()
-      );
-
-      mv(uploadedFilePath, destinationPath, function (err) {
-        if (err) {
-          console.log("Error while moving file", err);
-          throw err;
-        }
-      });
-
-      // fs.renameSync(uploadedFilePath, destinationPath);
+      const destinationPath = path.join(process.cwd(), "file" + Date.now());
+      fs.renameSync(pdfPath, destinationPath);
 
       try {
         const pdfText = await readContent(
