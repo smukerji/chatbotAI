@@ -115,6 +115,7 @@ function General({ chatbotId, chatbotName }: any) {
         open={openDeleteModal}
         setOpen={setOpenDeleteModal}
         chatbotId={chatbotId}
+        reload={true}
       />
     </div>
   );

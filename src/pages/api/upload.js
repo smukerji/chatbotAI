@@ -2,7 +2,6 @@ import path from "path";
 import { readContent } from "../../app/_helpers/server/ReadContent";
 import fs from "fs";
 import mv from "mv";
-import os from "os";
 
 const formidable = require("formidable");
 
@@ -37,35 +36,13 @@ export default async function handler(req, res) {
             charLength: pdfText.length,
             filepath: destinationPath,
             fileType: files.file[0].mimetype,
+            fileText: pdfText,
           });
         } catch (error) {
           console.error(error);
           res.status(500).send("Error reading file content");
         }
       });
-
-      const tempDir = os.tmpdir();
-
-      // Create a path within the temporary directory (e.g., '/tmp/myfolder')
-      const tempFolderPath = path.join(tempDir, "/");
-
-      // Function to list all files in a folder
-      const listFilesInFolder = (folderPath) => {
-        // Use fs.readdir to read the contents of the folder
-        fs.readdir(folderPath, (err, files) => {
-          // Handle errors
-          if (err) {
-            console.error("Error reading folder:", err);
-            return;
-          }
-
-          // Log the list of files
-          console.log("Files in folder:", files);
-
-          // You can perform additional operations with the file list here
-        });
-      };
-      listFilesInFolder(tempFolderPath);
     });
   } else {
     res.status(405).send("Method not allowed");

@@ -9,6 +9,7 @@ function DeleteModal({
   chatbotId,
   setChangeFlag,
   changeFlag,
+  reload,
 }: any) {
   /// states to handle modal
   const [confirmLoading, setConfirmLoading] = useState(false);
@@ -85,14 +86,22 @@ function DeleteModal({
       /// displaying status
       const data = await res.json();
 
-      messageApi.open({
-        type: "error",
-        content: data.text,
-      });
-      // .then(() => {
-      //   window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot`;
-      // });
-      setChangeFlag(!changeFlag);
+      if (reload) {
+        messageApi
+          .open({
+            type: "error",
+            content: data.text,
+          })
+          .then(() => {
+            window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot`;
+          });
+      } else {
+        messageApi.open({
+          type: "error",
+          content: data.text,
+        });
+        setChangeFlag(!changeFlag);
+      }
     } catch (error) {
       console.log("Error while deleting chatbot", error);
     } finally {
