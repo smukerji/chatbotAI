@@ -24,10 +24,47 @@ const authOptions: NextAuthOptions = {
   ],
 
   callbacks: {
-    async session({ session, user, token }) {
+    // async session({ session, user, token }) {
+
+    //   return session;
+    // },
+    async signIn({ user, account, profile, email, credentials }) {
       cookies().set("profile-img", user.image!);
       cookies().set("userId", user.id);
-      return session;
+
+      /// db connection
+      const db = (await connectDatabase()).db();
+
+      /// get the starter plan ID
+      const starterPlan = await db
+        .collection("plans")
+        .findOne({ name: "starter" });
+
+      /// insert in users table too
+      await db.collection("users").updateOne(
+        { _id: user.id },
+        {
+          $set: {
+            _id: user.id,
+            username: user.name,
+            email: user.email,
+            planId: starterPlan?._id,
+          },
+        },
+        {
+          upsert: true,
+        }
+      );
+
+      const isAllowedToSignIn = true;
+      if (isAllowedToSignIn) {
+        return true;
+      } else {
+        // Return false to display a default error message
+        return false;
+        // Or you can return a URL to redirect to:
+        // return '/unauthorized'
+      }
     },
   },
 };

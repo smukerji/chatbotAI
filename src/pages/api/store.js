@@ -31,6 +31,19 @@ export default async function handler(req, res) {
       // return;
       const files = JSON.parse(fields?.defaultFileList);
       const userId = fields?.userId[0];
+
+      /// db connection
+      const db = (await connectDatabase()).db();
+      /// first check id user is able to create chatbot or not
+      /// get the number of chatbot create by user
+      const noOfChatbotsUserCreated = await db
+        .collection("user-chatbots")
+        .countDocuments({ userId: userId });
+
+      console.log(
+        "No of chatbot user created <<<<<<<<",
+        noOfChatbotsUserCreated
+      );
       const chatbotId =
         fields?.chatbotId[0] !== "undefined" ? fields?.chatbotId[0] : uuid();
       const qaList = JSON.parse(fields?.qaList);
@@ -107,8 +120,6 @@ export default async function handler(req, res) {
 
       // console.log(qaList);
 
-      /// db connection
-      const db = (await connectDatabase()).db();
       /// if new chatbot is being created the new chatbot entry
       let collection = db.collection("chatbots-data");
 

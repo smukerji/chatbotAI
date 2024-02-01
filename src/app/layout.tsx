@@ -25,7 +25,7 @@ export default function RootLayout({
   /// usestate to check whether to display header or not
   useEffect(() => {
     setPath(window.location.pathname);
-  });
+  }, []);
 
   return (
     <html lang="en">
