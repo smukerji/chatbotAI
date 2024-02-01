@@ -1,10 +1,13 @@
 import { Input, Modal, message } from "antd";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import "./rename-modal.scss";
 import { CreateBotContext } from "../../../../../_helpers/client/Context/CreateBotContext";
+import axios from "axios";
 
 function NewChatbotNameModal({ open, setOpen, chatbotId }: any) {
+  const [cookies, setCookie] = useCookies(["userId"]);
+
   const botContext: any = useContext(CreateBotContext);
   const botDetails = botContext?.createBotInfo;
   const chatbotText = botDetails?.chatbotName;
@@ -18,6 +21,27 @@ function NewChatbotNameModal({ open, setOpen, chatbotId }: any) {
   const [messageApi, contextHolder] = message.useMessage();
 
   const handleOk = async () => {
+    /// check if user has exceeded the number of creation of bots
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/account/user/details?userId=${cookies?.userId}`
+    );
+
+    const userDetails = response.data;
+
+    if (
+      userDetails.noOfChatbotsUserCreated + 1 >
+      userDetails.plan.numberOfChatbot
+    ) {
+      messageApi.open({
+        type: "error",
+        content: "Chatbot Creation Limit Exceed",
+      });
+      setOpen(false);
+      setConfirmLoading(false);
+      botContext?.handleChange("");
+      return;
+    }
+
     if (chatbotText == "") {
       messageApi.open({
         type: "error",
@@ -41,6 +65,8 @@ function NewChatbotNameModal({ open, setOpen, chatbotId }: any) {
   const handleCancel = () => {
     setOpen(false);
   };
+
+  // useEff
 
   return (
     <>

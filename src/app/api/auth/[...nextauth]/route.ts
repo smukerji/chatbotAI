@@ -24,14 +24,12 @@ const authOptions: NextAuthOptions = {
   ],
 
   callbacks: {
-    // async session({ session, user, token }) {
-
-    //   return session;
-    // },
-    async signIn({ user, account, profile, email, credentials }) {
+    async session({ session, user, token }) {
       cookies().set("profile-img", user.image!);
       cookies().set("userId", user.id);
-
+      return session;
+    },
+    async signIn({ user, account, profile, email, credentials }) {
       /// db connection
       const db = (await connectDatabase()).db();
 

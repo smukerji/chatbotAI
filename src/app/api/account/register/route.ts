@@ -22,11 +22,15 @@ async function register(request: any) {
   const saltRounds = 10;
   const hashPassword = await bcrypt.hash(password, saltRounds);
 
+  /// get the starter plan ID
+  const starterPlan = await db.collection("plans").findOne({ name: "starter" });
+
   /// register new user
   await collection.insertOne({
     username,
     email,
     password: hashPassword,
+    planId: starterPlan?._id,
   });
 
   return { message: "Registered successfully... Please login to continue" };

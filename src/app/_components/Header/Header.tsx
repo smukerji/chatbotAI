@@ -154,7 +154,7 @@ function Header() {
                     window.location.href = "/account/login";
                   } else if (session?.user || userId) {
                     await logout();
-                    signOut();
+                    await signOut();
                     window.location.href = "/";
                   }
                 }}

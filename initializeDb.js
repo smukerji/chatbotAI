@@ -26,6 +26,19 @@ async function initializeDb() {
     { upsert: true }
   );
 
+  /// get the starter plan ID
+  const starterPlan = await db.collection("plans").findOne({ name: "starter" });
+  /// set the default plan Id for each user
+  await userColection.updateMany(
+    {},
+    {
+      $set: {
+        planId: starterPlan?._id,
+      },
+    },
+    { upsert: true }
+  );
+
   console.log("Database initialized successfully");
   process.exit();
 }
