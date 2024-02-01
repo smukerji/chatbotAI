@@ -302,7 +302,7 @@ export async function POST(request: any) {
                 ----------------
                 context:
                 ${similaritySearchResults}
-
+                
                 Answer user query and include images write respect to each line if available`,
               },
               // ...messages,

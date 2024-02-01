@@ -33,6 +33,8 @@
     height: 600px;
     width: 400px;
     background-color: white;
+    margin-right: 5%;
+    margin-bottom: 3%;
 }
 
 .embed-chatbot-container .chat-container {
@@ -45,7 +47,7 @@
     height: 85%;
 }
 
-.chat-container .chat-question{
+.chat-container .chat-question {
     width: 95%;
 }
 

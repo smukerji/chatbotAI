@@ -31,6 +31,9 @@ function Chat({
   sessionStartDate,
   setSessionID,
   setSessionStartDate,
+  isPopUp = false,
+  userId,
+  chatbotName,
 }: any) {
   const botContext: any = useContext(CreateBotContext);
   const botDetails = botContext?.createBotInfo;
@@ -116,7 +119,7 @@ function Chat({
           body: JSON.stringify({
             chatbotId: chatbot.id,
             messages: messagesTime,
-            userId: cookies.userId,
+            userId: cookies.userId ? cookies.userId : userId,
             sessionID,
             sessionStartDate,
             sessionEndDate: getDate(),
@@ -269,68 +272,71 @@ function Chat({
   return (
     <div className="chat-container">
       {/*------------------------------------------left-section----------------------------------------------*/}
-      <div className="chatbot-details">
-        <div className="detail">
-          <span>Chatbot ID</span>
-          <div className="chatbot-id">
-            <span>{chatbot?.id}</span> <Image src={copyIcon} alt="copy-icon" />
-          </div>
-        </div>
-
-        <div className="detail">
-          <span>Status</span>
-          <div className="status">
-            <div className="dot"></div> <span>Trained</span>
-          </div>
-        </div>
-
-        <div className="detail">
-          <span>Model</span>
-          <div className="model">
-            <span>gpt 3.5 - turbo</span>
-          </div>
-        </div>
-
-        <div className="detail">
-          <span>Number of characters</span>
-          <div className="characters">
-            <span>12</span>
-          </div>
-        </div>
-
-        <div className="detail">
-          <span>Visibility</span>
-          <div className="visibility">
-            <span>Public</span>
-          </div>
-        </div>
-
-        <div className="detail">
-          <div className="temperature">
-            <span>Temperature</span>
-            <span>{inputValue}</span>
+      {!isPopUp && (
+        <div className="chatbot-details">
+          <div className="detail">
+            <span>Chatbot ID</span>
+            <div className="chatbot-id">
+              <span>{chatbot?.id}</span>{" "}
+              <Image src={copyIcon} alt="copy-icon" />
+            </div>
           </div>
 
-          <Slider
-            min={0}
-            max={1}
-            onChange={onChange}
-            value={typeof inputValue === "number" ? inputValue : 0}
-            step={0.1}
-          />
-          <div className="slider-bottom">
-            <div>Reserved</div>
-            <div>Creative</div>
+          <div className="detail">
+            <span>Status</span>
+            <div className="status">
+              <div className="dot"></div> <span>Trained</span>
+            </div>
           </div>
-        </div>
 
-        <div className="detail">
-          <span>Last trained at</span>
-          <div className="trained">
-            <span>December 18,2023 at 03:17 PM </span>
+          <div className="detail">
+            <span>Model</span>
+            <div className="model">
+              <span>gpt 3.5 - turbo</span>
+            </div>
+          </div>
+
+          <div className="detail">
+            <span>Number of characters</span>
+            <div className="characters">
+              <span>12</span>
+            </div>
+          </div>
+
+          <div className="detail">
+            <span>Visibility</span>
+            <div className="visibility">
+              <span>Public</span>
+            </div>
+          </div>
+
+          <div className="detail">
+            <div className="temperature">
+              <span>Temperature</span>
+              <span>{inputValue}</span>
+            </div>
+
+            <Slider
+              min={0}
+              max={1}
+              onChange={onChange}
+              value={typeof inputValue === "number" ? inputValue : 0}
+              step={0.1}
+            />
+            <div className="slider-bottom">
+              <div>Reserved</div>
+              <div>Creative</div>
+            </div>
+          </div>
+
+          <div className="detail">
+            <span>Last trained at</span>
+            <div className="trained">
+              <span>December 18,2023 at 03:17 PM </span>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/*------------------------------------------right-section----------------------------------------------*/}
       <div className="messages-section">
@@ -421,7 +427,9 @@ function Chat({
             onChange={(event) => {
               setUserQuery(event.target.value);
             }}
-            placeholder={`Message ${botDetails?.chatbotName}`}
+            placeholder={`Message ${
+              isPopUp ? chatbotName : botDetails?.chatbotName
+            }`}
             value={userQuery}
           />
           <button className="icon" onClick={() => getReply("click")}>
