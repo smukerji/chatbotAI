@@ -4,7 +4,7 @@ import {
   MessageOutlined,
   MoreOutlined,
 } from "@ant-design/icons";
-import { Spin } from "antd";
+import { Spin, message } from "antd";
 import React, { Suspense, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import "./chatbot.scss";
@@ -40,6 +40,9 @@ const antIcon = (
 
 function Chatbot() {
   const { status } = useSession();
+
+  /// state to store user plan
+  const [userDetails, setUserDetails]: any = useState({});
 
   /// chatbots details state
   const [chatbotData, setChatbotData] = useState([]);
@@ -88,6 +91,19 @@ function Chatbot() {
           }
         );
         const data = await response.json();
+
+        /// get the user and plan details
+        const userDetailsresponse = await fetch(
+          `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/account/user/details?userId=${cookies?.userId}`,
+          {
+            method: "GET",
+            next: { revalidate: 0 },
+          }
+        );
+
+        const userDetails = await userDetailsresponse.json();
+        setUserDetails(userDetails);
+
         setChatbotData(data.chatbots);
         setLoading(false);
       } catch (error) {
@@ -98,6 +114,8 @@ function Chatbot() {
 
     fetchData();
   }, [changeFlag]);
+
+  useEffect(() => {}, []);
 
   /// view chatbot
   function openChatbot(id: any) {
@@ -148,7 +166,20 @@ function Chatbot() {
               /> */}
             </div>
             {/* <Link href={`${process.env.NEXT_PUBLIC_WEBSITE_URL}home`}> */}
-            <button onClick={() => setOpenNewChatbotNameModal(true)}>
+            <button
+              onClick={() => {
+                /// check if user has exceeded the number of creation of bots
+                if (
+                  userDetails?.noOfChatbotsUserCreated + 1 >
+                  userDetails?.plan.numberOfChatbot
+                ) {
+                  message.error("Chatbot Creation Limit Exceed");
+                  return;
+                }
+
+                setOpenNewChatbotNameModal(true);
+              }}
+            >
               New Chatbot
             </button>
             {/* </Link> */}
@@ -205,6 +236,7 @@ function Chatbot() {
           setChangeFlag={setChangeFlag}
           changeFlag={changeFlag}
         />
+
         <NewChatbotNameModal
           open={openNewChatbotNameModal}
           setOpen={setOpenNewChatbotNameModal}

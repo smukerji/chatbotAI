@@ -142,102 +142,122 @@ function Chat({
   /// get the chatbase response
   async function getReply(event: any) {
     if (event.key === "Enter" || event === "click") {
-      if (userQuery.trim() == "") {
-        alert("Please enter the message");
+      /// clear the response
+      setUserQuery("");
+      /// set the user query
+      setMessages((prev: any) => [
+        ...prev,
+        { role: "user", content: userQuery },
+      ]);
+      setMessagesTime((prev: any) => [
+        ...prev,
+        { role: "user", content: userQuery, messageTime: getDate() },
+      ]);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/account/user/details?userId=${cookies?.userId}`,
+        {
+          method: "GET",
+          next: { revalidate: 0 },
+        }
+      );
+
+      const userDetails = await response.json();
+
+      /// check if user can chat or not
+      const userChatCountTillNow = userDetails?.userDetails?.totalMessageCount;
+      const userPlanMessageLimit = userDetails?.plan?.messageLimit;
+      if (userChatCountTillNow + 1 > userPlanMessageLimit) {
+        message.error(
+          "Sorry you have exceeded the chat limit. PLease upgrade your plan"
+        );
+        return;
       } else {
-        /// clear the response
-        setUserQuery("");
-        /// set the user query
-        setMessages((prev: any) => [
-          ...prev,
-          { role: "user", content: userQuery },
-        ]);
-        setMessagesTime((prev: any) => [
-          ...prev,
-          { role: "user", content: userQuery, messageTime: getDate() },
-        ]);
-        try {
-          setLoading(true);
-          /// get similarity search
-          const response: any = await fetch(
-            `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/pinecone`,
-            {
-              method: "POST",
-              body: JSON.stringify({
-                userQuery,
-                chatbotId: chatbot?.id,
-                // userId: cookies.userId,
-                //// default chatbot set
-                userId:
-                  chatbot?.id === "123d148a-be02-4749-a612-65be9d96266c"
-                    ? "651d111b8158397ebd0e65fb"
-                    : chatbot?.id === "34cceb84-07b9-4b3e-ad6f-567a1c8f3557"
-                    ? "65795294269d08529b8cd743"
-                    : chatbot?.id === "f0893732-3302-46b2-922a-95e79ef3524c"
-                    ? "651d111b8158397ebd0e65fb"
-                    : cookies.userId,
-              }),
+        if (userQuery.trim() == "") {
+          alert("Please enter the message");
+        } else {
+          try {
+            setLoading(true);
+            /// get similarity search
+            const response: any = await fetch(
+              `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/pinecone`,
+              {
+                method: "POST",
+                body: JSON.stringify({
+                  userQuery,
+                  chatbotId: chatbot?.id,
+                  // userId: cookies.userId,
+                  //// default chatbot set
+                  userId:
+                    chatbot?.id === "123d148a-be02-4749-a612-65be9d96266c"
+                      ? "651d111b8158397ebd0e65fb"
+                      : chatbot?.id === "34cceb84-07b9-4b3e-ad6f-567a1c8f3557"
+                      ? "65795294269d08529b8cd743"
+                      : chatbot?.id === "f0893732-3302-46b2-922a-95e79ef3524c"
+                      ? "651d111b8158397ebd0e65fb"
+                      : cookies.userId,
+                }),
+              }
+            );
+
+            /// parse the response and extract the similarity results
+            const respText = await response.text();
+
+            const similaritySearchResults = JSON.parse(respText).join("\n");
+            console.log(similaritySearchResults);
+
+            /// get response from backend in streaming
+            const responseFromBackend: any = await fetch(
+              `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/chat`,
+              {
+                method: "POST",
+                body: JSON.stringify({
+                  similaritySearchResults,
+                  messages,
+                  userQuery,
+                }),
+              }
+            );
+            let resptext = "";
+            const reader = responseFromBackend.body
+              .pipeThrough(new TextDecoderStream())
+              .getReader();
+            while (true) {
+              const { value, done } = await reader.read();
+              if (done) {
+                /// setting the response when completed
+                setMessages((prev: any) => [
+                  ...prev,
+                  { role: "assistant", content: resptext },
+                ]);
+                /// setting the response time when completed
+                setMessagesTime((prev: any) => [
+                  ...prev,
+                  {
+                    role: "assistant",
+                    content: resptext,
+                    messageTime: getDate(),
+                  },
+                ]);
+                // if (!store.ok) {
+                //   alert(await store.text());
+                // }
+                setResponse("");
+                setLoading(false);
+                break;
+              }
+
+              resptext += value;
+              setResponse(resptext);
             }
-          );
-
-          /// parse the response and extract the similarity results
-          const respText = await response.text();
-
-          const similaritySearchResults = JSON.parse(respText).join("\n");
-          console.log(similaritySearchResults);
-
-          /// get response from backend in streaming
-          const responseFromBackend: any = await fetch(
-            `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/chat`,
-            {
-              method: "POST",
-              body: JSON.stringify({
-                similaritySearchResults,
-                messages,
-                userQuery,
-              }),
-            }
-          );
-          let resptext = "";
-          const reader = responseFromBackend.body
-            .pipeThrough(new TextDecoderStream())
-            .getReader();
-          while (true) {
-            const { value, done } = await reader.read();
-            if (done) {
-              /// setting the response when completed
-              setMessages((prev: any) => [
-                ...prev,
-                { role: "assistant", content: resptext },
-              ]);
-              /// setting the response time when completed
-              setMessagesTime((prev: any) => [
-                ...prev,
-                {
-                  role: "assistant",
-                  content: resptext,
-                  messageTime: getDate(),
-                },
-              ]);
-              // if (!store.ok) {
-              //   alert(await store.text());
-              // }
-              setResponse("");
-              setLoading(false);
-              break;
-            }
-
-            resptext += value;
-            setResponse(resptext);
+          } catch (e: any) {
+            console.log(
+              "Error while getting completion from custom chatbot",
+              e,
+              e.message
+            );
+          } finally {
+            setLoading(false);
           }
-        } catch (e: any) {
-          console.log(
-            "Error while getting completion from custom chatbot",
-            e,
-            e.message
-          );
-        } finally {
-          setLoading(false);
         }
       }
     }
@@ -275,7 +295,7 @@ function Chat({
       {!isPopUp && (
         <div className="chatbot-details">
           <div className="detail">
-            <span>Chatbot ID</span>
+            <span>ID</span>
             <div className="chatbot-id">
               <span>{chatbot?.id}</span>{" "}
               <Image src={copyIcon} alt="copy-icon" />

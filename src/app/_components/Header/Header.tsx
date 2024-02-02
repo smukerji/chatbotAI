@@ -12,9 +12,22 @@ import { useCookies } from "react-cookie";
 import { useUserService } from "../../_services/useUserService";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { formatNumber } from "../../_helpers/client/formatNumber";
 
 function Header() {
   const router = useRouter();
+  /// state to store user plan
+  const [userPlan, setUserPlan] = useState<{
+    _id: string;
+    name: string;
+    messageLimit: number;
+    numberOfChatbot: number;
+    trainingDataLimit: number;
+  }>();
+  const [userMessageCount, setUserMessageCount] = useState<number>(0);
+
+  /// state to store the percentage of message sent by user
+  const [progressPercent, setProgressPercent] = useState<number>(0);
 
   /// create a ref for menu to close it when user click outside of the mene-container
   const menuRef: any = useRef(null);
@@ -47,6 +60,28 @@ function Header() {
 
   /// useeffect to check if the user has clicked outside the menu and the menu is open set to false
   useEffect(() => {
+    /// get the user and plan details
+
+    const fetchData = async () => {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/account/user/details?userId=${cookies?.userId}`,
+        {
+          method: "GET",
+          next: { revalidate: 0 },
+        }
+      );
+
+      const userDetails = await response.json();
+      setUserMessageCount(userDetails?.userDetails?.totalMessageCount);
+      setUserPlan(userDetails?.plan);
+      const percent =
+        (userDetails?.userDetails?.totalMessageCount /
+          userDetails?.plan?.messageLimit) *
+        100;
+      setProgressPercent(percent);
+    };
+    fetchData();
+
     const handleClickOutside = (event: any) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
         setOpenMenu(false);
@@ -78,9 +113,16 @@ function Header() {
         {/*------------------------------------------messages limit----------------------------------------------*/}
         <div className="messages-limit-container">
           <span>Messages</span>
-          <Progress strokeLinecap="butt" percent={75} showInfo={false} />
+          <Progress
+            strokeLinecap="butt"
+            percent={progressPercent}
+            showInfo={false}
+          />
           <span>
-            <span style={{ color: "#141416" }}>24</span>/100
+            <span style={{ color: "#141416" }}>{userMessageCount}</span>/
+            {formatNumber(
+              userPlan?.messageLimit ? userPlan?.messageLimit : 10000
+            )}
           </span>
         </div>
 

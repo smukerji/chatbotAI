@@ -49,7 +49,7 @@ function General({ chatbotId, chatbotName }: any) {
       <div className="ids-container">
         <div className="ids">ID</div>
         <div className="ids-details">
-          <div className="ids-detail-content">tl059483fdsdfJHKCd8s</div>
+          <div className="ids-detail-content">{chatbotId}</div>
           <div className="icon">
             <svg
               xmlns="http://www.w3.org/2000/svg"

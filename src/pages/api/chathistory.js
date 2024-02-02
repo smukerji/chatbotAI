@@ -20,6 +20,22 @@ export default async function handler(req, res) {
     /// get the collection to store chat history
     let collection = db.collection("chat-history");
 
+    /// update the chat count
+    const updateBotCount = await db.collection("user-details").updateOne(
+      { userId: userId },
+      {
+        $set: {
+          userId: userId,
+        },
+        $inc: {
+          totalMessageCount: 1,
+        },
+      },
+      {
+        upsert: true,
+      }
+    );
+
     /// check if the user already interacted with the chatbot
     const user = await collection.findOne({
       userId,

@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDatabase } from "../../../../../db";
 import { ObjectId } from "mongodb";
+import { apiHandler } from "../../../../_helpers/server/api/api-handler";
+module.exports = apiHandler({
+  GET: userDetails,
+});
 
-export async function GET(request: NextRequest) {
+async function userDetails(request: NextRequest) {
   const params = request.nextUrl.searchParams;
   const userId: string = params.get("userId")!;
   /// first check id user is able to create chatbot or not
@@ -31,10 +35,15 @@ export async function GET(request: NextRequest) {
     ])
     .toArray();
 
-  return NextResponse.json({
+  const userDetails = await db.collection("user-details").findOne({
+    userId: userId,
+  });
+
+  return {
     plan: planDetails[0].plan[0],
     noOfChatbotsUserCreated,
-  });
+    userDetails,
+  };
   //   const chatbotCapacity = planDetails[0].plan[0].numberOfChatbot;
   //   if (noOfChatbotsUserCreated + 1 > chatbotCapacity)
   //     return res.status(200).send({
