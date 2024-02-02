@@ -230,6 +230,7 @@ function Home({
       formData.append("deleteFileList", JSON.stringify(deleteFileList));
       formData.append("deleteQAList", JSON.stringify(botDetails?.deleteQaList));
       formData.append("crawledList", JSON.stringify(crawledList));
+      formData.append("numberOfCharacterTrained", totalCharCount);
       formData.append(
         "deleteCrawlList",
         JSON.stringify(botDetails?.deleteCrawlList)

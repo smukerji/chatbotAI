@@ -107,6 +107,7 @@ function DeleteModal({
     } finally {
       setOpen(false);
       setConfirmLoading(false);
+      setOkText("Delete");
     }
   };
 

@@ -42,6 +42,16 @@ function General({ chatbotId, chatbotName }: any) {
     }
   };
 
+  /// to copy chatbot Id
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.write(chatbotId);
+      message.success("ID copied to clipboard");
+    } catch (err: any) {
+      message.error("Failed to copy ", err.message);
+    }
+  };
+
   /// managing delete chatbot
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   return (
@@ -50,7 +60,7 @@ function General({ chatbotId, chatbotName }: any) {
         <div className="ids">ID</div>
         <div className="ids-details">
           <div className="ids-detail-content">{chatbotId}</div>
-          <div className="icon">
+          <div className="icon" onClick={handleCopy}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="20"

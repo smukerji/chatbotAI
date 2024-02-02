@@ -20,6 +20,13 @@ async function dataSources(request: any) {
     chatbotId: chatbotId,
   });
 
+  /// get chatbot Setting
+  const chatBotSettingCollection = db.collection("chatbot-settings");
+  const chatbotSetting = await chatBotSettingCollection.findOne({
+    chatbotId: chatbotId,
+    userId: userId,
+  });
+
   /// filter the source as per home component
   let qaCount = 0;
   let qaCharCount = 0;
@@ -74,5 +81,6 @@ async function dataSources(request: any) {
     crawlData,
     crawlDataLength,
     chatbotName: chatbotDetails?.chatbotName,
+    chatbotSetting,
   };
 }

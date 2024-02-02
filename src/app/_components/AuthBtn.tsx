@@ -3,10 +3,12 @@ import { useUserService } from "../_services/useUserService";
 import { signOut, useSession } from "next-auth/react";
 import { useCookies } from "react-cookie";
 import jwt from "jsonwebtoken";
+import { useRouter } from "next/navigation";
 
 export default function AuthBtn() {
   const { data: session } = useSession();
   const userService = useUserService();
+  const router = useRouter();
   const [cookies, setCookie, removeCookie] = useCookies([
     "userId",
     "authorization",
@@ -61,7 +63,8 @@ export default function AuthBtn() {
         <div
           className="try-free-btn"
           onClick={() => {
-            window.location.href = "/chatbot";
+            // window.location.href = "/chatbot";
+            router.push("/chatbot");
           }}
         >
           My Chatbots

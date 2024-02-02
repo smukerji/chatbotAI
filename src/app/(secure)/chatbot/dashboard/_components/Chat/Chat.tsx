@@ -20,6 +20,8 @@ import dislikeIcon from "../../../../../../../public/svgs/dislike.svg";
 import sendChatIcon from "../../../../../../../public/svgs/send.svg";
 import { v4 as uuid } from "uuid";
 import { CreateBotContext } from "../../../../../_helpers/client/Context/CreateBotContext";
+import { ChatbotSettingContext } from "../../../../../_helpers/client/Context/ChatbotSettingContext";
+import { formatTimestamp } from "../../../../../_helpers/client/formatTimestamp";
 
 function Chat({
   chatbot,
@@ -35,8 +37,13 @@ function Chat({
   userId,
   chatbotName,
 }: any) {
+  /// get the bot context
   const botContext: any = useContext(CreateBotContext);
   const botDetails = botContext?.createBotInfo;
+
+  /// get the bot settings context
+  const botSettingContext: any = useContext(ChatbotSettingContext);
+  const botSettings = botSettingContext?.chatbotSettings;
 
   const [cookies, setCookies] = useCookies(["userId"]);
 
@@ -289,6 +296,16 @@ function Chat({
 
   // console.log(messageImages);
 
+  /// to copy chatbot Id
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.write(chatbot?.id);
+      message.success("ID copied to clipboard");
+    } catch (err: any) {
+      message.error("Failed to copy ", err.message);
+    }
+  };
+
   return (
     <div className="chat-container">
       {/*------------------------------------------left-section----------------------------------------------*/}
@@ -298,7 +315,12 @@ function Chat({
             <span>ID</span>
             <div className="chatbot-id">
               <span>{chatbot?.id}</span>{" "}
-              <Image src={copyIcon} alt="copy-icon" />
+              <Image
+                src={copyIcon}
+                alt="copy-icon"
+                style={{ cursor: "pointer" }}
+                onClick={handleCopy}
+              />
             </div>
           </div>
 
@@ -352,7 +374,7 @@ function Chat({
           <div className="detail">
             <span>Last trained at</span>
             <div className="trained">
-              <span>December 18,2023 at 03:17 PM </span>
+              <span>{formatTimestamp(botSettings?.lastTrained)}</span>
             </div>
           </div>
         </div>

@@ -8,6 +8,19 @@ import { v4 as uuid } from "uuid";
 import { authorize, uploadFile } from "../../app/_services/googleFileUpload";
 
 import {
+  chatbotBubbleAlignment,
+  defaultChatBubbleIconColor,
+  defaultModelInstruction,
+  defaultPlaceholderMessage,
+  defaultSuggestedMessage,
+  defaultUserMessageColor,
+  initialMessage,
+  models,
+  theme,
+  visibility,
+} from "../../app/_helpers/constant";
+
+import {
   deleteFileVectorsById,
   updateVectorsById,
   upsert,
@@ -32,6 +45,7 @@ export default async function handler(req, res) {
         // return;
         const files = JSON.parse(fields?.defaultFileList);
         const userId = fields?.userId[0];
+        const numberOfCharacterTrained = fields?.numberOfCharacterTrained[0];
 
         /// db connection
         const db = (await connectDatabase()).db();
@@ -530,6 +544,7 @@ export default async function handler(req, res) {
           : "Chabot trained successfully";
 
         if (!updateChatbot) {
+          /// create the chatbot entry in DB
           const chatbotName = fields?.chatbotText[0];
           let userChatbotsCollection = db.collection("user-chatbots");
           await userChatbotsCollection.insertOne({
@@ -537,6 +552,38 @@ export default async function handler(req, res) {
             chatbotId,
             chatbotName,
           });
+
+          /// set the default settings for the chatbot in DB
+          await db.collection("chatbot-settings").insertOne({
+            userId: userId,
+            chatbotId: chatbotId,
+            model: models[0],
+            visibility: visibility.PUBLIC,
+            temperature: 0,
+            numberOfCharacterTrained: numberOfCharacterTrained,
+            instruction: defaultModelInstruction,
+            initialMessage: initialMessage,
+            suggestedMessages: defaultSuggestedMessage,
+            messagePlaceholder: defaultPlaceholderMessage,
+            theme: theme.LIGHT,
+            userMessageColor: defaultUserMessageColor,
+            chatbotIconColor: defaultChatBubbleIconColor,
+            profilePictureUrl: "",
+            bubbleIconUrl: "",
+            lastTrained: new Date().getTime(),
+            chatbotBubbleAlignment: chatbotBubbleAlignment.LEFT,
+          });
+        } else {
+          /// if chatbot is being updated just update the timestamp and characters
+          await db.collection("chatbot-settings").updateOne(
+            { userId: userId, chatbotId: chatbotId },
+            {
+              $set: {
+                numberOfCharacterTrained: numberOfCharacterTrained,
+                lastTrained: new Date().getTime(),
+              },
+            }
+          );
         }
         return res.status(responseCode).send(responseText);
       });

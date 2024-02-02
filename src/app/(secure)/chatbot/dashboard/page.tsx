@@ -19,12 +19,18 @@ import { CreateBotContext } from "../../../_helpers/client/Context/CreateBotCont
 import History from "./_components/History/History";
 import EmbedSite from "./_components/EmbedSite/EmbedSite";
 import Integration from "./_components/Integration/Integration";
+import { ChatbotSettingContext } from "../../../_helpers/client/Context/ChatbotSettingContext";
 
 function Dashboard() {
   const { status } = useSession();
 
+  /// get the bot context
   const botContext: any = useContext(CreateBotContext);
   const botDetails = botContext?.createBotInfo;
+
+  /// get the bot setting context
+  const chatbotSettingContext: any = useContext(ChatbotSettingContext);
+  const chatbotSettings = chatbotSettingContext?.chatbotSettings;
 
   /// check which action is active
   const editChatbot = botDetails?.editChatbot;
@@ -99,6 +105,9 @@ function Dashboard() {
           }
         );
         const content = await response.json();
+
+        /// set all the chatbot setting
+        chatbotSettingContext?.loadData(content?.chatbotSetting);
 
         /// total characters count
         // const tempQaCharCount = qaData ? qaData.qaCharCount : 0;

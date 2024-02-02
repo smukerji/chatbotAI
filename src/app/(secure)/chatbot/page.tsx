@@ -23,7 +23,7 @@ import GridLayout from "./_components/GridLayout";
 import TableLayout from "./_components/TableLayout";
 import DeleteModal from "./dashboard/_components/Modal/DeleteModal";
 import ShareModal from "./dashboard/_components/Modal/ShareModal";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
@@ -32,6 +32,7 @@ import Icon from "../../_components/Icon/Icon";
 import GridIcon from "../../../assets/svg/GridIcon";
 import MenuIcon from "../../../assets/svg/MenuIcon";
 import NewChatbotNameModal from "./dashboard/_components/Modal/NewChatbotNameModal";
+import LimitReachedModal from "./dashboard/_components/Modal/LimitReachedModal";
 // import GridIcon from "../../as";
 
 const antIcon = (
@@ -40,9 +41,13 @@ const antIcon = (
 
 function Chatbot() {
   const { status } = useSession();
+  const router = useRouter();
 
   /// state to store user plan
   const [userDetails, setUserDetails]: any = useState({});
+
+  //manage limit model
+  const [openLimitModal, setOpenLimitModel] = useState(false);
 
   /// chatbots details state
   const [chatbotData, setChatbotData] = useState([]);
@@ -100,10 +105,9 @@ function Chatbot() {
             next: { revalidate: 0 },
           }
         );
-
         const userDetails = await userDetailsresponse.json();
-        setUserDetails(userDetails);
 
+        setUserDetails(userDetails);
         setChatbotData(data.chatbots);
         setLoading(false);
       } catch (error) {
@@ -115,20 +119,29 @@ function Chatbot() {
     fetchData();
   }, [changeFlag]);
 
-  useEffect(() => {}, []);
-
   /// view chatbot
   function openChatbot(id: any) {
     /// send the user to dashboard page
-    window.location.href = `${
-      process.env.NEXT_PUBLIC_WEBSITE_URL
-    }chatbot/dashboard?${encodeURIComponent("chatbot")}=${encodeURIComponent(
-      JSON.stringify(
-        chatbotData.filter((data: any) => {
-          return data.id == id;
-        })[0]
-      )
-    )}`;
+    router.push(
+      `${
+        process.env.NEXT_PUBLIC_WEBSITE_URL
+      }chatbot/dashboard?${encodeURIComponent("chatbot")}=${encodeURIComponent(
+        JSON.stringify(
+          chatbotData.filter((data: any) => {
+            return data.id == id;
+          })[0]
+        )
+      )}`
+    );
+    // window.location.href = `${
+    //   process.env.NEXT_PUBLIC_WEBSITE_URL
+    // }chatbot/dashboard?${encodeURIComponent("chatbot")}=${encodeURIComponent(
+    //   JSON.stringify(
+    //     chatbotData.filter((data: any) => {
+    //       return data.id == id;
+    //     })[0]
+    //   )
+    // )}`;
   }
 
   if (status === "authenticated" || cookies?.userId) {
@@ -171,9 +184,9 @@ function Chatbot() {
                 /// check if user has exceeded the number of creation of bots
                 if (
                   userDetails?.noOfChatbotsUserCreated + 1 >
-                  userDetails?.plan.numberOfChatbot
+                  userDetails?.plan?.numberOfChatbot
                 ) {
-                  message.error("Chatbot Creation Limit Exceed");
+                  setOpenLimitModel(true);
                   return;
                 }
 
@@ -184,6 +197,11 @@ function Chatbot() {
             </button>
             {/* </Link> */}
           </div>
+          {openLimitModal ? (
+            <LimitReachedModal setOpenLimitModel={setOpenLimitModel} />
+          ) : (
+            <></>
+          )}
         </div>
 
         {/*------------------------------------------chatbot-list-grid----------------------------------------------*/}

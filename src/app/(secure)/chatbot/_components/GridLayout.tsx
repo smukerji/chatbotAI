@@ -67,7 +67,7 @@ function GridLayout({
     };
   }, []);
 
-  if (chatbotData.length > 0) {
+  if (chatbotData?.length > 0) {
     return (
       <div className="chatbot-grid">
         {chatbotData?.map((data: any, index: number) => {

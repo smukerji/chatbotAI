@@ -78,11 +78,7 @@ function Model() {
               defaultValue="gpt-3.5-turbo"
               options={[
                 { value: "gpt-3.5-turbo", label: "gpt-3.5-turbo" },
-                {
-                  value: "gpt-3.5-turbo-instruct",
-                  label: "gpt-3.5-turbo-instruct",
-                },
-                { value: "Gpt 4", label: "Gpt 4" },
+                { value: "gpt-4", label: "gpt-4" },
               ]}
               suffixIcon={
                 <svg
