@@ -276,6 +276,7 @@ function ChatInterface({ chatbotId }: any) {
               type="text"
               className="message-input"
               placeholder="Enter your message here"
+              defaultValue={botSettings?.messagePlaceholder}
               onChange={(e) => {
                 botSettingContext?.handleChange("messagePlaceholder")(
                   e.target.value
@@ -331,6 +332,7 @@ function ChatInterface({ chatbotId }: any) {
               type="text"
               className="display-iput"
               placeholder="Super Bot"
+              defaultValue={botSettings?.chatbotDisplayName}
               onChange={(e) => {
                 botSettingContext?.handleChange("chatbotDisplayName")(
                   e.target.value

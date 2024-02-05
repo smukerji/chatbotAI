@@ -299,7 +299,7 @@ function Chat({
   /// to copy chatbot Id
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.write(chatbot?.id);
+      await navigator.clipboard.writeText(chatbot?.id);
       message.success("ID copied to clipboard");
     } catch (err: any) {
       message.error("Failed to copy ", err.message);

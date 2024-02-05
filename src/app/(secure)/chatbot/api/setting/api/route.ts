@@ -144,6 +144,7 @@ async function updateChatbotSettings(request: NextRequest) {
       chatbotBubbleAlignment,
       tempprofilePictureName,
       tempbubbleIconName,
+      chatbotDisplayName,
     } = body;
 
     /// extract only the field that need to be updated
@@ -173,6 +174,9 @@ async function updateChatbotSettings(request: NextRequest) {
       }),
       ...(tempbubbleIconName !== undefined && {
         bubbleIconName: tempbubbleIconName,
+      }),
+      ...(chatbotDisplayName !== undefined && {
+        chatbotDisplayName,
       }),
       ...(chatbotBubbleAlignment !== undefined && { chatbotBubbleAlignment }),
     };
