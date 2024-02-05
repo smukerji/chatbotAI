@@ -11,22 +11,6 @@ export const ChatbotSettingContext = createContext({});
 
 export const ChatbotSettingDataProvider = ({ children }: any) => {
   const [chatbotSettings, setChatbotSettings] = useState({
-    // model: models[0],
-    // visibility: visibility.PUBLIC,
-    // temperature: 0,
-    // lastTrained: new Date().getTime(),
-    // numberOfCharactersTrained: 0,
-    // instruction: "",
-    // initialMessage: "",
-    // suggestedMessage: [],
-    // messagePlaceholder: "",
-    // theme: "",
-    // userMessageColor: "",
-    // profilePictureUrl: "",
-    // chatbotIconColor: "",
-    // chatbotIconUrl: "",
-    // chatBubbleAlignment: "",
-
     model: models[0],
     visibility: visibility.PUBLIC,
     temperature: 0,
@@ -39,8 +23,11 @@ export const ChatbotSettingDataProvider = ({ children }: any) => {
     userMessageColor: "",
     chatbotIconColor: "",
     profilePictureUrl: "",
+    profilePictureName: "",
     bubbleIconUrl: "",
+    bubbleIconName: "",
     lastTrained: new Date().getTime(),
+    chatbotDisplayName: "",
     chatbotBubbleAlignment: chatbotBubbleAlignment.LEFT,
   });
 

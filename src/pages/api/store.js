@@ -570,6 +570,7 @@ export default async function handler(req, res) {
             chatbotIconColor: defaultChatBubbleIconColor,
             profilePictureUrl: "",
             bubbleIconUrl: "",
+            chatbotDisplayName: chatbotName,
             lastTrained: new Date().getTime(),
             chatbotBubbleAlignment: chatbotBubbleAlignment.LEFT,
           });

@@ -111,9 +111,9 @@ async function updateChatbotSettings(request: NextRequest) {
   /// Chatbot name if renaming is present
   const chatbotRename = body?.chatbotRename;
 
+  const db = (await connectDatabase())?.db();
   /// if rename is not ""
-  if (chatbotRename !== "") {
-    const db = (await connectDatabase())?.db();
+  if (chatbotRename !== "" && chatbotRename !== undefined) {
     const collection = db.collection("user-chatbots");
 
     /// update the name
@@ -123,6 +123,68 @@ async function updateChatbotSettings(request: NextRequest) {
         chatbotId: chatbotId,
       },
       { $set: { chatbotName: chatbotRename } }
+    );
+  } else {
+    /// update the chatbot settings table
+    const {
+      model,
+      visibility,
+      temperature,
+      numberOfCharacterTrained,
+      instruction,
+      initialMessage,
+      suggestedMessages,
+      messagePlaceholder,
+      theme,
+      userMessageColor,
+      chatbotIconColor,
+      tempprofilePictureUrl,
+      tempbubbleIconUrl,
+      lastTrained,
+      chatbotBubbleAlignment,
+      tempprofilePictureName,
+      tempbubbleIconName,
+    } = body;
+
+    /// extract only the field that need to be updated
+    const updateFields = {
+      ...(model !== undefined && { model }),
+      ...(visibility !== undefined && { visibility }),
+      ...(temperature !== undefined && { temperature }),
+      ...(numberOfCharacterTrained !== undefined && {
+        numberOfCharacterTrained,
+      }),
+      ...(instruction !== undefined && { instruction }),
+      ...(initialMessage !== undefined && { initialMessage }),
+      ...(suggestedMessages !== undefined && { suggestedMessages }),
+      ...(messagePlaceholder !== undefined && { messagePlaceholder }),
+      ...(theme !== undefined && { theme }),
+      ...(userMessageColor !== undefined && { userMessageColor }),
+      ...(chatbotIconColor !== undefined && { chatbotIconColor }),
+      ...(tempprofilePictureUrl !== undefined && {
+        profilePictureUrl: tempprofilePictureUrl,
+      }),
+      ...(tempbubbleIconUrl !== undefined && {
+        bubbleIconUrl: tempbubbleIconUrl,
+      }),
+      ...(lastTrained !== undefined && { lastTrained }),
+      ...(tempprofilePictureName !== undefined && {
+        profilePictureName: tempprofilePictureName,
+      }),
+      ...(tempbubbleIconName !== undefined && {
+        bubbleIconName: tempbubbleIconName,
+      }),
+      ...(chatbotBubbleAlignment !== undefined && { chatbotBubbleAlignment }),
+    };
+    const collection = db.collection("chatbot-settings");
+
+    /// update the name
+    await collection.updateOne(
+      {
+        userId: userId,
+        chatbotId: chatbotId,
+      },
+      { $set: updateFields }
     );
   }
 

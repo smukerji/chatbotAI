@@ -140,7 +140,7 @@ function Chat({
     if (conversationLength > 1 && conversationLength & 1) storeHistory();
   }, [messages]);
 
-  const [inputValue, setInputValue] = useState(0);
+  const [inputValue, setInputValue] = useState(botSettings?.temperature);
 
   const onChange = (newValue: number) => {
     setInputValue(newValue);
@@ -334,21 +334,21 @@ function Chat({
           <div className="detail">
             <span>Model</span>
             <div className="model">
-              <span>gpt 3.5 - turbo</span>
+              <span>{botSettings?.model}</span>
             </div>
           </div>
 
           <div className="detail">
             <span>Number of characters</span>
             <div className="characters">
-              <span>12</span>
+              <span>{botSettings?.numberOfCharacterTrained}</span>
             </div>
           </div>
 
           <div className="detail">
             <span>Visibility</span>
             <div className="visibility">
-              <span>Public</span>
+              <span>{botSettings?.visibility}</span>
             </div>
           </div>
 
