@@ -244,6 +244,8 @@ function Home({
           ? "65795294269d08529b8cd743"
           : chatbotId === "f0893732-3302-46b2-922a-95e79ef3524c"
           ? "651d111b8158397ebd0e65fb"
+          : chatbotId === "f8095ef4-6cd0-4373-a45e-8fe15cb6dd0f"
+          ? "6523fee523c290d75609a1fa"
           : cookies.userId
       );
       formData.append("qaList", JSON.stringify(botDetails?.qaList));

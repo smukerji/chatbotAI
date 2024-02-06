@@ -201,6 +201,8 @@ function Chat({
                       ? "65795294269d08529b8cd743"
                       : chatbot?.id === "f0893732-3302-46b2-922a-95e79ef3524c"
                       ? "651d111b8158397ebd0e65fb"
+                      : chatbot?.id === "f8095ef4-6cd0-4373-a45e-8fe15cb6dd0f"
+                      ? "6523fee523c290d75609a1fa"
                       : cookies.userId,
                 }),
               }
@@ -221,7 +223,22 @@ function Chat({
                   similaritySearchResults,
                   messages,
                   userQuery,
+                  chatbotId: chatbot?.id,
+                  //// default chatbot set
+                  userId:
+                    chatbot?.id === "123d148a-be02-4749-a612-65be9d96266c"
+                      ? "651d111b8158397ebd0e65fb"
+                      : chatbot?.id === "34cceb84-07b9-4b3e-ad6f-567a1c8f3557"
+                      ? "65795294269d08529b8cd743"
+                      : chatbot?.id === "f0893732-3302-46b2-922a-95e79ef3524c"
+                      ? "651d111b8158397ebd0e65fb"
+                      : chatbot?.id === "f8095ef4-6cd0-4373-a45e-8fe15cb6dd0f"
+                      ? "6523fee523c290d75609a1fa"
+                      : cookies.userId
+                      ? cookies.userId
+                      : userId,
                 }),
+                next: { revalidate: 0 },
               }
             );
             let resptext = "";
@@ -381,7 +398,12 @@ function Chat({
       )}
 
       {/*------------------------------------------right-section----------------------------------------------*/}
-      <div className="messages-section">
+      <div
+        className="messages-section"
+        style={{
+          backgroundColor: botSettings?.theme === "dark" ? "black" : "",
+        }}
+      >
         <div className="header">
           <span>Powered by Lucifer.AI</span>
           <div className="action-btns">
@@ -400,7 +422,13 @@ function Chat({
                   <div className="assistant-message-container">
                     <div
                       className="assistant-message"
-                      style={{ display: "flex", flexDirection: "column" }}
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        backgroundColor:
+                          botSettings?.theme === "dark" ? "#353945" : "",
+                        color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
+                      }}
                       dangerouslySetInnerHTML={{
                         __html: message.content,
                       }}
@@ -434,7 +462,11 @@ function Chat({
             else
               return (
                 <div className="user-message-container">
-                  <div className="user-message" key={index}>
+                  <div
+                    className="user-message"
+                    key={index}
+                    style={{ backgroundColor: botSettings?.userMessageColor }}
+                  >
                     {message.content}
                   </div>
                   <div className="time">{messagesTime[index]?.messageTime}</div>
@@ -443,7 +475,14 @@ function Chat({
           })}
           {loading && response.length == 0 && (
             <div className="assistant-message-container">
-              <div className="assistant-message">
+              <div
+                className="assistant-message"
+                style={{
+                  backgroundColor:
+                    botSettings?.theme === "dark" ? "#353945" : "",
+                  color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
+                }}
+              >
                 <div className="typing-indicator">
                   <div className="dot"></div>
                   <div className="dot"></div>
@@ -456,14 +495,29 @@ function Chat({
             <div className="assistant-message-container">
               <div
                 className="assistant-message"
-                style={{ display: "flex", flexDirection: "column" }}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  backgroundColor:
+                    botSettings?.theme === "dark" ? "#353945" : "",
+                  color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
+                }}
                 dangerouslySetInnerHTML={{ __html: response }}
               />
             </div>
           )}
         </div>
-        <div className="chat-question">
+        <div
+          className="chat-question"
+          style={{
+            backgroundColor: botSettings?.theme === "dark" ? "#353945" : "",
+          }}
+        >
           <input
+            style={{
+              backgroundColor: botSettings?.theme === "dark" ? "#353945" : "",
+              color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
+            }}
             type="text"
             onKeyDown={getReply}
             onChange={(event) => {
@@ -474,7 +528,11 @@ function Chat({
             }`}
             value={userQuery}
           />
-          <button className="icon" onClick={() => getReply("click")}>
+          <button
+            className="icon"
+            onClick={() => getReply("click")}
+            style={{ backgroundColor: botSettings?.userMessageColor }}
+          >
             <Image src={sendChatIcon} alt="send-chat-icon" />
           </button>
         </div>

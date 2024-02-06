@@ -677,6 +677,7 @@ function ChatInterface({ chatbotId }: any) {
                 style={{
                   backgroundColor:
                     botSettings?.theme === "dark" ? "#353945" : "",
+                  color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
                 }}
               />
               <span
