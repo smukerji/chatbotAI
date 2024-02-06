@@ -35,6 +35,8 @@ export const CreateBotDataProvider = ({ children }: any) => {
 
     isUpdateChatbot: false,
 
+    plan: {},
+
     chatbotName: "",
   };
   const [createBotInfo, setCreateBotInfo] = useState(initialCreateBotInfo);

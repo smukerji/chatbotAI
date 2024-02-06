@@ -5,6 +5,9 @@ import loginBg from "../../../../../public/sections-images/common/contact-us-bg-
 import luciferIcon from "../../../../../public/svgs/lucifer-ai-logo.svg";
 import googleIcon from "../../../../../public/google-icon-blue.svg";
 import githubIcon from "../../../../../public/github-icon-blue.svg";
+import openEyeIcon from "../../../../../public/svgs/open-eye.svg";
+import closeEyeIcon from "../../../../../public/svgs/close-eye.svg";
+
 import "./login.scss";
 import { signIn, useSession } from "next-auth/react";
 import { LoadingOutlined } from "@ant-design/icons";
@@ -18,6 +21,7 @@ function Login() {
   /// email and password messages state
   const [emailMessage, setEmailMessage]: any = useState("");
   const [passwordMessage, setPasswordMessage]: any = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   /// email and password storing state
   const [email, setEmail]: any = useState(null);
@@ -94,6 +98,11 @@ function Login() {
       setPasswordMessage("");
     }
   };
+
+  /// to toggle eye icon
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
   return (
     <div className="login-container">
       {/* --------------------------left section------------------------------ */}
@@ -111,7 +120,7 @@ function Login() {
         <div className="login-form">
           <h1>
             <span>Welcome back!</span>
-            <span>Glad to see you, Again!</span>
+            <span>Glad to see you Again!</span>
           </h1>
 
           <div className="input-container">
@@ -127,15 +136,23 @@ function Login() {
               />
               <span>{emailMessage}</span>
             </div>
-            <div>
+            <div className="password-container">
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="Enter your Password"
                 onChange={checkPassword}
                 onKeyDown={(e) => {
                   if (e.key == "Enter")
                     if (emailMessage == "" && passwordMessage == "") login();
                 }}
+              />
+              <Image
+                className="eye-icon"
+                src={showPassword ? closeEyeIcon : openEyeIcon}
+                alt="eye-icon"
+                width={24}
+                height={24}
+                onClick={togglePasswordVisibility}
               />
               <span>{passwordMessage}</span>
             </div>

@@ -21,6 +21,7 @@ async function initializeDb() {
         numberOfChatbot: 5,
         messageLimit: 10000,
         trainingDataLimit: 1000000,
+        websiteCrawlingLimit: 50,
       },
     },
     { upsert: true }

@@ -114,6 +114,23 @@ function Home({
   const currentTextHash = crypto.createHash("sha1").update(text).digest("hex");
 
   useEffect(() => {
+    const fetchData = async () => {
+      /// get the user and plan details
+      const userDetailsresponse = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/account/user/details?userId=${cookies?.userId}`,
+        {
+          method: "GET",
+          next: { revalidate: 0 },
+        }
+      );
+      const userDetails = await userDetailsresponse.json();
+      botContext.handleChange("plan")(userDetails?.plan);
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
     /// set chatbot name
     // Accessing search parameters using window.location.search to get chatbotname
     const searchParams = new URLSearchParams(window.location.search);
@@ -172,6 +189,23 @@ function Home({
   /// creating custom chatbot
   async function createCustomBot() {
     botContext?.handleChange("isLoading")(true);
+    /// check if the crawling links are as per user plan
+    if (crawledList?.length > botDetails?.plan?.websiteCrawlingLimit) {
+      message.error(
+        `You have only ${botDetails?.plan?.websiteCrawlingLimit} links limit to crawl in this plan. Please delete some links or update the plan`
+      );
+      botContext?.handleChange("isLoading")(false);
+      return;
+    }
+
+    /// if the training data limit is exceeded  then show error message
+    if (totalCharCount > botDetails?.plan?.trainingDataLimit) {
+      message.error(
+        "Training data limit exceed. Please remove some training data or upgrade the plan."
+      );
+      botContext?.handleChange("isLoading")(false);
+      return;
+    }
 
     if (
       qaCount === 0 &&
@@ -440,6 +474,8 @@ function Home({
                 websiteCharCount={websiteCharCount}
                 totalCharCount={totalCharCount}
                 isUpdateChatbot={isUpdateChatbot}
+                chatbotId={chatbotId}
+                userId={cookies?.userId}
               />
             )}
           </div>
@@ -509,7 +545,7 @@ function Home({
 
                 <span>
                   {totalCharCount}
-                  <span>/11.000.000 limit</span>
+                  <span>/{botDetails?.plan?.trainingDataLimit}</span>
                 </span>
               </div>
             </div>

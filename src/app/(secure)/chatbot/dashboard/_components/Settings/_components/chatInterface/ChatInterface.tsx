@@ -327,7 +327,7 @@ function ChatInterface({ chatbotId }: any) {
 
           {/* --------------display-container */}
           <div className="display-container">
-            <p className="display-text">Display name</p>
+            <p className="display-text">Display Name</p>
             <input
               type="text"
               className="display-iput"

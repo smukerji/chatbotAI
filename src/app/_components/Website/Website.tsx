@@ -5,7 +5,13 @@ import Image from "next/image";
 import "./website.scss";
 import deleteIcon from "../../../../public/create-chatbot-svgs/delete-icon.svg";
 
-function Website({ websiteCharCount, totalCharCount, isUpdateChatbot }: any) {
+function Website({
+  websiteCharCount,
+  totalCharCount,
+  isUpdateChatbot,
+  chatbotId,
+  userId,
+}: any) {
   const [progress, setProgress] = useState(0);
 
   const botContext: any = useContext(CreateBotContext);
@@ -71,6 +77,8 @@ function Website({ websiteCharCount, totalCharCount, isUpdateChatbot }: any) {
         },
         body: JSON.stringify({
           sourceURL: value,
+          chatbotId: chatbotId,
+          userId: userId,
         }),
         next: { revalidate: 0 },
       };
@@ -161,7 +169,7 @@ function Website({ websiteCharCount, totalCharCount, isUpdateChatbot }: any) {
         on the website).
         <span>
           {crawledList?.length}
-          <span>/10 links</span>
+          <span>/{botDetails?.plan?.websiteCrawlingLimit} links</span>
         </span>
       </span>
       <hr />

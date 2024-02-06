@@ -128,7 +128,15 @@ function Header() {
 
         {/*------------------------------------------chatbot-btn----------------------------------------------*/}
         <a href="/chatbot" style={{ textDecoration: "none" }}>
-          <button className="feedback-btn">My Chatbots</button>
+          <button
+            className="feedback-btn"
+            style={{
+              color:
+                `${window.location.pathname}` === "/chatbot" ? "#2E58EA" : "",
+            }}
+          >
+            My Chatbots
+          </button>
         </a>
         {/*------------------------------------------feedback-btn----------------------------------------------*/}
         <button className="feedback-btn">Feedback</button>

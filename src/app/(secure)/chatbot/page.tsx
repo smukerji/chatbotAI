@@ -5,7 +5,7 @@ import {
   MoreOutlined,
 } from "@ant-design/icons";
 import { Spin, message } from "antd";
-import React, { Suspense, useEffect, useState } from "react";
+import React, { Suspense, useContext, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import "./chatbot.scss";
 import Image from "next/image";
@@ -33,6 +33,7 @@ import GridIcon from "../../../assets/svg/GridIcon";
 import MenuIcon from "../../../assets/svg/MenuIcon";
 import NewChatbotNameModal from "./dashboard/_components/Modal/NewChatbotNameModal";
 import LimitReachedModal from "./dashboard/_components/Modal/LimitReachedModal";
+import { CreateBotContext } from "../../_helpers/client/Context/CreateBotContext";
 // import GridIcon from "../../as";
 
 const antIcon = (
@@ -42,6 +43,9 @@ const antIcon = (
 function Chatbot() {
   const { status } = useSession();
   const router = useRouter();
+
+  const botContext: any = useContext(CreateBotContext);
+  const botDetails = botContext?.createBotInfo;
 
   /// state to store user plan
   const [userDetails, setUserDetails]: any = useState({});
@@ -106,6 +110,8 @@ function Chatbot() {
           }
         );
         const userDetails = await userDetailsresponse.json();
+
+        botContext?.handleChange("plan")(userDetails?.plan);
 
         setUserDetails(userDetails);
         setChatbotData(data.chatbots);
