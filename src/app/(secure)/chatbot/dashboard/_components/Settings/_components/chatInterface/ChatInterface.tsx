@@ -609,6 +609,7 @@ function ChatInterface({ chatbotId }: any) {
                     message.trim() !== "" && (
                       <div
                         className="msg"
+                        key={index}
                         style={{
                           backgroundColor:
                             botSettings?.theme === "dark" ? "#353945" : "",
