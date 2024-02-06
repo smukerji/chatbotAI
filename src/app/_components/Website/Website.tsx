@@ -4,6 +4,7 @@ import { Progress, message } from "antd";
 import Image from "next/image";
 import "./website.scss";
 import deleteIcon from "../../../../public/create-chatbot-svgs/delete-icon.svg";
+import { UserDetailsContext } from "../../_helpers/client/Context/UserDetailsContext";
 
 function Website({
   websiteCharCount,
@@ -16,6 +17,10 @@ function Website({
 
   const botContext: any = useContext(CreateBotContext);
   const botDetails = botContext?.createBotInfo;
+
+  /// get userDetails context
+  const userDetailContext: any = useContext(UserDetailsContext);
+  const userDetails = userDetailContext?.userDetails;
 
   /// get the crawledlist & deleteCrawlList from context
   const crawledList = botDetails?.crawledList;
@@ -169,7 +174,7 @@ function Website({
         on the website).
         <span>
           {crawledList?.length}
-          <span>/{botDetails?.plan?.websiteCrawlingLimit} links</span>
+          <span>/{userDetails?.plan?.websiteCrawlingLimit} links</span>
         </span>
       </span>
       <hr />

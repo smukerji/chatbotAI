@@ -34,6 +34,7 @@ import MenuIcon from "../../../assets/svg/MenuIcon";
 import NewChatbotNameModal from "./dashboard/_components/Modal/NewChatbotNameModal";
 import LimitReachedModal from "./dashboard/_components/Modal/LimitReachedModal";
 import { CreateBotContext } from "../../_helpers/client/Context/CreateBotContext";
+import { UserDetailsContext } from "../../_helpers/client/Context/UserDetailsContext";
 // import GridIcon from "../../as";
 
 const antIcon = (
@@ -47,8 +48,12 @@ function Chatbot() {
   const botContext: any = useContext(CreateBotContext);
   const botDetails = botContext?.createBotInfo;
 
+  /// get userDetails context
+  const userDetailContext: any = useContext(UserDetailsContext);
+  const userDetails = userDetailContext?.userDetails;
+
   /// state to store user plan
-  const [userDetails, setUserDetails]: any = useState({});
+  // const [userDetails, setUserDetails]: any = useState({});
 
   //manage limit model
   const [openLimitModal, setOpenLimitModel] = useState(false);
@@ -110,10 +115,13 @@ function Chatbot() {
           }
         );
         const userDetails = await userDetailsresponse.json();
+        userDetailContext?.handleChange("noOfChatbotsUserCreated")(
+          userDetails?.noOfChatbotsUserCreated
+        );
 
-        botContext?.handleChange("plan")(userDetails?.plan);
+        // botContext?.handleChange("plan")(userDetails?.plan);
 
-        setUserDetails(userDetails);
+        // setUserDetails(userDetails);
         setChatbotData(data.chatbots);
         setLoading(false);
       } catch (error) {

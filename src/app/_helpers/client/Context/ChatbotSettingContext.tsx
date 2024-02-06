@@ -10,13 +10,13 @@ import {
 export const ChatbotSettingContext = createContext({});
 
 export const ChatbotSettingDataProvider = ({ children }: any) => {
-  const [chatbotSettings, setChatbotSettings] = useState({
+  const initialChatbotSettings = {
     model: models[0],
     visibility: visibility.PUBLIC,
     temperature: 0,
     numberOfCharacterTrained: 0,
     instruction: "",
-    initialMessage: "",
+    initialMessage: [],
     suggestedMessages: [],
     messagePlaceholder: "",
     theme: theme.LIGHT,
@@ -29,7 +29,10 @@ export const ChatbotSettingDataProvider = ({ children }: any) => {
     lastTrained: new Date().getTime(),
     chatbotDisplayName: "",
     chatbotBubbleAlignment: chatbotBubbleAlignment.LEFT,
-  });
+  };
+  const [chatbotSettings, setChatbotSettings] = useState(
+    initialChatbotSettings
+  );
 
   /// handle individual the changes
   const handleChange = (props: any) => (value: any) => {
@@ -44,9 +47,13 @@ export const ChatbotSettingDataProvider = ({ children }: any) => {
     setChatbotSettings({ ...chatbotSettings, ...obj });
   };
 
+  const resetChatbotSettings = () => {
+    setChatbotSettings(initialChatbotSettings);
+  };
+
   return (
     <ChatbotSettingContext.Provider
-      value={{ chatbotSettings, handleChange, loadData }}
+      value={{ chatbotSettings, handleChange, loadData, resetChatbotSettings }}
     >
       {children}
     </ChatbotSettingContext.Provider>

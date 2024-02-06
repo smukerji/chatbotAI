@@ -22,6 +22,10 @@ import { v4 as uuid } from "uuid";
 import { CreateBotContext } from "../../../../../_helpers/client/Context/CreateBotContext";
 import { ChatbotSettingContext } from "../../../../../_helpers/client/Context/ChatbotSettingContext";
 import { formatTimestamp } from "../../../../../_helpers/client/formatTimestamp";
+import Icon from "../../../../../_components/Icon/Icon";
+import RefreshBtn from "../../../../../../assets/svg/RefreshBtn";
+import ExportBtn from "../../../../../../assets/svg/ExportBtn";
+import { UserDetailsContext } from "../../../../../_helpers/client/Context/UserDetailsContext";
 
 function Chat({
   chatbot,
@@ -40,6 +44,10 @@ function Chat({
   /// get the bot context
   const botContext: any = useContext(CreateBotContext);
   const botDetails = botContext?.createBotInfo;
+
+  /// get userDetails context
+  const userDetailContext: any = useContext(UserDetailsContext);
+  const userDetails = userDetailContext?.userDetails;
 
   /// get the bot settings context
   const botSettingContext: any = useContext(ChatbotSettingContext);
@@ -118,6 +126,17 @@ function Chat({
 
   useEffect(() => {
     const storeHistory = async () => {
+      /// update the message count
+      userDetailContext?.handleChange("totalMessageCount")(
+        userDetails?.totalMessageCount + 1
+      );
+      const percent =
+        ((userDetails?.totalMessageCount + 1) /
+          userDetails?.plan?.messageLimit) *
+        100;
+
+      /// store the percentage of message sent by user
+      userDetailContext?.handleChange("percent")(percent);
       /// store/update the chathistory
       const store = await fetch(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/chathistory`,
@@ -140,10 +159,10 @@ function Chat({
     if (conversationLength > 1 && conversationLength & 1) storeHistory();
   }, [messages]);
 
-  const [inputValue, setInputValue] = useState(botSettings?.temperature);
+  // const [inputValue, setInputValue] = useState(botSettings?.temperature);
 
   const onChange = (newValue: number) => {
-    setInputValue(newValue);
+    botSettingContext?.handleChange("temperature")(newValue);
   };
 
   /// get the chatbase response
@@ -372,14 +391,19 @@ function Chat({
           <div className="detail">
             <div className="temperature">
               <span>Temperature</span>
-              <span>{inputValue}</span>
+              <span>{botSettings?.temperature}</span>
             </div>
 
             <Slider
               min={0}
               max={1}
               onChange={onChange}
-              value={typeof inputValue === "number" ? inputValue : 0}
+              value={
+                typeof botSettings?.temperature === "number"
+                  ? botSettings?.temperature
+                  : 0
+              }
+              disabled={true}
               step={0.1}
             />
             <div className="slider-bottom">
@@ -407,8 +431,17 @@ function Chat({
         <div className="header">
           <span>Powered by Lucifer.AI</span>
           <div className="action-btns">
-            <Image src={refreshBtn} alt="refresh-btn" onClick={refreshChat} />
-            <Image src={exportBtn} alt="export-btn" />
+            {/* <Image src={refreshBtn} alt="refresh-btn" onClick={refreshChat} /> */}
+            {/* <Image src={exportBtn} alt="export-btn" /> */}
+            <Icon
+              Icon={RefreshBtn}
+              onClick={refreshChat}
+              className={botSettings?.theme === "dark" ? "color-white" : ""}
+            />
+            <Icon
+              Icon={ExportBtn}
+              className={botSettings?.theme === "dark" ? "color-white" : ""}
+            />
           </div>
         </div>
 

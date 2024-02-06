@@ -8,6 +8,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import ContactHeader from "./_components/Contact-Header/Contact-Header";
 import Header from "./_components/Header/Header";
+import { UserDetailsDataProvider } from "./_helpers/client/Context/UserDetailsContext";
 
 // const AuthBtn = dynamic(() => import("./_components/AuthBtn"), { ssr: false });
 const AuthHeader = dynamic(() => import("./_components/AuthHeader"), {
@@ -27,6 +28,8 @@ export default function RootLayout({
     setPath(window.location.pathname);
   }, []);
 
+  ///
+
   return (
     <html lang="en">
       <head>
@@ -40,8 +43,10 @@ export default function RootLayout({
 
       <body>
         <SessionProvider>
-          {path !== "/" && <AuthHeader />}
-          {children}
+          <UserDetailsDataProvider>
+            {path !== "/" && <AuthHeader />}
+            {children}
+          </UserDetailsDataProvider>
         </SessionProvider>
       </body>
     </html>

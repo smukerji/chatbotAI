@@ -230,14 +230,16 @@ function ChatInterface({ chatbotId }: any) {
             </Button>
           </div>
 
-          <input
+          <textarea
             className="input-container"
-            defaultValue={initialMessage}
-            value={botSettings?.initialMessage}
+            defaultValue={botSettings?.initialMessage.join("\n")}
+            value={botSettings?.initialMessage.join("\n")}
             onChange={(e) => {
-              botSettingContext?.handleChange("initialMessage")(e.target.value);
+              botSettingContext?.handleChange("initialMessage")(
+                e.target.value.split("\n")
+              );
             }}
-          ></input>
+          ></textarea>
 
           <p className="helper-text">Enter each message in a new line.</p>
 
@@ -602,16 +604,21 @@ function ChatInterface({ chatbotId }: any) {
             <div className="chat-box-body">
               {/* -----------------bots message-------------- */}
               <div className="message bot">
-                <div
-                  className="msg"
-                  style={{
-                    backgroundColor:
-                      botSettings?.theme === "dark" ? "#353945" : "",
-                    color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
-                  }}
-                >
-                  {botSettings?.initialMessage}
-                </div>
+                {botSettings?.initialMessage.map(
+                  (message: any, index: any) =>
+                    message.trim() !== "" && (
+                      <div
+                        className="msg"
+                        style={{
+                          backgroundColor:
+                            botSettings?.theme === "dark" ? "#353945" : "",
+                          color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
+                        }}
+                      >
+                        {message}
+                      </div>
+                    )
+                )}
                 <div className="like-icons">
                   <div className="like-img">
                     <Image src={like} alt="Like" />

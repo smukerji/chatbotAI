@@ -35,7 +35,7 @@ export const CreateBotDataProvider = ({ children }: any) => {
 
     isUpdateChatbot: false,
 
-    plan: {},
+    // plan: {},
 
     chatbotName: "",
   };

@@ -19,6 +19,7 @@ import { Spin, message } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import { useCookies } from "react-cookie";
 import { redirect, useRouter } from "next/navigation";
+import { UserDetailsContext } from "../../_helpers/client/Context/UserDetailsContext";
 const crypto = require("crypto");
 
 function Home({
@@ -43,6 +44,10 @@ function Home({
 
   const botContext: any = useContext(CreateBotContext);
   const botDetails = botContext?.createBotInfo;
+
+  /// get userDetails context
+  const userDetailContext: any = useContext(UserDetailsContext);
+  const userDetails = userDetailContext?.userDetails;
 
   /// check if chatbot is being updated
   const isUpdateChatbot = botDetails?.isUpdateChatbot;
@@ -113,22 +118,22 @@ function Home({
   const text = botDetails?.text;
   const currentTextHash = crypto.createHash("sha1").update(text).digest("hex");
 
-  useEffect(() => {
-    const fetchData = async () => {
-      /// get the user and plan details
-      const userDetailsresponse = await fetch(
-        `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/account/user/details?userId=${cookies?.userId}`,
-        {
-          method: "GET",
-          next: { revalidate: 0 },
-        }
-      );
-      const userDetails = await userDetailsresponse.json();
-      botContext.handleChange("plan")(userDetails?.plan);
-    };
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     /// get the user and plan details
+  //     const userDetailsresponse = await fetch(
+  //       `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/account/user/details?userId=${cookies?.userId}`,
+  //       {
+  //         method: "GET",
+  //         next: { revalidate: 0 },
+  //       }
+  //     );
+  //     const userDetails = await userDetailsresponse.json();
+  //     botContext.handleChange("plan")(userDetails?.plan);
+  //   };
 
-    fetchData();
-  }, []);
+  //   fetchData();
+  // }, []);
 
   useEffect(() => {
     /// set chatbot name
@@ -190,16 +195,16 @@ function Home({
   async function createCustomBot() {
     botContext?.handleChange("isLoading")(true);
     /// check if the crawling links are as per user plan
-    if (crawledList?.length > botDetails?.plan?.websiteCrawlingLimit) {
+    if (crawledList?.length > userDetails?.plan?.websiteCrawlingLimit) {
       message.error(
-        `You have only ${botDetails?.plan?.websiteCrawlingLimit} links limit to crawl in this plan. Please delete some links or update the plan`
+        `You have only ${userDetails?.plan?.websiteCrawlingLimit} links limit to crawl in this plan. Please delete some links or update the plan`
       );
       botContext?.handleChange("isLoading")(false);
       return;
     }
 
     /// if the training data limit is exceeded  then show error message
-    if (totalCharCount > botDetails?.plan?.trainingDataLimit) {
+    if (totalCharCount > userDetails?.plan?.trainingDataLimit) {
       message.error(
         "Training data limit exceed. Please remove some training data or upgrade the plan."
       );
@@ -545,7 +550,7 @@ function Home({
 
                 <span>
                   {totalCharCount}
-                  <span>/{botDetails?.plan?.trainingDataLimit}</span>
+                  <span>/{userDetails?.plan?.trainingDataLimit}</span>
                 </span>
               </div>
             </div>

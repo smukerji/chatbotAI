@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import LuciferLogo from "../../../../public/svgs/lucifer-ai-logo.svg";
 import profileIcon from "../../../../public/svgs/profile-circle.svg";
 import walletIcon from "../../../../public/svgs/wallet-add.svg";
@@ -13,21 +13,26 @@ import { useUserService } from "../../_services/useUserService";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { formatNumber } from "../../_helpers/client/formatNumber";
+import { UserDetailsContext } from "../../_helpers/client/Context/UserDetailsContext";
 
 function Header() {
   const router = useRouter();
   /// state to store user plan
-  const [userPlan, setUserPlan] = useState<{
-    _id: string;
-    name: string;
-    messageLimit: number;
-    numberOfChatbot: number;
-    trainingDataLimit: number;
-  }>();
-  const [userMessageCount, setUserMessageCount] = useState<number>(0);
+  // const [userPlan, setUserPlan] = useState<{
+  //   _id: string;
+  //   name: string;
+  //   messageLimit: number;
+  //   numberOfChatbot: number;
+  //   trainingDataLimit: number;
+  // }>();
+
+  const userDetailContext: any = useContext(UserDetailsContext);
+  const userDetails = userDetailContext?.userDetails;
+
+  // const [userMessageCount, setUserMessageCount] = useState<number>(0);
 
   /// state to store the percentage of message sent by user
-  const [progressPercent, setProgressPercent] = useState<number>(0);
+  // const [progressPercent, setProgressPercent] = useState<number>(0);
 
   /// create a ref for menu to close it when user click outside of the mene-container
   const menuRef: any = useRef(null);
@@ -72,13 +77,19 @@ function Header() {
       );
 
       const userDetails = await response.json();
-      setUserMessageCount(userDetails?.userDetails?.totalMessageCount);
-      setUserPlan(userDetails?.plan);
+      userDetailContext?.handleChange("totalMessageCount")(
+        userDetails?.userDetails?.totalMessageCount
+      );
+      userDetailContext?.handleChange("plan")(userDetails?.plan);
+      userDetailContext?.handleChange("noOfChatbotsUserCreated")(
+        userDetails?.noOfChatbotsUserCreated
+      );
       const percent =
         (userDetails?.userDetails?.totalMessageCount /
           userDetails?.plan?.messageLimit) *
         100;
-      setProgressPercent(percent);
+      /// store the percentage of message sent by user
+      userDetailContext?.handleChange("percent")(percent);
     };
     fetchData();
 
@@ -115,13 +126,18 @@ function Header() {
           <span>Messages</span>
           <Progress
             strokeLinecap="butt"
-            percent={progressPercent}
+            percent={userDetails?.percent}
             showInfo={false}
           />
           <span>
-            <span style={{ color: "#141416" }}>{userMessageCount}</span>/
+            <span style={{ color: "#141416" }}>
+              {userDetails?.totalMessageCount}
+            </span>
+            /
             {formatNumber(
-              userPlan?.messageLimit ? userPlan?.messageLimit : 10000
+              userDetails?.plan?.messageLimit
+                ? userDetails?.plan?.messageLimit
+                : 10000
             )}
           </span>
         </div>

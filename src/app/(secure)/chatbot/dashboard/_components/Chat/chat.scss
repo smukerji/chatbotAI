@@ -117,8 +117,34 @@
             .action-btns {
                 display: flex;
                 gap: 24px;
-                img {
+                .icon {
                     cursor: pointer;
+                    &.color-white {
+                        stroke-width: 1px;
+                        svg {
+                            color: white;
+                            stroke: white;
+                            path {
+                                color: white;
+                                stroke: white;
+                                fill: #fff;
+                            }
+                        }
+                    }
+                    &:first-child {
+                        &.color-white {
+                            stroke-width: 1px;
+                            svg {
+                                color: white;
+                                stroke: white;
+                                path {
+                                    color: white;
+                                    stroke: white;
+                                    fill: transparent;
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -213,7 +239,7 @@
             .user-message-container {
                 position: relative;
                 display: flex;
-                justify-content: end;
+                justify-content: flex-end;
                 margin-top: 10px;
                 margin-bottom: 10px;
                 .user-message {
