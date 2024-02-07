@@ -132,9 +132,36 @@ function Website({
     }
   };
 
-  //   const handleCrawlLinkChange = (event: any) => {
-  //     botContext?.handleChange("crawlLink")(event.target.value);
-  //   };
+  const deleteAllLinks = () => {
+    // console.log(botDetails);
+    let totalLinksCharToDelete = 0;
+    /// filter the links that need to be deleted from database
+    const newDeleteCrawlLinks = crawledList?.filter(
+      (link: any, index: number) => {
+        totalLinksCharToDelete += link?.charCount;
+
+        return link?.dataID != "" && link?.dataID != undefined;
+      }
+    );
+
+    /// set the delete crawl list
+    botContext?.handleChange("deleteCrawlList")([
+      ...deleteCrawlList,
+      ...newDeleteCrawlLinks,
+    ]);
+
+    /// update the char count
+    botContext?.handleChange("totalCharCount")(
+      totalCharCount - totalLinksCharToDelete
+    );
+    botContext?.handleChange("websiteCharCount")(
+      websiteCharCount - totalLinksCharToDelete
+    );
+
+    /// update the list
+    botContext?.handleChange("crawledList")([]);
+  };
+
   return (
     <div className="website-source-container">
       {/* <Search
@@ -179,7 +206,10 @@ function Website({
       </span>
       <hr />
       {crawledList?.length > 0 && (
-        <h2 className="website-text">Included links</h2>
+        <div className="website-text-container">
+          <h2 className="website-text">Included links</h2>
+          <span onClick={deleteAllLinks}>Delete all</span>
+        </div>
       )}
       <div className="fetched-links-container">
         {crawledList?.map((item: any, index: number) => {

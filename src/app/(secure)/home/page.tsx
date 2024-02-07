@@ -20,6 +20,7 @@ import { LoadingOutlined } from "@ant-design/icons";
 import { useCookies } from "react-cookie";
 import { redirect, useRouter } from "next/navigation";
 import { UserDetailsContext } from "../../_helpers/client/Context/UserDetailsContext";
+import { formatNumber } from "../../_helpers/client/formatNumber";
 const crypto = require("crypto");
 
 function Home({
@@ -550,7 +551,13 @@ function Home({
 
                 <span>
                   {totalCharCount}
-                  <span>/{userDetails?.plan?.trainingDataLimit}</span>
+                  <span>
+                    /
+                    {userDetails?.plan?.trainingDataLimit
+                      ? formatNumber(userDetails?.plan?.trainingDataLimit)
+                      : 0}{" "}
+                    limit
+                  </span>
                 </span>
               </div>
             </div>
