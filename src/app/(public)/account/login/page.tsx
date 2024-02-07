@@ -120,7 +120,7 @@ function Login() {
         <div className="login-form">
           <h1>
             <span>Welcome back!</span>
-            <span>Glad to see you Again!</span>
+            <span>Glad to see you again!</span>
           </h1>
 
           <div className="input-container">
@@ -148,7 +148,7 @@ function Login() {
               />
               <Image
                 className="eye-icon"
-                src={showPassword ? closeEyeIcon : openEyeIcon}
+                src={showPassword ? openEyeIcon : closeEyeIcon}
                 alt="eye-icon"
                 width={24}
                 height={24}

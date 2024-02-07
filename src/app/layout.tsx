@@ -6,7 +6,6 @@ import { SessionProvider } from "next-auth/react";
 // import AuthBtn from "./_components/AuthBtn";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import ContactHeader from "./_components/Contact-Header/Contact-Header";
 import Header from "./_components/Header/Header";
 import { UserDetailsDataProvider } from "./_helpers/client/Context/UserDetailsContext";
 
