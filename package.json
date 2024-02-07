@@ -11,6 +11,7 @@
   "dependencies": {
     "@ant-design/icons": "^5.2.6",
     "@auth/mongodb-adapter": "^2.0.0",
+    "@hubspot/api-client": "^10.2.0",
     "@pinecone-database/pinecone": "^0.1.6",
     "@sparticuz/chromium-min": "^119.0.2",
     "@types/node": "20.4.6",
@@ -29,6 +30,7 @@
     "joi": "^17.10.1",
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
+    "langchain": "^0.1.13",
     "mammoth": "^1.6.0",
     "mongodb": "^6.0.0",
     "mv": "^2.1.1",

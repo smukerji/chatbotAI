@@ -1,11 +1,11 @@
 // const { connectDatabase } = require("./src/db.js");
 const { MongoClient } = require("mongodb");
-require("dotenv").config();
+require("dotenv").config({path: '.env.local'});
 
 const uri = process.env.NEXT_PUBLIC_MONGO_URI;
 
 async function initializeDb() {
-  let client = new MongoClient(uri);
+  let client = new MongoClient(uri ,  { useNewUrlParser: true, useUnifiedTopology: true });
   let db = (await client.connect()).db();
 
   const planCollection = db.collection("plans");
