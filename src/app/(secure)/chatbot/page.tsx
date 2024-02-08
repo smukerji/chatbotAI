@@ -198,6 +198,7 @@ function Chatbot() {
 
                 setOpenNewChatbotNameModal(true);
               }}
+              disabled={loading}
             >
               New Chatbot
             </button>

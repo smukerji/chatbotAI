@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Image from "next/image";
 import exportBtn from "../../../../../../../public/svgs/export-btn.svg";
 import { useCookies } from "react-cookie";
@@ -7,6 +7,7 @@ import dislikeIcon from "../../../../../../../public/svgs/dislike.svg";
 import "./history.scss";
 import ChatbotNameModal from "../../../../../_components/Modal/ChatbotNameModal";
 import { message } from "antd";
+import { ChatbotSettingContext } from "../../../../../_helpers/client/Context/ChatbotSettingContext";
 
 function History({ chatbotId }: any) {
   const [chatHistoryList, setChatHistoryList]: any = useState([]);
@@ -15,6 +16,10 @@ function History({ chatbotId }: any) {
     useState();
 
   const [cookies, setCookies] = useCookies(["userId"]);
+
+  /// get the bot settings context
+  const botSettingContext: any = useContext(ChatbotSettingContext);
+  const botSettings = botSettingContext?.chatbotSettings;
 
   useEffect(() => {
     /// retrive the chatbot data
@@ -113,7 +118,10 @@ function History({ chatbotId }: any) {
                         setActiveCurrentChatHistory("today" + index);
                       }}
                     >
-                      {data[1]?.messages[1]?.content}
+                      {
+                        data[1]?.messages[botSettings?.initialMessage?.length]
+                          ?.content
+                      }
                     </div>
                   );
                 }
@@ -142,7 +150,10 @@ function History({ chatbotId }: any) {
                         setActiveCurrentChatHistory("yesterday" + index);
                       }}
                     >
-                      {data[1]?.messages[1]?.content}
+                      {
+                        data[1]?.messages[botSettings?.initialMessage?.length]
+                          ?.content
+                      }
                     </div>
                   );
                 }
@@ -166,7 +177,9 @@ function History({ chatbotId }: any) {
                       }`}
                       key={index}
                       onClick={() => {
-                        setCurrentChatHistory(data[1]?.messages);
+                        setCurrentChatHistory(
+                          data[botSettings?.initialMessage?.length]?.messages
+                        );
                         setActiveCurrentChatHistory("lastSevenDay" + index);
                       }}
                     >
@@ -196,16 +209,44 @@ function History({ chatbotId }: any) {
             if (message.role == "assistant")
               return (
                 <React.Fragment key={index}>
-                  <div className="assistant-message-container">
+                  <div
+                    className="assistant-message-container"
+                    style={{
+                      marginTop:
+                        `${message.messageType}` === "initial" ? "10px" : "0",
+                    }}
+                  >
                     <div
                       className="assistant-message"
-                      style={{ display: "flex", flexDirection: "column" }}
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                      }}
                       dangerouslySetInnerHTML={{
                         __html: message.content,
                       }}
                     ></div>
-                    <div className="time">{message?.messageTime}</div>
-                    <div className="like-dislike-container">
+                    {/* <div className="time">{message?.messageTime}</div> */}
+                    {message.messageType !== "initial" && (
+                      <div className="time">{message?.messageTime}</div>
+                    )}
+
+                    {(currentChatHistory[index + 1] === undefined ||
+                      currentChatHistory[index + 1].role == "user") && (
+                      <div className="like-dislike-container">
+                        <Image
+                          src={likeIcon}
+                          alt="like-icon"
+                          onClick={() => openChatbotModal(index, "like")}
+                        />
+                        <Image
+                          src={dislikeIcon}
+                          alt="dislike-icon"
+                          onClick={() => openChatbotModal(index, "dislike")}
+                        />
+                      </div>
+                    )}
+                    {/* <div className="like-dislike-container">
                       <Image
                         src={likeIcon}
                         alt="like-icon"
@@ -216,7 +257,7 @@ function History({ chatbotId }: any) {
                         alt="dislike-icon"
                         onClick={() => openChatbotModal(index, "dislike")}
                       />
-                    </div>
+                    </div> */}
                   </div>
                   <ChatbotNameModal
                     open={open}
@@ -231,7 +272,11 @@ function History({ chatbotId }: any) {
             else
               return (
                 <div className="user-message-container">
-                  <div className="user-message" key={index}>
+                  <div
+                    className="user-message"
+                    key={index}
+                    style={{ backgroundColor: botSettings?.userMessageColor }}
+                  >
                     {message.content}
                   </div>
                   <div className="time">{message?.messageTime}</div>

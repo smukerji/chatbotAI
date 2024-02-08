@@ -124,42 +124,33 @@ function Chat({
     }
   }, [response]);
 
-  useEffect(() => {
-    const storeHistory = async () => {
-      /// update the message count
-      userDetailContext?.handleChange("totalMessageCount")(
-        userDetails?.totalMessageCount + 1
-      );
-      const percent =
-        ((userDetails?.totalMessageCount + 1) /
-          userDetails?.plan?.messageLimit) *
-        100;
+  async function storeHistory(userLatestQuery: any, gptLatestResponse: any) {
+    /// update the message count
+    userDetailContext?.handleChange("totalMessageCount")(
+      userDetails?.totalMessageCount + 1
+    );
+    const percent =
+      ((userDetails?.totalMessageCount + 1) / userDetails?.plan?.messageLimit) *
+      100;
 
-      /// store the percentage of message sent by user
-      userDetailContext?.handleChange("percent")(percent);
-      /// store/update the chathistory
-      const store = await fetch(
-        `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/chathistory`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            chatbotId: chatbot.id,
-            messages: messagesTime,
-            userId: cookies.userId ? cookies.userId : userId,
-            sessionID,
-            sessionStartDate,
-            sessionEndDate: getDate(),
-          }),
-        }
-      );
-    };
-
-    /// check if assistant replied with the user message then only store the data
-    const conversationLength = messages.length;
-    if (conversationLength > 1 && conversationLength & 1) storeHistory();
-  }, [messages]);
-
-  // const [inputValue, setInputValue] = useState(botSettings?.temperature);
+    /// store the percentage of message sent by user
+    userDetailContext?.handleChange("percent")(percent);
+    /// store/update the chathistory
+    const store = await fetch(
+      `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/chathistory`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          chatbotId: chatbot.id,
+          messages: [...messagesTime, userLatestQuery, gptLatestResponse],
+          userId: cookies.userId ? cookies.userId : userId,
+          sessionID,
+          sessionStartDate,
+          sessionEndDate: getDate(),
+        }),
+      }
+    );
+  }
 
   const onChange = (newValue: number) => {
     botSettingContext?.handleChange("temperature")(newValue);
@@ -281,9 +272,15 @@ function Chat({
                     messageTime: getDate(),
                   },
                 ]);
-                // if (!store.ok) {
-                //   alert(await store.text());
-                // }
+                /// store history
+                const userLatestQuery = { role: "user", content: userQuery };
+                const gptLatestResponse = {
+                  role: "assistant",
+                  content: resptext,
+                  messageTime: getDate(),
+                };
+
+                storeHistory(userLatestQuery, gptLatestResponse);
                 setResponse("");
                 setLoading(false);
                 break;
@@ -452,7 +449,15 @@ function Chat({
             if (message.role == "assistant")
               return (
                 <React.Fragment key={index}>
-                  <div className="assistant-message-container">
+                  <div
+                    className="assistant-message-container"
+                    style={{
+                      marginTop:
+                        `${messagesTime[index].messageType}` === "initial"
+                          ? "10px"
+                          : "0",
+                    }}
+                  >
                     <div
                       className="assistant-message"
                       style={{
@@ -466,21 +471,26 @@ function Chat({
                         __html: message.content,
                       }}
                     ></div>
-                    <div className="time">
-                      {messagesTime[index]?.messageTime}
-                    </div>
-                    <div className="like-dislike-container">
-                      <Image
-                        src={likeIcon}
-                        alt="like-icon"
-                        onClick={() => openChatbotModal(index, "like")}
-                      />
-                      <Image
-                        src={dislikeIcon}
-                        alt="dislike-icon"
-                        onClick={() => openChatbotModal(index, "dislike")}
-                      />
-                    </div>
+                    {messagesTime[index].messageType !== "initial" && (
+                      <div className="time">
+                        {messagesTime[index]?.messageTime}
+                      </div>
+                    )}
+                    {(messages[index + 1] === undefined ||
+                      messages[index + 1].role == "user") && (
+                      <div className="like-dislike-container">
+                        <Image
+                          src={likeIcon}
+                          alt="like-icon"
+                          onClick={() => openChatbotModal(index, "like")}
+                        />
+                        <Image
+                          src={dislikeIcon}
+                          alt="dislike-icon"
+                          onClick={() => openChatbotModal(index, "dislike")}
+                        />
+                      </div>
+                    )}
                   </div>
                   <ChatbotNameModal
                     open={open}
