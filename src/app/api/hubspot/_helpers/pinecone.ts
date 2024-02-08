@@ -1,15 +1,16 @@
 import { PineconeClient } from "@pinecone-database/pinecone";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
-
+require("dotenv").config();
 import { v4 as uuid } from "uuid";
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
+import { string } from "joi";
 const CHUNK_LIMIT = 200;
 const CHUNK_MINIMAL = 100;
 
-const PINECONE_API_KEY = "8f6bfa6d-e980-4d18-a167-00119b12b5ff";
-const PINECONE_ENV = "gcp-starter";
-const PINECONE_INDEX = "hb-demo";
+const PINECONE_API_KEY = String(process.env.PINECONE_KEY);
+const PINECONE_ENV = String(process.env.PINECONE_ENV);
+const PINECONE_INDEX = String(process.env.PINECONE_INDEX);
 
 export const upsert = async (data: any, batchSize = 250) => {
   const pinecone = new PineconeClient();

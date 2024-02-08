@@ -30,6 +30,7 @@ export async function POST(request: Request) {
   const contactsData = JSON.stringify(activity);// converting json data to string
   // const deleteData  =  await deletevectors('b', 'a', sourceType , dataType);
 
+  //ANCHOR - data embedding and storing it to the pinecone
   const vectorStoreRes = await createVectorStore(
     contactsData,
     "a",

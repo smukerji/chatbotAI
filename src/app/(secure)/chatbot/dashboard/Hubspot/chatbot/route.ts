@@ -1,11 +1,5 @@
-import {
-  createVectorStore,
-  createVectorStoreQuery,
-} from "@/app/api/hubspot/_helpers/embed.data";
+import { createVectorStoreQuery } from "@/app/api/hubspot/_helpers/embed.data";
 import { createResponse } from "@/app/api/hubspot/_helpers/openAI";
-import { queryVectors } from "@/app/api/hubspot/_helpers/pinecone";
-import { any } from "joi";
-// import { OpenAIApi, Configuration } from 'openai';
 
 export async function POST(request: Request) {
   let question = "give me contact details of shivam";
@@ -24,6 +18,7 @@ export async function POST(request: Request) {
     .map((obj: any) => JSON.stringify(obj))
     .join("");
   console.log(combinedString);
+  
   //ANCHOR - asking question to openAI
   const res = await createResponse(question, combinedString);
 

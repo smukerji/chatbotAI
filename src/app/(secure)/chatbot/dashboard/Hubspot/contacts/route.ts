@@ -11,11 +11,12 @@ export async function POST(request: Request) {
     accessToken: process.env.HUBSPOT_ACCESS_TOKEN,
   });
   const result = await hubspotClient.crm.contacts.getAll();
-  return Response.json(result)
+//   return Response.json(result)
   const contactsData = JSON.stringify(result);
 
   // const deleteData  =  await deletevectors(1 , 1, sourceType , dataType);
 
+  //ANCHOR - data embedding and storing it to the pinecone
   const vectorStoreRes = await createVectorStore(
     contactsData,
     "a",
