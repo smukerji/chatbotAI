@@ -92,6 +92,37 @@ function SourceUpload({ totalCharCount, filesCharCount }: any) {
     botContext?.handleChange("defaultFileList")(newDefaultFileList);
   }
 
+  /// remove all the documents
+  function deleteAll() {
+    /// calculate the total characters of the documents
+    let totalFileCharCount = 0;
+    /// get all the files that need to be deleted from databse first
+    const deleteDatabseDoc = defaultFileList?.filter(
+      (file: any, index: number) => {
+        totalFileCharCount += file?.charLength;
+        return file?.id != "" && file?.id != undefined;
+      }
+    );
+
+    /// the files to the delete list
+    botContext?.handleChange("deleteFileList")([
+      ...deleteFileList,
+      ...deleteDatabseDoc,
+    ]);
+
+    /// updating the character count
+    botContext?.handleChange("totalCharCount")(
+      totalCharCount - totalFileCharCount
+    );
+    botContext?.handleChange("filesCharCount")(
+      filesCharCount - totalFileCharCount
+    );
+
+    /// empty the file list
+    botContext?.handleChange("defaultFileList")([]);
+    botContext?.handleChange("newFileList")([]);
+  }
+
   return (
     <div className="source-upload-container">
       <div className="dragger-wrapper">
@@ -118,6 +149,7 @@ function SourceUpload({ totalCharCount, filesCharCount }: any) {
           <>
             <div className="text">
               <h1>Attached Files</h1>
+              <span onClick={deleteAll}>Delete all</span>
             </div>
           </>
         )}

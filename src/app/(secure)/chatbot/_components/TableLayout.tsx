@@ -68,7 +68,7 @@ function TableLayout({
   }, []);
 
   // check if chatbotData is available
-  if (chatbotData.length > 0) {
+  if (chatbotData?.length > 0) {
     return (
       <div className="chabot-table">
         <table>

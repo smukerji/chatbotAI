@@ -99,9 +99,11 @@ function Settings({ chatbotId, chatbotName }: any) {
           {chabotSettings === "general" && (
             <General chatbotId={chatbotId} chatbotName={chatbotName} />
           )}
-          {chabotSettings === "model" && <Model />}
-          {chabotSettings === "chatInterface" && <ChatInterface />}
-          {chabotSettings === "security" && <Security/>}
+          {chabotSettings === "model" && <Model chatbotId={chatbotId} />}
+          {chabotSettings === "chatInterface" && (
+            <ChatInterface chatbotId={chatbotId} />
+          )}
+          {chabotSettings === "security" && <Security />}
           {chabotSettings === "lead" && <h1>lead</h1>}
           {chabotSettings === "notifications" && <h1>notifications</h1>}
         </div>

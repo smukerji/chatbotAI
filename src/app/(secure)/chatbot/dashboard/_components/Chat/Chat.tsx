@@ -22,6 +22,10 @@ import { v4 as uuid } from "uuid";
 import { CreateBotContext } from "../../../../../_helpers/client/Context/CreateBotContext";
 import { ChatbotSettingContext } from "../../../../../_helpers/client/Context/ChatbotSettingContext";
 import { formatTimestamp } from "../../../../../_helpers/client/formatTimestamp";
+import Icon from "../../../../../_components/Icon/Icon";
+import RefreshBtn from "../../../../../../assets/svg/RefreshBtn";
+import ExportBtn from "../../../../../../assets/svg/ExportBtn";
+import { UserDetailsContext } from "../../../../../_helpers/client/Context/UserDetailsContext";
 
 function Chat({
   chatbot,
@@ -40,6 +44,10 @@ function Chat({
   /// get the bot context
   const botContext: any = useContext(CreateBotContext);
   const botDetails = botContext?.createBotInfo;
+
+  /// get userDetails context
+  const userDetailContext: any = useContext(UserDetailsContext);
+  const userDetails = userDetailContext?.userDetails;
 
   /// get the bot settings context
   const botSettingContext: any = useContext(ChatbotSettingContext);
@@ -118,6 +126,17 @@ function Chat({
 
   useEffect(() => {
     const storeHistory = async () => {
+      /// update the message count
+      userDetailContext?.handleChange("totalMessageCount")(
+        userDetails?.totalMessageCount + 1
+      );
+      const percent =
+        ((userDetails?.totalMessageCount + 1) /
+          userDetails?.plan?.messageLimit) *
+        100;
+
+      /// store the percentage of message sent by user
+      userDetailContext?.handleChange("percent")(percent);
       /// store/update the chathistory
       const store = await fetch(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/chathistory`,
@@ -140,10 +159,10 @@ function Chat({
     if (conversationLength > 1 && conversationLength & 1) storeHistory();
   }, [messages]);
 
-  const [inputValue, setInputValue] = useState(0);
+  // const [inputValue, setInputValue] = useState(botSettings?.temperature);
 
   const onChange = (newValue: number) => {
-    setInputValue(newValue);
+    botSettingContext?.handleChange("temperature")(newValue);
   };
 
   /// get the chatbase response
@@ -201,6 +220,8 @@ function Chat({
                       ? "65795294269d08529b8cd743"
                       : chatbot?.id === "f0893732-3302-46b2-922a-95e79ef3524c"
                       ? "651d111b8158397ebd0e65fb"
+                      : chatbot?.id === "f8095ef4-6cd0-4373-a45e-8fe15cb6dd0f"
+                      ? "6523fee523c290d75609a1fa"
                       : cookies.userId,
                 }),
               }
@@ -221,7 +242,22 @@ function Chat({
                   similaritySearchResults,
                   messages,
                   userQuery,
+                  chatbotId: chatbot?.id,
+                  //// default chatbot set
+                  userId:
+                    chatbot?.id === "123d148a-be02-4749-a612-65be9d96266c"
+                      ? "651d111b8158397ebd0e65fb"
+                      : chatbot?.id === "34cceb84-07b9-4b3e-ad6f-567a1c8f3557"
+                      ? "65795294269d08529b8cd743"
+                      : chatbot?.id === "f0893732-3302-46b2-922a-95e79ef3524c"
+                      ? "651d111b8158397ebd0e65fb"
+                      : chatbot?.id === "f8095ef4-6cd0-4373-a45e-8fe15cb6dd0f"
+                      ? "6523fee523c290d75609a1fa"
+                      : cookies.userId
+                      ? cookies.userId
+                      : userId,
                 }),
+                next: { revalidate: 0 },
               }
             );
             let resptext = "";
@@ -299,7 +335,7 @@ function Chat({
   /// to copy chatbot Id
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.write(chatbot?.id);
+      await navigator.clipboard.writeText(chatbot?.id);
       message.success("ID copied to clipboard");
     } catch (err: any) {
       message.error("Failed to copy ", err.message);
@@ -334,35 +370,40 @@ function Chat({
           <div className="detail">
             <span>Model</span>
             <div className="model">
-              <span>gpt 3.5 - turbo</span>
+              <span>{botSettings?.model}</span>
             </div>
           </div>
 
           <div className="detail">
             <span>Number of characters</span>
             <div className="characters">
-              <span>12</span>
+              <span>{botSettings?.numberOfCharacterTrained}</span>
             </div>
           </div>
 
           <div className="detail">
             <span>Visibility</span>
             <div className="visibility">
-              <span>Public</span>
+              <span>{botSettings?.visibility}</span>
             </div>
           </div>
 
           <div className="detail">
             <div className="temperature">
               <span>Temperature</span>
-              <span>{inputValue}</span>
+              <span>{botSettings?.temperature}</span>
             </div>
 
             <Slider
               min={0}
               max={1}
               onChange={onChange}
-              value={typeof inputValue === "number" ? inputValue : 0}
+              value={
+                typeof botSettings?.temperature === "number"
+                  ? botSettings?.temperature
+                  : 0
+              }
+              disabled={true}
               step={0.1}
             />
             <div className="slider-bottom">
@@ -381,12 +422,26 @@ function Chat({
       )}
 
       {/*------------------------------------------right-section----------------------------------------------*/}
-      <div className="messages-section">
+      <div
+        className="messages-section"
+        style={{
+          backgroundColor: botSettings?.theme === "dark" ? "black" : "",
+        }}
+      >
         <div className="header">
           <span>Powered by Lucifer.AI</span>
           <div className="action-btns">
-            <Image src={refreshBtn} alt="refresh-btn" onClick={refreshChat} />
-            <Image src={exportBtn} alt="export-btn" />
+            {/* <Image src={refreshBtn} alt="refresh-btn" onClick={refreshChat} /> */}
+            {/* <Image src={exportBtn} alt="export-btn" /> */}
+            <Icon
+              Icon={RefreshBtn}
+              onClick={refreshChat}
+              className={botSettings?.theme === "dark" ? "color-white" : ""}
+            />
+            <Icon
+              Icon={ExportBtn}
+              className={botSettings?.theme === "dark" ? "color-white" : ""}
+            />
           </div>
         </div>
 
@@ -400,7 +455,13 @@ function Chat({
                   <div className="assistant-message-container">
                     <div
                       className="assistant-message"
-                      style={{ display: "flex", flexDirection: "column" }}
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        backgroundColor:
+                          botSettings?.theme === "dark" ? "#353945" : "",
+                        color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
+                      }}
                       dangerouslySetInnerHTML={{
                         __html: message.content,
                       }}
@@ -434,7 +495,11 @@ function Chat({
             else
               return (
                 <div className="user-message-container">
-                  <div className="user-message" key={index}>
+                  <div
+                    className="user-message"
+                    key={index}
+                    style={{ backgroundColor: botSettings?.userMessageColor }}
+                  >
                     {message.content}
                   </div>
                   <div className="time">{messagesTime[index]?.messageTime}</div>
@@ -443,7 +508,14 @@ function Chat({
           })}
           {loading && response.length == 0 && (
             <div className="assistant-message-container">
-              <div className="assistant-message">
+              <div
+                className="assistant-message"
+                style={{
+                  backgroundColor:
+                    botSettings?.theme === "dark" ? "#353945" : "",
+                  color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
+                }}
+              >
                 <div className="typing-indicator">
                   <div className="dot"></div>
                   <div className="dot"></div>
@@ -456,14 +528,29 @@ function Chat({
             <div className="assistant-message-container">
               <div
                 className="assistant-message"
-                style={{ display: "flex", flexDirection: "column" }}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  backgroundColor:
+                    botSettings?.theme === "dark" ? "#353945" : "",
+                  color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
+                }}
                 dangerouslySetInnerHTML={{ __html: response }}
               />
             </div>
           )}
         </div>
-        <div className="chat-question">
+        <div
+          className="chat-question"
+          style={{
+            backgroundColor: botSettings?.theme === "dark" ? "#353945" : "",
+          }}
+        >
           <input
+            style={{
+              backgroundColor: botSettings?.theme === "dark" ? "#353945" : "",
+              color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
+            }}
             type="text"
             onKeyDown={getReply}
             onChange={(event) => {
@@ -474,7 +561,11 @@ function Chat({
             }`}
             value={userQuery}
           />
-          <button className="icon" onClick={() => getReply("click")}>
+          <button
+            className="icon"
+            onClick={() => getReply("click")}
+            style={{ backgroundColor: botSettings?.userMessageColor }}
+          >
             <Image src={sendChatIcon} alt="send-chat-icon" />
           </button>
         </div>

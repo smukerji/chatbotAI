@@ -8,7 +8,8 @@ export const config = {
 export default async function handler(req, res) {
   if (req.method === "POST") {
     /// parse the request object
-    const { similaritySearchResults, messages, userQuery } = await req.json();
+    const { similaritySearchResults, messages, userQuery, chatbotId, userId } =
+      await req.json();
 
     // Set response headers for SSE
 
@@ -16,41 +17,36 @@ export default async function handler(req, res) {
     const openai = new OpenAI({
       apiKey: process.env.NEXT_PUBLIC_OPENAI_KEY,
     });
+    /// get the chatbot settings from database
+    const chatbotSettingsResponse = await fetch(
+      `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard/api?chatbotId=${chatbotId}&userId=${userId}`,
+      {
+        method: "GET",
+        next: { revalidate: 0 },
+      }
+    );
+    const data = await chatbotSettingsResponse.json();
+    const chatbotSetting = data?.chatbotSetting;
+
     const response = await openai.chat.completions.create({
       // model: "gpt-3.5-turbo-16k",
-      model: "gpt-4",
-      temperature: 0,
+      model: chatbotSetting?.model ? chatbotSetting?.model : "gpt-4",
+      temperature: chatbotSetting?.temperature
+        ? chatbotSetting?.temperature
+        : 0,
       top_p: 1,
 
-      // messages: [
-      //   {
-      //     role: "system",
-      //     content: `Use the following pieces of context to answer the users question.
-      //       If you don't know the answer, just say that you don't know, don't try to make up an answer.
-      //       ----------------
-      //       context:
-      //       ${similaritySearchResults}
-
-      //       Answer user query and include images write respect to each line if available`,
-      //   },
-      //   ...messages,
-      //   {
-      //     role: "user",
-      //     content: `
-      //         Strictly write all the response in html format with only raw text and img tags.
-      //         Answer user query and include images in response if available in the given context
-
-      //         query: ${userQuery}`,
-      //   },
-      // ],
       messages: [
         {
           role: "system",
           content: `Use the following pieces of context to answer the users question.
-            If you don't know the answer, simply give me the output in html format that you don't know the answer, don't try to make up an answer. and also, don't give me question back in response.
+            If you don't know the answer, simply give me the output in html format that you don't know the answer, don't try to make up an answer. and also, don't give me question back in response. Also focus on the instruction given to answer the question.
             ----------------
             context:
             ${similaritySearchResults}
+
+            instruction:
+            ${chatbotSetting?.instruction}
 
             Answer user query only if it is available in context or in previos chat history.Strictly write all the response in html format with only raw text and image link inside img tag. Check previous history every time before giving answer. If something is out of context or chat history then simply say I don't know the answer. If user is giving some personal information then don't tell that I don't know. Just continue the conversation and remember the chat history and next time when user ask question from it then answer from chat history. give image if it is available in database and related to context. give image link inside img tag. Otherwise don't include img tag in your response.`,
         },

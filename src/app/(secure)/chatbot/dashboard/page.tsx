@@ -169,6 +169,8 @@ function Dashboard() {
                 alt="arrow-icon"
                 style={{ transform: "rotate(180deg)", cursor: "pointer" }}
                 onClick={() => {
+                  botContext?.resetCreateBotInfo();
+                  chatbotSettingContext?.resetChatbotSettings();
                   window.history.back();
                 }}
               />

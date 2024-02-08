@@ -1,9 +1,10 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { connectDatabase } from "../../../../../db";
 import { apiHandler } from "../../../../_helpers/server/api/api-handler";
 
 module.exports = apiHandler({
   POST: dataSources,
+  GET: getChatBotSettings,
 });
 
 async function dataSources(request: any) {
@@ -83,4 +84,20 @@ async function dataSources(request: any) {
     chatbotName: chatbotDetails?.chatbotName,
     chatbotSetting,
   };
+}
+
+async function getChatBotSettings(request: NextRequest) {
+  const params = await request.nextUrl.searchParams;
+  const chatbotId = params.get("chatbotId");
+  const userId = params.get("userId");
+
+  /// get chatbot Setting
+  const db = (await connectDatabase())?.db();
+  const chatBotSettingCollection = db.collection("chatbot-settings");
+  const chatbotSetting = await chatBotSettingCollection.findOne({
+    chatbotId: chatbotId,
+    userId: userId,
+  });
+
+  return { chatbotSetting };
 }

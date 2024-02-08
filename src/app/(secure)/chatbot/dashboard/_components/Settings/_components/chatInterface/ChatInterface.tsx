@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import "./../chatInterface/chatInterface.scss";
 import { Button, ColorPicker, Input } from "antd";
 import DeleteIcon from "@/assets/svg/DeleteIcon";
@@ -12,83 +12,153 @@ import ChatBubbleButton from "../../../../../../../../../public/create-chatbot-s
 import deleteImgIcon from "../../../../../../../../../public/create-chatbot-svgs/delete-icon.svg";
 import { message } from "antd";
 import chatbubble from "../../../../../../../../../public/create-chatbot-svgs/message-2.svg";
-function ChatInterface() {
-  const [userMessageColor, setUserMessageColor] = useState<string>("#fe632f");
-  const [bubbleIconColor, setBubbleIconColor] = useState<string>("#9B00FB");
-  const [theme, setTheme] = useState<string>("Light");
-  const [iconPlacement, setIconPlacement] = useState<string>("Left");
-  const [displayName, setDisplayName] = useState<string>("Super Bot");
-  const [initialMessage, setInitialMessage] = useState<string>(
-    "Hello! What can I help you today?"
-  );
-  const [suggestedMessage, setSuggestedMessage] = useState<string[]>([
-    "This is suggested message",
-  ]);
+import { ChatbotSettingContext } from "../../../../../../../_helpers/client/Context/ChatbotSettingContext";
+import {
+  defaultSuggestedMessage,
+  defaultUserMessageColor,
+  initialMessage,
+} from "../../../../../../../_helpers/constant";
+import { useCookies } from "react-cookie";
+function ChatInterface({ chatbotId }: any) {
+  const [cookies, setCookies] = useCookies(["userId"]);
+  /// get the bot settings context
+  const botSettingContext: any = useContext(ChatbotSettingContext);
+  const botSettings = botSettingContext?.chatbotSettings;
 
-  const [messagePlaceholder, setMessagePlaceholder] = useState<string>();
+  const [isLoading, setIsLoading] = useState(false);
+
+  // const [userMessageColor, setUserMessageColor] = useState<string>("#fe632f");
+  // const [bubbleIconColor, setBubbleIconColor] = useState<string>("#9b00fb");
+  // const [theme, setTheme] = useState<string>("Light");
+  // const [iconPlacement, setIconPlacement] = useState<string>("Left");
+  // const [displayName, setDisplayName] = useState<string>("Super Bot");
+  // const [initialMessage, setInitialMessage] = useState<string>(
+  //   "Hello! What can I help you today?"
+  // );
+  // const [suggestedMessage, setSuggestedMessage] = useState<string[]>([
+  //   "This is suggested message",
+  // ]);
+
+  // const [messagePlaceholder, setMessagePlaceholder] = useState<string>();
 
   const [popupCount, setPopupCount] = useState<number>(10);
 
-  const [fileName, setFileName] = useState<any>("");
+  const [fileName, setFileName] = useState<any>(
+    botSettings?.profilePictureName
+  );
 
-  const [fileNameChat, setFileNameChat] = useState<any>("");
+  const [fileNameChat, setFileNameChat] = useState<any>(
+    botSettings?.bubbleIconName
+  );
 
-  const [iconImage, setIconImage] = useState<any>();
-  const [chatBubbleImage, setChatBubbleImage] = useState<any>("");
+  const [iconImage, setIconImage] = useState<any>(
+    botSettings?.profilePictureUrl
+  );
+  const [chatBubbleImage, setChatBubbleImage] = useState<any>(
+    botSettings?.bubbleIconUrl
+  );
 
   // for reset input button
 
   const [initialMessageReset, setInitialMessageReset] = useState<string>(
     "Hello! What can I help you today?"
   );
-  const [suggestedMessageReset, setSuggestedMessageReset] = useState<string[]>([
-    "This is suggested message ",
-  ]);
+  // const [suggestedMessageReset, setSuggestedMessageReset] = useState<string[]>([
+  //   "This is suggested message ",
+  // ]);
   const [popupCountReset, setPopupCountReset] = useState<number>(10);
 
-  const [userMessageColorReset, setUserMessageColorReset] =
-    useState<string>("#fe632f");
+  // const [userMessageColorReset, setUserMessageColorReset] =
+  //   useState<string>("#fe632f");
+  // const userMessageResetColor = "#fe632f";
 
-  const imageHandler = (e: any) => {
+  const imageHandler = async (e: any) => {
     const selectedFile = e.target.files[0];
 
     // Check if a file is selected and it's an image
     if (selectedFile && isImageFile(selectedFile)) {
-      setFileName(selectedFile);
-      // preview image
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        setIconImage(e.target.result);
-      };
-      if (selectedFile) {
-        reader.readAsDataURL(selectedFile);
+      /// upload the image file to vercel
+      try {
+        setIsLoading(!isLoading);
+        /// delete any existing URL if any
+        if (botSettings?.profilePictureUrl != iconImage) {
+          fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}api/delete-img`, {
+            method: "POST",
+            body: JSON.stringify({ url: iconImage }),
+          });
+        }
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/upload-img?filename=${selectedFile.name}`,
+          {
+            method: "POST",
+            body: selectedFile,
+          }
+        );
+
+        if (!res.ok) {
+          throw await res.json();
+        }
+        const data = await res.json();
+        // botSettingContext?.handleChange("profilePictureUrl")(data?.uploadUrl);
+        setIconImage(data?.uploadUrl);
+      } catch (error: any) {
+        message.error(error.message);
+        return;
+      } finally {
+        setIsLoading((prev) => !prev);
       }
+
+      setFileName(selectedFile.name);
     } else {
       // Display an error message or handle the invalid file selection as needed
       message.error("Invalid file format. Please select an image.");
       return;
     }
   };
-  const imageHandlerChat = (e: any) => {
+  const imageHandlerChat = async (e: any) => {
     const selectedFile = e.target.files[0];
     // Check if a file is selected and it's an image
 
     if (selectedFile && isImageFile(selectedFile)) {
-      setFileNameChat(selectedFile);
-      // preview image
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        setChatBubbleImage(e.target.result);
-      };
-      if (selectedFile) {
-        reader.readAsDataURL(selectedFile);
+      /// upload the image file to vercel
+      setIsLoading(!isLoading);
+      try {
+        /// delete any existing URL if any
+        if (botSettings?.bubbleIconUrl != chatBubbleImage) {
+          fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}api/delete-img`, {
+            method: "POST",
+            body: JSON.stringify({ url: chatBubbleImage }),
+          });
+        }
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/upload-img?filename=${selectedFile.name}`,
+          {
+            method: "POST",
+            body: selectedFile,
+          }
+        );
+
+        if (!res.ok) {
+          throw await res.json();
+        }
+        const data = await res.json();
+        // botSettingContext?.handleChange("bubbleIconUrl")(data?.uploadUrl);
+        setChatBubbleImage(data?.uploadUrl);
+      } catch (error: any) {
+        message.error(error.message);
+        return;
+      } finally {
+        setIsLoading((prev) => !prev);
       }
+
+      setFileNameChat(selectedFile.name);
     } else {
       // Display an error message or handle the invalid file selection as needed
       message.error("Invalid file format. Please select an image.");
       return;
     }
   };
+
   // Function to check if a file is an image
   const isImageFile = (file: any) => {
     const acceptedImageTypes = [
@@ -99,6 +169,45 @@ function ChatInterface() {
     ];
     return acceptedImageTypes.includes(file.type);
   };
+
+  const updateSettings = async () => {
+    botSettingContext?.handleChange("profilePictureUrl")(iconImage);
+    botSettingContext?.handleChange("profilePictureName")(fileName);
+    botSettingContext?.handleChange("bubbleIconUrl")(chatBubbleImage);
+    botSettingContext?.handleChange("bubbleIconName")(fileNameChat);
+
+    console.log(fileName);
+
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/api/setting/api`,
+        {
+          method: "PUT",
+          body: JSON.stringify({
+            chatbotId: chatbotId,
+            userId: cookies?.userId,
+
+            tempprofilePictureUrl: iconImage,
+            tempprofilePictureName: fileName,
+            tempbubbleIconUrl: chatBubbleImage,
+            tempbubbleIconName: fileNameChat,
+            ...botSettings,
+          }),
+          next: { revalidate: 0 },
+        }
+      );
+      if (!res.ok) {
+        throw await res.json();
+      }
+      /// displaying status
+      const data = await res.json();
+
+      message.success(data?.message);
+    } catch (error: any) {
+      message.error(error?.message);
+    }
+  };
+
   return (
     <div className="chat-interface-parent">
       <div className="training-container">
@@ -112,21 +221,25 @@ function ChatInterface() {
               type="text"
               className="initial-message-button"
               onClick={(e) => {
-                setInitialMessage(initialMessageReset);
+                botSettingContext?.handleChange("initialMessage")(
+                  initialMessage
+                );
               }}
             >
               Reset
             </Button>
           </div>
 
-          <input
+          <textarea
             className="input-container"
-            defaultValue={initialMessage}
-            value={initialMessage}
+            defaultValue={botSettings?.initialMessage.join("\n")}
+            value={botSettings?.initialMessage.join("\n")}
             onChange={(e) => {
-              setInitialMessage(e.target.value);
+              botSettingContext?.handleChange("initialMessage")(
+                e.target.value.split("\n")
+              );
             }}
-          ></input>
+          ></textarea>
 
           <p className="helper-text">Enter each message in a new line.</p>
 
@@ -137,7 +250,9 @@ function ChatInterface() {
               type="text"
               className="initial-message-button"
               onClick={(e) => {
-                setSuggestedMessage(suggestedMessageReset);
+                botSettingContext?.handleChange("suggestedMessages")(
+                  defaultSuggestedMessage
+                );
               }}
             >
               Reset
@@ -146,10 +261,12 @@ function ChatInterface() {
 
           <textarea
             className="input-container"
-            defaultValue={suggestedMessage.join("\n")}
-            value={suggestedMessage.join("\n")}
+            defaultValue={botSettings?.suggestedMessages.join("\n")}
+            value={botSettings?.suggestedMessages.join("\n")}
             onChange={(e) => {
-              setSuggestedMessage(e.target.value.split("\n"));
+              botSettingContext?.handleChange("suggestedMessages")(
+                e.target.value.split("\n")
+              );
             }}
           ></textarea>
 
@@ -161,8 +278,11 @@ function ChatInterface() {
               type="text"
               className="message-input"
               placeholder="Enter your message here"
+              defaultValue={botSettings?.messagePlaceholder}
               onChange={(e) => {
-                setMessagePlaceholder(e.target.value);
+                botSettingContext?.handleChange("messagePlaceholder")(
+                  e.target.value
+                );
               }}
             />
             <p className="message-helper-text">
@@ -178,27 +298,27 @@ function ChatInterface() {
                 <input
                   type="radio"
                   name="Theme"
-                  value="Light"
-                  id="Light"
+                  value="light"
+                  id="light"
                   onChange={(e) => {
-                    setTheme(e.target.value);
+                    botSettingContext?.handleChange("theme")(e.target.value);
                   }}
-                  checked={theme === "Light"}
+                  checked={botSettings?.theme === "light"}
                 />
-                <label htmlFor="Light">Light</label>
+                <label htmlFor="light">Light</label>
               </div>
               <div className="theme-radio-group2">
                 <input
                   type="radio"
                   name="Theme"
-                  value="Dark"
-                  id="Dark"
+                  value="dark"
+                  id="dark"
                   onChange={(e) => {
-                    setTheme(e.target.value);
+                    botSettingContext?.handleChange("theme")(e.target.value);
                   }}
-                  checked={theme === "Dark"}
+                  checked={botSettings?.theme === "dark"}
                 />
-                <label htmlFor="Dark">Dark</label>
+                <label htmlFor="dark">Dark</label>
               </div>
             </div>
 
@@ -209,13 +329,16 @@ function ChatInterface() {
 
           {/* --------------display-container */}
           <div className="display-container">
-            <p className="display-text">Display name</p>
+            <p className="display-text">Display Name</p>
             <input
               type="text"
               className="display-iput"
               placeholder="Super Bot"
+              defaultValue={botSettings?.chatbotDisplayName}
               onChange={(e) => {
-                setDisplayName(e.target.value);
+                botSettingContext?.handleChange("chatbotDisplayName")(
+                  e.target.value
+                );
               }}
             />
           </div>
@@ -245,7 +368,7 @@ function ChatInterface() {
                         "No file uploaded".toLowerCase() && <></>}
                     </>
                   ) : fileName ? (
-                    <>{fileName.name} </>
+                    <>{fileName} </>
                   ) : (
                     "No file chosen"
                   )}
@@ -255,6 +378,16 @@ function ChatInterface() {
                 onClick={() => {
                   setFileName("");
                   setIconImage("");
+                  if (botSettings?.profilePictureUrl != iconImage) {
+                    fetch(
+                      `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/delete-img`,
+                      {
+                        method: "POST",
+                        body: JSON.stringify({ url: iconImage }),
+                      }
+                    );
+                  }
+                  // botSettingContext?.handleChange("profilePictureUrl")("");
                 }}
                 style={{ display: fileName === "" ? "none" : "" }}
               >
@@ -271,7 +404,10 @@ function ChatInterface() {
                 type="text"
                 className="user-message-color-top-btn"
                 onClick={() => {
-                  setUserMessageColor(userMessageColorReset);
+                  // setUserMessageColor(userMessageColorReset);
+                  botSettingContext?.handleChange("userMessageColor")(
+                    defaultUserMessageColor
+                  );
                 }}
               >
                 Reset
@@ -280,10 +416,10 @@ function ChatInterface() {
             <div className="user-message-color-bottom">
               <ColorPicker
                 className="user-message-color-picker"
-                defaultValue={userMessageColor}
-                value={userMessageColor}
+                defaultValue={defaultUserMessageColor}
+                value={botSettings?.userMessageColor}
                 onChange={(value, hex) => {
-                  setUserMessageColor(hex);
+                  botSettingContext?.handleChange("userMessageColor")(hex);
                 }}
               />
             </div>
@@ -313,7 +449,7 @@ function ChatInterface() {
                         "No file uploaded".toLowerCase() && <></>}
                     </>
                   ) : fileNameChat ? (
-                    <>{fileNameChat.name} </>
+                    <>{fileNameChat} </>
                   ) : (
                     "No file chosen"
                   )}
@@ -323,6 +459,16 @@ function ChatInterface() {
                 onClick={() => {
                   setFileNameChat("");
                   setChatBubbleImage("");
+                  if (botSettings?.bubbleIconUrl != chatBubbleImage) {
+                    fetch(
+                      `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/delete-img`,
+                      {
+                        method: "POST",
+                        body: JSON.stringify({ url: chatBubbleImage }),
+                      }
+                    );
+                  }
+                  // botSettingContext?.handleChange("bubbleIconUrl")("");
                 }}
                 style={{ display: fileNameChat === "" ? "none" : "" }}
               >
@@ -343,9 +489,11 @@ function ChatInterface() {
             <ColorPicker
               className="chat-bubble-color-picker"
               onChange={(value, hex) => {
-                setBubbleIconColor(hex);
+                botSettingContext?.handleChange("chatbotIconColor")(hex);
               }}
-              value={chatBubbleImage ? "#FCFCFD" : bubbleIconColor}
+              value={
+                chatBubbleImage ? "#FCFCFD" : botSettings?.chatbotIconColor
+              }
               disabled={chatBubbleImage ? true : false}
               style={{ backgroundColor: "white" }}
             />
@@ -359,27 +507,31 @@ function ChatInterface() {
                 <input
                   type="radio"
                   name="chat"
-                  value="Left"
-                  id="Left"
+                  value="left"
+                  id="left"
                   onChange={(e) => {
-                    setIconPlacement(e.target.value);
+                    botSettingContext?.handleChange("chatbotBubbleAlignment")(
+                      e.target.value
+                    );
                   }}
-                  checked={iconPlacement === "Left"}
+                  checked={botSettings?.chatbotBubbleAlignment === "left"}
                 />
-                <label htmlFor="Left">Left</label>
+                <label htmlFor="left">Left</label>
               </div>
               <div className="chat-radio-group2">
                 <input
                   type="radio"
                   name="chat"
-                  value="Right"
-                  id="Right"
+                  value="right"
+                  id="right"
                   onChange={(e) => {
-                    setIconPlacement(e.target.value);
+                    botSettingContext?.handleChange("chatbotBubbleAlignment")(
+                      e.target.value
+                    );
                   }}
-                  checked={iconPlacement === "Right"}
+                  checked={botSettings?.chatbotBubbleAlignment === "right"}
                 />
-                <label htmlFor="Right">Right</label>
+                <label htmlFor="right">Right</label>
               </div>
             </div>
           </div>
@@ -415,7 +567,11 @@ function ChatInterface() {
           </div>
 
           {/* ------------- save button */}
-          <button className="save-btn">
+          <button
+            className="save-btn"
+            disabled={isLoading}
+            onClick={updateSettings}
+          >
             <p className="save-btn-text">Save</p>
           </button>
         </div>
@@ -424,7 +580,9 @@ function ChatInterface() {
         <div className="training-right-container">
           <div
             className="chat-box-container"
-            style={{ backgroundColor: theme === "Dark" ? "black" : "" }}
+            style={{
+              backgroundColor: botSettings?.theme === "dark" ? "black" : "",
+            }}
           >
             <div className="chat-box-header">
               <div className="chat-box-image-container">
@@ -438,23 +596,30 @@ function ChatInterface() {
               </div>
               <p
                 className="chat-box-header-title"
-                style={{ color: theme === "Dark" ? "white" : "" }}
+                style={{ color: botSettings?.theme === "dark" ? "white" : "" }}
               >
-                {displayName}
+                {botSettings?.chatbotDisplayName}
               </p>
             </div>
             <div className="chat-box-body">
               {/* -----------------bots message-------------- */}
               <div className="message bot">
-                <div
-                  className="msg"
-                  style={{
-                    backgroundColor: theme === "Dark" ? "#353945" : "",
-                    color: theme === "Dark" ? "#FCFCFD" : "",
-                  }}
-                >
-                  {initialMessage}
-                </div>
+                {botSettings?.initialMessage.map(
+                  (message: any, index: any) =>
+                    message.trim() !== "" && (
+                      <div
+                        className="msg"
+                        key={index}
+                        style={{
+                          backgroundColor:
+                            botSettings?.theme === "dark" ? "#353945" : "",
+                          color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
+                        }}
+                      >
+                        {message}
+                      </div>
+                    )
+                )}
                 <div className="like-icons">
                   <div className="like-img">
                     <Image src={like} alt="Like" />
@@ -469,7 +634,7 @@ function ChatInterface() {
                 <div className="date">10/01/2024 16:30</div>
                 <div
                   className="msg"
-                  style={{ backgroundColor: userMessageColor }}
+                  style={{ backgroundColor: botSettings?.userMessageColor }}
                 >
                   What’s your name?
                 </div>
@@ -477,15 +642,16 @@ function ChatInterface() {
             </div>
             <div className="suggested-container">
               <div className="suggested-messages">
-                {suggestedMessage.map(
-                  (message, index) =>
+                {botSettings?.suggestedMessages.map(
+                  (message: any, index: any) =>
                     message.trim() !== "" && (
                       <div
                         className="suggested-msg"
                         key={index}
                         style={{
-                          backgroundColor: theme === "Dark" ? "#353945" : "",
-                          color: theme === "Dark" ? "#FCFCFD" : "",
+                          backgroundColor:
+                            botSettings?.theme === "dark" ? "#353945" : "",
+                          color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
                         }}
                       >
                         {message}
@@ -495,28 +661,36 @@ function ChatInterface() {
               </div>
               <div
                 className="powered-by"
-                style={{ color: theme === "Dark" ? "#B1B5C3" : "" }}
+                style={{
+                  color: botSettings?.theme === "dark" ? "#B1B5C3" : "",
+                }}
               >
                 Powered by Lucifer.AI
               </div>
             </div>
             <div
               className="chat-box-footer"
-              style={{ backgroundColor: theme === "Dark" ? "#353945" : "" }}
+              style={{
+                backgroundColor: botSettings?.theme === "dark" ? "#353945" : "",
+              }}
             >
               <input
                 type="text"
                 // value={messagePlaceholder}
                 placeholder={
-                  messagePlaceholder
-                    ? messagePlaceholder
+                  botSettings?.messagePlaceholder
+                    ? botSettings?.messagePlaceholder
                     : "Enter your message here"
                 }
-                style={{ backgroundColor: theme === "Dark" ? "#353945" : "" }}
+                style={{
+                  backgroundColor:
+                    botSettings?.theme === "dark" ? "#353945" : "",
+                  color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
+                }}
               />
               <span
                 className="icon"
-                style={{ backgroundColor: userMessageColor }}
+                style={{ backgroundColor: botSettings?.userMessageColor }}
               >
                 <svg
                   width="24"
@@ -546,13 +720,18 @@ function ChatInterface() {
           <div
             className="message-icon-container"
             style={{
-              justifyContent: iconPlacement === "Right" ? "flex-end" : "",
+              justifyContent:
+                botSettings?.chatbotBubbleAlignment === "right"
+                  ? "flex-end"
+                  : "",
             }}
           >
             <div
               className="message-icon-child"
               style={{
-                backgroundColor: chatBubbleImage ? "" : bubbleIconColor,
+                backgroundColor: chatBubbleImage
+                  ? ""
+                  : botSettings?.chatbotIconColor,
               }}
             >
               <Image

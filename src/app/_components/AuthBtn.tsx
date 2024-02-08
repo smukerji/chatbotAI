@@ -63,8 +63,8 @@ export default function AuthBtn() {
         <div
           className="try-free-btn"
           onClick={() => {
-            // window.location.href = "/chatbot";
-            router.push("/chatbot");
+            window.location.href = "/chatbot";
+            // router.push("/chatbot");
           }}
         >
           My Chatbots
