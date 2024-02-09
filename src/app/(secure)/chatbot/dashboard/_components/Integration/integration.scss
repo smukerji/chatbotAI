@@ -27,6 +27,19 @@
             font-weight: 500;
             line-height: 24px; /* 150% */
         }
+        .action-btn{
+            // background-color: #fe632f;
+            color: #fe632f;
+            font-size: 16px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 24px; /* 150% */
+            border: none;
+            background: none;
+        }
+        .action-btn:hover{
+            cursor: pointer;
+        }
     }
 
     .integration:nth-of-type(2) .action {
