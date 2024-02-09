@@ -1,6 +1,4 @@
 import { createVectorStore } from "@/app/api/hubspot/_helpers/embed.data";
-import { deletevectors } from "@/app/api/hubspot/_helpers/pinecone";
-import { Result } from "antd";
 require("dotenv").config();
 const hubspot = require("@hubspot/api-client");
 

@@ -39,7 +39,6 @@ export const upsert = async (data: any, batchSize = 250) => {
         values: embeddingArr[j],
         metadata: {
           content: contentArr[j],
-          // content_tokens,
           data_type,
           chatbot_id,
           source_type,
@@ -143,7 +142,11 @@ export const queryVectors = async (vector: any) => {
       vector: vector,
       includeMetadata: true,
       // includeValues:true,
-      namespace: 'b'
+      namespace: 'b',
+      filter:{
+        chatbot_id: "a",
+        data_type: "Hubspot"
+      },
     };
     const result = await index.query({ queryRequest: cred });
     console.log(result)

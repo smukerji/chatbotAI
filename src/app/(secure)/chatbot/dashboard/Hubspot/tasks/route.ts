@@ -1,7 +1,4 @@
 import { createVectorStore } from "@/app/api/hubspot/_helpers/embed.data";
-import { Result } from "antd";
-import axios from "axios";
-const hubspot = require("@hubspot/api-client");
 require("dotenv").config();
 
 //ANCHOR - Retrieving data of tasks from Hub-spot and adding it to pinecone

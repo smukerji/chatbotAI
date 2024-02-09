@@ -287,7 +287,7 @@ function Dashboard() {
           {/*------------------------------------------integrations-component----------------------------------------------*/}
           {editChatbot == "integrations" && !loading && (
             <>
-              <Integration />
+              <Integration chatbotId={chatbot.id}/>
             </>
           )}
 

@@ -1,5 +1,4 @@
 import { createVectorStore } from "@/app/api/hubspot/_helpers/embed.data";
-import { Result } from "antd";
 require("dotenv").config();
 
 //ANCHOR - Retrieving data of notes from Hub-spot and adding it to pinecone

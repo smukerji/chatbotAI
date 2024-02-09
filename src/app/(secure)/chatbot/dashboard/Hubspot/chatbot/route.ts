@@ -2,7 +2,7 @@ import { createVectorStoreQuery } from "@/app/api/hubspot/_helpers/embed.data";
 import { createResponse } from "@/app/api/hubspot/_helpers/openAI";
 
 export async function POST(request: Request) {
-  let question = "give me contact details of shivam";
+  let question = "give me contact of juzar mantri";
 
   //ANCHOR - querying from pinecone
   const ans = await createVectorStoreQuery(

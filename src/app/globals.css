@@ -31,3 +31,20 @@ Header a {
 .ant-btn-primary:hover {
   background-color: rgba(10, 10, 10, 0.856) !important;
 } */
+.hubspot-modal  .hubspot-input{
+  padding: 8px;
+  height: 40px;
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid  #B1B5C3;
+  background:  #FFF;
+}
+.hubspot-input:focus{
+  outline: none;
+}
+.hubspot-modal .error{
+  color: red;
+  padding-top: 5px;
+  margin: 0px;
+  font-size: 14px;
+}
