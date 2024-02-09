@@ -25,6 +25,7 @@ import { formatTimestamp } from "../../../../../_helpers/client/formatTimestamp"
 import Icon from "../../../../../_components/Icon/Icon";
 import RefreshBtn from "../../../../../../assets/svg/RefreshBtn";
 import ExportBtn from "../../../../../../assets/svg/ExportBtn";
+import ChatBotIcon from "../../../../../../../public/create-chatbot-svgs/ChatBotIcon.svg";
 import { UserDetailsContext } from "../../../../../_helpers/client/Context/UserDetailsContext";
 
 function Chat({
@@ -306,22 +307,28 @@ function Chat({
 
   /// refresh the chat window
   const refreshChat = () => {
-    setMessages(
-      chatbot.initial_message == null
-        ? [{ role: "assistant", content: `Hi! What can I help you with?` }]
-        : [{ role: "assistant", content: chatbot.initial_message }]
-    );
-    setMessagesTime(
-      chatbot.initial_message == null
-        ? [
-            {
-              role: "assistant",
-              content: `Hi! What can I help you with?`,
-              messageTime: getTime(),
-            },
-          ]
-        : [{ role: "assistant" }]
-    );
+    setMessages([]);
+    setMessagesTime([]);
+
+    botSettings.initialMessage?.map((message: string, index: number) => {
+      setMessages((prevMessages: any) => [
+        ...prevMessages,
+        {
+          role: "assistant",
+          content: message,
+        },
+      ]);
+
+      setMessagesTime((prevMessages: any) => [
+        ...prevMessages,
+        {
+          role: "assistant",
+          content: message,
+          messageTime: getDate(),
+          messageType: "initial",
+        },
+      ]);
+    });
 
     setSessionID(uuid());
     setSessionStartDate(getDate());
@@ -426,13 +433,24 @@ function Chat({
         }}
       >
         <div className="header">
-          <span>Powered by Lucifer.AI</span>
+          <div className="chatbot-name-container">
+            <Image
+              src={
+                botSettings?.profilePictureUrl
+                  ? botSettings?.profilePictureUrl
+                  : ChatBotIcon
+              }
+              alt="bot-img"
+            />
+            <h1>{botSettings?.chatbotDisplayName}</h1>
+          </div>
+
           <div className="action-btns">
             {/* <Image src={refreshBtn} alt="refresh-btn" onClick={refreshChat} /> */}
             {/* <Image src={exportBtn} alt="export-btn" /> */}
             <Icon
               Icon={RefreshBtn}
-              onClick={refreshChat}
+              click={refreshChat}
               className={botSettings?.theme === "dark" ? "color-white" : ""}
             />
             <Icon
@@ -443,7 +461,6 @@ function Chat({
         </div>
 
         <hr />
-
         <div className="conversation-container" ref={chatWindowRef}>
           {messages.map((message: any, index: any) => {
             if (message.role == "assistant")
@@ -550,6 +567,20 @@ function Chat({
             </div>
           )}
         </div>
+        <div className="suggested-messages">
+          {botSettings?.suggestedMessages?.map((message: any, index: any) => {
+            return (
+              <div
+                className="message"
+                key={index}
+                onClick={() => setUserQuery(message)}
+              >
+                {message}
+              </div>
+            );
+          })}
+        </div>
+        <span className="powered-by">Powered by Lucifer.AI</span>
         <div
           className="chat-question"
           style={{
@@ -566,9 +597,11 @@ function Chat({
             onChange={(event) => {
               setUserQuery(event.target.value);
             }}
-            placeholder={`Message ${
-              isPopUp ? chatbotName : botDetails?.chatbotName
-            }`}
+            placeholder={
+              isPopUp
+                ? `Message ${chatbotName}`
+                : botSettings?.messagePlaceholder
+            }
             value={userQuery}
           />
           <button

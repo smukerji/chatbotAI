@@ -560,6 +560,7 @@ export default async function handler(req, res) {
           : "Chabot trained successfully";
 
         if (!updateChatbot) {
+          const currrentTime = new Date().getTime();
           /// create the chatbot entry in DB
           const chatbotName = fields?.chatbotText[0];
           let userChatbotsCollection = db.collection("user-chatbots");
@@ -567,6 +568,9 @@ export default async function handler(req, res) {
             userId,
             chatbotId,
             chatbotName,
+            lastUsed: currrentTime,
+            createdAt: currrentTime,
+            noOfMessagesSent: 0,
           });
 
           /// set the default settings for the chatbot in DB
@@ -587,8 +591,10 @@ export default async function handler(req, res) {
             profilePictureUrl: "",
             bubbleIconUrl: "",
             chatbotDisplayName: chatbotName,
-            lastTrained: new Date().getTime(),
+            lastTrained: currrentTime,
             chatbotBubbleAlignment: chatbotBubbleAlignment.LEFT,
+            lastUsed: currrentTime,
+            noOfMessagesSent: 0,
           });
         } else {
           /// if chatbot is being updated just update the timestamp and characters

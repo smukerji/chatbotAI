@@ -10,6 +10,7 @@ import {
 export const ChatbotSettingContext = createContext({});
 
 export const ChatbotSettingDataProvider = ({ children }: any) => {
+  const currrentTime = new Date().getTime();
   const initialChatbotSettings = {
     model: models[0],
     visibility: visibility.PUBLIC,
@@ -26,7 +27,7 @@ export const ChatbotSettingDataProvider = ({ children }: any) => {
     profilePictureName: "",
     bubbleIconUrl: "",
     bubbleIconName: "",
-    lastTrained: new Date().getTime(),
+    lastTrained: currrentTime,
     chatbotDisplayName: "",
     chatbotBubbleAlignment: chatbotBubbleAlignment.LEFT,
   };
