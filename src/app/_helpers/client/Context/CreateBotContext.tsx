@@ -4,10 +4,10 @@ import { createContext, useState } from "react";
 export const CreateBotContext = createContext({});
 
 export const CreateBotDataProvider = ({ children }: any) => {
-  const [createBotInfo, setCreateBotInfo] = useState({
+  const initialCreateBotInfo = {
     activeSource: "document",
     editChatbot: "chatbot",
-    chabotSettings:"general",
+    chabotSettings: "general",
 
     isLoading: false,
     totalCharCount: 0,
@@ -35,8 +35,11 @@ export const CreateBotDataProvider = ({ children }: any) => {
 
     isUpdateChatbot: false,
 
+    // plan: {},
+
     chatbotName: "",
-  });
+  };
+  const [createBotInfo, setCreateBotInfo] = useState(initialCreateBotInfo);
 
   /// handle the changes
   const handleChange = (props: any) => (value: any) => {
@@ -46,8 +49,15 @@ export const CreateBotDataProvider = ({ children }: any) => {
     }));
   };
 
+  /// for reseting the state
+  const resetCreateBotInfo = () => {
+    setCreateBotInfo(initialCreateBotInfo);
+  };
+
   return (
-    <CreateBotContext.Provider value={{ createBotInfo, handleChange }}>
+    <CreateBotContext.Provider
+      value={{ createBotInfo, handleChange, resetCreateBotInfo }}
+    >
       {children}
     </CreateBotContext.Provider>
   );

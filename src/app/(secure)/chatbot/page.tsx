@@ -5,19 +5,11 @@ import {
   MoreOutlined,
 } from "@ant-design/icons";
 import { Spin, message } from "antd";
-import React, { Suspense, useEffect, useState } from "react";
+import React, { Suspense, useContext, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import "./chatbot.scss";
 import Image from "next/image";
-import chatbotBg from "../../../../public/sections-images/common/chatbot-bg-img.svg";
-import chatbotOpenIcon from "../../../../public/sections-images/common/chatbot-open-icon.svg";
-import chatbotMenuIcon from "../../../../public/sections-images/common/chatbot-menu-icon.svg";
-import shareIcon from "../../../../public/sections-images/common/share.svg";
-import duplicateIcon from "../../../../public/sections-images/common/document-copy.svg";
-import renameIcon from "../../../../public/sections-images/common/edit.svg";
-import deleteIcon from "../../../../public/sections-images/common/trash.svg";
 import noChatbotBg from "../../../../public/sections-images/common/no-chatbot-icon.svg";
-import menuIcon from "../../../../public/svgs/menu-icon.svg";
 // import gridIcon from "../../../../public/svgs/grid-icon.svg";
 import GridLayout from "./_components/GridLayout";
 import TableLayout from "./_components/TableLayout";
@@ -33,6 +25,8 @@ import GridIcon from "../../../assets/svg/GridIcon";
 import MenuIcon from "../../../assets/svg/MenuIcon";
 import NewChatbotNameModal from "./dashboard/_components/Modal/NewChatbotNameModal";
 import LimitReachedModal from "./dashboard/_components/Modal/LimitReachedModal";
+import { CreateBotContext } from "../../_helpers/client/Context/CreateBotContext";
+import { UserDetailsContext } from "../../_helpers/client/Context/UserDetailsContext";
 // import GridIcon from "../../as";
 
 const antIcon = (
@@ -43,8 +37,15 @@ function Chatbot() {
   const { status } = useSession();
   const router = useRouter();
 
+  const botContext: any = useContext(CreateBotContext);
+  const botDetails = botContext?.createBotInfo;
+
+  /// get userDetails context
+  const userDetailContext: any = useContext(UserDetailsContext);
+  const userDetails = userDetailContext?.userDetails;
+
   /// state to store user plan
-  const [userDetails, setUserDetails]: any = useState({});
+  // const [userDetails, setUserDetails]: any = useState({});
 
   //manage limit model
   const [openLimitModal, setOpenLimitModel] = useState(false);
@@ -106,8 +107,13 @@ function Chatbot() {
           }
         );
         const userDetails = await userDetailsresponse.json();
+        userDetailContext?.handleChange("noOfChatbotsUserCreated")(
+          userDetails?.noOfChatbotsUserCreated
+        );
 
-        setUserDetails(userDetails);
+        // botContext?.handleChange("plan")(userDetails?.plan);
+
+        // setUserDetails(userDetails);
         setChatbotData(data.chatbots);
         setLoading(false);
       } catch (error) {
@@ -192,6 +198,7 @@ function Chatbot() {
 
                 setOpenNewChatbotNameModal(true);
               }}
+              disabled={loading}
             >
               New Chatbot
             </button>

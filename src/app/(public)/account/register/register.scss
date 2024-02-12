@@ -60,6 +60,17 @@
                     }
                 }
 
+                .password-container {
+                    position: relative;
+                }
+
+                .eye-icon {
+                    position: absolute;
+                    top: 18px;
+                    left: 358px;
+                    cursor: pointer;
+                }
+
                 a {
                     color: #777e90;
                     font-size: 16px;

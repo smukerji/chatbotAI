@@ -71,7 +71,7 @@
         border-radius: 12px;
         border: 1px solid #e6e8ec;
         background: #fff;
-        overflow: hidden;
+        // overflow: hidden;
         resize: none;
         color: #23262f;
 
@@ -299,11 +299,10 @@
           justify-content: space-between;
           align-items: center;
           align-self: stretch;
-          .profile-image-child{
+          .profile-image-child {
             display: flex;
             gap: 16px;
-          .file-label{
-          
+            .file-label {
               display: flex;
               align-items: center;
               gap: 8px;
@@ -313,16 +312,15 @@
               font-weight: 500;
               line-height: 24px; /* 150% */
               cursor: pointer;
-      
+            }
+            .file-name {
+              color: #777e90;
+              font-size: 16px;
+              font-style: normal;
+              font-weight: 500;
+              line-height: 24px; /* 150% */
+            }
           }
-           .file-name {
-            color: #777e90;
-            font-size: 16px;
-            font-style: normal;
-            font-weight: 500;
-            line-height: 24px; /* 150% */
-        }
-      }
         }
         .profile-image-container :nth-child(2) :hover {
           cursor: pointer;
@@ -390,6 +388,7 @@
         .update-chat-icon-text {
           color: #353945;
           text-align: left;
+          text-transform: capitalize;
 
           /* Body/Medium */
           font-size: 16px;
@@ -403,11 +402,10 @@
           justify-content: space-between;
           align-items: center;
           align-self: stretch;
-          .chat-image-child{
+          .chat-image-child {
             display: flex;
             gap: 16px;
-          .file-label{
-          
+            .file-label {
               display: flex;
               align-items: center;
               gap: 8px;
@@ -417,15 +415,14 @@
               font-weight: 500;
               line-height: 24px; /* 150% */
               cursor: pointer;
-      
-          }
-           .file-name {
-            color: #777e90;
-            font-size: 16px;
-            font-style: normal;
-            font-weight: 500;
-            line-height: 24px; /* 150% */
-        }
+            }
+            .file-name {
+              color: #777e90;
+              font-size: 16px;
+              font-style: normal;
+              font-weight: 500;
+              line-height: 24px; /* 150% */
+            }
           }
         }
         .update-chat-icon-image-container :nth-child(2):hover {
@@ -627,6 +624,7 @@
         background: #2e58ea;
         outline: none;
         border: 0px;
+        cursor: pointer;
 
         .save-btn-text {
           color: #fcfcfd;
@@ -637,9 +635,11 @@
           font-weight: 600;
           line-height: 28px; /* 175% */
         }
-      }
-      .save-btn:hover {
-        cursor: pointer;
+
+        &:disabled {
+          cursor: not-allowed;
+          background: #2e57ea7a;
+        }
       }
     }
     .training-right-container {
@@ -698,6 +698,7 @@
               border-radius: 16px;
               font-size: 16px;
               line-height: 24px;
+              width: fit-content;
             }
             .like-icons {
               display: flex;
@@ -722,7 +723,7 @@
           }
         }
         .suggested-container {
-          .suggested-messages{
+          .suggested-messages {
             display: flex;
             gap: 4px;
           }
@@ -786,13 +787,13 @@
         display: flex;
         width: 100%;
         justify-content: flex-start;
-        .message-icon-child{
+        .message-icon-child {
           width: 64px;
           height: 64px;
           border-radius: 50%;
-          display:flex;
-          justify-content:center;
-          align-items:center
+          display: flex;
+          justify-content: center;
+          align-items: center;
         }
       }
     }

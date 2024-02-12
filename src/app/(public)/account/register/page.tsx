@@ -11,6 +11,8 @@ import { LoadingOutlined } from "@ant-design/icons";
 import { redirect, useRouter } from "next/navigation";
 import { useUserService } from "../../../_services/useUserService";
 import { Spin, message } from "antd";
+import openEyeIcon from "../../../../../public/svgs/open-eye.svg";
+import closeEyeIcon from "../../../../../public/svgs/close-eye.svg";
 
 function Register() {
   const router = useRouter();
@@ -20,6 +22,7 @@ function Register() {
   const [passwordMessage, setPasswordMessage]: any = useState("");
   const [firstNameMessage, setFirstNameMessage]: any = useState("");
   const [lastNameMessage, setLastNameMessage]: any = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   /// first name, last name, email and password storing state
   const [email, setEmail]: any = useState(null);
@@ -137,6 +140,11 @@ function Register() {
     }
   };
 
+  /// to toggle eye icon
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
     <div className="register-container">
       {/* --------------------------left section------------------------------ */}
@@ -212,9 +220,9 @@ function Register() {
               />
               <span>{emailMessage}</span>
             </div>
-            <div>
+            <div className="password-container">
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="Enter your Password"
                 onChange={checkPassword}
                 onKeyDown={(e) => {
@@ -227,6 +235,14 @@ function Register() {
                     )
                       register();
                 }}
+              />
+              <Image
+                className="eye-icon"
+                src={showPassword ? closeEyeIcon : openEyeIcon}
+                alt="eye-icon"
+                width={24}
+                height={24}
+                onClick={togglePasswordVisibility}
               />
               <span>{passwordMessage}</span>
             </div>

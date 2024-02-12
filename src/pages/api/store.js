@@ -5,7 +5,9 @@ import {
 } from "../../app/_helpers/server/embeddings";
 import { connectDatabase } from "../../db";
 import { v4 as uuid } from "uuid";
-import { authorize, uploadFile } from "../../app/_services/googleFileUpload";
+// import { authorize, uploadFile } from "../../app/_services/googleFileUpload";
+import { put } from "@vercel/blob";
+import fs from "fs";
 
 import {
   chatbotBubbleAlignment,
@@ -86,24 +88,40 @@ export default async function handler(req, res) {
               /// store the images
               var oldPath = imageFile[0].filepath;
 
-              /// store the file on google drive
-              authorize()
-                .then((authClient) =>
-                  uploadFile(authClient, oldPath, qa.image)
-                    .then((file) => {
-                      qa.image = file.data.id;
-                      console.log("Stored file to drive", qa.image);
-                      resolve(1);
-                    })
-                    .catch((err) => {
-                      console.log("Error storing file", err);
-                      reject(err);
-                    })
-                )
+              const readStream = fs.createReadStream(oldPath);
+
+              /// store image on vercel
+              put(imageFile[0].originalFilename, readStream, {
+                access: "public",
+              })
+                .then((blob) => {
+                  qa.image = blob.url;
+                  console.log("Stored file to vercel", qa.image);
+                  resolve(1);
+                })
                 .catch((err) => {
-                  console.log("Error uploading file to Google Drive:", err);
+                  console.log("Error storing file", err);
                   reject(err);
                 });
+
+              /// store the file on google drive
+              // authorize()
+              //   .then((authClient) =>
+              //     uploadFile(authClient, oldPath, qa.image)
+              //       .then((file) => {
+              //         qa.image = file.data.id;
+              //         console.log("Stored file to drive", qa.image);
+              //         resolve(1);
+              //       })
+              //       .catch((err) => {
+              //         console.log("Error storing file", err);
+              //         reject(err);
+              //       })
+              //   )
+              //   .catch((err) => {
+              //     console.log("Error uploading file to Google Drive:", err);
+              //     reject(err);
+              //   });
               /// move the file from tmp to server
               // mv(oldPath, newPath, function (err) {
               //   console.log("Error storing file", err);
@@ -347,9 +365,7 @@ export default async function handler(req, res) {
                   qa.image
                     ? JSON.stringify({
                         question: qa.question,
-                        answer:
-                          `${qa.answer}` +
-                          `image: https://drive.google.com/uc?export=view&id=${qa.image}`,
+                        answer: `${qa.answer}` + `image: ${qa.image}`,
                         // filename: qa.image,
                       })
                     : JSON.stringify({
@@ -544,6 +560,7 @@ export default async function handler(req, res) {
           : "Chabot trained successfully";
 
         if (!updateChatbot) {
+          const currrentTime = new Date().getTime();
           /// create the chatbot entry in DB
           const chatbotName = fields?.chatbotText[0];
           let userChatbotsCollection = db.collection("user-chatbots");
@@ -551,6 +568,9 @@ export default async function handler(req, res) {
             userId,
             chatbotId,
             chatbotName,
+            lastUsed: currrentTime,
+            createdAt: currrentTime,
+            noOfMessagesSent: 0,
           });
 
           /// set the default settings for the chatbot in DB
@@ -570,8 +590,11 @@ export default async function handler(req, res) {
             chatbotIconColor: defaultChatBubbleIconColor,
             profilePictureUrl: "",
             bubbleIconUrl: "",
-            lastTrained: new Date().getTime(),
+            chatbotDisplayName: chatbotName,
+            lastTrained: currrentTime,
             chatbotBubbleAlignment: chatbotBubbleAlignment.LEFT,
+            lastUsed: currrentTime,
+            noOfMessagesSent: 0,
           });
         } else {
           /// if chatbot is being updated just update the timestamp and characters

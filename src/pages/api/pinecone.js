@@ -1,10 +1,8 @@
-import { PineconeClient } from "@pinecone-database/pinecone";
+import { Pinecone } from "@pinecone-database/pinecone";
 
 import { createEmbedding } from "../../app/_helpers/server/embeddings";
 import { connectDatabase } from "../../db";
 import { deletevectors } from "../../app/_helpers/server/pinecone";
-
-export const pinecone = new PineconeClient();
 
 export default async function handler(req, res) {
   if (req.method === "POST") {
@@ -32,39 +30,36 @@ export default async function handler(req, res) {
     const queryRequest = {
       vector: embed,
       topK: 5,
-      includeValues: false,
       includeMetadata: true,
       filter: {
         chatbotId: chatbotId,
       },
-      namespace: userId,
     };
 
     try {
+      const pinecone = new Pinecone({
+        apiKey: process.env.NEXT_PUBLIC_PINECONE_KEY,
+      });
+      const index = pinecone.index(process.env.NEXT_PUBLIC_PINECONE_INDEX);
+
       try {
-        await pinecone.init({
-          environment: process.env.NEXT_PUBLIC_PINECONE_ENV,
-          apiKey: process.env.NEXT_PUBLIC_PINECONE_KEY,
-        });
-      } catch (error) {
-        console.error("Error initializing Pinecone client:", error);
-        throw new Error(
-          "Failed to initialize Pinecone client while retriving the similarity results"
+        /// query embeddings
+        const ns = index.namespace(userId);
+        const response = await ns.query(queryRequest);
+        /// extract the content
+        const extractedContents = response?.matches?.map(
+          (item) => item.metadata["content"]
         );
+        return res.status(200).send(extractedContents);
+      } catch (error) {
+        console.error("Error during queryfetch:", error);
+        return res.status(200).send(error.message);
       }
-
-      const index = pinecone.Index(process.env.NEXT_PUBLIC_PINECONE_INDEX);
-
-      /// query embeddings
-      const response = await index.query({ queryRequest });
-      /// extract the content
-      const extractedContents = response?.matches?.map(
-        (item) => item.metadata["content"]
-      );
-      return res.status(200).send(extractedContents);
     } catch (error) {
-      console.error("Error during queryfetch:", error);
-      return res.status(200).send(error.message);
+      console.error("Error initializing Pinecone client:", error);
+      throw new Error(
+        "Failed to initialize Pinecone client while retriving the similarity results"
+      );
     }
   } else {
     /// deleting the chatbot data from pinecone
@@ -87,8 +82,9 @@ export default async function handler(req, res) {
         doc.content.forEach((content) => {
           vectorId.push(content.dataID);
         });
+      } else {
+        vectorId.push(doc.dataID);
       }
-      vectorId.push(doc.dataID);
       namespace = userId;
     }
     vectorId = [].concat(...vectorId);

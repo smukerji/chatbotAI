@@ -4,12 +4,23 @@ import { Progress, message } from "antd";
 import Image from "next/image";
 import "./website.scss";
 import deleteIcon from "../../../../public/create-chatbot-svgs/delete-icon.svg";
+import { UserDetailsContext } from "../../_helpers/client/Context/UserDetailsContext";
 
-function Website({ websiteCharCount, totalCharCount, isUpdateChatbot }: any) {
+function Website({
+  websiteCharCount,
+  totalCharCount,
+  isUpdateChatbot,
+  chatbotId,
+  userId,
+}: any) {
   const [progress, setProgress] = useState(0);
 
   const botContext: any = useContext(CreateBotContext);
   const botDetails = botContext?.createBotInfo;
+
+  /// get userDetails context
+  const userDetailContext: any = useContext(UserDetailsContext);
+  const userDetails = userDetailContext?.userDetails;
 
   /// get the crawledlist & deleteCrawlList from context
   const crawledList = botDetails?.crawledList;
@@ -71,6 +82,8 @@ function Website({ websiteCharCount, totalCharCount, isUpdateChatbot }: any) {
         },
         body: JSON.stringify({
           sourceURL: value,
+          chatbotId: chatbotId,
+          userId: userId,
         }),
         next: { revalidate: 0 },
       };
@@ -119,9 +132,36 @@ function Website({ websiteCharCount, totalCharCount, isUpdateChatbot }: any) {
     }
   };
 
-  //   const handleCrawlLinkChange = (event: any) => {
-  //     botContext?.handleChange("crawlLink")(event.target.value);
-  //   };
+  const deleteAllLinks = () => {
+    // console.log(botDetails);
+    let totalLinksCharToDelete = 0;
+    /// filter the links that need to be deleted from database
+    const newDeleteCrawlLinks = crawledList?.filter(
+      (link: any, index: number) => {
+        totalLinksCharToDelete += link?.charCount;
+
+        return link?.dataID != "" && link?.dataID != undefined;
+      }
+    );
+
+    /// set the delete crawl list
+    botContext?.handleChange("deleteCrawlList")([
+      ...deleteCrawlList,
+      ...newDeleteCrawlLinks,
+    ]);
+
+    /// update the char count
+    botContext?.handleChange("totalCharCount")(
+      totalCharCount - totalLinksCharToDelete
+    );
+    botContext?.handleChange("websiteCharCount")(
+      websiteCharCount - totalLinksCharToDelete
+    );
+
+    /// update the list
+    botContext?.handleChange("crawledList")([]);
+  };
+
   return (
     <div className="website-source-container">
       {/* <Search
@@ -161,12 +201,15 @@ function Website({ websiteCharCount, totalCharCount, isUpdateChatbot }: any) {
         on the website).
         <span>
           {crawledList?.length}
-          <span>/10 links</span>
+          <span>/{userDetails?.plan?.websiteCrawlingLimit} links</span>
         </span>
       </span>
       <hr />
       {crawledList?.length > 0 && (
-        <h2 className="website-text">Included links</h2>
+        <div className="website-text-container">
+          <h2 className="website-text">Included links</h2>
+          <span onClick={deleteAllLinks}>Delete all</span>
+        </div>
       )}
       <div className="fetched-links-container">
         {crawledList?.map((item: any, index: number) => {

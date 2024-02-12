@@ -45,7 +45,7 @@ function General({ chatbotId, chatbotName }: any) {
   /// to copy chatbot Id
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.write(chatbotId);
+      await navigator.clipboard.writeText(chatbotId);
       message.success("ID copied to clipboard");
     } catch (err: any) {
       message.error("Failed to copy ", err.message);

@@ -72,81 +72,83 @@ function GridLayout({
       <div className="chatbot-grid">
         {chatbotData?.map((data: any, index: number) => {
           return (
-            <div
-              className="chatbot"
-              key={data.id}
-              onMouseEnter={() => setCurrentChatbotId(data.id)}
-              onMouseLeave={() => {
-                setCurrentChatbotId(null);
-              }}
-              onClick={() => {
-                openChatbot(data.id);
-              }}
-              style={{
-                background: `${
-                  data.id === currentChatbotId
-                    ? "#ecf0fe"
-                    : openMenu?.[index]
-                    ? "ecf0fe"
-                    : ""
-                }`,
-              }}
-              //   onClick={() => openMenu && setOpenMenu(null)}
-            >
-              <Image src={chatbotBg} alt={"chatbot-img"} />
-              <div className="name">
-                {data.name}
-                {/* <Image
+            <React.Fragment key={index}>
+              <div
+                className="chatbot"
+                key={data.id}
+                onMouseEnter={() => setCurrentChatbotId(data.id)}
+                onMouseLeave={() => {
+                  setCurrentChatbotId(null);
+                }}
+                onClick={() => {
+                  openChatbot(data.id);
+                }}
+                style={{
+                  background: `${
+                    data.id === currentChatbotId
+                      ? "#ecf0fe"
+                      : openMenu?.[index]
+                      ? "ecf0fe"
+                      : ""
+                  }`,
+                }}
+                //   onClick={() => openMenu && setOpenMenu(null)}
+              >
+                <Image src={chatbotBg} alt={"chatbot-img"} />
+                <div className="name">
+                  {data.name}
+                  {/* <Image
                   className="open-icon"
                   src={chatbotOpenIcon}
                   alt={"chatbot-open-icon"}
                 /> */}
-              </div>
-
-              {/* opening the menu for chatbot actions */}
-              <Image
-                style={{
-                  visibility: `${
-                    data.id === currentChatbotId
-                      ? "visible"
-                      : openMenu?.[index]
-                      ? "visible"
-                      : "hidden"
-                  }`,
-                }}
-                className="menu-icon"
-                src={chatbotMenuIcon}
-                alt={"chatbot-menu-icon"}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  changeMenu({ [index]: !openMenu?.[index] });
-                  setChatbotId(data.id);
-                }}
-              />
-
-              {/* opening the menu for chatbot actions */}
-              {openMenu?.[index] ? (
-                <div className={`menu ${openMenu?.[index] && "active"}`}>
-                  <ul>
-                    <li className="chatbot-actions" value={0}>
-                      <Image src={shareIcon} alt={"share-icon"} /> Share
-                    </li>
-                    <li className="chatbot-actions" value={1}>
-                      <Image src={duplicateIcon} alt={"duplicate-icon"} />
-                      Duplicate
-                    </li>
-
-                    <li className="chatbot-actions" value={2}>
-                      <Image src={renameIcon} alt={"rename-icon"} /> Rename
-                    </li>
-                    <li className="chatbot-actions" value={3}>
-                      <Image src={deleteIcon} alt={"delete-icon"} />
-                      Delete
-                    </li>
-                  </ul>
                 </div>
-              ) : null}
-            </div>
+
+                {/* opening the menu for chatbot actions */}
+                <Image
+                  style={{
+                    visibility: `${
+                      data.id === currentChatbotId
+                        ? "visible"
+                        : openMenu?.[index]
+                        ? "visible"
+                        : "hidden"
+                    }`,
+                  }}
+                  className="menu-icon"
+                  src={chatbotMenuIcon}
+                  alt={"chatbot-menu-icon"}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    changeMenu({ [index]: !openMenu?.[index] });
+                    setChatbotId(data.id);
+                  }}
+                />
+
+                {/* opening the menu for chatbot actions */}
+                {openMenu?.[index] ? (
+                  <div className={`menu ${openMenu?.[index] && "active"}`}>
+                    <ul>
+                      <li className="chatbot-actions" value={0}>
+                        <Image src={shareIcon} alt={"share-icon"} /> Share
+                      </li>
+                      <li className="chatbot-actions" value={1}>
+                        <Image src={duplicateIcon} alt={"duplicate-icon"} />
+                        Duplicate
+                      </li>
+
+                      <li className="chatbot-actions" value={2}>
+                        <Image src={renameIcon} alt={"rename-icon"} /> Rename
+                      </li>
+                      <li className="chatbot-actions" value={3}>
+                        <Image src={deleteIcon} alt={"delete-icon"} />
+                        Delete
+                      </li>
+                    </ul>
+                  </div>
+                ) : null}
+              </div>
+            </React.Fragment>
           );
         })}
       </div>

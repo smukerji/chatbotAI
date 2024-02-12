@@ -55,25 +55,85 @@ async function fetchCustomBots(userId: string) {
   // console.log("Collection ", collection);
 
   //// default chatbot set temporary
+  // const customBots = await collection
+  //   ?.find({
+  //     $or: [
+  //       { userId: userId },
+  //       {
+  //         chatbotId: "123d148a-be02-4749-a612-65be9d96266c",
+  //       },
+  //       {
+  //         chatbotId: "34cceb84-07b9-4b3e-ad6f-567a1c8f3557",
+  //       },
+  //       {
+  //         chatbotId: "f0893732-3302-46b2-922a-95e79ef3524c",
+  //       },
+  //       { chatbotId: "f8095ef4-6cd0-4373-a45e-8fe15cb6dd0f" },
+  //     ],
+  //   })
+  //   .toArray();
+
+  /// default chatbot set temporary
   const customBots = await collection
-    ?.find({
-      $or: [
-        { userId: userId },
-        {
-          chatbotId: "123d148a-be02-4749-a612-65be9d96266c",
+    .aggregate([
+      {
+        $match: {
+          $or: [
+            { userId: userId },
+            {
+              chatbotId: {
+                $in: [
+                  "123d148a-be02-4749-a612-65be9d96266c",
+                  "34cceb84-07b9-4b3e-ad6f-567a1c8f3557",
+                  "f0893732-3302-46b2-922a-95e79ef3524c",
+                  "f8095ef4-6cd0-4373-a45e-8fe15cb6dd0f",
+                ],
+              },
+            },
+          ],
         },
-        {
-          chatbotId: "34cceb84-07b9-4b3e-ad6f-567a1c8f3557",
+      },
+      {
+        $lookup: {
+          from: "chatbot-settings",
+          localField: "chatbotId",
+          foreignField: "chatbotId",
+          as: "chatbotSettings",
+          /// this will only include the field needed from chatbot settings
+          pipeline: [
+            {
+              $project: {
+                _id: 0,
+                lastTrained: 1,
+                numberOfCharacterTrained: 1,
+              },
+            },
+          ],
         },
-        {
-          chatbotId: "f0893732-3302-46b2-922a-95e79ef3524c",
+      },
+
+      {
+        $group: {
+          _id: "$_id",
+          userId: { $first: "$userId" },
+          chatbotId: { $first: "$chatbotId" },
+          chatbotName: { $first: "$chatbotName" },
+          lastUsed: { $first: "$lastUsed" },
+          noOfMessagesSent: { $first: "$noOfMessagesSent" },
+          chatbotSettings: { $push: "$chatbotSettings" },
         },
-      ],
-    })
+      },
+    ])
     .toArray();
+
   return customBots.map((doc: any) => ({
     id: doc.chatbotId,
     name: doc.chatbotName,
+    lastUsed: doc?.lastUsed,
+    noOfMessagesSent: doc?.noOfMessagesSent,
+    lastTrained: doc.chatbotSettings[0][0]?.lastTrained,
+    numberOfCharacterTrained:
+      doc.chatbotSettings[0][0]?.numberOfCharacterTrained,
   }));
 }
 

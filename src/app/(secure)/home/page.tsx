@@ -19,6 +19,8 @@ import { Spin, message } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import { useCookies } from "react-cookie";
 import { redirect, useRouter } from "next/navigation";
+import { UserDetailsContext } from "../../_helpers/client/Context/UserDetailsContext";
+import { formatNumber } from "../../_helpers/client/formatNumber";
 const crypto = require("crypto");
 
 function Home({
@@ -43,6 +45,10 @@ function Home({
 
   const botContext: any = useContext(CreateBotContext);
   const botDetails = botContext?.createBotInfo;
+
+  /// get userDetails context
+  const userDetailContext: any = useContext(UserDetailsContext);
+  const userDetails = userDetailContext?.userDetails;
 
   /// check if chatbot is being updated
   const isUpdateChatbot = botDetails?.isUpdateChatbot;
@@ -113,6 +119,23 @@ function Home({
   const text = botDetails?.text;
   const currentTextHash = crypto.createHash("sha1").update(text).digest("hex");
 
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     /// get the user and plan details
+  //     const userDetailsresponse = await fetch(
+  //       `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/account/user/details?userId=${cookies?.userId}`,
+  //       {
+  //         method: "GET",
+  //         next: { revalidate: 0 },
+  //       }
+  //     );
+  //     const userDetails = await userDetailsresponse.json();
+  //     botContext.handleChange("plan")(userDetails?.plan);
+  //   };
+
+  //   fetchData();
+  // }, []);
+
   useEffect(() => {
     /// set chatbot name
     // Accessing search parameters using window.location.search to get chatbotname
@@ -172,6 +195,23 @@ function Home({
   /// creating custom chatbot
   async function createCustomBot() {
     botContext?.handleChange("isLoading")(true);
+    /// check if the crawling links are as per user plan
+    if (crawledList?.length > userDetails?.plan?.websiteCrawlingLimit) {
+      message.error(
+        `You have only ${userDetails?.plan?.websiteCrawlingLimit} links limit to crawl in this plan. Please delete some links or update the plan`
+      );
+      botContext?.handleChange("isLoading")(false);
+      return;
+    }
+
+    /// if the training data limit is exceeded  then show error message
+    if (totalCharCount > userDetails?.plan?.trainingDataLimit) {
+      message.error(
+        "Training data limit exceed. Please remove some training data or upgrade the plan."
+      );
+      botContext?.handleChange("isLoading")(false);
+      return;
+    }
 
     if (
       qaCount === 0 &&
@@ -244,6 +284,8 @@ function Home({
           ? "65795294269d08529b8cd743"
           : chatbotId === "f0893732-3302-46b2-922a-95e79ef3524c"
           ? "651d111b8158397ebd0e65fb"
+          : chatbotId === "f8095ef4-6cd0-4373-a45e-8fe15cb6dd0f"
+          ? "6523fee523c290d75609a1fa"
           : cookies.userId
       );
       formData.append("qaList", JSON.stringify(botDetails?.qaList));
@@ -438,6 +480,8 @@ function Home({
                 websiteCharCount={websiteCharCount}
                 totalCharCount={totalCharCount}
                 isUpdateChatbot={isUpdateChatbot}
+                chatbotId={chatbotId}
+                userId={cookies?.userId}
               />
             )}
           </div>
@@ -507,7 +551,13 @@ function Home({
 
                 <span>
                   {totalCharCount}
-                  <span>/11.000.000 limit</span>
+                  <span>
+                    /
+                    {userDetails?.plan?.trainingDataLimit
+                      ? formatNumber(userDetails?.plan?.trainingDataLimit)
+                      : 0}{" "}
+                    limit
+                  </span>
                 </span>
               </div>
             </div>

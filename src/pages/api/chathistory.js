@@ -20,7 +20,7 @@ export default async function handler(req, res) {
     /// get the collection to store chat history
     let collection = db.collection("chat-history");
 
-    /// update the chat count
+    /// update the total chat count
     const updateBotCount = await db.collection("user-details").updateOne(
       { userId: userId },
       {
@@ -29,6 +29,22 @@ export default async function handler(req, res) {
         },
         $inc: {
           totalMessageCount: 1,
+        },
+      },
+      {
+        upsert: true,
+      }
+    );
+
+    /// update chat count for each chatbot
+    await db.collection("user-chatbots").updateOne(
+      { userId: userId, chatbotId: chatbotId },
+      {
+        $set: {
+          lastUsed: new Date().getTime(),
+        },
+        $inc: {
+          noOfMessagesSent: 1,
         },
       },
       {

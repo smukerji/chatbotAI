@@ -202,6 +202,8 @@ import { apiHandler } from "../../../../_helpers/server/api/api-handler";
 import * as puppeteer from "puppeteer";
 import { parse } from "node-html-parser";
 import chromium from "@sparticuz/chromium-min";
+import { connectDatabase } from "../../../../../db";
+import { ObjectId } from "mongodb";
 
 module.exports = apiHandler({
   POST: fetchLinks,
@@ -246,10 +248,54 @@ async function fetchLinks(request: NextRequest) {
   // const sourceUrl: string = params?.get("sourceURL")!;
   const data = await request.json();
   const sourceUrl = data?.sourceURL;
+  const chatbotId = data?.chatbotId;
+  const userId = data?.userId;
 
   /// check if valid URl
   const urlRegex = /^https?:\/\/[^\s/$.?#].[^\s]*$/;
   if (urlRegex.test(sourceUrl)) {
+    /// first check how much link user can crawl
+    const db = (await connectDatabase())?.db();
+    /// get the user plan
+    const planDetails = await db
+      .collection("users")
+      .aggregate([
+        {
+          $match: { _id: new ObjectId(userId) },
+        },
+        {
+          $lookup: {
+            from: "plans",
+            localField: "planId",
+            foreignField: "_id",
+            as: "plan",
+          },
+        },
+      ])
+      .toArray();
+    const plan = planDetails[0].plan[0];
+
+    /// find how many link are previously fetched  by this user for this bot
+    const chatBotDataCollection = db.collection("chatbots-data");
+    const previousFetches = await chatBotDataCollection.findOne({
+      chatbotId: chatbotId!,
+      source: "crawling",
+    });
+    let limit = 0;
+    /// if previousFetches are null then crawl link
+    if (!previousFetches) {
+      limit = plan.websiteCrawlingLimit;
+    } else {
+      limit = plan.websiteCrawlingLimit - previousFetches?.content.length;
+    }
+
+    if (limit === 0) {
+      return {
+        error:
+          "Sorry you have exceeded crawling limit. Please upgrade the plan to crawl more",
+      };
+    }
+
     const browser = await puppeteer.launch({
       /// this code only run for vercel dvelopment
       args: [...chromium.args, "--hide-scrollbars", "--disable-web-security"],
@@ -311,7 +357,7 @@ async function fetchLinks(request: NextRequest) {
           charCount: text.length,
         });
 
-        if (crawledData.length === 50) {
+        if (crawledData.length === limit) {
           return {
             fetchedLinks: crawledData,
           };

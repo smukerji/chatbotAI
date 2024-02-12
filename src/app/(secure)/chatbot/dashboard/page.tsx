@@ -48,22 +48,11 @@ function Dashboard() {
   };
 
   /// messages
-  const [messages, setMessages] = useState(
-    chatbot.initial_message == null
-      ? [{ role: "assistant", content: `Hi! What can I help you with?` }]
-      : [{ role: "assistant", content: chatbot.initial_message }]
-  );
-  const [messagesTime, setMessagesTime] = useState(
-    chatbot.initial_message == null
-      ? [
-          {
-            role: "assistant",
-            content: `Hi! What can I help you with?`,
-            messageTime: getTime(),
-          },
-        ]
-      : [{ role: "assistant" }]
-  );
+  const [messages, setMessages]: any = useState([]);
+
+  // console.log(chatbotSettings);
+
+  const [messagesTime, setMessagesTime]: any = useState([]);
 
   /// data sources state
   const [qaData, setQaData]: any = useState();
@@ -108,6 +97,36 @@ function Dashboard() {
 
         /// set all the chatbot setting
         chatbotSettingContext?.loadData(content?.chatbotSetting);
+        content?.chatbotSetting?.initialMessage?.map(
+          (message: string, index: number) => {
+            // setMessages((prev): any => {
+            //   [
+            //     ...prev,
+            //     {
+            //       role: "assistant",
+            //       content: message,
+            //     },
+            //   ];
+            // });
+            setMessages((prevMessages: any) => [
+              ...prevMessages,
+              {
+                role: "assistant",
+                content: message,
+              },
+            ]);
+
+            setMessagesTime((prevMessages: any) => [
+              ...prevMessages,
+              {
+                role: "assistant",
+                content: message,
+                messageTime: getDate(),
+                messageType: "initial",
+              },
+            ]);
+          }
+        );
 
         /// total characters count
         // const tempQaCharCount = qaData ? qaData.qaCharCount : 0;
@@ -169,6 +188,8 @@ function Dashboard() {
                 alt="arrow-icon"
                 style={{ transform: "rotate(180deg)", cursor: "pointer" }}
                 onClick={() => {
+                  botContext?.resetCreateBotInfo();
+                  chatbotSettingContext?.resetChatbotSettings();
                   window.history.back();
                 }}
               />
