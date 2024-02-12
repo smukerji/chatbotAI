@@ -1,6 +1,6 @@
 // const { connectDatabase } = require("./src/db.js");
 const { MongoClient } = require("mongodb");
-require("dotenv").config();
+require("dotenv").config({path:".env.local"});
 
 const uri = process.env.NEXT_PUBLIC_MONGO_URI;
 
