@@ -5,7 +5,7 @@ import {
 } from "../../app/_helpers/server/embeddings";
 import { connectDatabase } from "../../db";
 import { v4 as uuid } from "uuid";
-import { authorize, uploadFile } from "../../app/_services/googleFileUpload";
+// import { authorize, uploadFile } from "../../app/_services/googleFileUpload";
 import { put } from "@vercel/blob";
 import fs from "fs";
 
