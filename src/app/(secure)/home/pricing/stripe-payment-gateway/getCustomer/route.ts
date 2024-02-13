@@ -2,7 +2,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { NextResponse } from "next/server";
 import { connectDatabase } from "@/db";
 import Stripe from "stripe";
-import { Console } from "console";
 const stripe = new Stripe(String(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY));
 
 export async function POST(req: NextApiRequest, res: NextApiResponse) {
@@ -12,22 +11,24 @@ export async function POST(req: NextApiRequest, res: NextApiResponse) {
       const collection = db.collection("users");
       let userId = "65c07c32e5cc6f17b42c2cb4";
       const data = await collection.findOne({ _id: userId });
-      if (data?.paymentId != null) {
-        const paymentIntent = await stripe.paymentIntents.create({
-          amount: 2000,
-          currency: "inr",
-          automatic_payment_methods: {
-            enabled: true,
-          },
-          customer: "cus_PYL34TeFqC44Aa",
-          payment_method: "pm_1OjEQBSIiEFKEPzTBwrSGC2V",
-        });
-
-        console.log("No errror");
-        return NextResponse.json(paymentIntent);
+      if (data?.customerId != null) {
+        console.log(data);
+        return NextResponse.json(data.customerId);
       } else {
-        console.log("errror");
-        return NextResponse.json({ status: 500 });
+        console.log(data)
+        const customer = await stripe.customers.create({
+          email: data.email,
+          name: data.username,
+        });
+        const add = await collection.updateOne(
+          { _id: userId },
+          {
+            $set: {
+              customerId: customer.id,
+            },
+          }
+        );
+        return NextResponse.json(customer.id);
       }
     } catch (error) {
       console.error(error);

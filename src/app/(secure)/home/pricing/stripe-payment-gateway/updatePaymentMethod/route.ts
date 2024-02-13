@@ -2,33 +2,26 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { NextResponse } from "next/server";
 import { connectDatabase } from "@/db";
 import Stripe from "stripe";
-import { Console } from "console";
 const stripe = new Stripe(String(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY));
 
-export async function POST(req: NextApiRequest, res: NextApiResponse) {
+export async function POST(req: any, res: NextApiResponse) {
   if (req.method === "POST") {
     try {
+      let { paymentId } = await req.json();
       const db = (await connectDatabase())?.db();
       const collection = db.collection("users");
       let userId = "65c07c32e5cc6f17b42c2cb4";
       const data = await collection.findOne({ _id: userId });
-      if (data?.paymentId != null) {
-        const paymentIntent = await stripe.paymentIntents.create({
-          amount: 2000,
-          currency: "inr",
-          automatic_payment_methods: {
-            enabled: true,
+      const result = await collection.updateOne(
+        { _id: userId },
+        {
+          $set: {
+            paymentId: paymentId,
           },
-          customer: "cus_PYL34TeFqC44Aa",
-          payment_method: "pm_1OjEQBSIiEFKEPzTBwrSGC2V",
-        });
-
-        console.log("No errror");
-        return NextResponse.json(paymentIntent);
-      } else {
-        console.log("errror");
-        return NextResponse.json({ status: 500 });
-      }
+        }
+      );
+      console.log(result);
+      return NextResponse.json(result);
     } catch (error) {
       console.error(error);
       // res.status(500).json({ error: 'Unable to create subscription' });

@@ -1,64 +1,44 @@
 "use client";
-import React, { useState } from 'react';
-import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import axios from 'axios';
-import Stripe from 'stripe';
-import { StripeElements } from '@stripe/stripe-js';
-const stripee = new Stripe(
-  "sk_test_51Mq8OZSIiEFKEPzTIq1BZu2jqgWMzIBKfJpLdTVnRDXoPL6wH4gp6Ju3okYqB5QLSA6Hkwn8wlxP5Xt9y6FbSKaE00JAsXarXn"
-  );
+import React, { useState, useEffect } from "react";
+import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import axios from "axios";
+// import Stripe from "stripe";
+import { StripeElements, loadStripe,Stripe } from "@stripe/stripe-js";
+import CreatePaymentMethod from "./CreatePaymentMethod";
+import {Stripe as s} from "stripe";
+const stripee = new s(String(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY));
+
 
 export default function CheckoutForm() {
-  const stripe = useStripe();
-  const elements = useElements();
+
   const [error, setError] = useState(null);
 
-  const handleSubmit = async (event: any) => {
-    event.preventDefault();
-    
-    if (!stripe || !elements) {
+  const handleSubmit = async () => {
+    const stripe = (await loadStripe(String(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY))) as Stripe;
+    // event.preventDefault();
+    if (!stripe ) {
       return;
     }
+    const result = await axios.post(
+      "http://localhost:3000/home/pricing/stripe-payment-gateway",
+    );
+    console.log(result)
 
-    const cardElement: any = elements.getElement(CardElement);
-    console.log("cardElement",cardElement)
-    try {
-      // const  paymentMethod  = await stripe.createPaymentMethod({type: 'card',card: cardElement});
-      // console.log(paymentMethod)
-      // const attachedPaymentMethod = await stripee.paymentMethods.attach('"pm_1OiwdDSIiEFKEPzT9HoU00bK"', {
-      //   customer: 'cus_PY2hh0pWHnA4pP',
-      // });
-      
-      // // Update the default payment method for the customer
-      // await stripee.customers.update('cus_PY2hh0pWHnA4pP', {
-      //   invoice_settings: {
-      //     default_payment_method: '"pm_1OiwdDSIiEFKEPzT9HoU00bK"',
-      //   },
-      // });
-      // const elements: StripeElements = {clientSecret:'sub_1OiweRSIiEFKEPzTGekqACgv'}
-      const r =  stripe.confirmPayment({clientSecret: 'pi_3OixjCSIiEFKEPzT0XycBPHL_secret_B1yGCOt0SO79pCokQZYfWxKPL',confirmParams:{
-        return_url: 'http://localhost:3000/home/pricing/stripe-payment-gateway/success'
-      }})
-      
-      // const response = await axios.post('/api/createPaymentMethod', {
-      //   paymentMethod: paymentMethod,
-      // });
-      console.log('Payment method created:', r);
-    } catch (error) {
-      console.error('Error creating payment method:', error);
-      //   setError(error.message || 'An error occurred');
-    }
+    const r = stripe.confirmPayment({
+      clientSecret:result.data.client_secret,
+      confirmParams: {
+        return_url:
+          "http://localhost:3000/home/pricing/stripe-payment-gateway/success",
+      },
+    });
   };
+  useEffect(() => {
+    handleSubmit();
+  }, []);
 
   return (
-    <form onSubmit={handleSubmit}>
-      <CardElement />
-      {error && <div>{error}</div>}
-      <button type="submit" disabled={!stripe}>
-        Pay
-      </button>
-    </form>
+    <button type="submit">
+      Pay
+    </button>
   );
-};
-
-// export default CheckoutForm;
+}
