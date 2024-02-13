@@ -95,7 +95,7 @@ function History({ chatbotId }: any) {
   };
 
   return (
-    <div className="chat-container">
+    <div className="history-chat-container">
       {/*------------------------------------------left-section----------------------------------------------*/}
       <div className="chatbot-history-details">
         {/*------------------------------------------today's-chat----------------------------------------------*/}
@@ -204,7 +204,7 @@ function History({ chatbotId }: any) {
 
         <hr />
 
-        <div className="conversation-container">
+        <div className="history-conversation-container">
           {currentChatHistory.map((message: any, index: any) => {
             if (message.role == "assistant")
               return (
