@@ -4,15 +4,15 @@
 }
 
 .chatbot-icon {
-    background-color: #15C3A7;
+    /* background-color: #15C3A7; */
     color: white;
-    padding: 15px;
+    /* padding: 15px; */
     border-radius: 50%;
     text-align: center;
     cursor: pointer;
     position: fixed;
     bottom: 20px;
-    right: 20px;
+    right: 70px;
 }
 
 .chatbot-icon .chat-icon {
@@ -26,15 +26,13 @@
 
 .embed-chatbot-container {
     position: fixed;
-    bottom: 94px;
-    right: 20px;
+    bottom: 165px;
+    right: 310px;
     max-width: 400px;
     max-height: 600px;
     height: 600px;
     width: 400px;
     background-color: white;
-    margin-right: 5%;
-    margin-bottom: 3%;
 }
 
 .embed-chatbot-container .chat-container {
@@ -43,24 +41,53 @@
     margin-top: 0;
 }
 
+.embed-chatbot-container .chat-container .messages-section {
+    width: 600px;
+}
+
 .embed-chatbot-container .chat-container .conversation-container {
     height: 85%;
 }
 
-.chat-container .chat-question {
+.embed-chatbot-container .chat-container .chat-question {
     width: 95%;
 }
 
-.chat-container .chat-question input[type="text"] {
+.embed-chatbot-container .chat-container .chat-question input[type="text"] {
     width: 100%;
 }
 
-.embed-chatbot-container .chat-container .conversation-container .assistant-message {
-    max-width: 95%;
-    margin-left: 10px;
+.embed-chatbot-container .chat-container .messages-section .header {
+    height: 35px;
 }
 
-.embed-chatbot-container .chat-container .conversation-container .user-message {
-    max-width: 95%;
-    margin-right: 10px;
+.embed-chatbot-container .chat-container .messages-section .header .chatbot-name-container {
+    align-items: center;
+}
+
+.embed-chatbot-container .chat-container .messages-section hr {
+    width: 100%;
+}
+
+
+.embed-chatbot-container .chat-container .messages-section .chat-question button {
+    width: 40px;
+}
+
+.embed-chatbot-container .chat-container .messages-section .conversation-container {
+    height: 410px;
+    margin-top: 0;
+}
+
+.embed-chatbot-container .chat-container .messages-section .header .action-btns .icon:nth-of-type(2) {
+    display: none;
+}
+
+.message-icon-child {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

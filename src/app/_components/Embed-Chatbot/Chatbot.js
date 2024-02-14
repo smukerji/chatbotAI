@@ -6,33 +6,35 @@ import Chat from "@/app/(secure)/chatbot/dashboard/_components/Chat/Chat";
 import { useSearchParams } from "next/navigation";
 import { getDate, getTime } from "../../_helpers/client/getTime";
 import { v4 as uuid } from "uuid";
+import { defaultChatBubbleIconColor } from "../../_helpers/constant";
+import chatbubble from "../../../../public/create-chatbot-svgs/message-2.svg";
+
+import Image from "next/image";
 import axios from "axios";
 
 function Chatbot() {
   const params = useSearchParams();
   const chatbot = { id: params.get("chatbotID") };
 
-  const [messages, setMessages] = useState([
-    { role: "assistant", content: `Hi! What can I help you with?` },
-  ]);
+  const [messages, setMessages] = useState([]);
 
-  const [messagesTime, setMessagesTime] = useState(
-    chatbot.initial_message == null
-      ? [
-          {
-            role: "assistant",
-            content: `Hi! What can I help you with?`,
-            messageTime: getTime(),
-          },
-        ]
-      : [{ role: "assistant" }]
-  );
+  const [messagesTime, setMessagesTime] = useState([]);
 
   const [sessionID, setSessionID] = useState();
   const [sessionStartDate, setSessionStartDate] = useState();
 
   const [userId, setUserId] = useState();
-  const [chatbotName, setChatBotName] = useState();
+  const [displayName, setDisplayName] = useState();
+  const [chatbotName, setChatbotName] = useState();
+
+  /// states to set chatbot setting
+  const [chatbotIconColor, setChatbotIconColor] = useState(
+    defaultChatBubbleIconColor
+  );
+  const [suggestedMessages, setSuggestedMessages] = useState([]);
+  const [initialMessage, setInitialMessage] = useState([]);
+  const [bubbleIconUrl, setBubbleIconUrl] = useState();
+  const [profilePictureUrl, setProfilePictureUrl] = useState();
 
   /// state to keep the chatbot open or close
   const [state, setState] = useState(false);
@@ -50,12 +52,47 @@ function Chatbot() {
     const fetchBotDetails = async () => {
       setIsBotDetailsFetched(true);
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/details/api?chatbotId=${chatbot?.id}`
+        // `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/details/api?chatbotId=${chatbot?.id}`
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/popup/details/api?chatbotId=${chatbot?.id}`
       );
 
       const botDetails = response.data;
-      setChatBotName(botDetails?.chatbotName);
+      setChatbotName(botDetails?.chatbotName);
+      setDisplayName(botDetails?.chatbotSettings[0]?.chatbotDisplayName);
+      setChatbotIconColor(botDetails?.chatbotSettings[0]?.chatbotIconColor);
+      setBubbleIconUrl(botDetails?.chatbotSettings[0]?.bubbleIconUrl);
+      setProfilePictureUrl(botDetails?.chatbotSettings[0]?.profilePictureUrl);
       setUserId(botDetails?.userId);
+      setSuggestedMessages(botDetails?.chatbotSettings[0]?.suggestedMessages);
+      setInitialMessage(botDetails?.chatbotSettings[0]?.initialMessage);
+      botDetails?.chatbotSettings[0]?.initialMessage?.map((message, index) => {
+        // setMessages((prev): any => {
+        //   [
+        //     ...prev,
+        //     {
+        //       role: "assistant",
+        //       content: message,
+        //     },
+        //   ];
+        // });
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          {
+            role: "assistant",
+            content: message,
+          },
+        ]);
+
+        setMessagesTime((prevMessages) => [
+          ...prevMessages,
+          {
+            role: "assistant",
+            content: message,
+            messageTime: getDate(),
+            messageType: "initial",
+          },
+        ]);
+      });
     };
 
     if (!isBotDetailsFetched && chatbot.id) fetchBotDetails();
@@ -78,17 +115,47 @@ function Chatbot() {
             isPopUp={true}
             userId={userId}
             chatbotName={chatbotName}
+            chatbotDisplayName={displayName}
+            suggestedMessages={suggestedMessages}
+            initialMessage={initialMessage}
+            profilePictureUrl={profilePictureUrl}
           />
         </div>
       )}
 
-      <div className="chatbot-icon" onClick={toggleChatbot}>
-        {state ? (
+      {/* <div className="chatbot-icon" onClick={toggleChatbot}> */}
+      {/* {state ? (
           <CloseOutlined className="chat-icon" />
         ) : (
           <MessageOutlined className="chat-icon" />
-        )}
+        )} */}
+      <div
+        className="chatbot-icon"
+        style={
+          {
+            // justifyContent:
+            //   botSettings?.chatbotBubbleAlignment === "right" ? "flex-end" : "",
+          }
+        }
+        onClick={toggleChatbot}
+      >
+        <div
+          className="message-icon-child"
+          style={{
+            backgroundColor: bubbleIconUrl ? "" : chatbotIconColor,
+          }}
+        >
+          <Image
+            src={bubbleIconUrl ? bubbleIconUrl : chatbubble}
+            alt="icon"
+            height={bubbleIconUrl ? "64" : 32}
+            width={bubbleIconUrl ? "64" : 32}
+            style={{ borderRadius: "50%" }}
+          />
+        </div>
+        {/* <Image src={ChatBubbleButton} alt="chat-bubble" /> */}
       </div>
+      {/* </div> */}
     </>
   );
 }
