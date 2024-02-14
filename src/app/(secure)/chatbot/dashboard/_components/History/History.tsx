@@ -119,8 +119,11 @@ function History({ chatbotId }: any) {
                       }}
                     >
                       {
-                        data[1]?.messages[botSettings?.initialMessage?.length]
-                          ?.content
+                        data[1]?.messages[
+                          data[1]?.initialMessageLength
+                            ? data[1]?.initialMessageLength
+                            : 1
+                        ]?.content
                       }
                     </div>
                   );
@@ -151,8 +154,11 @@ function History({ chatbotId }: any) {
                       }}
                     >
                       {
-                        data[1]?.messages[botSettings?.initialMessage?.length]
-                          ?.content
+                        data[1]?.messages[
+                          data[1]?.initialMessageLength
+                            ? data[1]?.initialMessageLength
+                            : 1
+                        ]?.content
                       }
                     </div>
                   );
@@ -177,13 +183,17 @@ function History({ chatbotId }: any) {
                       }`}
                       key={index}
                       onClick={() => {
-                        setCurrentChatHistory(
-                          data[botSettings?.initialMessage?.length]?.messages
-                        );
+                        setCurrentChatHistory(data[1]?.messages);
                         setActiveCurrentChatHistory("lastSevenDay" + index);
                       }}
                     >
-                      {data[1]?.messages[1]?.content}
+                      {
+                        data[1]?.messages[
+                          data[1]?.initialMessageLength
+                            ? data[1]?.initialMessageLength
+                            : 1
+                        ]?.content
+                      }
                     </div>
                   );
                 }

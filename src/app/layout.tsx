@@ -43,7 +43,9 @@ export default function RootLayout({
       <body>
         <SessionProvider>
           <UserDetailsDataProvider>
-            {path !== "/" && <AuthHeader />}
+            {path !== "/" &&
+              path !== "/account/login" &&
+              path !== "/account/register" && <AuthHeader />}
             {children}
           </UserDetailsDataProvider>
         </SessionProvider>

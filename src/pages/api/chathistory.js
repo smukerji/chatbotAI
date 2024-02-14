@@ -10,6 +10,7 @@ export default async function handler(req, res) {
     const sessionID = body?.sessionID;
     const sessionStartDate = body?.sessionStartDate;
     const sessionEndDate = body?.sessionEndDate;
+    const initialMessageLength = body?.initialMessageLength;
 
     /// for storing the history date wise
     const startDate = sessionStartDate.split(" ")[0];
@@ -20,7 +21,7 @@ export default async function handler(req, res) {
     /// get the collection to store chat history
     let collection = db.collection("chat-history");
 
-    /// update the total chat count
+    /// update the chat count
     const updateBotCount = await db.collection("user-details").updateOne(
       { userId: userId },
       {
@@ -70,6 +71,7 @@ export default async function handler(req, res) {
               messages,
               sessionStartDate,
               sessionEndDate,
+              initialMessageLength: initialMessageLength,
             },
           },
           date: startDate,
@@ -86,6 +88,7 @@ export default async function handler(req, res) {
                   messages,
                   sessionStartDate,
                   sessionEndDate,
+                  initialMessageLength: initialMessageLength,
                 },
               },
             },

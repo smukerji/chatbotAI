@@ -17,18 +17,18 @@ export default function AuthHeader() {
     await userService.logout();
   }
 
-  useEffect(() => {
-    // Make a request to the server to get the data you need
-    const verifyJwt = async () => {
-      await fetch("/api/account/verify-jwt").then(async (res) => {
-        const data = await res.json();
-        if (data?.message === "jwt expired") {
-          window.location.reload();
-        }
-      });
-    };
-    verifyJwt();
-  }, []);
+  // useEffect(() => {
+  //   // Make a request to the server to get the data you need
+  //   const verifyJwt = async () => {
+  //     await fetch("/api/account/verify-jwt").then(async (res) => {
+  //       const data = await res.json();
+  //       if (data?.message === "jwt expired") {
+  //         window.location.reload();
+  //       }
+  //     });
+  //   };
+  //   verifyJwt();
+  // }, []);
 
   const userId = cookies.userId;
 

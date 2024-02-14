@@ -155,6 +155,7 @@ function Chat({
           sessionID,
           sessionStartDate,
           sessionEndDate: getDate(),
+          initialMessageLength: botSettings?.initialMessage?.length,
         }),
       }
     );
