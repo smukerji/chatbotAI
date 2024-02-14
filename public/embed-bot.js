@@ -1,9 +1,12 @@
 (function EmbedBot() {
   const cssStyles = `
-      iframe{
-        position:fixed;
-      }
-    `;
+    iframe{
+      position:fixed;
+      bottom:20px !important;
+      right:20px !important;
+      border:none;
+    }
+  `;
 
   // Get the script element
   const scriptElement = document.querySelector(
@@ -28,10 +31,8 @@
   document.body.insertAdjacentHTML(
     "beforeend",
     `<iframe
-      src="https://chatbot-ai-silk.vercel.app/embed-bot?chatbotID=${param1}"
+      src="https://chatbot-ai-silk.vercel.app/embed-bot?chatbotID=${param1}";
       frameborder="0"
-      width="100%"
-      height="100%"
     ></iframe>`
   );
 })();

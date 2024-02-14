@@ -221,7 +221,9 @@ function Chat({
                       ? "651d111b8158397ebd0e65fb"
                       : chatbot?.id === "f8095ef4-6cd0-4373-a45e-8fe15cb6dd0f"
                       ? "6523fee523c290d75609a1fa"
-                      : cookies.userId,
+                      : cookies.userId
+                      ? cookies.userId
+                      : userId,
                 }),
               }
             );
