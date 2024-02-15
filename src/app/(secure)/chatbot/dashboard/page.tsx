@@ -231,7 +231,7 @@ function Dashboard() {
                   botContext?.handleChange("editChatbot")("sources");
                 }}
               >
-                <h3 className="option">sources</h3>
+                <h3 className="option">data sources</h3>
               </li>
               <li
                 className={`${editChatbot === "integrations" ? "active" : ""}`}
