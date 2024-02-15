@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.2.6",
-    "@auth/mongodb-adapter": "^2.0.0",
+    "@auth/mongodb-adapter": "^2.4.0",
     "@pinecone-database/pinecone": "^2.0.1",
     "@sparticuz/chromium-min": "^119.0.2",
     "@types/node": "20.4.6",
@@ -22,7 +22,7 @@
     "axios": "^1.4.0",
     "bcrypt": "^5.1.1",
     "csv-parser": "^3.0.0",
-    "dotenv": "^16.4.1",
+    "dotenv": "^16.4.4",
     "eslint": "8.46.0",
     "eslint-config-next": "13.4.12",
     "formidable": "^3.5.0",

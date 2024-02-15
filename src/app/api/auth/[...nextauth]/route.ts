@@ -4,11 +4,12 @@ import GithubProvider from "next-auth/providers/github";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import { connectDatabase } from "../../../../db";
 import { cookies } from "next/headers";
+import { Adapter } from "next-auth/adapters";
 
 const authOptions: NextAuthOptions = {
   adapter: MongoDBAdapter(connectDatabase(), {
     databaseName: "sapahk-chatbot",
-  }),
+  }) as Adapter,
   //   session: {
   //     strategy: "jwt",
   //   },
