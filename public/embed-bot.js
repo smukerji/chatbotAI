@@ -1,13 +1,18 @@
 (function EmbedBot() {
   const cssStyles = `
-      iframe{
+    iframe{
         position:fixed;
+        bottom:20px !important;
+        right:20px !important;
+        border:none;
+        height: 750px;
+        width: 600px;
       }
-    `;
+  `;
 
   // Get the script element
   const scriptElement = document.querySelector(
-    'script[src="https://chatbot-ai-silk.vercel.app/embed-bot.js"]'
+    'script[src="https://luciferai-test.vercel.app/embed-bot.js"]'
     // 'script[src="http://192.168.1.76:3000/embed-bot.js"]'
   );
 
@@ -28,10 +33,8 @@
   document.body.insertAdjacentHTML(
     "beforeend",
     `<iframe
-      src="https://chatbot-ai-silk.vercel.app/embed-bot?chatbotID=${param1}"
+      src="https://luciferai-test.vercel.app/embed-bot?chatbotID=${param1}";
       frameborder="0"
-      width="100%"
-      height="100%"
     ></iframe>`
   );
 })();

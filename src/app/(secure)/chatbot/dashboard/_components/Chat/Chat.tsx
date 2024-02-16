@@ -41,6 +41,10 @@ function Chat({
   isPopUp = false,
   userId,
   chatbotName,
+  chatbotDisplayName,
+  suggestedMessages,
+  initialMessage,
+  profilePictureUrl,
 }: any) {
   /// get the bot context
   const botContext: any = useContext(CreateBotContext);
@@ -127,15 +131,18 @@ function Chat({
 
   async function storeHistory(userLatestQuery: any, gptLatestResponse: any) {
     /// update the message count
-    userDetailContext?.handleChange("totalMessageCount")(
-      userDetails?.totalMessageCount + 1
-    );
-    const percent =
-      ((userDetails?.totalMessageCount + 1) / userDetails?.plan?.messageLimit) *
-      100;
+    if (!isPopUp) {
+      userDetailContext?.handleChange("totalMessageCount")(
+        userDetails?.totalMessageCount + 1
+      );
+      const percent =
+        ((userDetails?.totalMessageCount + 1) /
+          userDetails?.plan?.messageLimit) *
+        100;
 
-    /// store the percentage of message sent by user
-    userDetailContext?.handleChange("percent")(percent);
+      /// store the percentage of message sent by user
+      userDetailContext?.handleChange("percent")(percent);
+    }
     /// store/update the chathistory
     const store = await fetch(
       `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/chathistory`,
@@ -148,6 +155,7 @@ function Chat({
           sessionID,
           sessionStartDate,
           sessionEndDate: getDate(),
+          initialMessageLength: botSettings?.initialMessage?.length,
         }),
       }
     );
@@ -214,7 +222,9 @@ function Chat({
                       ? "651d111b8158397ebd0e65fb"
                       : chatbot?.id === "f8095ef4-6cd0-4373-a45e-8fe15cb6dd0f"
                       ? "6523fee523c290d75609a1fa"
-                      : cookies.userId,
+                      : cookies.userId
+                      ? cookies.userId
+                      : userId,
                 }),
               }
             );
@@ -310,26 +320,48 @@ function Chat({
     setMessages([]);
     setMessagesTime([]);
 
-    botSettings.initialMessage?.map((message: string, index: number) => {
-      setMessages((prevMessages: any) => [
-        ...prevMessages,
-        {
-          role: "assistant",
-          content: message,
-        },
-      ]);
+    /// check if chat window is opened from popup
+    if (isPopUp) {
+      initialMessage?.map((message: string, index: number) => {
+        setMessages((prevMessages: any) => [
+          ...prevMessages,
+          {
+            role: "assistant",
+            content: message,
+          },
+        ]);
 
-      setMessagesTime((prevMessages: any) => [
-        ...prevMessages,
-        {
-          role: "assistant",
-          content: message,
-          messageTime: getDate(),
-          messageType: "initial",
-        },
-      ]);
-    });
+        setMessagesTime((prevMessages: any) => [
+          ...prevMessages,
+          {
+            role: "assistant",
+            content: message,
+            messageTime: getDate(),
+            messageType: "initial",
+          },
+        ]);
+      });
+    } else {
+      botSettings?.initialMessage?.map((message: string, index: number) => {
+        setMessages((prevMessages: any) => [
+          ...prevMessages,
+          {
+            role: "assistant",
+            content: message,
+          },
+        ]);
 
+        setMessagesTime((prevMessages: any) => [
+          ...prevMessages,
+          {
+            role: "assistant",
+            content: message,
+            messageTime: getDate(),
+            messageType: "initial",
+          },
+        ]);
+      });
+    }
     setSessionID(uuid());
     setSessionStartDate(getDate());
   };
@@ -436,13 +468,24 @@ function Chat({
           <div className="chatbot-name-container">
             <Image
               src={
-                botSettings?.profilePictureUrl
+                isPopUp
+                  ? profilePictureUrl
+                    ? profilePictureUrl
+                    : ChatBotIcon
+                  : botSettings?.profilePictureUrl
                   ? botSettings?.profilePictureUrl
                   : ChatBotIcon
               }
               alt="bot-img"
+              width={40}
+              height={40}
+              style={{ borderRadius: "50%" }}
             />
-            <h1>{botSettings?.chatbotDisplayName}</h1>
+            <h1>
+              {isPopUp
+                ? `${chatbotDisplayName}`
+                : botSettings?.chatbotDisplayName}
+            </h1>
           </div>
 
           <div className="action-btns">
@@ -568,6 +611,18 @@ function Chat({
           )}
         </div>
         <div className="suggested-messages">
+          {/* if chatbot is opened from popup render the suggested messages from state */}
+          {suggestedMessages?.map((message: any, index: any) => {
+            return (
+              <div
+                className="message"
+                key={index}
+                onClick={() => setUserQuery(message)}
+              >
+                {message}
+              </div>
+            );
+          })}
           {botSettings?.suggestedMessages?.map((message: any, index: any) => {
             return (
               <div

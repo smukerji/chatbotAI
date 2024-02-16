@@ -72,6 +72,7 @@ export default async function handler(req, res) {
     const db = (await connectDatabase()).db();
     const collection = db.collection("chatbots-data");
     const userChatbots = db.collection("user-chatbots");
+    const userChatbotSettings = db.collection("chatbot-settings");
     const cursor = collection.find({ chatbotId: chatbotId });
 
     let vectorId = [];
@@ -92,6 +93,8 @@ export default async function handler(req, res) {
     const deleteData = await collection.deleteMany({ chatbotId: chatbotId });
     /// delete the chatbot
     await userChatbots.deleteOne({ chatbotId: chatbotId });
+    /// delete chatbot settings
+    await userChatbotSettings.deleteOne({ chatbotId: chatbotId });
 
     /// deleting the chunks to avoid  Request Header Fields Too Large error
     const deleteBatchSize = 250;

@@ -1,4 +1,4 @@
-.chat-container {
+.history-chat-container {
     display: flex;
     gap: 40px;
     margin-left: 45px;
@@ -93,7 +93,7 @@
             background: #e6e8ec;
         }
 
-        .conversation-container {
+        .history-conversation-container {
             overflow-y: auto;
 
             height: 510px;
@@ -109,6 +109,113 @@
 
             &::-webkit-scrollbar-track {
                 background-color: transparent;
+            }
+
+            /*------------------------------------------assistant-message-container----------------------------------------------*/
+            .assistant-message-container {
+                position: relative;
+                .assistant-message {
+                    display: inline-flex;
+                    padding: 12px 16px;
+                    // align-items: center;
+                    gap: 10px;
+                    width: fit-content;
+                    max-width: 80%;
+                    border-radius: 16px;
+                    background: #e6e8ec;
+                    text-align: justify;
+                    word-break: break-word;
+                    white-space: pre-line;
+                    img {
+                        width: 100%;
+                    }
+
+                    .typing-indicator {
+                        display: flex;
+                        justify-content: space-between;
+                        width: 60px;
+                    }
+
+                    .dot {
+                        width: 10px;
+                        height: 10px;
+                        background-color: black;
+                        border-radius: 50%;
+                        animation: bounce 1s infinite;
+                        opacity: 0.6;
+                        transition: opacity 0.3s ease-in-out;
+                    }
+
+                    .dot:nth-child(2) {
+                        animation-delay: 0.2s;
+                    }
+
+                    .dot:nth-child(3) {
+                        animation-delay: 0.4s;
+                    }
+                }
+
+                .time {
+                    position: absolute;
+                    top: -14px;
+                    color: #b1b5c3;
+                    text-align: center;
+                    font-size: 12px;
+                    font-style: normal;
+                    font-weight: 500;
+                    line-height: normal;
+                }
+
+                .like-dislike-container {
+                    display: flex;
+                    margin-top: 4px;
+                    gap: 8px;
+                }
+            }
+
+            /*------------------------------------------user-message-container----------------------------------------------*/
+            .user-message-container {
+                position: relative;
+                display: flex;
+                justify-content: flex-end;
+                margin-top: 10px;
+                margin-bottom: 10px;
+                .user-message {
+                    display: inline-flex;
+                    padding: 12px 16px;
+                    align-items: center;
+                    gap: 10px;
+                    width: fit-content;
+                    max-width: 80%;
+                    border-radius: 16px;
+                    background: #335df3;
+                    color: #fcfcfd;
+                }
+
+                .time {
+                    position: absolute;
+                    top: -14px;
+                    color: #b1b5c3;
+                    text-align: center;
+                    font-size: 12px;
+                    font-style: normal;
+                    font-weight: 500;
+                    line-height: normal;
+                }
+            }
+        }
+
+        .suggested-messages {
+            display: flex;
+            gap: 10px;
+            overflow-y: auto;
+
+            .message {
+                display: inline-flex;
+                padding: 12px 16px;
+                border-radius: 16px;
+                background: #e6e8ec;
+                text-wrap: nowrap;
             }
         }
     }

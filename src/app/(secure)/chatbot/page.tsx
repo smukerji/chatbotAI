@@ -27,6 +27,7 @@ import NewChatbotNameModal from "./dashboard/_components/Modal/NewChatbotNameMod
 import LimitReachedModal from "./dashboard/_components/Modal/LimitReachedModal";
 import { CreateBotContext } from "../../_helpers/client/Context/CreateBotContext";
 import { UserDetailsContext } from "../../_helpers/client/Context/UserDetailsContext";
+import { JWT_EXPIRED } from "../../_helpers/errorConstants";
 // import GridIcon from "../../as";
 
 const antIcon = (
@@ -97,6 +98,11 @@ function Chatbot() {
           }
         );
         const data = await response.json();
+
+        /// check if session is expired
+        if (data.message == JWT_EXPIRED) {
+          window.location.href = "/account/login";
+        }
 
         /// get the user and plan details
         const userDetailsresponse = await fetch(

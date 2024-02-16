@@ -95,7 +95,7 @@ function History({ chatbotId }: any) {
   };
 
   return (
-    <div className="chat-container">
+    <div className="history-chat-container">
       {/*------------------------------------------left-section----------------------------------------------*/}
       <div className="chatbot-history-details">
         {/*------------------------------------------today's-chat----------------------------------------------*/}
@@ -119,8 +119,11 @@ function History({ chatbotId }: any) {
                       }}
                     >
                       {
-                        data[1]?.messages[botSettings?.initialMessage?.length]
-                          ?.content
+                        data[1]?.messages[
+                          data[1]?.initialMessageLength
+                            ? data[1]?.initialMessageLength
+                            : 1
+                        ]?.content
                       }
                     </div>
                   );
@@ -151,8 +154,11 @@ function History({ chatbotId }: any) {
                       }}
                     >
                       {
-                        data[1]?.messages[botSettings?.initialMessage?.length]
-                          ?.content
+                        data[1]?.messages[
+                          data[1]?.initialMessageLength
+                            ? data[1]?.initialMessageLength
+                            : 1
+                        ]?.content
                       }
                     </div>
                   );
@@ -177,13 +183,17 @@ function History({ chatbotId }: any) {
                       }`}
                       key={index}
                       onClick={() => {
-                        setCurrentChatHistory(
-                          data[botSettings?.initialMessage?.length]?.messages
-                        );
+                        setCurrentChatHistory(data[1]?.messages);
                         setActiveCurrentChatHistory("lastSevenDay" + index);
                       }}
                     >
-                      {data[1]?.messages[1]?.content}
+                      {
+                        data[1]?.messages[
+                          data[1]?.initialMessageLength
+                            ? data[1]?.initialMessageLength
+                            : 1
+                        ]?.content
+                      }
                     </div>
                   );
                 }
@@ -204,7 +214,7 @@ function History({ chatbotId }: any) {
 
         <hr />
 
-        <div className="conversation-container">
+        <div className="history-conversation-container">
           {currentChatHistory.map((message: any, index: any) => {
             if (message.role == "assistant")
               return (

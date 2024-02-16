@@ -20,6 +20,7 @@ import History from "./_components/History/History";
 import EmbedSite from "./_components/EmbedSite/EmbedSite";
 import Integration from "./_components/Integration/Integration";
 import { ChatbotSettingContext } from "../../../_helpers/client/Context/ChatbotSettingContext";
+import { JWT_EXPIRED } from "../../../_helpers/errorConstants";
 
 function Dashboard() {
   const { status } = useSession();
@@ -94,6 +95,11 @@ function Dashboard() {
           }
         );
         const content = await response.json();
+
+        /// check if session is expired
+        if (content.message == JWT_EXPIRED) {
+          window.location.href = "/account/login";
+        }
 
         /// set all the chatbot setting
         chatbotSettingContext?.loadData(content?.chatbotSetting);
@@ -225,7 +231,7 @@ function Dashboard() {
                   botContext?.handleChange("editChatbot")("sources");
                 }}
               >
-                <h3 className="option">sources</h3>
+                <h3 className="option">data sources</h3>
               </li>
               <li
                 className={`${editChatbot === "integrations" ? "active" : ""}`}

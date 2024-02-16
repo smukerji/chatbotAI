@@ -593,7 +593,6 @@ export default async function handler(req, res) {
             chatbotDisplayName: chatbotName,
             lastTrained: currrentTime,
             chatbotBubbleAlignment: chatbotBubbleAlignment.LEFT,
-            lastUsed: currrentTime,
             noOfMessagesSent: 0,
           });
         } else {
