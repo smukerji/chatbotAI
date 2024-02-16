@@ -2,13 +2,22 @@ import React, { useState, useEffect, useDebugValue } from 'react';
 import axios from 'axios';
 import '../../pricing/stripe.scss';
 import Image from 'next/image';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import tickCircle from '../../../../../../public/svgs/tick-circle.svg';
 import unTickCircle from '../../../../../../public/svgs/untick-circle.svg';
 import line from '../../../../../../public/svgs/Vector 2189.svg';
 
 export default function PlanOne({ setPlan, price }: any) {
+  const { status } = useSession();
+  const router = useRouter();
+
   const changePlan = async () => {
-    setPlan(1);
+    if (status === 'authenticated') {
+      setPlan(1);
+    } else {
+      router.push('/account/login');
+    }
     // setStatus()
   };
   return (

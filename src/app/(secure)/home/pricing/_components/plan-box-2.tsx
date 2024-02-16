@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useDebugValue } from 'react';
 import axios from 'axios';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import '../../pricing/stripe.scss';
 import Image from 'next/image';
 import tickCircle from '../../../../../../public/svgs/tick-circle-white.svg';
@@ -7,8 +9,16 @@ import unTickCircle from '../../../../../../public/svgs/tick-circle -blue.svg';
 import line from '../../../../../../public/svgs/Vector 2189.svg';
 
 export default function PlanTwo({ setPlan, price }: any) {
+  const { status } = useSession();
+  const router = useRouter();
+
   const changePlan = async () => {
-    setPlan(2);
+    if (status === 'authenticated') {
+      setPlan(2);
+    } else {
+      router.push('/account/login');
+    }
+
     // setStatus()
   };
 
