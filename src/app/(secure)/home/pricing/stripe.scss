@@ -192,6 +192,10 @@
             line-height: 28px; /* 140% */
           }
         }
+        .pay-btn:disabled {
+          cursor: not-allowed;
+          background-color: #bacaf1; /* Change cursor style when button is disabled */
+        }
         .plan-details {
           display: flex;
           flex-direction: column;
@@ -343,7 +347,59 @@
     }
   }
 }
-.success{
+.success {
   width: fit-content;
-  margin: 200px auto 0px auto
+  margin: 200px auto 0px auto;
+}
+.cardElementForm {
+  width: 35%;
+  display: flex;
+  // flex-direction: raw;
+  margin: 20px auto 0px auto;
+  padding: 20px;
+  .left {
+    width: 35%;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+  }
+  .right {
+    width: 65%;
+    display: flex;
+    flex-direction: column;
+    .card-element {
+      .cardNumber {
+        padding: 12px 15px;
+        margin-bottom: 10px;
+        border: 1px solid rgb(77, 77, 77);
+        border-radius: 10px;
+      }
+      .cardExpiry {
+        padding: 12px 15px;
+        margin-bottom: 10px;
+        border: 1px solid rgb(77, 77, 77);
+        border-radius: 10px;
+      }
+      .cardCvc {
+        padding: 12px 15px;
+        margin-bottom: 10px;
+        border: 1px solid rgb(77, 77, 77);
+        border-radius: 10px;
+      }
+      
+    }
+    .btn-card-submit{
+      padding: 12px ;
+      border: 1px solid mediumseagreen;
+      border-radius: 10px;
+      color: white;
+      font-size: 18px;
+      font-weight: 600;
+      background-color: mediumseagreen;
+
+    }
+
+    // padding-bottom: 30px;
+  }
 }

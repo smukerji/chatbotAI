@@ -33,10 +33,10 @@ export default function CheckoutForm({plan}: any) {
       },
     });
 
-    // const a = await axios.post(
-    //   "http://localhost:3000/home/pricing/stripe-payment-gateway/add-payment",
-    //   {plan:plan}
-    // );
+    const a = await axios.post(
+      "http://localhost:3000/home/pricing/stripe-payment-gateway/add-payment",
+      {plan:plan}
+    );
     
   };
   useEffect(() => {

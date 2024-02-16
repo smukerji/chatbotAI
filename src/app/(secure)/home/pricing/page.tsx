@@ -10,10 +10,6 @@ import "../pricing/stripe.scss";
 import Image from "next/image";
 import PlanOne from "./_components/plan-box-1";
 import PlanTwo from "./_components/plan-box-2";
-import MessageAddOn from "./_components/messageAddOn";
-import CustomDomain from "./_components/customDomain";
-import RemoveWaterMark from "./_components/removeWaterMark";
-import ChatBotAddOn from "./_components/chatBotAddOn";
 import zoho from "../../../../../public/Rectangle 159.png";
 import whatsapp from "../../../../../public/whatsapp.png";
 import telegram from "../../../../../public/telegram.png";
@@ -26,7 +22,8 @@ const stripePromise = loadStripe(
 export default function Home() {
   const [status, setStatus] = useState<number>(2);
   const [plan, setPlan] = useState(0);
-  const [flag, setFlag] = useState(false);
+  const [enableOne, setEnableOne] = useState(false)
+  const [enableTwo, setEnableTwo] = useState(false)
   const makePayment = async () => {
     const response = await axios.get(
       "http://localhost:3000/home/pricing/stripe-payment-gateway"
@@ -43,7 +40,23 @@ export default function Home() {
       "http://localhost:3000/home/pricing/stripe-payment-gateway/getPlanDetails"
     );
   };
+  const checkPlan = async() => {
+    const checkPlan = await axios.put(
+      "http://localhost:3000/home/pricing/stripe-payment-gateway"
+    );
+    console.log(checkPlan)
+    if(checkPlan.data.msg == 2){
+      console.log("2")
+      setEnableOne(true)
+      setEnableTwo(true)
+    }
+    else if(checkPlan.data.msg == 1){
+      console.log("1")
+      setEnableOne(true)
+    }
+  }
   useEffect(() => {
+    checkPlan()
     if (plan == 1 || plan == 2) {
       console.log(plan);
       makePayment();
@@ -61,8 +74,8 @@ export default function Home() {
           </div>
 
           <div className="plan-container">
-            <PlanOne setPlan={setPlan} />
-            <PlanTwo setPlan={setPlan} />
+            <PlanOne setPlan={setPlan} enableOne={enableOne}/>
+            <PlanTwo setPlan={setPlan} enableTwo={enableTwo}/>
           </div>
           <div className="add-ons-container">
             <p className="add-ons-head">Add-ons</p>
@@ -140,7 +153,7 @@ export default function Home() {
         </div>
       )}
       <Elements stripe={stripePromise}>
-        {status === 1 && <CreatePaymentMethod setStatus={setStatus} />}
+        {status === 1 && <CreatePaymentMethod setStatus={setStatus} plan={plan} />}
         {status === 0 && <CheckoutForm plan={plan} />}
       </Elements>
     </>

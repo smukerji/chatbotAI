@@ -17,12 +17,10 @@ export async function POST(req: any, res: NextApiResponse) {
       const collection = db.collection("users");
       let userId = "65c07a9dd73744ba62c1ea14";
       const data = await collection.findOne({ _id: userId });
-      if(data.plan == 'Agency Plan'){
-        return "You already have maximum plan"
+      if((data.plan == 'Agency Plan') || (data.plan == 'Individual Plan' && plan == 1)){
+        return "You already have plan";
       }
-      else if(data.plan){
-
-      }
+      
       const h = data.paymentId;
       if (h) {
         let amount: number = 0;
@@ -70,4 +68,23 @@ export async function GET(req: NextApiRequest, res: NextApiResponse) {
   } else {
     return NextResponse.json({ status: 500 });
   }
+}
+
+export async function PUT(req: NextApiRequest, res: NextApiResponse) {
+  const db = (await connectDatabase())?.db();
+  const collection = db.collection("users");
+  let userId = "65c07a9dd73744ba62c1ea14";
+  const data = await collection.findOne({ _id: userId });
+  
+  //ANCHOR - check current plan of the user
+  if((data.plan == 'Agency Plan') ){
+    return NextResponse.json({msg:2});
+  }
+  else if(data.plan == 'Individual Plan'){
+    return NextResponse.json({msg:1})
+  }
+  else{
+    return NextResponse.json({msg:0})
+  }
+
 }

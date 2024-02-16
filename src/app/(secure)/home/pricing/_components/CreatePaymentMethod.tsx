@@ -1,15 +1,24 @@
 "use client";
 import React, { useState } from "react";
-import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import {
+  CardElement,
+  useStripe,
+  useElements,
+  PaymentElement,
+  CardNumberElement,
+  CardCvcElement,
+  CardExpiryElement,
+} from "@stripe/react-stripe-js";
 import axios from "axios";
 import Stripe from "stripe";
 import { useRouter } from "next/navigation";
 import { StripeElements } from "@stripe/stripe-js";
 const stripee = new Stripe(String(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY));
+import "../../pricing/stripe.scss";
 
-export default function createPaymentMethod({ setStatus }: any) {
+export default function createPaymentMethod({ setStatus, plan }: any) {
   const stripe = useStripe();
-  const elements = useElements();
+  const elements: any = useElements();
   const [error, setError] = useState(null);
   const router = useRouter();
 
@@ -20,7 +29,9 @@ export default function createPaymentMethod({ setStatus }: any) {
       return;
     }
 
-    const cardElement: any = elements.getElement(CardElement);
+    const cardNumber: any = elements.getElement(CardNumberElement);
+    const cardCvc: any = elements.getElement(CardCvcElement);
+    const cardExpiry: any = elements.getElement(CardExpiryElement);
     try {
       const response = await axios.post(
         "http://localhost:3000/home/pricing/stripe-payment-gateway/getCustomer"
@@ -29,7 +40,7 @@ export default function createPaymentMethod({ setStatus }: any) {
 
       const paymentMethod = await stripe.createPaymentMethod({
         type: "card",
-        card: cardElement,
+        card: cardNumber,
       });
       console.log(paymentMethod.paymentMethod?.id);
       const id: any = paymentMethod.paymentMethod?.id;
@@ -45,12 +56,30 @@ export default function createPaymentMethod({ setStatus }: any) {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <CardElement />
-      {error && <div>{error}</div>}
-      <button type="submit" disabled={!stripe}>
-        Pay
-      </button>
+    <form className="cardElementForm" onSubmit={handleSubmit}>
+      <div className="left">
+        {plan == 1 && <h3>Individual Plan</h3>}
+        {plan == 1 && <span>$15</span>}
+        {plan == 2 && <h1>Agency Plan</h1>}
+        {plan == 2 && <span>$89</span>}
+      </div>
+      <div className="right">
+        <div className="card-element">
+          <div className="cardNumber">
+            <CardNumberElement />
+          </div>
+          <div className="cardExpiry">
+            <CardExpiryElement />
+          </div>
+          <div className="cardCvc">
+            <CardCvcElement />
+          </div>
+        </div>
+        {error && <div>{error}</div>}
+        <button className="btn-card-submit" type="submit" disabled={!stripe}>
+          Pay
+        </button>
+      </div>
     </form>
   );
 }

@@ -31,3 +31,8 @@ Header a {
 .ant-btn-primary:hover {
   background-color: rgba(10, 10, 10, 0.856) !important;
 } */
+
+.CardField{
+  display: flex;
+  flex-direction: column;
+}

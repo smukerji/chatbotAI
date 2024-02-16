@@ -6,7 +6,8 @@ import tickCircle from "../../../../../../public/svgs/tick-circle.svg";
 import unTickCircle from "../../../../../../public/svgs/untick-circle.svg";
 import line from "../../../../../../public/svgs/Vector 2189.svg";
 
-export default function PlanOne({ setPlan }: any) {
+export default function PlanOne({ setPlan ,enableOne}: any) {
+  console.log(enableOne)
   const changePlan = async () => {
     setPlan(1);
     // setStatus()
@@ -28,7 +29,7 @@ export default function PlanOne({ setPlan }: any) {
         </div>
       </div>
       <div className="plan-container-list">
-        <button className="pay-btn" onClick={changePlan}>
+        <button className="pay-btn" onClick={changePlan} disabled = {enableOne} title={enableOne ? "Already have plan" : undefined}>
           <span className="btn-text">Get Started</span>
         </button>
         <div className="plan-details">
