@@ -14,17 +14,36 @@ async function initializeDb() {
 
   /// update/insert starter plan
   await planCollection.updateOne(
-    { name: "starter" },
+
+    { name: "Individual Plan" },
     {
       $set: {
-        name: "starter",
-        numberOfChatbot: 5,
-        messageLimit: 10000,
+        name: "Individual Plan",
+        numberOfChatbot: 1,
+        messageLimit: 2000,
         trainingDataLimit: 1000000,
-        websiteCrawlingLimit: 50,
+        websiteCrawlingLimit: 10,
       },
     },
+    
     { upsert: true }
+  
+  );
+  await planCollection.updateOne(
+
+    { name: "Agency Plan" },
+    {
+      $set: {
+        name: "Agency Plan",
+        numberOfChatbot: 5,
+        messageLimit: 2000,
+        trainingDataLimit: 1000000,
+        websiteCrawlingLimit: 20,
+      },
+    },
+    
+    { upsert: true }
+  
   );
 
   /// get the starter plan ID

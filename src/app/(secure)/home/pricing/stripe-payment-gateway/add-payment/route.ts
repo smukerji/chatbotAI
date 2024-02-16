@@ -7,39 +7,25 @@ const stripe = new Stripe(String(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY));
 export async function POST(req: any, res: NextApiResponse) {
   if (req.method === "POST") {
     try {
-      let { paymentId } = await req.json();
+      let { plan } = await req.json();
       const db = (await connectDatabase())?.db();
       const collection = db.collection("users");
       let userId = "65c07a9dd73744ba62c1ea14";
-      
+      let plan_name = null
+      if(plan == 1){
+        plan_name = 'Individual Plan'
+      }
+      else{
+        plan_name = 'Agency Plan'
+      }
       //ANCHOR - Get data of user by user_id
-      const data = await collection.findOne({ _id: userId });
-
-      //ANCHOR - attach paymentId with customerId
-      const attachedPaymentMethod = await stripe.paymentMethods.attach(
-        paymentId,
-        {
-          customer: data.customerId,
+      const data = await collection.updateMany({ _id: userId },{
+        $set:{
+            plan: plan_name,
         }
-      );
-
-      //ANCHOR - update default payment method in customerId
-      await stripe.customers.update(data.customerId, {
-        invoice_settings: {
-          default_payment_method: paymentId,
-        },
       });
 
-      //ANCHOR - update user data to add paymentId
-      const result = await collection.updateOne(
-        { _id: userId },
-        {
-          $set: {
-            paymentId: paymentId,
-          },
-        }
-      );
-      return NextResponse.json(result);
+      return NextResponse.json(data);
     } catch (error) {
       console.error(error);
       // res.status(500).json({ error: 'Unable to create subscription' });

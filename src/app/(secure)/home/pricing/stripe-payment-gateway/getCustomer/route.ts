@@ -9,13 +9,15 @@ export async function POST(req: NextApiRequest, res: NextApiResponse) {
     try {
       const db = (await connectDatabase())?.db();
       const collection = db.collection("users");
-      let userId = "65c07c32e5cc6f17b42c2cb4";
+      let userId = "65c07a9dd73744ba62c1ea14";
       const data = await collection.findOne({ _id: userId });
+
+      //ANCHOR - checking that user has customerId or not
       if (data?.customerId != null) {
         console.log(data);
         return NextResponse.json(data.customerId);
       } else {
-        console.log(data)
+        //ANCHOR - create user's customerId
         const customer = await stripe.customers.create({
           email: data.email,
           name: data.username,
@@ -28,7 +30,7 @@ export async function POST(req: NextApiRequest, res: NextApiResponse) {
             },
           }
         );
-        return NextResponse.json(customer.id);
+        return NextResponse.json({message: "success"});
       }
     } catch (error) {
       console.error(error);

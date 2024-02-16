@@ -9,7 +9,7 @@ import {Stripe as s} from "stripe";
 const stripee = new s(String(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY));
 
 
-export default function CheckoutForm() {
+export default function CheckoutForm({plan}: any) {
 
   const [error, setError] = useState(null);
 
@@ -21,24 +21,29 @@ export default function CheckoutForm() {
     }
     const result = await axios.post(
       "http://localhost:3000/home/pricing/stripe-payment-gateway",
+      {plan:plan}
     );
     console.log(result)
-
+    console.log(result)
     const r = stripe.confirmPayment({
       clientSecret:result.data.client_secret,
       confirmParams: {
         return_url:
-          "http://localhost:3000/home/pricing/stripe-payment-gateway/success",
+          "http://localhost:3000/home/success",
       },
     });
+
+    // const a = await axios.post(
+    //   "http://localhost:3000/home/pricing/stripe-payment-gateway/add-payment",
+    //   {plan:plan}
+    // );
+    
   };
   useEffect(() => {
     handleSubmit();
   }, []);
 
   return (
-    <button type="submit">
-      Pay
-    </button>
+   <></>
   );
 }

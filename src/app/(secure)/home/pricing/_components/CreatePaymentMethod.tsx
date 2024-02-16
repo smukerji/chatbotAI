@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { StripeElements } from "@stripe/stripe-js";
 const stripee = new Stripe(String(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY));
 
-export default function createPaymentMethod({ setFlag }: any) {
+export default function createPaymentMethod({ setStatus }: any) {
   const stripe = useStripe();
   const elements = useElements();
   const [error, setError] = useState(null);
@@ -23,8 +23,7 @@ export default function createPaymentMethod({ setFlag }: any) {
     const cardElement: any = elements.getElement(CardElement);
     try {
       const response = await axios.post(
-        "http://localhost:3000/home/pricing/stripe-payment-gateway/getCustomer",
-        {}
+        "http://localhost:3000/home/pricing/stripe-payment-gateway/getCustomer"
       );
       console.log("Payment method created:", response);
 
@@ -34,26 +33,14 @@ export default function createPaymentMethod({ setFlag }: any) {
       });
       console.log(paymentMethod.paymentMethod?.id);
       const id: any = paymentMethod.paymentMethod?.id;
-      const attachedPaymentMethod = await stripee.paymentMethods.attach(id, {
-        customer: response.data,
-      });
-
-      // Update the default payment method for the customer
-      await stripee.customers.update(response.data, {
-        invoice_settings: {
-          default_payment_method: id,
-        },
-      });
 
       const update = await axios.post(
         "http://localhost:3000/home/pricing/stripe-payment-gateway/updatePaymentMethod",
         { paymentId: paymentMethod.paymentMethod?.id }
       );
-      //   router.push('/home/pricing', { scroll: false })
-      setFlag(true);
+      setStatus(0);
     } catch (error) {
       console.error("Error creating payment method:", error);
-      //   setError(error.message || 'An error occurred');
     }
   };
 
