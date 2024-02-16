@@ -1,16 +1,17 @@
-"use client";
+'use client';
 
-import React, { useEffect } from "react";
-import "./hero-header.scss";
-import { Button, Input, Space } from "antd";
-import Image from "next/image";
-import LuciferLogo from "../../../../public/svgs/lucifer-ai-logo.svg";
-import smsIcon from "../../../../public/svgs/sms.svg";
-import { useRouter } from "next/navigation";
-import { useCookies } from "react-cookie";
-import { useSession } from "next-auth/react";
-import dynamic from "next/dynamic";
-const AuthBtn = dynamic(() => import("../AuthBtn"), { ssr: false });
+import React, { useEffect } from 'react';
+import './hero-header.scss';
+import { Button, Input, Space } from 'antd';
+import Image from 'next/image';
+import LuciferLogo from '../../../../public/svgs/lucifer-ai-logo.svg';
+import smsIcon from '../../../../public/svgs/sms.svg';
+import { useRouter } from 'next/navigation';
+import { useCookies } from 'react-cookie';
+import { useSession } from 'next-auth/react';
+import dynamic from 'next/dynamic';
+import Link from 'next/link';
+const AuthBtn = dynamic(() => import('../AuthBtn'), { ssr: false });
 
 function HeroHeader() {
   return (
@@ -29,7 +30,7 @@ function HeroHeader() {
             </li>
 
             <li>
-              <a href="#">Pricing</a>
+              <Link href="/home/pricing">Pricing</Link>
             </li>
           </ul>
         </div>
@@ -57,7 +58,7 @@ function HeroHeader() {
             <input type="text" placeholder="Email Address" />
           </div>
           <a
-            style={{ color: "white", textDecoration: "none" }}
+            style={{ color: 'white', textDecoration: 'none' }}
             href="#contact-us"
           >
             <button className="request-demo-btn">Book a Demo</button>

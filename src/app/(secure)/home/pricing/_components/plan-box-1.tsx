@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useDebugValue } from "react";
-import axios from "axios";
-import "../../pricing/stripe.scss";
-import Image from "next/image";
-import tickCircle from "../../../../../../public/svgs/tick-circle.svg";
-import unTickCircle from "../../../../../../public/svgs/untick-circle.svg";
-import line from "../../../../../../public/svgs/Vector 2189.svg";
+import React, { useState, useEffect, useDebugValue } from 'react';
+import axios from 'axios';
+import '../../pricing/stripe.scss';
+import Image from 'next/image';
+import tickCircle from '../../../../../../public/svgs/tick-circle.svg';
+import unTickCircle from '../../../../../../public/svgs/untick-circle.svg';
+import line from '../../../../../../public/svgs/Vector 2189.svg';
 
-export default function PlanOne({ setPlan }: any) {
+export default function PlanOne({ setPlan, price }: any) {
   const changePlan = async () => {
     setPlan(1);
     // setStatus()
@@ -23,7 +23,7 @@ export default function PlanOne({ setPlan }: any) {
         <div className="plan-price-container">
           <div className="plan-price-frame">
             <span className="price-sign">$</span>
-            <span className="price-number">15</span>
+            <span className="price-number">{price}</span>
           </div>
         </div>
       </div>

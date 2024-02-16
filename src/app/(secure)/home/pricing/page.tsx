@@ -1,23 +1,23 @@
-"use client";
+'use client';
 
-import CheckoutForm from "./_components/CheckoutForm";
-import React, { useState, useEffect, useDebugValue } from "react";
-import { loadStripe } from "@stripe/stripe-js";
-import { Elements } from "@stripe/react-stripe-js";
-import axios from "axios";
-import CreatePaymentMethod from "./_components/CreatePaymentMethod";
-import "../pricing/stripe.scss";
-import Image from "next/image";
-import PlanOne from "./_components/plan-box-1";
-import PlanTwo from "./_components/plan-box-2";
-import MessageAddOn from "./_components/messageAddOn";
-import CustomDomain from "./_components/customDomain";
-import RemoveWaterMark from "./_components/removeWaterMark";
-import ChatBotAddOn from "./_components/chatBotAddOn";
-import zoho from "../../../../../public/Rectangle 159.png";
-import whatsapp from "../../../../../public/whatsapp.png";
-import telegram from "../../../../../public/telegram.png";
-import hubspot from "../../../../../public/hubspot.png";
+import CheckoutForm from './_components/CheckoutForm';
+import React, { useState, useEffect, useDebugValue } from 'react';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
+import axios from 'axios';
+import CreatePaymentMethod from './_components/CreatePaymentMethod';
+import '../pricing/stripe.scss';
+import Image from 'next/image';
+import PlanOne from './_components/plan-box-1';
+import PlanTwo from './_components/plan-box-2';
+import MessageAddOn from './_components/messageAddOn';
+import CustomDomain from './_components/customDomain';
+import RemoveWaterMark from './_components/removeWaterMark';
+import ChatBotAddOn from './_components/chatBotAddOn';
+import zoho from '../../../../../public/Rectangle 159.png';
+import whatsapp from '../../../../../public/whatsapp.png';
+import telegram from '../../../../../public/telegram.png';
+import hubspot from '../../../../../public/hubspot.png';
 
 const stripePromise = loadStripe(
   String(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY)
@@ -27,9 +27,10 @@ export default function Home() {
   const [status, setStatus] = useState<number>(2);
   const [plan, setPlan] = useState(0);
   const [flag, setFlag] = useState(false);
+  const [isYearlyPlan, setIsYearlyPlan] = useState(false);
   const makePayment = async () => {
     const response = await axios.get(
-      "http://localhost:3000/home/pricing/stripe-payment-gateway"
+      'http://localhost:3000/home/pricing/stripe-payment-gateway'
     );
     console.log(response);
     if (response.data?.status == 500) {
@@ -40,7 +41,7 @@ export default function Home() {
   };
   const getPlanDetails = async () => {
     const planDetails = await axios.get(
-      "http://localhost:3000/home/pricing/stripe-payment-gateway/getPlanDetails"
+      'http://localhost:3000/home/pricing/stripe-payment-gateway/getPlanDetails'
     );
   };
   useEffect(() => {
@@ -49,6 +50,9 @@ export default function Home() {
       makePayment();
     }
   }, [plan]);
+
+  const handlePlanType = () => setIsYearlyPlan(!isYearlyPlan);
+
   return (
     <>
       {status === 2 && (
@@ -59,10 +63,25 @@ export default function Home() {
             <span className="price-offer-normal">users will receive Flat</span>
             <span className="price-offer">&nbsp;20% discount.</span>
           </div>
+          <div className="plan-tab-container">
+            <button
+              className={`plan-type ${!isYearlyPlan && 'active'}`}
+              onClick={handlePlanType}
+            >
+              Monthly
+            </button>
+            <button
+              className={`plan-type ${isYearlyPlan && 'active'}`}
+              onClick={handlePlanType}
+            >
+              Yearly
+            </button>
+          </div>
+          <div className="annual-discount">Save 20% annualy</div>
 
           <div className="plan-container">
-            <PlanOne setPlan={setPlan} />
-            <PlanTwo setPlan={setPlan} />
+            <PlanOne setPlan={setPlan} price={isYearlyPlan ? 144 : 15} />
+            <PlanTwo setPlan={setPlan} price={isYearlyPlan ? 854 : 89} />
           </div>
           <div className="add-ons-container">
             <p className="add-ons-head">Add-ons</p>
@@ -133,7 +152,10 @@ export default function Home() {
               <div className="left-head">
                 <p className="left-head-text">Pricing FAQs</p>
               </div>
-                <p className="left-text">We are offering an accessible interface to website or other platforms.</p>
+              <p className="left-text">
+                We are offering an accessible interface to website or other
+                platforms.
+              </p>
             </div>
             <div className="footer-right"></div>
           </div>

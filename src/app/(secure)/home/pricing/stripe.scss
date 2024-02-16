@@ -35,6 +35,65 @@
       line-height: 28px;
     }
   }
+  .plan-tab-container {
+    display: flex;
+    justify-content: center;
+    background: #e6e8ec;
+    width: fit-content;
+    margin: 20px auto;
+    border-radius: 12px;
+    padding: 8px;
+
+    .plan-type {
+      background: none;
+      border: none;
+      outline: none;
+      padding: 13px 17px;
+      margin-right: 5px;
+      cursor: pointer;
+      color: #777e90;
+      font-family: sans-serif;
+      font-size: 14px;
+      font-style: normal;
+
+      &:hover {
+        background: none;
+        border: none;
+        outline: none;
+        color: #777e90;
+      }
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+
+    .active {
+      background: #fff;
+      color: #000;
+      border-radius: 10px;
+
+      &:hover {
+        background: #fff;
+        color: #000;
+        border-radius: 10px;
+        outline: none;
+      }
+    }
+  }
+
+  .annual-discount {
+    display: flex;
+    justify-content: center;
+    margin: 0 auto 25px auto;
+    color: #fe632f;
+    font-family: sans-serif;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 28px;
+    width: fit-content;
+  }
+
   .plan-duration-container {
     margin-top: 24px;
     margin-bottom: 50px;
@@ -319,7 +378,7 @@
         align-self: stretch;
         .left-head-text {
           color: var(--Neutral-8, #141416);
-          font-family: "General Sans";
+          font-family: 'General Sans';
           font-size: 48px;
           font-style: normal;
           font-weight: 600;
@@ -328,7 +387,7 @@
       }
       .left-text {
         color: var(--Neutral-5, #777e90);
-        font-family: "General Sans";
+        font-family: 'General Sans';
         font-size: 20px;
         font-style: normal;
         font-weight: 500;
@@ -343,7 +402,7 @@
     }
   }
 }
-.success{
+.success {
   width: fit-content;
-  margin: 200px auto 0px auto
+  margin: 200px auto 0px auto;
 }

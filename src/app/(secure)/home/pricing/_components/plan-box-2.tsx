@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useDebugValue } from "react";
-import axios from "axios";
-import "../../pricing/stripe.scss";
-import Image from "next/image";
-import tickCircle from "../../../../../../public/svgs/tick-circle-white.svg";
-import unTickCircle from "../../../../../../public/svgs/tick-circle -blue.svg";
-import line from "../../../../../../public/svgs/Vector 2189.svg";
+import React, { useState, useEffect, useDebugValue } from 'react';
+import axios from 'axios';
+import '../../pricing/stripe.scss';
+import Image from 'next/image';
+import tickCircle from '../../../../../../public/svgs/tick-circle-white.svg';
+import unTickCircle from '../../../../../../public/svgs/tick-circle -blue.svg';
+import line from '../../../../../../public/svgs/Vector 2189.svg';
 
-export default function PlanTwo({ setPlan }: any) {
+export default function PlanTwo({ setPlan, price }: any) {
   const changePlan = async () => {
     setPlan(2);
     // setStatus()
@@ -24,7 +24,7 @@ export default function PlanTwo({ setPlan }: any) {
         <div className="plan-price-container">
           <div className="plan-price-frame">
             <span className="price-sign price-sign-even">$</span>
-            <span className="price-number price-number-even">89</span>
+            <span className="price-number price-number-even">{price}</span>
           </div>
         </div>
       </div>
@@ -39,7 +39,9 @@ export default function PlanTwo({ setPlan }: any) {
           </div>
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
-            <span className="plan-text plan-text-even">2k messages / chatBot / month</span>
+            <span className="plan-text plan-text-even">
+              2k messages / chatBot / month
+            </span>
           </div>
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
@@ -55,7 +57,9 @@ export default function PlanTwo({ setPlan }: any) {
           </div>
           <Image src={line} alt="no image" />
           <div className="plan-item">
-            <span className="plan-text-head plan-text-head-even">Allowed Training Data</span>
+            <span className="plan-text-head plan-text-head-even">
+              Allowed Training Data
+            </span>
           </div>
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
@@ -83,20 +87,28 @@ export default function PlanTwo({ setPlan }: any) {
           </div>
           <Image src={line} alt="no image" />
           <div className="plan-item">
-            <span className="plan-text-head plan-text-head-even">Integration </span>
+            <span className="plan-text-head plan-text-head-even">
+              Integration{' '}
+            </span>
           </div>
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
-            <span className="plan-text plan-text-even">Embed on unlimited websites</span>
+            <span className="plan-text plan-text-even">
+              Embed on unlimited websites
+            </span>
           </div>
           <Image src={line} alt="no image" />
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
-            <span className="plan-text plan-text-even">View Conversation History</span>
+            <span className="plan-text plan-text-even">
+              View Conversation History
+            </span>
           </div>
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
-            <span className="plan-text plan-text-even">Optional Collect Leads</span>
+            <span className="plan-text plan-text-even">
+              Optional Collect Leads
+            </span>
           </div>
           <Image src={line} alt="no image" />
           <div className="plan-item">
@@ -107,7 +119,9 @@ export default function PlanTwo({ setPlan }: any) {
           </div>
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
-            <span className="plan-text plan-text-even">Customize Chatbot’s Personality</span>
+            <span className="plan-text plan-text-even">
+              Customize Chatbot’s Personality
+            </span>
           </div>
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
@@ -115,7 +129,9 @@ export default function PlanTwo({ setPlan }: any) {
           </div>
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
-            <span className="plan-text plan-text-even">Setting Tone of the Bot</span>
+            <span className="plan-text plan-text-even">
+              Setting Tone of the Bot
+            </span>
           </div>
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
@@ -123,7 +139,9 @@ export default function PlanTwo({ setPlan }: any) {
           </div>
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
-            <span className="plan-text plan-text-even">Dashboard Analytics</span>
+            <span className="plan-text plan-text-even">
+              Dashboard Analytics
+            </span>
           </div>
           <div className="plan-item">
             <Image src={unTickCircle} alt="no-svg" />
@@ -133,7 +151,9 @@ export default function PlanTwo({ setPlan }: any) {
           </div>
           <div className="plan-item">
             <Image src={unTickCircle} alt="no-svg" />
-            <span className="plan-text plan-text-even">Affliliation/API Access</span>
+            <span className="plan-text plan-text-even">
+              Affliliation/API Access
+            </span>
           </div>
           <div className="plan-item">
             <Image src={unTickCircle} alt="no-svg" />
@@ -145,7 +165,9 @@ export default function PlanTwo({ setPlan }: any) {
           </div>
           <div className="plan-item">
             <Image src={unTickCircle} alt="no-svg" />
-            <span className="plan-text plan-text-even">Share & Delete Bots</span>
+            <span className="plan-text plan-text-even">
+              Share & Delete Bots
+            </span>
           </div>
           <div className="plan-item">
             <Image src={unTickCircle} alt="no-svg" />
@@ -163,7 +185,9 @@ export default function PlanTwo({ setPlan }: any) {
           </div>
           <div className="plan-item">
             <Image src={unTickCircle} alt="no-svg" />
-            <span className="plan-text plan-text-even">Content Summarization</span>
+            <span className="plan-text plan-text-even">
+              Content Summarization
+            </span>
           </div>
           <div className="plan-item">
             <Image src={unTickCircle} alt="no-svg" />
