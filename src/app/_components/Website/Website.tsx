@@ -77,7 +77,6 @@ function Website({
         method: "POST",
         headers: {
           accept: "application/json",
-          // authorization: `Bearer ${process.env.NEXT_PUBLIC_AUTHORIZATION}`,
           cache: "no-store",
         },
         body: JSON.stringify({

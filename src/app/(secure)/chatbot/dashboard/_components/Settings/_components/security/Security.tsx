@@ -16,9 +16,16 @@ function Security() {
             <option value="Private">Private</option>
           </select>
           <p className="visibility-container-para">
-            Other people can chat with your chatbot if you send them the link.
-            You can also embed it on your website so your website visitors are
-            able to use it.
+            <span>
+              'private': No one can access your chatbot except you (your
+              account)
+            </span>
+            <br />
+            <span>
+              'public': Other people can chat with your chatbot if you send them
+              the link. You can also embed it on your website so your website
+              visitors are able to use it.
+            </span>
           </p>
         </div>
         <div className="horizontal-line">

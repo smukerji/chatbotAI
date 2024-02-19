@@ -7,16 +7,6 @@ module.exports = apiHandler({
 });
 
 async function fetchBots(request: any) {
-  const options = {
-    method: "GET",
-    headers: {
-      accept: "application/json",
-      Authorization: `Bearer ${process.env.NEXT_PUBLIC_AUTHORIZATION}`,
-      cache: "no-store",
-    },
-    next: { revalidate: 0 },
-  };
-
   // Read the body from the request
   const { userId } = await request.json();
 

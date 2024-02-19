@@ -25,53 +25,6 @@ function DeleteModal({
     setOkText("Deleting...");
 
     try {
-      // if (chatbotId.length !== 36) {
-      //   const res = await fetch(
-      //     `https://www.chatbase.co/api/v1/delete-chatbot?chatbotId=${chatbotId}`,
-      //     {
-      //       method: "DELETE",
-      //       headers: {
-      //         Authorization: `Bearer ${process.env.NEXT_PUBLIC_AUTHORIZATION}`,
-      //       },
-      //     }
-      //   );
-
-      //   /// displaying error
-      //   const data = await res.json();
-
-      //   messageApi
-      //     .open({
-      //       type: "error",
-      //       content: data.message,
-      //     })
-      //     .then(() => {
-      //       window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot`;
-      //     });
-      // } else {
-      //   const res = await fetch(
-      //     `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/pinecone`,
-      //     {
-      //       method: "DELETE",
-      //       body: JSON.stringify({
-      //         chatbotId: chatbotId,
-      //         userId: cookies?.userId,
-      //       }),
-      //       next: { revalidate: 0 },
-      //     }
-      //   );
-      //   /// displaying status
-      //   const data = await res.json();
-
-      //   messageApi
-      //     .open({
-      //       type: "error",
-      //       content: data.text,
-      //     })
-      //     .then(() => {
-      //       window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot`;
-      //     });
-      // }
-
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/pinecone`,
         {
