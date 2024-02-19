@@ -30,15 +30,12 @@ const authOptions: NextAuthOptions = {
       return session;
     },
     async signIn({ user, account, profile, email, credentials }) {
-      /// db connection
       const db = (await connectDatabase()).db();
 
-      /// get the starter plan ID
       const starterPlan = await db
         .collection("plans")
         .findOne({ name: "starter" });
 
-      /// insert in users table too
       await db.collection("users").updateOne(
         { _id: user.id },
         {

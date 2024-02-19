@@ -2,15 +2,15 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { NextResponse } from "next/server";
 import { connectDatabase } from "@/db";
 import Stripe from "stripe";
+import { ObjectId } from "mongodb";
 const stripe = new Stripe(String(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY));
 
 export async function POST(req: any, res: NextApiResponse) {
   if (req.method === "POST") {
     try {
-      let { plan } = await req.json();
+      let { plan ,u_id} = await req.json();
       const db = (await connectDatabase())?.db();
       const collection = db.collection("users");
-      let userId = "65c07a9dd73744ba62c1ea14";
       let plan_name = null
       if(plan == 1){
         plan_name = 'Individual Plan'
@@ -19,11 +19,14 @@ export async function POST(req: any, res: NextApiResponse) {
         plan_name = 'Agency Plan'
       }
       //ANCHOR - Get data of user by user_id
-      const data = await collection.updateMany({ _id: userId },{
+      const currentDate = new Date();
+      const endDate = new Date(currentDate.getTime() + (30 * 24 * 60 * 60 * 1000));
+      const data = await collection.updateMany({ _id: new ObjectId(u_id) },{
         $set:{
             plan: plan_name,
-              // Date(), { $multiply: [ 30, 24, 60, 60, 1000 ] 
-        }
+            startDate: currentDate, // Add current date to documents
+            endDate: endDate
+    }
       });
 
       return NextResponse.json(data);

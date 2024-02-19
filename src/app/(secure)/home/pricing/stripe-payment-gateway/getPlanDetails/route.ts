@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { NextResponse } from "next/server";
 import { connectDatabase } from "@/db";
+import { ObjectId } from "mongodb";
 
 export async function GET(req: NextApiRequest, res: NextApiResponse) {
     try {
@@ -14,3 +15,22 @@ export async function GET(req: NextApiRequest, res: NextApiResponse) {
         console.log(error)
     }
 }
+//ANCHOR - checking that user has payment-methodId or not
+export async function POST(req: any, res: NextResponse) {
+
+    let {u_id} = await req.json();
+    console.log('[Symbol]....................',u_id)
+    const db = (await connectDatabase())?.db();
+    const collection = db.collection("users");
+    // let userId = "65c07a9dd73744ba62c1ea14";
+    const user = await collection.findOne({ _id: new ObjectId(u_id) });
+    console.log(user)
+    const h = user.paymentId;
+  
+    //ANCHOR - check that paymentId available or not
+    if (h != undefined) {
+      return NextResponse.json("success");
+    } else {
+      return NextResponse.json({ status: 500 });
+    }
+  }

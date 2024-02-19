@@ -4,16 +4,17 @@ import { connectDatabase } from "@/db";
 import { StripeElements, loadStripe, Stripe } from "@stripe/stripe-js";
 import { Stripe as s } from "stripe";
 import { Console } from "console";
+import { useSearchParams } from "next/navigation";
+import { ObjectId } from "mongodb";
 const stripe = new s(String(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY));
 
-export async function POST(req: any, res: NextApiResponse) {
+export async function POST(req: any, res: NextResponse) {
   if (req.method === "POST") {
     try {
       const db = (await connectDatabase())?.db();
-      let { plan, price } = await req.json();
+      let { plan, price, u_id } = await req.json();
       const collection = db.collection("users");
-      let userId = "65c07a9dd73744ba62c1ea14";
-      const data = await collection.findOne({ _id: userId });
+      const data = await collection.findOne({ _id: new ObjectId(u_id) });
       console.log(data)
       if((data.plan == 'Agency Plan') || (data.plan == 'Individual Plan' && plan == 1)){
         return "You already have plan";
@@ -33,8 +34,11 @@ export async function POST(req: any, res: NextApiResponse) {
           confirm:true,
           customer: data.customerId,
           payment_method: data.paymentId,
-          
         });
+        // const paymentIntents = await stripe.paymentIntents.confirm(paymentIntent.id, {
+        //   payment_method: data.paymentId,
+        //   // customer: data.customerId,
+        // });
         // console.log(paymentIntent)
         return NextResponse.json(paymentIntent);
       } else {
@@ -50,27 +54,29 @@ export async function POST(req: any, res: NextApiResponse) {
   }
 }
 
-//ANCHOR - checking that user has payment-methodId or not
-export async function GET(req: NextApiRequest, res: NextApiResponse) {
+// //ANCHOR - checking that user has payment-methodId or not
+// export async function GET(req: any, res: NextResponse) {
+
+//   let u_id = await req.json();
+//   console.log('[Symbol]....................',u_id)
+//   const db = (await connectDatabase())?.db();
+//   const collection = db.collection("users");
+//   const user = await collection.findOne({ _id: userId });
+//   const h = user.paymentId;
+
+//   //ANCHOR - check that paymentId available or not
+//   if (h != undefined) {
+//     return NextResponse.json("success");
+//   } else {
+//     return NextResponse.json({ status: 500 });
+//   }
+// }
+
+export async function PUT(req: any, res: NextResponse) {
+  let {u_id} = await req.json()
   const db = (await connectDatabase())?.db();
   const collection = db.collection("users");
-  let userId = "65c07a9dd73744ba62c1ea14";
-  const data = await collection.findOne({ _id: userId });
-  const h = data.paymentId;
-
-  //ANCHOR - check that paymentId available or not
-  if (h != undefined) {
-    return NextResponse.json("success");
-  } else {
-    return NextResponse.json({ status: 500 });
-  }
-}
-
-export async function PUT(req: NextApiRequest, res: NextApiResponse) {
-  const db = (await connectDatabase())?.db();
-  const collection = db.collection("users");
-  let userId = "65c07a9dd73744ba62c1ea14";
-  const data = await collection.findOne({ _id: userId });
+  const data = await collection.findOne({ _id: new ObjectId(u_id) });
   
   //ANCHOR - check current plan of the user
   if((data.plan == 'Agency Plan') ){

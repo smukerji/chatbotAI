@@ -15,12 +15,15 @@ import { useRouter } from "next/navigation";
 import { StripeElements } from "@stripe/stripe-js";
 const stripee = new Stripe(String(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY));
 import "../../pricing/stripe.scss";
+import { useCookies } from "react-cookie";
+import { message } from "antd";
 
 export default function createPaymentMethod({ setStatus, plan , price }: any) {
   const stripe = useStripe();
   const elements: any = useElements();
   const [error, setError] = useState(null);
   const router = useRouter();
+  const [cookies, setCookie] = useCookies(["userId"]);
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
@@ -32,9 +35,14 @@ export default function createPaymentMethod({ setStatus, plan , price }: any) {
     const cardNumber: any = elements.getElement(CardNumberElement);
     const cardCvc: any = elements.getElement(CardCvcElement);
     const cardExpiry: any = elements.getElement(CardExpiryElement);
+
+    const u_id:any = cookies.userId;
     try {
       const response = await axios.post(
-        "http://localhost:3000/home/pricing/stripe-payment-gateway/getCustomer"
+        "http://localhost:3000/home/pricing/stripe-payment-gateway/getCustomer",
+        {
+          u_id: u_id
+        }
       );
       console.log("Payment method created:", response);
 
@@ -47,10 +55,11 @@ export default function createPaymentMethod({ setStatus, plan , price }: any) {
 
       const update = await axios.post(
         "http://localhost:3000/home/pricing/stripe-payment-gateway/updatePaymentMethod",
-        { paymentId: paymentMethod.paymentMethod?.id }
+        { paymentId: paymentMethod.paymentMethod?.id ,u_id:u_id}
       );
       setStatus(0);
     } catch (error) {
+      message.error(`${error}`);
       console.error("Error creating payment method:", error);
     }
   };

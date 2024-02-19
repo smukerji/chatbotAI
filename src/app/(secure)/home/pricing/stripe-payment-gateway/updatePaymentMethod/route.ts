@@ -2,18 +2,18 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { NextResponse } from "next/server";
 import { connectDatabase } from "@/db";
 import Stripe from "stripe";
+import { ObjectId } from "mongodb";
 const stripe = new Stripe(String(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY));
 
 export async function POST(req: any, res: NextApiResponse) {
   if (req.method === "POST") {
     try {
-      let { paymentId } = await req.json();
+      let { paymentId ,u_id} = await req.json();
       const db = (await connectDatabase())?.db();
       const collection = db.collection("users");
-      let userId = "65c07a9dd73744ba62c1ea14";
       
       //ANCHOR - Get data of user by user_id
-      const data = await collection.findOne({ _id: userId });
+      const data = await collection.findOne({ _id: new ObjectId(u_id) });
 
       //ANCHOR - attach paymentId with customerId
       const attachedPaymentMethod = await stripe.paymentMethods.attach(
@@ -32,7 +32,7 @@ export async function POST(req: any, res: NextApiResponse) {
 
       //ANCHOR - update user data to add paymentId
       const result = await collection.updateOne(
-        { _id: userId },
+        { _id: new ObjectId(u_id) },
         {
           $set: {
             paymentId: paymentId,
