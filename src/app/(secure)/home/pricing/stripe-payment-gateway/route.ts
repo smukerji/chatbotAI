@@ -7,39 +7,35 @@ import { Console } from "console";
 const stripe = new s(String(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY));
 
 export async function POST(req: any, res: NextApiResponse) {
-  const stripee = (await loadStripe(
-    String(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY)
-  )) as Stripe;
   if (req.method === "POST") {
     try {
       const db = (await connectDatabase())?.db();
-      let { plan } = await req.json();
+      let { plan, price } = await req.json();
       const collection = db.collection("users");
       let userId = "65c07a9dd73744ba62c1ea14";
       const data = await collection.findOne({ _id: userId });
+      console.log(data)
       if((data.plan == 'Agency Plan') || (data.plan == 'Individual Plan' && plan == 1)){
         return "You already have plan";
       }
-      
       const h = data.paymentId;
       if (h) {
-        let amount: number = 0;
-        if (plan == 2) {
-          amount = 8900;
-        } else {
-          amount = 1500;
-        }
+        let amount: number = price * 100;
+
         //ANCHOR - stripe payment intent creation
         const paymentIntent = await stripe.paymentIntents.create({
           amount: amount,
           currency: "inr",
           automatic_payment_methods: {
             enabled: true,
+            allow_redirects:"never"
           },
+          confirm:true,
           customer: data.customerId,
           payment_method: data.paymentId,
+          
         });
-
+        // console.log(paymentIntent)
         return NextResponse.json(paymentIntent);
       } else {
         return NextResponse.json({ status: 500 });

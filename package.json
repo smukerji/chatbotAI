@@ -11,6 +11,7 @@
   "dependencies": {
     "@ant-design/icons": "^5.2.6",
     "@auth/mongodb-adapter": "^2.0.0",
+    "@nextui-org/react": "^2.2.9",
     "@pinecone-database/pinecone": "^2.0.1",
     "@sparticuz/chromium-min": "^119.0.2",
     "@stripe/react-stripe-js": "^2.4.0",

@@ -1,16 +1,22 @@
-import React, { useState, useEffect, useDebugValue } from "react";
-import axios from "axios";
-import "../../pricing/stripe.scss";
-import Image from "next/image";
-import tickCircle from "../../../../../../public/svgs/tick-circle.svg";
-import unTickCircle from "../../../../../../public/svgs/untick-circle.svg";
-import line from "../../../../../../public/svgs/Vector 2189.svg";
+import React, { useState, useEffect, useDebugValue } from 'react';
+import axios from 'axios';
+import '../../pricing/stripe.scss';
+import Image from 'next/image';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import tickCircle from '../../../../../../public/svgs/tick-circle.svg';
+import unTickCircle from '../../../../../../public/svgs/untick-circle.svg';
+import line from '../../../../../../public/svgs/Vector 2189.svg';
 
-export default function PlanOne({ setPlan ,enableOne}: any) {
+export default function PlanOne({ setPlan,setPrice, price ,enableOne}: any) {
   console.log(enableOne)
+  const { status } = useSession();
+  const router = useRouter();
+
   const changePlan = async () => {
-    setPlan(1);
-    // setStatus()
+    // if (status === 'authenticated') {
+      setPrice(price);
+      setPlan(1);
   };
   return (
     <div className="plan-box">
@@ -24,7 +30,7 @@ export default function PlanOne({ setPlan ,enableOne}: any) {
         <div className="plan-price-container">
           <div className="plan-price-frame">
             <span className="price-sign">$</span>
-            <span className="price-number">15</span>
+            <span className="price-number">{price}</span>
           </div>
         </div>
       </div>

@@ -16,7 +16,7 @@ import { StripeElements } from "@stripe/stripe-js";
 const stripee = new Stripe(String(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY));
 import "../../pricing/stripe.scss";
 
-export default function createPaymentMethod({ setStatus, plan }: any) {
+export default function createPaymentMethod({ setStatus, plan , price }: any) {
   const stripe = useStripe();
   const elements: any = useElements();
   const [error, setError] = useState(null);
@@ -58,19 +58,21 @@ export default function createPaymentMethod({ setStatus, plan }: any) {
   return (
     <form className="cardElementForm" onSubmit={handleSubmit}>
       <div className="left">
-        {plan == 1 && <h3>Individual Plan</h3>}
-        {plan == 1 && <span>$15</span>}
-        {plan == 2 && <h1>Agency Plan</h1>}
-        {plan == 2 && <span>$89</span>}
+        {plan == 1 && <h2>Individual Plan</h2>}
+        {plan == 2 && <h2>Agency Plan</h2>}
+        <span>${price}</span>
       </div>
       <div className="right">
         <div className="card-element">
+          <label className="card-label">Card Number</label>
           <div className="cardNumber">
             <CardNumberElement />
           </div>
+          <label className="card-label">Card Expiry</label>
           <div className="cardExpiry">
             <CardExpiryElement />
           </div>
+          <label className="card-label">Card CVC</label>
           <div className="cardCvc">
             <CardCvcElement />
           </div>

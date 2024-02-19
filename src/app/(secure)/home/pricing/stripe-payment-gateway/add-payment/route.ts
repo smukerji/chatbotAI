@@ -22,6 +22,7 @@ export async function POST(req: any, res: NextApiResponse) {
       const data = await collection.updateMany({ _id: userId },{
         $set:{
             plan: plan_name,
+              // Date(), { $multiply: [ 30, 24, 60, 60, 1000 ] 
         }
       });
 

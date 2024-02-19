@@ -1,6 +1,6 @@
 "use client";
 
-import CheckoutForm from "./_components/CheckoutForm";
+// import CheckoutForm from "./_components/CheckoutForm";
 import React, { useState, useEffect, useDebugValue } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
@@ -14,6 +14,8 @@ import zoho from "../../../../../public/Rectangle 159.png";
 import whatsapp from "../../../../../public/whatsapp.png";
 import telegram from "../../../../../public/telegram.png";
 import hubspot from "../../../../../public/hubspot.png";
+import { Spinner } from "@nextui-org/react";
+import { useCookies } from "react-cookie";
 
 const stripePromise = loadStripe(
   String(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY)
@@ -22,12 +24,19 @@ const stripePromise = loadStripe(
 export default function Home() {
   const [status, setStatus] = useState<number>(2);
   const [plan, setPlan] = useState(0);
-  const [enableOne, setEnableOne] = useState(false)
-  const [enableTwo, setEnableTwo] = useState(false)
+  const [enableOne, setEnableOne] = useState(false);
+  const [enableTwo, setEnableTwo] = useState(false);
+  const [isYearlyPlan, setIsYearlyPlan] = useState(false);
+  const [price, setPrice] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [cookies, setCookie] = useCookies(["userId"]);
+
+  const u_id:any = JSON.stringify({ userId: cookies.userId });
   const makePayment = async () => {
     const response = await axios.get(
-      "http://localhost:3000/home/pricing/stripe-payment-gateway"
+      "http://localhost:3000/home/pricing/stripe-payment-gateway",
     );
+    
     console.log(response);
     if (response.data?.status == 500) {
       setStatus(1);
@@ -40,30 +49,75 @@ export default function Home() {
       "http://localhost:3000/home/pricing/stripe-payment-gateway/getPlanDetails"
     );
   };
-  const checkPlan = async() => {
+  const checkPlan = async () => {
     const checkPlan = await axios.put(
       "http://localhost:3000/home/pricing/stripe-payment-gateway"
     );
-    console.log(checkPlan)
-    if(checkPlan.data.msg == 2){
-      console.log("2")
-      setEnableOne(true)
-      setEnableTwo(true)
+    if (checkPlan.data.msg == 2) {
+      setEnableOne(true);
+      setEnableTwo(true);
+    } else if (checkPlan.data.msg == 1) {
+      setEnableOne(true);
     }
-    else if(checkPlan.data.msg == 1){
-      console.log("1")
-      setEnableOne(true)
+  };
+  const handleSubmit = async () => {
+    // const retrievedCookieData = cookies.getdata(userId);
+    const stripe = await loadStripe(
+      String(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY)
+    );
+    // event.preventDefault();
+    if (!stripe) {
+      return;
     }
-  }
+    // setLoading(true)
+    console.log(plan)
+    let duration = null
+    if(isYearlyPlan){
+      duration = 'year'
+    }
+    else{
+      duration = 'month'
+    }
+    const result = await axios.post(
+      "http://localhost:3000/home/pricing/stripe-payment-gateway",
+      { plan: plan ,price: price }
+    );
+    console.log(result);
+    console.log(loading);
+    const r = stripe.confirmPayment({
+      clientSecret: result.data.client_secret,
+      confirmParams: {
+        return_url: "http://localhost:3000/home/success",
+      },
+    });
+
+    const a = await axios.post(
+      "http://localhost:3000/home/pricing/stripe-payment-gateway/add-payment",
+      { plan: plan,duration: duration }
+    );
+
+    setLoading(false);
+  };
   useEffect(() => {
     checkPlan()
     if (plan == 1 || plan == 2) {
       console.log(plan);
       makePayment();
     }
-  }, [plan]);
+    if (status == 0) {
+      console.log("checkout");
+      handleSubmit();
+    }
+  }, [plan, status]);
+
+  const handlePlanType = () => {
+    setLoading(true);
+    setIsYearlyPlan(!isYearlyPlan);
+  };
+
   return (
     <>
+      {loading == true && <Spinner />}
       {status === 2 && (
         <div className="main">
           <h2 className="price-header">Pricing Plans</h2>
@@ -72,10 +126,35 @@ export default function Home() {
             <span className="price-offer-normal">users will receive Flat</span>
             <span className="price-offer">&nbsp;20% discount.</span>
           </div>
+          <div className="plan-tab-container">
+            <button
+              className={`plan-type ${!isYearlyPlan && "active"}`}
+              onClick={handlePlanType}
+            >
+              Monthly
+            </button>
+            <button
+              className={`plan-type ${isYearlyPlan && "active"}`}
+              onClick={handlePlanType}
+            >
+              Yearly
+            </button>
+          </div>
+          <div className="annual-discount">Save 20% annualy</div>
 
           <div className="plan-container">
-            <PlanOne setPlan={setPlan} enableOne={enableOne}/>
-            <PlanTwo setPlan={setPlan} enableTwo={enableTwo}/>
+            <PlanOne
+              setPlan={setPlan}
+              setPrice={setPrice}
+              price={isYearlyPlan ? 144 : 15}
+              enableOne={enableOne}
+            />
+            <PlanTwo
+              setPlan={setPlan}
+              setPrice={setPrice}
+              price={isYearlyPlan ? 854 : 89}
+              enableTwo={enableTwo}
+            />
           </div>
           <div className="add-ons-container">
             <p className="add-ons-head">Add-ons</p>
@@ -146,15 +225,23 @@ export default function Home() {
               <div className="left-head">
                 <p className="left-head-text">Pricing FAQs</p>
               </div>
-                <p className="left-text">We are offering an accessible interface to website or other platforms.</p>
+              <p className="left-text">
+                We are offering an accessible interface to website or other
+                platforms.
+              </p>
             </div>
             <div className="footer-right"></div>
           </div>
         </div>
       )}
       <Elements stripe={stripePromise}>
-        {status === 1 && <CreatePaymentMethod setStatus={setStatus} plan={plan} />}
-        {status === 0 && <CheckoutForm plan={plan} />}
+        {status === 1 && (
+          <CreatePaymentMethod
+            setStatus={setStatus}
+            plan={plan}
+            price={price}
+          />
+        )}
       </Elements>
     </>
   );
