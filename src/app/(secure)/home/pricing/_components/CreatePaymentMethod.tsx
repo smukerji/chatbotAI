@@ -24,7 +24,7 @@ export default function createPaymentMethod({ setStatus, plan , price }: any) {
   const [error, setError] = useState(null);
   const router = useRouter();
   const [cookies, setCookie] = useCookies(["userId"]);
-
+  console.log(price)
   const handleSubmit = async (event: any) => {
     event.preventDefault();
 
@@ -39,7 +39,7 @@ export default function createPaymentMethod({ setStatus, plan , price }: any) {
     const u_id:any = cookies.userId;
     try {
       const response = await axios.post(
-        "http://localhost:3000/home/pricing/stripe-payment-gateway/getCustomer",
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/getCustomer`,
         {
           u_id: u_id
         }
@@ -54,7 +54,7 @@ export default function createPaymentMethod({ setStatus, plan , price }: any) {
       const id: any = paymentMethod.paymentMethod?.id;
 
       const update = await axios.post(
-        "http://localhost:3000/home/pricing/stripe-payment-gateway/updatePaymentMethod",
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/updatePaymentMethod`,
         { paymentId: paymentMethod.paymentMethod?.id ,u_id:u_id}
       );
       setStatus(0);

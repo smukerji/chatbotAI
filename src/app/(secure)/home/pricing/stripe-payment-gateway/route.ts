@@ -1,10 +1,6 @@
-import { NextApiRequest, NextApiResponse } from "next";
 import { NextResponse } from "next/server";
 import { connectDatabase } from "@/db";
-import { StripeElements, loadStripe, Stripe } from "@stripe/stripe-js";
 import { Stripe as s } from "stripe";
-import { Console } from "console";
-import { useSearchParams } from "next/navigation";
 import { ObjectId } from "mongodb";
 const stripe = new s(String(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY));
 
@@ -83,7 +79,12 @@ export async function PUT(req: any, res: NextResponse) {
     return NextResponse.json({msg:2});
   }
   else if(data.plan == 'Individual Plan'){
-    return NextResponse.json({msg:1})
+    if(data.duration == 'month'){
+      return NextResponse.json({msg:1,prePrice:15})
+    }
+    else{
+      return NextResponse.json({msg:1,prePrice:144})
+    }
   }
   else{
     return NextResponse.json({msg:0})

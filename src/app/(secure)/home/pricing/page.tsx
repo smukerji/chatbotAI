@@ -17,6 +17,7 @@ import hubspot from "../../../../../public/hubspot.png";
 import { Spinner } from "@nextui-org/react";
 import { useCookies } from "react-cookie";
 import { message } from "antd";
+import Loader from "./_components/Loader";
 
 const stripePromise = loadStripe(
   String(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY)
@@ -31,10 +32,9 @@ export default function Home() {
   const [price, setPrice] = useState(0);
   const [loading, setLoading] = useState(false);
   const [cookies, setCookie] = useCookies(["userId"]);
+  const [prePrice, setPrePrice] = useState(0);
 
   const u_id: any = cookies.userId;
-
-  console.log(u_id);
 
   // const success = () => {
   //   messageApi.open({
@@ -52,12 +52,12 @@ export default function Home() {
 
   const makePayment = async () => {
     try {
+      setLoading(true)
       const response = await axios.post(
         `http://localhost:3000/home/pricing/stripe-payment-gateway/getPlanDetails`,
         { u_id: u_id }
       );
 
-      console.log(response);
       if (response.data?.status == 500) {
         setStatus(1);
         // message.success('This is a success message')
@@ -65,38 +65,41 @@ export default function Home() {
         setStatus(0);
         //  message.error('This is a error msg')
       }
+      setLoading(false)
     } catch (error) {
       message.error(`${error}`);
     }
   };
   const getPlanDetails = async () => {
-    try{
-
+    try {
       const planDetails = await axios.get(
-        "http://localhost:3000/home/pricing/stripe-payment-gateway/getPlanDetails"
-        );
-      }
-      catch(error){
-        message.error(`${error}`);
-      }
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/getPlanDetails`
+      );
+    } catch (error) {
+      message.error(`${error}`);
     }
-      const checkPlan = async () => {
-        try{
-
-          const checkPlan = await axios.put(
-            "http://localhost:3000/home/pricing/stripe-payment-gateway",
-            { u_id: u_id }
-          );
-          if (checkPlan.data.msg == 2) {
-            setEnableOne(true);
-            setEnableTwo(true);
-          } else if (checkPlan.data.msg == 1) {
-            setEnableOne(true);
-          }
-        }catch(error){
-          message.error(`${error}`);
-        }
-        };
+  };
+  const checkPlan = async () => {
+    try {
+      setLoading(true);
+      const checkPlan = await axios.put(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway`,
+        { u_id: u_id }
+      );
+      console.log(checkPlan);
+      if (checkPlan.data.msg == 2) {
+        setEnableOne(true);
+        setEnableTwo(true);
+      } else if (checkPlan.data.msg == 1) {
+        console.log(checkPlan.data.prePrice, checkPlan.data.msg);
+        setPrePrice(checkPlan.data.prePrice);
+        setEnableOne(true);
+      }
+    } catch (error) {
+      message.error(`${error}`);
+    }
+    setLoading(false);
+  };
   const handleSubmit = async () => {
     // const retrievedCookieData = cookies.getdata(userId);
     const stripe = await loadStripe(
@@ -114,36 +117,31 @@ export default function Home() {
     } else {
       duration = "month";
     }
-    try{
-
+    try {
       const result = await axios.post(
-        "http://localhost:3000/home/pricing/stripe-payment-gateway",
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway`,
         { plan: plan, price: price, u_id: u_id }
-        );
-        console.log(result);
-        console.log(loading);
-        const r = stripe.confirmPayment({
-          clientSecret: result.data.client_secret,
-          confirmParams: {
-            return_url: "http://localhost:3000/home/success",
-          },
-        });
-      }
-      catch(error){
-        message.error(`${error}`);
-      }
-      try{
-        
-        const a = await axios.post(
-          "http://localhost:3000/home/pricing/stripe-payment-gateway/add-payment",
-          { plan: plan, duration: duration, u_id: u_id }
-          );
-          message.success('success')
-        }catch(error){
-          message.error(`${error}`);
-        }
+      );
+      const r = stripe.confirmPayment({
+        clientSecret: result.data.client_secret,
+        confirmParams: {
+          return_url: `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/success`,
+        },
+      });
+    } catch (error) {
+      message.error(`${error}`);
+    }
+    try {
+      const a = await axios.post(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/add-payment`,
+        { plan: plan, duration: duration, u_id: u_id }
+      );
+      message.success("success");
+      setLoading(false);
+    } catch (error) {
+      message.error(`${error}`);
+    }
 
-    setLoading(false);
   };
   useEffect(() => {
     checkPlan();
@@ -158,14 +156,17 @@ export default function Home() {
   }, [plan, status]);
 
   const handlePlanType = () => {
-    setLoading(true);
     setIsYearlyPlan(!isYearlyPlan);
   };
 
+  
+
   return (
     <>
-      {loading == true && <Spinner />}
-      {status === 2 && (
+      {loading && (
+        <Loader />
+      )}
+      {status === 2 && loading == false && (
         <div className="main">
           <h2 className="price-header">Pricing Plans</h2>
           <div className="price-offer-container">
@@ -201,6 +202,8 @@ export default function Home() {
               setPrice={setPrice}
               price={isYearlyPlan ? 854 : 89}
               enableTwo={enableTwo}
+              // enableOne={enableOne}
+              prePrice={prePrice}
             />
           </div>
           <div className="add-ons-container">

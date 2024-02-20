@@ -7,13 +7,15 @@ import Image from 'next/image';
 import tickCircle from '../../../../../../public/svgs/tick-circle-white.svg';
 import unTickCircle from '../../../../../../public/svgs/tick-circle -blue.svg';
 import line from '../../../../../../public/svgs/Vector 2189.svg';
+import { number } from 'joi';
 
-export default function PlanTwo({ setPlan, enableTwo, price ,setPrice}: any) {
+export default function PlanTwo({ setPlan, enableTwo, price ,setPrice, prePrice}: any) {
   const { status } = useSession();
   const router = useRouter();
 
   const changePlan = async () => {
-      setPrice(price)
+      setPrice(Number(price) - Number(prePrice))
+      console.log(prePrice)
       setPlan(2);
    
 

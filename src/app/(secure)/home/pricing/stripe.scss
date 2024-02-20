@@ -491,3 +491,28 @@
     width : 35%
   }
 }
+.example {
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  background: linear-gradient(
+    180deg,
+    rgba(80, 85, 95, 0.27) 0%,
+    rgba(30, 30, 31, 0.58) 100%
+  );
+}
+.ant-spin-dot {
+  .ant-spin-dot-item {
+    background-color: #3d3329;
+    height: 30px;
+    width: 30px;
+    // padding: 20px;
+    margin: 10px;
+  }
+}

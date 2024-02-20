@@ -1,11 +1,10 @@
-import { NextApiRequest, NextApiResponse } from "next";
 import { NextResponse } from "next/server";
 import { connectDatabase } from "@/db";
 import Stripe from "stripe";
 import { ObjectId } from "mongodb";
 const stripe = new Stripe(String(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY));
 
-export async function POST(req: any, res: NextApiResponse) {
+export async function POST(req: any, res: NextResponse) {
   if (req.method === "POST") {
     try {
       let { paymentId ,u_id} = await req.json();
