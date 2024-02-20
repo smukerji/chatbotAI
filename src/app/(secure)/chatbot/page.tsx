@@ -279,7 +279,7 @@ function Chatbot() {
           <div className="no-chatbots-container">
             <Image src={noChatbotBg} alt="no-chatbot-bg" />
             <p>
-              You haven&apos;t created any Chatbots. Go ahead and create New
+            You haven't created any Chatbots. Go ahead and create a New Chatbot!
             </p>
           </div>
         )}

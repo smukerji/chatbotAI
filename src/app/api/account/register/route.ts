@@ -26,11 +26,21 @@ async function register(request: any) {
   const starterPlan = await db.collection("plans").findOne({ name: "starter" });
 
   /// register new user
-  await collection.insertOne({
+  const userResult = await collection.insertOne({
     username,
     email,
     password: hashPassword,
     planId: starterPlan?._id,
+  });
+
+  const userId = userResult?.insertedId.toString();
+
+  console.log("fsdhjgfajds", userId);
+
+  /// set the user details
+  await db.collection("user-details").insertOne({
+    userId: userId,
+    totalMessageCount: 0,
   });
 
   return { message: "Registered successfully... Please login to continue" };

@@ -21,6 +21,7 @@ import { useCookies } from "react-cookie";
 import { redirect, useRouter } from "next/navigation";
 import { UserDetailsContext } from "../../_helpers/client/Context/UserDetailsContext";
 import { formatNumber } from "../../_helpers/client/formatNumber";
+import LoaderModal from "../chatbot/dashboard/_components/Modal/LoaderModal";
 const crypto = require("crypto");
 
 function Home({
@@ -42,6 +43,7 @@ function Home({
 
   const [cookies, setCookie] = useCookies(["userId"]);
   const [messageApi, contextHolder] = message.useMessage();
+  const [isResponseOk, setIsResponseOk] = useState(false);
 
   const botContext: any = useContext(CreateBotContext);
   const botDetails = botContext?.createBotInfo;
@@ -194,7 +196,21 @@ function Home({
 
   /// creating custom chatbot
   async function createCustomBot() {
-    botContext?.handleChange("isLoading")(true);
+    /// check if user is able to create the bot
+    const canCreate =
+      userDetails?.noOfChatbotsUserCreated + 1 <=
+      userDetails?.plan?.numberOfChatbot;
+
+    console.log(canCreate, updateChatbot);
+
+    if (!canCreate && !updateChatbot) {
+      message.error(
+        `Sorry you cannot create the chatbot. Please upgrade your plan.`
+      );
+      botContext?.handleChange("isLoading")(false);
+      return;
+    }
+
     /// check if the crawling links are as per user plan
     if (crawledList?.length > userDetails?.plan?.websiteCrawlingLimit) {
       message.error(
@@ -244,10 +260,10 @@ function Home({
     }
     /// send the data
     try {
-      messageApi.open({
-        type: "info",
-        content: "Please wait while your chatbot is getting trained",
-      });
+      // messageApi.open({
+      //   type: "info",
+      //   content: "Please wait while your chatbot is getting trained",
+      // });
       const formData = new FormData();
 
       // Append the QA data including images to the formData object
@@ -295,6 +311,8 @@ function Home({
         chatbotName ? chatbotName : botDetails?.chatbotName
       );
 
+      botContext?.handleChange("isLoading")(true);
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/store`,
         {
@@ -308,11 +326,13 @@ function Home({
       );
 
       if (!response.ok) {
+        const errorMessage = await response?.text();
         messageApi
           .open({
             type: "error",
-            content:
-              "Something went wrong while creating custom bot. Please refresh the page and try again!",
+            // content:
+            // "Something went wrong while creating custom bot. Please refresh the page and try again!",
+            content: errorMessage,
           })
           .then(() => {
             botContext?.handleChange("isLoading")(false);
@@ -321,9 +341,10 @@ function Home({
       }
 
       if (response.status == 200) {
-        message.success(await response.text()).then(() => {
-          window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot`;
-        });
+        setIsResponseOk(true);
+        // message.success(await response.text()).then(() => {
+        //   // window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot`;
+        // });
       } else if (response.status == 201) {
         message.success(await response.text()).then(() => {
           window.location.href = `${
@@ -367,6 +388,12 @@ function Home({
   } else if (status === "authenticated" || cookies?.userId) {
     return (
       <div className="create-chatbot-container">
+        {(botDetails?.isLoading == true || isResponseOk) && (
+          <LoaderModal
+            isResponseOk={isResponseOk}
+            setIsResponseOk={setIsResponseOk}
+          />
+        )}
         {contextHolder}
         {/*------------------------------------------top-section----------------------------------------------*/}
         <div className="top">
