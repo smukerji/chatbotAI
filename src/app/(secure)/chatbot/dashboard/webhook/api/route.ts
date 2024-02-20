@@ -20,6 +20,7 @@ export async function GET(req: NextRequest) {
     hubMode === "subscribe" &&
     hubToken === process.env.WHATSAPPCALLBACKTOKEN
   ) {
+    console.log('verified successfully')
     return new Response(hubChallenge);
   }
 
@@ -29,7 +30,6 @@ export async function GET(req: NextRequest) {
 // WhatsApp will triger this post request once user asked question to bot and also response to the user
 export async function POST(req: NextRequest) {
   let res: any = await req.json();
-
   let questionFromWhatsapp =
     res?.entry?.[0]?.changes?.[0]?.value?.messages?.[0]?.text?.body; // question received from whatsapp
 
