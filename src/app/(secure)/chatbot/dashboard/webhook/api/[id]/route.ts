@@ -3,6 +3,14 @@ import { NextRequest, NextResponse } from "next/server";
 // import { NextApiResponse } from "next";
 import { connectDatabase } from "@/db";
 
+const getChatbotId = (req:NextRequest) => {
+  return req.nextUrl.pathname.split("api/")[1];
+}
+
+const getResponseNumber = (res:any)=>{
+  return res?.entry?.[0]?.changes?.[0]?.value?.contacts[0]?.wa_id;
+}
+
 export async function GET(req: NextRequest) {
   let hubMode = req.nextUrl.searchParams.get("hub.mode");
   let hubChallenge = req.nextUrl.searchParams.get("hub.challenge");
@@ -29,8 +37,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "status received" });
   }
 
-  let chatbotId = req.nextUrl.pathname.split("api/")[1]; //here you will recieved the chatbot unique id, based on this you would identify knowledge base
-  const responseNumber = res?.entry?.[0]?.changes?.[0]?.value?.contacts[0]?.wa_id;
+  let chatbotId = getChatbotId(req); //here you will recieved the chatbot unique id, based on this you would identify knowledge base
+  const responseNumber = getResponseNumber(req);
 
   // retriving userId from database
   try {
@@ -104,7 +112,7 @@ export async function POST(req: NextRequest) {
       const phoneNumberId = process.env.WHATSAPPPHONENUMBERID; // Replace with your phone number ID
       const recipientPhoneNumber = '+'+responseNumber;
       const accessToken = process.env.WHATSAPPTOKEN
-
+      
       // Define the URL for the POST request
       const url = `https://graph.facebook.com/${version}/${phoneNumberId}/messages`;
 
@@ -130,18 +138,19 @@ export async function POST(req: NextRequest) {
         body: JSON.stringify(data),
       };
       // Make the POST request using fetch
-      fetch(url, options)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
-          return response.json();
-        })
-        .then((data) => {
+      try {
+          const response = await fetch(url, options);
           
-        })
-        .catch((error) => {
-        });
+          if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+
+          const data = await response.json();
+          
+          // Handle the data as needed
+      } catch (error) {
+          // Handle the error as needed
+      }
     }
   } catch (error:any) {
     //mantain the error log in database, in case of unhandle error
@@ -149,3 +158,4 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ message: "received" });
 }
+
