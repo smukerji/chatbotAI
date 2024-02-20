@@ -36,23 +36,9 @@ export default function Home() {
 
   const u_id: any = cookies.userId;
 
-  // const success = () => {
-  //   messageApi.open({
-  //     type: 'success',
-  //     content: 'This is a success message',
-  //   });
-  // };
-
-  // const error = () => {
-  //   messageApi.open({
-  //     type: 'error',
-  //     content: 'This is an error message',
-  //   });
-  // };
-
   const makePayment = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
       const response = await axios.post(
         `http://localhost:3000/home/pricing/stripe-payment-gateway/getPlanDetails`,
         { u_id: u_id }
@@ -65,7 +51,7 @@ export default function Home() {
         setStatus(0);
         //  message.error('This is a error msg')
       }
-      setLoading(false)
+      setLoading(false);
     } catch (error) {
       message.error(`${error}`);
     }
@@ -122,12 +108,6 @@ export default function Home() {
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway`,
         { plan: plan, price: price, u_id: u_id }
       );
-      const r = stripe.confirmPayment({
-        clientSecret: result.data.client_secret,
-        confirmParams: {
-          return_url: `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/success`,
-        },
-      });
     } catch (error) {
       message.error(`${error}`);
     }
@@ -141,7 +121,6 @@ export default function Home() {
     } catch (error) {
       message.error(`${error}`);
     }
-
   };
   useEffect(() => {
     checkPlan();
@@ -159,13 +138,9 @@ export default function Home() {
     setIsYearlyPlan(!isYearlyPlan);
   };
 
-  
-
   return (
     <>
-      {loading && (
-        <Loader />
-      )}
+      {loading && <Loader />}
       {status === 2 && loading == false && (
         <div className="main">
           <h2 className="price-header">Pricing Plans</h2>

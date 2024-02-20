@@ -25,17 +25,20 @@ export async function POST(req: any, res: NextResponse) {
           currency: "inr",
           automatic_payment_methods: {
             enabled: true,
-            allow_redirects:"never"
+            // allow_redirects:"never"
           },
           confirm:true,
           customer: data.customerId,
           payment_method: data.paymentId,
+          receipt_email: data.email,
+          off_session: true
         });
         // const paymentIntents = await stripe.paymentIntents.confirm(paymentIntent.id, {
-        //   payment_method: data.paymentId,
+        //   payment_method: 'pm_card_visa',
         //   // customer: data.customerId,
         // });
-        // console.log(paymentIntent)
+        // console.log(paymentIntents)
+        console.log(paymentIntent)
         return NextResponse.json(paymentIntent);
       } else {
         return NextResponse.json({ status: 500 });
