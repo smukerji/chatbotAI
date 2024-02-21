@@ -1,5 +1,5 @@
-"use client";
-import React, { useState } from "react";
+'use client';
+import React, { useState } from 'react';
 import {
   CardElement,
   useStripe,
@@ -8,22 +8,22 @@ import {
   CardNumberElement,
   CardCvcElement,
   CardExpiryElement,
-} from "@stripe/react-stripe-js";
-import axios from "axios";
-import Stripe from "stripe";
-import { useRouter } from "next/navigation";
-import { StripeElements } from "@stripe/stripe-js";
+} from '@stripe/react-stripe-js';
+import axios from 'axios';
+import Stripe from 'stripe';
+import { useRouter } from 'next/navigation';
+import { StripeElements } from '@stripe/stripe-js';
 const stripee = new Stripe(String(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY));
-import "../../pricing/stripe.scss";
-import { useCookies } from "react-cookie";
-import { message } from "antd";
+import '../../pricing/stripe.scss';
+import { useCookies } from 'react-cookie';
+import { message } from 'antd';
 
-export default function CreatePaymentMethod({ setStatus, plan, price }: any) {
+export default function CreatePaymentMethod({ plan, price, duration }: any) {
   const stripe = useStripe();
   const elements: any = useElements();
   const [error, setError] = useState(null);
   const router = useRouter();
-  const [cookies, setCookie] = useCookies(["userId"]);
+  const [cookies, setCookie] = useCookies(['userId']);
   console.log(price);
   const handleSubmit = async (event: any) => {
     event.preventDefault();
@@ -44,35 +44,58 @@ export default function CreatePaymentMethod({ setStatus, plan, price }: any) {
           u_id: u_id,
         }
       );
-      console.log("Payment method created:", response);
+      console.log('Payment method created:', response);
     } catch {
-      message.error("error while getting customer data");
-      setStatus(1);
+      message.error('error while getting customer data');
+      // setStatus(1);
       throw error;
     }
     try {
       const paymentMethod = await stripe.createPaymentMethod({
-        type: "card",
+        type: 'card',
         card: cardNumber,
       });
       console.log(paymentMethod.paymentMethod?.id);
       const id: any = paymentMethod.paymentMethod?.id;
-      if(paymentMethod.paymentMethod?.id){
-
+      if (paymentMethod.paymentMethod?.id) {
         const update = await axios.post(
           `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/updatePaymentMethod`,
-        { paymentId: paymentMethod.paymentMethod?.id, u_id: u_id }
+          { paymentId: paymentMethod.paymentMethod?.id, u_id: u_id }
         );
-        console.log("...................>>>>>>>>>>>>>>>>>>>>>>>>",update)
-        setStatus(0);
-      }
-      else{
-        setStatus(1);
-        message.error("Finding error while making payment with this card, please check your card details")
+        console.log('...................>>>>>>>>>>>>>>>>>>>>>>>>', update);
+
+        if (update.data.acknowledged) {
+          //ANCHOR - api call to create paymentIntent
+          const result = await axios.post(
+            `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway`,
+            { plan: plan, price: price, u_id: u_id }
+          );
+
+          //ANCHOR - payment confirmation
+          const r = stripe.confirmPayment({
+            clientSecret: result.data.client_secret,
+            confirmParams: {
+              return_url: `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/success`,
+            },
+          });
+
+          //ANCHOR - adding data to backend
+          const a = await axios.post(
+            `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/add-payment`,
+            { plan: plan, duration: duration, u_id: u_id }
+          );
+          message.success('success');
+        }
+        // setStatus(0);
+      } else {
+        // setStatus(1);
+        message.error(
+          'Finding error while making payment with this card, please check your card details'
+        );
       }
     } catch (error) {
       message.error(`${error}`);
-      console.error("Error creating payment method:");
+      console.error('Error creating payment method:');
       throw error;
     }
   };

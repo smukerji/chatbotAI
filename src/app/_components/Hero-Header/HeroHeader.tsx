@@ -30,7 +30,7 @@ function HeroHeader() {
             </li>
 
             <li>
-              <Link href="/home/pricing">Pricing</Link>
+              <a href="/home/pricing">Pricing</a>
             </li>
           </ul>
         </div>

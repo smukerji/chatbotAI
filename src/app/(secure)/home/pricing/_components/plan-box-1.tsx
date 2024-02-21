@@ -7,19 +7,19 @@ import { useRouter } from 'next/navigation';
 import tickCircle from '../../../../../../public/svgs/tick-circle.svg';
 import unTickCircle from '../../../../../../public/svgs/untick-circle.svg';
 import line from '../../../../../../public/svgs/Vector 2189.svg';
-import { useCookies } from "react-cookie";
+import { useCookies } from 'react-cookie';
 
-export default function PlanOne({ setPlan,setPrice, price ,enableOne}: any) {
+export default function PlanOne({ setPlan, setPrice, price, enableOne }: any) {
   const { status } = useSession();
   const router = useRouter();
-  const [cookies, setCookie] = useCookies(["userId"]);
-  console.log(cookies)
+  const [cookies, setCookie] = useCookies(['userId']);
+  console.log(cookies);
   const changePlan = async () => {
     if (cookies?.userId) {
-      setPrice(price);
-      setPlan(1);
-    }
-    else{
+      // setPrice(price);
+      // setPlan(1);
+      router.push(`/home/pricing/checkout/${1}`);
+    } else {
       router.push('/account/login');
     }
   };
@@ -40,7 +40,12 @@ export default function PlanOne({ setPlan,setPrice, price ,enableOne}: any) {
         </div>
       </div>
       <div className="plan-container-list">
-        <button className="pay-btn" onClick={changePlan} disabled = {enableOne} title={enableOne ? "Already have plan" : undefined}>
+        <button
+          className="pay-btn"
+          onClick={changePlan}
+          disabled={enableOne}
+          title={enableOne ? 'Already have plan' : undefined}
+        >
           <span className="btn-text">Get Started</span>
         </button>
         <div className="plan-details">
