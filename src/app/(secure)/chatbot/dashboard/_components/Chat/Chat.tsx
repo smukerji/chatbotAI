@@ -108,7 +108,7 @@ function Chat({
     }
 
     const body = await response.json();
-    message.success(body?.message);
+    message.info(body?.message);
   };
 
   /// Messages feedback opener
@@ -374,7 +374,7 @@ function Chat({
       await navigator.clipboard.writeText(chatbot?.id);
       message.success("ID copied to clipboard");
     } catch (err: any) {
-      message.error("Failed to copy ", err.message);
+      message.error("Copy Failed!", err.message);
     }
   };
 

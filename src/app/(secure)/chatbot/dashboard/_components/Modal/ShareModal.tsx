@@ -24,9 +24,9 @@ function ShareModal({ open, setOpen, chatbotId }: any) {
     //   });
     try {
       await navigator.clipboard.writeText(script);
-      message.success("Content copied to clipboard");
+      message.success("Copied successfully!");
     } catch (err: any) {
-      message.error("Failed to copy ", err.message);
+      message.error("Copy Failed!", err.message);
     }
     setOpen(false);
   };

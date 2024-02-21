@@ -27,7 +27,7 @@ function LoaderModal({ isResponseOk, setIsResponseOk }: any) {
           centered
           className="chatbot-trained-success"
           footer={[
-            <div className="success-footer">
+            <div className="success-footer" key={1}>
               <Button key="back" onClick={gotoHome} className="home-btn">
                 Home
               </Button>
@@ -56,7 +56,7 @@ function LoaderModal({ isResponseOk, setIsResponseOk }: any) {
         >
           <Spin indicator={<LoadingOutlined spin />} />
           <p className="please-wait-text">
-            Please wait while your Chatbot getting trained
+            Please wait while your Chatbot is getting trained!
           </p>
         </Modal>
       )}

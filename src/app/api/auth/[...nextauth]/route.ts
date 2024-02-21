@@ -34,12 +34,16 @@ const authOptions: NextAuthOptions = {
         .collection("plans")
         .findOne({ name: "starter" });
 
+      const username: string[] = message.user.name?.split(" ")!;
+
       /// insert in users table too
       await db.collection("users").updateOne(
         { _id: new ObjectId(message.user.id) },
         {
           $set: {
             planId: starterPlan?._id,
+            username:
+              username[0] + `${username?.[1] ? "_" + username?.[1] : ""}`,
           },
         },
         {
@@ -53,6 +57,8 @@ const authOptions: NextAuthOptions = {
     async session({ session, user, token }) {
       cookies().set("profile-img", user.image!);
       cookies().set("userId", user.id);
+      /// set the username
+      cookies().set("username", user?.name!);
       return session;
     },
     // async signIn({ user, account, profile, email, credentials }) {

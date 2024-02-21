@@ -35,8 +35,6 @@ async function register(request: any) {
 
   const userId = userResult?.insertedId.toString();
 
-  console.log("fsdhjgfajds", userId);
-
   /// set the user details
   await db.collection("user-details").insertOne({
     userId: userId,

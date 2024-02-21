@@ -74,9 +74,9 @@ function Footer() {
             <li>
               <a href="">News</a>
             </li>
-            <li>
+            {/* <li>
               <a href="">Terms & Conditions</a>
-            </li>
+            </li> */}
             <li>
               <a href="#contact-us">Book a Demo</a>
             </li>

@@ -213,8 +213,8 @@ function Home({
 
     /// check if the crawling links are as per user plan
     if (crawledList?.length > userDetails?.plan?.websiteCrawlingLimit) {
-      message.error(
-        `You have only ${userDetails?.plan?.websiteCrawlingLimit} links limit to crawl in this plan. Please delete some links or update the plan`
+      message.warning(
+        `Oops! You have reached the crawling limit of your plan. Please delete few links or upgrade the plan.`
       );
       botContext?.handleChange("isLoading")(false);
       return;
@@ -222,8 +222,8 @@ function Home({
 
     /// if the training data limit is exceeded  then show error message
     if (totalCharCount > userDetails?.plan?.trainingDataLimit) {
-      message.error(
-        "Training data limit exceed. Please remove some training data or upgrade the plan."
+      message.warning(
+        "Oops! You have reached the data limit of your plan. Please upgrade to train more data."
       );
       botContext?.handleChange("isLoading")(false);
       return;
@@ -235,13 +235,13 @@ function Home({
       defaultFileList.length === 0 &&
       crawledList.length === 0
     ) {
-      message.error("Please add some content to create the bot").then(() => {
+      message.warning("Please add some content to create the bot").then(() => {
         botContext?.handleChange("isLoading")(false);
       });
       return;
     }
     if (totalCharCount < 100) {
-      message.error("Not enough content to create the bot").then(() => {
+      message.warning("Not enough content to create the bot").then(() => {
         botContext?.handleChange("isLoading")(false);
       });
       return;
@@ -249,7 +249,7 @@ function Home({
     for await (const item of botDetails?.qaList) {
       if (item.question.length < 10 || item.answer.length < 20) {
         message
-          .error(
+          .warning(
             "Question/Answer length too short in Q&A section. Min length : q = 10, a = 20"
           )
           .then(() => {
@@ -329,10 +329,12 @@ function Home({
         const errorMessage = await response?.text();
         messageApi
           .open({
-            type: "error",
+            type: "warning",
             // content:
             // "Something went wrong while creating custom bot. Please refresh the page and try again!",
-            content: errorMessage,
+            // content: errorMessage,
+            content:
+              "Something went wrong. Please refresh the page and try again! ",
           })
           .then(() => {
             botContext?.handleChange("isLoading")(false);

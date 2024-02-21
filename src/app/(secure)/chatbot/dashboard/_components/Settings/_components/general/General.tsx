@@ -48,7 +48,7 @@ function General({ chatbotId, chatbotName }: any) {
       await navigator.clipboard.writeText(chatbotId);
       message.success("ID copied to clipboard");
     } catch (err: any) {
-      message.error("Failed to copy ", err.message);
+      message.error("Copy Failed!", err.message);
     }
   };
 
