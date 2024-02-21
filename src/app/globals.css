@@ -40,6 +40,13 @@ Header a {
 
 
 }
+.whatsapp-steps{
+  width: 60%;
+  margin: auto;
+}
+.ant-steps-item-icon{
+  /* background: #2e58ea !important; */
+}
 .whatsapp-integration-title{
   color: #141416;
   text-align: center;
@@ -94,6 +101,7 @@ line-height: 24px;
 .whatsapp-btn{
   display: flex;
   justify-content: flex-end;
+  margin-top: 15px !important;
 }
 .whatsapp-verify{
   display: flex;
@@ -105,6 +113,9 @@ border-radius: 12px;
 background:  #2E58EA;
 border: none;
 }
+.whatsapp-verify:hover{
+  cursor: pointer;
+}
 .whatsapp-verify-text{
   color: #FCFCFD !important;
 text-align: center ;
@@ -113,4 +124,25 @@ font-style: normal !important;
 font-weight: 600 !important;
 line-height: 24px !important; /* 150% */
 margin-top: 0px !important;
+}
+ .whatsapp-modal .ant-modal-footer{
+  display: none !important;
+}
+.whatsapp-status-container{
+  display: flex;
+  justify-content: space-between;
+  border:  1px solid #E6E8EC ;
+  border-radius: 12px;
+  margin: 30px;
+  padding: 10px;
+}
+.whatsapp-status-container-mobile-section{
+  width: 50%;
+}
+.whatsapp-status-container-switch-section{
+  width: 50%;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+
 }
