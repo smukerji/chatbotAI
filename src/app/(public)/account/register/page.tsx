@@ -41,7 +41,8 @@ function Register() {
 
   if (status === "authenticated") {
     // redirect("/chatbot");
-    router.push("/chatbot");
+    // router.push("/chatbot");
+    window.location.href = "/chatbot";
   }
   const userService = useUserService();
 
@@ -182,7 +183,14 @@ function Register() {
                       register();
                 }}
               />
-              <span>{firstNameMessage}</span>
+              <p
+                style={{
+                  color: "red",
+                  margin: "5px 0 0 5px",
+                }}
+              >
+                {firstNameMessage}
+              </p>
             </div>
             <div>
               <input
@@ -200,7 +208,14 @@ function Register() {
                       register();
                 }}
               />
-              <span>{lastNameMessage}</span>
+              <p
+                style={{
+                  color: "red",
+                  margin: "5px 0 0 5px",
+                }}
+              >
+                {lastNameMessage}
+              </p>
             </div>
             <div>
               <input
@@ -218,7 +233,14 @@ function Register() {
                       register();
                 }}
               />
-              <span>{emailMessage}</span>
+              <p
+                style={{
+                  color: "red",
+                  margin: "5px 0 0 5px",
+                }}
+              >
+                {emailMessage}
+              </p>
             </div>
             <div className="password-container">
               <input
@@ -244,7 +266,14 @@ function Register() {
                 height={24}
                 onClick={togglePasswordVisibility}
               />
-              <span>{passwordMessage}</span>
+              <p
+                style={{
+                  color: "red",
+                  margin: "5px 0 0 5px",
+                }}
+              >
+                {passwordMessage}
+              </p>
             </div>
           </div>
 

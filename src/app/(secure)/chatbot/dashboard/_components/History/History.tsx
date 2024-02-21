@@ -91,7 +91,7 @@ function History({ chatbotId }: any) {
     }
 
     const body = await response.json();
-    message.success(body?.message);
+    message.info(body?.message);
   };
 
   return (

@@ -4,10 +4,11 @@ import GithubProvider from "next-auth/providers/github";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import { connectDatabase } from "../../../../db";
 import { cookies } from "next/headers";
+import { ObjectId } from "mongodb";
 
 const authOptions: NextAuthOptions = {
   adapter: MongoDBAdapter(connectDatabase(), {
-    databaseName: "sapahk-chatbot",
+    databaseName: "luciferai-test",
   }),
   //   session: {
   //     strategy: "jwt",
@@ -23,44 +24,79 @@ const authOptions: NextAuthOptions = {
     }),
   ],
 
-  callbacks: {
-    async session({ session, user, token }) {
-      cookies().set("profile-img", user.image!);
-      cookies().set("userId", user.id);
-      return session;
-    },
-    async signIn({ user, account, profile, email, credentials }) {
+  events: {
+    signIn: async (message) => {
+      /// db connection
       const db = (await connectDatabase()).db();
 
       const starterPlan = await db
         .collection("plans")
         .findOne({ name: "starter" });
 
+      const username: string[] = message.user.name?.split(" ")!;
+
+      /// insert in users table too
       await db.collection("users").updateOne(
-        { _id: user.id },
+        { _id: new ObjectId(message.user.id) },
         {
           $set: {
-            _id: user.id,
-            username: user.name,
-            email: user.email,
             planId: starterPlan?._id,
+            username:
+              username[0] + `${username?.[1] ? "_" + username?.[1] : ""}`,
           },
         },
         {
           upsert: true,
         }
       );
-
-      const isAllowedToSignIn = true;
-      if (isAllowedToSignIn) {
-        return true;
-      } else {
-        // Return false to display a default error message
-        return false;
-        // Or you can return a URL to redirect to:
-        // return '/unauthorized'
-      }
     },
+  },
+
+  callbacks: {
+    async session({ session, user, token }) {
+      cookies().set("profile-img", user.image!);
+      cookies().set("userId", user.id);
+      /// set the username
+      cookies().set("username", user?.name!);
+      return session;
+    },
+    // async signIn({ user, account, profile, email, credentials }) {
+    //   /// db connection
+    //   const db = (await connectDatabase()).db();
+
+    //   /// get the starter plan ID
+    //   const starterPlan = await db
+    //     .collection("plans")
+    //     .findOne({ name: "starter" });
+
+    //   console.log(user);
+
+    //   /// insert in users table too
+    //   await db.collection("users").updateOne(
+    //     { _id: user.id },
+    //     {
+    //       $set: {
+    //         _id: user.id,
+    //         username: user.name,
+    //         email: user.email,
+    //         planId: starterPlan?._id,
+    //       },
+    //     },
+    //     {
+    //       upsert: true,
+    //     }
+    //   );
+
+    //   const isAllowedToSignIn = true;
+    //   if (isAllowedToSignIn) {
+    //     return true;
+    //   } else {
+    //     // Return false to display a default error message
+    //     return false;
+    //     // Or you can return a URL to redirect to:
+    //     // return '/unauthorized'
+    //   }
+    // },
   },
 };
 

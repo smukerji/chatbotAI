@@ -49,8 +49,48 @@ export default async function handler(req, res) {
         const userId = fields?.userId[0];
         const numberOfCharacterTrained = fields?.numberOfCharacterTrained[0];
 
+        /// using this variable to check if the chatbot needs to be retrained and has updated QA and Text source
+        const updateChatbot = JSON.parse(fields?.updateChatbot[0]);
+
         /// db connection
         const db = (await connectDatabase()).db();
+
+        /// first check if user can create the chatbot or not
+        const noOfChatbotsUserCreated = await db
+          .collection("user-chatbots")
+          .countDocuments({ userId: userId });
+
+        /// get the number of chatbot user can create from plan table
+        const planDetails = await db
+          .collection("users")
+          .aggregate([
+            {
+              $match: { _id: new ObjectId(userId) },
+            },
+            {
+              $lookup: {
+                from: "plans",
+                localField: "planId",
+                foreignField: "_id",
+                as: "plan",
+              },
+            },
+          ])
+          .toArray();
+
+        if (
+          planDetails[0].plan[0]?.numberOfChatbot <
+            noOfChatbotsUserCreated + 1 &&
+          !updateChatbot
+        ) {
+          res
+            .status(500)
+            .send(
+              "Sorry you cannot create the chatbot. Please upgrade your plan."
+            );
+
+          return;
+        }
 
         const chatbotId =
           fields?.chatbotId[0] !== "undefined" ? fields?.chatbotId[0] : uuid();
@@ -63,8 +103,6 @@ export default async function handler(req, res) {
         // console.log(chatbotId);
         // return;
 
-        /// using this variable to check if the chatbot needs to be retrained and has updated QA and Text source
-        const updateChatbot = JSON.parse(fields?.updateChatbot[0]);
         /// deleting the file list
         const deleteFileList = JSON.parse(fields?.deleteFileList[0]);
         /// deleting the QA list

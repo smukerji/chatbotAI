@@ -110,7 +110,13 @@ async function fetchCustomBots(userId: string) {
           chatbotName: { $first: "$chatbotName" },
           lastUsed: { $first: "$lastUsed" },
           noOfMessagesSent: { $first: "$noOfMessagesSent" },
+          createdAt: { $first: "$createdAt" },
           chatbotSettings: { $push: "$chatbotSettings" },
+        },
+      },
+      {
+        $sort: {
+          createdAt: 1,
         },
       },
     ])

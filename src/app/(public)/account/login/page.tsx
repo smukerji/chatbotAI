@@ -14,10 +14,8 @@ import { LoadingOutlined } from "@ant-design/icons";
 import { redirect } from "next/navigation";
 import { useUserService } from "../../../_services/useUserService";
 import { Spin, message } from "antd";
-import { useRouter } from "next/navigation";
 
 function Login() {
-  const router = useRouter();
   /// email and password messages state
   const [emailMessage, setEmailMessage]: any = useState("");
   const [passwordMessage, setPasswordMessage]: any = useState("");
@@ -37,8 +35,8 @@ function Login() {
   );
 
   if (status === "authenticated") {
-    // redirect("/chatbot");
-    router.push("/chatbot");
+    window.location.href = "/chatbot"; /// used this to load the header
+    // router.push("/chatbot");
   }
 
   const userService = useUserService();
@@ -46,7 +44,7 @@ function Login() {
   const login = () => {
     /// check if anything is empty
     if (email == null) {
-      setEmailMessage("Invalid email address format");
+      setEmailMessage("Email required.");
       return;
     }
 
@@ -60,7 +58,7 @@ function Login() {
       if (!data?.username) {
         message.error(data);
       } else {
-        message.success(`Welcome back ${data?.username}`);
+        message.info(`Welcome back ${data?.username}!`);
         window.location.reload(); // Refresh the page
       }
       setLoading(false);
@@ -79,7 +77,7 @@ function Login() {
     const result = email?.match(pattern);
 
     if (!result) {
-      setEmailMessage("Invalid email address format");
+      setEmailMessage("Invalid email format.");
     } else {
       setEmailMessage("");
     }
@@ -93,7 +91,7 @@ function Login() {
     setPassword(password);
 
     if (!password.length) {
-      setPasswordMessage("Please input your password!");
+      setPasswordMessage("Password required.");
     } else {
       setPasswordMessage("");
     }
@@ -134,7 +132,14 @@ function Login() {
                     if (emailMessage == "" && passwordMessage == "") login();
                 }}
               />
-              <span>{emailMessage}</span>
+              <p
+                style={{
+                  color: "red",
+                  margin: "5px 0 0 5px",
+                }}
+              >
+                {emailMessage}
+              </p>
             </div>
             <div className="password-container">
               <input
@@ -154,7 +159,14 @@ function Login() {
                 height={24}
                 onClick={togglePasswordVisibility}
               />
-              <span>{passwordMessage}</span>
+              <p
+                style={{
+                  color: "red",
+                  margin: "5px 0 0 5px",
+                }}
+              >
+                {passwordMessage}
+              </p>
             </div>
             <a href="">Forgot password?</a>
           </div>

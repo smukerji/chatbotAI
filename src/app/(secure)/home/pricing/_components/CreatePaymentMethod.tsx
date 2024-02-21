@@ -68,7 +68,7 @@ export default function CreatePaymentMethod({ setStatus, plan, price }: any) {
       }
       else{
         setStatus(1);
-        message.error("invalid card details")
+        message.error("Finding error while making payment with this card, please check your card details")
       }
     } catch (error) {
       message.error(`${error}`);
