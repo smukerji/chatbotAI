@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "node initializeDb.js && node cron.js && next dev",
+    "dev": "concurrently \"node initializeDb.js\" \"next dev\" \"node cron.js\"",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -24,6 +24,7 @@
     "antd": "^5.10.1",
     "axios": "^1.4.0",
     "bcrypt": "^5.1.1",
+    "cron": "^3.1.6",
     "csv-parser": "^3.0.0",
     "dotenv": "^16.4.1",
     "eslint": "8.46.0",
@@ -65,6 +66,7 @@
     "@types/js-cookie": "^3.0.3",
     "@types/jsonwebtoken": "^9.0.2",
     "@types/uuid": "^9.0.2",
+    "concurrently": "^8.2.2",
     "encoding": "^0.1.13",
     "sass": "^1.69.5"
   }

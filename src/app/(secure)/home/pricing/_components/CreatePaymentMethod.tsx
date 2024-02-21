@@ -18,13 +18,13 @@ import "../../pricing/stripe.scss";
 import { useCookies } from "react-cookie";
 import { message } from "antd";
 
-export default function createPaymentMethod({ setStatus, plan , price }: any) {
+export default function CreatePaymentMethod({ setStatus, plan, price }: any) {
   const stripe = useStripe();
   const elements: any = useElements();
   const [error, setError] = useState(null);
   const router = useRouter();
   const [cookies, setCookie] = useCookies(["userId"]);
-  console.log(price)
+  console.log(price);
   const handleSubmit = async (event: any) => {
     event.preventDefault();
 
@@ -36,31 +36,44 @@ export default function createPaymentMethod({ setStatus, plan , price }: any) {
     const cardCvc: any = elements.getElement(CardCvcElement);
     const cardExpiry: any = elements.getElement(CardExpiryElement);
 
-    const u_id:any = cookies.userId;
+    const u_id: any = cookies.userId;
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/getCustomer`,
         {
-          u_id: u_id
+          u_id: u_id,
         }
       );
       console.log("Payment method created:", response);
-
+    } catch {
+      message.error("error while getting customer data");
+      setStatus(1);
+      throw error;
+    }
+    try {
       const paymentMethod = await stripe.createPaymentMethod({
         type: "card",
         card: cardNumber,
       });
       console.log(paymentMethod.paymentMethod?.id);
       const id: any = paymentMethod.paymentMethod?.id;
+      if(paymentMethod.paymentMethod?.id){
 
-      const update = await axios.post(
-        `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/updatePaymentMethod`,
-        { paymentId: paymentMethod.paymentMethod?.id ,u_id:u_id}
-      );
-      setStatus(0);
+        const update = await axios.post(
+          `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/updatePaymentMethod`,
+        { paymentId: paymentMethod.paymentMethod?.id, u_id: u_id }
+        );
+        console.log("...................>>>>>>>>>>>>>>>>>>>>>>>>",update)
+        setStatus(0);
+      }
+      else{
+        setStatus(1);
+        message.error("invalid card details")
+      }
     } catch (error) {
       message.error(`${error}`);
-      console.error("Error creating payment method:", error);
+      console.error("Error creating payment method:");
+      throw error;
     }
   };
 

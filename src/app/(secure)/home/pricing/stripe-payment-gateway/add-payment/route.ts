@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { connectDatabase } from "@/db";
 import Stripe from "stripe";
 import { ObjectId } from "mongodb";
-const stripe = new Stripe(String(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY));
 
 export async function POST(req: any, res: NextResponse) {
   if (req.method === "POST") {
@@ -12,16 +11,25 @@ export async function POST(req: any, res: NextResponse) {
 
       //ANCHOR - Get data of user by user_id
       const collection = db.collection("users");
+      const userData = await collection.findOne({ _id: new ObjectId(u_id) });
       let plan_name = null;
+
+      //ANCHOR - plan name initialized
       if (plan == 1) {
         plan_name = "Individual Plan";
       } else {
         plan_name = "Agency Plan";
       }
+
+      //ANCHOR - getting plan details
       const collectionPlan = db.collection("plans");
-      const plan_data = await collectionPlan.findOne({name: plan_name})
-      console.log(plan_data)
-      const currentDate = new Date();
+      const plan_data = await collectionPlan.findOne({ name: plan_name });
+      let currentDate = null;
+      if (userData?.startDate != null) {
+        currentDate = userData.startDate;
+      } else {
+        currentDate = new Date();
+      }
       if (duration == "month") {
         const endDate = new Date(
           currentDate.getTime() + 30 * 24 * 60 * 60 * 1000
@@ -36,6 +44,9 @@ export async function POST(req: any, res: NextResponse) {
               endDate: endDate,
               duration: duration,
               planId: plan_data?._id,
+              nextPlan: plan_name,
+              nextPlanId: plan_data?._id,
+              nextPlanDuration: duration
             },
           }
         );
@@ -53,31 +64,22 @@ export async function POST(req: any, res: NextResponse) {
               plan: plan_name,
               startDate: currentDate,
               endDate: endDate,
-              duration: duration
+              duration: duration,
+              planId: plan_data?._id,
+              nextPlan: plan_name,
+              nextPlanId: plan_data?._id,
+              nextPlanDuration: duration
             },
           }
         );
 
         return NextResponse.json(data);
       }
-
-      //   //ANCHOR - update data of user
-      //   const data = await collection.updateMany({ _id: new ObjectId(u_id) },{
-      //     $set:{
-      //         plan: plan_name,
-      //         startDate: currentDate, // Add current date to documents
-      //         endDate: endDate
-      // }
-      //   });
-
-      //   return NextResponse.json(data);
     } catch (error) {
       console.error(error);
-      // res.status(500).json({ error: 'Unable to create subscription' });
+      return NextResponse.json(error);
     }
   } else {
-    // res.setHeader('Allow', ['POST']);
-    // res.status(405).end('Method Not Allowed');
     console.log("error");
   }
 }

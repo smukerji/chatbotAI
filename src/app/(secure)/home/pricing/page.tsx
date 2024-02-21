@@ -1,6 +1,5 @@
 "use client";
 
-// import CheckoutForm from "./_components/CheckoutForm";
 import React, { useState, useEffect, useDebugValue } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
@@ -14,7 +13,6 @@ import zoho from "../../../../../public/Rectangle 159.png";
 import whatsapp from "../../../../../public/whatsapp.png";
 import telegram from "../../../../../public/telegram.png";
 import hubspot from "../../../../../public/hubspot.png";
-import { Spinner } from "@nextui-org/react";
 import { useCookies } from "react-cookie";
 import { message } from "antd";
 import Loader from "./_components/Loader";
@@ -33,31 +31,33 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [cookies, setCookie] = useCookies(["userId"]);
   const [prePrice, setPrePrice] = useState(0);
+  const [disableMonth, setDisableMonth] = useState(false);
 
   const u_id: any = cookies.userId;
 
   const makePayment = async () => {
     try {
-      setLoading(true);
+      // setLoading(true);
+
+      //ANCHOR - getting details of user payment-method
       const response = await axios.post(
-        `http://localhost:3000/home/pricing/stripe-payment-gateway/getPlanDetails`,
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/getPlanDetails`,
         { u_id: u_id }
       );
 
       if (response.data?.status == 500) {
         setStatus(1);
-        // message.success('This is a success message')
       } else {
         setStatus(0);
-        //  message.error('This is a error msg')
       }
-      setLoading(false);
+      // setLoading(false);
     } catch (error) {
       message.error(`${error}`);
     }
   };
   const getPlanDetails = async () => {
     try {
+      //ANCHOR - getting all plans details
       const planDetails = await axios.get(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/getPlanDetails`
       );
@@ -66,19 +66,21 @@ export default function Home() {
     }
   };
   const checkPlan = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
+      //ANCHOR - Checking existing plan details
       const checkPlan = await axios.put(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway`,
         { u_id: u_id }
       );
-      console.log(checkPlan);
       if (checkPlan.data.msg == 2) {
         setEnableOne(true);
         setEnableTwo(true);
       } else if (checkPlan.data.msg == 1) {
-        console.log(checkPlan.data.prePrice, checkPlan.data.msg);
         setPrePrice(checkPlan.data.prePrice);
+        if (checkPlan.data.duration == "year") {
+          setDisableMonth(true);
+        }
         setEnableOne(true);
       }
     } catch (error) {
@@ -86,17 +88,15 @@ export default function Home() {
     }
     setLoading(false);
   };
+
   const handleSubmit = async () => {
-    // const retrievedCookieData = cookies.getdata(userId);
+    setLoading(true);
     const stripe = await loadStripe(
       String(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY)
     );
-    // event.preventDefault();
     if (!stripe) {
       return;
     }
-    // setLoading(true)
-    console.log(plan);
     let duration = null;
     if (isYearlyPlan) {
       duration = "year";
@@ -104,33 +104,45 @@ export default function Home() {
       duration = "month";
     }
     try {
+      //ANCHOR - api call to create paymentIntent
       const result = await axios.post(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway`,
         { plan: plan, price: price, u_id: u_id }
       );
+
+      //ANCHOR - payment confirmation
+      const r = stripe.confirmPayment({
+        clientSecret: result.data.client_secret,
+        confirmParams: {
+          return_url: `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/success`,
+        },
+      });
     } catch (error) {
-      message.error(`${error}`);
+      message.error(`Error while creating payment intent`);
     }
     try {
+      //ANCHOR - adding data to backend
+      // setLoading(true);
       const a = await axios.post(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/add-payment`,
         { plan: plan, duration: duration, u_id: u_id }
       );
       message.success("success");
-      setLoading(false);
     } catch (error) {
-      message.error(`${error}`);
+      message.error(`error while adding data to backend`);
     }
+    setLoading(false);
   };
   useEffect(() => {
-    checkPlan();
-    if (plan == 1 || plan == 2) {
-      console.log(plan);
-      makePayment();
-    }
-    if (status == 0) {
-      console.log("checkout");
-      handleSubmit();
+    if(cookies.userId){
+
+      checkPlan();
+      if (plan == 1 || plan == 2) {
+        makePayment();
+      }
+      if (status == 0) {
+        handleSubmit();
+      }
     }
   }, [plan, status]);
 
@@ -177,8 +189,8 @@ export default function Home() {
               setPrice={setPrice}
               price={isYearlyPlan ? 854 : 89}
               enableTwo={enableTwo}
-              // enableOne={enableOne}
               prePrice={prePrice}
+              disableMonth={isYearlyPlan ? false : disableMonth}
             />
           </div>
           <div className="add-ons-container">

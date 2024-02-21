@@ -7,10 +7,10 @@ const stripe = new Stripe(String(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY));
 export async function POST(req: any, res: NextResponse) {
   if (req.method === "POST") {
     try {
-      let { paymentId ,u_id} = await req.json();
+      let { paymentId, u_id } = await req.json();
       const db = (await connectDatabase())?.db();
       const collection = db.collection("users");
-      
+
       //ANCHOR - Get data of user by user_id
       const data = await collection.findOne({ _id: new ObjectId(u_id) });
 
@@ -41,11 +41,10 @@ export async function POST(req: any, res: NextResponse) {
       return NextResponse.json(result);
     } catch (error) {
       console.error(error);
-      // res.status(500).json({ error: 'Unable to create subscription' });
+      return NextResponse.json(error);
     }
   } else {
-    // res.setHeader('Allow', ['POST']);
-    // res.status(405).end('Method Not Allowed');
     console.log("error");
+    return NextResponse.json("invalid method");
   }
 }

@@ -9,15 +9,16 @@ import unTickCircle from '../../../../../../public/svgs/tick-circle -blue.svg';
 import line from '../../../../../../public/svgs/Vector 2189.svg';
 import { number } from 'joi';
 
-export default function PlanTwo({ setPlan, enableTwo, price ,setPrice, prePrice}: any) {
+export default function PlanTwo({ setPlan, enableTwo, price ,setPrice, prePrice, disableMonth}: any) {
   const { status } = useSession();
   const router = useRouter();
 
   const changePlan = async () => {
+    if (status === 'authenticated') {
       setPrice(Number(price) - Number(prePrice))
       console.log(prePrice)
       setPlan(2);
-   
+    }
 
     // setStatus()
   };
@@ -39,7 +40,7 @@ export default function PlanTwo({ setPlan, enableTwo, price ,setPrice, prePrice}
         </div>
       </div>
       <div className="plan-container-list">
-        <button className="pay-btn" onClick={changePlan} disabled={enableTwo} title={enableTwo ? "Already have maximum plan" : undefined}>
+        <button className="pay-btn" onClick={changePlan} disabled={enableTwo || disableMonth} title={enableTwo ? "Already have maximum plan" : undefined}>
           <span className="btn-text">Get Started</span>
         </button>
         <div className="plan-details">

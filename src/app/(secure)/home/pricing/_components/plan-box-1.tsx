@@ -7,16 +7,21 @@ import { useRouter } from 'next/navigation';
 import tickCircle from '../../../../../../public/svgs/tick-circle.svg';
 import unTickCircle from '../../../../../../public/svgs/untick-circle.svg';
 import line from '../../../../../../public/svgs/Vector 2189.svg';
+import { useCookies } from "react-cookie";
 
 export default function PlanOne({ setPlan,setPrice, price ,enableOne}: any) {
-  console.log(enableOne)
   const { status } = useSession();
   const router = useRouter();
-
+  const [cookies, setCookie] = useCookies(["userId"]);
+  console.log(cookies)
   const changePlan = async () => {
-    // if (status === 'authenticated') {
+    if (cookies?.userId) {
       setPrice(price);
       setPlan(1);
+    }
+    else{
+      router.push('/account/login');
+    }
   };
   return (
     <div className="plan-box">

@@ -501,15 +501,15 @@
   right: 0;
   bottom: 0;
   z-index: 10;
-  background: linear-gradient(
-    180deg,
-    rgba(80, 85, 95, 0.27) 0%,
-    rgba(30, 30, 31, 0.58) 100%
-  );
+  // background: linear-gradient(
+  //   180deg,
+  //   rgba(255, 255, 255) 0%,
+  //   rgba(255, 255, 255) 100%
+  // );
 }
 .ant-spin-dot {
   .ant-spin-dot-item {
-    background-color: #3d3329;
+    background-color: #2e58ea;
     height: 30px;
     width: 30px;
     // padding: 20px;

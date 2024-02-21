@@ -1,6 +1,6 @@
 // const { connectDatabase } = require("./src/db.js");
 const { MongoClient } = require("mongodb");
-require("dotenv").config({path:".env.local"});
+require("dotenv").config({ path: ".env.local" });
 
 const uri = process.env.NEXT_PUBLIC_MONGO_URI;
 
@@ -14,7 +14,6 @@ async function initializeDb() {
 
   /// update/insert starter plan
   await planCollection.updateOne(
-
     { name: "Individual Plan" },
     {
       $set: {
@@ -25,12 +24,10 @@ async function initializeDb() {
         websiteCrawlingLimit: 10,
       },
     },
-    
+
     { upsert: true }
-  
   );
   await planCollection.updateOne(
-
     { name: "Agency Plan" },
     {
       $set: {
@@ -41,21 +38,7 @@ async function initializeDb() {
         websiteCrawlingLimit: 20,
       },
     },
-    
-    { upsert: true }
-  
-  );
 
-  /// get the starter plan ID
-  const starterPlan = await db.collection("plans").findOne({ name: "starter" });
-  /// set the default plan Id for each user
-  await userColection.updateMany(
-    {},
-    {
-      $set: {
-        planId: starterPlan?._id,
-      },
-    },
     { upsert: true }
   );
 
