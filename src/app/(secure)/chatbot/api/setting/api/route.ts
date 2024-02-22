@@ -80,7 +80,6 @@ async function retriveChatbotSettings(request: NextRequest) {
   const moreThanSevenDayInMillis = 24 * 60 * 60 * 1000 * 7;
   data?.forEach((obj: any) => {
     const date: any = new Date(obj.date.replace(/\//g, "-"));
-    console.log(new Date(date), new Date(todaysDate), yesterDayInMillis);
 
     // Calculate the difference in milliseconds
     const timeDiff = Math.abs(date - todaysDate);
@@ -93,8 +92,11 @@ async function retriveChatbotSettings(request: NextRequest) {
     else if (timeDiff > yesterDayInMillis)
       lastSevenDay["chats"] = { ...lastSevenDay["chats"], ...obj.chats };
     /// get more than last 7 days chat conversation
-    else if (timeDiff == moreThanSevenDayInMillis)
-      moreThanLastSevenDay = { ...obj };
+    else if (timeDiff > sevenDayInMillis)
+      moreThanLastSevenDay["chats"] = {
+        ...moreThanLastSevenDay["chats"],
+        ...obj.chats,
+      };
   });
 
   return {

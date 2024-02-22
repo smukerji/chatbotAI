@@ -36,20 +36,42 @@ const authOptions: NextAuthOptions = {
 
       const username: string[] = message.user.name?.split(" ")!;
 
-      /// insert in users table too
-      await db.collection("users").updateOne(
-        { _id: new ObjectId(message.user.id) },
-        {
-          $set: {
-            planId: starterPlan?._id,
-            username:
-              username[0] + `${username?.[1] ? "_" + username?.[1] : ""}`,
+      /// Check if planId is not already set
+      const user = await db
+        .collection("users")
+        .findOne({ _id: new ObjectId(message.user.id) });
+
+      if (!user.planId) {
+        /// insert in users table too
+        await db.collection("users").updateOne(
+          { _id: new ObjectId(message.user.id) },
+          {
+            $set: {
+              planId: starterPlan?._id,
+              username:
+                username[0] + `${username?.[1] ? "_" + username?.[1] : ""}`,
+            },
           },
-        },
-        {
-          upsert: true,
-        }
-      );
+          {
+            upsert: true,
+          }
+        );
+      }
+
+      const userId = message.user.id;
+      /// set the user details
+      // Check if a document with the given userId already exists
+      const existingUser = await db
+        .collection("user-details")
+        .findOne({ userId: userId });
+
+      // If no document exists for the given userId, insert a new one
+      if (!existingUser) {
+        await db.collection("user-details").insertOne({
+          userId: userId,
+          totalMessageCount: 0,
+        });
+      }
     },
   },
 

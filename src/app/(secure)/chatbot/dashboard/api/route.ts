@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDatabase } from "../../../../../db";
 import { apiHandler } from "../../../../_helpers/server/api/api-handler";
+import joi from "joi";
 
 module.exports = apiHandler({
   POST: dataSources,
@@ -101,3 +102,9 @@ async function getChatBotSettings(request: NextRequest) {
 
   return { chatbotSetting };
 }
+
+getChatBotSettings.schema = joi.object({
+  chatbotId: joi.string().required(),
+  userId: joi.string().required(),
+  // email: joi.string().required(),
+});
