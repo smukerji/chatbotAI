@@ -1,43 +1,35 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, useDebugValue } from "react";
-import { loadStripe } from "@stripe/stripe-js";
-import { Elements } from "@stripe/react-stripe-js";
-import axios from "axios";
-import CreatePaymentMethod from "./_components/CreatePaymentMethod";
-import "../pricing/stripe.scss";
-import Image from "next/image";
-import PlanOne from "./_components/plan-box-1";
-import PlanTwo from "./_components/plan-box-2";
-import zoho from "../../../../../public/Rectangle 159.png";
-import whatsapp from "../../../../../public/whatsapp.png";
-import telegram from "../../../../../public/telegram.png";
-import hubspot from "../../../../../public/hubspot.png";
-import { useCookies } from "react-cookie";
-import { message } from "antd";
-import Loader from "./_components/Loader";
-
-const stripePromise = loadStripe(
-  String(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY)
-);
+import React, { useState, useEffect, useDebugValue } from 'react';
+import axios from 'axios';
+import CreatePaymentMethod from './_components/CreatePaymentMethod';
+import '../pricing/stripe.scss';
+import Image from 'next/image';
+import PlanOne from './_components/plan-box-1';
+import PlanTwo from './_components/plan-box-2';
+import zoho from '../../../../../public/Rectangle 159.png';
+import whatsapp from '../../../../../public/whatsapp.png';
+import telegram from '../../../../../public/telegram.png';
+import hubspot from '../../../../../public/hubspot.png';
+import { useCookies } from 'react-cookie';
+import { message } from 'antd';
+import Loader from './_components/Loader';
 
 export default function Home() {
   const [status, setStatus] = useState<number>(2);
   const [plan, setPlan] = useState(0);
   const [enableOne, setEnableOne] = useState(false);
-  const [enableTwo, setEnableTwo] = useState(false);
   const [isYearlyPlan, setIsYearlyPlan] = useState(false);
   const [price, setPrice] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [cookies, setCookie] = useCookies(["userId"]);
+  const [loading, setLoading] = useState(true);
+  const [cookies, setCookie] = useCookies(['userId']);
   const [prePrice, setPrePrice] = useState(0);
-  const [disableMonth, setDisableMonth] = useState(false);
 
   const u_id: any = cookies.userId;
 
   const makePayment = async () => {
     try {
-      // setLoading(true);
+      setLoading(true);
 
       //ANCHOR - getting details of user payment-method
       const response = await axios.post(
@@ -50,7 +42,7 @@ export default function Home() {
       } else {
         setStatus(0);
       }
-      // setLoading(false);
+      setLoading(false);
     } catch (error) {
       message.error(`${error}`);
     }
@@ -66,86 +58,34 @@ export default function Home() {
     }
   };
   const checkPlan = async () => {
-    // setLoading(true);
     try {
+      setLoading(true)
       //ANCHOR - Checking existing plan details
       const checkPlan = await axios.put(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway`,
         { u_id: u_id }
       );
-      if (checkPlan.data.msg == 2) {
-        setEnableOne(true);
-        setEnableTwo(true);
-      } else if (checkPlan.data.msg == 1) {
+      if (checkPlan.data.msg == 1) {
         setPrePrice(checkPlan.data.prePrice);
-        if (checkPlan.data.duration == "year") {
-          setDisableMonth(true);
-        }
         setEnableOne(true);
       }
     } catch (error) {
       message.error(`${error}`);
     }
-    // setLoading(false);
+    setLoading(false)
   };
 
-  const handleSubmit = async () => {
-    setLoading(true);
-    const stripe = await loadStripe(
-      String(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY)
-    );
-    if (!stripe) {
-      return;
-    }
-    let duration = null;
-    if (isYearlyPlan) {
-      duration = "year";
-    } else {
-      duration = "month";
-    }
-    try {
-      //ANCHOR - api call to create paymentIntent
-      const result = await axios.post(
-        `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway`,
-        { plan: plan, price: price, u_id: u_id }
-      );
-
-      //ANCHOR - payment confirmation
-      const r = stripe.confirmPayment({
-        clientSecret: result.data.client_secret,
-        confirmParams: {
-          return_url: `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/success`,
-        },
-      });
-    } catch (error) {
-      message.error(`Error while creating payment intent`);
-    }
-    try {
-      //ANCHOR - adding data to backend
-      // setLoading(true);
-      const a = await axios.post(
-        `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/add-payment`,
-        { plan: plan, duration: duration, u_id: u_id }
-      );
-      message.success("success");
-    } catch (error) {
-      message.error(`error while adding data to backend`);
-    }
-    setLoading(false);
-  };
   useEffect(() => {
-    // setLoading(true)
-    if(cookies.userId){
-
+    if (cookies.userId) {
+      setLoading(true)
       checkPlan();
       if (plan == 1 || plan == 2) {
         makePayment();
       }
-      if (status == 0) {
-        handleSubmit();
-      }
     }
-    // setLoading(false)
+    else{
+      setLoading(false)
+    }
   }, [plan, status]);
 
   const handlePlanType = () => {
@@ -165,13 +105,13 @@ export default function Home() {
           </div>
           <div className="plan-tab-container">
             <button
-              className={`plan-type ${!isYearlyPlan && "active"}`}
+              className={`plan-type ${!isYearlyPlan && 'active'}`}
               onClick={handlePlanType}
             >
               Monthly
             </button>
             <button
-              className={`plan-type ${isYearlyPlan && "active"}`}
+              className={`plan-type ${isYearlyPlan && 'active'}`}
               onClick={handlePlanType}
             >
               Yearly
@@ -190,9 +130,9 @@ export default function Home() {
               setPlan={setPlan}
               setPrice={setPrice}
               price={isYearlyPlan ? 854 : 89}
-              enableTwo={enableTwo}
+              // enableTwo={true}
               prePrice={prePrice}
-              disableMonth={isYearlyPlan ? false : disableMonth}
+              // disableMonth={isYearlyPlan ? false : disableMonth}
             />
           </div>
           <div className="add-ons-container">
@@ -273,15 +213,6 @@ export default function Home() {
           </div>
         </div>
       )}
-      <Elements stripe={stripePromise}>
-        {status === 1 && loading == false &&(
-          <CreatePaymentMethod
-            setStatus={setStatus}
-            plan={plan}
-            price={price}
-          />
-        )}
-      </Elements>
     </>
   );
 }

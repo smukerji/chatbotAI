@@ -2,9 +2,15 @@ import { NextResponse } from "next/server";
 import { connectDatabase } from "@/db";
 import { Stripe as s } from "stripe";
 import { ObjectId } from "mongodb";
+import { apiHandler } from "@/app/_helpers/server/api/api-handler";
 const stripe = new s(String(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY));
 
-export async function POST(req: any, res: NextResponse) {
+module.exports = apiHandler({
+  POST: createPaymentIntent,
+  PUT: checkCurrentPlan
+});
+
+async function createPaymentIntent(req: any, res: NextResponse) {
   if (req.method === "POST") {
     try {
       const db = (await connectDatabase())?.db();
@@ -36,43 +42,33 @@ export async function POST(req: any, res: NextResponse) {
           receipt_email: data.email,
         });
 
-        return NextResponse.json(paymentIntent);
+        return paymentIntent;
       } else {
-        return NextResponse.json({ status: 500 });
+        return { status: 500 };
       }
     } catch (error) {
       console.error(error);
-      return NextResponse.json(error);
+      return error;
     }
   } else {
     console.log("error");
   }
 }
 
-export async function PUT(req: any, res: NextResponse) {
+async function checkCurrentPlan(req: any, res: NextResponse) {
   let { u_id } = await req.json();
   const db = (await connectDatabase())?.db();
   const collection = db.collection("users");
   const data = await collection.findOne({ _id: new ObjectId(u_id) });
-
+  let currentDate = new Date()
   //ANCHOR - check current plan of the user
-  if (data.plan == "Agency Plan") {
-    return NextResponse.json({ msg: 2 });
-  } else if (data.plan == "Individual Plan") {
-    if (data.duration == "month") {
+if (data.endDate > currentDate) {
       return NextResponse.json({
         msg: 1,
         prePrice: 15,
         duration: data.duration,
       });
-    } else {
-      return NextResponse.json({
-        msg: 1,
-        prePrice: 144,
-        duration: data.duration,
-      });
-    }
   } else {
-    return NextResponse.json({ msg: 0 });
+    return { msg: 0 };
   }
 }

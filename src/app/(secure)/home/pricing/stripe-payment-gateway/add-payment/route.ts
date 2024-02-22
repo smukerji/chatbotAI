@@ -2,8 +2,13 @@ import { NextResponse } from "next/server";
 import { connectDatabase } from "@/db";
 import Stripe from "stripe";
 import { ObjectId } from "mongodb";
+import { apiHandler } from "@/app/_helpers/server/api/api-handler";
 
-export async function POST(req: any, res: NextResponse) {
+module.exports = apiHandler({
+  POST: addPaymentDetails,
+});
+
+async function addPaymentDetails(req: any, res: NextResponse) {
   if (req.method === "POST") {
     try {
       let { plan, u_id, duration } = await req.json();
@@ -46,12 +51,12 @@ export async function POST(req: any, res: NextResponse) {
               planId: plan_data?._id,
               nextPlan: plan_name,
               nextPlanId: plan_data?._id,
-              nextPlanDuration: duration
+              nextPlanDuration: duration,
             },
           }
         );
 
-        return NextResponse.json(data);
+        return data;
       } else {
         const endDate = new Date(
           currentDate.getTime() + 365 * 24 * 60 * 60 * 1000
@@ -68,16 +73,16 @@ export async function POST(req: any, res: NextResponse) {
               planId: plan_data?._id,
               nextPlan: plan_name,
               nextPlanId: plan_data?._id,
-              nextPlanDuration: duration
+              nextPlanDuration: duration,
             },
           }
         );
 
-        return NextResponse.json(data);
+        return data;
       }
     } catch (error) {
       console.error(error);
-      return NextResponse.json(error);
+      return error;
     }
   } else {
     console.log("error");

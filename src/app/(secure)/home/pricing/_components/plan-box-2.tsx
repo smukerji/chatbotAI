@@ -40,8 +40,8 @@ export default function PlanTwo({ setPlan, enableTwo, price ,setPrice, prePrice,
         </div>
       </div>
       <div className="plan-container-list">
-        <button className="pay-btn" onClick={changePlan} disabled={enableTwo || disableMonth} title={enableTwo ? "Already have maximum plan" : undefined}>
-          <span className="btn-text">Get Started</span>
+        <button className="pay-btn" disabled={true}>
+          <span className="btn-text">Coming soon ...</span>
         </button>
         <div className="plan-details">
           <div className="plan-item">
@@ -155,53 +155,53 @@ export default function PlanTwo({ setPlan, enableTwo, price ,setPrice, prePrice,
             </span>
           </div>
           <div className="plan-item">
-            <Image src={unTickCircle} alt="no-svg" />
+            <Image src={tickCircle} alt="no-svg" />
             <span className="plan-text plan-text-even">
               Multilingual Support with Auto Translation
             </span>
           </div>
           <div className="plan-item">
-            <Image src={unTickCircle} alt="no-svg" />
+            <Image src={tickCircle} alt="no-svg" />
             <span className="plan-text plan-text-even">
               Affliliation/API Access
             </span>
           </div>
           <div className="plan-item">
-            <Image src={unTickCircle} alt="no-svg" />
+            <Image src={tickCircle} alt="no-svg" />
             <span className="plan-text plan-text-even">Remove Branding</span>
           </div>
           <div className="plan-item">
-            <Image src={unTickCircle} alt="no-svg" />
+            <Image src={tickCircle} alt="no-svg" />
             <span className="plan-text plan-text-even">Duplicate Bots</span>
           </div>
           <div className="plan-item">
-            <Image src={unTickCircle} alt="no-svg" />
+            <Image src={tickCircle} alt="no-svg" />
             <span className="plan-text plan-text-even">
               Share & Delete Bots
             </span>
           </div>
           <div className="plan-item">
-            <Image src={unTickCircle} alt="no-svg" />
+            <Image src={tickCircle} alt="no-svg" />
             <span className="plan-text plan-text-even">Role Based Access</span>
           </div>
           <div className="plan-item">
-            <Image src={unTickCircle} alt="no-svg" />
+            <Image src={tickCircle} alt="no-svg" />
             <span className="plan-text plan-text-even">Team Collaboration</span>
           </div>
           <div className="plan-item">
-            <Image src={unTickCircle} alt="no-svg" />
+            <Image src={tickCircle} alt="no-svg" />
             <span className="plan-text plan-text-even">
               Organizing Data Sources into Folder
             </span>
           </div>
           <div className="plan-item">
-            <Image src={unTickCircle} alt="no-svg" />
+            <Image src={tickCircle} alt="no-svg" />
             <span className="plan-text plan-text-even">
               Content Summarization
             </span>
           </div>
           <div className="plan-item">
-            <Image src={unTickCircle} alt="no-svg" />
+            <Image src={tickCircle} alt="no-svg" />
             <span className="plan-text plan-text-even">Chrome Extension</span>
           </div>
         </div>

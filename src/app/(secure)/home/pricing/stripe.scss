@@ -253,7 +253,15 @@
         }
         .pay-btn:disabled {
           cursor: not-allowed;
-          background-color: #bacaf1; /* Change cursor style when button is disabled */
+          background-color: #ffffff; /* Change cursor style when button is disabled */
+        }
+        .plan1:disabled {
+          cursor: not-allowed;
+          background-color: #000000;
+          border-color: black;
+          .btn-text {
+            color: white;
+          }
         }
         .plan-details {
           display: flex;
@@ -382,7 +390,7 @@
         align-self: stretch;
         .left-head-text {
           color: var(--Neutral-8, #141416);
-          font-family: 'General Sans';
+          font-family: sans-serif;
           font-size: 48px;
           font-style: normal;
           font-weight: 600;
@@ -391,7 +399,7 @@
       }
       .left-text {
         color: var(--Neutral-5, #777e90);
-        font-family: 'General Sans';
+        font-family: sans-serif;
         font-size: 20px;
         font-style: normal;
         font-weight: 500;
@@ -410,85 +418,170 @@
   width: fit-content;
   margin: 200px auto 0px auto;
 }
-.cardElementForm {
-  // border: 2px solid black;
-  width: 50%;
-  display: flex;
-  // flex-direction: raw;
-  margin: 20px auto 0px auto;
-  padding: 20px;
-  border: 1px solid #2e58ea;
-  border-radius: 20px;
-  .left {
-    width: 35%;
-    color: white;
-    align-items: center;
-    justify-content: center;
-    display: flex;
-    flex-direction: column;
-    background-color: #2e58ea;
-    border-radius: 20px;
-
-    h2{
-      text-align: center;
-    }
-
-    span{
-      margin-top: 15px;
-      font-size: 25px;
-      font-weight: 600;
-    }
+.card-main {
+  .card-head {
+    width: 40%;
+    margin: auto;
+    color: var(--Neutral-8, #141416);
+    font-family: sans-serif;
+    font-size: 36px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 44px;
   }
-  .right {
-    width: 65%;
+  .cardElementForm {
+    width: 40%;
     display: flex;
-    flex-direction: column;
-    padding-left: 25px;
-    .card-element {
-      .cardNumber {
-        padding: 12px 15px;
-        margin-bottom: 15px;
-        border: 1px solid rgb(77, 77, 77);
-        border-radius: 10px;
-      }
-      .cardExpiry {
-        padding: 12px 15px;
-        margin-bottom: 15px;
-        border: 1px solid rgb(77, 77, 77);
-        border-radius: 10px;
-      }
-      .cardCvc {
-        padding: 12px 15px;
-        margin-bottom: 20px;
-        border: 1px solid rgb(77, 77, 77);
-        border-radius: 10px;
-      }
-      
-    }
-    .card-label{
-      padding: 5px;
-      margin-bottom: 10px;
-      line-height: 25px;
-    }
-    .btn-card-submit{
-      padding: 12px ;
-      border: none;
-      border-radius: 10px;
+    margin: 20px auto 0px auto;
+    .left {
+      width: 50%;
       color: white;
-      font-size: 18px;
-      font-weight: 600;
+      display: flex;
+      flex-direction: column;
       background-color: #2e58ea;
+      border-radius: 20px;
+      padding: 24px;
+      align-items: flex-start;
+      gap: 22px;
+      flex-shrink: 0;
+      height: 700px;
+      .top-left {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+        align-self: stretch;
 
+        .plan-name {
+          color: var(--Neutral-1, #fcfcfd);
+          text-align: center;
+          font-family: sans-serif;
+          font-size: 24px;
+          font-style: normal;
+          font-weight: 600;
+          line-height: 32px;
+        }
+        .price {
+          display: flex;
+          align-items: baseline;
+          gap: 12px;
+
+          span {
+            color: var(--Neutral-1, #fcfcfd);
+            text-align: center;
+            font-family: sans-serif;
+            font-size: 48px;
+            font-style: normal;
+            font-weight: 600;
+            line-height: 68px;
+          }
+          .price-duration {
+            color: var(--Primary-4, #99aef9);
+            text-align: center;
+            font-family: sans-serif;
+            font-size: 20px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 28px;
+          }
+        }
+      }
+      .bottom-left {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        align-self: stretch;
+        .total {
+          color: var(--Primary-3, #ccd7fc);
+          text-align: center;
+          font-family: sans-serif;
+          font-size: 20px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 28px;
+        }
+        .total-price {
+          color: var(--Neutral-1, #fcfcfd);
+          text-align: center;
+          font-family: sans-serif;
+          font-size: 24px;
+          font-style: normal;
+          font-weight: 600;
+          line-height: 32px;
+        }
+      }
     }
+    .right {
+      width: 50%;
+      display: flex;
+      flex-direction: column;
+      padding-left: 25px;
+      .right-top {
+        color: var(--Neutral-8, #141416);
+        font-family: sans-serif;
+        font-size: 24px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 32px;
+      }
+      .card-element {
+        display: flex;
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-top: 33px;
+        .cardNumber {
+          width: 100%;
+          padding: 12px 16px;
+          margin-bottom: 24px;
+          border-radius: 12px;
+          border: 1px solid var(--Neutral-3, #e6e8ec);
+          background: #fff;
+        }
+        .cardExpiry {
+          width: 100%;
+          padding: 12px 16px;
+          margin-bottom: 24px;
+          border-radius: 12px;
+          border: 1px solid var(--Neutral-3, #e6e8ec);
+          background: #fff;
+        }
+        .cardCvc {
+          width: 100%;
+          padding: 12px 16px;
+          border-radius: 12px;
+          border: 1px solid var(--Neutral-3, #e6e8ec);
+          background: #fff;
+        }
+      }
+      .card-label {
+        color: var(--Neutral-6, #353945);
+        text-align: center;
+        font-family: sans-serif;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 24px;
+      }
+      .btn-card-submit {
+        margin-top: 40px;
+        padding: 12px 16px;
+        color: white;
+        justify-content: center;
+        align-items: center;
+        border: none;
+        border-radius: 16px;
+        background: var(--Primary-6, #335df3);
+      }
 
-    // padding-bottom: 30px;
+      // padding-bottom: 30px;
+    }
   }
 }
 
-
-@media screen and (min-width : 1400px){
-  .cardElementForm{
-    width : 35%
+@media screen and (min-width: 1400px) {
+  .cardElementForm {
+    width: 35%;
   }
 }
 .example {

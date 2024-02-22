@@ -1,0 +1,153 @@
+.billing-main {
+  width: 55%;
+  margin: 20px auto;
+  .billing-head {
+    color: var(--Neutral-8, #141416);
+    font-family: sans-serif;
+    font-size: 30px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 40px;
+  }
+  .message-count {
+    margin-top: 40px;
+    display: flex;
+    width: 376px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 16px;
+    .message-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      align-self: stretch;
+      .message-head-text {
+        color: var(--Neutral-8, #141416);
+        font-family: sans-serif;
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 28px;
+      }
+      .message-head-count {
+        .message-head-count-used {
+          color: var(--Neutral-8, #141416);
+          font-family: sans-serif;
+          font-size: 20px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 28px;
+        }
+        .message-head-count-limit {
+          color: var(--Neutral-5, #777e90);
+          font-family: sans-serif;
+          font-size: 20px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 28px;
+        }
+      }
+    }
+  }
+  .plan-head {
+    color: var(--Neutral-8, #141416);
+    font-family: sans-serif;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 32px;
+  }
+  .plan-details {
+    display: flex;
+    width: 792px;
+    padding: 16px 24px;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 16px;
+    border: 1px solid var(--Primary-7, #2e58ea);
+    background: var(--Neutral-1, #fcfcfd);
+    .name-features {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+      .plan-name {
+        color: var(--Neutral-8, #141416);
+
+        /* Subtitle/Large */
+        font-family: sans-serif;
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 28px; /* 140% */
+      }
+      .plan-feature {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        .plan-message {
+          color: var(--Neutral-5, #777e90);
+
+          /* Subtitle/Large */
+          font-family: sans-serif;
+          font-size: 20px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 28px; /* 140% */
+        }
+        .plan-chatbot {
+          color: var(--Neutral-5, #777e90);
+
+          /* Subtitle/Large */
+          font-family: sans-serif;
+          font-size: 20px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 28px; /* 140% */
+        }
+      }
+    }
+    .btn-upgrade {
+      display: flex;
+      padding: 12px 16px;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      border-radius: 12px;
+      background: var(--Primary-7, #2e58ea);
+      border: none;
+      .btn-text {
+        color: var(--Neutral-1, #fcfcfd);
+        text-align: center;
+        font-family: sans-serif;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 28px; /* 175% */
+      }
+    }
+  }
+  .next-renewal-date {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-top:24px;
+    .next-renewal-date-text {
+      color: var(--Neutral-5, #777e90);
+      font-family: sans-serif;
+      font-size: 20px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 28px;
+    }
+    .next-renewal-date-date {
+      color: var(--Neutral-8, #141416);
+      font-family: sans-serif;
+      font-size: 20px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 28px;
+    }
+  }
+}

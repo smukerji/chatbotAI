@@ -108,6 +108,9 @@ function Header() {
     };
   }, []);
 
+  console.log(userDetails);
+  
+
   return (
     <div className="header-container">
       {/*------------------------------------------logo----------------------------------------------*/}

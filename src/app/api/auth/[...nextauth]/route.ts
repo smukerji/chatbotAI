@@ -31,7 +31,7 @@ const authOptions: NextAuthOptions = {
 
       const starterPlan = await db
         .collection("plans")
-        .findOne({ name: "starter" });
+        .findOne({ name: "Individual Plan" });
 
       const username: string[] = message.user.name?.split(" ")!;
 

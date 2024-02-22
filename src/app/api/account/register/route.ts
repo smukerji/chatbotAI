@@ -21,9 +21,11 @@ async function register(request: any) {
   /// generate the password hash
   const saltRounds = 10;
   const hashPassword = await bcrypt.hash(password, saltRounds);
-
+  let currentDate = new Date()
+  let endDate = new Date(
+    currentDate.getTime() + 7 * 24 * 60 * 60 * 1000);
   /// get the starter plan ID
-  const starterPlan = await db.collection("plans").findOne({ name: "starter" });
+  const starterPlan = await db.collection("plans").findOne({ name: "Individual Plan" });
 
   /// register new user
   const userResult = await collection.insertOne({
@@ -31,6 +33,8 @@ async function register(request: any) {
     email,
     password: hashPassword,
     planId: starterPlan?._id,
+    startDate: currentDate,
+    endDate: endDate
   });
 
   const userId = userResult?.insertedId.toString();

@@ -2,9 +2,14 @@ import { NextResponse } from "next/server";
 import { connectDatabase } from "@/db";
 import Stripe from "stripe";
 import { ObjectId } from "mongodb";
+import { apiHandler } from "@/app/_helpers/server/api/api-handler";
 const stripe = new Stripe(String(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY));
 
-export async function POST(req: any, res: NextResponse) {
+module.exports = apiHandler({
+  POST: updateUserPaymentMethod,
+});
+
+async function updateUserPaymentMethod(req: any, res: NextResponse) {
   if (req.method === "POST") {
     try {
       let { paymentId, u_id } = await req.json();
@@ -38,13 +43,13 @@ export async function POST(req: any, res: NextResponse) {
           },
         }
       );
-      return NextResponse.json(result);
+      return result;
     } catch (error) {
       console.error(error);
-      return NextResponse.json(error);
+      return error;
     }
   } else {
     console.log("error");
-    return NextResponse.json("invalid method");
+    return "invalid method";
   }
 }

@@ -3,9 +3,14 @@ import { NextResponse } from "next/server";
 import { connectDatabase } from "@/db";
 import Stripe from "stripe";
 import { ObjectId } from "mongodb";
+import { apiHandler } from "@/app/_helpers/server/api/api-handler";
 const stripe = new Stripe(String(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY));
 
-export async function POST(req: any, res: NextResponse) {
+module.exports = apiHandler({
+  POST: getCustomer,
+});
+
+async function getCustomer(req: any, res: NextResponse) {
   if (req.method === "POST") {
     try {
       let { u_id } = await req.json();
@@ -15,7 +20,7 @@ export async function POST(req: any, res: NextResponse) {
 
       //ANCHOR - checking that user has customerId or not
       if (data?.customerId != null) {
-        return NextResponse.json(data.customerId);
+        return data.customerId;
       } else {
         //ANCHOR - create user's customerId
         const customer = await stripe.customers.create({
@@ -30,11 +35,11 @@ export async function POST(req: any, res: NextResponse) {
             },
           }
         );
-        return NextResponse.json({ message: "success" });
+        return { message: "success" };
       }
     } catch (error) {
       console.error(error);
-      return NextResponse.json(error);
+      return error;
       // res.status(500).json({ error: 'Unable to create subscription' });
     }
   } else {
