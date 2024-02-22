@@ -66,7 +66,7 @@ export default function Home() {
     }
   };
   const checkPlan = async () => {
-    setLoading(true);
+    // setLoading(true);
     try {
       //ANCHOR - Checking existing plan details
       const checkPlan = await axios.put(
@@ -86,7 +86,7 @@ export default function Home() {
     } catch (error) {
       message.error(`${error}`);
     }
-    setLoading(false);
+    // setLoading(false);
   };
 
   const handleSubmit = async () => {
@@ -134,6 +134,7 @@ export default function Home() {
     setLoading(false);
   };
   useEffect(() => {
+    // setLoading(true)
     if(cookies.userId){
 
       checkPlan();
@@ -144,6 +145,7 @@ export default function Home() {
         handleSubmit();
       }
     }
+    // setLoading(false)
   }, [plan, status]);
 
   const handlePlanType = () => {
@@ -272,7 +274,7 @@ export default function Home() {
         </div>
       )}
       <Elements stripe={stripePromise}>
-        {status === 1 && (
+        {status === 1 && loading == false &&(
           <CreatePaymentMethod
             setStatus={setStatus}
             plan={plan}
