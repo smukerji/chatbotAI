@@ -1,10 +1,12 @@
-import { Modal, Steps, Switch } from "antd";
-import React, { useRef, useState } from "react";
+import { Modal, Steps, Switch, message } from "antd";
+import React, { useEffect, useRef, useState } from "react";
 import copyIcon from "../../../../../../../public/svgs/copy-icon.svg";
 import Image from "next/image";
 import "./WhatsappModal.scss";
 import DeleteIcon from "../../../../../../../public/create-chatbot-svgs/delete-icon.svg";
 import editIcon from "../../../../../../../public/sections-images/common/edit.svg";
+import { useSearchParams } from "next/navigation";
+import { useCookies } from "react-cookie";
 
 function WhatsappModal({ isOpen, onClose }: any) {
   // This state is where the user currently is
@@ -26,10 +28,29 @@ function WhatsappModal({ isOpen, onClose }: any) {
     },
   ]);
 
+  const[whatsAppWebhookToken,setWhatsAppWebHookToken]=useState<string>()
+
   const [accountStatus, setAccountStatus] = useState<boolean>(false);
+
+// This is state where there is all credentials for meta app
+  const[metaDetails,setMetaDetails]=useState<any>({
+    whatsAppAccessToken:'',
+   facebookAppSecret:'',
+   whatsAppPhoneNumber:'',
+   phoneNumberID:'',
+   phoneBusinessID:''
+  })
 
   const inputCallBackUrlRef = useRef<HTMLInputElement>(null); // Ref for the input callback url  element
   const inputTokenRef = useRef<HTMLInputElement>(null); // Ref for the input Token   element
+
+  
+  // This code is for gettig chatbot id
+  const params: any = useSearchParams();
+ const chatbot = JSON.parse(decodeURIComponent(params.get("chatbot")));
+
+  const userId= useCookies(['userId'])
+
 
   //this function is when user clicks on copy icon and values will be copied
   const handleCopy = (value: string) => {
@@ -68,9 +89,27 @@ function WhatsappModal({ isOpen, onClose }: any) {
   };
 
   // This function is written where user clicks save button in Third step
-  const saveHandler = () => {
+  const saveHandler = async () => {
     setAccountStatus(true);
     setStepState({ step1: false, step2: false, step3: false });
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/whatsapp/api`,{
+        headers: {
+          cache: "no-store",
+        },
+        method: "POST",
+        body:JSON.stringify({...metaDetails,chbotId:chatbot.id,userId:userId[0].userId}),
+        next: { revalidate: 0 },
+      })
+      const resp = await response.json()
+      message.success(resp.message)
+
+    } catch (error) {
+      message.error('error sending data')
+    }
+
+
   };
 
   const handleOk = () => {
@@ -81,6 +120,28 @@ function WhatsappModal({ isOpen, onClose }: any) {
   const onChangeSwitch = (checked: boolean) => {
     setSwitchStatus(!switchStatus);
   };
+
+
+  const  fetchWebhookToken=async ()=>{
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/whatsapp/api`,{
+        headers: {
+          cache: "no-store",
+        },
+        method: "GET",
+        next: { revalidate: 0 },
+      })
+      const {webhook_verification_token  } = await response.json()
+      setWhatsAppWebHookToken(webhook_verification_token)
+
+    } catch (error) {
+      message.error('error getting token')
+    }
+  }
+
+  useEffect(()=>{
+      fetchWebhookToken()
+  },[])
 
   return (
     <div className="whatsapp-modal-container">
@@ -106,7 +167,7 @@ function WhatsappModal({ isOpen, onClose }: any) {
                     <input
                       type="text"
                       className="whatsapp-input"
-                      defaultValue="url"
+                      defaultValue='url'
                       ref={inputCallBackUrlRef}
                     ></input>
                     <Image
@@ -126,7 +187,7 @@ function WhatsappModal({ isOpen, onClose }: any) {
                     <input
                       type="text"
                       className="whatsapp-input"
-                      defaultValue="token"
+                      defaultValue={whatsAppWebhookToken}
                       ref={inputTokenRef}
                     ></input>
                     <Image
@@ -157,6 +218,7 @@ function WhatsappModal({ isOpen, onClose }: any) {
                       type="text"
                       className="whatsapp-input"
                       placeholder="Enter your whatsapp access token provided by meta"
+                      onChange={(e)=>{setMetaDetails({...metaDetails,whatsAppAccessToken:e.target.value})}}
                     ></input>
                   </div>
                 </div>
@@ -167,6 +229,7 @@ function WhatsappModal({ isOpen, onClose }: any) {
                       type="text"
                       className="whatsapp-input"
                       placeholder="Enter your facebook app secret provided by meta"
+                      onChange={(e)=>{setMetaDetails({...metaDetails,facebookAppSecret:e.target.value})}}
                     ></input>
                   </div>
                 </div>
@@ -189,6 +252,7 @@ function WhatsappModal({ isOpen, onClose }: any) {
                       type="text"
                       className="whatsapp-input"
                       placeholder="Enter phone number "
+                      onChange={(e)=>{setMetaDetails({...metaDetails,whatsAppPhoneNumber:e.target.value})}}
                     ></input>
                   </div>
                 </div>
@@ -199,6 +263,7 @@ function WhatsappModal({ isOpen, onClose }: any) {
                       type="text"
                       className="whatsapp-input"
                       placeholder="Enter phone number ID"
+                      onChange={(e)=>{setMetaDetails({...metaDetails,phoneNumberID:e.target.value})}}
                     ></input>
                   </div>
                 </div>
@@ -209,6 +274,7 @@ function WhatsappModal({ isOpen, onClose }: any) {
                       type="text"
                       className="whatsapp-input"
                       placeholder="Enter phone business ID"
+                      onChange={(e)=>{setMetaDetails({...metaDetails,phoneBusinessID:e.target.value})}}
                     ></input>
                   </div>
                 </div>
