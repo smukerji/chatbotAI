@@ -40,27 +40,36 @@ async function saveWhatsappData(req: NextRequest) {
 
   // const collection = await db?.collection('whatsappbot_details')
   //insert data into database
-  const result = await prisma.whatsappbot_details.create({ data: { 
-    facebookAppSecret:"123",
-    isActive:true,
-    userId:"123",
-    webhookUrl:"123",
-    chatbotId:"123",
-    isVarifyWebhook:true,
-    phoneBusinessId:"123",
-    phoneNumberId:"123",
-    webhookVarificationToken:"123",
-    whatsAppAccessToken:"123",
-    whatsAppPhoneNumber:"123",
-   } })
+  try {
+    const result = 
+    await prisma.whatsappbot_details.create({
+      data: {
+        facebookAppSecret:request.facebookAppSecret,
+        isActive:true,
+        userId:request.userId,
+        chatbotId:request.chatbotId,
+        isVarifyWebhook:true,
+        phoneBusinessId:request.phoneBusinessID,
+        phoneNumberId:request.phoneNumberID,
+        whatsAppAccessToken:request.whatsAppAccessToken,
+        whatsAppPhoneNumber:request.whatsAppPhoneNumber,
+      }
+    })
+    if (result) {
+      return { message: 'data saved successfully' }
+    }
+    return { message: 'Error saving data' }
+  }
+  catch (e) {
+    console.log(e)
+    return { message: 'Error saving data'+e }
+  }
+
 
 
   // const result = await collection?.insertOne({ ...request })
 
-  if (result) {
-    return { message: 'data saved successfully' }
-  }
-  return { message: 'Error saving data' }
+  
 }
 
 
