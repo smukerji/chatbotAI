@@ -3,6 +3,9 @@ import { apiHandler } from "../../../../../_helpers/server/api/api-handler";
 import { NextApiRequest } from "next";
 import { connectDatabase } from "../../../../../../db";
 import { getDate } from "../../../../../_helpers/client/getTime";
+import joi from "joi";
+import { authOptions } from "../../../../../api/auth/[...nextauth]/route";
+import { getServerSession } from "next-auth";
 
 module.exports = apiHandler({
   POST: retriveChatbotSettings,
@@ -20,11 +23,14 @@ type Chats = {
 };
 
 async function retriveChatbotSettings(request: NextRequest) {
+  /// get the session and then access the id
+  const session: any = await getServerSession(authOptions);
+  const userId = request?.headers.get("userId")
+    ? request?.headers.get("userId")
+    : session?.user?.id;
   const body = await request.json();
   // Accessing chatbotId from body
   const chatbotId = body?.chatbotId;
-  // Accessing userId from body
-  const userId = body?.userId;
 
   const db = (await connectDatabase())?.db();
   const collection = db.collection("chat-history");
@@ -36,31 +42,6 @@ async function retriveChatbotSettings(request: NextRequest) {
       // date: getDate().split(" ")[0],
     })
     .toArray();
-
-  // const chatHistory: Chats = data?.chats;
-  // console.log(chatHistory);
-
-  // const startDate = "2023-12-21 15:31:00";
-  // const endDate = "2023-12-21 15:33:00";
-
-  // const filteredChats: any = {};
-
-  // for (const [chatId, chatData] of Object.entries(chatHistory)) {
-  //   const startTimestamp = new Date(chatData?.sessionStartDate).getTime();
-  //   const endTimestamp = new Date(chatData?.sessionEndDate).getTime();
-  //   const targetStartTimestamp = new Date(startDate).getTime();
-  //   const targetEndTimestamp = new Date(endDate).getTime();
-
-  //   if (
-  //     startTimestamp >= targetStartTimestamp &&
-  //     endTimestamp <= targetEndTimestamp
-  //   ) {
-  //     filteredChats[chatId] = chatData;
-  //   }
-  // }
-
-  // //   return filteredChats;
-  // console.log("Flier>>", filteredChats);
 
   /// filter data
   let today: any = {};
@@ -105,11 +86,16 @@ async function retriveChatbotSettings(request: NextRequest) {
 }
 
 async function updateChatbotSettings(request: NextRequest) {
+  /// get the session and then access the id
+  const session: any = await getServerSession(authOptions);
+  const userId = request?.headers.get("userId")
+    ? request?.headers.get("userId")
+    : session?.user?.id;
+
   const body = await request.json();
   // Accessing chatbotId from body
   const chatbotId = body?.chatbotId;
-  // Accessing userId from body
-  const userId = body?.userId;
+
   /// Chatbot name if renaming is present
   const chatbotRename = body?.chatbotRename;
 
@@ -196,3 +182,36 @@ async function updateChatbotSettings(request: NextRequest) {
 
   return { message: "Chatbot Updated successfully..." };
 }
+
+/**
+ * defining schema for /chatbot/api/setting/api POST route
+ */
+retriveChatbotSettings.schema = joi.object({
+  chatbotId: joi.string().required(),
+});
+
+/**
+ * defining schema for /chatbot/api/setting/api PUT route
+ */
+updateChatbotSettings.schema = joi.object({
+  chatbotId: joi.string().required(),
+  chatbotRename: joi.string().optional(),
+  model: joi.string().optional(),
+  visibility: joi.string().optional(),
+  temperature: joi.number().optional(),
+  numberOfCharacterTrained: joi.string().optional(),
+  instruction: joi.string().optional(),
+  initialMessage: joi.array().optional(),
+  suggestedMessages: joi.array().optional(),
+  messagePlaceholder: joi.string().optional(),
+  theme: joi.string().optional(),
+  userMessageColor: joi.string().optional(),
+  chatbotIconColor: joi.string().optional(),
+  tempprofilePictureUrl: joi.string().optional().allow(""),
+  tempbubbleIconUrl: joi.string().optional().allow(""),
+  lastTrained: joi.date().optional(),
+  chatbotBubbleAlignment: joi.string().optional().allow(""),
+  tempprofilePictureName: joi.string().optional().allow(""),
+  tempbubbleIconName: joi.string().optional().allow(""),
+  chatbotDisplayName: joi.string().optional(),
+});

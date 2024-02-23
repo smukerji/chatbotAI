@@ -6,10 +6,8 @@ import { connectDatabase } from "../../../../db";
 import { cookies } from "next/headers";
 import { ObjectId } from "mongodb";
 
-const authOptions: NextAuthOptions = {
-  adapter: MongoDBAdapter(connectDatabase(), {
-    databaseName: "luciferai-test",
-  }),
+export const authOptions: NextAuthOptions = {
+  adapter: MongoDBAdapter(connectDatabase()),
   //   session: {
   //     strategy: "jwt",
   //   },
@@ -76,11 +74,12 @@ const authOptions: NextAuthOptions = {
   },
 
   callbacks: {
-    async session({ session, user, token }) {
+    async session({ session, user }: any) {
       cookies().set("profile-img", user.image!);
       cookies().set("userId", user.id);
       /// set the username
       cookies().set("username", user?.name!);
+      session.user.id = user.id;
       return session;
     },
     // async signIn({ user, account, profile, email, credentials }) {
