@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { apiHandler } from "../../../../../_helpers/server/api/api-handler";
-// import{connectDatabase} from '../../../../../../db';
-import prisma from "@/lib/prisma";
+import{connectDatabase} from '../../../../../../db';
 module.exports = apiHandler({
   POST: saveWhatsappData,
   GET: getCallBackUrl,
@@ -35,41 +34,14 @@ async function getCallBackUrl(req: NextRequest, res: NextResponse) {
 
 async function saveWhatsappData(req: NextRequest) {
   const request = await req.json()
-  // const db = (await connectDatabase())?.db();
+  const db = (await connectDatabase())?.db();
 
 
-  // const collection = await db?.collection('whatsappbot_details')
-  //insert data into database
-  try {
-    const result = 
-    await prisma.whatsappbot_details.create({
-      data: {
-        facebookAppSecret:request.facebookAppSecret,
-        isActive:true,
-        userId:request.userId,
-        chatbotId:request.chatbotId,
-        isVarifyWebhook:true,
-        phoneBusinessId:request.phoneBusinessID,
-        phoneNumberId:request.phoneNumberID,
-        whatsAppAccessToken:request.whatsAppAccessToken,
-        whatsAppPhoneNumber:request.whatsAppPhoneNumber,
-      }
-    })
-    if (result) {
-      return { message: 'data saved successfully' }
-    }
-    return { message: 'Error saving data' }
-  }
-  catch (e) {
-    console.log(e)
-    return { message: 'Error saving data'+e }
-  }
+  const collection = await db?.collection('whatsappbot_details')
+  // insert data into database
 
+  const result = await collection?.insertOne({ ...request })
 
-
-  // const result = await collection?.insertOne({ ...request })
-
-  
 }
 
 
