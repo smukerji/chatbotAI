@@ -1,19 +1,19 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useDebugValue } from 'react';
-import axios from 'axios';
-import CreatePaymentMethod from './_components/CreatePaymentMethod';
-import '../pricing/stripe.scss';
-import Image from 'next/image';
-import PlanOne from './_components/plan-box-1';
-import PlanTwo from './_components/plan-box-2';
-import zoho from '../../../../../public/Rectangle 159.png';
-import whatsapp from '../../../../../public/whatsapp.png';
-import telegram from '../../../../../public/telegram.png';
-import hubspot from '../../../../../public/hubspot.png';
-import { useCookies } from 'react-cookie';
-import { message } from 'antd';
-import Loader from './_components/Loader';
+import React, { useState, useEffect, useDebugValue } from "react";
+import axios from "axios";
+import CreatePaymentMethod from "./_components/CreatePaymentMethod";
+import "../pricing/stripe.scss";
+import Image from "next/image";
+import PlanOne from "./_components/plan-box-1";
+import PlanTwo from "./_components/plan-box-2";
+import zoho from "../../../../../public/Rectangle 159.png";
+import whatsapp from "../../../../../public/whatsapp.png";
+import telegram from "../../../../../public/telegram.png";
+import hubspot from "../../../../../public/hubspot.png";
+import { useCookies } from "react-cookie";
+import { Modal, message } from "antd";
+import Loader from "./_components/Loader";
 
 export default function Home() {
   const [status, setStatus] = useState<number>(2);
@@ -22,8 +22,22 @@ export default function Home() {
   const [isYearlyPlan, setIsYearlyPlan] = useState(false);
   const [price, setPrice] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [cookies, setCookie] = useCookies(['userId']);
+  const [cookies, setCookie] = useCookies(["userId"]);
   const [prePrice, setPrePrice] = useState(0);
+  // const [isModalOpen, setIsModalOpen] = useState(true);
+
+  // const showModal = () => {
+  //   setIsModalOpen(true);
+  // };
+
+  // const handleOk = () => {
+  //   setIsModalOpen(false);
+  // };
+
+  // const handleCancel = () => {
+  //   setIsModalOpen(false);
+  //   setIsModalOpen(true);
+  // };
 
   const u_id: any = cookies.userId;
 
@@ -59,12 +73,13 @@ export default function Home() {
   };
   const checkPlan = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
       //ANCHOR - Checking existing plan details
       const checkPlan = await axios.put(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway`,
         { u_id: u_id }
       );
+      console.log(checkPlan);
       if (checkPlan.data.msg == 1) {
         setPrePrice(checkPlan.data.prePrice);
         setEnableOne(true);
@@ -72,19 +87,18 @@ export default function Home() {
     } catch (error) {
       message.error(`${error}`);
     }
-    setLoading(false)
+    setLoading(false);
   };
 
   useEffect(() => {
     if (cookies.userId) {
-      setLoading(true)
+      setLoading(true);
       checkPlan();
       if (plan == 1 || plan == 2) {
         makePayment();
       }
-    }
-    else{
-      setLoading(false)
+    } else {
+      setLoading(false);
     }
   }, [plan, status]);
 
@@ -94,6 +108,7 @@ export default function Home() {
 
   return (
     <>
+     
       {loading && <Loader />}
       {status === 2 && loading == false && (
         <div className="main">
@@ -105,13 +120,13 @@ export default function Home() {
           </div>
           <div className="plan-tab-container">
             <button
-              className={`plan-type ${!isYearlyPlan && 'active'}`}
+              className={`plan-type ${!isYearlyPlan && "active"}`}
               onClick={handlePlanType}
             >
               Monthly
             </button>
             <button
-              className={`plan-type ${isYearlyPlan && 'active'}`}
+              className={`plan-type ${isYearlyPlan && "active"}`}
               onClick={handlePlanType}
             >
               Yearly

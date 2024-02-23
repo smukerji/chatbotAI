@@ -8,7 +8,7 @@ import { ObjectId } from "mongodb";
 
 const authOptions: NextAuthOptions = {
   adapter: MongoDBAdapter(connectDatabase(), {
-    databaseName: "luciferai-test",
+    databaseName: "test",
   }),
   //   session: {
   //     strategy: "jwt",

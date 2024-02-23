@@ -11,8 +11,8 @@ const stripePromise = loadStripe(
 const plans = [
   { id: 1, name: 'Individual Plan', price: 15, days: 30 },
   { id: 2, name: 'Agency Plan', price: 89, days: 30 },
-  { id: 3, name: 'Individual Plan', price: 144, days: 30 },
-  { id: 4, name: 'Agency Plan', price: 854, days: 30 },
+  { id: 3, name: 'Individual Plan', price: 144, days: 365 },
+  { id: 4, name: 'Agency Plan', price: 854, days: 365 },
 ];
 
 const CheckoutPage = ({ params }: any) => {
@@ -29,7 +29,7 @@ const CheckoutPage = ({ params }: any) => {
         <CreatePaymentMethod
           plan={selectedPlan?.id}
           price={selectedPlan?.price}
-          duration={selectedPlan?.duration === 365 ? 'year' : 'month'}
+          duration={selectedPlan?.days === 365 ? 'year' : 'month'}
         />
       </Elements>
     </div>

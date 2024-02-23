@@ -51,7 +51,6 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
       console.log("Payment method created:", response);
     } catch {
       message.error("error while getting customer data");
-      // setStatus(1);
       throw error;
     }
     try {
@@ -79,7 +78,7 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
           const r = stripe.confirmPayment({
             clientSecret: result.data.client_secret,
             confirmParams: {
-              return_url: `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/success`,
+              return_url: `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot`,
             },
           });
 
@@ -90,13 +89,11 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
           );
           message.success("success");
         }
-        setLoading(false);
-        // setStatus(0);
       } else {
-        // setStatus(1);
         message.error(
           "Finding error while making payment with this card, please check your card details"
-        );
+          );
+          setLoading(false);
       }
     } catch (error) {
       message.error(`${error}`);
@@ -106,12 +103,16 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
   };
 
   return (
-    <div className="card-main">
+    <>
+    {loading && <Loader />}
+    {
+      loading == false &&
+      <div className="card-main">
       <div className="card-head">Billing Info</div>
       <form className="cardElementForm" onSubmit={handleSubmit}>
         <div className="left">
           <div className="top-left">
-            {plan == 1 && <div className="plan-name">Individual Plan</div>}
+          {plan == 1 && <div className="plan-name">Individual Plan</div>}
             {plan == 2 && <div className="plan-name">Agency Plan</div>}
             <div className="price">
               <span>${price}</span>
@@ -123,11 +124,11 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
               <div className="total">Total</div>
               <div className="total-price">${price}</div>
             </div>
-        </div>
+            </div>
         <div className="right">
           <div className="right-top">Pay with Card</div>
           <div className="card-element">
-            <label className="card-label">Card Number</label>
+          <label className="card-label">Card Number</label>
             <div className="cardNumber">
               <CardNumberElement />
             </div>
@@ -138,14 +139,17 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
             <label className="card-label">Card CVC</label>
             <div className="cardCvc">
               <CardCvcElement />
-            </div>
+              </div>
           </div>
           {error && <div>{error}</div>}
           <button className="btn-card-submit" type="submit" disabled={!stripe}>
-            Pay
+          Pay
           </button>
         </div>
       </form>
     </div>
-  );
+  }
+  </>
+    );
+
 }

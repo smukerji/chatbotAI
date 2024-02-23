@@ -63,11 +63,11 @@ async function checkCurrentPlan(req: any, res: NextResponse) {
   let currentDate = new Date()
   //ANCHOR - check current plan of the user
 if (data.endDate > currentDate) {
-      return NextResponse.json({
+      return {
         msg: 1,
         prePrice: 15,
         duration: data.duration,
-      });
+      }
   } else {
     return { msg: 0 };
   }

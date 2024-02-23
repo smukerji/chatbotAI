@@ -4,7 +4,7 @@ import {
   MessageOutlined,
   MoreOutlined,
 } from "@ant-design/icons";
-import { Spin, message } from "antd";
+import { Modal, Spin, message } from "antd";
 import React, { Suspense, useContext, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import "./chatbot.scss";
@@ -82,6 +82,21 @@ function Chatbot() {
 
   /// managing new chatbot name modal
   const [openNewChatbotNameModal, setOpenNewChatbotNameModal] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(true);
+
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleOk = () => {
+    router.push('home/pricing')
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
+
+  };
+
 
   /// retrive the chatbots details
   useEffect(() => {
@@ -158,10 +173,21 @@ function Chatbot() {
 
   if (status === "authenticated" || cookies?.userId) {
     return (
+      <>
+      <Modal
+      title="Basic Modal"
+      open={isModalOpen}
+      onOk={handleOk}
+      onCancel={handleCancel}
+      >
+      <p>Some contents...</p>
+      <p>Some contents...</p>
+      <p>Some contents...</p>
+    </Modal>
       <div
         className="chatbot-list-container"
         onClick={() => openMenu && setOpenMenu(null)}
-      >
+        >
         {/*------------------------------------------title----------------------------------------------*/}
         <div className="title-container">
           <h1 className="title">My Chatbots</h1>
@@ -201,7 +227,7 @@ function Chatbot() {
                   setOpenLimitModel(true);
                   return;
                 }
-
+                
                 setOpenNewChatbotNameModal(true);
               }}
               disabled={loading}
@@ -212,9 +238,9 @@ function Chatbot() {
           </div>
           {openLimitModal ? (
             <LimitReachedModal setOpenLimitModel={setOpenLimitModel} />
-          ) : (
+            ) : (
             <></>
-          )}
+            )}
         </div>
 
         {/*------------------------------------------chatbot-list-grid----------------------------------------------*/}
@@ -230,7 +256,7 @@ function Chatbot() {
               setChatbotId={setChatbotId}
               setOpenDeleteModal={setOpenDeleteModal}
               setOpenRenameModal={setOpenRenameModal}
-            />
+              />
           </>
         )}
 
@@ -266,13 +292,13 @@ function Chatbot() {
           chatbotId={chatbotId}
           setChangeFlag={setChangeFlag}
           changeFlag={changeFlag}
-        />
+          />
 
         <NewChatbotNameModal
           open={openNewChatbotNameModal}
           setOpen={setOpenNewChatbotNameModal}
           chatbotId={chatbotId}
-        />
+          />
 
         {/*------------------------------------------loading/no-chatbots----------------------------------------------*/}
         {!loading && chatbotData?.length == 0 && (
@@ -286,6 +312,7 @@ function Chatbot() {
         )}
         {loading && <Spin indicator={antIcon} />}
       </div>
+        </>
     );
   } else if (status === "unauthenticated") {
     redirect("/account/login");
