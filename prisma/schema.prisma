@@ -121,7 +121,6 @@ model user_chatbots {
   lastUsed         Float
   noOfMessagesSent Int
   userId           String
-  whatsappbot      whatsappbot_details?
 
   @@map("user-chatbots")
 }
@@ -149,17 +148,15 @@ model users {
 
 model whatsappbot_details{
   id            String @id @default(auto()) @map("_id") @db.ObjectId
-  webhookUrl    String
-  webhookVarificationToken String
+  webhookVarificationToken String?
   isVarifyWebhook Boolean
-  whatsAppAccessToken String
-  facebookAppSecret String
-  whatsAppPhoneNumber String
-  phoneNumberId String
-  phoneBusinessId String
+  whatsAppAccessToken String?
+  facebookAppSecret String?
+  whatsAppPhoneNumber String?
+  phoneNumberId String?
+  phoneBusinessId String?
   isActive Boolean
-  userId String @db.ObjectId @unique
-  user  users  @relation(fields: [userId], references: [id])
-  chatbotId String @db.ObjectId @unique
-  chatbot user_chatbots @relation(fields: [chatbotId],references: [id])
+  userId String? @db.ObjectId @unique
+  user  users?  @relation(fields: [userId], references: [id])
+  chatbotId String?
 }
