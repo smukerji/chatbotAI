@@ -81,4 +81,6 @@ const PrintingChats = React.forwardRef(
   }
 );
 
+PrintingChats.displayName = "PrintingChats";
+
 export { PrintingChats };

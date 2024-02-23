@@ -219,6 +219,7 @@ function Header() {
                   if (!isLoggedIn) {
                     window.location.href = "/account/login";
                   } else if (session?.user || userId) {
+                    setOpenMenu(!openMenu);
                     await logout();
                     await signOut();
                     window.location.href = "/";

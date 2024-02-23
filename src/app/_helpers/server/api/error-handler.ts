@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import React from "react";
 
 function errorHandler(err: any) {
-  console.error(err);
+  console.log(err.name);
 
   if (typeof err === "string") {
     // custom application error
@@ -16,6 +16,13 @@ function errorHandler(err: any) {
     /// jwt error - delete cookie to auto logout
     cookies().delete("authorization");
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  if (err.name === "TokenExpiredError") {
+    /// jwt error - delete cookie to auto logout
+    cookies().delete("authorization");
+    cookies().delete("username");
+    cookies().delete("userId");
   }
 
   // default to 500 server error
