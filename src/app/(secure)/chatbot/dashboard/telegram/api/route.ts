@@ -1,15 +1,25 @@
+import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { apiHandler } from '../../../../../_helpers/server/api/api-handler'
 
-export async function GET(request: NextRequest) {
-    // let req = await request.json()
-    return NextResponse.json({message:'success'})
-}
-export async function POST(request:NextRequest){
+module.exports = apiHandler({
+    POST: receivingRequestFromTelegram,
+    // GET: getChatBotSettings,
+  });
+  
+
+// export async function GET(request: NextRequest) {
+//     // let req = await request.json()
+//     return NextResponse.json({message:'success'})
+// }
+ async function receivingRequestFromTelegram(request:NextRequest){
     let req= await request.json()
     const chatId = req?.message?.chat?.id;
+   const telegramToken = request?.nextUrl?.searchParams.get('token')
    
-    // This code is for sending message to telegram 
-    const url = `https://api.telegram.org/bot${process.env.TELEGRAMTOKEN}/sendMessage`;
+   
+    //--------------- This code is for sending message to telegram 
+    const url = `https://api.telegram.org/bot${telegramToken}/sendMessage`;
 
     const body = {
         chat_id: chatId,
