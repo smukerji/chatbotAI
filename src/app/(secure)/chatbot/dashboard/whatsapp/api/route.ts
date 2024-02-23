@@ -44,7 +44,7 @@ async function saveWhatsappData(req: NextRequest) {
     facebookAppSecret:"123",
     isActive:true,
     userId:"123",
-    webhookUrl:"123",
+   
     chatbotId:"123",
     isVarifyWebhook:true,
     phoneBusinessId:"123",

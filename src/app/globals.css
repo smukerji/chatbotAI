@@ -44,9 +44,7 @@ Header a {
   width: 60%;
   margin: auto;
 }
-.ant-steps-item-icon{
-  /* background: #2e58ea !important; */
-}
+
 .whatsapp-integration-title{
   color: #141416;
   text-align: center;
@@ -57,9 +55,7 @@ font-weight: 500;
 line-height: 28px; /* 140% */
 margin-bottom: 5px;
 }
-.whatsapp-top-container{
 
-}
 .whatsapp-top-title{
   color:  #353945 !important;
 
@@ -73,6 +69,11 @@ line-height: 24px !important; /* 150% */
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+.whatsapp-error-message{
+  color: red !important;
+  margin: 0px !important;
+  font-size: 14px !important;
 }
 .whatsapp-input{
   width: 90%;

@@ -41,6 +41,55 @@ function WhatsappModal({ isOpen, onClose }: any) {
    phoneBusinessID:''
   })
 
+
+// This state is for handeling userinput errors
+const [errors, setErrors] = useState<any>({
+  whatsAppAccessToken: null,
+  facebookAppSecret: null,
+  whatsAppPhoneNumber:null,
+   phoneNumberID:null,
+   phoneBusinessID:null
+});
+
+const handleChange = (field: string, value: string) => {
+  const trimmedValue = value.trim(); // Trim the value to remove leading and trailing spaces
+  setMetaDetails({ ...metaDetails, [field]: trimmedValue });
+  setErrors({
+    ...errors,
+    [field]: trimmedValue ? "" : `Please fill in this field`,
+  });
+};
+
+
+// WhatsApp Change handler
+const whatsappChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+  handleChange("whatsAppAccessToken", e.target.value);
+};
+
+// Facebook App Secret Change handler
+const facebookChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+  handleChange("facebookAppSecret", e.target.value);
+};
+
+// WhatsApp Phone Number Change handler
+const whatsappPhoneNumberHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+  handleChange("whatsAppPhoneNumber", e.target.value);
+};
+
+// Phone Number ID Change handler
+const whatsappPhoneNumberIDHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+  handleChange("phoneNumberID", e.target.value);
+};
+
+// Phone Business ID Change handler
+const whatsappBusinessIDHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+  handleChange("phoneBusinessID", e.target.value);
+};
+
+
+
+
+
   const inputCallBackUrlRef = useRef<HTMLInputElement>(null); // Ref for the input callback url  element
   const inputTokenRef = useRef<HTMLInputElement>(null); // Ref for the input Token   element
 
@@ -79,36 +128,63 @@ function WhatsappModal({ isOpen, onClose }: any) {
 
   // This function is written where user clicks Add Account button in Second step
   const handleAddAccount = () => {
-    setStepState({ ...stepState, step3: true, step2: false });
-    // Update the status of the third object in the items array
-    setItems([
-      { status: "finish" }, // Update the status of the first step
-      { status: "finish" }, // Update the status of the second step
-      { status: "process" },
-    ]);
+    // Check if the errors for both fields are empty
+    if (errors.whatsAppAccessToken === '' && errors.facebookAppSecret === '') {
+      // Proceed to the next step if both fields are filled
+      setStepState({ ...stepState, step3: true, step2: false });
+      // Update the status of the third object in the items array
+      setItems([
+        { status: "finish" }, // Update the status of the first step
+        { status: "finish" }, // Update the status of the second step
+        { status: "process" },
+      ]);
+    } else {
+
+
+       setErrors({
+      ...errors,
+      whatsAppAccessToken: errors.whatsAppAccessToken === null ? "Please fill in this field" : errors.whatsAppAccessToken,
+      facebookAppSecret: errors.facebookAppSecret === null ? "Please fill in this field" : errors.facebookAppSecret
+    });
+    }
   };
+  
 
   // This function is written where user clicks save button in Third step
   const saveHandler = async () => {
-    setAccountStatus(true);
-    setStepState({ step1: false, step2: false, step3: false });
-
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/whatsapp/api`,{
-        headers: {
-          cache: "no-store",
-        },
-        method: "POST",
-        body:JSON.stringify({...metaDetails,chbotId:chatbot.id,userId:userId[0].userId}),
-        next: { revalidate: 0 },
-      })
-      const resp = await response.json()
-      message.success(resp.message)
-
-    } catch (error) {
-      message.error('error sending data')
+    if( errors.whatsAppPhoneNumber == '' &&
+    errors.phoneNumberID == '' &&
+    errors.phoneBusinessID == ''){
+      setAccountStatus(true);
+      setStepState({ step1: false, step2: false, step3: false });
+  
+      try {
+       
+        const response = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/whatsapp/api`,{
+          headers: {
+            cache: "no-store",
+          },
+          method: "POST",
+          body:JSON.stringify({...metaDetails,chatbotId:chatbot.id,userId:userId[0].userId}),
+          next: { revalidate: 0 },
+        })
+        const resp = await response.json()
+        message.success(resp.message)
+  
+      } catch (error) {
+        message.error('error sending data')
+      }
+      
     }
-
+    else{
+      setErrors({
+        ...errors,
+        whatsAppPhoneNumber: errors.whatsAppPhoneNumber === null ? "Please fill in this field" : errors.whatsAppPhoneNumber,
+        phoneNumberID: errors.phoneNumberID === null ? "Please fill in this field" : errors.phoneNumberID,
+        phoneBusinessID: errors.phoneBusinessID === null ? "Please fill in this field" : errors.phoneBusinessID
+      });
+  }
+    
 
   };
 
@@ -213,24 +289,27 @@ function WhatsappModal({ isOpen, onClose }: any) {
               <div className="whatsapp-step-container">
                 <div className="whatsapp-top-container">
                   <p className="whatsapp-top-title">WhatsApp Access Token</p>
-                  <div className="whatsapp-input-copy-container">
+                  <div className="whatsapp-input-copy-container-step2">
                     <input
                       type="text"
                       className="whatsapp-input"
                       placeholder="Enter your whatsapp access token provided by meta"
-                      onChange={(e)=>{setMetaDetails({...metaDetails,whatsAppAccessToken:e.target.value})}}
+                      onChange={whatsappChangeHandler}
                     ></input>
+                    {errors.whatsAppAccessToken && <p className="whatsapp-error-message">{errors.whatsAppAccessToken}</p>}
                   </div>
                 </div>
                 <div className="whatsapp-top-container">
                   <p className="whatsapp-top-title">Facebook App Secret</p>
-                  <div className="whatsapp-input-copy-container">
+                  <div className="whatsapp-input-copy-container-step2">
                     <input
                       type="text"
                       className="whatsapp-input"
                       placeholder="Enter your facebook app secret provided by meta"
-                      onChange={(e)=>{setMetaDetails({...metaDetails,facebookAppSecret:e.target.value})}}
+                      onChange={facebookChangeHandler}
                     ></input>
+                    {errors.facebookAppSecret && <p className="whatsapp-error-message">{errors.facebookAppSecret}</p>}
+
                   </div>
                 </div>
               </div>
@@ -247,35 +326,40 @@ function WhatsappModal({ isOpen, onClose }: any) {
               <div className="whatsapp-step-container">
                 <div className="whatsapp-top-container">
                   <p className="whatsapp-top-title">WhatsApp Phone Number</p>
-                  <div className="whatsapp-input-copy-container">
+                  <div className="whatsapp-input-copy-container-step3">
                     <input
                       type="text"
                       className="whatsapp-input"
                       placeholder="Enter phone number "
-                      onChange={(e)=>{setMetaDetails({...metaDetails,whatsAppPhoneNumber:e.target.value})}}
+                      onChange={whatsappPhoneNumberHandler}
                     ></input>
+                     {errors.whatsAppPhoneNumber && <p className="whatsapp-error-message">{errors.whatsAppPhoneNumber}</p>}
                   </div>
                 </div>
                 <div className="whatsapp-top-container">
                   <p className="whatsapp-top-title">Phone Number ID</p>
-                  <div className="whatsapp-input-copy-container">
+                  <div className="whatsapp-input-copy-container-step3">
                     <input
                       type="text"
                       className="whatsapp-input"
                       placeholder="Enter phone number ID"
-                      onChange={(e)=>{setMetaDetails({...metaDetails,phoneNumberID:e.target.value})}}
+                      onChange={whatsappPhoneNumberIDHandler}
                     ></input>
+                     {errors.phoneNumberID && <p className="whatsapp-error-message">{errors.phoneNumberID}</p>}
+
                   </div>
                 </div>
                 <div className="whatsapp-top-container">
                   <p className="whatsapp-top-title">Phone Business ID</p>
-                  <div className="whatsapp-input-copy-container">
+                  <div className="whatsapp-input-copy-container-step3">
                     <input
                       type="text"
                       className="whatsapp-input"
                       placeholder="Enter phone business ID"
-                      onChange={(e)=>{setMetaDetails({...metaDetails,phoneBusinessID:e.target.value})}}
+                      onChange={whatsappBusinessIDHandler}
                     ></input>
+                     {errors.phoneBusinessID && <p className="whatsapp-error-message">{errors.phoneBusinessID}</p>}
+
                   </div>
                 </div>
               </div>
