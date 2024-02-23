@@ -1,0 +1,165 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("NEXT_PUBLIC_MONGO_URI")
+}
+
+type ChatHistoryChats {
+  d34540d_f3ca_45cd_a52e_3e4925f45602 ChatHistoryChats8D34540DF3Ca45CdA52E3E4925F45602? @map("8d34540d-f3ca-45cd-a52e-3e4925f45602")
+  b9ca3_853d_4998_aa4c_a473029357de   ChatHistoryChats976B9Ca3853D4998Aa4CA473029357De? @map("976b9ca3-853d-4998-aa4c-a473029357de")
+}
+
+type ChatHistoryChats8D34540DF3Ca45CdA52E3E4925F45602 {
+  initialMessageLength Int
+  messages             ChatHistoryChats8D34540Df3Ca45CdA52E3E4925F45602Messages[]
+  sessionEndDate       String
+  sessionStartDate     String
+}
+
+type ChatHistoryChats8D34540Df3Ca45CdA52E3E4925F45602Messages {
+  content     String
+  messageTime String?
+  messageType String?
+  role        String
+}
+
+type ChatHistoryChats976B9Ca3853D4998Aa4CA473029357De {
+  messages         ChatHistoryChats976B9Ca3853D4998Aa4Ca473029357DeMessages[]
+  sessionEndDate   String
+  sessionStartDate String
+}
+
+type ChatHistoryChats976B9Ca3853D4998Aa4Ca473029357DeMessages {
+  content     String
+  messageTime String?
+  messageType String?
+  role        String
+}
+
+model accounts {
+  id                String @id @default(auto()) @map("_id") @db.ObjectId
+  access_token      String
+  expires_at        Int
+  id_token          String
+  provider          String
+  providerAccountId String
+  scope             String
+  token_type        String
+  type              String
+  userId            String @db.ObjectId
+}
+
+model chat_history {
+  id        String           @id @default(auto()) @map("_id") @db.ObjectId
+  chatbotId String
+  chats     ChatHistoryChats
+  date      String
+  userId    String
+
+  @@map("chat-history")
+}
+
+model chatbot_settings {
+  id                       String   @id @default(auto()) @map("_id") @db.ObjectId
+  bubbleIconUrl            String
+  chatbotBubbleAlignment   String
+  chatbotDisplayName       String
+  chatbotIconColor         String
+  chatbotId                String
+  initialMessage           String[]
+  instruction              String
+  lastTrained              Float
+  messagePlaceholder       String
+  model                    String
+  noOfMessagesSent         Int
+  numberOfCharacterTrained String
+  profilePictureUrl        String
+  suggestedMessages        String[]
+  temperature              Int
+  theme                    String
+  userId                   String
+  userMessageColor         String
+  visibility               String
+
+  @@map("chatbot-settings")
+}
+
+model chatbots_data {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  chatbotId String
+  content   String
+  dataID    String[]
+  source    String
+
+  @@map("chatbots-data")
+}
+
+model plans {
+  id                   String @id @default(auto()) @map("_id") @db.ObjectId
+  messageLimit         Int
+  name                 String
+  numberOfChatbot      Int
+  trainingDataLimit    Int
+  websiteCrawlingLimit Int
+}
+
+model sessions {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  expires      DateTime @db.Date
+  sessionToken String
+  userId       String   @db.ObjectId
+}
+
+model user_chatbots {
+  id               String @id @default(auto()) @map("_id") @db.ObjectId
+  chatbotId        String
+  chatbotName      String
+  createdAt        Float
+  lastUsed         Float
+  noOfMessagesSent Int
+  userId           String
+  whatsappbot      whatsappbot_details?
+
+  @@map("user-chatbots")
+}
+
+model user_details {
+  id                String @id @default(auto()) @map("_id") @db.ObjectId
+  totalMessageCount Int
+  userId            String
+
+  @@map("user-details")
+}
+
+model users {
+  id            String  @id @default(auto()) @map("_id") @db.ObjectId
+  email         String?
+  /// Could not determine type: the field only had null or empty values in the sample set.
+  emailVerified Json?
+  image         String?
+  name          String?
+  password      String?
+  planId        String  @db.ObjectId
+  username      String?
+  whatsappbot   whatsappbot_details?
+}
+
+model whatsappbot_details{
+  id            String @id @default(auto()) @map("_id") @db.ObjectId
+  webhookUrl    String
+  webhookVarificationToken String
+  isVarifyWebhook Boolean
+  whatsAppAccessToken String
+  facebookAppSecret String
+  whatsAppPhoneNumber String
+  phoneNumberId String
+  phoneBusinessId String
+  isActive Boolean
+  userId String @db.ObjectId @unique
+  user  users  @relation(fields: [userId], references: [id])
+  chatbotId String @db.ObjectId @unique
+  chatbot user_chatbots @relation(fields: [chatbotId],references: [id])
+}
