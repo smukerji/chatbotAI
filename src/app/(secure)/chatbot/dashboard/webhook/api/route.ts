@@ -3,8 +3,17 @@ import { NextRequest, NextResponse } from "next/server";
 // import { NextApiResponse } from "next";
 import { connectDatabase } from "@/db";
 
-const getChatbotId = (req:NextRequest) => {
-  return req.nextUrl.pathname.split("api/")[1];
+const getChatbotId = async(wa_id:any) => {
+    try {
+       const db = (await connectDatabase()).db();
+       const collection = db.collection("whatsApp-details");
+       const result = await collection.findOne({whatsAppPhoneNumber:wa_id})
+       const chatbotId =await result.chatbotId
+       return  chatbotId ;
+    } catch (error) {
+      console.log("error getting chatbotID")
+      return error
+    }
 }
 
 const getResponseNumber = (res:any)=>{
@@ -37,8 +46,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "status received" });
   }
 
-  let chatbotId = getChatbotId(req); //here you will recieved the chatbot unique id, based on this you would identify knowledge base
-  const responseNumber = getResponseNumber(req);
+  let chatbotId =await getChatbotId(res?.entry?.[0]?.changes?.[0]?.value?.contacts[0]?.wa_id); //here you will recieved the chatbot unique id, based on this you would identify knowledge base
+ 
+  const responseNumber = getResponseNumber(res);
 
   // retriving userId from database
   try {
@@ -46,8 +56,9 @@ export async function POST(req: NextRequest) {
 
     const collection = db.collection("user-chatbots");
     const cursor = await collection.findOne({
-      chatbotId: "",
+      chatbotId: chatbotId,
     });
+   
     const userID = cursor.userId;
 
     // if we have user id
@@ -57,7 +68,7 @@ export async function POST(req: NextRequest) {
         method: "POST",
         body: JSON.stringify({
           userQuery: questionFromWhatsapp,
-          chatbotId: "",
+          chatbotId: chatbotId,
           userId: userID,
         }),
       }
@@ -106,6 +117,7 @@ export async function POST(req: NextRequest) {
 
     const openaiBody = JSON.parse(await responseOpenAI.text());
 
+  
     // after getting response from open ai
     if (openaiBody.choices[0].message.content) {
       const version = "v18.0"; // Replace with your desired version
@@ -153,6 +165,7 @@ export async function POST(req: NextRequest) {
       }
     }
   } catch (error:any) {
+    console.log(error)
     //mantain the error log in database, in case of unhandle error
   }
 
