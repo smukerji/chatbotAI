@@ -40,7 +40,19 @@ async function saveWhatsappData(req: NextRequest) {
 
   // const collection = await db?.collection('whatsappbot_details')
   //insert data into database
-  const result = await prisma.whatsappbot_details.create({ data: {  } })
+  const result = await prisma.whatsappbot_details.create({ data: { 
+    facebookAppSecret:"123",
+    isActive:true,
+    userId:"123",
+    webhookUrl:"123",
+    chatbotId:"123",
+    isVarifyWebhook:true,
+    phoneBusinessId:"123",
+    phoneNumberId:"123",
+    webhookVarificationToken:"123",
+    whatsAppAccessToken:"123",
+    whatsAppPhoneNumber:"123",
+   } })
 
 
   // const result = await collection?.insertOne({ ...request })
