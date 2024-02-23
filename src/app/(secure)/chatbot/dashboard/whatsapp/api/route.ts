@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { apiHandler } from "../../../../../_helpers/server/api/api-handler";
-import{connectDatabase} from '../../../../../../db';
+// import{connectDatabase} from '../../../../../../db';
+import prisma from "@/lib/prisma";
 module.exports = apiHandler({
   POST: saveWhatsappData,
   GET: getCallBackUrl,
@@ -8,7 +9,7 @@ module.exports = apiHandler({
 // This function will generate a random string
 function generateRandomString() {
   //define a variable consisting alphabets in small and capital letter
-  var characters = "ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
+  var characters = "ABCDE&#$FGHIJKLM@NOPQRSTUVWXTZ&abcdefghiklmno&*pqrstuvwx(yz";
 
   //specify the length for the new string
   var lenString = 7;
@@ -32,18 +33,22 @@ async function getCallBackUrl(req: NextRequest, res: NextResponse) {
 }
 
 
-async function saveWhatsappData(req:NextRequest){
-    const request = await req.json()
-    const db = (await connectDatabase())?.db();
+async function saveWhatsappData(req: NextRequest) {
+  const request = await req.json()
+  // const db = (await connectDatabase())?.db();
 
-   
-    const collection = await db?.collection('whatsApp-details')
-    const result = await collection?.insertOne({...request})
 
-if(result){
-    return{message:'data saved successfully'}
-}  
-   return{message:'Error saving data'}
+  // const collection = await db?.collection('whatsappbot_details')
+  //insert data into database
+  const result = await prisma.whatsappbot_details.create({ data: {  } })
+
+
+  // const result = await collection?.insertOne({ ...request })
+
+  if (result) {
+    return { message: 'data saved successfully' }
+  }
+  return { message: 'Error saving data' }
 }
 
 
