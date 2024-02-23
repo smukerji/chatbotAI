@@ -6,10 +6,8 @@ import { connectDatabase } from "../../../../db";
 import { cookies } from "next/headers";
 import { ObjectId } from "mongodb";
 
-const authOptions: NextAuthOptions = {
-  adapter: MongoDBAdapter(connectDatabase(), {
-    databaseName: "test",
-  }),
+export const authOptions: NextAuthOptions = {
+  adapter: MongoDBAdapter(connectDatabase()),
   //   session: {
   //     strategy: "jwt",
   //   },
@@ -27,6 +25,10 @@ const authOptions: NextAuthOptions = {
   events: {
     signIn: async (message) => {
       /// db connection
+
+      let currentDate = new Date();
+      let endDate = new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+
       const db = (await connectDatabase()).db();
 
       const starterPlan = await db
@@ -35,29 +37,54 @@ const authOptions: NextAuthOptions = {
 
       const username: string[] = message.user.name?.split(" ")!;
 
-      /// insert in users table too
-      await db.collection("users").updateOne(
-        { _id: new ObjectId(message.user.id) },
-        {
-          $set: {
-            planId: starterPlan?._id,
-            username:
-              username[0] + `${username?.[1] ? "_" + username?.[1] : ""}`,
+      /// Check if planId is not already set
+      const user = await db
+        .collection("users")
+        .findOne({ _id: new ObjectId(message.user.id) });
+
+      if (!user.planId) {
+        /// insert in users table too
+        await db.collection("users").updateOne(
+          { _id: new ObjectId(message.user.id) },
+          {
+            $set: {
+              startDate: currentDate,
+              endDate: endDate,
+              planId: starterPlan?._id,
+              username:
+                username[0] + `${username?.[1] ? "_" + username?.[1] : ""}`,
+            },
           },
-        },
-        {
-          upsert: true,
-        }
-      );
+          {
+            upsert: true,
+          }
+        );
+      }
+
+      const userId = message.user.id;
+      /// set the user details
+      // Check if a document with the given userId already exists
+      const existingUser = await db
+        .collection("user-details")
+        .findOne({ userId: userId });
+
+      // If no document exists for the given userId, insert a new one
+      if (!existingUser) {
+        await db.collection("user-details").insertOne({
+          userId: userId,
+          totalMessageCount: 0,
+        });
+      }
     },
   },
 
   callbacks: {
-    async session({ session, user, token }) {
+    async session({ session, user }: any) {
       cookies().set("profile-img", user.image!);
       cookies().set("userId", user.id);
       /// set the username
       cookies().set("username", user?.name!);
+      session.user.id = user.id;
       return session;
     },
     // async signIn({ user, account, profile, email, credentials }) {

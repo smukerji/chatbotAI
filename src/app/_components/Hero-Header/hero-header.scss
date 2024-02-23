@@ -1,13 +1,13 @@
-.hero-header{
-    background: url('../.././../../public/sections-images/header-background/hero-header.svg');
+.hero-header {
+    background: url("../.././../../public/sections-images/header-background/hero-header.svg");
     height: 900px;
     background-repeat: no-repeat;
     background-size: cover;
     position: relative;
     z-index: 999;
 
-    &::after{
-        content: '';
+    &::after {
+        content: "";
         position: absolute;
         left: 0;
         top: 0;
@@ -22,7 +22,6 @@
         background-position: center center;
     }
 }
-
 
 .header-title-container {
     display: flex;
@@ -43,54 +42,50 @@
         display: flex;
         align-items: flex-start;
         gap: 56px;
-        a{
+        a {
             text-align: center;
             text-decoration: unset;
             font-size: 20px;
             font-style: normal;
             font-weight: 500;
             line-height: 28px;
-            color: #FCFCFD;
-            &:hover{
-                color: #0035F0;
-
+            color: #fcfcfd;
+            &:hover {
+                color: #0035f0;
             }
         }
     }
 }
-
 
 .login-register-container {
     display: flex;
     align-items: center;
     gap: 32px;
     .login-btn {
-        color: #FCFCFD;
+        color: #fcfcfd;
         text-align: center;
         font-size: 20px;
         font-style: normal;
         font-weight: 500;
         line-height: 28px;
         cursor: pointer;
-    };
+    }
     .try-free-btn {
         display: flex;
         padding: 12px 24px;
         align-items: center;
         gap: 10px;
-        color: #FCFCFD;
+        color: #fcfcfd;
         text-align: center;
         font-size: 20px;
         font-style: normal;
         font-weight: 600;
         line-height: 28px;
         border-radius: 12px;
-        background: #0035F0;
+        background: #0035f0;
         cursor: pointer;
-    
     }
 }
-
 
 .header-content-container {
     display: flex;
@@ -101,10 +96,9 @@
     padding: 8.7vw 8vw 0 8vw;
 }
 
-
 .hero-header {
     .header-text {
-        color: #FCFCFD;
+        color: #fcfcfd;
         text-align: center;
         font-size: 60px;
         font-style: normal;
@@ -113,7 +107,7 @@
         /* 120% */
     }
     .header-sub-text {
-        color: #FCFCFD;
+        color: #fcfcfd;
         text-align: center;
         /* Subtitle/Large */
         font-size: 20px;
@@ -122,49 +116,45 @@
         line-height: 28px;
     }
 }
-
-
-.request-demo-email-container {
+.request-demo-btn {
     display: flex;
-    width: 500px;
-    padding: 8px 8px 8px 16px;
-    justify-content: space-between;
+    padding: 16px;
     align-items: center;
-    border-radius: 16px;
-    background: #FCFCFD;
-    button {
-        display: flex;
-        padding: 16px;
-        align-items: center;
-        gap: 10px;
-        border-radius: 12px;
-        background: #0035F0;
-        border: none;
-        cursor: pointer;
-        color: #FFF;
-        text-align: center;
-        font-size: 20px;
-        font-style: normal;
-        font-weight: 600;
-        line-height: 28px;
-        /* 140% */
-    }
-    .email-input {
-
-        display: flex;
-        width: 303.5px;
-        align-items: center;
-        gap: 12px;
-        flex-shrink: 0;
-        input {
-            width: 100%;
-            border: none;
-            &:focus-visible {
-                border: none;
-                outline: none;
-            }
-        }
-        
-    }
-    
+    gap: 10px;
+    border-radius: 12px;
+    background: #0035f0;
+    border: none;
+    cursor: pointer;
+    color: #fff;
+    text-align: center;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 28px;
+    /* 140% */
 }
+// .request-demo-email-container {
+//     display: flex;
+//     width: 500px;
+//     padding: 8px 8px 8px 16px;
+//     justify-content: space-between;
+//     align-items: center;
+//     border-radius: 16px;
+//     background: #fcfcfd;
+
+//     .email-input {
+//         display: flex;
+//         width: 303.5px;
+//         align-items: center;
+//         gap: 12px;
+//         flex-shrink: 0;
+//         input {
+//             width: 100%;
+//             border: none;
+//             &:focus-visible {
+//                 border: none;
+//                 outline: none;
+//             }
+//         }
+//     }
+// }

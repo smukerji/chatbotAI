@@ -12,8 +12,9 @@ import whatsapp from "../../../../../public/whatsapp.png";
 import telegram from "../../../../../public/telegram.png";
 import hubspot from "../../../../../public/hubspot.png";
 import { useCookies } from "react-cookie";
-import { Modal, message } from "antd";
+import { Modal, message, Collapse } from "antd";
 import Loader from "./_components/Loader";
+import Coll from "./_components/Collapse"
 
 export default function Home() {
   const [status, setStatus] = useState<number>(2);
@@ -108,7 +109,6 @@ export default function Home() {
 
   return (
     <>
-     
       {loading && <Loader />}
       {status === 2 && loading == false && (
         <div className="main">
@@ -150,67 +150,74 @@ export default function Home() {
               // disableMonth={isYearlyPlan ? false : disableMonth}
             />
           </div>
+          <p className="add-ons-head">Add-ons</p>
           <div className="add-ons-container">
-            <p className="add-ons-head">Add-ons</p>
-            <div className="add-ons-integration">
-              <span className="integration-head">Integration Options</span>
-              <div className="integration-list">
-                <div className="app-integration">
-                  <div className="integration-name-container">
-                    <Image src={whatsapp} alt="no image" />
-                    <p className="integration-name">Whatsapp</p>
+            <div className="add-ons-left">
+              <div className="add-ons-integration">
+                <span className="integration-head">Integration Options</span>
+                <div className="integration-list">
+                  <div className="app-integration">
+                    <div className="integration-name-container">
+                      <Image src={whatsapp} alt="no image" />
+                      <p className="integration-name">Whatsapp</p>
+                    </div>
+                    <div className="app-integration-price">$7 USD monthly</div>
                   </div>
-                  <div className="app-integration-price">$7 USD monthly</div>
-                </div>
-                <div className="app-integration">
-                  <div className="integration-name-container">
-                    <Image src={telegram} alt="no image" />
-                    <p className="integration-name">Telegram</p>
+                  <div className="app-integration">
+                    <div className="integration-name-container">
+                      <Image src={telegram} alt="no image" />
+                      <p className="integration-name">Telegram</p>
+                    </div>
+                    <div className="app-integration-price">$7 USD monthly</div>
                   </div>
-                  <div className="app-integration-price">$7 USD monthly</div>
-                </div>
-                <div className="app-integration">
-                  <div className="integration-name-container">
-                    <Image src={hubspot} alt="no image" />
-                    <p className="integration-name">Hubspot CRM</p>
+                  <div className="app-integration">
+                    <div className="integration-name-container">
+                      <Image src={hubspot} alt="no image" />
+                      <p className="integration-name">Hubspot CRM</p>
+                    </div>
+                    <div className="app-integration-price">$7 USD monthly</div>
                   </div>
-                  <div className="app-integration-price">$7 USD monthly</div>
-                </div>
-                <div className="app-integration">
-                  <div className="integration-name-container">
-                    <Image src={zoho} alt="no image" />
-                    <p className="integration-name">Zoho CRM</p>
+                  <div className="app-integration">
+                    <div className="integration-name-container">
+                      <Image src={zoho} alt="no image" />
+                      <p className="integration-name">Zoho CRM</p>
+                    </div>
+                    <div className="app-integration-price">$7 USD monthly</div>
                   </div>
-                  <div className="app-integration-price">$7 USD monthly</div>
-                </div>
-              </div>
-            </div>
-            <div className="add-ons-integration">
-              <p className="integration-head">Messaging per chatbot</p>
-              <div className="integration-list">
-                <div className="app-integration">
-                  <div className="integration-name-container">
-                    <p className="integration-name">5K messages</p>
-                  </div>
-                  <div className="app-integration-price">$5 USD</div>
-                </div>
-                <div className="app-integration">
-                  <div className="integration-name-container">
-                    <p className="integration-name">5K messages</p>
-                  </div>
-                  <div className="app-integration-price">$8 USD</div>
+                  <button className="btn-add-ons"><span className="btn-text">Get Add-on</span></button>
                 </div>
               </div>
             </div>
-            <div className="add-ons-integration">
-              <p className="integration-head">Training data</p>
-              <div className="integration-list">
-                <div className="app-integration">
-                  <div className="integration-name-container">
-                    <p className="integration-name">5K messages</p>
+            <div className="add-ons-right">
+              <div className="add-ons-integration">
+                <p className="integration-head">Messaging per chatbot</p>
+                <div className="integration-list">
+                  <div className="app-integration">
+                    <div className="integration-name-container">
+                      <p className="integration-name">5K messages</p>
+                    </div>
+                    <div className="app-integration-price">$5 USD</div>
                   </div>
-                  <div className="app-integration-price">$5 USD</div>
+                  <div className="app-integration">
+                    <div className="integration-name-container">
+                      <p className="integration-name">5K messages</p>
+                    </div>
+                    <div className="app-integration-price">$8 USD</div>
+                  </div>
                 </div>
+                <button className="btn-add-ons"><span className="btn-text">Get Add-on</span></button>
+              </div>
+              <div className="add-ons-integration">
+                <p className="integration-head">Training data</p>
+                <div className="integration-list">
+                  <div className="app-integration">
+                    <div className="integration-name-container">
+                      <p className="integration-name">5K messages</p>
+                    </div>
+                    <div className="app-integration-price">$5 USD</div>
+                  </div>
+                </div>
+                <button className="btn-add-ons"><span className="btn-text">Get Add-on</span></button>
               </div>
             </div>
           </div>
@@ -224,7 +231,9 @@ export default function Home() {
                 platforms.
               </p>
             </div>
-            <div className="footer-right"></div>
+            <div className="footer-right">
+              <Coll />
+            </div>
           </div>
         </div>
       )}

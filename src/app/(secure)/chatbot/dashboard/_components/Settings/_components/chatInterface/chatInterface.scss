@@ -72,7 +72,9 @@
         border: 1px solid #e6e8ec;
         background: #fff;
         // overflow: hidden;
-        resize: none;
+        // resize: none;
+        min-width: 100%;
+        max-width: 100%;
         color: #23262f;
 
         /* Body/Medium */

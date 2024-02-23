@@ -158,7 +158,7 @@ function Header() {
           </button>
         </a>
         {/*------------------------------------------feedback-btn----------------------------------------------*/}
-        <button className="feedback-btn">Feedback</button>
+        <button className="feedback-btn">Support</button>
         {/*------------------------------------------Profile Image----------------------------------------------*/}
 
         <div className="profile-img" onClick={() => setOpenMenu(!openMenu)}>

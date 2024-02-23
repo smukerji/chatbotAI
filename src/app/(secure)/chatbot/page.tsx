@@ -4,7 +4,7 @@ import {
   MessageOutlined,
   MoreOutlined,
 } from "@ant-design/icons";
-import { Modal, Spin, message } from "antd";
+import { Modal, Spin, message ,Button} from "antd";
 import React, { Suspense, useContext, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import "./chatbot.scss";
@@ -28,6 +28,7 @@ import LimitReachedModal from "./dashboard/_components/Modal/LimitReachedModal";
 import { CreateBotContext } from "../../_helpers/client/Context/CreateBotContext";
 import { UserDetailsContext } from "../../_helpers/client/Context/UserDetailsContext";
 import { JWT_EXPIRED } from "../../_helpers/errorConstants";
+import axios from "axios";
 // import GridIcon from "../../as";
 
 const antIcon = (
@@ -82,24 +83,34 @@ function Chatbot() {
 
   /// managing new chatbot name modal
   const [openNewChatbotNameModal, setOpenNewChatbotNameModal] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const showModal = () => {
     setIsModalOpen(true);
   };
 
   const handleOk = () => {
-    router.push('home/pricing')
+    router.push("home/pricing");
     setIsModalOpen(false);
   };
 
   const handleCancel = () => {
-
+    // router.push("home/pricing");
+    // setIsModalOpen(false);
   };
 
-
+  const first = async () => {
+    const checkPlan = await axios.put(
+      `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway`,
+      { u_id: cookies.userId }
+    );
+    if (checkPlan.data.msg == 0) {
+      setIsModalOpen(true);
+    }
+  };
   /// retrive the chatbots details
   useEffect(() => {
+    first();
     const fetchData = async () => {
       try {
         setLoading(true);
@@ -174,36 +185,39 @@ function Chatbot() {
   if (status === "authenticated" || cookies?.userId) {
     return (
       <>
-      <Modal
-      title="Basic Modal"
-      open={isModalOpen}
-      onOk={handleOk}
-      onCancel={handleCancel}
-      >
-      <p>Some contents...</p>
-      <p>Some contents...</p>
-      <p>Some contents...</p>
-    </Modal>
-      <div
-        className="chatbot-list-container"
-        onClick={() => openMenu && setOpenMenu(null)}
+        <Modal
+          title="Upgrade your plan"
+          open={isModalOpen}
+          // onOk={handleOk}
+          onCancel={handleCancel}
+          footer={[
+            <Button key="submit" type="primary" onClick={handleOk}>
+              UPGRADE
+            </Button>,
+          ]}
         >
-        {/*------------------------------------------title----------------------------------------------*/}
-        <div className="title-container">
-          <h1 className="title">My Chatbots</h1>
-          <div className="action-container">
-            <div className="chatbot-list-action">
-              <Icon
-                className={listType == "grid" ? "active" : ""}
-                Icon={GridIcon}
-                click={() => setListType("grid")}
-              />
-              <Icon
-                className={listType == "table" ? "active" : ""}
-                Icon={MenuIcon}
-                click={() => setListType("table")}
-              />
-              {/* <Image
+          <p>Your plan is expired, please upgrade your plan to access chatbots</p>
+        </Modal>
+        <div
+          className="chatbot-list-container"
+          onClick={() => openMenu && setOpenMenu(null)}
+        >
+          {/*------------------------------------------title----------------------------------------------*/}
+          <div className="title-container">
+            <h1 className="title">My Chatbots</h1>
+            <div className="action-container">
+              <div className="chatbot-list-action">
+                <Icon
+                  className={listType == "grid" ? "active" : ""}
+                  Icon={GridIcon}
+                  click={() => setListType("grid")}
+                />
+                <Icon
+                  className={listType == "table" ? "active" : ""}
+                  Icon={MenuIcon}
+                  click={() => setListType("table")}
+                />
+                {/* <Image
                 className={listType == "grid" ? "active" : ""}
                 src={gridIcon}
                 alt="grid-icon"
@@ -215,38 +229,54 @@ function Chatbot() {
                 alt="menu-icon"
                 onClick={() => setListType("table")}
               /> */}
-            </div>
-            {/* <Link href={`${process.env.NEXT_PUBLIC_WEBSITE_URL}home`}> */}
-            <button
-              onClick={() => {
-                /// check if user has exceeded the number of creation of bots
-                if (
-                  userDetails?.noOfChatbotsUserCreated + 1 >
-                  userDetails?.plan?.numberOfChatbot
-                ) {
-                  setOpenLimitModel(true);
-                  return;
-                }
-                
-                setOpenNewChatbotNameModal(true);
-              }}
-              disabled={loading}
-            >
-              New Chatbot
-            </button>
-            {/* </Link> */}
-          </div>
-          {openLimitModal ? (
-            <LimitReachedModal setOpenLimitModel={setOpenLimitModel} />
-            ) : (
-            <></>
-            )}
-        </div>
+              </div>
+              {/* <Link href={`${process.env.NEXT_PUBLIC_WEBSITE_URL}home`}> */}
+              <button
+                onClick={() => {
+                  /// check if user has exceeded the number of creation of bots
+                  if (
+                    userDetails?.noOfChatbotsUserCreated + 1 >
+                    userDetails?.plan?.numberOfChatbot
+                  ) {
+                    setOpenLimitModel(true);
+                    return;
+                  }
 
-        {/*------------------------------------------chatbot-list-grid----------------------------------------------*/}
-        {listType === "grid" && (
-          <>
-            <GridLayout
+                  setOpenNewChatbotNameModal(true);
+                }}
+                disabled={loading}
+              >
+                New Chatbot
+              </button>
+              {/* </Link> */}
+            </div>
+            {openLimitModal ? (
+              <LimitReachedModal setOpenLimitModel={setOpenLimitModel} />
+            ) : (
+              <></>
+            )}
+          </div>
+
+          {/*------------------------------------------chatbot-list-grid----------------------------------------------*/}
+          {listType === "grid" && (
+            <>
+              <GridLayout
+                chatbotData={chatbotData}
+                changeMenu={changeMenu}
+                openMenu={openMenu}
+                openChatbot={openChatbot}
+                setOpenShareModal={setOpenShareModal}
+                chatbotId={chatbotId}
+                setChatbotId={setChatbotId}
+                setOpenDeleteModal={setOpenDeleteModal}
+                setOpenRenameModal={setOpenRenameModal}
+              />
+            </>
+          )}
+
+          {/*------------------------------------------chatbot-list-table----------------------------------------------*/}
+          {listType === "table" && (
+            <TableLayout
               chatbotData={chatbotData}
               changeMenu={changeMenu}
               openMenu={openMenu}
@@ -256,63 +286,47 @@ function Chatbot() {
               setChatbotId={setChatbotId}
               setOpenDeleteModal={setOpenDeleteModal}
               setOpenRenameModal={setOpenRenameModal}
-              />
-          </>
-        )}
-
-        {/*------------------------------------------chatbot-list-table----------------------------------------------*/}
-        {listType === "table" && (
-          <TableLayout
-            chatbotData={chatbotData}
-            changeMenu={changeMenu}
-            openMenu={openMenu}
-            openChatbot={openChatbot}
-            setOpenShareModal={setOpenShareModal}
+            />
+          )}
+          <DeleteModal
+            open={openDeleteModal}
+            setOpen={setOpenDeleteModal}
             chatbotId={chatbotId}
-            setChatbotId={setChatbotId}
-            setOpenDeleteModal={setOpenDeleteModal}
-            setOpenRenameModal={setOpenRenameModal}
+            setChangeFlag={setChangeFlag}
+            changeFlag={changeFlag}
           />
-        )}
-        <DeleteModal
-          open={openDeleteModal}
-          setOpen={setOpenDeleteModal}
-          chatbotId={chatbotId}
-          setChangeFlag={setChangeFlag}
-          changeFlag={changeFlag}
-        />
-        <ShareModal
-          open={openShareModal}
-          setOpen={setOpenShareModal}
-          chatbotId={chatbotId}
-        />
-        <RenameModal
-          open={openRenameModal}
-          setOpen={setOpenRenameModal}
-          chatbotId={chatbotId}
-          setChangeFlag={setChangeFlag}
-          changeFlag={changeFlag}
+          <ShareModal
+            open={openShareModal}
+            setOpen={setOpenShareModal}
+            chatbotId={chatbotId}
+          />
+          <RenameModal
+            open={openRenameModal}
+            setOpen={setOpenRenameModal}
+            chatbotId={chatbotId}
+            setChangeFlag={setChangeFlag}
+            changeFlag={changeFlag}
           />
 
-        <NewChatbotNameModal
-          open={openNewChatbotNameModal}
-          setOpen={setOpenNewChatbotNameModal}
-          chatbotId={chatbotId}
+          <NewChatbotNameModal
+            open={openNewChatbotNameModal}
+            setOpen={setOpenNewChatbotNameModal}
+            chatbotId={chatbotId}
           />
 
-        {/*------------------------------------------loading/no-chatbots----------------------------------------------*/}
-        {!loading && chatbotData?.length == 0 && (
-          <div className="no-chatbots-container">
-            <Image src={noChatbotBg} alt="no-chatbot-bg" />
-            <p>
-              You haven&apos;t created any Chatbots. Go ahead and create a New
-              Chatbot!
-            </p>
-          </div>
-        )}
-        {loading && <Spin indicator={antIcon} />}
-      </div>
-        </>
+          {/*------------------------------------------loading/no-chatbots----------------------------------------------*/}
+          {!loading && chatbotData?.length == 0 && (
+            <div className="no-chatbots-container">
+              <Image src={noChatbotBg} alt="no-chatbot-bg" />
+              <p>
+                You haven&apos;t created any Chatbots. Go ahead and create a New
+                Chatbot!
+              </p>
+            </div>
+          )}
+          {loading && <Spin indicator={antIcon} />}
+        </div>
+      </>
     );
   } else if (status === "unauthenticated") {
     redirect("/account/login");
