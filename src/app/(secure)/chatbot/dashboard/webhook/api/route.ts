@@ -6,13 +6,16 @@ import { connectDatabase } from "@/db";
 const getChatbotId = async(wa_id:any) => {
     try {
        const db = (await connectDatabase()).db();
-       const collection = db.collection("whatsApp-details");
-       const result = await collection.findOne({whatsAppPhoneNumber:wa_id})
-       const chatbotId =await result.chatbotId
-       return  chatbotId ;
+       const collection = db.collection("whatsappbot_details");
+       const result = await collection.findOne({phoneNumberID:wa_id})
+       if(result.chatbotId){
+         return result.chatbotId;
+       }
+      return null;
+       
     } catch (error) {
       console.log("error getting chatbotID")
-      return error
+      return "error"
     }
 }
 
@@ -25,11 +28,23 @@ export async function GET(req: NextRequest) {
   let hubChallenge = req.nextUrl.searchParams.get("hub.challenge");
   let hubToken = req.nextUrl.searchParams.get("hub.verify_token");
 
+  const db = (await connectDatabase())?.db();
+  const collection = db?.collection('whatsappbot_details');
+  //find the token in database
+  const tokenDetails = await collection?.findOne({ webhook_verification_token: hubToken });
   if (
     hubMode === "subscribe" &&
-    hubToken === process.env.WHATSAPPCALLBACKTOKEN
+    hubToken === tokenDetails?.webhook_verification_token
+    // hubToken === process.env.WHATSAPPCALLBACKTOKEN
   ) {
-    console.log('verified successfully')
+
+    // find whome the hubToken belongs to and update the isTokenVerified to true
+    const tokenDetails = await collection?.findOne({ webhook_verification_token: hubToken });
+    if (tokenDetails) {
+      await collection?.updateOne({ webhook_verification_token: hubToken }, { $set: { isTokenVerified: true } });
+    }
+
+    console.log('verified successfully');
     return new Response(hubChallenge);
   }
 
@@ -46,8 +61,21 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "status received" });
   }
 
-  let chatbotId =await getChatbotId(res?.entry?.[0]?.changes?.[0]?.value?.contacts[0]?.wa_id); //here you will recieved the chatbot unique id, based on this you would identify knowledge base
  
+  //get the phone number id from the response
+  const phoneNumberId = res?.entry?.[0]?.changes?.[0]?.value?.metadata["phone_number_id"];
+
+  let chatbotId =await getChatbotId(phoneNumberId); //here you will recieved the chatbot unique id, based on this you would identify knowledge base
+
+
+  if(!chatbotId || chatbotId === "error"){
+    return {
+      status: 400,
+      message: "Chatbot not found"
+    }
+  }
+
+
   const responseNumber = getResponseNumber(res);
 
   // retriving userId from database
@@ -171,4 +199,6 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ message: "received" });
 }
+
+
 

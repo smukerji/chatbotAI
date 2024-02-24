@@ -1,46 +1,78 @@
 import { NextRequest, NextResponse } from "next/server";
 import { apiHandler } from "../../../../../_helpers/server/api/api-handler";
 import{connectDatabase} from '../../../../../../db';
+import { v4 as uuidv4 } from 'uuid';
+
 module.exports = apiHandler({
   POST: saveWhatsappData,
   GET: getCallBackUrl,
+  PUT: isWhatsAppTokenVerified
 });
 // This function will generate a random string
-function generateRandomString() {
-  //define a variable consisting alphabets in small and capital letter
-  var characters = "ABCDE&#$FGHIJKLM@NOPQRSTUVWXTZ&abcdefghiklmno&*pqrstuvwx(yz";
-
-  //specify the length for the new string
-  var lenString = 7;
-  var randomstring = "";
-
-  //loop to select a new character in each iteration
-  for (var i = 0; i < lenString; i++) {
-    var rnum = Math.floor(Math.random() * characters.length);
-    randomstring += characters.substring(rnum, rnum + 1);
-  }
-
-  return randomstring.toUpperCase();
+function generateUniqueToken() {
+  return uuidv4();
 }
-
 
 // This is get method for generation webhook verification token
 async function getCallBackUrl(req: NextRequest, res: NextResponse) {
-  const randomString = generateRandomString();
-    
+  const randomString = generateUniqueToken();
+  // const request = await req.json();
+  let chatBotId = req.nextUrl.searchParams.get("chatBotId");
+
+
+  //insert the token into database
+  const db = (await connectDatabase())?.db();
+  const collection = db?.collection('whatsappbot_details');
+
+  //find the user based on the chatbot id
+  const userCollection = db?.collection('user-chatbots');
+  const user = await userCollection?.findOne({ chatbotId: chatBotId });
+
+  //find user with chatbot id in whatsappbot_details on token verified false then send the token
+  const tokenDetails = await collection?.findOne({ chatbotId: chatBotId, isTokenVerified: false });
+  if (tokenDetails) {
+    return { webhook_verification_token: tokenDetails.webhook_verification_token };
+  }
+
+  // insert data into database
+  await collection?.insertOne({ webhook_verification_token: randomString, userId: user.userId, chatbotId: chatBotId, isTokenVerified: false})
+
+
   return { webhook_verification_token: randomString };
 }
+
 
 
 async function saveWhatsappData(req: NextRequest) {
   const request = await req.json()
   const db = (await connectDatabase())?.db();
 
+  //if data exist based on the chatbot id then update the data
+  const collection = db?.collection('whatsappbot_details');
+  const tokenDetails = await collection?.findOne({ chatbotId: request.chatbotId, isTokenVerified: true, userId: request.userId });
 
-  const collection = await db?.collection('whatsappbot_details')
-  // insert data into database
+  if (tokenDetails) {
+    await collection?.updateOne({ chatbotId: request.chatbotId, isTokenVerified: true, userId: request.userId }, { $set: { ...request } });
+    return { message: "success" };
+  }
 
-  const result = await collection?.insertOne({ ...request })
+  //return error respose
+  return { message: "error" };
+
+}
+
+async function isWhatsAppTokenVerified(req: NextRequest) {
+
+  let whatsAppToken = req.nextUrl.searchParams.get("whatsAppVerifyToken");
+
+  const db = (await connectDatabase())?.db();
+  const collection = db?.collection('whatsappbot_details');
+  const tokenDetails = await collection?.findOne({ webhook_verification_token: whatsAppToken });
+
+  return {
+   verifyMessage : tokenDetails?.isTokenVerified ? "verified token" : "invalid token",
+   verifyValue: tokenDetails?.isTokenVerified ? true : false
+  }
 
 }
 
