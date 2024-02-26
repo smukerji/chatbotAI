@@ -20,14 +20,17 @@
       gap: 20px;
     }
 
-    .action {
-      color: #fe632f;
-      font-size: 16px;
-      font-style: normal;
-      font-weight: 500;
-      line-height: 24px; /* 150% */
+        .action {
+            color: #fe632f;
+            font-size: 16px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 24px; /* 150% */
+        }
+        .action:hover{
+            cursor: pointer;
+        }
     }
-  }
 
   .integration:nth-of-type(2) .action {
     color: #777e90;
