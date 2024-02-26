@@ -68,6 +68,10 @@ export async function POST(req: NextRequest) {
   let whatsAppDetailsResult:any = await getWhatsAppDetails(phoneNumberId); //here you will recieved the chatbot unique id, based on this you would identify knowledge base
 
 
+  if(whatsAppDetailsResult.isEnabled === false){
+    return { message: "Chatbot with WhatsApp is disabled" };
+  }
+
   if (!whatsAppDetailsResult || whatsAppDetailsResult === "error") {
     return {
       status: 400,
@@ -192,6 +196,7 @@ export async function POST(req: NextRequest) {
         // Handle the data as needed
       } catch (error) {
         // Handle the error as needed
+        console.log(error);
       }
     }
   } catch (error: any) {
