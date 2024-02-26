@@ -1,38 +1,38 @@
-"use client";
+'use client';
 import {
   LoadingOutlined,
   MessageOutlined,
   MoreOutlined,
-} from "@ant-design/icons";
-import { Modal, Spin, message, Button } from "antd";
-import React, { Suspense, useContext, useEffect, useState } from "react";
-import { useCookies } from "react-cookie";
-import "./chatbot.scss";
-import Image from "next/image";
-import noChatbotBg from "../../../../public/sections-images/common/no-chatbot-icon.svg";
+} from '@ant-design/icons';
+import { Modal, Spin, message, Button } from 'antd';
+import React, { Suspense, useContext, useEffect, useState } from 'react';
+import { useCookies } from 'react-cookie';
+import './chatbot.scss';
+import Image from 'next/image';
+import noChatbotBg from '../../../../public/sections-images/common/no-chatbot-icon.svg';
 // import gridIcon from "../../../../public/svgs/grid-icon.svg";
-import GridLayout from "./_components/GridLayout";
-import TableLayout from "./_components/TableLayout";
-import DeleteModal from "./dashboard/_components/Modal/DeleteModal";
-import ShareModal from "./dashboard/_components/Modal/ShareModal";
-import { redirect, useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
-import dynamic from "next/dynamic";
-import Link from "next/link";
-import RenameModal from "./dashboard/_components/Modal/RenameModal";
-import Icon from "../../_components/Icon/Icon";
-import GridIcon from "../../../assets/svg/GridIcon";
-import MenuIcon from "../../../assets/svg/MenuIcon";
-import NewChatbotNameModal from "./dashboard/_components/Modal/NewChatbotNameModal";
-import LimitReachedModal from "./dashboard/_components/Modal/LimitReachedModal";
-import { CreateBotContext } from "../../_helpers/client/Context/CreateBotContext";
-import { UserDetailsContext } from "../../_helpers/client/Context/UserDetailsContext";
-import { JWT_EXPIRED } from "../../_helpers/errorConstants";
-import axios from "axios";
+import GridLayout from './_components/GridLayout';
+import TableLayout from './_components/TableLayout';
+import DeleteModal from './dashboard/_components/Modal/DeleteModal';
+import ShareModal from './dashboard/_components/Modal/ShareModal';
+import { redirect, useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
+import dynamic from 'next/dynamic';
+import Link from 'next/link';
+import RenameModal from './dashboard/_components/Modal/RenameModal';
+import Icon from '../../_components/Icon/Icon';
+import GridIcon from '../../../assets/svg/GridIcon';
+import MenuIcon from '../../../assets/svg/MenuIcon';
+import NewChatbotNameModal from './dashboard/_components/Modal/NewChatbotNameModal';
+import LimitReachedModal from './dashboard/_components/Modal/LimitReachedModal';
+import { CreateBotContext } from '../../_helpers/client/Context/CreateBotContext';
+import { UserDetailsContext } from '../../_helpers/client/Context/UserDetailsContext';
+import { JWT_EXPIRED } from '../../_helpers/errorConstants';
+import axios from 'axios';
 // import GridIcon from "../../as";
 
 const antIcon = (
-  <LoadingOutlined style={{ fontSize: 24, color: "black" }} spin />
+  <LoadingOutlined style={{ fontSize: 24, color: 'black' }} spin />
 );
 
 function Chatbot() {
@@ -54,15 +54,15 @@ function Chatbot() {
 
   /// chatbots details state
   const [chatbotData, setChatbotData] = useState([]);
-  const [cookies, setCookie] = useCookies(["userId"]);
+  const [cookies, setCookie] = useCookies(['userId']);
 
   /// loading state
   const [loading, setLoading] = useState(false);
 
   /// state for showing the chabot list
-  const [listType, setListType]: any = useState("grid");
+  const [listType, setListType]: any = useState('grid');
 
-  const [chatbotId, setChatbotId] = useState("");
+  const [chatbotId, setChatbotId] = useState('');
 
   /// managing share chatbot
   const [openShareModal, setOpenShareModal] = useState(false);
@@ -83,7 +83,6 @@ function Chatbot() {
 
   /// managing new chatbot name modal
   const [openNewChatbotNameModal, setOpenNewChatbotNameModal] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // const showModal = async () => {
   //   const checkPlan = await axios.put(
@@ -96,11 +95,6 @@ function Chatbot() {
   //   }
   //   // setIsModalOpen(true);
   // };
-
-  const handleOk = () => {
-    router.push("home/pricing");
-    setIsModalOpen(false);
-  };
 
   const handleCancel = () => {
     // router.push("home/pricing");
@@ -117,7 +111,7 @@ function Chatbot() {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/api`,
           {
-            method: "POST",
+            method: 'POST',
             body: JSON.stringify({ userId: cookies.userId }),
             next: { revalidate: 0 },
           }
@@ -126,19 +120,19 @@ function Chatbot() {
 
         /// check if session is expired
         if (data.message == JWT_EXPIRED) {
-          window.location.href = "/account/login";
+          window.location.href = '/account/login';
         }
 
         /// get the user and plan details
         const userDetailsresponse = await fetch(
           `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/account/user/details?userId=${cookies?.userId}`,
           {
-            method: "GET",
+            method: 'GET',
             next: { revalidate: 0 },
           }
         );
         const userDetails = await userDetailsresponse.json();
-        userDetailContext?.handleChange("noOfChatbotsUserCreated")(
+        userDetailContext?.handleChange('noOfChatbotsUserCreated')(
           userDetails?.noOfChatbotsUserCreated
         );
 
@@ -149,7 +143,7 @@ function Chatbot() {
         setLoading(false);
       } catch (error) {
         setLoading(false);
-        console.error("Error fetching chatbot data:", error);
+        console.error('Error fetching chatbot data:', error);
       }
     };
 
@@ -162,7 +156,7 @@ function Chatbot() {
     router.push(
       `${
         process.env.NEXT_PUBLIC_WEBSITE_URL
-      }chatbot/dashboard?${encodeURIComponent("chatbot")}=${encodeURIComponent(
+      }chatbot/dashboard?${encodeURIComponent('chatbot')}=${encodeURIComponent(
         JSON.stringify(
           chatbotData.filter((data: any) => {
             return data.id == id;
@@ -181,24 +175,9 @@ function Chatbot() {
     // )}`;
   }
 
-  if (status === "authenticated" || cookies?.userId) {
+  if (status === 'authenticated' || cookies?.userId) {
     return (
       <>
-        <Modal
-          title="Upgrade your plan"
-          open={isModalOpen}
-          // onOk={handleOk}
-          onCancel={handleCancel}
-          footer={[
-            <Button key="submit" type="primary" onClick={handleOk}>
-              UPGRADE
-            </Button>,
-          ]}
-        >
-          <p>
-            Your plan is expired, please upgrade your plan to access chatbots
-          </p>
-        </Modal>
         <div
           className="chatbot-list-container"
           onClick={() => openMenu && setOpenMenu(null)}
@@ -209,14 +188,14 @@ function Chatbot() {
             <div className="action-container">
               <div className="chatbot-list-action">
                 <Icon
-                  className={listType == "grid" ? "active" : ""}
+                  className={listType == 'grid' ? 'active' : ''}
                   Icon={GridIcon}
-                  click={() => setListType("grid")}
+                  click={() => setListType('grid')}
                 />
                 <Icon
-                  className={listType == "table" ? "active" : ""}
+                  className={listType == 'table' ? 'active' : ''}
                   Icon={MenuIcon}
-                  click={() => setListType("table")}
+                  click={() => setListType('table')}
                 />
                 {/* <Image
                 className={listType == "grid" ? "active" : ""}
@@ -235,17 +214,16 @@ function Chatbot() {
               <button
                 onClick={() => {
                   // showModal()
-                    /// check if user has exceeded the number of creation of bots
-                    if (
-                      userDetails?.noOfChatbotsUserCreated + 1 >
-                      userDetails?.plan?.numberOfChatbot
-                    ) {
-                      setOpenLimitModel(true);
-                      return;
-                    }
+                  /// check if user has exceeded the number of creation of bots
+                  if (
+                    userDetails?.noOfChatbotsUserCreated + 1 >
+                    userDetails?.plan?.numberOfChatbot
+                  ) {
+                    setOpenLimitModel(true);
+                    return;
+                  }
 
-                    setOpenNewChatbotNameModal(true);
-                  
+                  setOpenNewChatbotNameModal(true);
                 }}
                 disabled={loading}
               >
@@ -261,7 +239,7 @@ function Chatbot() {
           </div>
 
           {/*------------------------------------------chatbot-list-grid----------------------------------------------*/}
-          {listType === "grid" && (
+          {listType === 'grid' && (
             <>
               <GridLayout
                 chatbotData={chatbotData}
@@ -278,7 +256,7 @@ function Chatbot() {
           )}
 
           {/*------------------------------------------chatbot-list-table----------------------------------------------*/}
-          {listType === "table" && (
+          {listType === 'table' && (
             <TableLayout
               chatbotData={chatbotData}
               changeMenu={changeMenu}
@@ -331,8 +309,8 @@ function Chatbot() {
         </div>
       </>
     );
-  } else if (status === "unauthenticated") {
-    redirect("/account/login");
+  } else if (status === 'unauthenticated') {
+    redirect('/account/login');
   }
 }
 
