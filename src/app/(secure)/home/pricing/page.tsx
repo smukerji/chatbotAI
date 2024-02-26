@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useDebugValue } from "react";
 import axios from "axios";
-import CreatePaymentMethod from "./_components/CreatePaymentMethod";
 import "../pricing/stripe.scss";
 import Image from "next/image";
 import PlanOne from "./_components/plan-box-1";
@@ -25,20 +24,6 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [cookies, setCookie] = useCookies(["userId"]);
   const [prePrice, setPrePrice] = useState(0);
-  // const [isModalOpen, setIsModalOpen] = useState(true);
-
-  // const showModal = () => {
-  //   setIsModalOpen(true);
-  // };
-
-  // const handleOk = () => {
-  //   setIsModalOpen(false);
-  // };
-
-  // const handleCancel = () => {
-  //   setIsModalOpen(false);
-  //   setIsModalOpen(true);
-  // };
 
   const u_id: any = cookies.userId;
 

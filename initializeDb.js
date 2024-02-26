@@ -9,8 +9,9 @@ async function initializeDb() {
   let db = (await client.connect()).db();
 
   const planCollection = db.collection("plans");
-  const accountsColection = db.collection("accounts");
-  const userColection = db.collection("users");
+  const accountsCollection = db.collection("accounts");
+  const userCollection = db.collection("users");
+  const paymentHistoryCollection = db.collection('payment-history');
 
   /// update/insert starter plan
   await planCollection.updateOne(

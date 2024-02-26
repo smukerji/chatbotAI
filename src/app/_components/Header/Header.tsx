@@ -192,12 +192,12 @@ function Header() {
                     <Image src={profileIcon} alt="profile-icon" />
                     Account settings
                   </li>
-                  <li>
+                  <li onClick={() => router.push("/home/BillingAndUsage")}>
                     <Image src={receiptIcon} alt="receipt-icon" />
                     Billing & Usage
                   </li>
 
-                  <li>
+                  <li onClick={() => router.push("/home/pricing")}>
                     <Image src={walletIcon} alt="wallet-icon" />
                     Pricing Plans
                   </li>

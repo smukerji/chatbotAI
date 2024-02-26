@@ -35,17 +35,22 @@ export default function BillingAndUsage() {
             <div className="plan-feature">
               <div className="plan-message">1k messages</div>
               <div className="plan-chatbot">7 chatbots</div>
+              <div className="next-renewal-date">
+                <div className="next-renewal-date-text">Next renewal date</div>
+                <div className="next-renewal-date-date">17/09/2001</div>
+              </div>
             </div>
           </div>
+        </div>
+        <div className="btn-class">
           <button className="btn-upgrade">
-            <span className="btn-text">Upgrade</span>
+            <span className="btn-text">Explore Plans</span>
+          </button>
+          <button className="btn-cancel-plan">
+            <span className="btn-text-cancel-plan">Cancel My Plan</span>
           </button>
         </div>
-        <div className="next-renewal-date">
-          <div className="next-renewal-date-text">Next renewal date</div>
-          <div className="next-renewal-date-date">17/09/2001</div>
-        </div>
-        <div className="manage-plan">Manage My Plan</div>
+        <div className="manage-plan">Payment history</div>
         <div className="manage-plan-text">
           Manage your payment methods or cancel your plan by clicking on the
           link below

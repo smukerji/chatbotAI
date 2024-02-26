@@ -1,5 +1,5 @@
 .billing-main {
-  width: 55%;
+  width: 80%;
   margin: 20px auto;
   .billing-head {
     color: var(--Neutral-8, #141416);
@@ -62,7 +62,7 @@
   .plan-details {
     margin-top: 20px;
     display: flex;
-    width: 792px;
+    width: 100%;
     padding: 16px 24px;
     justify-content: space-between;
     align-items: center;
@@ -76,18 +76,38 @@
       gap: 10px;
       .plan-name {
         color: var(--Neutral-8, #141416);
-
-        /* Subtitle/Large */
         font-family: sans-serif;
-        font-size: 20px;
+        font-size: 24px;
         font-style: normal;
-        font-weight: 500;
-        line-height: 28px; /* 140% */
+        font-weight: 600;
+        line-height: 32px;
       }
       .plan-feature {
         display: flex;
         align-items: center;
         gap: 24px;
+        .next-renewal-date {
+          display: inline-flex;
+          align-items: flex-start;
+          gap: 16px;
+          // margin-top: 24px;
+          .next-renewal-date-text {
+            color: var(--Neutral-5, #777e90);
+            font-family: sans-serif;
+            font-size: 20px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 28px;
+          }
+          .next-renewal-date-date {
+            color: var(--Neutral-8, #141416);
+            font-family: sans-serif;
+            font-size: 20px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 28px;
+          }
+        }
         .plan-message {
           color: var(--Neutral-5, #777e90);
 
@@ -110,7 +130,29 @@
         }
       }
     }
+  }
+  .btn-class {
+    display: flex;
+    .btn-cancel-plan {
+      margin-top: 24px;
+      display: flex;
+      padding: 12px 16px;
+      justify-content: center;
+      align-items: center;
+      background-color: #fff;
+      gap: 10px;
+      border: none;
+      .btn-text-cancel-plan {
+        color: var(--Red, #f00000);
+        font-family: sans-serif;
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 28px;
+      }
+    }
     .btn-upgrade {
+      margin-top: 24px;
       display: flex;
       padding: 12px 16px;
       justify-content: center;
@@ -130,28 +172,7 @@
       }
     }
   }
-  .next-renewal-date {
-    display: inline-flex;
-    align-items: flex-start;
-    gap: 16px;
-    margin-top: 24px;
-    .next-renewal-date-text {
-      color: var(--Neutral-5, #777e90);
-      font-family: sans-serif;
-      font-size: 20px;
-      font-style: normal;
-      font-weight: 500;
-      line-height: 28px;
-    }
-    .next-renewal-date-date {
-      color: var(--Neutral-8, #141416);
-      font-family: sans-serif;
-      font-size: 20px;
-      font-style: normal;
-      font-weight: 500;
-      line-height: 28px;
-    }
-  }
+
   .manage-plan {
     color: var(--Neutral-8, #141416);
     margin-top: 40px;

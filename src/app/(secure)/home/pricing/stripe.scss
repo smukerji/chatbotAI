@@ -249,6 +249,9 @@
             line-height: 28px; /* 140% */
           }
         }
+        .plan1:hover {
+          cursor: pointer;
+        }
         .pay-btn:disabled {
           cursor: not-allowed;
         }
@@ -713,6 +716,9 @@
         border: none;
         border-radius: 16px;
         background: var(--Primary-6, #335df3);
+      }
+      .btn-card-submit:hover {
+        cursor: pointer;
       }
 
       // padding-bottom: 30px;
