@@ -36,12 +36,13 @@ async function createPaymentIntent(req: any, res: NextResponse) {
           automatic_payment_methods: {
             enabled: true,
           },
-          // confirm:true,
           customer: data.customerId,
           payment_method: data.paymentId,
           receipt_email: data.email,
         });
-
+        console.log(
+          paymentIntent
+        )
         return paymentIntent;
       } else {
         return { status: 500 };

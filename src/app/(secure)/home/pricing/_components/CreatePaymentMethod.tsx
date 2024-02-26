@@ -4,6 +4,7 @@ import {
   CardElement,
   useStripe,
   useElements,
+  PaymentElement,
   CardNumberElement,
   CardCvcElement,
   CardExpiryElement,
@@ -18,7 +19,7 @@ import "../../pricing/stripe.scss";
 import { useCookies } from "react-cookie";
 import { message } from "antd";
 import line from "../../../../../../public/svgs/line.svg";
-import Image from "next/image";
+import Image from 'next/image';
 
 export default function CreatePaymentMethod({ plan, price, duration }: any) {
   const stripe = useStripe();
@@ -30,17 +31,17 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
   console.log(price);
   const handleSubmit = async (event: any) => {
     event.preventDefault();
-
+    
     if (!stripe || !elements) {
       return;
     }
-
+    
+    setLoading(true)
     const cardNumber: any = elements.getElement(CardNumberElement);
     const cardCvc: any = elements.getElement(CardCvcElement);
     const cardExpiry: any = elements.getElement(CardExpiryElement);
 
     const u_id: any = cookies.userId;
-    setLoading(true);
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/getCustomer`,
@@ -53,13 +54,12 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
       message.error("error while getting customer data");
       throw error;
     }
-    console.log(cardNumber);
-    const paymentMethod = await stripe.createPaymentMethod({
-      type: "card",
-      card: cardNumber,
-    });
-    console.log(paymentMethod.paymentMethod?.id);
     try {
+      const paymentMethod = await stripe.createPaymentMethod({
+        type: "card",
+        card: cardNumber,
+      });
+      console.log(paymentMethod.paymentMethod?.id);
       const id: any = paymentMethod.paymentMethod?.id;
       if (paymentMethod.paymentMethod?.id) {
         const update = await axios.post(
@@ -73,28 +73,26 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
             `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway`,
             { plan: plan, price: price, u_id: u_id }
           );
-          console.log(result);
-
           //ANCHOR - payment confirmation
           const r = stripe.confirmPayment({
             clientSecret: result.data.client_secret,
             confirmParams: {
-              return_url: `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot`,
+              return_url: 'http://localhost:3000/chatbot',
             },
           });
-
           //ANCHOR - adding data to backend
           const a = await axios.post(
             `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/add-payment`,
             { plan: plan, duration: duration, u_id: u_id }
           );
           message.success("success");
+          window.location.href = 'http://localhost:3000/chatbot'
+          // setLoading(false)
         }
       } else {
         message.error(
           "Finding error while making payment with this card, please check your card details"
-        );
-        setLoading(false);
+          );
       }
     } catch (error) {
       message.error(`${error}`);
@@ -105,54 +103,51 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
 
   return (
     <>
-      {loading && <Loader />}
-      {loading == false && (
-        <div className="card-main">
-          <div className="card-head">Billing Info</div>
-          <form className="cardElementForm" onSubmit={handleSubmit}>
-            <div className="left">
-              <div className="top-left">
-                {plan == 1 && <div className="plan-name">Individual Plan</div>}
-                {plan == 2 && <div className="plan-name">Agency Plan</div>}
-                <div className="price">
-                  <span>${price}</span>
-                  <span className="price-duration">Per {duration}</span>
-                </div>
-              </div>
-              <Image src={line} alt={"no image"} />
-              <div className="bottom-left">
-                <div className="total">Total</div>
-                <div className="total-price">${price}</div>
-              </div>
+    {loading && <Loader />}
+    {
+      <div className="card-main">
+      <div className="card-head">Billing Info</div>
+      <form className="cardElementForm" onSubmit={handleSubmit}>
+        <div className="left">
+          <div className="top-left">
+          {plan == 1 && <div className="plan-name">Individual Plan</div>}
+            {plan == 2 && <div className="plan-name">Agency Plan</div>}
+            <div className="price">
+              <span>${price}</span>
+              <span className="price-duration">Per {duration}</span>
             </div>
-            <div className="right">
-              <div className="right-top">Pay with Card</div>
-              <div className="card-element">
-                <label className="card-label">Card Number</label>
-                <div className="cardNumber">
-                  <CardNumberElement />
-                </div>
-                <label className="card-label">Card Expiry</label>
-                <div className="cardExpiry">
-                  <CardExpiryElement />
-                </div>
-                <label className="card-label">Card CVC</label>
-                <div className="cardCvc">
-                  <CardCvcElement />
-                </div>
-              </div>
-              {error && <div>{error}</div>}
-              <button
-                className="btn-card-submit"
-                type="submit"
-                disabled={!stripe}
-              >
-                Pay
-              </button>
+          </div>
+            <Image src={line} alt={"no image"} />
+            <div className="bottom-left">
+              <div className="total">Total</div>
+              <div className="total-price">${price}</div>
             </div>
-          </form>
+            </div>
+        <div className="right">
+          <div className="right-top">Pay with Card</div>
+          <div className="card-element">
+          <label className="card-label">Card Number</label>
+            <div className="cardNumber">
+              <CardNumberElement />
+            </div>
+            <label className="card-label">Card Expiry</label>
+            <div className="cardExpiry">
+              <CardExpiryElement />
+            </div>
+            <label className="card-label">Card CVC</label>
+            <div className="cardCvc">
+              <CardCvcElement />
+              </div>
+          </div>
+          {error && <div>{error}</div>}
+          <button className="btn-card-submit" type="submit" disabled={!stripe}>
+          Pay
+          </button>
         </div>
-      )}
-    </>
-  );
+      </form>
+    </div>
+  }
+  </>
+    );
+
 }
