@@ -1,59 +1,114 @@
 .settings-container {
-    .top {
-        .sources-header {
-            .options-container {
-                margin-top: 20px;
-                padding-left: 46px;
-                list-style: none;
-                display: flex;
-                gap: 12px;
-                li {
-                    display: flex;
-                    padding: 8px 16px;
-                    align-items: center;
-                    gap: 12px;
-                    h3 {
-                        font-size: 16px;
-                        font-style: normal;
-                        color: #777e90;
-                        font-weight: 500;
-                        line-height: 24px; /* 150% */
-                    }
-                    cursor: pointer;
-                    .icon {
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        svg {
-                            stroke-width: 0.1;
-                            path {
-                                fill: #777e90;
-                            }
-                        }
-                    }
-
-                    &.active {
-                        h3 {
-                            color: #2e58ea;
-                        }
-                        .icon {
-                            svg {
-                                path {
-                                    fill: #2e58ea;
-                                }
-                            }
-                        }
-                    }
-                }
+  .top {
+    .sources-header {
+      .options-container {
+        margin-top: 20px;
+        padding-left: 46px;
+        list-style: none;
+        display: flex;
+        gap: 12px;
+        li {
+          display: flex;
+          padding: 8px 16px;
+          align-items: center;
+          gap: 12px;
+          h3 {
+            font-size: 16px;
+            font-style: normal;
+            color: #777e90;
+            font-weight: 500;
+            line-height: 24px; /* 150% */
+          }
+          cursor: pointer;
+          .icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            svg {
+              stroke-width: 0.1;
+              path {
+                fill: #777e90;
+              }
             }
+          }
+
+          &.active {
+            h3 {
+              color: #2e58ea;
+            }
+            .icon {
+              svg {
+                path {
+                  fill: #2e58ea;
+                }
+              }
+            }
+          }
         }
+      }
+    }
+  }
+  .bottom {
+    display: flex;
+    gap: 40px;
+    margin-left: 46px;
+    .left {
+      flex: 2;
+    }
+  }
+
+  @media only screen and (max-width: 991px) {
+    .bottom {
+      // margin-left: 0px;
+
+      .left {
+        .general-setting-parent {
+          width: auto;
+          height: auto;
+          // padding-bottom: 30px;
+
+          // .parent-name-btn {
+          //   flex-direction: column;
+
+          //   .name-container {
+          //     .input-box {
+          //       width: 100%;
+          //     }
+          //   }
+          // }
+        }
+      }
+    }
+  }
+
+  @media only screen and (max-width: 767px) {
+    .top {
+      .sources-header {
+        .options-container {
+          padding-left: 30px;
+        }
+      }
     }
     .bottom {
-        display: flex;
-        gap: 40px;
-        margin-left: 46px;
-        .left {
-            flex: 2;
+      margin-left: 0px;
+
+      .left {
+        .general-setting-parent {
+          width: auto;
+          height: auto;
+          padding-bottom: 30px;
+
+          .parent-name-btn {
+            flex-direction: column;
+
+            .name-container {
+              .input-box {
+                width: 100%;
+              }
+            }
+          }
         }
+      }
     }
+  }
 }
