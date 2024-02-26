@@ -3,23 +3,23 @@ import { NextRequest, NextResponse } from "next/server";
 // import { NextApiResponse } from "next";
 import { connectDatabase } from "@/db";
 
-const getChatbotId = async(wa_id:any) => {
-    try {
-       const db = (await connectDatabase()).db();
-       const collection = db.collection("whatsappbot_details");
-       const result = await collection.findOne({phoneNumberID:wa_id})
-       if(result.chatbotId){
-         return result.chatbotId;
-       }
-      return null;
-       
-    } catch (error) {
-      console.log("error getting chatbotID")
-      return "error"
+const getWhatsAppDetails = async (wa_id: any) => {
+  try {
+    const db = (await connectDatabase()).db();
+    const collection = db.collection("whatsappbot_details");
+    const result = await collection.findOne({ phoneNumberID: wa_id })
+    if (result.chatbotId) {
+      return result;
     }
+    return null;
+
+  } catch (error) {
+    console.log("error getting chatbotID")
+    return "error"
+  }
 }
 
-const getResponseNumber = (res:any)=>{
+const getResponseNumber = (res: any) => {
   return res?.entry?.[0]?.changes?.[0]?.value?.contacts[0]?.wa_id;
 }
 
@@ -61,14 +61,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "status received" });
   }
 
- 
+
   //get the phone number id from the response
   const phoneNumberId = res?.entry?.[0]?.changes?.[0]?.value?.metadata["phone_number_id"];
 
-  let chatbotId =await getChatbotId(phoneNumberId); //here you will recieved the chatbot unique id, based on this you would identify knowledge base
+  let whatsAppDetailsResult:any = await getWhatsAppDetails(phoneNumberId); //here you will recieved the chatbot unique id, based on this you would identify knowledge base
 
 
-  if(!chatbotId || chatbotId === "error"){
+  if (!whatsAppDetailsResult || whatsAppDetailsResult === "error") {
     return {
       status: 400,
       message: "Chatbot not found"
@@ -84,9 +84,9 @@ export async function POST(req: NextRequest) {
 
     const collection = db.collection("user-chatbots");
     const cursor = await collection.findOne({
-      chatbotId: chatbotId,
+      chatbotId: whatsAppDetailsResult.chatbotId,
     });
-   
+
     const userID = cursor.userId;
 
     // if we have user id
@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
         method: "POST",
         body: JSON.stringify({
           userQuery: questionFromWhatsapp,
-          chatbotId: chatbotId,
+          chatbotId: whatsAppDetailsResult.chatbotId,
           userId: userID,
         }),
       }
@@ -145,54 +145,56 @@ export async function POST(req: NextRequest) {
 
     const openaiBody = JSON.parse(await responseOpenAI.text());
 
-  
+
     // after getting response from open ai
     if (openaiBody.choices[0].message.content) {
       const version = "v18.0"; // Replace with your desired version
-      const phoneNumberId = process.env.WHATSAPPPHONENUMBERID; // Replace with your phone number ID
-      const recipientPhoneNumber = '+'+responseNumber;
-      const accessToken = process.env.WHATSAPPTOKEN
-      
+      // const phoneNumberId = process.env.WHATSAPPPHONENUMBERID; // Replace with your phone number ID
+      const phoneNumberId = whatsAppDetailsResult.phoneNumberID;
+      const recipientPhoneNumber = '+' + responseNumber;
+      // const accessToken = process.env.WHATSAPPTOKEN
+      const accessToken = whatsAppDetailsResult.whatsAppAccessToken;
+
       // Define the URL for the POST request
       const url = `https://graph.facebook.com/${version}/${phoneNumberId}/messages`;
 
       // Define the data to be sent in the request body
       const data = {
-        messaging_product: "whatsapp",    
+        messaging_product: "whatsapp",
         recipient_type: "individual",
         to: `${recipientPhoneNumber}`,
         type: "text",
         text: {
-            preview_url: false,
-            body: openaiBody.choices[0].message.content
+          preview_url: false,
+          body: openaiBody.choices[0].message.content
         }
-    };
+      };
 
       // Define the options for the fetch request
       const options = {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${accessToken}` 
+          "Authorization": `Bearer ${accessToken}`
         },
         body: JSON.stringify(data),
       };
       // Make the POST request using fetch
       try {
-          const response = await fetch(url, options);
-          
-          if (!response.ok) {
-              throw new Error(`HTTP error! Status: ${response.status}`);
-          }
+        const response = await fetch(url, options);
 
-          const data = await response.json();
-          
-          // Handle the data as needed
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // Handle the data as needed
       } catch (error) {
-          // Handle the error as needed
+        // Handle the error as needed
       }
     }
-  } catch (error:any) {
+  } catch (error: any) {
     console.log(error)
     //mantain the error log in database, in case of unhandle error
   }
