@@ -203,7 +203,7 @@ function Header() {
                     <Image src={profileIcon} alt="profile-icon" />
                     Account settings
                   </li>
-                  <li onClick={() => router.push("/home/BillingAndUsage")}>
+                  <li onClick={() => router.push("#")}>
                     <Image src={receiptIcon} alt="receipt-icon" />
                     Billing & Usage
                   </li>
