@@ -31,14 +31,14 @@ async function getCallBackUrl(req: NextRequest, res: NextResponse) {
   //find user with chatbot id in whatsappbot_details on token verified false then send the token
   const tokenDetails = await collection?.findOne({ chatbotId: chatBotId });
   if (tokenDetails) {
-    return { webhook_verification_token: tokenDetails.webhook_verification_token };
+    return { webhook_verification_token: tokenDetails.webhook_verification_token, whatsAppDetailId: tokenDetails._id };
   }
 
   // insert data into database
-  await collection?.insertOne({ webhook_verification_token: randomString, userId: user.userId, chatbotId: chatBotId, isTokenVerified: false,isEnabled:true})
+  let result = await collection?.insertOne({ webhook_verification_token: randomString, userId: user.userId, chatbotId: chatBotId, isTokenVerified: false,isEnabled:true})
 
 
-  return { webhook_verification_token: randomString };
+  return { webhook_verification_token: randomString, whatsAppDetailId: result?.insertedId };
 }
 
 
