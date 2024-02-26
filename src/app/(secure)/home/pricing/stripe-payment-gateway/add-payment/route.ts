@@ -3,6 +3,7 @@ import { connectDatabase } from "@/db";
 import Stripe from "stripe";
 import { ObjectId } from "mongodb";
 import { apiHandler } from "@/app/_helpers/server/api/api-handler";
+import { number } from "joi";
 
 module.exports = apiHandler({
   POST: addPaymentDetails,
@@ -13,11 +14,40 @@ async function addPaymentDetails(req: any, res: NextResponse) {
     try {
       let { plan, u_id, duration } = await req.json();
       const db = (await connectDatabase())?.db();
-
       //ANCHOR - Get data of user by user_id
       const collection = db.collection("users");
       const userData = await collection.findOne({ _id: new ObjectId(u_id) });
       let plan_name = null;
+
+      //ANCHOR - add ons limit update
+      const collectionAdd = db.collection("user-details");
+      const userDataAdd = await collectionAdd.findOne({ userId: String(u_id) });
+
+      //ANCHOR - message limit update
+      if (plan == 5) {
+        const data = await collectionAdd.updateMany(
+          { userId: String(u_id) },
+          {
+            $set: {
+              extraCharacterLimit: Number(userDataAdd?.extraCharacterLimit) + 1000000,
+            },
+          }
+        );
+        return data;
+      }
+
+      //ANCHOR - character limit update
+      if (plan == 6) {
+        const data = await collectionAdd.updateMany(
+          { userId: String(u_id) },
+          {
+            $set: {
+              extraMessageLimit: Number(userDataAdd?.extraMessageLimit) + 5000,
+            },
+          }
+        );
+        return data;
+      }
 
       //ANCHOR - plan name initialized
       if (plan == 1) {

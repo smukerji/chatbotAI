@@ -4,7 +4,7 @@ import {
   MessageOutlined,
   MoreOutlined,
 } from "@ant-design/icons";
-import { Modal, Spin, message ,Button} from "antd";
+import { Modal, Spin, message, Button } from "antd";
 import React, { Suspense, useContext, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import "./chatbot.scss";
@@ -85,8 +85,16 @@ function Chatbot() {
   const [openNewChatbotNameModal, setOpenNewChatbotNameModal] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const showModal = () => {
-    setIsModalOpen(true);
+  const showModal = async () => {
+    const checkPlan = await axios.put(
+      `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway`,
+      { u_id: cookies.userId }
+    );
+    if (checkPlan.data.msg == 0) {
+      // setIsModalOpen(true);
+      window.location.href = 'http://localhost:3000/chatbot'
+    }
+    // setIsModalOpen(true);
   };
 
   const handleOk = () => {
@@ -108,9 +116,14 @@ function Chatbot() {
       setIsModalOpen(true);
     }
   };
-  /// retrive the chatbots details
+
   useEffect(() => {
     first();
+  }, []);
+
+  /// retrive the chatbots details
+  useEffect(() => {
+    // first();
     const fetchData = async () => {
       try {
         setLoading(true);
@@ -196,7 +209,9 @@ function Chatbot() {
             </Button>,
           ]}
         >
-          <p>Your plan is expired, please upgrade your plan to access chatbots</p>
+          <p>
+            Your plan is expired, please upgrade your plan to access chatbots
+          </p>
         </Modal>
         <div
           className="chatbot-list-container"
@@ -233,16 +248,18 @@ function Chatbot() {
               {/* <Link href={`${process.env.NEXT_PUBLIC_WEBSITE_URL}home`}> */}
               <button
                 onClick={() => {
-                  /// check if user has exceeded the number of creation of bots
-                  if (
-                    userDetails?.noOfChatbotsUserCreated + 1 >
-                    userDetails?.plan?.numberOfChatbot
-                  ) {
-                    setOpenLimitModel(true);
-                    return;
-                  }
+                  showModal()
+                    /// check if user has exceeded the number of creation of bots
+                    if (
+                      userDetails?.noOfChatbotsUserCreated + 1 >
+                      userDetails?.plan?.numberOfChatbot
+                    ) {
+                      setOpenLimitModel(true);
+                      return;
+                    }
 
-                  setOpenNewChatbotNameModal(true);
+                    setOpenNewChatbotNameModal(true);
+                  
                 }}
                 disabled={loading}
               >

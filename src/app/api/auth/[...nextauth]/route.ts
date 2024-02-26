@@ -59,6 +59,17 @@ export const authOptions: NextAuthOptions = {
             upsert: true,
           }
         );
+        await db.collection("user-details").updateOne(
+          {'userId' : String(message.user.id)},
+          {
+            $set: {
+              extraMessageLimit: 0,
+              extraChatBotLimit: 0,
+              extraCharacterLimit: 0,
+              extraCrawlLimit: 0
+            }
+          }
+        )
       }
 
       const userId = message.user.id;

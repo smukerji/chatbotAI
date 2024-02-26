@@ -86,7 +86,7 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
             { plan: plan, duration: duration, u_id: u_id }
           );
           message.success("success");
-          window.location.href = 'http://localhost:3000/chatbot'
+        //  window.location.href = 'http://localhost:3000/chatbot'
           // setLoading(false)
         }
       } else {
@@ -110,8 +110,10 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
       <form className="cardElementForm" onSubmit={handleSubmit}>
         <div className="left">
           <div className="top-left">
-          {plan == 1 && <div className="plan-name">Individual Plan</div>}
+          {(plan == 1 || plan == 3) && <div className="plan-name">Individual Plan</div>}
             {plan == 2 && <div className="plan-name">Agency Plan</div>}
+            {plan == 5 && <div className="plan-name">Character add on</div>}
+            {plan == 6 && <div className="plan-name">Message add on</div>}
             <div className="price">
               <span>${price}</span>
               <span className="price-duration">Per {duration}</span>

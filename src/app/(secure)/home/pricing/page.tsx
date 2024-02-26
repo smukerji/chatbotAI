@@ -14,6 +14,7 @@ import { useCookies } from "react-cookie";
 import { Modal, message, Collapse } from "antd";
 import Loader from "./_components/Loader";
 import Coll from "./_components/Collapse"
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
   const [status, setStatus] = useState<number>(2);
@@ -24,8 +25,17 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [cookies, setCookie] = useCookies(["userId"]);
   const [prePrice, setPrePrice] = useState(0);
+  const router = useRouter();
 
   const u_id: any = cookies.userId;
+
+  const CharacterAddOn = async() => {
+    router.push(`/home/pricing/checkout/${5}`);
+  }
+
+  const MessageAddOn = async () =>{
+    router.push(`/home/pricing/checkout/${6}`);
+  }
 
   const makePayment = async () => {
     try {
@@ -185,24 +195,24 @@ export default function Home() {
                   </div>
                   <div className="app-integration">
                     <div className="integration-name-container">
-                      <p className="integration-name">5K messages</p>
+                      <p className="integration-name">10K messages</p>
                     </div>
                     <div className="app-integration-price">$8 USD</div>
                   </div>
                 </div>
-                <button className="btn-add-ons"><span className="btn-text">Get Add-on</span></button>
+                <button className="btn-add-ons" onClick={MessageAddOn}><span className="btn-text">Get Add-on</span></button>
               </div>
               <div className="add-ons-integration">
                 <p className="integration-head">Training data</p>
                 <div className="integration-list">
                   <div className="app-integration">
                     <div className="integration-name-container">
-                      <p className="integration-name">5K messages</p>
+                      <p className="integration-name">Total Characters for training - 1M</p>
                     </div>
                     <div className="app-integration-price">$5 USD</div>
                   </div>
                 </div>
-                <button className="btn-add-ons"><span className="btn-text">Get Add-on</span></button>
+                <button className="btn-add-ons" onClick={CharacterAddOn}><span className="btn-text">Get Add-on</span></button>
               </div>
             </div>
           </div>

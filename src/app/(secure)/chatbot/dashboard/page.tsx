@@ -1,6 +1,6 @@
 "use client";
 import { Button, Modal, Radio, RadioChangeEvent } from "antd";
-import { redirect, useSearchParams } from "next/navigation";
+import { redirect, useRouter, useSearchParams } from "next/navigation";
 import React, { useContext, useEffect, useState } from "react";
 import "./dashboard.scss";
 import Chat from "./_components/Chat/Chat";
@@ -21,6 +21,7 @@ import EmbedSite from "./_components/EmbedSite/EmbedSite";
 import Integration from "./_components/Integration/Integration";
 import { ChatbotSettingContext } from "../../../_helpers/client/Context/ChatbotSettingContext";
 import { JWT_EXPIRED } from "../../../_helpers/errorConstants";
+import axios from "axios";
 
 function Dashboard() {
   const { status } = useSession();
@@ -60,6 +61,8 @@ function Dashboard() {
   const [textData, setTextData]: any = useState();
   const [fileData, setFileData]: any = useState();
   const [crawlData, setCrawlData]: any = useState();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const router = useRouter();
   // const [qaCharCount, setQACharCount] = useState(0);
 
   /// sesstion Id and date for current chat window
@@ -70,11 +73,35 @@ function Dashboard() {
     setSessionStartDate(getDate());
   }, []);
 
+
+
+  const handleOk = () => {
+    router.push("home/pricing");
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    // router.push("home/pricing");
+    // setIsModalOpen(false);
+  };
+
   /// managing delete chatbot
   const [open, setOpen] = useState(false);
   const showModal = () => {
     setOpen(true);
   };
+  const first = async () => {
+    const checkPlan = await axios.put(
+      `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway`,
+      { u_id: cookies.userId }
+    );
+    if (checkPlan.data.msg == 0) {
+      setIsModalOpen(true);
+    }
+  };
+
+  useEffect(() => {
+    first();},[])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -183,6 +210,21 @@ function Dashboard() {
   const [loading, setLoading] = useState(false);
   if (status === "authenticated" || cookies?.userId) {
     return (
+      <>
+      
+      <Modal
+          title="Upgrade your plan"
+          open={isModalOpen}
+          // onOk={handleOk}
+          onCancel={handleCancel}
+          footer={[
+            <Button key="submit" type="primary" onClick={handleOk}>
+              UPGRADE
+            </Button>,
+          ]}
+        >
+          <p>Your plan is expired, please upgrade your plan to access chatbots</p>
+        </Modal>
       <div className="edit-chatbot-container">
         {/*------------------------------------------top-section----------------------------------------------*/}
         <div className="top">
@@ -328,73 +370,10 @@ function Dashboard() {
         </div>
       </div>
 
-      //   <div className="dashboard-container">
-      //     <center>
-      //       <h1 className="title">{chatbot.name}</h1>
-      //       <Radio.Group onChange={onChange} value={source} disabled={loading}>
-      //         <Radio name="source" value={"chatbot"}>
-      //           Chatbot
-      //         </Radio>
-      //         <Radio name="source" value={"settings"}>
-      //           Settings
-      //         </Radio>
-      //         <Radio name="source" value={"sources"} onClick={fetchData}>
-      //           Sources
-      //         </Radio>
-      //         <Radio name="source" value={"delete"} onClick={showModal}>
-      //           Delete
-      //         </Radio>
-      //       </Radio.Group>
-
-      //       {/* managing the component rendering */}
-      //       {source == "chatbot" && (
-      //         <>
-      //           <Chat
-      //             chatbot={chatbot}
-      //             messages={messages}
-      //             setMessages={setMessages}
-      //             messagesTime={messagesTime}
-      //             setMessagesTime={setMessagesTime}
-      //             sessionID={sessionID}
-      //             sessionStartDate={sessionStartDate}
-      //           />{" "}
-      //           <DeleteModal
-      //             open={open}
-      //             setOpen={setOpen}
-      //             chatbotId={chatbot.id}
-      //           />
-      //         </>
-      //       )}
-      //       {source == "settings" && (
-      //         <>
-      //           <Settings chatbotId={chatbot.id} />
-      //           <DeleteModal
-      //             open={open}
-      //             setOpen={setOpen}
-      //             chatbotId={chatbot.id}
-      //           />
-      //         </>
-      //       )}
-      //       {source == "sources" && !loading && (
-      //         <>
-      //           <Home
-      //             updateChatbot="true"
-      //             qaData={qaData}
-      //             textData={textData}
-      //             fileData={fileData}
-      //             crawlingData={crawlData}
-      //             chatbotId={chatbot.id}
-      //             chatbotName={chatbot.name}
-      //           />
-      //           <DeleteModal
-      //             open={open}
-      //             setOpen={setOpen}
-      //             chatbotId={chatbot.id}
-      //           />
-      //         </>
-      //       )}
-      //     </center>
-      //   </div>
+     
+     
+   
+      </>
     );
   } else if (status === "unauthenticated") {
     redirect("/account/login");

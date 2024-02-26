@@ -26,7 +26,6 @@ async function updateUserPaymentMethod(req: any, res: NextResponse) {
           customer: data.customerId,
         }
       );
-      console.log(attachedPaymentMethod)
 
       //ANCHOR - update default payment method in customerId
       // await stripe.customers.update(data.customerId, {
@@ -44,7 +43,6 @@ async function updateUserPaymentMethod(req: any, res: NextResponse) {
           },
         }
       );
-      console.log(result)
       return result;
     } catch (error) {
       console.error(error);
