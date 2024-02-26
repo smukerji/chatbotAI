@@ -80,6 +80,7 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
               return_url: 'http://localhost:3000/chatbot',
             },
           });
+          console.log(r)
           //ANCHOR - adding data to backend
           const a = await axios.post(
             `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/add-payment`,
@@ -93,10 +94,12 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
         message.error(
           "Finding error while making payment with this card, please check your card details"
           );
+          window.location.href = 'http://localhost:3000/home/pricing'
       }
     } catch (error) {
       message.error(`${error}`);
       console.error("Error creating payment method:");
+      window.location.href = 'http://localhost:3000/home/pricing'
       throw error;
     }
   };

@@ -7,7 +7,7 @@ const stripe = new s(String(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY));
 
 module.exports = apiHandler({
   POST: createPaymentIntent,
-  PUT: checkCurrentPlan
+  PUT: checkCurrentPlan,
 });
 
 async function createPaymentIntent(req: any, res: NextResponse) {
@@ -17,11 +17,12 @@ async function createPaymentIntent(req: any, res: NextResponse) {
       let { plan, price, u_id } = await req.json();
       const collection = db.collection("users");
       const data = await collection.findOne({ _id: new ObjectId(u_id) });
-      
+
       //ANCHOR - checking existing plan of user
       if (
         (data.plan == "Agency Plan" ||
-        (data.plan == "Individual Plan" && plan == 1)) && plan != 5
+          (data.plan == "Individual Plan" && plan == 1)) &&
+        (plan != 5 && plan != 6)
       ) {
         return "You already have plan";
       }
@@ -59,14 +60,14 @@ async function checkCurrentPlan(req: any, res: NextResponse) {
   const db = (await connectDatabase())?.db();
   const collection = db.collection("users");
   const data = await collection.findOne({ _id: new ObjectId(u_id) });
-  let currentDate = new Date()
+  let currentDate = new Date();
   //ANCHOR - check current plan of the user
-if (data.endDate > currentDate) {
-      return {
-        msg: 1,
-        prePrice: 15,
-        duration: data.duration,
-      }
+  if (data.endDate > currentDate) {
+    return {
+      msg: 1,
+      prePrice: 15,
+      duration: data.duration,
+    };
   } else {
     return { msg: 0 };
   }

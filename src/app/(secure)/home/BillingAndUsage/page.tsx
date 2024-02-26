@@ -8,10 +8,30 @@ import { useCookies } from "react-cookie";
 import { message } from "antd";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
+import { getDate } from "@/app/_helpers/client/getTime";
+
 
 export default function BillingAndUsage() {
   const [cookies, setCookie] = useCookies(["userId"]);
   const { status } = useSession();
+  const [plan, setPlan] = useState("")
+  const [msg, setMsg] = useState(0)
+  const [chat, setChat] = useState(0)
+  const [date,setDate] = useState()
+
+  const myFunction = async () => {
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/BillingAndUsage/api`,
+      { u_id: cookies.userId }
+      );
+      setChat(response.data.chatbot)
+      setMsg(response.data.message)
+      setPlan(response.data.plan)
+      setDate(response.data.nextRenewal)
+  }
+  useEffect(() =>{
+    myFunction()
+  })
 
   if (status === "authenticated" || cookies?.userId) {
     return (
@@ -31,13 +51,13 @@ export default function BillingAndUsage() {
         <div className="plan-head">My Plan</div>
         <div className="plan-details">
           <div className="name-features">
-            <div className="plan-name">Mit</div>
+            <div className="plan-name">{plan}</div>
             <div className="plan-feature">
-              <div className="plan-message">1k messages</div>
-              <div className="plan-chatbot">7 chatbots</div>
+              <div className="plan-message">{msg} messages</div>
+              <div className="plan-chatbot">{chat} chatbots</div>
               <div className="next-renewal-date">
                 <div className="next-renewal-date-text">Next renewal date</div>
-                <div className="next-renewal-date-date">17/09/2001</div>
+                <div className="next-renewal-date-date">{date}</div>
               </div>
             </div>
           </div>
