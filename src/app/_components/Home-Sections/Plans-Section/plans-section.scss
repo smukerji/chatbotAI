@@ -1,140 +1,171 @@
 .plans-section {
-    padding: 5.2vw 0;
-    /* --------------------------top section------------------------------ */
-    .top {
-        h1 {
-            color: #141416;
-            font-size: 48px;
-            font-style: normal;
-            text-align: center;
-            font-weight: 600;
-            line-height: 68px; /* 141.667% */
+  padding: 5.2vw 0;
+  /* --------------------------top section------------------------------ */
+  .top {
+    h1 {
+      color: #141416;
+      font-size: 48px;
+      font-style: normal;
+      text-align: center;
+      font-weight: 600;
+      line-height: 68px; /* 141.667% */
+    }
+
+    p {
+      color: #777e90;
+      text-align: center;
+      font-size: 20px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 28px; /* 140% */
+    }
+  }
+
+  /* --------------------------bottom section------------------------------ */
+  .bottom {
+    margin-top: 69px;
+    .plans-container {
+      display: flex;
+      padding: 24px;
+      gap: 16px;
+
+      @media only screen and (max-width: 991px) {
+        flex-wrap: wrap;
+      }
+
+      .plan {
+        display: flex;
+        padding: 24px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 40px;
+        flex: 1;
+        border-radius: 16px;
+        background: #f4f5f6;
+
+        a {
+          color: #2e58ea;
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 24px; /* 150% */
         }
 
-        p {
+        h3 {
+          color: #141416;
+          text-align: center;
+          font-size: 24px;
+          font-style: normal;
+          font-weight: 600;
+          line-height: 32px; /* 133.333% */
+          margin-bottom: 19px;
+        }
+
+        h1 {
+          color: #141416;
+          font-size: 60px;
+          font-style: normal;
+          font-weight: 600;
+          line-height: 72px; /* 120% */
+          position: relative;
+          padding-left: 15px;
+          &::before {
+            content: '$';
+            height: 20px;
+            width: 20px;
+            position: absolute;
+            top: 0;
+            left: 0;
             color: #777e90;
-            text-align: center;
             font-size: 20px;
             font-style: normal;
             font-weight: 500;
-            line-height: 28px; /* 140% */
+            line-height: 28px;
+          }
         }
-    }
 
-    /* --------------------------bottom section------------------------------ */
-    .bottom {
-        margin-top: 69px;
-        .plans-container {
+        .details-container {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+          width: 100%;
+          button {
+            pointer-events: none;
+            cursor: pointer !important;
+            width: 100%;
             display: flex;
-            padding: 24px;
-            gap: 16px;
-            .plan {
-                display: flex;
-                padding: 24px;
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 40px;
-                flex: 1;
-                border-radius: 16px;
-                background: #f4f5f6;
+            padding: 16px;
+            justify-content: center;
+            align-items: center;
+            align-self: stretch;
+            border-radius: 12px;
+            border: 1px solid #2e58ea;
+            color: #2e58ea;
+            text-align: center;
+            font-size: 20px;
+            font-style: normal;
+            font-weight: 600;
+            line-height: 28px; /* 140% */
+          }
 
-                a {
-                    color: #2e58ea;
-                    font-size: 16px;
-                    font-style: normal;
-                    font-weight: 500;
-                    line-height: 24px; /* 150% */
-                }
-
-                h3 {
-                    color: #141416;
-                    text-align: center;
-                    font-size: 24px;
-                    font-style: normal;
-                    font-weight: 600;
-                    line-height: 32px; /* 133.333% */
-                    margin-bottom: 19px;
-                }
-
-                h1 {
-                    color: #141416;
-                    font-size: 60px;
-                    font-style: normal;
-                    font-weight: 600;
-                    line-height: 72px; /* 120% */
-                    position: relative;
-                    padding-left: 15px;
-                    &::before {
-                        content: "$";
-                        height: 20px;
-                        width: 20px;
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        color: #777e90;
-                        font-size: 20px;
-                        font-style: normal;
-                        font-weight: 500;
-                        line-height: 28px;
-                    }
-                }
-
-                .details-container {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 20px;
-                    width: 100%;
-                    button {
-                        pointer-events: none;
-                        cursor: pointer !important;
-                        width: 100%;
-                        display: flex;
-                        padding: 16px;
-                        justify-content: center;
-                        align-items: center;
-                        align-self: stretch;
-                        border-radius: 12px;
-                        border: 1px solid #2e58ea;
-                        color: #2e58ea;
-                        text-align: center;
-                        font-size: 20px;
-                        font-style: normal;
-                        font-weight: 600;
-                        line-height: 28px; /* 140% */
-                    }
-
-                    .details {
-                        display: flex;
-                        gap: 12px;
-                        color: #141416;
-                        font-size: 16px;
-                        font-style: normal;
-                        font-weight: 500;
-                        line-height: 24px; /* 150% */
-                    }
-                }
-
-                // &:hover {
-                //     border: 1px solid #2e58ea;
-                //     background: #ecf0fe;
-
-                //     button {
-                //         background: #2e58ea;
-                //         color: #fcfcfd;
-                //     }
-                // }
-
-                &.active {
-                    border: 1px solid #2e58ea;
-                    background: #ecf0fe;
-
-                    button {
-                        background: #2e58ea;
-                        color: #fcfcfd;
-                        pointer-events: all;
-                    }
-                }
-            }
+          .details {
+            display: flex;
+            gap: 12px;
+            color: #141416;
+            font-size: 16px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 24px; /* 150% */
+          }
         }
+
+        // &:hover {
+        //     border: 1px solid #2e58ea;
+        //     background: #ecf0fe;
+
+        //     button {
+        //         background: #2e58ea;
+        //         color: #fcfcfd;
+        //     }
+        // }
+
+        &.active {
+          border: 1px solid #2e58ea;
+          background: #ecf0fe;
+
+          button {
+            background: #2e58ea;
+            color: #fcfcfd;
+            pointer-events: all;
+          }
+        }
+      }
     }
+  }
+
+  @media only screen and (max-width: 767px) {
+    padding: 20px;
+
+    .top {
+      h1 {
+        font-size: 45px;
+        line-height: 50px;
+      }
+
+      p {
+        margin-top: 10px;
+      }
+    }
+
+    .bottom {
+      margin-top: 30px;
+
+      .plans-container {
+        .plan {
+          width: 100%;
+          flex: none;
+        }
+      }
+    }
+  }
 }

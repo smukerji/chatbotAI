@@ -43,11 +43,11 @@ async function initializeDb() {
     { upsert: true }
   );
 
-  console.log("Database initialized successfully");
+  console.log('Database initialized successfully');
   process.exit();
 }
 
 initializeDb().catch((error) => {
-  console.error("Error initializing database:", error);
+  console.error('Error initializing database:', error);
   process.exit(1);
 });

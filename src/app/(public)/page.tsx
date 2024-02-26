@@ -21,11 +21,10 @@ function Home() {
       <ServicesOffered />
       <CompatibilitySection />
       <Testimonials />
-      <PlansSection />
+      {/* <PlansSection /> */}
       <FAQ />
       <ContactSection />
       <Footer />
-      
     </>
   );
 }

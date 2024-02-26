@@ -1,4 +1,5 @@
 'use client';
+'use client';
 import {
   LoadingOutlined,
   MessageOutlined,
@@ -11,23 +12,23 @@ import './chatbot.scss';
 import Image from 'next/image';
 import noChatbotBg from '../../../../public/sections-images/common/no-chatbot-icon.svg';
 // import gridIcon from "../../../../public/svgs/grid-icon.svg";
-import GridLayout from './_components/GridLayout';
-import TableLayout from './_components/TableLayout';
-import DeleteModal from './dashboard/_components/Modal/DeleteModal';
-import ShareModal from './dashboard/_components/Modal/ShareModal';
-import { redirect, useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
-import dynamic from 'next/dynamic';
-import Link from 'next/link';
-import RenameModal from './dashboard/_components/Modal/RenameModal';
-import Icon from '../../_components/Icon/Icon';
-import GridIcon from '../../../assets/svg/GridIcon';
-import MenuIcon from '../../../assets/svg/MenuIcon';
-import NewChatbotNameModal from './dashboard/_components/Modal/NewChatbotNameModal';
-import LimitReachedModal from './dashboard/_components/Modal/LimitReachedModal';
-import { CreateBotContext } from '../../_helpers/client/Context/CreateBotContext';
-import { UserDetailsContext } from '../../_helpers/client/Context/UserDetailsContext';
-import { JWT_EXPIRED } from '../../_helpers/errorConstants';
+import GridLayout from "./_components/GridLayout";
+import TableLayout from "./_components/TableLayout";
+import DeleteModal from "./dashboard/_components/Modal/DeleteModal";
+import ShareModal from "./dashboard/_components/Modal/ShareModal";
+import { redirect, useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import dynamic from "next/dynamic";
+import Link from "next/link";
+import RenameModal from "./dashboard/_components/Modal/RenameModal";
+import Icon from "../../_components/Icon/Icon";
+import GridIcon from "../../../assets/svg/GridIcon";
+import MenuIcon from "../../../assets/svg/MenuIcon";
+import NewChatbotNameModal from "./dashboard/_components/Modal/NewChatbotNameModal";
+import LimitReachedModal from "./dashboard/_components/Modal/LimitReachedModal";
+import { CreateBotContext } from "../../_helpers/client/Context/CreateBotContext";
+import { UserDetailsContext } from "../../_helpers/client/Context/UserDetailsContext";
+import { JWT_EXPIRED } from "../../_helpers/errorConstants";
 import axios from 'axios';
 // import GridIcon from "../../as";
 
@@ -186,27 +187,26 @@ function Chatbot() {
 
   if (status === 'authenticated' || cookies?.userId) {
     return (
-      <>
-        <div
-          className="chatbot-list-container"
-          onClick={() => openMenu && setOpenMenu(null)}
-        >
-          {/*------------------------------------------title----------------------------------------------*/}
-          <div className="title-container">
-            <h1 className="title">My Chatbots</h1>
-            <div className="action-container">
-              <div className="chatbot-list-action">
-                <Icon
-                  className={listType == 'grid' ? 'active' : ''}
-                  Icon={GridIcon}
-                  click={() => setListType('grid')}
-                />
-                <Icon
-                  className={listType == 'table' ? 'active' : ''}
-                  Icon={MenuIcon}
-                  click={() => setListType('table')}
-                />
-                {/* <Image
+      <div
+        className="chatbot-list-container"
+        onClick={() => openMenu && setOpenMenu(null)}
+      >
+        {/*------------------------------------------title----------------------------------------------*/}
+        <div className="title-container">
+          <h1 className="title">My Chatbots</h1>
+          <div className="action-container">
+            <div className="chatbot-list-action">
+              <Icon
+                className={listType == "grid" ? "active" : ""}
+                Icon={GridIcon}
+                click={() => setListType("grid")}
+              />
+              <Icon
+                className={listType == "table" ? "active" : ""}
+                Icon={MenuIcon}
+                click={() => setListType("table")}
+              />
+              {/* <Image
                 className={listType == "grid" ? "active" : ""}
                 src={gridIcon}
                 alt="grid-icon"
@@ -232,44 +232,25 @@ function Chatbot() {
                     return;
                   }
 
-                  setOpenNewChatbotNameModal(true);
-                }}
-                disabled={
-                  loading || (user && new Date(user?.endDate) < new Date())
-                }
-              >
-                New Chatbot
-              </button>
-              {/* </Link> */}
-            </div>
-            {openLimitModal ? (
-              <LimitReachedModal setOpenLimitModel={setOpenLimitModel} />
-            ) : (
-              <></>
-            )}
+                setOpenNewChatbotNameModal(true);
+              }}
+              disabled={loading}
+            >
+              New Chatbot
+            </button>
+            {/* </Link> */}
           </div>
-
-          {/*------------------------------------------chatbot-list-grid----------------------------------------------*/}
-          {listType === 'grid' && (
-            <>
-              <GridLayout
-                chatbotData={chatbotData}
-                changeMenu={changeMenu}
-                openMenu={openMenu}
-                openChatbot={openChatbot}
-                setOpenShareModal={setOpenShareModal}
-                chatbotId={chatbotId}
-                setChatbotId={setChatbotId}
-                setOpenDeleteModal={setOpenDeleteModal}
-                setOpenRenameModal={setOpenRenameModal}
-                disabled={user && new Date(user?.endDate) < new Date()}
-              />
-            </>
+          {openLimitModal ? (
+            <LimitReachedModal setOpenLimitModel={setOpenLimitModel} />
+          ) : (
+            <></>
           )}
+        </div>
 
-          {/*------------------------------------------chatbot-list-table----------------------------------------------*/}
-          {listType === 'table' && (
-            <TableLayout
+        {/*------------------------------------------chatbot-list-grid----------------------------------------------*/}
+        {listType === "grid" && (
+          <>
+            <GridLayout
               chatbotData={chatbotData}
               changeMenu={changeMenu}
               openMenu={openMenu}
@@ -279,28 +260,43 @@ function Chatbot() {
               setChatbotId={setChatbotId}
               setOpenDeleteModal={setOpenDeleteModal}
               setOpenRenameModal={setOpenRenameModal}
-              disabled={user && new Date(user?.endDate) < new Date()}
             />
-          )}
-          <DeleteModal
-            open={openDeleteModal}
-            setOpen={setOpenDeleteModal}
+          </>
+        )}
+
+        {/*------------------------------------------chatbot-list-table----------------------------------------------*/}
+        {listType === "table" && (
+          <TableLayout
+            chatbotData={chatbotData}
+            changeMenu={changeMenu}
+            openMenu={openMenu}
+            openChatbot={openChatbot}
+            setOpenShareModal={setOpenShareModal}
             chatbotId={chatbotId}
-            setChangeFlag={setChangeFlag}
-            changeFlag={changeFlag}
+            setChatbotId={setChatbotId}
+            setOpenDeleteModal={setOpenDeleteModal}
+            setOpenRenameModal={setOpenRenameModal}
           />
-          <ShareModal
-            open={openShareModal}
-            setOpen={setOpenShareModal}
-            chatbotId={chatbotId}
-          />
-          <RenameModal
-            open={openRenameModal}
-            setOpen={setOpenRenameModal}
-            chatbotId={chatbotId}
-            setChangeFlag={setChangeFlag}
-            changeFlag={changeFlag}
-          />
+        )}
+        <DeleteModal
+          open={openDeleteModal}
+          setOpen={setOpenDeleteModal}
+          chatbotId={chatbotId}
+          setChangeFlag={setChangeFlag}
+          changeFlag={changeFlag}
+        />
+        <ShareModal
+          open={openShareModal}
+          setOpen={setOpenShareModal}
+          chatbotId={chatbotId}
+        />
+        <RenameModal
+          open={openRenameModal}
+          setOpen={setOpenRenameModal}
+          chatbotId={chatbotId}
+          setChangeFlag={setChangeFlag}
+          changeFlag={changeFlag}
+        />
 
           <NewChatbotNameModal
             open={openNewChatbotNameModal}
@@ -308,19 +304,18 @@ function Chatbot() {
             chatbotId={chatbotId}
           />
 
-          {/*------------------------------------------loading/no-chatbots----------------------------------------------*/}
-          {!loading && chatbotData?.length == 0 && (
-            <div className="no-chatbots-container">
-              <Image src={noChatbotBg} alt="no-chatbot-bg" />
-              <p>
-                You haven&apos;t created any Chatbots. Go ahead and create a New
-                Chatbot!
-              </p>
-            </div>
-          )}
-          {loading && <Spin indicator={antIcon} />}
-        </div>
-      </>
+        {/*------------------------------------------loading/no-chatbots----------------------------------------------*/}
+        {!loading && chatbotData?.length == 0 && (
+          <div className="no-chatbots-container">
+            <Image src={noChatbotBg} alt="no-chatbot-bg" />
+            <p>
+              You haven&apos;t created any Chatbots. Go ahead and create a New
+              Chatbot!
+            </p>
+          </div>
+        )}
+        {loading && <Spin indicator={antIcon} />}
+      </div>
     );
   } else if (status === 'unauthenticated') {
     redirect('/account/login');

@@ -7,7 +7,7 @@ import { authOptions } from "../../../../api/auth/[...nextauth]/route";
 
 module.exports = apiHandler({
   POST: dataSources,
-  // GET: getChatBotSettings,
+  GET: getChatBotSettings,
 });
 
 async function dataSources(request: any) {
@@ -99,28 +99,28 @@ async function dataSources(request: any) {
  * currrently commented as there was no use
  */
 
-// async function getChatBotSettings(request: NextRequest) {
-//   const params = await request.nextUrl.searchParams;
-//   const chatbotId = params.get("chatbotId");
-//   const userId = params.get("userId");
+async function getChatBotSettings(request: NextRequest) {
+  const params = await request.nextUrl.searchParams;
+  const chatbotId = params.get("chatbotId");
+  const userId = params.get("userId");
 
-//   /// get chatbot Setting
-//   const db = (await connectDatabase())?.db();
-//   const chatBotSettingCollection = db.collection("chatbot-settings");
-//   const chatbotSetting = await chatBotSettingCollection.findOne({
-//     chatbotId: chatbotId,
-//     userId: userId,
-//   });
+  /// get chatbot Setting
+  const db = (await connectDatabase())?.db();
+  const chatBotSettingCollection = db.collection("chatbot-settings");
+  const chatbotSetting = await chatBotSettingCollection.findOne({
+    chatbotId: chatbotId,
+    userId: userId,
+  });
 
-//   return { chatbotSetting };
-// }
+  return { chatbotSetting };
+}
 
 /**
  * defining schema for /chatbot/dashboard/api GET route
  */
-// getChatBotSettings.schema = joi.object({
-//   chatbotId: joi.string().required(),
-// });
+getChatBotSettings.schema = joi.object({
+  chatbotId: joi.string().required(),
+});
 
 /**
  * defining schema for /chatbot/dashboard/api POST route
