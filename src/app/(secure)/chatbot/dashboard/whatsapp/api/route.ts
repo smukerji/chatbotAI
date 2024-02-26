@@ -29,7 +29,7 @@ async function getCallBackUrl(req: NextRequest, res: NextResponse) {
   const user = await userCollection?.findOne({ chatbotId: chatBotId });
 
   //find user with chatbot id in whatsappbot_details on token verified false then send the token
-  const tokenDetails = await collection?.findOne({ chatbotId: chatBotId, isTokenVerified: false });
+  const tokenDetails = await collection?.findOne({ chatbotId: chatBotId });
   if (tokenDetails) {
     return { webhook_verification_token: tokenDetails.webhook_verification_token };
   }
