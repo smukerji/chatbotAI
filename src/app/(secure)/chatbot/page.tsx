@@ -234,7 +234,9 @@ function Chatbot() {
 
                 setOpenNewChatbotNameModal(true);
               }}
-              disabled={loading}
+              disabled={
+                loading || (user && new Date(user?.endDate) < new Date())
+              }
             >
               New Chatbot
             </button>
@@ -260,6 +262,7 @@ function Chatbot() {
               setChatbotId={setChatbotId}
               setOpenDeleteModal={setOpenDeleteModal}
               setOpenRenameModal={setOpenRenameModal}
+              disabled={user && new Date(user?.endDate) < new Date()}
             />
           </>
         )}
@@ -276,6 +279,7 @@ function Chatbot() {
             setChatbotId={setChatbotId}
             setOpenDeleteModal={setOpenDeleteModal}
             setOpenRenameModal={setOpenRenameModal}
+            disabled={user && new Date(user?.endDate) < new Date()}
           />
         )}
         <DeleteModal
