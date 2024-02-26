@@ -42,13 +42,12 @@ async function login(request: any) {
       /// set the username
       cookies().set("username", user?.username?.toString());
 
-      //   return { message: "Login successfull..." };
-      return user;
+      return { message: "Login successfull...", username: user?.username };
     } else {
-      throw "Username or password is incorrect";
+      throw "Invalid email or password.";
     }
   } else {
-    throw `User doesn't exists`;
+    throw `User doesn’t exist!`;
   }
 }
 

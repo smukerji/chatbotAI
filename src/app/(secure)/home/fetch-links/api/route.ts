@@ -292,7 +292,7 @@ async function fetchLinks(request: NextRequest) {
     if (limit === 0) {
       return {
         error:
-          "Sorry you have exceeded crawling limit. Please upgrade the plan to crawl more",
+          "Oops! You have reached the crawling limit of your plan. Please upgrade to crawl more websites.",
       };
     }
 

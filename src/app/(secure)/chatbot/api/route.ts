@@ -1,34 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDatabase } from "../../../../db";
 import { apiHandler } from "../../../_helpers/server/api/api-handler";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../../api/auth/[...nextauth]/route";
 
 module.exports = apiHandler({
   POST: fetchBots,
 });
 
-async function fetchBots(request: any) {
-  // Read the body from the request
-  const { userId } = await request.json();
+async function fetchBots(request: NextRequest) {
+  /// get the session and then access the id
+  const session: any = await getServerSession(authOptions);
+  const userId = request?.headers.get("userId")
+    ? request?.headers.get("userId")
+    : session?.user?.id;
 
   try {
-    // Fetch the chatbot data from chatbase and custom chatbots from the database concurrently
-    // const [chatbaseResponse, customBots] = await Promise.all([
-    //   fetch("https://www.chatbase.co/api/v1/get-chatbots", options),
-    //   fetchCustomBots(userId),
-    // ]);
-
     /// Fetch the chatbot data of custom chatbots from the database concurrently
     const [customBots] = await Promise.all([fetchCustomBots(userId)]);
-
-    // if (!chatbaseResponse.ok) {
-    //   throw new Error("Error while retrieving chatbots from chatbase");
-    // }
-
-    // const chatbaseData = await chatbaseResponse.json();
-
-    // Process custom chatbots and merge them with chatbase data
-    // const mergedChatbots = mergeCustomBots(chatbaseData.chatbots, customBots);
-
     return { chatbots: customBots };
   } catch (error) {
     console.log("Error in chatbot route", error);
@@ -43,25 +32,6 @@ async function fetchCustomBots(userId: string) {
 
   const collection = db?.collection("user-chatbots");
   // console.log("Collection ", collection);
-
-  //// default chatbot set temporary
-  // const customBots = await collection
-  //   ?.find({
-  //     $or: [
-  //       { userId: userId },
-  //       {
-  //         chatbotId: "123d148a-be02-4749-a612-65be9d96266c",
-  //       },
-  //       {
-  //         chatbotId: "34cceb84-07b9-4b3e-ad6f-567a1c8f3557",
-  //       },
-  //       {
-  //         chatbotId: "f0893732-3302-46b2-922a-95e79ef3524c",
-  //       },
-  //       { chatbotId: "f8095ef4-6cd0-4373-a45e-8fe15cb6dd0f" },
-  //     ],
-  //   })
-  //   .toArray();
 
   /// default chatbot set temporary
   const customBots = await collection
@@ -110,7 +80,14 @@ async function fetchCustomBots(userId: string) {
           chatbotName: { $first: "$chatbotName" },
           lastUsed: { $first: "$lastUsed" },
           noOfMessagesSent: { $first: "$noOfMessagesSent" },
+          createdAt: { $first: "$createdAt" },
           chatbotSettings: { $push: "$chatbotSettings" },
+        },
+      },
+      {
+        /// sorting in ascending order
+        $sort: {
+          createdAt: 1,
         },
       },
     ])
@@ -125,24 +102,6 @@ async function fetchCustomBots(userId: string) {
     numberOfCharacterTrained:
       doc.chatbotSettings[0][0]?.numberOfCharacterTrained,
   }));
-}
-
-// Merge custom chatbots with chatbase chatbots
-function mergeCustomBots(chatbaseChatbots: any[], customBots: any[]) {
-  const mergedChatbots = [...chatbaseChatbots];
-  for (const customBot of customBots) {
-    if (!objectExists(mergedChatbots, customBot)) {
-      mergedChatbots.push(customBot);
-    }
-  }
-  return mergedChatbots;
-}
-
-// Check if the chatbot entry already exists in the array
-function objectExists(array: any, targetObject: any) {
-  return array.some(
-    (obj: any) => JSON.stringify(obj) === JSON.stringify(targetObject)
-  );
 }
 
 export const fetchCache = "force-no-store";

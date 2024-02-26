@@ -93,13 +93,12 @@ function Website({
       );
       const data = await response.json();
       if (data?.error) {
-        message.error(data.error);
+        message.warning(data.error);
         return;
       }
-      console.log("Fetched links", data);
 
       /// if there is any error show error
-      if (data.error) return alert(data.error);
+      // if (data.error) return alert(data.error);
 
       // Calculate total character count
       let retotalCharCount = 0;

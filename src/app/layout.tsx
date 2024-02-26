@@ -27,8 +27,6 @@ export default function RootLayout({
     setPath(window.location.pathname);
   }, []);
 
-  ///
-
   return (
     <html lang="en">
       <head>
