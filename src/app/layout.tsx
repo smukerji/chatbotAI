@@ -31,7 +31,12 @@ export default function RootLayout({
 
   const getUser = async () => {
     if (
-      !['/', '/account/login', '/account/register'].includes(pathName ?? '')
+      ![
+        '/',
+        '/account/login',
+        '/account/register',
+        '/home/pricing/checkout',
+      ].includes(pathName ?? '')
     ) {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/user?userId=${cookies.userId}`
@@ -56,13 +61,24 @@ export default function RootLayout({
       if (user) {
         const planEndDate = new Date(user?.endDate);
 
-        if (new Date() > planEndDate && pathName !== '/home/pricing') {
+        if (
+          new Date() > planEndDate &&
+          pathName !== '/home/pricing' &&
+          pathName &&
+          pathName.length > 0 &&
+          !pathName.includes('/home/pricing/checkout')
+        ) {
           setIsPlanNotification(true);
         }
       }
     }, 1000);
 
-    if (pathName === '/home/pricing') {
+    if (
+      pathName === '/home/pricing' ||
+      (pathName &&
+        pathName.length > 0 &&
+        pathName.includes('/home/pricing/checkout'))
+    ) {
       setIsPlanNotification(false);
     }
 
