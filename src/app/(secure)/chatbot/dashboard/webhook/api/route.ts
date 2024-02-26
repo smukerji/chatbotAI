@@ -58,7 +58,8 @@ export async function POST(req: NextRequest) {
     res?.entry?.[0]?.changes?.[0]?.value?.messages?.[0]?.text?.body; // question received from whatsapp
 
   if (questionFromWhatsapp == undefined || questionFromWhatsapp.trim().length <= 0) { //if the request is only about status don't move further
-    return NextResponse.json({ message: "status received" });
+    // return NextResponse.json({ message: "received" });
+    return new Response("received", { status: 200 });
   }
 
 
@@ -71,14 +72,16 @@ export async function POST(req: NextRequest) {
   if(whatsAppDetailsResult.isEnabled === false){
     // return { message: "Chatbot with WhatsApp is disabled" };
     console.log('Chatbot with WhatsApp is disabled ')
-    return NextResponse.json({ message: "status received" });
+    // return NextResponse.json({ message: "received" });
+    return new Response("received", { status: 200 });
   }
 
   if (!whatsAppDetailsResult || whatsAppDetailsResult === "error") {
-    return {
-      status: 400,
-      message: "Chatbot not found"
-    }
+    // return {
+    //   status: 400,
+    //   message: "Chatbot not found"
+    // }
+    return new Response("received", { status: 200 });
   }
 
 
@@ -206,7 +209,8 @@ export async function POST(req: NextRequest) {
     //mantain the error log in database, in case of unhandle error
   }
 
-  return NextResponse.json({ message: "received" });
+  // return NextResponse.json({ message: "received" });
+  return new Response("received", { status: 200 });
 }
 
 
