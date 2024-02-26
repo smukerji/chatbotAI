@@ -85,17 +85,17 @@ function Chatbot() {
   const [openNewChatbotNameModal, setOpenNewChatbotNameModal] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const showModal = async () => {
-    const checkPlan = await axios.put(
-      `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway`,
-      { u_id: cookies.userId }
-    );
-    if (checkPlan.data.msg == 0) {
-      // setIsModalOpen(true);
-      window.location.href = 'http://localhost:3000/chatbot'
-    }
-    // setIsModalOpen(true);
-  };
+  // const showModal = async () => {
+  //   const checkPlan = await axios.put(
+  //     `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway`,
+  //     { u_id: cookies.userId }
+  //   );
+  //   if (checkPlan.data.msg == 0) {
+  //     // setIsModalOpen(true);
+  //     window.location.href = 'http://localhost:3000/chatbot'
+  //   }
+  //   // setIsModalOpen(true);
+  // };
 
   const handleOk = () => {
     router.push("home/pricing");
@@ -106,20 +106,6 @@ function Chatbot() {
     // router.push("home/pricing");
     // setIsModalOpen(false);
   };
-
-  const first = async () => {
-    const checkPlan = await axios.put(
-      `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway`,
-      { u_id: cookies.userId }
-    );
-    if (checkPlan.data.msg == 0) {
-      setIsModalOpen(true);
-    }
-  };
-
-  useEffect(() => {
-    first();
-  }, []);
 
   /// retrive the chatbots details
   useEffect(() => {
@@ -248,7 +234,7 @@ function Chatbot() {
               {/* <Link href={`${process.env.NEXT_PUBLIC_WEBSITE_URL}home`}> */}
               <button
                 onClick={() => {
-                  showModal()
+                  // showModal()
                     /// check if user has exceeded the number of creation of bots
                     if (
                       userDetails?.noOfChatbotsUserCreated + 1 >
