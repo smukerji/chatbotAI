@@ -69,7 +69,9 @@ export async function POST(req: NextRequest) {
 
 
   if(whatsAppDetailsResult.isEnabled === false){
-    return { message: "Chatbot with WhatsApp is disabled" };
+    // return { message: "Chatbot with WhatsApp is disabled" };
+    console.log('Chatbot with WhatsApp is disabled ')
+    return NextResponse.json({ message: "status received" });
   }
 
   if (!whatsAppDetailsResult || whatsAppDetailsResult === "error") {
