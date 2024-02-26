@@ -155,7 +155,7 @@ function Header() {
           </button>
         </a>
         {/*------------------------------------------feedback-btn----------------------------------------------*/}
-        <button className="feedback-btn">Feedback</button>
+        <button className="feedback-btn">Support</button>
         {/*------------------------------------------Profile Image----------------------------------------------*/}
 
         <div className="profile-img" onClick={() => setOpenMenu(!openMenu)}>
@@ -219,6 +219,7 @@ function Header() {
                   if (!isLoggedIn) {
                     window.location.href = "/account/login";
                   } else if (session?.user || userId) {
+                    setOpenMenu(!openMenu);
                     await logout();
                     await signOut();
                     window.location.href = "/";

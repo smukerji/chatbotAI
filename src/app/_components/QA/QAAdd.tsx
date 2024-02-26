@@ -23,7 +23,7 @@ function QAAdd({
       onImageChange(selectedFile);
     } else {
       // Display an error message or handle the invalid file selection as needed
-      message.error("Invalid file format. Please select an image.");
+      message.error("Invalid file format.");
       return;
     }
   };

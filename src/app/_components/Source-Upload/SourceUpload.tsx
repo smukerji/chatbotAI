@@ -48,11 +48,9 @@ function SourceUpload({ totalCharCount, filesCharCount }: any) {
           ]);
         }
 
-        message
-          .success(`${info.file.name} file uploaded successfully.`)
-          .then(() => {
-            botContext?.handleChange("isLoading")(false);
-          });
+        message.success(`${info.file.name} uploaded successfully!`).then(() => {
+          botContext?.handleChange("isLoading")(false);
+        });
       } else if (status === "error") {
         message.error(`${response}`).then(() => {
           botContext?.handleChange("isLoading")(false);

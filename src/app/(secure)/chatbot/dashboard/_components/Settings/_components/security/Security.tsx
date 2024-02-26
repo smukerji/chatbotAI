@@ -17,14 +17,14 @@ function Security() {
           </select>
           <p className="visibility-container-para">
             <span>
-              'private': No one can access your chatbot except you (your
-              account)
+              &apos;private&apos;: No one can access your chatbot except you
+              (your account)
             </span>
             <br />
             <span>
-              'public': Other people can chat with your chatbot if you send them
-              the link. You can also embed it on your website so your website
-              visitors are able to use it.
+              &apos;public&apos;: Other people can chat with your chatbot if you
+              send them the link. You can also embed it on your website so your
+              website visitors are able to use it.
             </span>
           </p>
         </div>

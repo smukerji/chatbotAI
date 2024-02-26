@@ -13,5 +13,5 @@ async function feedBack(request: any) {
   const collection = db?.collection("chatbots-feebback-data");
   /// store the feedback response
   await collection.insertOne({ chatbotId, messages, feedback });
-  return { message: "Thank you for your valuable feedback" };
+  return { message: "Thank you for your valuable feedback!" };
 }

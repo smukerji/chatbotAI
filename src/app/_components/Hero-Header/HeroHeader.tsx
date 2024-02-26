@@ -51,18 +51,18 @@ function HeroHeader() {
           companion in the digital realm
         </p>
 
-        <div className="request-demo-email-container">
+        <a
+          style={{ color: "white", textDecoration: "none" }}
+          href="#contact-us"
+        >
+          <button className="request-demo-btn">Book a Demo</button>
+        </a>
+        {/* <div className="request-demo-email-container">
           <div className="email-input">
             <Image src={smsIcon} alt="sms-icon" />
             <input type="text" placeholder="Email Address" />
           </div>
-          <a
-            style={{ color: "white", textDecoration: "none" }}
-            href="#contact-us"
-          >
-            <button className="request-demo-btn">Book a Demo</button>
-          </a>
-        </div>
+        </div> */}
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import exportBtn from "../../../../../../../public/svgs/export-btn.svg";
 import { useCookies } from "react-cookie";
@@ -8,8 +8,12 @@ import "./history.scss";
 import ChatbotNameModal from "../../../../../_components/Modal/ChatbotNameModal";
 import { message } from "antd";
 import { ChatbotSettingContext } from "../../../../../_helpers/client/Context/ChatbotSettingContext";
+import { PrintingChats } from "../Printing-Chats/Printing";
+import ReactToPrint from "react-to-print";
 
 function History({ chatbotId }: any) {
+  let tempRef: any = useRef<HTMLDivElement>();
+
   const [chatHistoryList, setChatHistoryList]: any = useState([]);
   const [currentChatHistory, setCurrentChatHistory]: any = useState([]);
   const [activeCurrentChatHistory, setActiveCurrentChatHistory]: any =
@@ -91,7 +95,7 @@ function History({ chatbotId }: any) {
     }
 
     const body = await response.json();
-    message.success(body?.message);
+    message.info(body?.message);
   };
 
   return (
@@ -103,8 +107,9 @@ function History({ chatbotId }: any) {
           {chatHistoryList?.today?.chats && (
             <>
               <div className="time">Today</div>
-              {Object.entries(chatHistoryList?.today?.chats)?.map(
-                (data: any, index: any) => {
+              {Object.entries(chatHistoryList?.today?.chats)
+                ?.reverse()
+                ?.map((data: any, index: any) => {
                   return (
                     <div
                       className={`first-message ${
@@ -127,8 +132,7 @@ function History({ chatbotId }: any) {
                       }
                     </div>
                   );
-                }
-              )}
+                })}
             </>
           )}
         </div>
@@ -138,8 +142,9 @@ function History({ chatbotId }: any) {
           {chatHistoryList?.yesterday?.chats && (
             <>
               <div className="time">Yesterday</div>
-              {Object.entries(chatHistoryList?.yesterday?.chats)?.map(
-                (data: any, index: any) => {
+              {Object.entries(chatHistoryList?.yesterday?.chats)
+                ?.reverse()
+                ?.map((data: any, index: any) => {
                   return (
                     <div
                       className={`first-message ${
@@ -162,8 +167,7 @@ function History({ chatbotId }: any) {
                       }
                     </div>
                   );
-                }
-              )}
+                })}
             </>
           )}
         </div>
@@ -172,8 +176,9 @@ function History({ chatbotId }: any) {
           {chatHistoryList?.lastSevenDay?.chats && (
             <>
               <div className="time">Last 7 days</div>
-              {Object.entries(chatHistoryList?.lastSevenDay?.chats)?.map(
-                (data: any, index: any) => {
+              {Object.entries(chatHistoryList?.lastSevenDay?.chats)
+                ?.reverse()
+                ?.map((data: any, index: any) => {
                   return (
                     <div
                       className={`first-message ${
@@ -196,23 +201,42 @@ function History({ chatbotId }: any) {
                       }
                     </div>
                   );
-                }
-              )}
+                })}
             </>
           )}
         </div>
       </div>
 
+      {/* this is used for printing the chats initially it will be hidden but on print it will be visible*/}
+      <PrintingChats
+        ref={tempRef}
+        messages={currentChatHistory}
+        // messagesTime={messagesTime}
+      />
+
       {/*------------------------------------------right-section----------------------------------------------*/}
       <div className="messages-section">
-        <div className="header">
-          <span>Powered by Lucifer.AI</span>
-          <div className="action-btns">
-            <Image src={exportBtn} alt="export-btn" />
-          </div>
-        </div>
+        {currentChatHistory.length != 0 && (
+          <>
+            <div className="header">
+              <span>Powered by iCHEF POS</span>
+              <div className="action-btns">
+                <ReactToPrint
+                  trigger={() => {
+                    return (
+                      <button style={{ border: "none", background: "none" }}>
+                        <Image src={exportBtn} alt="export-btn" />
+                      </button>
+                    );
+                  }}
+                  content={() => tempRef.current}
+                />
+              </div>
+            </div>
 
-        <hr />
+            <hr />
+          </>
+        )}
 
         <div className="history-conversation-container">
           {currentChatHistory.map((message: any, index: any) => {

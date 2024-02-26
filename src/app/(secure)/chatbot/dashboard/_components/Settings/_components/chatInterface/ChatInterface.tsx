@@ -111,7 +111,7 @@ function ChatInterface({ chatbotId }: any) {
       setFileName(selectedFile.name);
     } else {
       // Display an error message or handle the invalid file selection as needed
-      message.error("Invalid file format. Please select an image.");
+      message.error("Invalid file format.");
       return;
     }
   };
@@ -154,7 +154,7 @@ function ChatInterface({ chatbotId }: any) {
       setFileNameChat(selectedFile.name);
     } else {
       // Display an error message or handle the invalid file selection as needed
-      message.error("Invalid file format. Please select an image.");
+      message.error("Invalid file format.");
       return;
     }
   };
@@ -214,63 +214,83 @@ function ChatInterface({ chatbotId }: any) {
         {/* ----------- for form fillup */}
         <div className="training-left-container">
           <p className="note">Note: Applies when embedded on a website</p>
+          <div
+            style={{
+              width: "100%",
+              display: "flex",
+              gap: "8px",
+              flexDirection: "column",
+            }}
+          >
+            <div className="initial-message-container">
+              <p className="initial-message-text"> Initial Messages</p>
+              <Button
+                type="text"
+                className="initial-message-button"
+                onClick={(e) => {
+                  botSettingContext?.handleChange("initialMessage")(
+                    initialMessage
+                  );
+                }}
+              >
+                Reset
+              </Button>
+            </div>
 
-          <div className="initial-message-container">
-            <p className="initial-message-text"> Initial Messages</p>
-            <Button
-              type="text"
-              className="initial-message-button"
-              onClick={(e) => {
+            <textarea
+              className="input-container"
+              defaultValue={botSettings?.initialMessage.join("\n")}
+              value={botSettings?.initialMessage.join("\n")}
+              onChange={(e) => {
                 botSettingContext?.handleChange("initialMessage")(
-                  initialMessage
+                  e.target.value.split("\n")
                 );
               }}
-            >
-              Reset
-            </Button>
+              rows={1}
+            ></textarea>
+
+            <p className="helper-text">Enter each message in a new line.</p>
           </div>
-
-          <textarea
-            className="input-container"
-            defaultValue={botSettings?.initialMessage.join("\n")}
-            value={botSettings?.initialMessage.join("\n")}
-            onChange={(e) => {
-              botSettingContext?.handleChange("initialMessage")(
-                e.target.value.split("\n")
-              );
-            }}
-          ></textarea>
-
-          <p className="helper-text">Enter each message in a new line.</p>
 
           {/* ---------- for suggested */}
-          <div className="initial-message-container">
-            <p className="initial-message-text"> Suggested Messages</p>
-            <Button
-              type="text"
-              className="initial-message-button"
-              onClick={(e) => {
+          <div
+            style={{
+              width: "100%",
+              display: "flex",
+              gap: "8px",
+              flexDirection: "column",
+            }}
+          >
+            <div className="initial-message-container">
+              <p className="initial-message-text"> Suggested Messages</p>
+              <Button
+                type="text"
+                className="initial-message-button"
+                onClick={(e) => {
+                  botSettingContext?.handleChange("suggestedMessages")(
+                    defaultSuggestedMessage
+                  );
+                }}
+              >
+                Reset
+              </Button>
+            </div>
+
+            <textarea
+              className="input-container"
+              defaultValue={botSettings?.suggestedMessages.join("\n")}
+              value={botSettings?.suggestedMessages.join("\n")}
+              onChange={(e) => {
                 botSettingContext?.handleChange("suggestedMessages")(
-                  defaultSuggestedMessage
+                  e.target.value.split("\n")
                 );
               }}
-            >
-              Reset
-            </Button>
+              rows={1}
+            ></textarea>
+
+            <p className="helper-text">Enter each message in a new line.</p>
           </div>
 
-          <textarea
-            className="input-container"
-            defaultValue={botSettings?.suggestedMessages.join("\n")}
-            value={botSettings?.suggestedMessages.join("\n")}
-            onChange={(e) => {
-              botSettingContext?.handleChange("suggestedMessages")(
-                e.target.value.split("\n")
-              );
-            }}
-          ></textarea>
-
-          <p className="helper-text">Enter each message in a new line.</p>
           {/* ------------for message placeholder */}
           <div className="message-container">
             <p className="message-placeholder">Message Placeholder</p>
