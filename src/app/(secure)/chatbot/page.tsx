@@ -83,6 +83,7 @@ function Chatbot() {
 
   /// managing new chatbot name modal
   const [openNewChatbotNameModal, setOpenNewChatbotNameModal] = useState(false);
+  const [user, setUser] = useState<any>(null);
 
   // const showModal = async () => {
   //   const checkPlan = await axios.put(
@@ -96,6 +97,14 @@ function Chatbot() {
   //   // setIsModalOpen(true);
   // };
 
+  const getUser = async () => {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/user?userId=${cookies.userId}`
+    );
+
+    setUser(response.data.user);
+  };
+
   const handleCancel = () => {
     // router.push("home/pricing");
     // setIsModalOpen(false);
@@ -103,7 +112,7 @@ function Chatbot() {
 
   /// retrive the chatbots details
   useEffect(() => {
-    // first();
+    getUser();
     const fetchData = async () => {
       try {
         setLoading(true);
@@ -225,7 +234,9 @@ function Chatbot() {
 
                   setOpenNewChatbotNameModal(true);
                 }}
-                disabled={loading}
+                disabled={
+                  loading || (user && new Date(user?.endDate) < new Date())
+                }
               >
                 New Chatbot
               </button>
@@ -251,6 +262,7 @@ function Chatbot() {
                 setChatbotId={setChatbotId}
                 setOpenDeleteModal={setOpenDeleteModal}
                 setOpenRenameModal={setOpenRenameModal}
+                disabled={user && new Date(user?.endDate) < new Date()}
               />
             </>
           )}
@@ -267,6 +279,7 @@ function Chatbot() {
               setChatbotId={setChatbotId}
               setOpenDeleteModal={setOpenDeleteModal}
               setOpenRenameModal={setOpenRenameModal}
+              disabled={user && new Date(user?.endDate) < new Date()}
             />
           )}
           <DeleteModal

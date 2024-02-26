@@ -10,8 +10,7 @@ import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import Header from './_components/Header/Header';
 import { UserDetailsDataProvider } from './_helpers/client/Context/UserDetailsContext';
-import { useRouter, usePathname } from 'next/navigation';
-import { useUserService } from './_services/useUserService';
+import { usePathname } from 'next/navigation';
 
 // const AuthBtn = dynamic(() => import("./_components/AuthBtn"), { ssr: false });
 const AuthHeader = dynamic(() => import('./_components/AuthHeader'), {
@@ -24,10 +23,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   // const { Header } = Layout;
-  const router = useRouter();
   const pathName = usePathname();
   const [path, setPath] = useState('');
-  const userService = useUserService();
   const [cookies, setCookie] = useCookies(['userId']);
   const [isPlanNotification, setIsPlanNotification] = useState(false);
   const [user, setUser] = useState<any>(null);
@@ -50,15 +47,8 @@ export default function RootLayout({
   }, []);
 
   const handleUpgradePlan = () => {
-    router.push('/home/pricing');
     setIsPlanNotification(false);
-  };
-
-  const logout = async () => {
-    await userService.logout();
-    setIsPlanNotification(false);
-    setUser(null);
-    window.location.href = '/';
+    window.location.href = '/home/pricing';
   };
 
   useEffect(() => {
@@ -101,15 +91,12 @@ export default function RootLayout({
             <Modal
               title="Upgrade your plan"
               open={isPlanNotification}
-              onCancel={logout}
-              // footer={[
-              //   <Button key="submit" type="primary" onClick={handleUpgradePlan}>
-              //     UPGRADE
-              //   </Button>,
-              // ]}
-              onOk={handleUpgradePlan}
-              okText="Upgrade"
-              cancelText="Logout"
+              onCancel={() => {}}
+              footer={[
+                <Button key="submit" type="primary" onClick={handleUpgradePlan}>
+                  UPGRADE
+                </Button>,
+              ]}
               closable={false}
             >
               <p>
