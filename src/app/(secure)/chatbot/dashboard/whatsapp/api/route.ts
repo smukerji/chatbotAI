@@ -35,7 +35,7 @@ async function getCallBackUrl(req: NextRequest, res: NextResponse) {
   }
 
   // insert data into database
-  await collection?.insertOne({ webhook_verification_token: randomString, userId: user.userId, chatbotId: chatBotId, isTokenVerified: false})
+  await collection?.insertOne({ webhook_verification_token: randomString, userId: user.userId, chatbotId: chatBotId, isTokenVerified: false,isEnabled:true})
 
 
   return { webhook_verification_token: randomString };
