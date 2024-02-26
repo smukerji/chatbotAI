@@ -28,78 +28,80 @@ function WhatsappModal({ isOpen, onClose }: any) {
     },
   ]);
 
-  const[whatsAppWebhookToken,setWhatsAppWebHookToken]=useState<string>()
+  const [whatsAppWebhookToken, setWhatsAppWebHookToken] = useState<string>();
 
   const [accountStatus, setAccountStatus] = useState<boolean>(false);
 
-// This is state where there is all credentials for meta app
-  const[metaDetails,setMetaDetails]=useState<any>({
-    whatsAppAccessToken:'',
-   facebookAppSecret:'',
-   whatsAppPhoneNumber:'',
-   phoneNumberID:'',
-   phoneBusinessID:''
-  })
-
-
-// This state is for handeling userinput errors
-const [errors, setErrors] = useState<any>({
-  whatsAppAccessToken: null,
-  facebookAppSecret: null,
-  whatsAppPhoneNumber:null,
-   phoneNumberID:null,
-   phoneBusinessID:null
-});
-
-const handleChange = (field: string, value: string) => {
-  const trimmedValue = value.trim(); // Trim the value to remove leading and trailing spaces
-  setMetaDetails({ ...metaDetails, [field]: trimmedValue });
-  setErrors({
-    ...errors,
-    [field]: trimmedValue ? "" : `Please fill in this field`,
+  // This is state where there is all credentials for meta app
+  const [metaDetails, setMetaDetails] = useState<any>({
+    id:null,
+    whatsAppAccessToken: "",
+    facebookAppSecret: "",
+    whatsAppPhoneNumber: "",
+    phoneNumberID: "",
+    phoneBusinessID: "",
+    isActive: true,
   });
-};
 
+  const[whatsapp_id,setWhatsapp_id]=useState<any>()
 
-// WhatsApp Change handler
-const whatsappChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-  handleChange("whatsAppAccessToken", e.target.value);
-};
+  // This state is for handeling userinput errors
+  const [errors, setErrors] = useState<any>({
+    whatsAppAccessToken: null,
+    facebookAppSecret: null,
+    whatsAppPhoneNumber: null,
+    phoneNumberID: null,
+    phoneBusinessID: null,
+  });
 
-// Facebook App Secret Change handler
-const facebookChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-  handleChange("facebookAppSecret", e.target.value);
-};
+  const handleChange = (field: string, value: string) => {
+    const trimmedValue = value.trim(); // Trim the value to remove leading and trailing spaces
+    setMetaDetails({ ...metaDetails, [field]: trimmedValue });
+    setErrors({
+      ...errors,
+      [field]: trimmedValue ? "" : `Please fill in this field`,
+    });
+  };
 
-// WhatsApp Phone Number Change handler
-const whatsappPhoneNumberHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-  handleChange("whatsAppPhoneNumber", e.target.value);
-};
+  // WhatsApp Change handler
+  const whatsappChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleChange("whatsAppAccessToken", e.target.value);
+  };
 
-// Phone Number ID Change handler
-const whatsappPhoneNumberIDHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-  handleChange("phoneNumberID", e.target.value);
-};
+  // Facebook App Secret Change handler
+  const facebookChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleChange("facebookAppSecret", e.target.value);
+  };
 
-// Phone Business ID Change handler
-const whatsappBusinessIDHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-  handleChange("phoneBusinessID", e.target.value);
-};
+  // WhatsApp Phone Number Change handler
+  const whatsappPhoneNumberHandler = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    handleChange("whatsAppPhoneNumber", e.target.value);
+  };
 
+  // Phone Number ID Change handler
+  const whatsappPhoneNumberIDHandler = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    handleChange("phoneNumberID", e.target.value);
+  };
 
-
-
+  // Phone Business ID Change handler
+  const whatsappBusinessIDHandler = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    handleChange("phoneBusinessID", e.target.value);
+  };
 
   const inputCallBackUrlRef = useRef<HTMLInputElement>(null); // Ref for the input callback url  element
   const inputTokenRef = useRef<HTMLInputElement>(null); // Ref for the input Token   element
 
-  
   // This code is for gettig chatbot id
   const params: any = useSearchParams();
- const chatbot = JSON.parse(decodeURIComponent(params.get("chatbot")));
+  const chatbot = JSON.parse(decodeURIComponent(params.get("chatbot")));
 
-  const userId= useCookies(['userId'])
-
+  const userId = useCookies(["userId"]);
 
   //this function is when user clicks on copy icon and values will be copied
   const handleCopy = (value: string) => {
@@ -107,29 +109,52 @@ const whatsappBusinessIDHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
       navigator.clipboard
         .writeText(value)
         .then(() => {
+          message.success('Value copied')
           console.log("Value copied:", value);
         })
         .catch((error) => {
+          message.error('Copy failed')
           console.error("Copy failed:", error);
         });
     }
   };
 
   // This function is written where user clicks verify button in First step
-  const handleVerify = () => {
-    setStepState({ ...stepState, step2: true, step1: false });
-    // Update the status of the second object in the items array
-    setItems([
-      { status: "finish" }, // Update the status of the first step
-      { status: "process" }, // Update the status of the second step
-      { status: "wait" }, // Keep the status of other steps unchanged
-    ]);
+  const handleVerify = async () => {
+    // This code is for verifying that user has verified call back or not from meta
+
+    try {
+      const url = `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard/whatsapp/api?whatsAppVerifyToken=${whatsAppWebhookToken}`;
+
+      const result = await fetch(url, {
+        headers: {
+          cache: "no-store",
+        },
+        method: "PUT",
+        next: { revalidate: 0 },
+      });
+      const res = await result.json();
+      if (res?.verifyValue === true) {
+        message.success(res?.verifyMessage);
+        setStepState({ ...stepState, step2: true, step1: false });
+        // Update the status of the second object in the items array
+        setItems([
+          { status: "finish" }, // Update the status of the first step
+          { status: "process" }, // Update the status of the second step
+          { status: "wait" }, // Keep the status of other steps unchanged
+        ]);
+      } else {
+        message.error(res?.verifyMessage);
+      }
+    } catch (error) {
+      console.log("error verifying", error);
+    }
   };
 
   // This function is written where user clicks Add Account button in Second step
   const handleAddAccount = () => {
     // Check if the errors for both fields are empty
-    if (errors.whatsAppAccessToken === '' && errors.facebookAppSecret === '') {
+    if (errors.whatsAppAccessToken === "" && errors.facebookAppSecret === "") {
       // Proceed to the next step if both fields are filled
       setStepState({ ...stepState, step3: true, step2: false });
       // Update the status of the third object in the items array
@@ -139,53 +164,68 @@ const whatsappBusinessIDHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         { status: "process" },
       ]);
     } else {
-
-
-       setErrors({
-      ...errors,
-      whatsAppAccessToken: errors.whatsAppAccessToken === null ? "Please fill in this field" : errors.whatsAppAccessToken,
-      facebookAppSecret: errors.facebookAppSecret === null ? "Please fill in this field" : errors.facebookAppSecret
-    });
+      setErrors({
+        ...errors,
+        whatsAppAccessToken:
+          errors.whatsAppAccessToken === null
+            ? "Please fill in this field"
+            : errors.whatsAppAccessToken,
+        facebookAppSecret:
+          errors.facebookAppSecret === null
+            ? "Please fill in this field"
+            : errors.facebookAppSecret,
+      });
     }
   };
-  
 
   // This function is written where user clicks save button in Third step
   const saveHandler = async () => {
-    if( errors.whatsAppPhoneNumber == '' &&
-    errors.phoneNumberID == '' &&
-    errors.phoneBusinessID == ''){
+    if (
+      errors.whatsAppPhoneNumber == "" &&
+      errors.phoneNumberID == "" &&
+      errors.phoneBusinessID == ""
+    ) {
       setAccountStatus(true);
       setStepState({ step1: false, step2: false, step3: false });
-  
+
       try {
-       
-        const response = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/whatsapp/api`,{
-          headers: {
-            cache: "no-store",
-          },
-          method: "POST",
-          body:JSON.stringify({...metaDetails,chatbotId:chatbot.id,userId:userId[0].userId}),
-          next: { revalidate: 0 },
-        })
-        const resp = await response.json()
-        message.success(resp.message)
-  
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/whatsapp/api`,
+          {
+            headers: {
+              cache: "no-store",
+            },
+            method: "POST",
+            body: JSON.stringify({
+              ...metaDetails,
+              chatbotId: chatbot.id,
+              userId: userId[0].userId,
+            }),
+            next: { revalidate: 0 },
+          }
+        );
+        const resp = await response.json();
+        message.success(resp.message);
       } catch (error) {
-        message.error('error sending data')
+        message.error("error sending data");
       }
-      
-    }
-    else{
+    } else {
       setErrors({
         ...errors,
-        whatsAppPhoneNumber: errors.whatsAppPhoneNumber === null ? "Please fill in this field" : errors.whatsAppPhoneNumber,
-        phoneNumberID: errors.phoneNumberID === null ? "Please fill in this field" : errors.phoneNumberID,
-        phoneBusinessID: errors.phoneBusinessID === null ? "Please fill in this field" : errors.phoneBusinessID
+        whatsAppPhoneNumber:
+          errors.whatsAppPhoneNumber === null
+            ? "Please fill in this field"
+            : errors.whatsAppPhoneNumber,
+        phoneNumberID:
+          errors.phoneNumberID === null
+            ? "Please fill in this field"
+            : errors.phoneNumberID,
+        phoneBusinessID:
+          errors.phoneBusinessID === null
+            ? "Please fill in this field"
+            : errors.phoneBusinessID,
       });
-  }
-    
-
+    }
   };
 
   const handleOk = () => {
@@ -193,32 +233,167 @@ const whatsappBusinessIDHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
   };
 
   // This function is for changing switch status in last step
-  const onChangeSwitch = (checked: boolean) => {
+  const onChangeSwitch = async  (checked: boolean) => {
     setSwitchStatus(!switchStatus);
+
+    // This is for setting active and inactive 
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/whatsapp/account?whatsappDetailsId=${whatsapp_id}`,
+        {
+          headers: {
+            cache: "no-store",
+          },
+          method: "PUT",
+          next: { revalidate: 0 },
+        }
+      );
+     const data = await response.json();
+     if(data?.message === 'success'){
+        message.success(data?.message)
+     }
+     else{
+      message.error(data?.message)
+     }
+     
+    } catch (error) {
+      console.log("error",error)
+      // message.error(error);
+    }
   };
 
-
-  const  fetchWebhookToken=async ()=>{
+  // This function is for fetching token
+  const fetchWebhookToken = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/whatsapp/api`,{
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/whatsapp/api?chatBotId=${chatbot.id}`,
+        {
+          headers: {
+            cache: "no-store",
+          },
+          method: "GET",
+          next: { revalidate: 0 },
+        }
+      );
+      const { webhook_verification_token,whatsAppDetailId } = await response.json();
+      setWhatsAppWebHookToken(webhook_verification_token);
+      setWhatsapp_id(whatsAppDetailId)
+    } catch (error) {
+      message.error("error getting token");
+    }
+  };
+
+  //this function is for deleting details of whatsapp
+  const deleteWhatsAppAccountDetails = async () => {
+
+
+    try {
+
+      let whatsAppDetailsId :any = null
+      //check if whatsapp id is available
+      if  (metaDetails.id == null || metaDetails.id == undefined) {
+        //call the get endpoints
+        try {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/whatsapp/account?userId=${userId[0].userId}`,
+            {
+              headers: {
+                cache: "no-store",
+              },
+              method: "GET",
+              next: { revalidate: 0 },
+            }
+          );
+          const data = await response.json();
+            whatsAppDetailsId = data?._id
+         
+          
+    
+        } catch (error) {
+          message.error("error getting data");
+        }
+        //update the whatsAppDetailsId
+      }
+      else{
+        whatsAppDetailsId=metaDetails?.id
+      }
+    
+        
+   
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/whatsapp/account?whatsAppDetailsId=${whatsAppDetailsId}`, {
         headers: {
           cache: "no-store",
         },
-        method: "GET",
+        method: "DELETE",
         next: { revalidate: 0 },
       })
-      const {webhook_verification_token  } = await response.json()
-      setWhatsAppWebHookToken(webhook_verification_token)
+      const resp = await response.json()
+      if(resp.message === 'success'){
+
+        message.success(resp.message)
+        window.location.reload();
+
+      }
+      else{
+        message.error(resp.message)
+      }
 
     } catch (error) {
-      message.error('error getting token')
+      message.error('error sending data')
     }
+
   }
 
-  useEffect(()=>{
-      fetchWebhookToken()
-  },[])
+  // This is for fetching values if present
+  const fetchWhatsappDetails = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/whatsapp/account?userId=${userId[0].userId}`,
+        {
+          headers: {
+            cache: "no-store",
+          },
+          method: "GET",
+          next: { revalidate: 0 },
+        }
+      );
+      const data = await response.json();
+      setMetaDetails({
+        ...metaDetails,
+        whatsAppAccessToken: data?.whatsAppAccessToken,
+        facebookAppSecret: data?.facebookAppSecret,
+        whatsAppPhoneNumber: data?.whatsAppPhoneNumber,
+        phoneNumberID: data?.phoneNumberID,
+        phoneBusinessID: data?.phoneBusinessID,
+        isActive: data?.isActive,
+        id:data?._id
+      });
 
+      // Assuming data is an object containing all the fields
+     // Assuming data is an object containing all the fields
+
+      setErrors({...errors,
+        whatsAppAccessToken: data?.whatsAppAccessToken ? '' :null,
+        facebookAppSecret: data?.facebookAppSecret ? '' :null,
+        whatsAppPhoneNumber: data?.whatsAppPhoneNumber ? '' :null,
+        phoneNumberID: data?.phoneNumberID ? '' :null,
+        phoneBusinessID: data?.phoneBusinessID ? '' :null,
+      
+      
+      })
+
+     
+    } catch (error) {
+      message.error("error getting data");
+    }
+  };
+
+  useEffect(() => {
+    fetchWebhookToken();
+    // fetch details if already present
+    fetchWhatsappDetails();
+  }, []);
   return (
     <div className="whatsapp-modal-container">
       <Modal
@@ -243,10 +418,11 @@ const whatsappBusinessIDHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
                     <input
                       type="text"
                       className="whatsapp-input"
-                      defaultValue='url'
+                      defaultValue={`${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard/webhook/api`}
                       ref={inputCallBackUrlRef}
                     ></input>
                     <Image
+                    className="whatsapp-copy-icon"
                       src={copyIcon}
                       alt="copy-icon"
                       onClick={() =>
@@ -265,10 +441,14 @@ const whatsappBusinessIDHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
                       className="whatsapp-input"
                       defaultValue={whatsAppWebhookToken}
                       ref={inputTokenRef}
+                      onChange={(e) => {
+                        setWhatsAppWebHookToken(e.target.value);
+                      }}
                     ></input>
                     <Image
                       src={copyIcon}
                       alt="copy-icon"
+                      className="whatsapp-copy-icon"
                       onClick={() =>
                         handleCopy(inputTokenRef.current?.value || "")
                       }
@@ -291,25 +471,40 @@ const whatsappBusinessIDHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
                   <p className="whatsapp-top-title">WhatsApp Access Token</p>
                   <div className="whatsapp-input-copy-container-step2">
                     <input
+                      value={
+                        metaDetails.whatsAppAccessToken &&
+                        metaDetails.whatsAppAccessToken
+                      }
                       type="text"
                       className="whatsapp-input"
                       placeholder="Enter your whatsapp access token provided by meta"
                       onChange={whatsappChangeHandler}
                     ></input>
-                    {errors.whatsAppAccessToken && <p className="whatsapp-error-message">{errors.whatsAppAccessToken}</p>}
+                    {errors.whatsAppAccessToken && (
+                      <p className="whatsapp-error-message">
+                        {errors.whatsAppAccessToken}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div className="whatsapp-top-container">
                   <p className="whatsapp-top-title">Facebook App Secret</p>
                   <div className="whatsapp-input-copy-container-step2">
                     <input
+                     value={
+                      metaDetails.facebookAppSecret &&
+                      metaDetails.facebookAppSecret
+                    }
                       type="text"
                       className="whatsapp-input"
                       placeholder="Enter your facebook app secret provided by meta"
                       onChange={facebookChangeHandler}
                     ></input>
-                    {errors.facebookAppSecret && <p className="whatsapp-error-message">{errors.facebookAppSecret}</p>}
-
+                    {errors.facebookAppSecret && (
+                      <p className="whatsapp-error-message">
+                        {errors.facebookAppSecret}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -328,38 +523,60 @@ const whatsappBusinessIDHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
                   <p className="whatsapp-top-title">WhatsApp Phone Number</p>
                   <div className="whatsapp-input-copy-container-step3">
                     <input
+                     value={
+                      metaDetails.whatsAppPhoneNumber &&
+                      metaDetails.whatsAppPhoneNumber
+                    }
                       type="text"
                       className="whatsapp-input"
                       placeholder="Enter phone number "
                       onChange={whatsappPhoneNumberHandler}
                     ></input>
-                     {errors.whatsAppPhoneNumber && <p className="whatsapp-error-message">{errors.whatsAppPhoneNumber}</p>}
+                    {errors.whatsAppPhoneNumber && (
+                      <p className="whatsapp-error-message">
+                        {errors.whatsAppPhoneNumber}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div className="whatsapp-top-container">
                   <p className="whatsapp-top-title">Phone Number ID</p>
                   <div className="whatsapp-input-copy-container-step3">
                     <input
+                      value={
+                        metaDetails.phoneNumberID &&
+                        metaDetails.phoneNumberID
+                      }
                       type="text"
                       className="whatsapp-input"
                       placeholder="Enter phone number ID"
                       onChange={whatsappPhoneNumberIDHandler}
                     ></input>
-                     {errors.phoneNumberID && <p className="whatsapp-error-message">{errors.phoneNumberID}</p>}
-
+                    {errors.phoneNumberID && (
+                      <p className="whatsapp-error-message">
+                        {errors.phoneNumberID}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div className="whatsapp-top-container">
                   <p className="whatsapp-top-title">Phone Business ID</p>
                   <div className="whatsapp-input-copy-container-step3">
                     <input
+                     value={
+                      metaDetails.phoneBusinessID &&
+                      metaDetails.phoneBusinessID
+                    }
                       type="text"
                       className="whatsapp-input"
                       placeholder="Enter phone business ID"
                       onChange={whatsappBusinessIDHandler}
                     ></input>
-                     {errors.phoneBusinessID && <p className="whatsapp-error-message">{errors.phoneBusinessID}</p>}
-
+                    {errors.phoneBusinessID && (
+                      <p className="whatsapp-error-message">
+                        {errors.phoneBusinessID}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -374,13 +591,13 @@ const whatsappBusinessIDHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
             <>
               <div className="whatsapp-status-container">
                 <div className="whatsapp-status-container-mobile-section">
-                  22222-2222
+                  {metaDetails?.whatsAppPhoneNumber && metaDetails?.whatsAppPhoneNumber}
                 </div>
                 <div className="whatsapp-status-container-switch-section">
                   <div>{switchStatus ? "Active" : "Inactive"}</div>
                   <Switch defaultChecked onChange={onChangeSwitch} />
-                  <Image src={editIcon} alt="edit" />
-                  <Image src={DeleteIcon} alt="delete" />
+                  {/* <Image src={editIcon} alt="edit" /> */}
+                  <Image src={DeleteIcon} className="whatsapp-delete" alt="delete" onClick={deleteWhatsAppAccountDetails}/>
                 </div>
               </div>
             </>

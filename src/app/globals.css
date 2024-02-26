@@ -115,7 +115,7 @@ background:  #2E58EA;
 border: none;
 }
 .whatsapp-verify:hover{
-  cursor: pointer;
+  cursor: pointer !important;
 }
 .whatsapp-verify-text{
   color: #FCFCFD !important;
@@ -125,6 +125,9 @@ font-style: normal !important;
 font-weight: 600 !important;
 line-height: 24px !important; /* 150% */
 margin-top: 0px !important;
+}
+.whatsapp-verify-text:hover{
+  cursor: pointer;
 }
  .whatsapp-modal .ant-modal-footer{
   display: none !important;
@@ -146,4 +149,10 @@ margin-top: 0px !important;
   justify-content: space-evenly;
   align-items: center;
 
+}
+.whatsapp-copy-icon:hover{
+  cursor:  pointer !important;
+}
+.whatsapp-delete{
+  cursor:  pointer !important;
 }
