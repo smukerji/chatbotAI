@@ -1,0 +1,22 @@
+.terms-condition-container {
+    padding: 5.2vw 12.2vw;
+    .last-modified {
+        margin-top: 20px;
+    }
+
+    .term-container {
+        margin-top: 30px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+
+        p {
+            line-height: 1.5;
+        }
+
+        ul {
+            padding-left: 20px;
+            line-height: 1.5;
+        }
+    }
+}
