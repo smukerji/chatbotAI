@@ -369,6 +369,7 @@ function WhatsappModal({ isOpen, onClose }: any) {
         isActive: data?.isActive,
         id:data?._id
       });
+      setSwitchStatus(data?.isEnabled)
 
       // Assuming data is an object containing all the fields
      // Assuming data is an object containing all the fields
@@ -595,7 +596,7 @@ function WhatsappModal({ isOpen, onClose }: any) {
                 </div>
                 <div className="whatsapp-status-container-switch-section">
                   <div>{switchStatus ? "Active" : "Inactive"}</div>
-                  <Switch defaultChecked onChange={onChangeSwitch} />
+                  <Switch checked={switchStatus} onChange={onChangeSwitch} />
                   {/* <Image src={editIcon} alt="edit" /> */}
                   <Image src={DeleteIcon} className="whatsapp-delete" alt="delete" onClick={deleteWhatsAppAccountDetails}/>
                 </div>
