@@ -1,79 +1,82 @@
 .faq-section {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 70px;
-    padding: 5.2vw 12.2vw;
-    /* --------------------------left section------------------------------ */
-    .left {
-        flex: 1;
-        h1 {
-            color: #141416;
-            font-size: 48px;
-            font-style: normal;
-            font-weight: 600;
-            line-height: 68px; /* 141.667% */
-        }
-
-        p {
-            color: #777e90;
-            font-size: 20px;
-            font-style: normal;
-            font-weight: 500;
-            line-height: 28px; /* 140% */
-        }
+  display: flex;
+  flex-wrap: wrap;
+  gap: 70px;
+  padding: 5.2vw 12.2vw;
+  /* --------------------------left section------------------------------ */
+  .left {
+    flex: 1;
+    h1 {
+      color: #141416;
+      font-size: 48px;
+      font-style: normal;
+      font-weight: 600;
+      line-height: 68px; /* 141.667% */
     }
-    /* --------------------------right section------------------------------ */
-    .right {
-        flex: 1;
-        .accordion {
-            overflow: hidden;
-            transition: max-height 0.5s ease-out;
-            padding: 20px;
 
-            &:not(.active) .accordion-content {
-                max-height: 0;
-            }
-
-            .accordion-btn {
-                background-color: #eee;
-                border: none;
-                border-radius: 5px;
-                width: 100%;
-                text-align: left;
-                outline: none;
-                cursor: pointer;
-                display: flex;
-                justify-content: space-between;
-                align-items: start;
-                color: #212121;
-                font-size: 22px;
-                font-style: normal;
-                font-weight: 600;
-                line-height: normal;
-                letter-spacing: 0.2px;
-                text-transform: capitalize;
-                background-color: transparent;
-
-                img {
-                    margin-left: 10px;
-                    transition: transform 0.3s ease-out;
-                }
-            }
-            .accordion-content {
-                max-height: 500px;
-                overflow: auto;
-                margin-top: 24px;
-                color: #606060;
-                font-family: Inter;
-                font-size: 20px;
-                font-style: normal;
-                font-weight: 500;
-                line-height: normal;
-            }
-
-            &.active .accordion-btn img {
-                transform: rotate(90deg);
-            }
-        }
+    p {
+      color: #777e90;
+      font-size: 20px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 28px; /* 140% */
     }
+  }
+  /* --------------------------right section------------------------------ */
+  .right {
+    flex: 1;
+    .accordion {
+      overflow: hidden;
+      transition: max-height 0.5s ease-out;
+      padding: 20px;
+
+      &:not(.active) .accordion-content {
+        max-height: 0;
+      }
+
+      .accordion-btn {
+        background-color: #eee;
+        border: none;
+        border-radius: 5px;
+        width: 100%;
+        text-align: left;
+        outline: none;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        color: #212121;
+        font-size: 22px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: normal;
+        letter-spacing: 0.2px;
+        text-transform: capitalize;
+        background-color: transparent;
+
+        img {
+          margin-left: 10px;
+          transition: transform 0.3s ease-out;
+        }
+      }
+      .accordion-content {
+        max-height: 500px;
+        overflow: auto;
+        margin-top: 24px;
+        color: #606060;
+        font-family: Inter;
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: normal;
+      }
+
+      &.active .accordion-btn img {
+        transform: rotate(90deg);
+      }
+    }
+  }
+  @media only screen and (max-width: 767px) {
+    padding: 30px;
+  }
 }

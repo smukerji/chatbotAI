@@ -27,6 +27,8 @@ import RefreshBtn from "../../../../../../assets/svg/RefreshBtn";
 import ExportBtn from "../../../../../../assets/svg/ExportBtn";
 import ChatBotIcon from "../../../../../../../public/create-chatbot-svgs/ChatBotIcon.svg";
 import { UserDetailsContext } from "../../../../../_helpers/client/Context/UserDetailsContext";
+import ReactToPrint from "react-to-print";
+import { PrintingChats } from "../Printing-Chats/Printing";
 
 function Chat({
   chatbot,
@@ -46,6 +48,8 @@ function Chat({
   initialMessage,
   profilePictureUrl,
 }: any) {
+  let tempRef: any = useRef<HTMLDivElement>();
+
   /// get the bot context
   const botContext: any = useContext(CreateBotContext);
   const botDetails = botContext?.createBotInfo;
@@ -168,6 +172,7 @@ function Chat({
   /// get the chatbase response
   async function getReply(event: any) {
     if (event.key === "Enter" || event === "click") {
+      const tempUserMessageTime = getDate();
       /// clear the response
       setUserQuery("");
       /// set the user query
@@ -177,7 +182,7 @@ function Chat({
       ]);
       setMessagesTime((prev: any) => [
         ...prev,
-        { role: "user", content: userQuery, messageTime: getDate() },
+        { role: "user", content: userQuery, messageTime: tempUserMessageTime },
       ]);
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/account/user/details?userId=${cookies?.userId}`,
@@ -284,7 +289,11 @@ function Chat({
                   },
                 ]);
                 /// store history
-                const userLatestQuery = { role: "user", content: userQuery };
+                const userLatestQuery = {
+                  role: "user",
+                  content: userQuery,
+                  messageTime: tempUserMessageTime,
+                };
                 const gptLatestResponse = {
                   role: "assistant",
                   content: resptext,
@@ -496,9 +505,28 @@ function Chat({
               click={refreshChat}
               className={botSettings?.theme === "dark" ? "color-white" : ""}
             />
-            <Icon
-              Icon={ExportBtn}
-              className={botSettings?.theme === "dark" ? "color-white" : ""}
+
+            {/* this is used for printing the chats initially it will be hidden but on print it will be visible*/}
+            <PrintingChats
+              ref={tempRef}
+              messages={messages}
+              messagesTime={messagesTime}
+            />
+
+            <ReactToPrint
+              trigger={() => {
+                return (
+                  <button style={{ border: "none", background: "none" }}>
+                    <Icon
+                      Icon={ExportBtn}
+                      className={
+                        botSettings?.theme === "dark" ? "color-white" : ""
+                      }
+                    />
+                  </button>
+                );
+              }}
+              content={() => tempRef.current}
             />
           </div>
         </div>

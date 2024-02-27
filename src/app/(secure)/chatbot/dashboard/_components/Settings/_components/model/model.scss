@@ -358,6 +358,24 @@
       }
     }
   }
+
+  @media only screen and (max-width: 767px) {
+    .model-parent {
+      .model-child-container {
+        flex-direction: column;
+
+        .model-child-left {
+          width: 100%;
+        }
+        .temperature-container {
+          width: 100%;
+          padding-left: 0;
+          padding-top: 30px;
+          padding-bottom: 100px;
+        }
+      }
+    }
+  }
 }
 .ant-select-item-option-selected {
   background-color: #2e58ea !important;

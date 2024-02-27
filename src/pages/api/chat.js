@@ -11,6 +11,14 @@ export default async function handler(req, res) {
     const { similaritySearchResults, messages, userQuery, chatbotId, userId } =
       await req.json();
 
+    console.log(
+      similaritySearchResults,
+      messages,
+      userQuery,
+      chatbotId,
+      userId
+    );
+
     // Set response headers for SSE
 
     // Fetch the response from the OpenAI API
@@ -62,9 +70,14 @@ export default async function handler(req, res) {
       stream: true,
     });
 
-    // Convert the response into a friendly text-stream
-    const stream = OpenAIStream(response);
-    // Respond with the stream
-    return new StreamingTextResponse(stream);
+    try {
+      // Convert the response into a friendly text-stream
+      const stream = OpenAIStream(response);
+      // Respond with the stream
+      return new StreamingTextResponse(stream);
+    } catch (error) {
+      console.log("errr", error);
+      return res.send(400).send(error);
+    }
   }
 }

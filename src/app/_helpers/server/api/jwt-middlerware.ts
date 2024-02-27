@@ -10,7 +10,7 @@ async function jwtMiddleware(req: NextRequest) {
   req.headers.set("userId", id);
 }
 
-function isPublicPath(req: NextRequest) {
+export function isPublicPath(req: NextRequest) {
   // public routes that don't require authentication
   const publicPaths = [
     "POST:/api/account/login",

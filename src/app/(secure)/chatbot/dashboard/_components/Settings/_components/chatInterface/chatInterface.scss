@@ -72,7 +72,9 @@
         border: 1px solid #e6e8ec;
         background: #fff;
         // overflow: hidden;
-        resize: none;
+        // resize: none;
+        min-width: 100%;
+        max-width: 100%;
         color: #23262f;
 
         /* Body/Medium */
@@ -560,7 +562,7 @@
             text-align: center;
 
             /* Body/Medium */
-            font-family: "General Sans";
+            font-family: 'General Sans';
             font-size: 16px;
             font-style: normal;
             font-weight: 500;
@@ -795,6 +797,19 @@
           justify-content: center;
           align-items: center;
         }
+      }
+    }
+  }
+
+  @media only screen and (max-width: 767px) {
+    .training-container {
+      flex-direction: column;
+
+      .training-left-container {
+        width: 100%;
+      }
+      .training-right-container {
+        width: 100%;
       }
     }
   }
