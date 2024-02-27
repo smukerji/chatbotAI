@@ -1,10 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import "./integration.scss";
 import Image from "next/image";
 import whatsAppIcon from "../../../../../../../public/svgs/whatsapp-icon.svg";
 import telegramIcon from "../../../../../../../public/svgs/telegram-icon.svg";
+import TelegramModal from "../Modal/TelegramModal";
 
 function Integration() {
+  //This state if for telegram modal open close
+  const [isTelegramModalOpen, setIsTelegramModalOpen] = useState<boolean>(false);
+
   return (
     <div className="integration-container">
       {/*------------------------------------------Whatsapp-integration----------------------------------------------*/}
@@ -20,10 +24,12 @@ function Integration() {
       <div className="integration">
         <div className="name">
           <Image src={telegramIcon} alt="telegram-icon" />
-          <span>Add to Telegram</span>
+          <span >Add to Telegram</span>
         </div>
-        <div className="action">Coming soon</div>
+        <div className="action" onClick={()=>{setIsTelegramModalOpen(true)}}>Coming soon</div>
       </div>
+      {/* ----------Telegram modal */}
+      {isTelegramModalOpen && <TelegramModal setIsTelegramModalOpen={setIsTelegramModalOpen} />}
     </div>
   );
 }
