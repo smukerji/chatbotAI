@@ -43,6 +43,7 @@ async function userDetails(request: NextRequest) {
     plan: planDetails[0].plan[0],
     noOfChatbotsUserCreated,
     userDetails,
+    planExpiry:planDetails[0].endDate
   };
   //   const chatbotCapacity = planDetails[0].plan[0].numberOfChatbot;
   //   if (noOfChatbotsUserCreated + 1 > chatbotCapacity)

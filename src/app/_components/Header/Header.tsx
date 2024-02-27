@@ -44,6 +44,8 @@ function Header() {
   ]);
   /// state for opening the profile menu
   const [openMenu, setOpenMenu] = useState(false);
+  const [plan, setPlan] = useState("");
+  const [expiry, setExpiry] = useState(0)
   const userService = useUserService();
   const { data: session } = useSession();
 
@@ -77,6 +79,14 @@ function Header() {
       );
 
       const userDetails = await response.json();
+      setPlan(userDetails?.plan.name);
+      const date2:any = new Date(userDetails?.planExpiry);
+      const date1:any = new Date(); // Current date
+
+      // Calculate the difference in milliseconds
+      const differenceMs = date2 - date1;
+      const differenceDays = Math.round(differenceMs / (1000 * 60 * 60 * 24));
+      setExpiry(differenceDays)
       userDetailContext?.handleChange("totalMessageCount")(
         userDetails?.userDetails?.totalMessageCount
       );
@@ -107,9 +117,6 @@ function Header() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
-  console.log(userDetails);
-  
 
   return (
     <div className="header-container">
@@ -208,9 +215,9 @@ function Header() {
               <div className="plan-details-container">
                 <div className="plan">
                   <span>Your plan</span>
-                  <h1>Starter</h1>
+                  <h1>{plan}</h1>
                 </div>
-                <p>Expires in 14 days</p>
+                <p>Expires in {expiry} days</p>
               </div>
 
               <hr />

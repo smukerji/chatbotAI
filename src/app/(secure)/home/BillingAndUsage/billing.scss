@@ -74,13 +74,34 @@
       flex-direction: column;
       align-items: flex-start;
       gap: 10px;
-      .plan-name {
-        color: var(--Neutral-8, #141416);
-        font-family: sans-serif;
-        font-size: 24px;
-        font-style: normal;
-        font-weight: 600;
-        line-height: 32px;
+      .plan-name-container {
+        display: flex;
+        gap: 10px;
+        .plan-name {
+          color: var(--Neutral-8, #141416);
+          font-family: sans-serif;
+          font-size: 24px;
+          font-style: normal;
+          font-weight: 600;
+          line-height: 32px;
+        }
+        .plan-duration {
+          display: flex;
+          padding: 4px 8px;
+          justify-content: center;
+          align-items: center;
+          gap: 10px;
+          border-radius: 12px;
+          background: var(--Neutral-3, #e6e8ec);
+          .plan-duration-text {
+            color: var(--Neutral-6, #353945);
+            font-family: sans-serif;
+            font-size: 14px;
+            font-style: normal;
+            font-weight: 600;
+            line-height: 24px; /* 171.429% */
+          }
+        }
       }
       .plan-feature {
         display: flex;
@@ -134,6 +155,7 @@
   .btn-class {
     display: flex;
     .btn-cancel-plan {
+      cursor: pointer;
       margin-top: 24px;
       display: flex;
       padding: 12px 16px;
@@ -152,6 +174,7 @@
       }
     }
     .btn-upgrade {
+      cursor: pointer;
       margin-top: 24px;
       display: flex;
       padding: 12px 16px;
@@ -210,4 +233,8 @@
       line-height: 28px; /* 175% */
     }
   }
+}
+.payment-table{
+  width: 80%;
+  margin: 24px auto 0px auto;
 }

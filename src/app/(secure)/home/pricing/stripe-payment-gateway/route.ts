@@ -17,11 +17,10 @@ async function createPaymentIntent(req: any, res: NextResponse) {
       let { plan, price, u_id } = await req.json();
       const collection = db.collection("users");
       const data = await collection.findOne({ _id: new ObjectId(u_id) });
-
+      let currentDate = new Date();
       //ANCHOR - checking existing plan of user
       if (
-        (data.plan == "Agency Plan" ||
-          (data.plan == "Individual Plan" && plan == 1)) &&
+        ((data.plan == "Individual Plan" && data.endDate > currentDate)) &&
         (plan != 5 && plan != 6)
       ) {
         return "You already have plan";
@@ -41,7 +40,7 @@ async function createPaymentIntent(req: any, res: NextResponse) {
           payment_method: data.paymentId,
           receipt_email: data.email,
         });
-
+        console.log(paymentIntent)
         return paymentIntent;
       } else {
         return { status: 500 };
