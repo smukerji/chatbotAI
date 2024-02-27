@@ -27,8 +27,8 @@ function RenameModal({
     setConfirmLoading(true);
     if (chatbotText == "") {
       messageApi.open({
-        type: "error",
-        content: "Please enter new name for Chatbot",
+        type: "warning",
+        content: "You haven’t entered a name for your Chatbot!",
       });
       return;
     }

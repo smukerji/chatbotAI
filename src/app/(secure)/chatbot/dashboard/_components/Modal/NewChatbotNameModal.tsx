@@ -23,8 +23,8 @@ function NewChatbotNameModal({ open, setOpen, chatbotId }: any) {
   const handleOk = async () => {
     if (chatbotText == "") {
       messageApi.open({
-        type: "error",
-        content: "Please enter name for Chatbot",
+        type: "warning",
+        content: "Please enter a name for the Chatbot.",
       });
       return;
     }
