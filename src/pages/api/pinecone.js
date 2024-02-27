@@ -96,6 +96,10 @@ export default async function handler(req, res) {
     /// delete chatbot settings
     await userChatbotSettings.deleteOne({ chatbotId: chatbotId });
 
+    //delete the whatsapp details collection record against chatbotId
+    const whatsappDetails = db.collection("whatsapp-details");
+    await whatsappDetails.deleteOne({ chatbotId: chatbotId });
+
     /// deleting the chunks to avoid  Request Header Fields Too Large error
     const deleteBatchSize = 250;
     for (let i = 0; i <= vectorId.length; i += deleteBatchSize) {
