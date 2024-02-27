@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react';
 import Header from './_components/Header/Header';
 import { UserDetailsDataProvider } from './_helpers/client/Context/UserDetailsContext';
 import { usePathname } from 'next/navigation';
+import './layout.scss';
 
 // const AuthBtn = dynamic(() => import("./_components/AuthBtn"), { ssr: false });
 const AuthHeader = dynamic(() => import('./_components/AuthHeader'), {
@@ -105,20 +106,20 @@ export default function RootLayout({
             {children}
 
             <Modal
-              title="Upgrade your plan"
+              title="Upgrade Now to create new Chatbots!"
               open={isPlanNotification}
               onCancel={() => {}}
               footer={[
                 <Button key="submit" type="primary" onClick={handleUpgradePlan}>
-                  UPGRADE
+                  Upgrade Now
                 </Button>,
               ]}
               closable={false}
+              centered
+              className="subscription-expire-popup"
+              width={800}
             >
-              <p>
-                Your plan is expired, please upgrade your plan to access
-                chatbots
-              </p>
+              <p>Upgrade now to access your chatbots!</p>
             </Modal>
           </UserDetailsDataProvider>
         </SessionProvider>
