@@ -74,7 +74,7 @@
         // overflow: hidden;
         // resize: none;
         min-width: 100%;
-        max-width: 100%;
+        max-width: 100% !important;
         color: #23262f;
 
         /* Body/Medium */
@@ -808,12 +808,13 @@
       .training-left-container {
         width: 100%;
 
-        p {
+        .note {
           text-align: left;
         }
 
         .auto-show-container {
           .auto-show-container-title-section {
+            align-items: baseline;
             .auto-show-container-title-text {
               text-align: left;
             }
