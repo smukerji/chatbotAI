@@ -113,11 +113,24 @@
       .sources-header {
         .options-container {
           flex-wrap: wrap;
+          padding-left: 0;
         }
+      }
+      hr {
+        margin-left: 10px;
+        margin-right: 10px;
       }
     }
 
     .bottom {
+      .create-chatbot-container {
+        .sources-header {
+          .options-container {
+            margin-left: 0;
+            margin-right: 0;
+          }
+        }
+      }
       .chat-container {
         flex-direction: column;
         margin-left: 5px;
