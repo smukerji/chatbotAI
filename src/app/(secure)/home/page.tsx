@@ -36,6 +36,9 @@ function Home({
   const { status } = useSession();
   const router = useRouter();
 
+  /// loading state for loader component
+  const [loadingComponent, setLoadingComponent]: any = useState(false);
+
   /// loading icon
   const antIcon = (
     <LoadingOutlined style={{ fontSize: 24, color: "black" }} spin />
@@ -201,8 +204,6 @@ function Home({
       userDetails?.noOfChatbotsUserCreated + 1 <=
       userDetails?.plan?.numberOfChatbot;
 
-    console.log(canCreate, updateChatbot);
-
     if (!canCreate && !updateChatbot) {
       message.error(
         `Sorry you cannot create the chatbot. Please upgrade your plan.`
@@ -311,7 +312,8 @@ function Home({
         chatbotName ? chatbotName : botDetails?.chatbotName
       );
 
-      botContext?.handleChange("isLoading")(true);
+      // botContext?.handleChange("isLoading")(true);
+      setLoadingComponent(true);
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/store`,
@@ -337,7 +339,8 @@ function Home({
               "Something went wrong. Please refresh the page and try again! ",
           })
           .then(() => {
-            botContext?.handleChange("isLoading")(false);
+            // botContext?.handleChange("isLoading")(false);
+            setLoadingComponent(false);
           });
         return;
       }
@@ -377,7 +380,8 @@ function Home({
     } catch (e: any) {
       message.error(e.message);
     } finally {
-      botContext?.handleChange("isLoading")(false);
+      // botContext?.handleChange("isLoading")(false);
+      setLoadingComponent(false);
     }
   }
 
@@ -390,7 +394,7 @@ function Home({
   } else if (status === "authenticated" || cookies?.userId) {
     return (
       <div className="create-chatbot-container">
-        {(botDetails?.isLoading == true || isResponseOk) && (
+        {(loadingComponent == true || isResponseOk) && (
           <LoaderModal
             isResponseOk={isResponseOk}
             setIsResponseOk={setIsResponseOk}

@@ -1,5 +1,5 @@
 .hero-header {
-  background: url('../.././../../public/sections-images/header-background/hero-header.svg');
+  background: url("../.././../../public/sections-images/header-background/hero-header.svg");
   height: 900px;
   background-repeat: no-repeat;
   background-size: cover;
@@ -7,7 +7,7 @@
   z-index: 999;
 
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     left: 0;
     top: 0;
@@ -116,6 +116,7 @@
       display: flex;
       align-items: center;
       width: 100%;
+      justify-content: space-between;
 
       .navbar {
         width: 75%;
@@ -235,45 +236,45 @@
     line-height: 28px;
   }
 }
-
-.request-demo-email-container {
+.request-demo-btn {
   display: flex;
-  width: 500px;
-  padding: 8px 8px 8px 16px;
-  justify-content: space-between;
+  padding: 16px;
   align-items: center;
-  border-radius: 16px;
-  background: #fcfcfd;
-  button {
-    display: flex;
-    padding: 16px;
-    align-items: center;
-    gap: 10px;
-    border-radius: 12px;
-    background: #0035f0;
-    border: none;
-    cursor: pointer;
-    color: #fff;
-    text-align: center;
-    font-size: 20px;
-    font-style: normal;
-    font-weight: 600;
-    line-height: 28px;
-    /* 140% */
-  }
-  .email-input {
-    display: flex;
-    width: 303.5px;
-    align-items: center;
-    gap: 12px;
-    flex-shrink: 0;
-    input {
-      width: 100%;
-      border: none;
-      &:focus-visible {
-        border: none;
-        outline: none;
-      }
-    }
-  }
+  gap: 10px;
+  border-radius: 12px;
+  background: #0035f0;
+  border: none;
+  cursor: pointer;
+  color: #fff;
+  text-align: center;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 28px;
+  /* 140% */
 }
+// .request-demo-email-container {
+//     display: flex;
+//     width: 500px;
+//     padding: 8px 8px 8px 16px;
+//     justify-content: space-between;
+//     align-items: center;
+//     border-radius: 16px;
+//     background: #fcfcfd;
+
+//     .email-input {
+//         display: flex;
+//         width: 303.5px;
+//         align-items: center;
+//         gap: 12px;
+//         flex-shrink: 0;
+//         input {
+//             width: 100%;
+//             border: none;
+//             &:focus-visible {
+//                 border: none;
+//                 outline: none;
+//             }
+//         }
+//     }
+// }

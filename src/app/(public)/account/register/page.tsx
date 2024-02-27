@@ -260,7 +260,7 @@ function Register() {
               />
               <Image
                 className="eye-icon"
-                src={showPassword ? closeEyeIcon : openEyeIcon}
+                src={showPassword ? openEyeIcon : closeEyeIcon}
                 alt="eye-icon"
                 width={24}
                 height={24}
