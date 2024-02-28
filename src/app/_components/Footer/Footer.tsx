@@ -107,10 +107,10 @@ function Footer() {
           <h2>Legal</h2>
           <ul>
             <li>
-              <a href="">Terms & Conditions</a>
+              <a href="/terms">Terms & Conditions</a>
             </li>
             <li>
-              <a href="">Privacy Policy</a>
+              <a href="/privacy">Privacy Policy</a>
             </li>
             <li>
               <a href="">License</a>

@@ -1,89 +1,122 @@
 .service-offered-container {
-    padding: 5.2vw 12.2vw;
+  padding: 5.2vw 12.2vw;
 
-    /* --------------------------top section------------------------------ */
-    .top {
+  /* --------------------------top section------------------------------ */
+  .top {
+    display: flex;
+    .left-part {
+      flex: 1;
+      h1 {
+        color: #141416;
+        font-size: 60px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 72px; /* 120% */
+      }
+
+      p {
+        color: #777e90;
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: normal;
+      }
+    }
+
+    .right-part {
+      flex: 1;
+      display: flex;
+      justify-content: flex-end;
+      button {
+        height: fit-content;
         display: flex;
-        .left-part {
-            flex: 1;
-            h1 {
-                color: #141416;
-                font-size: 60px;
-                font-style: normal;
-                font-weight: 600;
-                line-height: 72px; /* 120% */
-            }
+        padding: 16px;
+        align-items: center;
+        gap: 10px;
+        border-radius: 12px;
+        background: #0035f0;
+        border: none;
+        cursor: pointer;
+        color: #fff;
+        text-align: center;
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 28px;
+        /* 140% */
+      }
+    }
+  }
 
-            p {
-                color: #777e90;
-                font-size: 20px;
-                font-style: normal;
-                font-weight: 500;
-                line-height: normal;
-            }
+  /* --------------------------bottom section------------------------------ */
+  .bottom {
+    margin-top: 64px;
+    .services-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 32px;
+      .service {
+        display: flex;
+        width: 31%;
+        padding: 25px;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 22px;
+        border-radius: 10px;
+        border: 1px solid #e0e0e0;
+
+        h3 {
+          color: #212121;
+          font-size: 22px;
+          font-style: normal;
+          font-weight: 600;
+          line-height: normal;
+          letter-spacing: 0.2px;
+          text-transform: capitalize;
         }
 
-        .right-part {
-            flex: 1;
-            display: flex;
-            justify-content: end;
-            button {
-                height: fit-content;
-                display: flex;
-                padding: 16px;
-                align-items: center;
-                gap: 10px;
-                border-radius: 12px;
-                background: #0035f0;
-                border: none;
-                cursor: pointer;
-                color: #fff;
-                text-align: center;
-                font-size: 20px;
-                font-style: normal;
-                font-weight: 600;
-                line-height: 28px;
-                /* 140% */
-            }
+        p {
+          color: #606060;
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: normal;
         }
+      }
+
+      @media only screen and (max-width: 991px) {
+        gap: 18px;
+      }
+    }
+  }
+  @media only screen and (max-width: 767px) {
+    padding: 30px;
+    .top {
+      flex-direction: column;
+      .left-part {
+        h1 {
+          font-size: 45px;
+          line-height: 50px;
+        }
+
+        p {
+          margin-top: 10px;
+        }
+      }
+
+      .right-part {
+        justify-content: center;
+        margin-top: 20px;
+      }
     }
 
-    /* --------------------------bottom section------------------------------ */
     .bottom {
-        margin-top: 64px;
-        .services-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 32px;
-            .service {
-                display: flex;
-                width: 31%;
-                padding: 25px;
-                flex-direction: column;
-                justify-content: center;
-                align-items: flex-start;
-                gap: 22px;
-                border-radius: 10px;
-                border: 1px solid #e0e0e0;
-
-                h3 {
-                    color: #212121;
-                    font-size: 22px;
-                    font-style: normal;
-                    font-weight: 600;
-                    line-height: normal;
-                    letter-spacing: 0.2px;
-                    text-transform: capitalize;
-                }
-
-                p {
-                    color: #606060;
-                    font-size: 16px;
-                    font-style: normal;
-                    font-weight: 500;
-                    line-height: normal;
-                }
-            }
+      .services-container {
+        .service {
+          width: 47%;
         }
+      }
     }
+  }
 }

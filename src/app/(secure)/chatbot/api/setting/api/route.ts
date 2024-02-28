@@ -35,13 +35,15 @@ async function retriveChatbotSettings(request: NextRequest) {
   const db = (await connectDatabase())?.db();
   const collection = db.collection("chat-history");
 
-  const data = await collection
-    .find({
-      userId: userId,
-      chatbotId: chatbotId,
-      // date: getDate().split(" ")[0],
-    })
-    .toArray();
+  const cursor = await collection.find({
+    userId: userId,
+    chatbotId: chatbotId,
+  });
+
+  const data = await cursor.toArray();
+
+  /// close the cursor
+  await cursor.close();
 
   /// filter data
   let today: any = {};

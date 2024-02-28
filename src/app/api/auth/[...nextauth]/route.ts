@@ -8,7 +8,7 @@ import { ObjectId } from "mongodb";
 import { Adapter } from "next-auth/adapters";
 
 export const authOptions: NextAuthOptions = {
-  adapter: MongoDBAdapter(connectDatabase())  as Adapter,
+  adapter: MongoDBAdapter(connectDatabase()) as Adapter,
   //   session: {
   //     strategy: "jwt",
   //   },
@@ -26,12 +26,15 @@ export const authOptions: NextAuthOptions = {
   events: {
     signIn: async (message) => {
       /// db connection
+
+      let currentDate = new Date();
+      let endDate = new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+
       const db = (await connectDatabase()).db();
 
-      /// get the starter plan ID
       const starterPlan = await db
         .collection("plans")
-        .findOne({ name: "starter" });
+        .findOne({ name: "individual" });
 
       const username: string[] = message.user.name?.split(" ")!;
 
@@ -46,13 +49,27 @@ export const authOptions: NextAuthOptions = {
           { _id: new ObjectId(message.user.id) },
           {
             $set: {
+              startDate: currentDate,
+              endDate: endDate,
               planId: starterPlan?._id,
+              isWhatsApp: true,
               username:
                 username[0] + `${username?.[1] ? "_" + username?.[1] : ""}`,
             },
           },
           {
             upsert: true,
+          }
+        );
+        await db.collection("user-details").updateOne(
+          { userId: String(message.user.id) },
+          {
+            $set: {
+              messageLimit: starterPlan?.messageLimit,
+              chatbotLimit: starterPlan?.numberOfChatbot,
+              trainingDataLimit: starterPlan?.trainingDataLimit,
+              websiteCrawlingLimit: starterPlan?.websiteCrawlingLimit,
+            },
           }
         );
       }
@@ -69,6 +86,10 @@ export const authOptions: NextAuthOptions = {
         await db.collection("user-details").insertOne({
           userId: userId,
           totalMessageCount: 0,
+          extraMessageLimit: 0,
+          extraChatBotLimit: 0,
+          extraCharacterLimit: 0,
+          extraCrawlLimit: 0,
         });
       }
     },

@@ -562,7 +562,7 @@
             text-align: center;
 
             /* Body/Medium */
-            font-family: "General Sans";
+            font-family: 'General Sans';
             font-size: 16px;
             font-style: normal;
             font-weight: 500;
@@ -796,6 +796,49 @@
           display: flex;
           justify-content: center;
           align-items: center;
+        }
+      }
+    }
+  }
+
+  @media only screen and (max-width: 767px) {
+    .training-container {
+      flex-direction: column;
+
+      .training-left-container {
+        width: 100%;
+
+        p {
+          text-align: left;
+        }
+
+        .auto-show-container {
+          .auto-show-container-title-section {
+            .auto-show-container-title-text {
+              text-align: left;
+            }
+          }
+        }
+      }
+      .training-right-container {
+        width: 100%;
+      }
+    }
+  }
+
+  @media only screen and (max-width: 991px) {
+    .training-container {
+      .training-left-container {
+        p {
+          text-align: left;
+        }
+
+        .auto-show-container {
+          .auto-show-container-title-section {
+            .auto-show-container-title-text {
+              text-align: left;
+            }
+          }
         }
       }
     }

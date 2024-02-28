@@ -77,6 +77,14 @@ function Header() {
       );
 
       const userDetails = await response.json();
+      const date2: any = new Date(userDetails?.planExpiry);
+      const date1: any = new Date(); // Current date
+
+      // Calculate the difference in milliseconds
+      const differenceMs = date2 - date1;
+      const differenceDays = Math.round(differenceMs / (1000 * 60 * 60 * 24));
+      /// set the expiry
+      userDetailContext?.handleChange("planExpiry")(differenceDays);
       userDetailContext?.handleChange("totalMessageCount")(
         userDetails?.userDetails?.totalMessageCount
       );
@@ -108,6 +116,14 @@ function Header() {
     };
   }, []);
 
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    if (window.innerWidth < 767) {
+      setIsMobile(true);
+    }
+  }, []);
+
   return (
     <div className="header-container">
       {/*------------------------------------------logo----------------------------------------------*/}
@@ -121,41 +137,47 @@ function Header() {
       />
 
       <div className="header-content">
-        {/*------------------------------------------messages limit----------------------------------------------*/}
-        <div className="messages-limit-container">
-          <span>Messages</span>
-          <Progress
-            strokeLinecap="butt"
-            percent={userDetails?.percent}
-            showInfo={false}
-          />
-          <span>
-            <span style={{ color: "#141416" }}>
-              {userDetails?.totalMessageCount}
-            </span>
-            /
-            {formatNumber(
-              userDetails?.plan?.messageLimit
-                ? userDetails?.plan?.messageLimit
-                : 10000
-            )}
-          </span>
-        </div>
+        {!isMobile && (
+          <>
+            {/*------------------------------------------messages limit----------------------------------------------*/}
+            <div className="messages-limit-container">
+              <span>Messages</span>
+              <Progress
+                strokeLinecap="butt"
+                percent={userDetails?.percent}
+                showInfo={false}
+              />
+              <span>
+                <span style={{ color: "#141416" }}>
+                  {userDetails?.totalMessageCount}
+                </span>
+                /
+                {formatNumber(
+                  userDetails?.plan?.messageLimit
+                    ? userDetails?.plan?.messageLimit
+                    : 10000
+                )}
+              </span>
+            </div>
 
-        {/*------------------------------------------chatbot-btn----------------------------------------------*/}
-        <a href="/chatbot" style={{ textDecoration: "none" }}>
-          <button
-            className="feedback-btn"
-            style={{
-              color:
-                `${window.location.pathname}` === "/chatbot" ? "#2E58EA" : "",
-            }}
-          >
-            My Chatbots
-          </button>
-        </a>
-        {/*------------------------------------------feedback-btn----------------------------------------------*/}
-        <button className="feedback-btn">Support</button>
+            {/*------------------------------------------chatbot-btn----------------------------------------------*/}
+            <a href="/chatbot" style={{ textDecoration: "none" }}>
+              <button
+                className="feedback-btn"
+                style={{
+                  color:
+                    `${window.location.pathname}` === "/chatbot"
+                      ? "#2E58EA"
+                      : "",
+                }}
+              >
+                My Chatbots
+              </button>
+            </a>
+            {/*------------------------------------------feedback-btn----------------------------------------------*/}
+            <button className="feedback-btn">Support</button>
+          </>
+        )}
         {/*------------------------------------------Profile Image----------------------------------------------*/}
 
         <div className="profile-img" onClick={() => setOpenMenu(!openMenu)}>
@@ -189,15 +211,62 @@ function Header() {
                     <Image src={profileIcon} alt="profile-icon" />
                     Account settings
                   </li>
-                  <li>
+                  <li onClick={() => router.push("/home/BillingAndUsage")}>
                     <Image src={receiptIcon} alt="receipt-icon" />
                     Billing & Usage
                   </li>
 
-                  <li>
+                  <li onClick={() => router.push("/home/pricing")}>
                     <Image src={walletIcon} alt="wallet-icon" />
                     Pricing Plans
                   </li>
+
+                  {isMobile && (
+                    <>
+                      <li>
+                        <a href="/chatbot" style={{ textDecoration: "none" }}>
+                          <button
+                            className="feedback-btn"
+                            style={{
+                              color:
+                                `${window.location.pathname}` === "/chatbot"
+                                  ? "#2E58EA"
+                                  : "",
+                            }}
+                          >
+                            My Chatbots
+                          </button>
+                        </a>
+                      </li>
+
+                      <li>
+                        <button className="feedback-btn">Support</button>
+                      </li>
+
+                      <li>
+                        <div className="messages-limit-container">
+                          <span>Messages</span>
+
+                          <Progress
+                            strokeLinecap="butt"
+                            percent={userDetails?.percent}
+                            showInfo={false}
+                          />
+                          <span>
+                            <span style={{ color: "#141416" }}>
+                              {userDetails?.totalMessageCount}
+                            </span>
+                            /
+                            {formatNumber(
+                              userDetails?.plan?.messageLimit
+                                ? userDetails?.plan?.messageLimit
+                                : 10000
+                            )}
+                          </span>
+                        </div>
+                      </li>
+                    </>
+                  )}
                 </ul>
               </div>
 
@@ -205,9 +274,9 @@ function Header() {
               <div className="plan-details-container">
                 <div className="plan">
                   <span>Your plan</span>
-                  <h1>Starter</h1>
+                  <h1>{userDetails?.plan?.name}</h1>
                 </div>
-                <p>Expires in 14 days</p>
+                <p>Expires in {userDetails?.planExpiry} days</p>
               </div>
 
               <hr />

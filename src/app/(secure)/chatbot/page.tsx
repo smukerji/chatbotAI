@@ -1,15 +1,16 @@
-"use client";
+'use client';
+'use client';
 import {
   LoadingOutlined,
   MessageOutlined,
   MoreOutlined,
-} from "@ant-design/icons";
-import { Spin, message } from "antd";
-import React, { Suspense, useContext, useEffect, useState } from "react";
-import { useCookies } from "react-cookie";
-import "./chatbot.scss";
-import Image from "next/image";
-import noChatbotBg from "../../../../public/sections-images/common/no-chatbot-icon.svg";
+} from '@ant-design/icons';
+import { Modal, Spin, message, Button } from 'antd';
+import React, { Suspense, useContext, useEffect, useState } from 'react';
+import { useCookies } from 'react-cookie';
+import './chatbot.scss';
+import Image from 'next/image';
+import noChatbotBg from '../../../../public/sections-images/common/no-chatbot-icon.svg';
 // import gridIcon from "../../../../public/svgs/grid-icon.svg";
 import GridLayout from "./_components/GridLayout";
 import TableLayout from "./_components/TableLayout";
@@ -28,10 +29,11 @@ import LimitReachedModal from "./dashboard/_components/Modal/LimitReachedModal";
 import { CreateBotContext } from "../../_helpers/client/Context/CreateBotContext";
 import { UserDetailsContext } from "../../_helpers/client/Context/UserDetailsContext";
 import { JWT_EXPIRED } from "../../_helpers/errorConstants";
+import axios from 'axios';
 // import GridIcon from "../../as";
 
 const antIcon = (
-  <LoadingOutlined style={{ fontSize: 24, color: "black" }} spin />
+  <LoadingOutlined style={{ fontSize: 24, color: 'black' }} spin />
 );
 
 function Chatbot() {
@@ -53,15 +55,15 @@ function Chatbot() {
 
   /// chatbots details state
   const [chatbotData, setChatbotData] = useState([]);
-  const [cookies, setCookie] = useCookies(["userId"]);
+  const [cookies, setCookie] = useCookies(['userId']);
 
   /// loading state
   const [loading, setLoading] = useState(false);
 
   /// state for showing the chabot list
-  const [listType, setListType]: any = useState("grid");
+  const [listType, setListType]: any = useState('grid');
 
-  const [chatbotId, setChatbotId] = useState("");
+  const [chatbotId, setChatbotId] = useState('');
 
   /// managing share chatbot
   const [openShareModal, setOpenShareModal] = useState(false);
@@ -82,9 +84,36 @@ function Chatbot() {
 
   /// managing new chatbot name modal
   const [openNewChatbotNameModal, setOpenNewChatbotNameModal] = useState(false);
+  const [user, setUser] = useState<any>(null);
+
+  // const showModal = async () => {
+  //   const checkPlan = await axios.put(
+  //     `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway`,
+  //     { u_id: cookies.userId }
+  //   );
+  //   if (checkPlan.data.msg == 0) {
+  //     // setIsModalOpen(true);
+  //     window.location.href = 'http://localhost:3000/chatbot'
+  //   }
+  //   // setIsModalOpen(true);
+  // };
+
+  const getUser = async () => {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/user?userId=${cookies.userId}`
+    );
+
+    setUser(response.data.user);
+  };
+
+  const handleCancel = () => {
+    // router.push("home/pricing");
+    // setIsModalOpen(false);
+  };
 
   /// retrive the chatbots details
   useEffect(() => {
+    getUser();
     const fetchData = async () => {
       try {
         setLoading(true);
@@ -92,7 +121,7 @@ function Chatbot() {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/api`,
           {
-            method: "POST",
+            method: 'POST',
             body: JSON.stringify({ userId: cookies.userId }),
             next: { revalidate: 0 },
           }
@@ -101,19 +130,19 @@ function Chatbot() {
 
         /// check if session is expired
         if (data.message == JWT_EXPIRED) {
-          window.location.href = "/account/login";
+          window.location.href = '/account/login';
         }
 
         /// get the user and plan details
         const userDetailsresponse = await fetch(
           `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/account/user/details?userId=${cookies?.userId}`,
           {
-            method: "GET",
+            method: 'GET',
             next: { revalidate: 0 },
           }
         );
         const userDetails = await userDetailsresponse.json();
-        userDetailContext?.handleChange("noOfChatbotsUserCreated")(
+        userDetailContext?.handleChange('noOfChatbotsUserCreated')(
           userDetails?.noOfChatbotsUserCreated
         );
 
@@ -124,7 +153,7 @@ function Chatbot() {
         setLoading(false);
       } catch (error) {
         setLoading(false);
-        console.error("Error fetching chatbot data:", error);
+        console.error('Error fetching chatbot data:', error);
       }
     };
 
@@ -137,7 +166,7 @@ function Chatbot() {
     router.push(
       `${
         process.env.NEXT_PUBLIC_WEBSITE_URL
-      }chatbot/dashboard?${encodeURIComponent("chatbot")}=${encodeURIComponent(
+      }chatbot/dashboard?${encodeURIComponent('chatbot')}=${encodeURIComponent(
         JSON.stringify(
           chatbotData.filter((data: any) => {
             return data.id == id;
@@ -156,7 +185,7 @@ function Chatbot() {
     // )}`;
   }
 
-  if (status === "authenticated" || cookies?.userId) {
+  if (status === 'authenticated' || cookies?.userId) {
     return (
       <div
         className="chatbot-list-container"
@@ -189,22 +218,25 @@ function Chatbot() {
                 alt="menu-icon"
                 onClick={() => setListType("table")}
               /> */}
-            </div>
-            {/* <Link href={`${process.env.NEXT_PUBLIC_WEBSITE_URL}home`}> */}
-            <button
-              onClick={() => {
-                /// check if user has exceeded the number of creation of bots
-                if (
-                  userDetails?.noOfChatbotsUserCreated + 1 >
-                  userDetails?.plan?.numberOfChatbot
-                ) {
-                  setOpenLimitModel(true);
-                  return;
-                }
+              </div>
+              {/* <Link href={`${process.env.NEXT_PUBLIC_WEBSITE_URL}home`}> */}
+              <button
+                onClick={() => {
+                  // showModal()
+                  /// check if user has exceeded the number of creation of bots
+                  if (
+                    userDetails?.noOfChatbotsUserCreated + 1 >
+                    userDetails?.plan?.numberOfChatbot
+                  ) {
+                    setOpenLimitModel(true);
+                    return;
+                  }
 
                 setOpenNewChatbotNameModal(true);
               }}
-              disabled={loading}
+              disabled={
+                loading || (user && new Date(user?.endDate) < new Date())
+              }
             >
               New Chatbot
             </button>
@@ -230,6 +262,7 @@ function Chatbot() {
               setChatbotId={setChatbotId}
               setOpenDeleteModal={setOpenDeleteModal}
               setOpenRenameModal={setOpenRenameModal}
+              disabled={user && new Date(user?.endDate) < new Date()}
             />
           </>
         )}
@@ -246,6 +279,7 @@ function Chatbot() {
             setChatbotId={setChatbotId}
             setOpenDeleteModal={setOpenDeleteModal}
             setOpenRenameModal={setOpenRenameModal}
+            disabled={user && new Date(user?.endDate) < new Date()}
           />
         )}
         <DeleteModal
@@ -268,11 +302,11 @@ function Chatbot() {
           changeFlag={changeFlag}
         />
 
-        <NewChatbotNameModal
-          open={openNewChatbotNameModal}
-          setOpen={setOpenNewChatbotNameModal}
-          chatbotId={chatbotId}
-        />
+          <NewChatbotNameModal
+            open={openNewChatbotNameModal}
+            setOpen={setOpenNewChatbotNameModal}
+            chatbotId={chatbotId}
+          />
 
         {/*------------------------------------------loading/no-chatbots----------------------------------------------*/}
         {!loading && chatbotData?.length == 0 && (
@@ -287,8 +321,8 @@ function Chatbot() {
         {loading && <Spin indicator={antIcon} />}
       </div>
     );
-  } else if (status === "unauthenticated") {
-    redirect("/account/login");
+  } else if (status === 'unauthenticated') {
+    redirect('/account/login');
   }
 }
 

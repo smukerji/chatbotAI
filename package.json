@@ -3,16 +3,19 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "node initializeDb.js && next dev",
+    "dev": "concurrently \"node initializeDb.js\" \"next dev\" \"node cron.js\"",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
     "@ant-design/icons": "^5.2.6",
-    "@auth/mongodb-adapter": "^2.4.0",
+    "@auth/mongodb-adapter": "^2.0.0",
+    "@nextui-org/react": "^2.2.9",
     "@pinecone-database/pinecone": "^2.0.1",
     "@sparticuz/chromium-min": "^119.0.2",
+    "@stripe/react-stripe-js": "^2.4.0",
+    "@stripe/stripe-js": "^2.4.0",
     "@types/node": "20.4.6",
     "@types/react": "18.2.18",
     "@types/react-dom": "18.2.7",
@@ -21,6 +24,7 @@
     "antd": "^5.10.1",
     "axios": "^1.4.0",
     "bcrypt": "^5.1.1",
+    "cron": "^3.1.6",
     "csv-parser": "^3.0.0",
     "dotenv": "^16.4.4",
     "eslint": "8.46.0",
@@ -35,6 +39,7 @@
     "mv": "^2.1.1",
     "next": "13.4.12",
     "next-auth": "^4.23.1",
+    "node-cron": "^3.0.3",
     "node-html-parser": "^6.1.10",
     "npm": "^10.4.0",
     "openai": "^4.14.2",
@@ -47,6 +52,7 @@
     "react-dom": "18.2.0",
     "react-to-print": "^2.15.1",
     "saslprep": "^1.0.3",
+    "stripe": "^14.16.0",
     "swiper": "^10.3.0",
     "twilio": "^4.14.1",
     "typescript": "5.1.6",
@@ -60,6 +66,7 @@
     "@types/js-cookie": "^3.0.3",
     "@types/jsonwebtoken": "^9.0.2",
     "@types/uuid": "^9.0.2",
+    "concurrently": "^8.2.2",
     "encoding": "^0.1.13",
     "sass": "^1.69.5"
   }
