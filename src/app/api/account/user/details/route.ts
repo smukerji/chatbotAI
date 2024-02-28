@@ -38,8 +38,6 @@ async function userDetails(request: NextRequest) {
   const userDetails = await db.collection("user-details").findOne({
     userId: userId,
   });
-
-  console.log("Fdssssssssssssssssssss",planDetails[0]);
   
   return {
     plan: planDetails[0].plan[0],

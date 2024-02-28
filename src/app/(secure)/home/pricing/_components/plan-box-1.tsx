@@ -10,10 +10,10 @@ import line from '../../../../../../public/svgs/Vector 2189.svg';
 import { useCookies } from 'react-cookie';
 import { Tooltip } from 'antd';
 
-export default function PlanOne({ setPlan, setPrice, price, enableOne }: any) {
+export default function PlanOne({ setPlan, setPrice, price, enableOne, text }: any) {
   const { status } = useSession();
   const router = useRouter();
-  const [cookies, setCookie] = useCookies(['userId']);
+  const [cookies, setCookie] = useCookies(["userId"]);
   console.log(cookies);
   const changePlan = async () => {
     if (cookies?.userId) {
@@ -23,16 +23,16 @@ export default function PlanOne({ setPlan, setPrice, price, enableOne }: any) {
         router.push(`/home/pricing/checkout/${3}`);
       }
     } else {
-      router.push('/account/login');
+      router.push("/account/login");
     }
   };
   return (
     <div className='plan-box plan-box-even'>
       <div className='plan-plan'>
         <div className='plan-name-price'>
-          <span className='plan-name plan-name-even'>Individual Plan</span>
+          <span className='plan-name plan-name-even'>Individual Plan (Monthly)</span>
           <span className='plan-placeholder plan-placeholder-even'>
-            Start your <span className='free-trial'>7-day free trial</span>
+            <span className='free-trial'>{text}</span>
           </span>
         </div>
         <div className='plan-price-container'>
@@ -51,9 +51,9 @@ export default function PlanOne({ setPlan, setPrice, price, enableOne }: any) {
           className='pay-btn plan1'
           onClick={changePlan}
           disabled={enableOne}
-          title={enableOne ? 'Already have plan' : undefined}
+          title={enableOne ? "Already have plan" : undefined}
         >
-          <span className='btn-text'>Start 7-day trial</span>
+          <span className='btn-text'>{text}</span>
         </button>
         {/* </Tooltip> */}
         <div className='plan-details'>
@@ -61,9 +61,9 @@ export default function PlanOne({ setPlan, setPrice, price, enableOne }: any) {
             <Image src={tickCircle} alt='no-svg' />
             <span className='plan-text  plan-text-even'>1 chatbots</span>
           </div>
-          <div className='plan-item'>
-            <Image src={tickCircle} alt='no-svg' />
-            <span className='plan-text  plan-text-even'>
+          <div className="plan-item">
+            <Image src={tickCircle} alt="no-svg" />
+            <span className="plan-text  plan-text-even">
               2k messages / month
             </span>
           </div>

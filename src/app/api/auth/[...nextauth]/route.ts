@@ -8,7 +8,7 @@ import { ObjectId } from "mongodb";
 import { Adapter } from "next-auth/adapters";
 
 export const authOptions: NextAuthOptions = {
-  adapter: MongoDBAdapter(connectDatabase())  as Adapter,
+  adapter: MongoDBAdapter(connectDatabase()) as Adapter,
   //   session: {
   //     strategy: "jwt",
   //   },
@@ -52,6 +52,7 @@ export const authOptions: NextAuthOptions = {
               startDate: currentDate,
               endDate: endDate,
               planId: starterPlan?._id,
+              isWhatsApp: true,
               username:
                 username[0] + `${username?.[1] ? "_" + username?.[1] : ""}`,
             },
@@ -60,17 +61,6 @@ export const authOptions: NextAuthOptions = {
             upsert: true,
           }
         );
-        await db.collection("user-details").updateOne(
-          {'userId' : String(message.user.id)},
-          {
-            $set: {
-              extraMessageLimit: 0,
-              extraChatBotLimit: 0,
-              extraCharacterLimit: 0,
-              extraCrawlLimit: 0
-            }
-          }
-        )
       }
 
       const userId = message.user.id;
@@ -85,6 +75,10 @@ export const authOptions: NextAuthOptions = {
         await db.collection("user-details").insertOne({
           userId: userId,
           totalMessageCount: 0,
+          extraMessageLimit: 0,
+          extraChatBotLimit: 0,
+          extraCharacterLimit: 0,
+          extraCrawlLimit: 0,
         });
       }
     },

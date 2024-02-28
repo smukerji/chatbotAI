@@ -62,12 +62,24 @@ async function checkCurrentPlan(req: any, res: NextResponse) {
   let currentDate = new Date();
   //ANCHOR - check current plan of the user
   if (data.endDate > currentDate) {
-    return {
-      msg: 1,
-      prePrice: 15,
-      duration: data.duration,
-    };
+    if(data.plan){
+      return {
+        msg: 1,
+        prePrice: 15,
+        duration: data.duration,
+        text: "Current Plan",
+        whatsAppIntegration: data.isWhatsApp
+      };
+    }
+    else{
+      return{
+        msg: 1,
+        prePrice: 15,
+        duration: data.duration,
+        text: "7 days free trial is running ..."
+      }
+    }
   } else {
-    return { msg: 0 };
+    return { msg: 0, text:"Get started" };
   }
 }

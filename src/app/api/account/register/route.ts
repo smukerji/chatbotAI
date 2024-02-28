@@ -35,6 +35,7 @@ async function register(request: any) {
     password: hashPassword,
     planId: starterPlan?._id,
     startDate: currentDate,
+    isWhatsApp: true,
     endDate: endDate,
   });
 

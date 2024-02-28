@@ -22,11 +22,11 @@ export default function PlanTwo({ setPlan, price, setPrice, prePrice }: any) {
   };
 
   return (
-    <div className='plan-box'>
-      <div className='plan-plan'>
-        <div className='plan-name-price'>
-          <span className='plan-name'>Agency Plan</span>
-          <span className='plan-placeholder'>
+    <div className="plan-box">
+      <div className="plan-plan">
+        <div className="plan-name-price">
+          <span className="plan-name">Agency Plan (Monthly)</span>
+          <span className="plan-placeholder">
             Have a go and test your superpowers
           </span>
         </div>

@@ -13,8 +13,8 @@ import hubspot from "../../../../../public/hubspot.png";
 import { useCookies } from "react-cookie";
 import { Modal, message, Collapse } from "antd";
 import Loader from "./_components/Loader";
-import Coll from "./_components/Collapse"
-import { useRouter } from 'next/navigation';
+import Coll from "./_components/Collapse";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [status, setStatus] = useState<number>(2);
@@ -25,38 +25,40 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [cookies, setCookie] = useCookies(["userId"]);
   const [prePrice, setPrePrice] = useState(0);
+  const [text, setText] = useState("");
   const router = useRouter();
+  const [whatsappDisable, setWhatsappDisable] = useState(false)
 
   const u_id: any = cookies.userId;
 
-  const CharacterAddOn = async() => {
+  const CharacterAddOn = async () => {
     router.push(`/home/pricing/checkout/${5}`);
-  }
-
-  const MessageAddOn = async () =>{
-    router.push(`/home/pricing/checkout/${6}`);
-  }
-
-  const makePayment = async () => {
-    try {
-      setLoading(true);
-
-      //ANCHOR - getting details of user payment-method
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/getPlanDetails`,
-        { u_id: u_id }
-      );
-
-      if (response.data?.status == 500) {
-        setStatus(1);
-      } else {
-        setStatus(0);
-      }
-      setLoading(false);
-    } catch (error) {
-      message.error(`${error}`);
-    }
   };
+
+  const MessageAddOn = async () => {
+    router.push(`/home/pricing/checkout/${6}`);
+  };
+
+  // const makePayment = async () => {
+  //   try {
+  //     setLoading(true);
+
+  //     //ANCHOR - getting details of user payment-method
+  //     const response = await axios.post(
+  //       `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/getPlanDetails`,
+  //       { u_id: u_id }
+  //     );
+
+  //     if (response.data?.status == 500) {
+  //       setStatus(1);
+  //     } else {
+  //       setStatus(0);
+  //     }
+  //     setLoading(false);
+  //   } catch (error) {
+  //     message.error(`${error}`);
+  //   }
+  // };
   const getPlanDetails = async () => {
     try {
       //ANCHOR - getting all plans details
@@ -76,6 +78,8 @@ export default function Home() {
         { u_id: u_id }
       );
       console.log(checkPlan);
+      setText(checkPlan.data.text);
+      setWhatsappDisable(checkPlan.data.whatsAppIntegration)
       if (checkPlan.data.msg == 1) {
         setPrePrice(checkPlan.data.prePrice);
         setEnableOne(true);
@@ -90,9 +94,9 @@ export default function Home() {
     if (cookies.userId) {
       setLoading(true);
       checkPlan();
-      if (plan == 1 || plan == 2) {
-        makePayment();
-      }
+      // if (plan == 1 || plan == 2) {
+      //   // makePayment();
+      // }
     } else {
       setLoading(false);
     }
@@ -108,12 +112,12 @@ export default function Home() {
       {status === 2 && loading == false && (
         <div className="main">
           <h2 className="price-header">Pricing Plans</h2>
-          <div className="price-offer-container">
+          {/* <div className="price-offer-container">
             <span className="price-offer">Early Bird&nbsp;</span>
             <span className="price-offer-normal">users will receive Flat</span>
             <span className="price-offer">&nbsp;20% discount.</span>
-          </div>
-          <div className="plan-tab-container">
+          </div> */}
+          {/* <div className="plan-tab-container">
             <button
               className={`plan-type ${!isYearlyPlan && "active"}`}
               onClick={handlePlanType}
@@ -126,8 +130,9 @@ export default function Home() {
             >
               Yearly
             </button>
-          </div>
-          <div className="annual-discount">Save 20% annualy</div>
+          </div> */}
+          {/* <div className="annual-discount">Save 20% annualy</div> */}
+          <br></br>
 
           <div className="plan-container">
             <PlanOne
@@ -135,6 +140,7 @@ export default function Home() {
               setPrice={setPrice}
               price={isYearlyPlan ? 144 : 15}
               enableOne={enableOne}
+              text={text}
             />
             <PlanTwo
               setPlan={setPlan}
@@ -179,7 +185,9 @@ export default function Home() {
                     </div>
                     <div className="app-integration-price">$7 USD monthly</div>
                   </div>
-                  <button className="btn-add-ons"><span className="btn-text">Get Add-on</span></button>
+                  <button className="btn-add-ons" disabled={whatsappDisable}>
+                    <span className="btn-text">Get Add-on</span>
+                  </button>
                 </div>
               </div>
             </div>
@@ -200,19 +208,35 @@ export default function Home() {
                     <div className="app-integration-price">$8 USD</div>
                   </div>
                 </div>
-                <button className="btn-add-ons" onClick={MessageAddOn} disabled={enableOne ? false : true} title={enableOne ? undefined : 'Please purchase plan first'}><span className="btn-text">Get Add-on</span></button>
+                <button
+                  className="btn-add-ons"
+                  onClick={MessageAddOn}
+                  disabled={enableOne ? false : true}
+                  title={enableOne ? undefined : "Please purchase plan first"}
+                >
+                  <span className="btn-text">Get Add-on</span>
+                </button>
               </div>
               <div className="add-ons-integration">
                 <p className="integration-head">Training data</p>
                 <div className="integration-list">
                   <div className="app-integration">
                     <div className="integration-name-container">
-                      <p className="integration-name">Total Characters for training - 1M</p>
+                      <p className="integration-name">
+                        Total Characters for training - 1M
+                      </p>
                     </div>
                     <div className="app-integration-price">$5 USD</div>
                   </div>
                 </div>
-                <button className="btn-add-ons" onClick={CharacterAddOn} disabled={enableOne ? false : true} title={enableOne ? undefined : 'Please purchase plan first'}><span className="btn-text">Get Add-on</span></button>
+                <button
+                  className="btn-add-ons"
+                  onClick={CharacterAddOn}
+                  disabled={enableOne ? false : true}
+                  title={enableOne ? undefined : "Please purchase plan first"}
+                >
+                  <span className="btn-text">Get Add-on</span>
+                </button>
               </div>
             </div>
           </div>

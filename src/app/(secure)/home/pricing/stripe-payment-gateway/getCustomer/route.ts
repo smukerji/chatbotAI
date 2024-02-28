@@ -8,6 +8,7 @@ const stripe = new Stripe(String(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY));
 
 module.exports = apiHandler({
   POST: getCustomer,
+  PUT: getCustomerWhatsappDetails,
 });
 
 async function getCustomer(req: any, res: NextResponse) {
@@ -44,5 +45,21 @@ async function getCustomer(req: any, res: NextResponse) {
     }
   } else {
     console.log("error");
+  }
+}
+
+async function getCustomerWhatsappDetails(req: any, res: NextResponse) {
+  try {
+    let { u_id } = await req.json();
+    const db = (await connectDatabase())?.db();
+    const collection = db.collection("whatsappbot_details");
+    const data = await collection.findOne({ userId: u_id });
+    if (data?.phoneNumberID == null) {
+      return { msg: false };
+    } else {
+      return { msg: true };
+    }
+  } catch (error) {
+    console.log(error);
   }
 }

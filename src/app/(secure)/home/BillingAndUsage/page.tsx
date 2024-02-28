@@ -17,7 +17,7 @@ export default function BillingAndUsage() {
   const [plan, setPlan] = useState('');
   const [msg, setMsg] = useState(0);
   const [chat, setChat] = useState(0);
-  const [date, setDate] = useState();
+  const [date, setDate] = useState<any>();
   const [duration, setDuration] = useState('');
   const [dataSource, setDataSource] = useState([]);
   const [disable, setDisable] = useState(false);
@@ -52,6 +52,7 @@ export default function BillingAndUsage() {
       title: 'PaymentId',
       dataIndex: 'paymentId',
       key: 'paymentId',
+      
     },
     {
       title: 'Amount',
@@ -82,7 +83,10 @@ export default function BillingAndUsage() {
     setChat(response?.data?.chatbot);
     setMsg(response?.data?.message);
     setPlan(response?.data?.plan);
-    setDate(response?.data?.nextRenewal);
+    const newDate = new Date(response?.data?.nextRenewal)
+    const options : any = { year: 'numeric', month: 'short', day: '2-digit' };
+    const formattedDate : any = newDate.toLocaleDateString('en-US', options);
+    setDate(formattedDate);
     setDataSource(response?.data?.paymentDetails);
     if (response?.data?.nextPlan == '') {
       setDisable(true);
@@ -165,6 +169,9 @@ export default function BillingAndUsage() {
           className='payment-table'
           dataSource={dataSource}
           columns={columns}
+          scroll={{
+            x: 600,
+          }}
         />
         ;
       </>

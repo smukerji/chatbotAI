@@ -252,6 +252,7 @@
     .plan-details {
       .name-features {
         .plan-feature {
+          flex-wrap: wrap;
           .plan-message {
             word-break: break-word;
           }
