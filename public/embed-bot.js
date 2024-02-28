@@ -8,6 +8,12 @@
         height: 750px;
         width: 600px;
       }
+
+      @media (max-width: 768px) { /* Adjust the max-width as needed for your mobile devices */
+      iframe {
+        width: 90%;
+      }
+    }
   `;
 
   // Get the script element

@@ -100,9 +100,10 @@ export default function RootLayout({
       <body>
         <SessionProvider>
           <UserDetailsDataProvider>
-            {path !== '/' &&
-              path !== '/account/login' &&
-              path !== '/account/register' && <AuthHeader />}
+            {path !== "/" &&
+              path !== "/account/login" &&
+              path !== "/account/register" &&
+              path !== "/terms" && <AuthHeader />}
             {children}
 
             <Modal

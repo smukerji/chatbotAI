@@ -45,10 +45,10 @@ async function register(request: any) {
   await db.collection("user-details").insertOne({
     userId: userId,
     totalMessageCount: 0,
-    extraMessageLimit: 0,
-    extraChatBotLimit: 0,
-    extraCharacterLimit: 0,
-    extraCrawlLimit: 0
+    messageLimit: starterPlan?.messageLimit,
+    chatbotLimit: starterPlan?.numberOfChatbot,
+    trainingDataLimit: starterPlan?.trainingDataLimit,
+    websiteCrawlingLimit: starterPlan?.websiteCrawlingLimit,
   });
 
   return { message: "Registered successfully... Please login to continue" };

@@ -34,7 +34,7 @@ export const authOptions: NextAuthOptions = {
 
       const starterPlan = await db
         .collection("plans")
-        .findOne({ name: "Individual Plan" });
+        .findOne({ name: "individual" });
 
       const username: string[] = message.user.name?.split(" ")!;
 
@@ -59,6 +59,17 @@ export const authOptions: NextAuthOptions = {
           },
           {
             upsert: true,
+          }
+        );
+        await db.collection("user-details").updateOne(
+          { userId: String(message.user.id) },
+          {
+            $set: {
+              messageLimit: starterPlan?.messageLimit,
+              chatbotLimit: starterPlan?.numberOfChatbot,
+              trainingDataLimit: starterPlan?.trainingDataLimit,
+              websiteCrawlingLimit: starterPlan?.websiteCrawlingLimit,
+            },
           }
         );
       }

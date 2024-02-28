@@ -29,7 +29,7 @@ async function CronFunction() {
       const data = dataa[i];
       if (data.nextPlan != "") {
         const h = data.paymentId;
-        if (data.nextPlan == "Agency Plan") {
+        if (data.nextPlan == "agency") {
           if (data.nextPlanDuration == "month") {
             price = 15;
           } else {

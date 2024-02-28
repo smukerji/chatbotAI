@@ -9,13 +9,12 @@ const stripePromise = loadStripe(
 );
 
 const plans = [
-  { id: 1, name: "Individual Plan", price: 15, days: 30 },
-  { id: 2, name: "Agency Plan", price: 89, days: 30 },
-  { id: 3, name: "Individual Plan", price: 144, days: 365 },
-  { id: 4, name: "Agency Plan", price: 854, days: 365 },
+  { id: 1, name: "individual", price: 15, days: 30 },
+  { id: 2, name: "agency", price: 89, days: 30 },
+  { id: 3, name: "individual", price: 144, days: 365 },
+  { id: 4, name: "agency", price: 854, days: 365 },
   { id: 5, name: "Character add on", price: 5, days: 30 },
   { id: 6, name: "Message add on", price: 5, days: 30 },
-
 ];
 
 const CheckoutPage = ({ params }: any) => {

@@ -7,6 +7,7 @@ import {
   CardCvcElement,
   CardExpiryElement,
 } from "@stripe/react-stripe-js";
+
 import axios from "axios";
 import Stripe from "stripe";
 import { useRouter } from "next/navigation";
@@ -170,34 +171,10 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
                 </div>
               </div>
               {/* <Image src={line} alt={"no image"} /> */}
-              {/* {(plan == 1 || plan == 3) && (
-                <>
-                  <div className="checkbox">
-                    <input
-                      type="checkbox"
-                      defaultChecked={defaultChecked}
-                      className="price-checkbox"
-                      onChange={(e) => {
-                        setIsChecked(e.target.checked);
-                      }}
-                    />
-                    <label className="checkbox-label">
-                      Add whatsapp integration
-                    </label>
-                  </div>
-                  <div className="bottom-left">
-                    <div className="total">Total</div>
-
-                    <div className="total-price">${newPrice}</div>
-                  </div>
-                </>
-              )}{(plan != 1 || plan != 3) && ( */}
-                <div className="bottom-left">
-                    <div className="total">Total</div>
-
-                    <div className="total-price">${price}</div>
-                  </div>
-              {/* )} */}
+              <div className="bottom-left">
+                <div className="total">Total</div>
+                <div className="total-price">${price}</div>
+              </div>
             </div>
             <div className="right">
               <div className="right-top">Pay with Card</div>

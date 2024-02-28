@@ -20,8 +20,10 @@ async function createPaymentIntent(req: any, res: NextResponse) {
       let currentDate = new Date();
       //ANCHOR - checking existing plan of user
       if (
-        ((data.plan == "Individual Plan" && data.endDate > currentDate)) &&
-        (plan != 5 && plan != 6)
+        data.plan == "individual" &&
+        data.endDate > currentDate &&
+        plan != 5 &&
+        plan != 6
       ) {
         return "You already have plan";
       }
@@ -40,7 +42,7 @@ async function createPaymentIntent(req: any, res: NextResponse) {
           payment_method: data.paymentId,
           receipt_email: data.email,
         });
-        console.log(paymentIntent)
+        console.log(paymentIntent);
         return paymentIntent;
       } else {
         return { status: 500 };
