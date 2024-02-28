@@ -29,12 +29,13 @@ async function deleteWhatsappData(req: NextRequest) {
     return { message: "error" };
 }
 
+// @ErrorHandler
 async function getWhatsappData(req: NextRequest) {
 
-    let userId:any = req.nextUrl.searchParams.get("userId");
+    let chatBotId:any = req.nextUrl.searchParams.get("chatBotId");
     const db = (await connectDatabase())?.db();
     const collection = db?.collection('whatsappbot_details');
-    const foundResult = await collection?.findOne({ userId: userId });
+    const foundResult = await collection?.findOne({ chatbotId: chatBotId });
 
     if (foundResult) {
       return foundResult;
