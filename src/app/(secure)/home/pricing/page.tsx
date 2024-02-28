@@ -200,7 +200,7 @@ export default function Home() {
                     <div className="app-integration-price">$8 USD</div>
                   </div>
                 </div>
-                <button className="btn-add-ons" onClick={MessageAddOn}><span className="btn-text">Get Add-on</span></button>
+                <button className="btn-add-ons" onClick={MessageAddOn} disabled={enableOne ? false : true} title={enableOne ? undefined : 'Please purchase plan first'}><span className="btn-text">Get Add-on</span></button>
               </div>
               <div className="add-ons-integration">
                 <p className="integration-head">Training data</p>
@@ -212,7 +212,7 @@ export default function Home() {
                     <div className="app-integration-price">$5 USD</div>
                   </div>
                 </div>
-                <button className="btn-add-ons" onClick={CharacterAddOn}><span className="btn-text">Get Add-on</span></button>
+                <button className="btn-add-ons" onClick={CharacterAddOn} disabled={enableOne ? false : true} title={enableOne ? undefined : 'Please purchase plan first'}><span className="btn-text">Get Add-on</span></button>
               </div>
             </div>
           </div>
