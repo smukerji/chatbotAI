@@ -144,7 +144,7 @@ function WhatsappModal({ isOpen, onClose }: any) {
           { status: "wait" }, // Keep the status of other steps unchanged
         ]);
       } else {
-        message.error(res?.verifyMessage);
+        message.error(res?.verifyMessage || res?.message);
       }
     } catch (error) {
       console.log("error verifying", error);
@@ -185,10 +185,9 @@ function WhatsappModal({ isOpen, onClose }: any) {
       errors.phoneNumberID == "" &&
       errors.phoneBusinessID == ""
     ) {
-      setAccountStatus(true);
-      setStepState({ step1: false, step2: false, step3: false });
-
+      
       try {
+        const {id,...wrapMetaDetails} = metaDetails
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/whatsapp/api`,
           {
@@ -197,15 +196,33 @@ function WhatsappModal({ isOpen, onClose }: any) {
             },
             method: "POST",
             body: JSON.stringify({
-              ...metaDetails,
+              ...wrapMetaDetails,
               chatbotId: chatbot.id,
               userId: userId[0].userId,
             }),
             next: { revalidate: 0 },
           }
-        );
-        const resp = await response.json();
-        message.success(resp.message);
+          );
+          
+          const resp = await response.json();
+          if(response.status !=200){
+            message.error(resp.message);
+            onClose();
+            setAccountStatus(false);
+            setStepState({ step1: true, step2: false, step3: false });
+            setItems([
+              { status: "process" }, // Update the status of the first step
+              { status: "wait" }, // Update the status of the second step
+              { status: "wait" },
+            ]);
+            
+          }
+          else{
+            message.success(resp.message);
+            setStepState({ step1: false, step2: false, step3: false });
+            setAccountStatus(true);
+        }
+       
       } catch (error) {
         message.error("error sending data");
       }
@@ -349,7 +366,7 @@ function WhatsappModal({ isOpen, onClose }: any) {
   const fetchWhatsappDetails = async () => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/whatsapp/account?userId=${userId[0].userId}`,
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/whatsapp/account?chatBotId=${chatbot.id}`,
         {
           headers: {
             cache: "no-store",
