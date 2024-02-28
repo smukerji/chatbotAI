@@ -1,19 +1,19 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
-import LuciferLogo from "../../../../public/svgs/lucifer-ai-logo.svg";
-import profileIcon from "../../../../public/svgs/profile-circle.svg";
-import walletIcon from "../../../../public/svgs/wallet-add.svg";
-import receiptIcon from "../../../../public/svgs/receipt-2.svg";
-import logoutIcon from "../../../../public/svgs/logout.svg";
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import LuciferLogo from '../../../../public/svgs/lucifer-ai-logo.svg';
+import profileIcon from '../../../../public/svgs/profile-circle.svg';
+import walletIcon from '../../../../public/svgs/wallet-add.svg';
+import receiptIcon from '../../../../public/svgs/receipt-2.svg';
+import logoutIcon from '../../../../public/svgs/logout.svg';
 
-import Image from "next/image";
-import { Progress } from "antd";
-import "./header.scss";
-import { useCookies } from "react-cookie";
-import { useUserService } from "../../_services/useUserService";
-import { signOut, useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { formatNumber } from "../../_helpers/client/formatNumber";
-import { UserDetailsContext } from "../../_helpers/client/Context/UserDetailsContext";
+import Image from 'next/image';
+import { Progress } from 'antd';
+import './header.scss';
+import { useCookies } from 'react-cookie';
+import { useUserService } from '../../_services/useUserService';
+import { signOut, useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { formatNumber } from '../../_helpers/client/formatNumber';
+import { UserDetailsContext } from '../../_helpers/client/Context/UserDetailsContext';
 
 function Header() {
   const router = useRouter();
@@ -37,18 +37,18 @@ function Header() {
   /// create a ref for menu to close it when user click outside of the mene-container
   const menuRef: any = useRef(null);
   const [cookies, setCookie] = useCookies([
-    "profile-img",
-    "username",
-    "userId",
-    "authorization",
+    'profile-img',
+    'username',
+    'userId',
+    'authorization',
   ]);
   /// state for opening the profile menu
   const [openMenu, setOpenMenu] = useState(false);
   const userService = useUserService();
   const { data: session } = useSession();
 
-  let shortUserName = "";
-  const names = cookies?.username?.split("_");
+  let shortUserName = '';
+  const names = cookies?.username?.split('_');
   if (names?.length > 1) {
     shortUserName = names?.[0][0] + names?.[1][0];
   } else {
@@ -71,17 +71,17 @@ function Header() {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/account/user/details?userId=${cookies?.userId}`,
         {
-          method: "GET",
+          method: 'GET',
           next: { revalidate: 0 },
         }
       );
 
       const userDetails = await response.json();
-      userDetailContext?.handleChange("totalMessageCount")(
+      userDetailContext?.handleChange('totalMessageCount')(
         userDetails?.userDetails?.totalMessageCount
       );
-      userDetailContext?.handleChange("plan")(userDetails?.plan);
-      userDetailContext?.handleChange("noOfChatbotsUserCreated")(
+      userDetailContext?.handleChange('plan')(userDetails?.plan);
+      userDetailContext?.handleChange('noOfChatbotsUserCreated')(
         userDetails?.noOfChatbotsUserCreated
       );
       const percent =
@@ -89,7 +89,7 @@ function Header() {
           userDetails?.plan?.messageLimit) *
         100;
       /// store the percentage of message sent by user
-      userDetailContext?.handleChange("percent")(percent);
+      userDetailContext?.handleChange('percent')(percent);
     };
     fetchData();
 
@@ -100,11 +100,11 @@ function Header() {
     };
 
     // Add event listener when component mounts
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
 
     // Remove event listener when component unmounts
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
@@ -117,30 +117,30 @@ function Header() {
   }, []);
 
   return (
-    <div className="header-container">
+    <div className='header-container'>
       {/*------------------------------------------logo----------------------------------------------*/}
       <Image
-        className="logo"
+        className='logo'
         src={LuciferLogo}
-        alt="img-logo"
+        alt='img-logo'
         onClick={() => {
-          window.location.href = "/";
+          window.location.href = '/';
         }}
       />
 
-      <div className="header-content">
+      <div className='header-content'>
         {!isMobile && (
           <>
             {/*------------------------------------------messages limit----------------------------------------------*/}
-            <div className="messages-limit-container">
+            <div className='messages-limit-container'>
               <span>Messages</span>
               <Progress
-                strokeLinecap="butt"
+                strokeLinecap='butt'
                 percent={userDetails?.percent}
                 showInfo={false}
               />
               <span>
-                <span style={{ color: "#141416" }}>
+                <span style={{ color: '#141416' }}>
                   {userDetails?.totalMessageCount}
                 </span>
                 /
@@ -153,34 +153,34 @@ function Header() {
             </div>
 
             {/*------------------------------------------chatbot-btn----------------------------------------------*/}
-            <a href="/chatbot" style={{ textDecoration: "none" }}>
+            <a href='/chatbot' style={{ textDecoration: 'none' }}>
               <button
-                className="feedback-btn"
+                className='feedback-btn'
                 style={{
                   color:
-                    `${window.location.pathname}` === "/chatbot"
-                      ? "#2E58EA"
-                      : "",
+                    `${window.location.pathname}` === '/chatbot'
+                      ? '#2E58EA'
+                      : '',
                 }}
               >
                 My Chatbots
               </button>
             </a>
             {/*------------------------------------------feedback-btn----------------------------------------------*/}
-            <button className="feedback-btn">Support</button>
+            <button className='feedback-btn'>Support</button>
           </>
         )}
         {/*------------------------------------------Profile Image----------------------------------------------*/}
 
-        <div className="profile-img" onClick={() => setOpenMenu(!openMenu)}>
-          {cookies?.["profile-img"] ? (
+        <div className='profile-img' onClick={() => setOpenMenu(!openMenu)}>
+          {cookies?.['profile-img'] ? (
             <Image
-              className="providers-img"
+              className='providers-img'
               width={40}
               height={40}
               // style={{ borderRadius: "50%" }}
-              src={cookies?.["profile-img"]}
-              alt="profile-img"
+              src={cookies?.['profile-img']}
+              alt='profile-img'
             />
           ) : (
             <span>{shortUserName?.toUpperCase()}</span>
@@ -189,41 +189,41 @@ function Header() {
           {openMenu && (
             /*------------------------------------------menu container----------------------------------------------*/
             <div
-              className="account-menu-conatiner"
+              className='account-menu-conatiner'
               onClick={(e) => e.stopPropagation()}
               ref={menuRef}
             >
-              <p className="username">
-                {names?.[0]} {names?.[1] ? " " + names?.[1] : ""}
+              <p className='username'>
+                {names?.[0]} {names?.[1] ? ' ' + names?.[1] : ''}
               </p>
               {/*------------------------------------------account actions menu----------------------------------------------*/}
-              <div className="account-actions-container">
+              <div className='account-actions-container'>
                 <ul>
-                  <li onClick={() => router.push("/home/account-settings")}>
-                    <Image src={profileIcon} alt="profile-icon" />
+                  <li onClick={() => router.push('/home/account-settings')}>
+                    <Image src={profileIcon} alt='profile-icon' />
                     Account settings
                   </li>
                   <li>
-                    <Image src={receiptIcon} alt="receipt-icon" />
+                    <Image src={receiptIcon} alt='receipt-icon' />
                     Billing & Usage
                   </li>
 
                   <li>
-                    <Image src={walletIcon} alt="wallet-icon" />
+                    <Image src={walletIcon} alt='wallet-icon' />
                     Pricing Plans
                   </li>
 
                   {isMobile && (
                     <>
                       <li>
-                        <a href="/chatbot" style={{ textDecoration: "none" }}>
+                        <a href='/chatbot' style={{ textDecoration: 'none' }}>
                           <button
-                            className="feedback-btn"
+                            className='feedback-btn'
                             style={{
                               color:
-                                `${window.location.pathname}` === "/chatbot"
-                                  ? "#2E58EA"
-                                  : "",
+                                `${window.location.pathname}` === '/chatbot'
+                                  ? '#2E58EA'
+                                  : '',
                             }}
                           >
                             My Chatbots
@@ -232,20 +232,20 @@ function Header() {
                       </li>
 
                       <li>
-                        <button className="feedback-btn">Support</button>
+                        <button className='feedback-btn'>Support</button>
                       </li>
 
                       <li>
-                        <div className="messages-limit-container">
+                        <div className='messages-limit-container'>
                           <span>Messages</span>
 
                           <Progress
-                            strokeLinecap="butt"
+                            strokeLinecap='butt'
                             percent={userDetails?.percent}
                             showInfo={false}
                           />
                           <span>
-                            <span style={{ color: "#141416" }}>
+                            <span style={{ color: '#141416' }}>
                               {userDetails?.totalMessageCount}
                             </span>
                             /
@@ -263,8 +263,8 @@ function Header() {
               </div>
 
               {/*------------------------------------------plan details container----------------------------------------------*/}
-              <div className="plan-details-container">
-                <div className="plan">
+              <div className='plan-details-container'>
+                <div className='plan'>
                   <span>Your plan</span>
                   <h1>Starter</h1>
                 </div>
@@ -275,19 +275,19 @@ function Header() {
 
               {/*------------------------------------------logout action----------------------------------------------*/}
               <button
-                className="logout-btn"
+                className='logout-btn'
                 onClick={async (e) => {
                   if (!isLoggedIn) {
-                    window.location.href = "/account/login";
+                    window.location.href = '/account/login';
                   } else if (session?.user || userId) {
                     setOpenMenu(!openMenu);
                     await logout();
                     await signOut();
-                    window.location.href = "/";
+                    window.location.href = '/';
                   }
                 }}
               >
-                <Image src={logoutIcon} alt="logout-icon" />
+                <Image src={logoutIcon} alt='logout-icon' />
                 Log out
               </button>
             </div>
