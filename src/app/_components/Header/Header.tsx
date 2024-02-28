@@ -79,7 +79,8 @@ function Header() {
       );
 
       const userDetails = await response.json();
-      setPlan(userDetails?.plan.name);
+      console.log(userDetails)
+      setPlan(userDetails?.plan?.name);
       const date2:any = new Date(userDetails?.planExpiry);
       const date1:any = new Date(); // Current date
 
@@ -118,6 +119,14 @@ function Header() {
     };
   }, []);
 
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    if (window.innerWidth < 767) {
+      setIsMobile(true);
+    }
+  }, []);
+
   return (
     <div className="header-container">
       {/*------------------------------------------logo----------------------------------------------*/}
@@ -131,41 +140,47 @@ function Header() {
       />
 
       <div className="header-content">
-        {/*------------------------------------------messages limit----------------------------------------------*/}
-        <div className="messages-limit-container">
-          <span>Messages</span>
-          <Progress
-            strokeLinecap="butt"
-            percent={userDetails?.percent}
-            showInfo={false}
-          />
-          <span>
-            <span style={{ color: "#141416" }}>
-              {userDetails?.totalMessageCount}
-            </span>
-            /
-            {formatNumber(
-              userDetails?.plan?.messageLimit
-                ? userDetails?.plan?.messageLimit
-                : 10000
-            )}
-          </span>
-        </div>
+        {!isMobile && (
+          <>
+            {/*------------------------------------------messages limit----------------------------------------------*/}
+            <div className="messages-limit-container">
+              <span>Messages</span>
+              <Progress
+                strokeLinecap="butt"
+                percent={userDetails?.percent}
+                showInfo={false}
+              />
+              <span>
+                <span style={{ color: "#141416" }}>
+                  {userDetails?.totalMessageCount}
+                </span>
+                /
+                {formatNumber(
+                  userDetails?.plan?.messageLimit
+                    ? userDetails?.plan?.messageLimit
+                    : 10000
+                )}
+              </span>
+            </div>
 
-        {/*------------------------------------------chatbot-btn----------------------------------------------*/}
-        <a href="/chatbot" style={{ textDecoration: "none" }}>
-          <button
-            className="feedback-btn"
-            style={{
-              color:
-                `${window.location.pathname}` === "/chatbot" ? "#2E58EA" : "",
-            }}
-          >
-            My Chatbots
-          </button>
-        </a>
-        {/*------------------------------------------feedback-btn----------------------------------------------*/}
-        <button className="feedback-btn">Support</button>
+            {/*------------------------------------------chatbot-btn----------------------------------------------*/}
+            <a href="/chatbot" style={{ textDecoration: "none" }}>
+              <button
+                className="feedback-btn"
+                style={{
+                  color:
+                    `${window.location.pathname}` === "/chatbot"
+                      ? "#2E58EA"
+                      : "",
+                }}
+              >
+                My Chatbots
+              </button>
+            </a>
+            {/*------------------------------------------feedback-btn----------------------------------------------*/}
+            <button className="feedback-btn">Support</button>
+          </>
+        )}
         {/*------------------------------------------Profile Image----------------------------------------------*/}
 
         <div className="profile-img" onClick={() => setOpenMenu(!openMenu)}>
@@ -208,6 +223,53 @@ function Header() {
                     <Image src={walletIcon} alt="wallet-icon" />
                     Pricing Plans
                   </li>
+
+                  {isMobile && (
+                    <>
+                      <li>
+                        <a href="/chatbot" style={{ textDecoration: "none" }}>
+                          <button
+                            className="feedback-btn"
+                            style={{
+                              color:
+                                `${window.location.pathname}` === "/chatbot"
+                                  ? "#2E58EA"
+                                  : "",
+                            }}
+                          >
+                            My Chatbots
+                          </button>
+                        </a>
+                      </li>
+
+                      <li>
+                        <button className="feedback-btn">Support</button>
+                      </li>
+
+                      <li>
+                        <div className="messages-limit-container">
+                          <span>Messages</span>
+
+                          <Progress
+                            strokeLinecap="butt"
+                            percent={userDetails?.percent}
+                            showInfo={false}
+                          />
+                          <span>
+                            <span style={{ color: "#141416" }}>
+                              {userDetails?.totalMessageCount}
+                            </span>
+                            /
+                            {formatNumber(
+                              userDetails?.plan?.messageLimit
+                                ? userDetails?.plan?.messageLimit
+                                : 10000
+                            )}
+                          </span>
+                        </div>
+                      </li>
+                    </>
+                  )}
                 </ul>
               </div>
 
@@ -229,6 +291,7 @@ function Header() {
                   if (!isLoggedIn) {
                     window.location.href = "/account/login";
                   } else if (session?.user || userId) {
+                    setOpenMenu(!openMenu);
                     await logout();
                     await signOut();
                     window.location.href = "/";

@@ -173,6 +173,9 @@
         line-height: 28px;
       }
     }
+    .btn-cancel-plan:disabled{
+      cursor: not-allowed;
+    }
     .btn-upgrade {
       cursor: pointer;
       margin-top: 24px;

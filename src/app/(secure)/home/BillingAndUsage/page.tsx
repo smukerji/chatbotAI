@@ -20,7 +20,7 @@ export default function BillingAndUsage() {
   const [date, setDate] = useState();
   const [duration, setDuration] = useState("");
   const [dataSource, setDataSource] = useState([]);
-  const [enable, setEnable] = useState()
+  const [disable, setDisable] = useState(false)
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   // const [columns, setColumns] = useState([])
@@ -40,6 +40,7 @@ export default function BillingAndUsage() {
     else{
       message.error(response.data.msg)
     }
+    setDisable(true)
     setIsModalOpen(false);
   };
 
@@ -84,6 +85,9 @@ export default function BillingAndUsage() {
     setPlan(response?.data?.plan);
     setDate(response?.data?.nextRenewal);
     setDataSource(response?.data?.paymentDetails);
+    if(response?.data?.nextPlan == ""){
+      setDisable(true)
+    }
 
     if (!response.data?.duration) {
       setDuration("7 days free trial");
@@ -141,7 +145,7 @@ export default function BillingAndUsage() {
             <button className="btn-upgrade" onClick={explorePlan}>
               <span className="btn-text">Explore Plans</span>
             </button>
-            <button className="btn-cancel-plan">
+            <button className="btn-cancel-plan"  onClick={showModal} disabled={disable}>
               <span className="btn-text-cancel-plan">Cancel My Plan</span>
             </button>
           </div>

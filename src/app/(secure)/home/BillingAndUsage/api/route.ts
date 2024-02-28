@@ -24,7 +24,7 @@ async function getUserDetails(req: any, res: NextResponse) {
     console.log(data, data_plan)
     const paymentDetails = await collectionPayment.find({userId: u_id}).toArray()
     console.log(paymentDetails)
-    return {plan: data.plan, nextRenewal: data.endDate, message: data_plan.messageLimit, chatbot: data_plan.numberOfChatbot, duration: data.duration, paymentDetails}
+    return {plan: data.plan, nextRenewal: data.endDate, message: data_plan.messageLimit, chatbot: data_plan.numberOfChatbot, duration: data.duration, paymentDetails, nextPlan: data.nextPlan}
   } catch (error) {}
 }
 

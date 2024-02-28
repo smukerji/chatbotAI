@@ -36,3 +36,128 @@ Header a {
   display: flex;
   flex-direction: column;
 }
+
+.whatsapp-step-container{
+  display: flex;
+  flex-direction: column;
+  /* justify-content: center; */
+  /* align-items: center; */
+
+
+}
+.whatsapp-steps{
+  width: 60%;
+  margin: auto;
+}
+
+.whatsapp-integration-title{
+  color: #141416;
+  text-align: center;
+/* Subtitle/Large */
+font-size: 20px;
+font-style: normal;
+font-weight: 500;
+line-height: 28px; /* 140% */
+margin-bottom: 5px;
+}
+
+.whatsapp-top-title{
+  color:  #353945 !important;
+
+/* Body/Medium */
+font-size: 16px !important;
+font-style: normal !important;
+font-weight: 500 !important;
+line-height: 24px !important; /* 150% */
+}
+.whatsapp-input-copy-container{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.whatsapp-error-message{
+  color: red !important;
+  margin: 0px !important;
+  font-size: 14px !important;
+}
+.whatsapp-input{
+  width: 90%;
+  display: flex;
+padding: 12px 16px;
+align-items: center;
+gap: 10px;
+align-self: stretch;
+border-radius: 12px;
+border: 1px solid #E6E8EC !important;
+background: #FFF;
+
+
+  /* style */
+  color: #141416;
+/* Body/Medium */
+font-size: 16px;
+font-style: normal;
+font-weight: 500;
+line-height: 24px;
+
+}
+.whatsapp-input:focus{
+  outline: none;
+}
+.whatsapp-btn{
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 15px !important;
+}
+.whatsapp-verify{
+  display: flex;
+padding: 12px 24px;
+justify-content: center;
+align-items: center;
+gap: 10px;
+border-radius: 12px;
+background:  #2E58EA;
+border: none;
+}
+.whatsapp-verify:hover{
+  cursor: pointer !important;
+}
+.whatsapp-verify-text{
+  color: #FCFCFD !important;
+text-align: center ;
+font-size: 16px !important;
+font-style: normal !important;
+font-weight: 600 !important;
+line-height: 24px !important; /* 150% */
+margin-top: 0px !important;
+}
+.whatsapp-verify-text:hover{
+  cursor: pointer;
+}
+ .whatsapp-modal .ant-modal-footer{
+  display: none !important;
+}
+.whatsapp-status-container{
+  display: flex;
+  justify-content: space-between;
+  border:  1px solid #E6E8EC ;
+  border-radius: 12px;
+  margin: 30px;
+  padding: 10px;
+}
+.whatsapp-status-container-mobile-section{
+  width: 50%;
+}
+.whatsapp-status-container-switch-section{
+  width: 50%;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+
+}
+.whatsapp-copy-icon:hover{
+  cursor:  pointer !important;
+}
+.whatsapp-delete{
+  cursor:  pointer !important;
+}

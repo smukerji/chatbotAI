@@ -51,7 +51,7 @@ async function addPaymentDetails(req: any, res: NextResponse) {
         day: "2-digit",
         year: "numeric",
       });
-      const updatePayment = await collectionPayment.insertOne({userId:u_id,status, date: formattedDate, price, paymentId})
+      const updatePayment = await collectionPayment.insertOne({userId:u_id,status, date: formattedDate, price:"$"+price, paymentId})
       
       //ANCHOR - message limit update
       if (plan == 5) {

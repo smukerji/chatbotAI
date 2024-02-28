@@ -39,6 +39,8 @@ async function userDetails(request: NextRequest) {
     userId: userId,
   });
 
+  console.log("Fdssssssssssssssssssss",planDetails[0]);
+  
   return {
     plan: planDetails[0].plan[0],
     noOfChatbotsUserCreated,

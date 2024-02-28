@@ -5,9 +5,10 @@ import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import { connectDatabase } from "../../../../db";
 import { cookies } from "next/headers";
 import { ObjectId } from "mongodb";
+import { Adapter } from "next-auth/adapters";
 
 export const authOptions: NextAuthOptions = {
-  adapter: MongoDBAdapter(connectDatabase()),
+  adapter: MongoDBAdapter(connectDatabase())  as Adapter,
   //   session: {
   //     strategy: "jwt",
   //   },
