@@ -177,9 +177,13 @@
             font-style: normal;
             font-weight: 500;
             line-height: 24px;
-            width: 210px;
+            width: 266px;
             &.plan-placeholder-even {
               color: #fcfcfd;
+            }
+
+            .free-trial {
+              font-weight: 700;
             }
           }
         }
@@ -265,6 +269,16 @@
           align-items: flex-start;
           gap: 20px;
           align-self: stretch;
+
+          .horizontal-line {
+            border-bottom: 1px solid #b1b5c3;
+            padding-bottom: 20px;
+          }
+
+          .horizontal-line-2 {
+            border-bottom: 1px solid #b1b5c3;
+            padding-bottom: 20px;
+          }
           .plan-item {
             display: flex;
             align-items: flex-start;
@@ -559,6 +573,157 @@
       }
     }
   }
+  @media only screen and (max-width: 767px) {
+    .price-header {
+      font-size: 34px !important;
+    }
+
+    .price-offer-container {
+      text-wrap: wrap;
+      word-break: break-word;
+      padding: 0 20px;
+
+      .price-offer {
+        font-size: 18px !important;
+      }
+
+      .price-offer-normal {
+        font-size: 18px !important;
+      }
+    }
+
+    .annual-discount {
+      font-size: 18px !important;
+    }
+
+    .plan-container {
+      flex-direction: column;
+      align-items: center;
+      margin: 0 10px;
+
+      .plan-box {
+        max-width: 100% !important;
+        width: 100%;
+
+        .plan-container-list {
+          .plan-details {
+            .horizontal-line {
+              border-bottom: 1px solid #b1b5c3;
+              padding-bottom: 20px;
+            }
+          }
+        }
+
+        .plan-name-price {
+          .plan-placeholder {
+            width: 235px !important;
+          }
+        }
+      }
+    }
+
+    .add-ons-head {
+      margin: 50px 0 20px 20px;
+    }
+
+    .add-ons-container {
+      flex-direction: column;
+      padding: 0 30px;
+
+      .add-ons-left {
+        width: 100% !important;
+
+        .add-ons-integration {
+          .integration-list {
+            .app-integration {
+              .integration-name-container {
+                // width: 60%;
+              }
+            }
+          }
+        }
+      }
+
+      .add-ons-right {
+        width: 100% !important;
+
+        .add-ons-integration {
+          .integration-list {
+            .app-integration {
+              .integration-name-container {
+                width: 80%;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .price-footer-container {
+      flex-direction: column;
+
+      .footer-left {
+        width: 100% !important;
+        padding: 0 20px;
+
+        .left-head {
+          .left-head-text {
+            font-size: 34px;
+          }
+        }
+      }
+
+      .footer-right {
+        width: 100% !important;
+        // padding: 0 30px 30px 30px;
+      }
+    }
+  }
+
+  @media only screen and (max-width: 991px) {
+    .plan-container {
+      padding: 0 30px;
+      .plan-box {
+        max-width: 50%;
+      }
+    }
+
+    .add-ons-head {
+      margin: 40px 0 20px 40px;
+    }
+
+    .add-ons-container {
+      padding: 0 30px;
+      .add-ons-left {
+        width: 50%;
+      }
+
+      .add-ons-right {
+        width: 50%;
+
+        .add-ons-integration {
+          .integration-list {
+            .app-integration {
+              .integration-name-container {
+                width: 70%;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .price-footer-container {
+      padding: 0 30px 30px 30px;
+      .footer-left {
+        width: 50%;
+      }
+
+      .footer-right {
+        width: 50%;
+      }
+    }
+  }
 }
 .success {
   width: fit-content;
@@ -597,6 +762,8 @@
         align-items: flex-start;
         gap: 4px;
         align-self: stretch;
+        border-bottom: 1px solid #b1b5c3;
+        padding-bottom: 20px;
 
         .plan-name {
           color: var(--Neutral-1, #fcfcfd);
@@ -724,6 +891,43 @@
       }
 
       // padding-bottom: 30px;
+    }
+  }
+  @media only screen and (max-width: 767px) {
+    .card-head {
+      width: 100%;
+      text-align: center;
+      font-size: 30px;
+    }
+
+    .cardElementForm {
+      width: 100% !important;
+      flex-direction: column;
+      padding: 0 30px;
+
+      .left {
+        width: 100% !important;
+        height: 350px;
+      }
+
+      .right {
+        width: 100% !important;
+        margin: 30px 0;
+        padding-left: 10px;
+      }
+    }
+  }
+
+  @media only screen and (max-width: 991px) {
+    .cardElementForm {
+      width: 100% !important;
+      padding: 0 30px;
+    }
+  }
+
+  @media only screen and (max-width: 1240px) {
+    .cardElementForm {
+      width: 60%;
     }
   }
 }
