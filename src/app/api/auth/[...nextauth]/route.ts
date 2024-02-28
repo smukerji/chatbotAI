@@ -8,7 +8,7 @@ import { ObjectId } from "mongodb";
 import { Adapter } from "next-auth/adapters";
 
 export const authOptions: NextAuthOptions = {
-  adapter: MongoDBAdapter(connectDatabase())  as Adapter,
+  adapter: MongoDBAdapter(connectDatabase()) as Adapter,
   //   session: {
   //     strategy: "jwt",
   //   },
@@ -34,7 +34,7 @@ export const authOptions: NextAuthOptions = {
 
       const starterPlan = await db
         .collection("plans")
-        .findOne({ name: "Individual Plan" });
+        .findOne({ name: "individual" });
 
       const username: string[] = message.user.name?.split(" ")!;
 
@@ -61,16 +61,16 @@ export const authOptions: NextAuthOptions = {
           }
         );
         await db.collection("user-details").updateOne(
-          {'userId' : String(message.user.id)},
+          { userId: String(message.user.id) },
           {
             $set: {
-              extraMessageLimit: 0,
-              extraChatBotLimit: 0,
-              extraCharacterLimit: 0,
-              extraCrawlLimit: 0
-            }
+              messageLimit: starterPlan?.messageLimit,
+              chatbotLimit: starterPlan?.numberOfChatbot,
+              trainingDataLimit: starterPlan?.trainingDataLimit,
+              websiteCrawlingLimit: starterPlan?.websiteCrawlingLimit,
+            },
           }
-        )
+        );
       }
 
       const userId = message.user.id;

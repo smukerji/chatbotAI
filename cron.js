@@ -8,7 +8,7 @@ const uri = process.env.NEXT_PUBLIC_MONGO_URI;
 const stripe = new Stripe(String(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY));
 
 // Define your cron job
-cron.schedule("*/10 * * * * *", () => {
+cron.schedule("01 00 * * *", () => {
   console.log("Cron job is running...");
   CronFunction();
 });
@@ -29,7 +29,7 @@ async function CronFunction() {
       const data = dataa[i];
       if (data.nextPlan != "") {
         const h = data.paymentId;
-        if (data.nextPlan == "Agency Plan") {
+        if (data.nextPlan == "agency") {
           if (data.nextPlanDuration == "month") {
             price = 15;
           } else {

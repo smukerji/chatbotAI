@@ -9,16 +9,13 @@ async function initializeDb() {
   let db = (await client.connect()).db();
 
   const planCollection = db.collection("plans");
-  const accountsCollection = db.collection("accounts");
-  const userCollection = db.collection("users");
-  const paymentHistoryCollection = db.collection('payment-history');
 
   /// update/insert starter plan
   await planCollection.updateOne(
-    { name: "Individual Plan" },
+    { name: "individual" },
     {
       $set: {
-        name: "Individual Plan",
+        name: "individual",
         numberOfChatbot: 1,
         messageLimit: 2000,
         trainingDataLimit: 1000000,
@@ -29,10 +26,10 @@ async function initializeDb() {
     { upsert: true }
   );
   await planCollection.updateOne(
-    { name: "Agency Plan" },
+    { name: "agency" },
     {
       $set: {
-        name: "Agency Plan",
+        name: "agency",
         numberOfChatbot: 5,
         messageLimit: 2000,
         trainingDataLimit: 1000000,
@@ -43,11 +40,41 @@ async function initializeDb() {
     { upsert: true }
   );
 
-  console.log('Database initialized successfully');
+  const plan_data = await planCollection.findOne({ name: "individual" });
+  // const userCollection = db.collection("users");
+  // let currentDate = new Date();
+  // let endDate = new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+  // await userCollection.updateMany(
+  //   {},
+  //   {
+  //     $set: {
+  //       planId: plan_data?._id,
+  //       startDate: currentDate,
+  //       endDate: endDate,
+  //     },
+  //   }
+  // );
+
+  const userDetailsCollection = db.collection("user-details");
+
+  await userDetailsCollection.updateMany(
+    {},
+    {
+      $set: {
+        messageLimit: plan_data?.messageLimit,
+        chatbotLimit: plan_data?.numberOfChatbot,
+        trainingDataLimit: plan_data?.trainingDataLimit,
+        websiteCrawlingLimit: plan_data?.websiteCrawlingLimit,
+      },
+    }
+  );
+
+  console.log("Database initialized successfully");
   process.exit();
 }
 
 initializeDb().catch((error) => {
-  console.error('Error initializing database:', error);
+  console.error("Error initializing database:", error);
   process.exit(1);
 });

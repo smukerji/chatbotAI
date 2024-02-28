@@ -113,11 +113,27 @@
     padding-bottom: 24px;
   }
 
+  @media only screen and (max-width: 991px) {
+    padding: 30px 10px 30px 20px;
+
+    .footer-container {
+      .company-details-container {
+        padding-right: 15px;
+      }
+    }
+  }
+
   @media only screen and (max-width: 767px) {
-    padding: 20px;
+    padding: 20px 30px;
 
     .footer-container {
       flex-wrap: wrap;
+      flex-direction: column;
+      margin-left: auto;
+
+      .links-container {
+        margin-top: 20px;
+      }
     }
   }
 }
