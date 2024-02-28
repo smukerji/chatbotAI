@@ -386,7 +386,7 @@ function WhatsappModal({ isOpen, onClose }: any) {
         isActive: data?.isActive,
         id:data?._id
       });
-      setSwitchStatus(data?.isEnabled)
+      setSwitchStatus(data?.isEnabled == undefined ? true : data?.isEnabled)
 
       // Assuming data is an object containing all the fields
      // Assuming data is an object containing all the fields
@@ -412,6 +412,7 @@ function WhatsappModal({ isOpen, onClose }: any) {
     // fetch details if already present
     fetchWhatsappDetails();
   }, []);
+  console.log("switch",switchStatus)
   return (
     <div className="whatsapp-modal-container">
       <Modal
