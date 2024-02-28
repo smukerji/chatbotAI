@@ -88,6 +88,10 @@ export default async function handler(req, res) {
       }
       namespace = userId;
     }
+
+    /// close the cursor
+    await cursor.close();
+
     vectorId = [].concat(...vectorId);
     /// delete the vectors
     const deleteData = await collection.deleteMany({ chatbotId: chatbotId });
