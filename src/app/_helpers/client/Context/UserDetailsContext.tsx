@@ -8,6 +8,7 @@ export const UserDetailsDataProvider = ({ children }: any) => {
     noOfChatbotsUserCreated: 0,
     plan: {},
     percent: 0,
+    planExpiry: null,
   };
 
   const [userDetails, setUserDetails] = useState(initialUserDetails);

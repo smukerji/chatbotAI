@@ -1,4 +1,5 @@
 'use client';
+'use client';
 
 import React, { useEffect, useState } from 'react';
 import './hero-header.scss';
@@ -10,6 +11,7 @@ import { useRouter } from 'next/navigation';
 import { useCookies } from 'react-cookie';
 import { useSession } from 'next-auth/react';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 const AuthBtn = dynamic(() => import('../AuthBtn'), { ssr: false });
 
 function HeroHeader() {
@@ -40,11 +42,11 @@ function HeroHeader() {
                 <a href='#'>API</a>
               </li>
 
-              <li>
-                <a href='#'>Pricing</a>
-              </li>
-            </ul>
-          </div>
+            <li>
+              <a href="/home/pricing">Pricing</a>
+            </li>
+          </ul>
+        </div>
 
           <div className='login-register-container'>
             {/* If user is logged in display my Chatbot else try for free */}

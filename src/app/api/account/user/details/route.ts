@@ -18,32 +18,47 @@ async function userDetails(request: NextRequest) {
     .countDocuments({ userId: userId });
 
   /// get the number of chatbot user can create from plan table
-  const planDetails = await db
+  const userCollection = await db
     .collection("users")
-    .aggregate([
-      {
-        $match: { _id: new ObjectId(userId) },
-      },
-      {
-        $lookup: {
-          from: "plans",
-          localField: "planId",
-          foreignField: "_id",
-          as: "plan",
-        },
-      },
-    ])
-    .toArray();
+    .findOne({ _id: new ObjectId(userId) });
+
+  /// get the plan name with the help of planId
+
+  const planCollection = await db
+    .collection("plans")
+    .findOne({ _id: userCollection?.planId });
+  // .aggregate([
+  //   {
+  //     $match: { _id: new ObjectId(userId) },
+  //   },
+  //   {
+  //     $lookup: {
+  //       from: "plans",
+  //       localField: "planId",
+  //       foreignField: "_id",
+  //       as: "plan",
+  //     },
+  //   },
+  // ])
+  // .toArray();
 
   const userDetails = await db.collection("user-details").findOne({
     userId: userId,
   });
 
   return {
-    plan: planDetails[0].plan[0],
+    plan: {
+      name: planCollection?.name,
+      messageLimit: userDetails?.messageLimit,
+      numberOfChatbot: userDetails?.chatbotLimit,
+      trainingDataLimit: userDetails?.trainingDataLimit,
+      websiteCrawlingLimit: userDetails?.websiteCrawlingLimit,
+    },
     noOfChatbotsUserCreated,
     userDetails,
+    planExpiry: userCollection?.endDate,
   };
+
   //   const chatbotCapacity = planDetails[0].plan[0].numberOfChatbot;
   //   if (noOfChatbotsUserCreated + 1 > chatbotCapacity)
   //     return res.status(200).send({
