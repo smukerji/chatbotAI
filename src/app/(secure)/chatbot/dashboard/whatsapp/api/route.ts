@@ -14,7 +14,7 @@ function generateUniqueToken() {
 }
 
 // This is get method for generation webhook verification token
-async function getCallBackUrl(req: NextRequest, res: NextResponse) {
+async function getCallBackUrl(req: NextRequest) {
   const randomString = generateUniqueToken();
   // const request = await req.json();
   let chatBotId = req.nextUrl.searchParams.get("chatBotId");
@@ -44,20 +44,67 @@ async function getCallBackUrl(req: NextRequest, res: NextResponse) {
 
 
 async function saveWhatsappData(req: NextRequest) {
-  const request = await req.json()
-  const db = (await connectDatabase())?.db();
 
-  //if data exist based on the chatbot id then update the data
-  const collection = db?.collection('whatsappbot_details');
-  const tokenDetails = await collection?.findOne({ chatbotId: request.chatbotId, isTokenVerified: true, userId: request.userId });
+  try {
+    const request = await req.json()
+    const db = (await connectDatabase())?.db();
 
-  if (tokenDetails) {
-    await collection?.updateOne({ chatbotId: request.chatbotId, isTokenVerified: true, userId: request.userId }, { $set: { ...request } });
-    return { message: "success" };
+    const collection = db?.collection('whatsappbot_details');
+    //if given chatbot id is not linked with enable whatsapp bot then return error
+    let findResult: any = await collection?.findOne({
+      chatbotId: {
+        $ne: request.chatbotId
+      }, isEnabled: true, phoneNumberID: request.phoneNumberID, phoneBusinessID: request.phoneBusinessID
+    });
+    if (findResult) {
+
+      return { message: `WhatsApp Business Account already linked with another bot`, status: 403 };
+      //find the chatbot which is already linked with the given phone number
+      let findChatbotResult = await collection?.aggregate([
+        {
+          $match: {
+            isEnabled: true,
+            phoneNumberID: request.phoneNumberID,
+            phoneBusinessID: request.phoneBusinessID
+          }
+        },
+        {
+          $lookup: {
+            from: "user-chatbots",
+            localField: "chatbotId",
+            foreignField: "chatbotId",
+            as: "userChatbotData"
+          }
+        }
+      ]).toArray();
+
+      //if login user has already linked with another bot then 
+      if(findChatbotResult[0]["userId"] == findChatbotResult[0]["userChatbotData"][0]["userId"]){
+        return { message: `already linked with '${findChatbotResult[0]["userChatbotData"][0]["chatbotName"] ? findChatbotResult[0]["userChatbotData"][0]["chatbotName"] : 'Another' }' bot!`, status: 403 };
+      }
+      else{
+        return {message:`already linked with another bot!`, status: 403};
+      }
+ 
+      return { message: `already linked with '${findChatbotResult[0]["userChatbotData"][0]["chatbotName"] ? findChatbotResult[0]["userChatbotData"][0]["chatbotName"] : 'Another' }' bot!`, status: 403 };
+      // return  Response(`already linked with '${findChatbotResult[0]["userChatbotData"][0]["chatbotName"]}' bot!`,{status:400});
+      // return NextResponse.json({ message: `already linked with '' bot!` });
+      // return new NextResponse(`already linked with '${findChatbotResult[0]["userChatbotData"][0]["chatbotName"]}' bot!`,{status:400});
+    }
+ 
+    //if data exist based on the chatbot id then update the data
+
+    const tokenDetails = await collection?.findOne({ chatbotId: request.chatbotId, isTokenVerified: true, userId: request.userId });
+
+    if (tokenDetails) {
+      await collection?.updateOne({ chatbotId: request.chatbotId, isTokenVerified: true, userId: request.userId }, { $set: { ...request } });
+      return { message: "success" };
+    }
   }
-
-  //return error respose
-  return { message: "error" };
+  catch (error: any) {
+    //return error respose
+    return { message: "error!", status: 503 };
+  }
 
 }
 
