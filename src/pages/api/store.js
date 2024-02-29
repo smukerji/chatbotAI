@@ -61,26 +61,15 @@ export default async function handler(req, res) {
           .countDocuments({ userId: userId });
 
         /// get the number of chatbot user can create from plan table
-        const cursor = await db.collection("users").aggregate([
+        const planDetails = await db.collection("user-details").findOne(
           {
-            $match: { _id: new ObjectId(userId) },
+            userId: userId ,
           },
-          {
-            $lookup: {
-              from: "plans",
-              localField: "planId",
-              foreignField: "_id",
-              as: "plan",
-            },
-          },
-        ]);
+          );
 
-        const planDetails = await cursor.toArray();
-        /// close the cursor
-        await cursor.close();
 
         if (
-          planDetails[0].plan[0]?.numberOfChatbot <
+          planDetails?.chatbotLimit <
             noOfChatbotsUserCreated + 1 &&
           !updateChatbot
         ) {
