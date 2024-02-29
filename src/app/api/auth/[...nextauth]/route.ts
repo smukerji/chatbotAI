@@ -52,7 +52,7 @@ export const authOptions: NextAuthOptions = {
               startDate: currentDate,
               endDate: endDate,
               planId: starterPlan?._id,
-              isWhatsApp: true,
+              isWhatsapp: true,
               username:
                 username[0] + `${username?.[1] ? "_" + username?.[1] : ""}`,
             },

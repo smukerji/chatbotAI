@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 module.exports = apiHandler({
   POST: saveWhatsappData,
   GET: getCallBackUrl,
-  PUT: isWhatsAppTokenVerified
+  PUT: isWhatsappTokenVerified
 });
 // This function will generate a random string
 function generateUniqueToken() {
@@ -108,7 +108,7 @@ async function saveWhatsappData(req: NextRequest) {
 
 }
 
-async function isWhatsAppTokenVerified(req: NextRequest) {
+async function isWhatsappTokenVerified(req: NextRequest) {
 
   let whatsAppToken = req.nextUrl.searchParams.get("whatsAppVerifyToken");
 

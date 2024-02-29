@@ -86,7 +86,7 @@ async function CronFunction() {
                   nextPlan: data.nextPlan,
                   nextPlanId: data.nextPlanId,
                   nextPlanDuration: data.nextPlanDuration,
-                  isWhatsApp: data.nextIsWhatsapp,
+                  isWhatsapp: data.nextIsWhatsapp,
                   nextIsWhatsapp: data.nextIsWhatsapp,
                 },
               }
@@ -134,7 +134,7 @@ async function CronFunction() {
                   nextPlan: data.nextPlan,
                   nextPlanId: data.nextPlanId,
                   nextPlanDuration: data.nextPlanDuration,
-                  isWhatsApp: data.nextIsWhatsapp,
+                  isWhatsapp: data.nextIsWhatsapp,
                   nextIsWhatsapp: nextIsWhatsapp,
                 },
               }

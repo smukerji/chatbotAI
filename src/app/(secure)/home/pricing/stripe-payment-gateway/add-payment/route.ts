@@ -107,7 +107,7 @@ async function addPaymentDetails(req: any, res: NextResponse) {
           { _id: new ObjectId(u_id)  },
           {
             $set: {
-              isWhatsApp:true,
+              isWhatsapp:true,
               nextIsWhatsapp:true
             },
           }
