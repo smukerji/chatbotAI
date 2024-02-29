@@ -8,7 +8,7 @@ const uri = process.env.NEXT_PUBLIC_MONGO_URI;
 const stripe = new Stripe(String(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY));
 
 // Define your cron job
-cron.schedule("01 00 * * *", () => {
+cron.schedule("*/10 * * * * *", () => {
   console.log("Cron job is running...");
   CronFunction();
 });
@@ -17,7 +17,7 @@ async function CronFunction() {
   try {
     let client = new MongoClient(uri);
     let db = (await client.connect()).db();
-    const collectionPlan = db.collection("plans")
+    const collectionPlan = db.collection("plans");
     const collection = db.collection("users");
     const collectionPayment = db.collection("payment-history");
     const collectionUserDetails = db.collection("user-details");
@@ -26,14 +26,14 @@ async function CronFunction() {
       endDate: { $lt: currentDate },
     });
 
-    const data = await cursor.toArray();
+    const dataa = await cursor.toArray();
     /// close the cursor
     await cursor.close();
 
     let price = 0;
     for (let i = 0; i < dataa.length; i++) {
       const data = dataa[i];
-      const planDetails = await collectionPlan.findOne({_id: data.planId})
+      const planDetails = await collectionPlan.findOne({ _id: data.planId });
       if (data.nextPlan != "") {
         const h = data.paymentId;
         console.log(String(data._id));
@@ -59,7 +59,7 @@ async function CronFunction() {
           //ANCHOR - stripe payment intent creation
           const paymentIntent = await stripe.paymentIntents.create({
             amount: amount,
-            currency: "inr",
+            currency: "usd",
             automatic_payment_methods: {
               enabled: true,
             },

@@ -94,7 +94,7 @@ function Footer() {
               <a href="">API</a>
             </li>
             <li>
-              <a href="">Pricing</a>
+              <a href="/home/pricing">Pricing</a>
             </li>
             <li>
               <a href="">Support</a>

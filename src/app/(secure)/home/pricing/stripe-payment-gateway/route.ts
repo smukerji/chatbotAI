@@ -34,7 +34,7 @@ async function createPaymentIntent(req: any, res: NextResponse) {
         //ANCHOR - stripe payment intent creation
         const paymentIntent = await stripe.paymentIntents.create({
           amount: amount,
-          currency: "inr",
+          currency: "usd",
           automatic_payment_methods: {
             enabled: true,
           },
