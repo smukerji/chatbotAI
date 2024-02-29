@@ -6,3 +6,7 @@ export const ERROR_ON_GET = "failed to get the data";
 export const ERROR_ON_DELETE = "failed to delete the data";
 export const ERROR_ON_UPDATE = "failed to update the data";
 export const AUTHORIZATION_FAILED = "Please login to continue again.";
+export const ERROR_PROCESSING_REQUEST = "Error processing your request";
+export const NOT_AUTHORIZED_USER = "Not a authorized user";
+export const PASSWORD_NOT_MATCHED =
+  "Your old password doesn't match the new password";

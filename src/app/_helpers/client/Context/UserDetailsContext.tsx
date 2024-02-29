@@ -9,6 +9,10 @@ export const UserDetailsDataProvider = ({ children }: any) => {
     plan: {},
     percent: 0,
     planExpiry: null,
+    firstName: "",
+    lastName: "",
+    fullName: "",
+    email: "",
   };
 
   const [userDetails, setUserDetails] = useState(initialUserDetails);
@@ -20,7 +24,6 @@ export const UserDetailsDataProvider = ({ children }: any) => {
       [props]: value,
     }));
   };
-
 
   return (
     <UserDetailsContext.Provider value={{ userDetails, handleChange }}>

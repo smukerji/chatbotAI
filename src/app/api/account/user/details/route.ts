@@ -46,6 +46,17 @@ async function userDetails(request: NextRequest) {
     userId: userId,
   });
 
+  /// split the first name and the last name
+  let username = "",
+    firstName = "",
+    lastName = "";
+
+  if (userCollection?.username) {
+    username = userCollection?.username?.split("_");
+    firstName = username[0];
+    lastName = username[1];
+  }
+
   return {
     plan: {
       name: planCollection?.name,
@@ -57,6 +68,10 @@ async function userDetails(request: NextRequest) {
     noOfChatbotsUserCreated,
     userDetails,
     planExpiry: userCollection?.endDate,
+    firstName: firstName,
+    lastName: lastName,
+    fullName: userCollection?.name ? userCollection?.name : "",
+    email: userCollection?.email,
   };
 
   //   const chatbotCapacity = planDetails[0].plan[0].numberOfChatbot;

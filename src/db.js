@@ -21,7 +21,7 @@ async function connectDatabase() {
     // In development mode, use a global variable so that the value
     // is preserved across module reloads caused by HMR (Hot Module Replacement).
     if (!global._mongoClientPromise) {
-      client = new MongoClient(uri, { options });
+      client = new MongoClient(uri, options);
       global._mongoClientPromise = client.connect();
       console.log("Connected to MongoDB in ", process.env.NODE_ENV, " mode");
     }
