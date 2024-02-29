@@ -88,6 +88,12 @@ function Header() {
       userDetailContext?.handleChange('totalMessageCount')(
         userDetails?.userDetails?.totalMessageCount
       );
+      /// set the username and email
+      userDetailContext?.handleChange('firstName')(userDetails?.firstName);
+      userDetailContext?.handleChange('lastName')(userDetails?.lastName);
+      userDetailContext?.handleChange('fullName')(userDetails?.fullName);
+      userDetailContext?.handleChange('email')(userDetails?.email);
+
       userDetailContext?.handleChange('plan')(userDetails?.plan);
       userDetailContext?.handleChange('noOfChatbotsUserCreated')(
         userDetails?.noOfChatbotsUserCreated

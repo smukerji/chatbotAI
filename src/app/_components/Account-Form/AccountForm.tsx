@@ -1,18 +1,46 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import './accForm.scss';
-import { Button, Form, Input, Modal } from 'antd';
+import { Button, Form, Input, Modal, message } from 'antd';
 import ChangePasswordForm from '@/app/(secure)/chatbot/dashboard/_components/Modal/ChangePasswordForm';
 import { useCookies } from 'react-cookie';
+import { UserDetailsContext } from '@/app/_helpers/client/Context/UserDetailsContext';
+import axios from 'axios';
+import { error } from 'console';
 
 function AccountForm() {
   const [visible, setVisible] = useState(false);
   const [profileImg, setProfileImg] = useCookies(['profile-img']);
   const [isGoogleLogin, setIsGoogleLogin] = useState(false);
-  console.log('profile-img', profileImg['profile-img']);
+  /// get userDetails context
+  const userDetailContext: any = useContext(UserDetailsContext);
+  const userDetails = userDetailContext?.userDetails;
 
-  const onFinish = (value: any) => {
-    console.log(value);
+  console.log(userDetails, 'llllllllllll');
+
+  const onFinish = async (e: any) => {
+    // console.log(value);
+    e.preventDefault();
+
+    const body = {
+      firstName: userDetails?.firstName,
+      lastName: userDetails?.lastName,
+      fullName: userDetails?.fullName,
+      // email: userDetails?.fullName,
+      isGoogleUser: isGoogleLogin,
+    };
+
+    axios
+      .post(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}/api/account/user/details/change`,
+        body
+      )
+      .then((res) => {
+        message.success(res?.data?.message);
+      })
+      .catch((error) => {
+        message.error(error);
+      });
   };
 
   useEffect(() => {
@@ -25,64 +53,115 @@ function AccountForm() {
       <div className='account-form'>
         <h2 className='account-form-heading'>User profile</h2>
 
-        <Form
-          layout='vertical'
-          onFinish={onFinish}
-          className='main-form-container'
-        >
-          {!isGoogleLogin ? (
-            <div className='form-item'>
-              <Form.Item label='Name' name={'name'} className='w-50'>
-                <Input placeholder='Enter your Name' />
-              </Form.Item>
+        <form className='main-form-container'>
+          {isGoogleLogin ? (
+            <div className='form-item w-50'>
+              <div className='form-items-direction'>
+                <label className='item-label' htmlFor='fullName'>
+                  FullName
+                </label>
+                <input
+                  placeholder='Enter your Name'
+                  onChange={(e) => {
+                    userDetailContext?.handleChange('fullName')(e.target.value);
+                  }}
+                  value={userDetails?.fullName}
+                />
+              </div>
             </div>
           ) : (
             <>
               <div className='form-item w-45'>
-                <Form.Item label='First Name' name={'firstName'} className=''>
-                  <Input placeholder='Enter your First Name' />
-                </Form.Item>
+                {/* <Form.Item label='First Name' name={'firstName'} className=''> */}
+                <div className='form-items-direction'>
+                  <label className='item-label' htmlFor='firstName'>
+                    FirstName
+                  </label>
+                  <input
+                    placeholder='Enter your First Name'
+                    onChange={(e) => {
+                      userDetailContext?.handleChange('firstName')(
+                        e.target.value
+                      );
+                    }}
+                    value={userDetails?.firstName}
+                  />
+                </div>
               </div>
 
               <div className='form-item w-45'>
-                <Form.Item label='Last Name' name={'lastName'} className=''>
-                  <Input placeholder='Enter your Last Name' />
-                </Form.Item>
+                {/* <Form.Item label='Last Name' name={'lastName'} className=''> */}
+                <div className='form-items-direction'>
+                  <label className='item-label' htmlFor='lastName'>
+                    lastName
+                  </label>
+                  <input
+                    placeholder='Enter your Last Name'
+                    onChange={(e) => {
+                      userDetailContext?.handleChange('lastName')(
+                        e.target.value
+                      );
+                    }}
+                    value={userDetails?.lastName}
+                  />
+                </div>
+                {/* </Form.Item> */}
               </div>
             </>
           )}
 
-          <div className='form-item'>
-            <Form.Item label='Email' name={'email'} className='w-50 email'>
-              <Input placeholder='tuan@gmail.com' disabled={true} />
-            </Form.Item>
+          <div className='form-item w-50 email'>
+            {/* <Form.Item label='Email' name={'email'} className='w-50 email'> */}
+            <div className='form-items-direction'>
+              <label className='item-label' htmlFor=''>
+                Email
+              </label>
+              <input
+                placeholder='tuan@gmail.com'
+                disabled={true}
+                value={userDetails?.email}
+              />
+            </div>
+            {/* </Form.Item> */}
           </div>
 
-          <div className='form-item'>
-            <Form.Item label='API Key' name={'apikey'} className='w-50 api-key'>
-              {/* <Input placeholder='tuan@gmail.com' /> */}
+          <div className='form-item w-50 api-key'>
+            {/* <Form.Item label='API Key' name={'apikey'} className='w-50 api-key'> */}
+            {/* <Input placeholder='tuan@gmail.com' /> */}
+            <div className='form-items-direction'>
+              <label className='item-label' htmlFor=''>
+                API Key
+              </label>
               <p className='api-key-text'>Coming soon</p>
-            </Form.Item>
+            </div>
+            {/* </Form.Item> */}
           </div>
 
-          {isGoogleLogin && (
+          {!isGoogleLogin && (
             <div className='form-item'>
-              <Form.Item label='Password' className=''>
-                {/* <Input placeholder='Password' /> */}
+              {/* <Form.Item label='Password' className=''> */}
+              {/* <Input placeholder='Password' /> */}
+              <div className='form-items-direction'>
+                <label className='item-label' htmlFor=''>
+                  Password
+                </label>
                 <div
                   className='change-password'
                   onClick={() => setVisible(true)}
                 >
                   Change Password
                 </div>
-              </Form.Item>
+              </div>
+              {/* </Form.Item> */}
             </div>
           )}
 
           <div className='form-item'>
-            <div className='audit-log'>
-              <p className='audit-log-label'>Audit Log</p>
-              <p className='audit-log-value'>Coming soon</p>
+            <div className='form-items-direction'>
+              <div className='audit-log'>
+                <p className='audit-log-label'>Audit Log</p>
+                <p className='audit-log-value'>Coming soon</p>
+              </div>
             </div>
           </div>
 
@@ -92,14 +171,14 @@ function AccountForm() {
               <p className='user-teams-value'>Coming soon</p>
             </div>
           </div>
-          <div className='form-item'>
-            <Form.Item className='w-50'>
-              <Button type='primary' htmlType='submit'>
-                Submit
-              </Button>
-            </Form.Item>
+          <div className='form-item w-50'>
+            {/* <Form.Item className='w-50'> */}
+            <Button type='primary' htmlType='submit' onClick={onFinish}>
+              Submit
+            </Button>
+            {/* </Form.Item> */}
           </div>
-        </Form>
+        </form>
 
         <Modal
           centered

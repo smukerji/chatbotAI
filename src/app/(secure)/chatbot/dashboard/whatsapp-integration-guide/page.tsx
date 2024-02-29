@@ -60,30 +60,33 @@ function page() {
     }
   };
 
+  const handleScroll = () => {
+    const rightDiv = rightRef.current;
+    const stepElements = rightDiv.querySelectorAll('[class^="step-"]');
+    let currentStep = 1;
+
+    stepElements.forEach((stepElement: any, index: any) => {
+      const rect = stepElement.getBoundingClientRect();
+
+      if (
+        rect.top <= 130 &&
+        (index === stepElements.length - 1 ||
+          stepElements[index + 1].getBoundingClientRect().top > 130)
+      ) {
+        // If the top of the stepElement is above the window top and the next stepElement is below the window top (or there's no next stepElement)
+        currentStep = index + 1; // Update currentStep directly based on index
+      }
+    });
+
+    // Update selectedStep state to reflect the current visible step
+    setSelectedStep(currentStep);
+  };
+
   useEffect(() => {
-    console.log(',,,,,,,,,,,,,,,,,,,,,,,,,,');
-    console.log(rightRef.current);
-    console.log(rightRef.current.querySelectorAll('[class^="step-"]'));
-
-    const handleScroll = () => {
-      console.log('handleScroll function called initially');
-
-      console.log('this runnning...........');
-      const rightDiv = rightRef.current;
-      const stepElements = rightDiv.querySelectorAll('[class^="step-"]');
-      let currentStep = 1;
-      stepElements.forEach((stepElement: any, index: any) => {
-        const rect = stepElement.getBoundingClientRect();
-        if (rect.top >= 0 && rect.bottom <= window.innerHeight) {
-          currentStep = index + 1;
-        }
-      });
-      setSelectedStep(currentStep);
-    };
-
-    window.addEventListener('scroll', handleScroll);
+    const sectionRight = document.querySelector('.right');
+    sectionRight?.addEventListener('scroll', handleScroll);
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      sectionRight?.removeEventListener('scroll', handleScroll);
     };
   });
 
