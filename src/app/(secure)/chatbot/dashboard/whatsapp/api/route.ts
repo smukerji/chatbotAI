@@ -88,7 +88,7 @@ async function saveWhatsappData(req: NextRequest) {
     if (findResult) {
 
       //read the chatbot name which are connected
-      let findChatbotResult = await collection?.aggregate([
+      let cursor = await collection?.aggregate([
         {
           $match: {
             isEnabled: true,
@@ -104,24 +104,15 @@ async function saveWhatsappData(req: NextRequest) {
             as: "userChatbotData"
           }
         }
-      ]).toArray();
+      ]);
+      
+      let findChatbotResult = await cursor.toArray();
+
+      await cursor.close();
+
 
       return { message: `WhatsApp Business Account already linked with '${findChatbotResult[0]["userChatbotData"][0]["chatbotName"]}' bot`, status: 403 };
       //find the chatbot which is already linked with the given phone number
-      
-
-      //if login user has already linked with another bot then 
-      if(findChatbotResult[0]["userId"] == findChatbotResult[0]["userChatbotData"][0]["userId"]){
-        return { message: `already linked with '${findChatbotResult[0]["userChatbotData"][0]["chatbotName"] ? findChatbotResult[0]["userChatbotData"][0]["chatbotName"] : 'Another' }' bot!`, status: 403 };
-      }
-      else{
-        return {message:`already linked with another bot!`, status: 403};
-      }
- 
-      return { message: `already linked with '${findChatbotResult[0]["userChatbotData"][0]["chatbotName"] ? findChatbotResult[0]["userChatbotData"][0]["chatbotName"] : 'Another' }' bot!`, status: 403 };
-      // return  Response(`already linked with '${findChatbotResult[0]["userChatbotData"][0]["chatbotName"]}' bot!`,{status:400});
-      // return NextResponse.json({ message: `already linked with '' bot!` });
-      // return new NextResponse(`already linked with '${findChatbotResult[0]["userChatbotData"][0]["chatbotName"]}' bot!`,{status:400});
     }
 
     //if another user trying to link the same phone number with any bot then return the error message
