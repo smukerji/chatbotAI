@@ -50,7 +50,7 @@ function Terms() {
             We may also collect information that your browser sends whenever you
             visit our Service or when you access Service by or through a Device
             (“Usage Data”). This Usage Data may include information such as your
-            computer's Internet Protocol address (e.g. IP address), browser
+            computer&apos;s Internet Protocol address (e.g. IP address), browser
             type, browser version, the pages of our Service that you visit, the
             time and date of your visit, the time spent on those pages, unique
             Device identifiers and other diagnostic data. When you access

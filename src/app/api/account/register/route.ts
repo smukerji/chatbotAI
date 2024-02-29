@@ -26,7 +26,7 @@ async function register(request: any) {
   /// get the starter plan ID
   const starterPlan = await db
     .collection("plans")
-    .findOne({ name: "Individual Plan" });
+    .findOne({ name: "individual" });
 
   /// register new user
   const userResult = await collection.insertOne({
