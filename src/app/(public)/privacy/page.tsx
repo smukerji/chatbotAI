@@ -20,15 +20,15 @@ function Terms() {
             governs the types of information and data we collect and how we use
             and share this information. Your access to and use of the Service
             are available for your use only on the condition that you agree to
-            the Terms of Service available under the following address:
+            the Terms & Conditions available under the following address:
             <a href={`/terms`}>{process.env.NEXT_PUBLIC_WEBSITE_URL}terms</a>
-            (“Terms of Service”) which include the terms of the Privacy Policy
-            set forth below. Lucifer.ai (“Company”) operates the Service.We use
+            (“Terms & Conditions”) which include the terms of the Privacy Policy
+            set forth below. Lucifer.AI (“Company”) operates the Service.We use
             your data to provide and improve Service. By using Service, you
             agree to the collection and use of information in accordance with
             this policy. Unless otherwise defined in this Privacy Policy, the
             terms used in this Privacy Policy have the same meanings as in our
-            Terms of Service.
+            Terms & Conditions.
           </p>
         </div>
         <div className="term-container">
@@ -95,7 +95,7 @@ function Terms() {
         <div className="term-container">
           <p>3. Use of Data</p>
           <p>
-            Lucifer.ai uses the collected Personal Data for various purposes:
+            Lucifer.AI uses the collected Personal Data for various purposes:
           </p>
 
           <ul>
@@ -269,7 +269,7 @@ function Terms() {
           <p>9. Contact Us</p>
           <p>
             If you have any questions about this Privacy Policy, please contact
-            us at support@lucifer.ai.
+            us at info@sapahk.ai.
           </p>
         </div>
       </div>

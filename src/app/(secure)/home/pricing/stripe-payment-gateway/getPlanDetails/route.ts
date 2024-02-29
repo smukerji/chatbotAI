@@ -13,7 +13,11 @@ async function getPlanDetails(req: NextRequest, res: NextResponse) {
   try {
     const db = (await connectDatabase())?.db();
     const collection = db.collection("plans");
-    const data = await collection.find().toArray();
+    const cursor = await collection.find();
+    const data = await cursor.toArray();
+
+    /// close the cursor
+    await cursor.close();
     return data;
   } catch (error) {
     return error;

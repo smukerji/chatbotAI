@@ -75,6 +75,7 @@
         // resize: none;
         min-width: 100%;
         max-width: 100%;
+        width: 100% !important;
         color: #23262f;
 
         /* Body/Medium */
@@ -562,7 +563,7 @@
             text-align: center;
 
             /* Body/Medium */
-            font-family: 'General Sans';
+            font-family: "General Sans";
             font-size: 16px;
             font-style: normal;
             font-weight: 500;

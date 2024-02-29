@@ -19,14 +19,17 @@ async function CronFunction() {
     let db = (await client.connect()).db();
     const collection = db.collection("users");
     const currentDate = new Date();
-    const dataa = await collection
-      .find({
-        endDate: { $lt: currentDate },
-      })
-      .toArray();
+    const cursor = await collection.find({
+      endDate: { $lt: currentDate },
+    });
+
+    const data = await cursor.toArray();
+    /// close the cursor
+    await cursor.close();
+
     let price = 0;
-    for (let i = 0; i < dataa.length; i++) {
-      const data = dataa[i];
+    for (let i = 0; i < data.length; i++) {
+      const data = data[i];
       if (data.nextPlan != "") {
         const h = data.paymentId;
         if (data.nextPlan == "agency") {
