@@ -65,11 +65,15 @@ export const authOptions: NextAuthOptions = {
           { userId: String(message.user.id) },
           {
             $set: {
+              totalMessageCount: 0,
               messageLimit: starterPlan?.messageLimit,
               chatbotLimit: starterPlan?.numberOfChatbot,
               trainingDataLimit: starterPlan?.trainingDataLimit,
               websiteCrawlingLimit: starterPlan?.websiteCrawlingLimit,
             },
+          },
+          {
+            upsert: true,
           }
         );
       }

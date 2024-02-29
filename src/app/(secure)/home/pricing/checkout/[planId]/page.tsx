@@ -15,6 +15,8 @@ const plans = [
   { id: 4, name: "agency", price: 854, days: 365 },
   { id: 5, name: "Character add on", price: 5, days: 30 },
   { id: 6, name: "Message add on", price: 5, days: 30 },
+  { id: 7, name: "Message add on", price: 8, days: 30 },
+  { id: 8, name: "Whatsapp Integration", price: 7, days: 30 },
 ];
 
 const CheckoutPage = ({ params }: any) => {

@@ -55,7 +55,7 @@ async function getCustomerWhatsappDetails(req: any, res: NextResponse) {
     const collection = db.collection("whatsappbot_details");
     const data = await collection.findOne({ userId: u_id });
     if (data?.phoneNumberID == null) {
-      return { msg: false };
+      return { msg: true };
     } else {
       return { msg: true };
     }
