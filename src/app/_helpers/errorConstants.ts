@@ -10,3 +10,7 @@ export const PASSWORD_CHANGED_SUCCESS = 'Password Changed successfully!';
 export const PASSWORD_DOES_NOT_MATCH = 'Password does not match!';
 export const OLD_PASS_CANNOT_EMPTY = 'Old password can not be empty';
 export const PASS_CANNOT_EMPTY = 'Password can not be empty';
+export const ERROR_PROCESSING_REQUEST = 'Error processing your request';
+export const NOT_AUTHORIZED_USER = 'Not a authorized user';
+export const PASSWORD_NOT_MATCHED =
+  "Your old password doesn't match the previous password";

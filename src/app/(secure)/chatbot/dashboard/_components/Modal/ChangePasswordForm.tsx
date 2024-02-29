@@ -9,22 +9,34 @@ import {
   PASS_CANNOT_EMPTY,
 } from '@/app/_helpers/errorConstants';
 
-function ChangePasswordForm({ setVisible }: any) {
+function ChangePasswordForm({ setVisible, isGoogleLogin }: any) {
   const [form] = Form.useForm();
+  console.log('isGoogleLogin', isGoogleLogin);
 
   const onFinish = async (value: any) => {
     console.log('value', value);
 
+    const body = {
+      oldPassword: value.oldPassword,
+      newPassword: value.confirmPassword,
+      isGoogleUser: isGoogleLogin,
+    };
+
     axios
       .post(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/account/user/details/change/password`,
-        value
+        body
       )
       .then((res) => {
+        console.log('response', res);
+
         message.success(res?.data?.message);
+        setVisible(false);
       })
       .catch((error) => {
-        message.error(error);
+        console.log('error', error);
+
+        message.error(error?.response?.data?.message);
       });
   };
   return (

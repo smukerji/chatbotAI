@@ -61,17 +61,6 @@ export const authOptions: NextAuthOptions = {
             upsert: true,
           }
         );
-        await db.collection("user-details").updateOne(
-          { userId: String(message.user.id) },
-          {
-            $set: {
-              messageLimit: starterPlan?.messageLimit,
-              chatbotLimit: starterPlan?.numberOfChatbot,
-              trainingDataLimit: starterPlan?.trainingDataLimit,
-              websiteCrawlingLimit: starterPlan?.websiteCrawlingLimit,
-            },
-          }
-        );
       }
 
       const userId = message.user.id;
@@ -86,10 +75,10 @@ export const authOptions: NextAuthOptions = {
         await db.collection("user-details").insertOne({
           userId: userId,
           totalMessageCount: 0,
-          extraMessageLimit: 0,
-          extraChatBotLimit: 0,
-          extraCharacterLimit: 0,
-          extraCrawlLimit: 0,
+          messageLimit: starterPlan?.messageLimit,
+          chatbotLimit: starterPlan?.numberOfChatbot,
+          trainingDataLimit: starterPlan?.trainingDataLimit,
+          websiteCrawlingLimit: starterPlan?.websiteCrawlingLimit,
         });
       }
     },

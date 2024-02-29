@@ -191,7 +191,10 @@ function AccountForm() {
           width={585}
           footer={false}
         >
-          <ChangePasswordForm setVisible={setVisible} />
+          <ChangePasswordForm
+            setVisible={setVisible}
+            isGoogleLogin={isGoogleLogin}
+          />
         </Modal>
       </div>
     </>

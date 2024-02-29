@@ -213,16 +213,31 @@ function Header() {
               {/*------------------------------------------account actions menu----------------------------------------------*/}
               <div className='account-actions-container'>
                 <ul>
-                  <li onClick={() => router.push('/home/account-settings')}>
+                  <li
+                    onClick={() => {
+                      setOpenMenu(!openMenu);
+                      router.push('/home/account-settings');
+                    }}
+                  >
                     <Image src={profileIcon} alt='profile-icon' />
                     Account settings
                   </li>
-                  <li onClick={() => router.push('/home/BillingAndUsage')}>
+                  <li
+                    onClick={() => {
+                      setOpenMenu(!openMenu);
+                      router.push('/home/BillingAndUsage');
+                    }}
+                  >
                     <Image src={receiptIcon} alt='receipt-icon' />
                     Billing & Usage
                   </li>
 
-                  <li onClick={() => router.push('/home/pricing')}>
+                  <li
+                    onClick={() => {
+                      setOpenMenu(!openMenu);
+                      router.push('/home/pricing');
+                    }}
+                  >
                     <Image src={walletIcon} alt='wallet-icon' />
                     Pricing Plans
                   </li>
