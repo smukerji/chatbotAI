@@ -196,7 +196,7 @@ function WhatsappModal({ isOpen, onClose }: any) {
             },
             method: "POST",
             body: JSON.stringify({
-              metaDetails,
+              ...metaDetails,
               chatbotId: chatbot.id,
               userId: userId[0].userId,
             }),
