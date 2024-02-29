@@ -25,6 +25,7 @@ function SecondaryHeader() {
         onClick={() => {
           router.push("/");
         }}
+        style={{ cursor: "pointer" }}
       />
 
       <div className={`hamburger-menu-icon`} onClick={toggleMenu}>

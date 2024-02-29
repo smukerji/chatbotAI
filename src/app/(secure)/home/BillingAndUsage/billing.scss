@@ -75,9 +75,11 @@
       align-items: flex-start;
       gap: 10px;
       .plan-name-container {
+        
         display: flex;
         gap: 10px;
         .plan-name {
+          text-transform: capitalize;
           color: var(--Neutral-8, #141416);
           font-family: sans-serif;
           font-size: 24px;

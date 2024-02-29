@@ -1,4 +1,4 @@
-import { Modal, Steps, Switch, message } from "antd";
+import { Modal, Spin, Steps, Switch, message } from "antd";
 import React, { useEffect, useRef, useState } from "react";
 import copyIcon from "../../../../../../../public/svgs/copy-icon.svg";
 import Image from "next/image";
@@ -454,7 +454,9 @@ function WhatsappModal({ isOpen, onClose }: any) {
                   <p className="whatsapp-top-title">
                     Webhook Verification Token
                   </p>
+                 
                   <div className="whatsapp-input-copy-container">
+                    {!whatsAppWebhookToken ?  <div className="whatsapp-spin-token"><Spin /></div> :<>
                     <input
                       type="text"
                       className="whatsapp-input"
@@ -472,6 +474,8 @@ function WhatsappModal({ isOpen, onClose }: any) {
                         handleCopy(inputTokenRef.current?.value || "")
                       }
                     />
+                    </>
+}
                   </div>
                 </div>
               </div>

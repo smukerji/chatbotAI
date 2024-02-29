@@ -27,7 +27,7 @@ export default function Home() {
   const [prePrice, setPrePrice] = useState(0);
   const [text, setText] = useState("");
   const router = useRouter();
-  const [whatsappDisable, setWhatsappDisable] = useState(false)
+  const [whatsappDisable, setWhatsappDisable] = useState(false);
 
   const u_id: any = cookies.userId;
 
@@ -39,26 +39,13 @@ export default function Home() {
     router.push(`/home/pricing/checkout/${6}`);
   };
 
-  // const makePayment = async () => {
-  //   try {
-  //     setLoading(true);
+  const MessageAddOnAdvance = async () => {
+    router.push(`/home/pricing/checkout/${7}`);
+  };
+  const WhatsappAddOn = async () => {
+    router.push(`/home/pricing/checkout/${8}`);
+  };
 
-  //     //ANCHOR - getting details of user payment-method
-  //     const response = await axios.post(
-  //       `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/getPlanDetails`,
-  //       { u_id: u_id }
-  //     );
-
-  //     if (response.data?.status == 500) {
-  //       setStatus(1);
-  //     } else {
-  //       setStatus(0);
-  //     }
-  //     setLoading(false);
-  //   } catch (error) {
-  //     message.error(`${error}`);
-  //   }
-  // };
   const getPlanDetails = async () => {
     try {
       //ANCHOR - getting all plans details
@@ -79,7 +66,7 @@ export default function Home() {
       );
       console.log(checkPlan);
       setText(checkPlan.data.text);
-      setWhatsappDisable(checkPlan.data.whatsAppIntegration)
+      setWhatsappDisable(checkPlan.data.whatsAppIntegration);
       if (checkPlan.data.msg == 1) {
         setPrePrice(checkPlan.data.prePrice);
         setEnableOne(true);
@@ -162,32 +149,46 @@ export default function Home() {
                       <Image src={whatsapp} alt="no image" />
                       <p className="integration-name">Whatsapp</p>
                     </div>
-                    <div className="app-integration-price">$7 USD monthly</div>
+                    <button
+                      className="app-integration-price-btn"
+                      disabled={whatsappDisable}
+                      onClick={WhatsappAddOn}
+                    >
+                      <span className="app-integration-price-btn-text">
+                        Get for $7 USD
+                      </span>
+                    </button>
                   </div>
                   <div className="app-integration">
                     <div className="integration-name-container">
                       <Image src={telegram} alt="no image" />
                       <p className="integration-name">Telegram</p>
                     </div>
-                    <div className="app-integration-price">$7 USD monthly</div>
+                    <div className="app-integration-price coming-soon">
+                      Coming soon
+                    </div>
                   </div>
                   <div className="app-integration">
                     <div className="integration-name-container">
                       <Image src={hubspot} alt="no image" />
                       <p className="integration-name">Hubspot CRM</p>
                     </div>
-                    <div className="app-integration-price">$7 USD monthly</div>
+                    <div className="app-integration-price coming-soon">
+                      Coming soon
+                    </div>
                   </div>
                   <div className="app-integration">
                     <div className="integration-name-container">
                       <Image src={zoho} alt="no image" />
                       <p className="integration-name">Zoho CRM</p>
                     </div>
-                    <div className="app-integration-price">$7 USD monthly</div>
+                    <div className="app-integration-price coming-soon">
+                      Coming soon
+                    </div>
                   </div>
-                  <button className="btn-add-ons" disabled={whatsappDisable}>
+                  {/* <button className="btn-add-ons" disabled={whatsappDisable}>
                     <span className="btn-text">Get Add-on</span>
-                  </button>
+                  </button> */}
                 </div>
               </div>
             </div>
@@ -199,23 +200,41 @@ export default function Home() {
                     <div className="integration-name-container">
                       <p className="integration-name">5K messages</p>
                     </div>
-                    <div className="app-integration-price">$5 USD</div>
+                    <button
+                      className="app-integration-price-btn"
+                      disabled={enableOne ? false : true}
+                      onClick={MessageAddOn}
+                      title={enableOne ? undefined : "You do not have valid plan"}
+                    >
+                      <span className="app-integration-price-btn-text">
+                        Get for $5 USD
+                      </span>
+                    </button>
                   </div>
                   <div className="app-integration">
                     <div className="integration-name-container">
                       <p className="integration-name">10K messages</p>
                     </div>
-                    <div className="app-integration-price">$8 USD</div>
+                    <button
+                      className="app-integration-price-btn"
+                      disabled={enableOne ? false : true}
+                      onClick={MessageAddOnAdvance}
+                      title={enableOne ? undefined : "You do not have valid plan"}
+                    >
+                      <span className="app-integration-price-btn-text">
+                        Get for $8 USD
+                      </span>
+                    </button>
                   </div>
                 </div>
-                <button
+                {/* <button
                   className="btn-add-ons"
                   onClick={MessageAddOn}
                   disabled={enableOne ? false : true}
                   title={enableOne ? undefined : "Please purchase plan first"}
                 >
                   <span className="btn-text">Get Add-on</span>
-                </button>
+                </button> */}
               </div>
               <div className="add-ons-integration">
                 <p className="integration-head">Training data</p>
@@ -226,17 +245,26 @@ export default function Home() {
                         Total Characters for training - 1M
                       </p>
                     </div>
-                    <div className="app-integration-price">$5 USD</div>
+                    <button
+                      className="app-integration-price-btn"
+                      disabled={enableOne ? false : true}
+                      onClick={CharacterAddOn}
+                      title={enableOne ? undefined : "You do not have valid plan"}
+                    >
+                      <span className="app-integration-price-btn-text">
+                        Get for $5 USD
+                      </span>
+                    </button>
                   </div>
                 </div>
-                <button
+                {/* <button
                   className="btn-add-ons"
                   onClick={CharacterAddOn}
                   disabled={enableOne ? false : true}
                   title={enableOne ? undefined : "Please purchase plan first"}
                 >
                   <span className="btn-text">Get Add-on</span>
-                </button>
+                </button> */}
               </div>
             </div>
           </div>

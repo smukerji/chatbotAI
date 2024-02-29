@@ -1,20 +1,60 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./integration.scss";
 import Image from "next/image";
 import whatsAppIcon from "../../../../../../../public/svgs/whatsapp-icon.svg";
 import telegramIcon from "../../../../../../../public/svgs/telegram-icon.svg";
 import WhatsappModal from "../Modal/WhatsappModal";
+import { useCookies } from "react-cookie";
+import { Spin, message } from "antd";
+import { useRouter } from "next/navigation";
 
 function Integration() {
-  const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState<boolean>(false);
+  const [isWhatsappModalOpen, setisWhatsappModalOpen] =
+    useState<boolean>(false);
+  const [isWhatappVerified, setisWhatsappVerified] = useState<boolean>(false);
+  const [loader, setLoader] = useState<boolean>(false);
+  const userId = useCookies(["userId"]);
+  const router = useRouter();
 
   const openWhatsAppModal = () => {
-    setIsWhatsAppModalOpen(true);
+    setisWhatsappModalOpen(true);
   };
 
   const closeWhatsAppModal = () => {
-    setIsWhatsAppModalOpen(false);
+    setisWhatsappModalOpen(false);
   };
+
+  const checkWhatsappAvailability = async () => {
+    setLoader(true);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard/integrationApi/api?userId=${userId[0].userId}`,
+        {
+          method: "GET",
+          cache: "no-cache",
+          next: { revalidate: 0 },
+        }
+      );
+      const data = await response.json();
+      console.log(data);
+      if (
+        data?.isWhatsappVerified === true ||
+        data?.isWhatsappVerified === false
+      ) {
+        setisWhatsappVerified(data?.isWhatsappVerified);
+      } else {
+        message.error("unable to get whatsapp status");
+      }
+    } catch (error: any) {
+      message.error("unable to get whatsapp status");
+    }
+    setLoader(false);
+  };
+
+  useEffect(() => {
+    
+    checkWhatsappAvailability();
+  }, []);
   return (
     <div className="integration-container">
       {/*------------------------------------------Whatsapp-integration----------------------------------------------*/}
@@ -23,7 +63,22 @@ function Integration() {
           <Image src={whatsAppIcon} alt="whatsapp-icon" />
           <span>Add to Whatsapp</span>
         </div>
-        <div className="action" onClick={openWhatsAppModal}>Subscription required</div>
+        <>{loader ? <Spin/>: <>{isWhatappVerified ? (
+          <div className="action" onClick={openWhatsAppModal}>
+            Connect
+          </div>
+        ) : (
+          <div
+            className="action"
+            onClick={() => {
+              router.push(`${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing`);
+            }}
+          >
+            Subscription required
+          </div>
+        )}</>}</>
+        
+        
       </div>
 
       {/*------------------------------------------Telegram-integration----------------------------------------------*/}
@@ -35,8 +90,11 @@ function Integration() {
         <div className="action">Coming soon</div>
       </div>
 
-          {/* Whatsapp Modal */}
-          <WhatsappModal isOpen={isWhatsAppModalOpen} onClose={closeWhatsAppModal} />
+      {/* Whatsapp Modal */}
+      <WhatsappModal
+        isOpen={isWhatsappModalOpen}
+        onClose={closeWhatsAppModal}
+      />
     </div>
   );
 }

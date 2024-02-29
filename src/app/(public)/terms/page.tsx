@@ -9,16 +9,16 @@ function Terms() {
     <>
       <SecondaryHeader />
       <div className="terms-privacy-container">
-        <h1>Terms of Service</h1>
+        <h1>Terms & Conditions</h1>
         <p className="last-modified">Last modified: February 27, 2024</p>
         <div className="term-container">
           <p>1. Introduction</p>
           <p>
-            These Terms of Service (“Terms”, “Terms of Service”) are used to
+            These Terms & Conditions (“Terms & Conditions”) are used to
             determine the rules of the Service and to clarify the legal
             relationship between the entity using the Service and the Company.
-            Lucifer.ai. (“Company”) operates web pages located at lucifer.ai
-            („Website”) and offers Service (as defined below in Section 2).The
+            Lucifer.AI. (“Company”) operates web pages located at Lucifer.AI
+            (“Website”) and offers Service (as defined below in Section 2).The
             Service is dedicated to the professional entities to help them to
             conduct their business. Using the Website and/or the Service in any
             manner, also by going through the Account registration process, the
@@ -29,8 +29,8 @@ function Terms() {
             which he/she represents and his/her declarations are effective. If
             the User does not agree to apply under the provisions of the Terms,
             he/she should not use the Service. In such a case however, the User
-            may contact the Company by emailing at support@lucifer.ai so the
-            Company can try to find a solution.
+            may contact the Company by emailing at info@sapahk.ai so the Company
+            can try to find a solution.
           </p>
         </div>
         <div className="term-container">
@@ -131,29 +131,28 @@ function Terms() {
             exact same conditions unless you cancel it or the Company cancels
             it. You may cancel your Subscription renewal either through your
             Account or by contacting Company’s customer support team at
-            support@lucifer.ai. A valid payment method, including credit or
-            debit card, Apple Pay or Google Pay, is required to process the
-            payment for your subscription. You shall provide the Company with
-            accurate and complete billing information including (i) full name,
-            (ii) email address, (iii) country, (iv) business’s legal entity
-            name, (v) VAT tax number and (vi) a valid payment method
-            information. By submitting such payment information, you
-            automatically authorize Company to charge all Subscription fees
-            incurred through your Account to any such payment instruments.
-            Should automatic billing fail to occur for any reason, Company will
-            issue an electronic invoice indicating that you must proceed
-            manually, within a certain deadline date, with the full payment
-            corresponding to the billing period as indicated on the invoice. We
-            reserve the right to refuse or cancel your order at any time for
-            reasons including but not limited to: service availability, errors
-            in the description or price of the service, error in your order or
-            other reasons. We reserve the right to refuse or cancel your order
-            if fraud or an unauthorized or illegal transaction is suspected.
-            Company is not responsible for any additional fees, including taxes,
-            imposed by the relevant authorities of the country in which the
-            person submitting an order resides / is located. Payment of these
-            additional fees remains the responsibility of the person submitting
-            the order.
+            info@sapahk.ai. A valid payment method, including credit or debit
+            card, Apple Pay or Google Pay, is required to process the payment
+            for your subscription. You shall provide the Company with accurate
+            and complete billing information including (i) full name, (ii) email
+            address, (iii) country, (iv) business’s legal entity name, (v) VAT
+            tax number and (vi) a valid payment method information. By
+            submitting such payment information, you automatically authorize
+            Company to charge all Subscription fees incurred through your
+            Account to any such payment instruments. Should automatic billing
+            fail to occur for any reason, Company will issue an electronic
+            invoice indicating that you must proceed manually, within a certain
+            deadline date, with the full payment corresponding to the billing
+            period as indicated on the invoice. We reserve the right to refuse
+            or cancel your order at any time for reasons including but not
+            limited to: service availability, errors in the description or price
+            of the service, error in your order or other reasons. We reserve the
+            right to refuse or cancel your order if fraud or an unauthorized or
+            illegal transaction is suspected. Company is not responsible for any
+            additional fees, including taxes, imposed by the relevant
+            authorities of the country in which the person submitting an order
+            resides / is located. Payment of these additional fees remains the
+            responsibility of the person submitting the order.
           </p>
         </div>
         <div className="term-container">
@@ -308,14 +307,14 @@ function Terms() {
             entity. If you are a copyright owner, or authorized on behalf of
             one, and you believe that the copyrighted work has been copied in a
             way that constitutes copyright Infringement, please submit your
-            claim via email to support@lucifer.ai, with the subject line:
-            “Copyright Infringement” and include in your claim a detailed
-            description of the alleged Infringement as detailed below, under
-            “DMCA Notice and Procedure for Copyright Infringement Claims”. You
-            may be held accountable for damages (including costs and
-            attorneys&apos; fees) for misrepresentation or bad-faith claims on
-            the infringement of any Content found on and/or through Service or
-            Website on your copyright.
+            claim via email to info@sapahk.ai, with the subject line: “Copyright
+            Infringement” and include in your claim a detailed description of
+            the alleged Infringement as detailed below, under “DMCA Notice and
+            Procedure for Copyright Infringement Claims”. You may be held
+            accountable for damages (including costs and attorneys&apos; fees)
+            for misrepresentation or bad-faith claims on the infringement of any
+            Content found on and/or through Service or Website on your
+            copyright.
           </p>
         </div>
         <div className="term-container">
@@ -355,7 +354,7 @@ function Terms() {
             </li>
           </ul>
           <p>
-            You can contact our Copyright Agent via email at support@lucifer.ai.
+            You can contact our Copyright Agent via email at info@sapahk.ai.
           </p>
         </div>
         <div className="term-container">
@@ -368,8 +367,8 @@ function Terms() {
             the comments submitted by these entities.
           </p>
           <p>
-            You may provide us directly at support@lucifer.ai with information
-            and feedback concerning errors, suggestions for improvements, ideas,
+            You may provide us directly at info@sapahk.ai with information and
+            feedback concerning errors, suggestions for improvements, ideas,
             problems, complaints, and other matters related to our Service
             (“Feedback”). You acknowledge and agree that: (i) you shall not
             retain, acquire or assert any intellectual property right or other
@@ -476,7 +475,7 @@ function Terms() {
           <p>14. Acknowledgement</p>
           <p>
             BY USING SERVICE OR OTHER SERVICES PROVIDED BY US, YOU ACKNOWLEDGE
-            THAT YOU HAVE READ THESE TERMS OF SERVICE AND AGREE TO BE BOUND BY
+            THAT YOU HAVE READ THESE Terms & Conditions AND AGREE TO BE BOUND BY
             THEM.
           </p>
         </div>
@@ -484,7 +483,7 @@ function Terms() {
           <p>15. Contact Us</p>
           <p>
             Any time you wish to contact the Company, please send email at:
-            support@lucifer.ai.
+            info@sapahk.ai.
           </p>
         </div>
       </div>

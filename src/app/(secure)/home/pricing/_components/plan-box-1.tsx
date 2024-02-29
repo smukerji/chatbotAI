@@ -110,29 +110,25 @@ export default function PlanOne({ setPlan, setPrice, price, enableOne, text }: a
             <span className="plan-text  plan-text-even">Excel & CSV</span>
           </div>
 
-          <div className="plan-item">
+          {/* <div className="plan-item">
             <span className="plan-text-head plan-text-head-even">
               Integration{" "}
             </span>
-          </div>
-          <div className="plan-item horizontal-line">
+          </div> */}
+         <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
-            <span className="plan-text  plan-text-even">
-              Embed on unlimited websites
-            </span>
+            <span className="plan-text  plan-text-even">Embed on unlimited websites</span>
           </div>
 
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
             <span className="plan-text  plan-text-even">
-              View Conversation History
+              View & Export Conversation History
             </span>
           </div>
-          <div className="plan-item horizontal-line">
+          <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
-            <span className="plan-text  plan-text-even">
-              Optional Collect Leads
-            </span>
+            <span className="plan-text  plan-text-even">Optional Collect Leads</span>
           </div>
 
           <div className="plan-item">
@@ -143,9 +139,7 @@ export default function PlanOne({ setPlan, setPrice, price, enableOne, text }: a
           </div>
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
-            <span className="plan-text  plan-text-even">
-              Customize Chatbot’s Personality
-            </span>
+            <span className="plan-text  plan-text-even">Customize Chatbot’s Personality</span>
           </div>
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
@@ -153,71 +147,94 @@ export default function PlanOne({ setPlan, setPrice, price, enableOne, text }: a
           </div>
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
-            <span className="plan-text  plan-text-even">
-              Setting Tone of the Bot
-            </span>
+            <span className="plan-text  plan-text-even">Setting Tone of the Bot</span>
           </div>
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
             <span className="plan-text  plan-text-even">Feedback Learning</span>
           </div>
           <div className="plan-item">
-            <Image src={unTickCircle} alt="no-svg" />
-            <span className="plan-text  plan-text-even">
-              Dashboard Analytics
-            </span>
-          </div>
-          <div className="plan-item">
-            <Image src={unTickCircle} alt="no-svg" />
-            <span className="plan-text  plan-text-even">
-              Multilingual Support with Auto Translation
-            </span>
-          </div>
-          <div className="plan-item">
-            <Image src={unTickCircle} alt="no-svg" />
-            <span className="plan-text  plan-text-even">
-              Affliliation/API Access
-            </span>
-          </div>
-          <div className="plan-item">
-            <Image src={unTickCircle} alt="no-svg" />
+            <Image src={tickCircle} alt="no-svg" />
             <span className="plan-text  plan-text-even">Remove Branding</span>
           </div>
-          <div className="plan-item">
-            <Image src={unTickCircle} alt="no-svg" />
-            <span className="plan-text  plan-text-even">Duplicate Bots</span>
+          <div className="plan-item-container">
+            <div className="plan-item">
+              <Image src={tickCircle} alt="no-svg" />
+              <span className="plan-text  plan-text-even">Share & Delete Bots</span>
+            </div>
+            <div className="coming-soon-even">Coming soon</div>
           </div>
-          <div className="plan-item">
-            <Image src={unTickCircle} alt="no-svg" />
-            <span className="plan-text  plan-text-even">
-              Share & Delete Bots
-            </span>
+          <div className="plan-item-container">
+            <div className="plan-item">
+              <Image src={tickCircle} alt="no-svg" />
+              <span className="plan-text  plan-text-even">Lead collection</span>
+            </div>
+            <div className="coming-soon-even">Coming soon</div>
           </div>
-          <div className="plan-item">
-            <Image src={unTickCircle} alt="no-svg" />
-            <span className="plan-text  plan-text-even">Role Based Access</span>
+          <div className="plan-item-container">
+            <div className="plan-item">
+              <Image src={unTickCircle} alt="no-svg" />
+              <span className="plan-text  plan-text-even plan-text-not">Dashboard Analytics</span>
+            </div>
+            <div className="coming-soon-even">Coming soon</div>
           </div>
-          <div className="plan-item">
-            <Image src={unTickCircle} alt="no-svg" />
-            <span className="plan-text  plan-text-even">
-              Team Collaboration
-            </span>
+          <div className="plan-item-container">
+            <div className="plan-item">
+              <Image src={unTickCircle} alt="no-svg" />
+              <span className="plan-text  plan-text-even plan-text-not">
+                Multilingual Support with Auto Translation
+              </span>
+            </div>
+            <div className="coming-soon-even">Coming soon</div>
           </div>
+          {/* <div className="plan-item">
+            <Image src={unTickCircle} alt="no-svg" />
+            <span className="plan-text  plan-text-even">Affliliation/API Access</span>
+          </div>
+         */}
+          <div className="plan-item-container">
+            <div className="plan-item">
+              <Image src={unTickCircle} alt="no-svg" />
+              <span className="plan-text  plan-text-even plan-text-not">Duplicate Bots</span>
+            </div>
+            <div className="coming-soon-even">Coming soon</div>
+          </div>
+          <div className="plan-item-container">
           <div className="plan-item">
             <Image src={unTickCircle} alt="no-svg" />
-            <span className="plan-text  plan-text-even">
+            <span className="plan-text  plan-text-even plan-text-not">Role Based Access</span>
+          </div>
+          <div className="coming-soon-even">Coming soon</div>
+        </div>
+        <div className="plan-item-container">
+          <div className="plan-item">
+            <Image src={unTickCircle} alt="no-svg" />
+            <span className="plan-text  plan-text-even plan-text-not">Team Collaboration</span>
+          </div>
+          <div className="coming-soon-even">Coming soon</div>
+        </div>
+        <div className="plan-item-container">
+          <div className="plan-item">
+            <Image src={unTickCircle} alt="no-svg" />
+            <span className="plan-text  plan-text-even plan-text-not">
               Organizing Data Sources into Folder
             </span>
           </div>
+          <div className="coming-soon-even">Coming soon</div>
+        </div>
+        <div className="plan-item-container">
           <div className="plan-item">
             <Image src={unTickCircle} alt="no-svg" />
-            <span className="plan-text  plan-text-even">
-              Content Summarization
-            </span>
+            <span className="plan-text  plan-text-even plan-text-not">Content Summarization</span>
           </div>
+          <div className="coming-soon-even">Coming soon</div>
+        </div>
+        <div className="plan-item-container">
           <div className="plan-item">
             <Image src={unTickCircle} alt="no-svg" />
-            <span className="plan-text  plan-text-even">Chrome Extension</span>
+            <span className="plan-text  plan-text-even plan-text-not">Chrome Extension</span>
+          </div>
+          <div className="coming-soon-even">Coming soon</div>
           </div>
         </div>
       </div>

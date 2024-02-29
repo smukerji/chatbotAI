@@ -34,64 +34,67 @@ async function fetchCustomBots(userId: string) {
   // console.log("Collection ", collection);
 
   /// default chatbot set temporary
-  const customBots = await collection
-    .aggregate([
-      {
-        $match: {
-          $or: [
-            { userId: userId },
-            {
-              chatbotId: {
-                $in: [
-                  "123d148a-be02-4749-a612-65be9d96266c",
-                  "34cceb84-07b9-4b3e-ad6f-567a1c8f3557",
-                  "f0893732-3302-46b2-922a-95e79ef3524c",
-                  "f8095ef4-6cd0-4373-a45e-8fe15cb6dd0f",
-                ],
-              },
+  const cursor = await collection.aggregate([
+    {
+      $match: {
+        $or: [
+          { userId: userId },
+          {
+            chatbotId: {
+              $in: [
+                "123d148a-be02-4749-a612-65be9d96266c",
+                "34cceb84-07b9-4b3e-ad6f-567a1c8f3557",
+                "f0893732-3302-46b2-922a-95e79ef3524c",
+                "f8095ef4-6cd0-4373-a45e-8fe15cb6dd0f",
+              ],
             },
-          ],
-        },
+          },
+        ],
       },
-      {
-        $lookup: {
-          from: "chatbot-settings",
-          localField: "chatbotId",
-          foreignField: "chatbotId",
-          as: "chatbotSettings",
-          /// this will only include the field needed from chatbot settings
-          pipeline: [
-            {
-              $project: {
-                _id: 0,
-                lastTrained: 1,
-                numberOfCharacterTrained: 1,
-              },
+    },
+    {
+      $lookup: {
+        from: "chatbot-settings",
+        localField: "chatbotId",
+        foreignField: "chatbotId",
+        as: "chatbotSettings",
+        /// this will only include the field needed from chatbot settings
+        pipeline: [
+          {
+            $project: {
+              _id: 0,
+              lastTrained: 1,
+              numberOfCharacterTrained: 1,
             },
-          ],
-        },
+          },
+        ],
       },
+    },
 
-      {
-        $group: {
-          _id: "$_id",
-          userId: { $first: "$userId" },
-          chatbotId: { $first: "$chatbotId" },
-          chatbotName: { $first: "$chatbotName" },
-          lastUsed: { $first: "$lastUsed" },
-          noOfMessagesSent: { $first: "$noOfMessagesSent" },
-          createdAt: { $first: "$createdAt" },
-          chatbotSettings: { $push: "$chatbotSettings" },
-        },
+    {
+      $group: {
+        _id: "$_id",
+        userId: { $first: "$userId" },
+        chatbotId: { $first: "$chatbotId" },
+        chatbotName: { $first: "$chatbotName" },
+        lastUsed: { $first: "$lastUsed" },
+        noOfMessagesSent: { $first: "$noOfMessagesSent" },
+        createdAt: { $first: "$createdAt" },
+        chatbotSettings: { $push: "$chatbotSettings" },
       },
-      {
-        /// sorting in ascending order
-        $sort: {
-          createdAt: 1,
-        },
+    },
+    {
+      /// sorting in ascending order
+      $sort: {
+        createdAt: 1,
       },
-    ])
-    .toArray();
+    },
+  ]);
+
+  const customBots = await cursor.toArray();
+
+  /// close the cursor
+  await cursor.close();
 
   return customBots.map((doc: any) => ({
     id: doc.chatbotId,
