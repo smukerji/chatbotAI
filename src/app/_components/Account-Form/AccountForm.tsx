@@ -58,7 +58,7 @@ function AccountForm() {
             <div className='form-item w-50'>
               <div className='form-items-direction'>
                 <label className='item-label' htmlFor='fullName'>
-                  FullName
+                  Name
                 </label>
                 <input
                   placeholder='Enter your Name'
@@ -75,7 +75,7 @@ function AccountForm() {
                 {/* <Form.Item label='First Name' name={'firstName'} className=''> */}
                 <div className='form-items-direction'>
                   <label className='item-label' htmlFor='firstName'>
-                    FirstName
+                    First Name
                   </label>
                   <input
                     placeholder='Enter your First Name'
@@ -93,7 +93,7 @@ function AccountForm() {
                 {/* <Form.Item label='Last Name' name={'lastName'} className=''> */}
                 <div className='form-items-direction'>
                   <label className='item-label' htmlFor='lastName'>
-                    lastName
+                    Last Name
                   </label>
                   <input
                     placeholder='Enter your Last Name'
@@ -113,7 +113,7 @@ function AccountForm() {
           <div className='form-item w-50 email'>
             {/* <Form.Item label='Email' name={'email'} className='w-50 email'> */}
             <div className='form-items-direction'>
-              <label className='item-label' htmlFor=''>
+              <label className='item-label email-label' htmlFor=''>
                 Email
               </label>
               <input
