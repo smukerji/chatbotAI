@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useDebugValue } from 'react';
+import React, { useState, useEffect, useDebugValue, useContext } from 'react';
 import axios from 'axios';
 import './billing.scss';
 import Image from 'next/image';
@@ -10,6 +10,7 @@ import { useSession } from 'next-auth/react';
 import { getDate } from '@/app/_helpers/client/getTime';
 import { Table, Modal, message } from 'antd';
 import { redirect, useRouter } from 'next/navigation';
+import { UserDetailsContext } from '@/app/_helpers/client/Context/UserDetailsContext';
 
 export default function BillingAndUsage() {
   const [cookies, setCookie] = useCookies(['userId']);
@@ -23,6 +24,10 @@ export default function BillingAndUsage() {
   const [disable, setDisable] = useState(false);
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const userDetailContext: any = useContext(UserDetailsContext);
+  const userDetails = userDetailContext?.userDetails;
+
+  console.log(userDetails)
   // const [columns, setColumns] = useState([])
 
   const showModal = () => {
@@ -92,9 +97,9 @@ export default function BillingAndUsage() {
       setDisable(true);
     }
 
-    if (!response.data?.duration) {
+    if (!response?.data?.duration) {
       setDuration('7 days free trial');
-    } else if (response.data.duration == 'month') {
+    } else if (response?.data?.duration == 'month') {
       setDuration('Billed monthly');
     } else {
       setDuration('Billed yearly');
@@ -133,8 +138,8 @@ export default function BillingAndUsage() {
                 </div>
               </div>
               <div className='plan-feature'>
-                <div className='plan-message'>{msg} messages</div>
-                <div className='plan-chatbot'>{chat} chatbots</div>
+                <div className='plan-message'>{userDetails?.plan?.messageLimit} messages</div>
+                <div className='plan-chatbot'>{userDetails?.plan?.numberOfChatbot} chatbots</div>
                 <div className='next-renewal-date'>
                   <div className='next-renewal-date-text'>
                     Next renewal date

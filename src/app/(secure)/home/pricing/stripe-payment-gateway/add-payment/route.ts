@@ -34,7 +34,7 @@ async function addPaymentDetailsFail(req: any, res: NextResponse) {
 async function addPaymentDetails(req: any, res: NextResponse) {
   if (req.method === "POST") {
     try {
-      let { plan, u_id, duration, status, paymentId, price } = await req.json();
+      let { plan, u_id, duration, status, paymentId, price, isWhatsapp } = await req.json();
       const db = (await connectDatabase())?.db();
 
       //ANCHOR - Get data of user by user_id
@@ -62,8 +62,7 @@ async function addPaymentDetails(req: any, res: NextResponse) {
         price: "$" + price,
         paymentId,
       });
-
-      //ANCHOR - message limit update
+      //ANCHOR - character limit update
       if (plan == 5) {
         const data = await collectionAdd.updateMany(
           { userId: String(u_id) },
@@ -77,13 +76,39 @@ async function addPaymentDetails(req: any, res: NextResponse) {
         return data;
       }
 
-      //ANCHOR - character limit update
+      //ANCHOR - message limit update
+
+      if (plan == 7) {
+        const data = await collectionAdd.updateMany(
+          { userId: String(u_id) },
+          {
+            $set: {
+              messageLimit:
+                Number(userDataAdd?.messageLimit) + 8000,
+            },
+          }
+        );
+        return data;
+      }
+
       if (plan == 6) {
         const data = await collectionAdd.updateMany(
           { userId: String(u_id) },
           {
             $set: {
               messageLimit: Number(userDataAdd?.messageLimit) + 5000,
+            },
+          }
+        );
+        return data;
+      }
+      if (plan == 8) {
+        const data = await collection.updateMany(
+          { _id: new ObjectId(u_id)  },
+          {
+            $set: {
+              isWhatsApp:true,
+              nextIsWhatsapp:true
             },
           }
         );
@@ -124,6 +149,9 @@ async function addPaymentDetails(req: any, res: NextResponse) {
               nextPlan: plan_name,
               nextPlanId: plan_data?._id,
               nextPlanDuration: duration,
+              isWhatsapp,
+              nextIsWhatsapp:isWhatsapp
+
             },
           }
         );
@@ -146,6 +174,8 @@ async function addPaymentDetails(req: any, res: NextResponse) {
               nextPlan: plan_name,
               nextPlanId: plan_data?._id,
               nextPlanDuration: duration,
+              isWhatsapp,
+              nextIsWhatsapp:isWhatsapp
             },
           }
         );

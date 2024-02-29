@@ -22,8 +22,8 @@ async function createPaymentIntent(req: any, res: NextResponse) {
       if (
         data.plan == "individual" &&
         data.endDate > currentDate &&
-        plan != 5 &&
-        plan != 6
+        plan == 1 &&
+        plan == 3 
       ) {
         return "You already have plan";
       }
@@ -78,10 +78,11 @@ async function checkCurrentPlan(req: any, res: NextResponse) {
         msg: 1,
         prePrice: 15,
         duration: data.duration,
-        text: "7 days free trial is running ..."
+        text: "Trial Expiring in 7 Days",
+        whatsAppIntegration: true
       }
     }
   } else {
-    return { msg: 0, text:"Get started" };
+    return { msg: 0, text:"Get started",whatsAppIntegration: data.isWhatsApp };
   }
 }
