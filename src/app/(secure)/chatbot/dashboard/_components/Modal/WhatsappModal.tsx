@@ -187,7 +187,7 @@ function WhatsappModal({ isOpen, onClose }: any) {
     ) {
       
       try {
-        const {id,...wrapMetaDetails} = metaDetails
+        // const {id,...wrapMetaDetails} = metaDetails
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/whatsapp/api`,
           {
@@ -196,7 +196,7 @@ function WhatsappModal({ isOpen, onClose }: any) {
             },
             method: "POST",
             body: JSON.stringify({
-              ...wrapMetaDetails,
+              metaDetails,
               chatbotId: chatbot.id,
               userId: userId[0].userId,
             }),
