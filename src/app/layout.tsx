@@ -1,20 +1,20 @@
-'use client';
-import Link from 'next/link';
-import './globals.css';
-import { Layout, Modal, Button } from 'antd';
-import { SessionProvider } from 'next-auth/react';
-import axios from 'axios';
-import { useCookies } from 'react-cookie';
+"use client";
+import Link from "next/link";
+import "./globals.css";
+import { Layout, Modal, Button } from "antd";
+import { SessionProvider } from "next-auth/react";
+import axios from "axios";
+import { useCookies } from "react-cookie";
 // import AuthBtn from "./_components/AuthBtn";
-import dynamic from 'next/dynamic';
-import { useEffect, useState } from 'react';
-import Header from './_components/Header/Header';
-import { UserDetailsDataProvider } from './_helpers/client/Context/UserDetailsContext';
-import { usePathname } from 'next/navigation';
-import './layout.scss';
+import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
+import Header from "./_components/Header/Header";
+import { UserDetailsDataProvider } from "./_helpers/client/Context/UserDetailsContext";
+import { usePathname } from "next/navigation";
+import "./layout.scss";
 
 // const AuthBtn = dynamic(() => import("./_components/AuthBtn"), { ssr: false });
-const AuthHeader = dynamic(() => import('./_components/AuthHeader'), {
+const AuthHeader = dynamic(() => import("./_components/AuthHeader"), {
   ssr: false,
 });
 
@@ -25,19 +25,19 @@ export default function RootLayout({
 }) {
   // const { Header } = Layout;
   const pathName = usePathname();
-  const [path, setPath] = useState('');
-  const [cookies, setCookie] = useCookies(['userId']);
+  const [path, setPath] = useState("");
+  const [cookies, setCookie] = useCookies(["userId"]);
   const [isPlanNotification, setIsPlanNotification] = useState(false);
   const [user, setUser] = useState<any>(null);
 
   const getUser = async () => {
     if (
       ![
-        '/',
-        '/account/login',
-        '/account/register',
-        '/home/pricing/checkout',
-      ].includes(pathName ?? '')
+        "/",
+        "/account/login",
+        "/account/register",
+        "/home/pricing/checkout",
+      ].includes(pathName ?? "")
     ) {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/user?userId=${cookies.userId}`
@@ -54,7 +54,7 @@ export default function RootLayout({
 
   const handleUpgradePlan = () => {
     setIsPlanNotification(false);
-    window.location.href = '/home/pricing';
+    window.location.href = "/home/pricing";
   };
 
   useEffect(() => {
@@ -64,10 +64,10 @@ export default function RootLayout({
 
         if (
           new Date() > planEndDate &&
-          pathName !== '/home/pricing' &&
+          pathName !== "/home/pricing" &&
           pathName &&
           pathName.length > 0 &&
-          !pathName.includes('/home/pricing/checkout')
+          !pathName.includes("/home/pricing/checkout")
         ) {
           setIsPlanNotification(true);
         }
@@ -75,10 +75,10 @@ export default function RootLayout({
     }, 1000);
 
     if (
-      pathName === '/home/pricing' ||
+      pathName === "/home/pricing" ||
       (pathName &&
         pathName.length > 0 &&
-        pathName.includes('/home/pricing/checkout'))
+        pathName.includes("/home/pricing/checkout"))
     ) {
       setIsPlanNotification(false);
     }
@@ -103,7 +103,8 @@ export default function RootLayout({
             {path !== "/" &&
               path !== "/account/login" &&
               path !== "/account/register" &&
-              path !== "/terms" && <AuthHeader />}
+              path !== "/terms" &&
+              path !== "/privacy" && <AuthHeader />}
             {children}
 
             <Modal

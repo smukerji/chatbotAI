@@ -29,6 +29,10 @@ import ChatBotIcon from "../../../../../../../public/create-chatbot-svgs/ChatBot
 import { UserDetailsContext } from "../../../../../_helpers/client/Context/UserDetailsContext";
 import ReactToPrint from "react-to-print";
 import { PrintingChats } from "../Printing-Chats/Printing";
+import {
+  AUTHORIZATION_FAILED,
+  JWT_EXPIRED,
+} from "../../../../../_helpers/errorConstants";
 
 function Chat({
   chatbot,
@@ -194,6 +198,13 @@ function Chat({
 
       const userDetails = await response.json();
 
+      if (userDetails?.message === JWT_EXPIRED) {
+        message.error(AUTHORIZATION_FAILED).then(() => {
+          window.location.href = "/account/login";
+        });
+        return;
+      }
+
       /// check if user can chat or not
       const userChatCountTillNow = userDetails?.userDetails?.totalMessageCount;
       const userPlanMessageLimit = userDetails?.plan?.messageLimit;
@@ -219,17 +230,15 @@ function Chat({
                   // userId: cookies.userId,
                   //// default chatbot set
                   userId:
-                    chatbot?.id === "123d148a-be02-4749-a612-65be9d96266c"
-                      ? "651d111b8158397ebd0e65fb"
-                      : chatbot?.id === "34cceb84-07b9-4b3e-ad6f-567a1c8f3557"
-                      ? "65795294269d08529b8cd743"
-                      : chatbot?.id === "f0893732-3302-46b2-922a-95e79ef3524c"
-                      ? "651d111b8158397ebd0e65fb"
-                      : chatbot?.id === "f8095ef4-6cd0-4373-a45e-8fe15cb6dd0f"
-                      ? "6523fee523c290d75609a1fa"
-                      : cookies.userId
-                      ? cookies.userId
-                      : userId,
+                    // chatbot?.id === "123d148a-be02-4749-a612-65be9d96266c"
+                    //   ? "651d111b8158397ebd0e65fb"
+                    //   : chatbot?.id === "34cceb84-07b9-4b3e-ad6f-567a1c8f3557"
+                    //   ? "65795294269d08529b8cd743"
+                    //   : chatbot?.id === "f0893732-3302-46b2-922a-95e79ef3524c"
+                    //   ? "651d111b8158397ebd0e65fb"
+                    //   : chatbot?.id === "f8095ef4-6cd0-4373-a45e-8fe15cb6dd0f"
+                    //   ? "6523fee523c290d75609a1fa"
+                    cookies.userId ? cookies.userId : userId,
                 }),
               }
             );
@@ -252,17 +261,15 @@ function Chat({
                   chatbotId: chatbot?.id,
                   //// default chatbot set
                   userId:
-                    chatbot?.id === "123d148a-be02-4749-a612-65be9d96266c"
-                      ? "651d111b8158397ebd0e65fb"
-                      : chatbot?.id === "34cceb84-07b9-4b3e-ad6f-567a1c8f3557"
-                      ? "65795294269d08529b8cd743"
-                      : chatbot?.id === "f0893732-3302-46b2-922a-95e79ef3524c"
-                      ? "651d111b8158397ebd0e65fb"
-                      : chatbot?.id === "f8095ef4-6cd0-4373-a45e-8fe15cb6dd0f"
-                      ? "6523fee523c290d75609a1fa"
-                      : cookies.userId
-                      ? cookies.userId
-                      : userId,
+                    // chatbot?.id === "123d148a-be02-4749-a612-65be9d96266c"
+                    //   ? "651d111b8158397ebd0e65fb"
+                    //   : chatbot?.id === "34cceb84-07b9-4b3e-ad6f-567a1c8f3557"
+                    //   ? "65795294269d08529b8cd743"
+                    //   : chatbot?.id === "f0893732-3302-46b2-922a-95e79ef3524c"
+                    //   ? "651d111b8158397ebd0e65fb"
+                    //   : chatbot?.id === "f8095ef4-6cd0-4373-a45e-8fe15cb6dd0f"
+                    //   ? "6523fee523c290d75609a1fa"
+                    cookies.userId ? cookies.userId : userId,
                 }),
                 next: { revalidate: 0 },
               }
