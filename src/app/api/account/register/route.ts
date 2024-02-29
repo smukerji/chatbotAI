@@ -21,9 +21,12 @@ async function register(request: any) {
   /// generate the password hash
   const saltRounds = 10;
   const hashPassword = await bcrypt.hash(password, saltRounds);
-
+  let currentDate = new Date();
+  let endDate = new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000);
   /// get the starter plan ID
-  const starterPlan = await db.collection("plans").findOne({ name: "starter" });
+  const starterPlan = await db
+    .collection("plans")
+    .findOne({ name: "individual" });
 
   /// register new user
   const userResult = await collection.insertOne({
@@ -31,6 +34,9 @@ async function register(request: any) {
     email,
     password: hashPassword,
     planId: starterPlan?._id,
+    startDate: currentDate,
+    isWhatsApp: true,
+    endDate: endDate,
   });
 
   const userId = userResult?.insertedId.toString();
@@ -39,6 +45,10 @@ async function register(request: any) {
   await db.collection("user-details").insertOne({
     userId: userId,
     totalMessageCount: 0,
+    messageLimit: starterPlan?.messageLimit,
+    chatbotLimit: starterPlan?.numberOfChatbot,
+    trainingDataLimit: starterPlan?.trainingDataLimit,
+    websiteCrawlingLimit: starterPlan?.websiteCrawlingLimit,
   });
 
   return { message: "Registered successfully... Please login to continue" };

@@ -295,15 +295,15 @@ function Home({
       //// default chatbot set
       formData.append(
         "userId",
-        chatbotId === "123d148a-be02-4749-a612-65be9d96266c"
-          ? "651d111b8158397ebd0e65fb"
-          : chatbotId === "34cceb84-07b9-4b3e-ad6f-567a1c8f3557"
-          ? "65795294269d08529b8cd743"
-          : chatbotId === "f0893732-3302-46b2-922a-95e79ef3524c"
-          ? "651d111b8158397ebd0e65fb"
-          : chatbotId === "f8095ef4-6cd0-4373-a45e-8fe15cb6dd0f"
-          ? "6523fee523c290d75609a1fa"
-          : cookies.userId
+        // chatbotId === "123d148a-be02-4749-a612-65be9d96266c"
+        //   ? "651d111b8158397ebd0e65fb"
+        //   : chatbotId === "34cceb84-07b9-4b3e-ad6f-567a1c8f3557"
+        //   ? "65795294269d08529b8cd743"
+        //   : chatbotId === "f0893732-3302-46b2-922a-95e79ef3524c"
+        //   ? "651d111b8158397ebd0e65fb"
+        //   : chatbotId === "f8095ef4-6cd0-4373-a45e-8fe15cb6dd0f"
+        //   ? "6523fee523c290d75609a1fa"
+        cookies.userId
       );
       formData.append("qaList", JSON.stringify(botDetails?.qaList));
       formData.append("text", text);

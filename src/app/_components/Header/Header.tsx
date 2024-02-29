@@ -77,6 +77,14 @@ function Header() {
       );
 
       const userDetails = await response.json();
+      const date2: any = new Date(userDetails?.planExpiry);
+      const date1: any = new Date(); // Current date
+
+      // Calculate the difference in milliseconds
+      const differenceMs = date2 - date1;
+      const differenceDays = Math.round(differenceMs / (1000 * 60 * 60 * 24));
+      /// set the expiry
+      userDetailContext?.handleChange('planExpiry')(differenceDays);
       userDetailContext?.handleChange('totalMessageCount')(
         userDetails?.userDetails?.totalMessageCount
       );
@@ -203,12 +211,12 @@ function Header() {
                     <Image src={profileIcon} alt='profile-icon' />
                     Account settings
                   </li>
-                  <li>
+                  <li onClick={() => router.push('/home/BillingAndUsage')}>
                     <Image src={receiptIcon} alt='receipt-icon' />
                     Billing & Usage
                   </li>
 
-                  <li>
+                  <li onClick={() => router.push('/home/pricing')}>
                     <Image src={walletIcon} alt='wallet-icon' />
                     Pricing Plans
                   </li>
@@ -266,9 +274,9 @@ function Header() {
               <div className='plan-details-container'>
                 <div className='plan'>
                   <span>Your plan</span>
-                  <h1>Starter</h1>
+                  <h1>{userDetails?.plan?.name}</h1>
                 </div>
-                <p>Expires in 14 days</p>
+                <p>Expires in {userDetails?.planExpiry} days</p>
               </div>
 
               <hr />

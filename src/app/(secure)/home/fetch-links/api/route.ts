@@ -257,22 +257,24 @@ async function fetchLinks(request: NextRequest) {
     /// first check how much link user can crawl
     const db = (await connectDatabase())?.db();
     /// get the user plan
-    const planDetails = await db
-      .collection("users")
-      .aggregate([
-        {
-          $match: { _id: new ObjectId(userId) },
+    const cursor = await db.collection("users").aggregate([
+      {
+        $match: { _id: new ObjectId(userId) },
+      },
+      {
+        $lookup: {
+          from: "plans",
+          localField: "planId",
+          foreignField: "_id",
+          as: "plan",
         },
-        {
-          $lookup: {
-            from: "plans",
-            localField: "planId",
-            foreignField: "_id",
-            as: "plan",
-          },
-        },
-      ])
-      .toArray();
+      },
+    ]);
+    const planDetails = await cursor.toArray();
+
+    /// close the cursor
+    await cursor.close();
+
     const plan = planDetails[0].plan[0];
 
     /// find how many link are previously fetched  by this user for this bot

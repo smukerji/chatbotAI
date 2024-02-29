@@ -16,9 +16,9 @@ function ServicesOffered() {
         <div className="left-part">
           <h1>Services We Offer</h1>
           <p>
-            Lucifer.ai is the AI chatbot that takes your digital presence to the
+            Lucifer.AI is the AI chatbot that takes your digital presence to the
             next level. Join us on this extraordinary journey, where
-            conversation meets innovation. Experience Lucifer.ai today, and
+            conversation meets innovation. Experience Lucifer.AI today, and
             never look back.
           </p>
         </div>
@@ -39,7 +39,7 @@ function ServicesOffered() {
             <Image src={langIcon} alt="service-icons" />
             <h3>Multi- language Support</h3>
             <p>
-              Lucifer.ai is the AI chatbot that takes your digital presence to
+              Lucifer.AI is the AI chatbot that takes your digital presence to
               the next level
             </p>
           </div>
@@ -48,7 +48,7 @@ function ServicesOffered() {
             <Image src={webIcon} alt="service-icons" />
             <h3>Web Chatbot Integration</h3>
             <p>
-              Lucifer.ai is the AI chatbot that takes your digital presence to
+              Lucifer.AI is the AI chatbot that takes your digital presence to
               the next level
             </p>
           </div>
@@ -57,7 +57,7 @@ function ServicesOffered() {
             <Image src={monitorIcon} alt="service-icons" />
             <h3>App chatbot Monitoring</h3>
             <p>
-              Lucifer.ai is the AI chatbot that takes your digital presence to
+              Lucifer.AI is the AI chatbot that takes your digital presence to
               the next level
             </p>
           </div>
@@ -66,7 +66,7 @@ function ServicesOffered() {
             <Image src={naturalLangIcon} alt="service-icons" />
             <h3>Natural Language Processing</h3>
             <p>
-              Lucifer.ai is the AI chatbot that takes your digital presence to
+              Lucifer.AI is the AI chatbot that takes your digital presence to
               the next level
             </p>
           </div>
@@ -75,7 +75,7 @@ function ServicesOffered() {
             <Image src={textImgIcon} alt="service-icons" />
             <h3>Text-Image-Audio chatbot</h3>
             <p>
-              Lucifer.ai is the AI chatbot that takes your digital presence to
+              Lucifer.AI is the AI chatbot that takes your digital presence to
               the next level
             </p>
           </div>
@@ -84,7 +84,7 @@ function ServicesOffered() {
             <Image src={costIcon} alt="service-icons" />
             <h3>Chatbot Cost Estimation</h3>
             <p>
-              Lucifer.ai is the AI chatbot that takes your digital presence to
+              Lucifer.AI is the AI chatbot that takes your digital presence to
               the next level
             </p>
           </div>
