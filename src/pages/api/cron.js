@@ -5,7 +5,7 @@ export default async function handler(req, res) {
   try {
     let client = new MongoClient(uri);
     let db = (await client.connect()).db();
-    const collectionPlan = db.collection("plans")
+    const collectionPlan = db.collection("plans");
     const collection = db.collection("users");
     const collectionPayment = db.collection("payment-history");
     const collectionUserDetails = db.collection("user-details");
@@ -14,14 +14,14 @@ export default async function handler(req, res) {
       endDate: { $lt: currentDate },
     });
 
-    const data = await cursor.toArray();
+    const dataa = await cursor.toArray();
     /// close the cursor
     await cursor.close();
 
     let price = 0;
     for (let i = 0; i < dataa.length; i++) {
       const data = dataa[i];
-      const planDetails = await collectionPlan.findOne({_id: data.planId})
+      const planDetails = await collectionPlan.findOne({ _id: data.planId });
       if (data.nextPlan != "") {
         const h = data.paymentId;
         console.log(String(data._id));
@@ -47,7 +47,7 @@ export default async function handler(req, res) {
           //ANCHOR - stripe payment intent creation
           const paymentIntent = await stripe.paymentIntents.create({
             amount: amount,
-            currency: "inr",
+            currency: "usd",
             automatic_payment_methods: {
               enabled: true,
             },

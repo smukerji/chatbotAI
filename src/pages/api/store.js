@@ -61,16 +61,12 @@ export default async function handler(req, res) {
           .countDocuments({ userId: userId });
 
         /// get the number of chatbot user can create from plan table
-        const planDetails = await db.collection("user-details").findOne(
-          {
-            userId: userId ,
-          },
-          );
-
+        const planDetails = await db.collection("user-details").findOne({
+          userId: userId,
+        });
 
         if (
-          planDetails?.chatbotLimit <
-            noOfChatbotsUserCreated + 1 &&
+          planDetails?.chatbotLimit < noOfChatbotsUserCreated + 1 &&
           !updateChatbot
         ) {
           res
