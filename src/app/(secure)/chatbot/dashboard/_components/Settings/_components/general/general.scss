@@ -33,6 +33,10 @@
       align-items: center;
       gap: 12px;
 
+      @media only screen and (max-width: 767px) {
+        flex-wrap: wrap;
+      }
+
       .ids-detail-content {
         color: #141416;
         text-align: center;

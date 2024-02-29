@@ -22,17 +22,18 @@ async function CronFunction() {
     const collectionPayment = db.collection("payment-history");
     const collectionUserDetails = db.collection("user-details");
     const currentDate = new Date();
-    const dataa = await collection
-      .find({
-        endDate: { $lt: currentDate },
-      })
-      .toArray();
+    const cursor = await collection.find({
+      endDate: { $lt: currentDate },
+    });
+
+    const data = await cursor.toArray();
+    /// close the cursor
+    await cursor.close();
+
     let price = 0;
     for (let i = 0; i < dataa.length; i++) {
       const data = dataa[i];
-      console.log(data.planId)
       const planDetails = await collectionPlan.findOne({_id: data.planId})
-      console.log(planDetails)
       if (data.nextPlan != "") {
         const h = data.paymentId;
         console.log(String(data._id));

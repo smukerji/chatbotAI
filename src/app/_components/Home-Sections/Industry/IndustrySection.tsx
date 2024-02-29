@@ -15,7 +15,7 @@ export default function IndustrySection() {
         <div className="left">
           <h1>AI Chatbot in the Industrial sector</h1>
           <p>
-            Discover the future of conversational excellence with Lucifer.ai,
+            Discover the future of conversational excellence with Lucifer.AI,
             your intelligent AI companion. Elevate your online interactions with
             natural and intuitive conversations.
           </p>
@@ -29,7 +29,7 @@ export default function IndustrySection() {
               <Image src={healthcareIcon} alt="healthcare-icon" />
               <h3>Healthcare And Wellness</h3>
               <p>
-                Lucifer.ai is the AI chatbot that takes your digital presence to
+                Lucifer.AI is the AI chatbot that takes your digital presence to
                 the next level
               </p>
             </div>
@@ -37,7 +37,7 @@ export default function IndustrySection() {
               <Image src={healthcareIcon} alt="healthcare-icon" />
               <h3>Healthcare And Wellness</h3>
               <p>
-                Lucifer.ai is the AI chatbot that takes your digital presence to
+                Lucifer.AI is the AI chatbot that takes your digital presence to
                 the next level
               </p>
             </div>
@@ -45,7 +45,7 @@ export default function IndustrySection() {
               <Image src={hotlesIcon} alt="hotels-icon" />
               <h3>Hotels And Hospitality</h3>
               <p>
-                Lucifer.ai is the AI chatbot that takes your digital presence to
+                Lucifer.AI is the AI chatbot that takes your digital presence to
                 the next level
               </p>
             </div>
@@ -53,7 +53,7 @@ export default function IndustrySection() {
               <Image src={healthcareIcon} alt="healthcare-icon" />
               <h3>Healthcare And Wellness</h3>
               <p>
-                Lucifer.ai is the AI chatbot that takes your digital presence to
+                Lucifer.AI is the AI chatbot that takes your digital presence to
                 the next level
               </p>
             </div>
@@ -65,7 +65,7 @@ export default function IndustrySection() {
               <Image src={healthcareIcon} alt="healthcare-icon" />
               <h3>Healthcare And Wellness</h3>
               <p>
-                Lucifer.ai is the AI chatbot that takes your digital presence to
+                Lucifer.AI is the AI chatbot that takes your digital presence to
                 the next level
               </p>
             </div>
@@ -73,7 +73,7 @@ export default function IndustrySection() {
               <Image src={educationIcon} alt="education-icon" />
               <h3>Education And Institutes</h3>
               <p>
-                Lucifer.ai is the AI chatbot that takes your digital presence to
+                Lucifer.AI is the AI chatbot that takes your digital presence to
                 the next level
               </p>
             </div>
@@ -81,7 +81,7 @@ export default function IndustrySection() {
               <Image src={businessIcon} alt="business-icon" />
               <h3>Small Medium Business</h3>
               <p>
-                Lucifer.ai is the AI chatbot that takes your digital presence to
+                Lucifer.AI is the AI chatbot that takes your digital presence to
                 the next level
               </p>
             </div>
@@ -89,7 +89,7 @@ export default function IndustrySection() {
               <Image src={coinIcon} alt="business-icon" />
               <h3>Nonprofits or B2C</h3>
               <p>
-                Lucifer.ai is the AI chatbot that takes your digital presence to
+                Lucifer.AI is the AI chatbot that takes your digital presence to
                 the next level
               </p>
             </div>
@@ -97,7 +97,7 @@ export default function IndustrySection() {
               <Image src={healthcareIcon} alt="healthcare-icon" />
               <h3>Healthcare And Wellness</h3>
               <p>
-                Lucifer.ai is the AI chatbot that takes your digital presence to
+                Lucifer.AI is the AI chatbot that takes your digital presence to
                 the next level
               </p>
             </div>
