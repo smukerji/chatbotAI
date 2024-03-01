@@ -1,4 +1,4 @@
-import { Modal, Steps, Switch, message } from "antd";
+import { Modal, Spin, Steps, Switch, message } from "antd";
 import React, { useEffect, useRef, useState } from "react";
 import copyIcon from "../../../../../../../public/svgs/copy-icon.svg";
 import Image from "next/image";
@@ -144,7 +144,7 @@ function WhatsappModal({ isOpen, onClose }: any) {
           { status: "wait" }, // Keep the status of other steps unchanged
         ]);
       } else {
-        message.error(res?.verifyMessage);
+        message.error(res?.verifyMessage || res?.message);
       }
     } catch (error) {
       console.log("error verifying", error);
@@ -185,11 +185,9 @@ function WhatsappModal({ isOpen, onClose }: any) {
       errors.phoneNumberID == "" &&
       errors.phoneBusinessID == ""
     ) {
-      setAccountStatus(true);
-      setStepState({ step1: false, step2: false, step3: false });
-
+      
       try {
-        const { id, ...remainingMetaDetails } = metaDetails;
+        // const {id,...wrapMetaDetails} = metaDetails
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/whatsapp/api`,
           {
@@ -198,15 +196,33 @@ function WhatsappModal({ isOpen, onClose }: any) {
             },
             method: "POST",
             body: JSON.stringify({
-              ...remainingMetaDetails,
+              ...metaDetails,
               chatbotId: chatbot.id,
               userId: userId[0].userId,
             }),
             next: { revalidate: 0 },
           }
-        );
-        const resp = await response.json();
-        message.success(resp.message);
+          );
+          
+          const resp = await response.json();
+          if(response.status !=200){
+            message.error(resp.message);
+            onClose();
+            setAccountStatus(false);
+            setStepState({ step1: true, step2: false, step3: false });
+            setItems([
+              { status: "process" }, // Update the status of the first step
+              { status: "wait" }, // Update the status of the second step
+              { status: "wait" },
+            ]);
+            
+          }
+          else{
+            message.success(resp.message);
+            setStepState({ step1: false, step2: false, step3: false });
+            setAccountStatus(true);
+        }
+       
       } catch (error) {
         message.error("error sending data");
       }
@@ -350,7 +366,7 @@ function WhatsappModal({ isOpen, onClose }: any) {
   const fetchWhatsappDetails = async () => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/whatsapp/account?userId=${userId[0].userId}`,
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/whatsapp/account?chatBotId=${chatbot.id}`,
         {
           headers: {
             cache: "no-store",
@@ -370,10 +386,8 @@ function WhatsappModal({ isOpen, onClose }: any) {
         isActive: data?.isActive,
         id:data?._id
       });
-    
-        setSwitchStatus(data?.isEnabled)
-      
-    
+      setSwitchStatus(data?.isEnabled == undefined ? true : data?.isEnabled)
+
       // Assuming data is an object containing all the fields
      // Assuming data is an object containing all the fields
 
@@ -398,6 +412,7 @@ function WhatsappModal({ isOpen, onClose }: any) {
     // fetch details if already present
     fetchWhatsappDetails();
   }, []);
+  console.log("switch",switchStatus)
   return (
     <div className="whatsapp-modal-container">
       <Modal
@@ -439,7 +454,9 @@ function WhatsappModal({ isOpen, onClose }: any) {
                   <p className="whatsapp-top-title">
                     Webhook Verification Token
                   </p>
+                 
                   <div className="whatsapp-input-copy-container">
+                    {!whatsAppWebhookToken ?  <div className="whatsapp-spin-token"><Spin /></div> :<>
                     <input
                       type="text"
                       className="whatsapp-input"
@@ -457,6 +474,8 @@ function WhatsappModal({ isOpen, onClose }: any) {
                         handleCopy(inputTokenRef.current?.value || "")
                       }
                     />
+                    </>
+}
                   </div>
                 </div>
               </div>

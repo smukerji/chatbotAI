@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useDebugValue, useContext } from 'react';
-import axios from 'axios';
-import './billing.scss';
-import Image from 'next/image';
-import { useCookies } from 'react-cookie';
-import { useSession } from 'next-auth/react';
+import React, { useState, useEffect, useDebugValue, useContext } from "react";
+import axios from "axios";
+import "./billing.scss";
+import Image from "next/image";
+import { useCookies } from "react-cookie";
+import { useSession } from "next-auth/react";
 // import { redirect } from "next/navigation";
 import { getDate } from '@/app/_helpers/client/getTime';
 import { Table, Modal, message } from 'antd';
@@ -18,11 +18,11 @@ import dynamic from 'next/dynamic';
 function BillingAndUsage() {
   const [cookies, setCookie] = useCookies(['userId']);
   const { status } = useSession();
-  const [plan, setPlan] = useState('');
+  const [plan, setPlan] = useState("");
   const [msg, setMsg] = useState(0);
   const [chat, setChat] = useState(0);
   const [date, setDate] = useState<any>();
-  const [duration, setDuration] = useState('');
+  const [duration, setDuration] = useState("");
   const [dataSource, setDataSource] = useState([]);
   const [disable, setDisable] = useState(false);
   const router = useRouter();
@@ -30,7 +30,7 @@ function BillingAndUsage() {
   const userDetailContext: any = useContext(UserDetailsContext);
   const userDetails = userDetailContext?.userDetails;
 
-  console.log(userDetails)
+  console.log(userDetails);
   // const [columns, setColumns] = useState([])
 
   const showModal = () => {
@@ -42,7 +42,7 @@ function BillingAndUsage() {
       `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/BillingAndUsage/api`,
       { u_id: cookies.userId }
     );
-    if (response.data.status == 1) {
+    if (response.data.status == true) {
       message.success(response.data.msg);
     } else {
       message.error(response.data.msg);
@@ -57,25 +57,24 @@ function BillingAndUsage() {
 
   const columns = [
     {
-      title: 'PaymentId',
-      dataIndex: 'paymentId',
-      key: 'paymentId',
-      
+      title: "PaymentId",
+      dataIndex: "paymentId",
+      key: "paymentId",
     },
     {
-      title: 'Amount',
-      dataIndex: 'price',
-      key: 'price',
+      title: "Amount",
+      dataIndex: "price",
+      key: "price",
     },
     {
-      title: 'Date',
-      dataIndex: 'date',
-      key: 'date',
+      title: "Date",
+      dataIndex: "date",
+      key: "date",
     },
     {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
     },
   ];
 
@@ -91,54 +90,55 @@ function BillingAndUsage() {
     setChat(response?.data?.chatbot);
     setMsg(response?.data?.message);
     setPlan(response?.data?.plan);
-    const newDate = new Date(response?.data?.nextRenewal)
-    const options : any = { year: 'numeric', month: 'short', day: '2-digit' };
-    const formattedDate : any = newDate.toLocaleDateString('en-US', options);
+    const newDate = new Date(response?.data?.nextRenewal);
+    const options: any = { year: "numeric", month: "short", day: "2-digit" };
+    const formattedDate: any = newDate.toLocaleDateString("en-US", options);
     setDate(formattedDate);
     setDataSource(response?.data?.paymentDetails);
-    if (response?.data?.nextPlan == '') {
+    if (response?.data?.nextPlan == "") {
       setDisable(true);
     }
 
     if (!response?.data?.duration) {
-      setDuration('7 days free trial');
-    } else if (response?.data?.duration == 'month') {
-      setDuration('Billed monthly');
+      setDuration("7 days free trial");
+    } else if (response?.data?.duration == "month") {
+      setDuration("Billed monthly");
     } else {
-      setDuration('Billed yearly');
+      setDuration("Billed yearly");
     }
   };
   useEffect(() => {
     myFunction();
   }, []);
 
-  if (status === 'authenticated' || cookies?.userId) {
+  if (status === "authenticated" || cookies?.userId) {
     return (
       <>
         <Modal
-          title='Cancel my plan'
+          title="Cancel My Plan"
           open={isModalOpen}
           onOk={handleOk}
           onCancel={handleCancel}
-          cancelText='Keep Plan'
-          okText='Cancel Plan'
+          cancelText="Keep"
+          okText="Cancel"
           closeIcon={null}
           className='model'
+          centered
         >
-          <p>Are you sure to cancel the plan</p>
+          <p>Are you sure to cancel your plan?</p>
         </Modal>
-        <div className='billing-main'>
-          <div className='billing-head'>Billing & Usage</div>
-          <div className='message-count'>
-            <div className='message-head'></div>
+        <div className="billing-main">
+          <div className="billing-head">Billing & Usage</div>
+          <div className="message-count">
+            <div className="message-head"></div>
           </div>
-          <div className='plan-head'>My Plan</div>
-          <div className='plan-details'>
-            <div className='name-features'>
-              <div className='plan-name-container'>
-                <span className='plan-name'>{plan}</span>
-                <div className='plan-duration'>
-                  <span className='plan-duration-text'>{duration}</span>
+          <div className="plan-head">My Plan</div>
+          <div className="plan-details">
+            <div className="name-features">
+              <div className="plan-name-container">
+                <span className="plan-name">{userDetails?.plan?.name}</span>
+                <div className="plan-duration">
+                  <span className="plan-duration-text">{duration}</span>
                 </div>
               </div>
               <div className='plan-feature'>
@@ -148,24 +148,24 @@ function BillingAndUsage() {
                   <div className='next-renewal-date-text'>
                   Auto Renewal due on 
                   </div>
-                  <div className='next-renewal-date-date'>{date}</div>
+                  <div className="next-renewal-date-date">{date}</div>
                 </div>
               </div>
             </div>
           </div>
-          <div className='btn-class'>
-            <button className='btn-upgrade' onClick={explorePlan}>
-              <span className='btn-text'>Explore Plans</span>
+          <div className="btn-class">
+            <button className="btn-upgrade" onClick={explorePlan}>
+              <span className="btn-text">Explore Plans</span>
             </button>
             <button
-              className='btn-cancel-plan'
+              className="btn-cancel-plan"
               onClick={showModal}
               disabled={disable}
             >
-              <span className='btn-text-cancel-plan'>Cancel My Plan</span>
+              <span className="btn-text-cancel-plan">Cancel My Plan</span>
             </button>
           </div>
-          <div className='manage-plan'>Payment history</div>
+          <div className="manage-plan">Payment history</div>
           {/* <div className="manage-plan-text">
           Manage your payment methods or cancel your plan by clicking on the
           link below
@@ -175,7 +175,7 @@ function BillingAndUsage() {
         </button> */}
         </div>
         <Table
-          className='payment-table'
+          className="payment-table"
           dataSource={dataSource}
           columns={columns}
           scroll={{
@@ -185,8 +185,8 @@ function BillingAndUsage() {
         ;
       </>
     );
-  } else if (status === 'unauthenticated') {
-    redirect('/account/login');
+  } else if (status === "unauthenticated") {
+    redirect("/account/login");
   }
 }
 

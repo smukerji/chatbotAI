@@ -34,7 +34,7 @@ async function createPaymentIntent(req: any, res: NextResponse) {
         //ANCHOR - stripe payment intent creation
         const paymentIntent = await stripe.paymentIntents.create({
           amount: amount,
-          currency: "inr",
+          currency: "usd",
           automatic_payment_methods: {
             enabled: true,
           },
@@ -42,7 +42,6 @@ async function createPaymentIntent(req: any, res: NextResponse) {
           payment_method: data.paymentId,
           receipt_email: data.email,
         });
-        console.log(paymentIntent);
         return paymentIntent;
       } else {
         return { status: 500 };

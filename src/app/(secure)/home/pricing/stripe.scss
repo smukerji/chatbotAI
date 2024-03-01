@@ -327,6 +327,8 @@
               font-style: normal;
               font-weight: 500;
               line-height: 24px;
+              width: 32%;
+              text-align: end;
             }
 
             .coming-soon-even {
@@ -337,6 +339,8 @@
               font-weight: 500;
               line-height: 24px;
               opacity: 0.7;
+              width: 32%;
+              text-align: end;
             }
 
             .plan-item {
@@ -344,6 +348,7 @@
               align-items: flex-start;
               gap: 12px;
               align-self: stretch;
+              width: 68%;
 
               .plan-text {
                 color: var(--Neutral-8, #141416);

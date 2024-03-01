@@ -7,7 +7,7 @@ const getWhatsAppDetails = async (wa_id: any) => {
   try {
     const db = (await connectDatabase()).db();
     const collection = db.collection("whatsappbot_details");
-    const result = await collection.findOne({ phoneNumberID: wa_id })
+    const result = await collection.findOne({ phoneNumberID: wa_id, isEnabled: true})
     if (result.chatbotId) {
       return result;
     }

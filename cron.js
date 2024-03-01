@@ -17,16 +17,19 @@ async function CronFunction() {
   try {
     let client = new MongoClient(uri);
     let db = (await client.connect()).db();
-    const collectionPlan = db.collection("plans")
+    const collectionPlan = db.collection("plans");
     const collection = db.collection("users");
     const collectionPayment = db.collection("payment-history");
     const collectionUserDetails = db.collection("user-details");
     const currentDate = new Date();
-    const dataa = await collection
-      .find({
-        endDate: { $lt: currentDate },
-      })
-      .toArray();
+    const cursor = await collection.find({
+      endDate: { $lt: currentDate },
+    });
+
+    const dataa = await cursor.toArray();
+    /// close the cursor
+    await cursor.close();
+
     let price = 0;
     for (let i = 0; i < dataa.length; i++) {
       const data = dataa[i];
@@ -55,7 +58,7 @@ async function CronFunction() {
           //ANCHOR - stripe payment intent creation
           const paymentIntent = await stripe.paymentIntents.create({
             amount: amount,
-            currency: "inr",
+            currency: "usd",
             automatic_payment_methods: {
               enabled: true,
             },

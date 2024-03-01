@@ -123,21 +123,12 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
               );
               message.success("success");
             }
+            else{
+              window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing`;
+              message.error(`Invalid card`);
+            }
           } catch (error) {
-            const a = await axios.post(
-              `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/add-payment`,
-              {
-                plan: plan,
-                duration: duration,
-                u_id: u_id,
-                status: "failed",
-                paymentId: result.data.id,
-                price: newPrice,
-                isWhatsapp: isChecked,
-                nextIsWhatsapp: isChecked,
-              }
-            );
-            message.error("failed");
+           
             window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing`;
           }
           // setLoading(false)
@@ -150,7 +141,6 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
       }
     } catch (error) {
       message.error(`${error}`);
-      console.error("Error creating payment method:");
       window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing`;
       throw error;
     }
