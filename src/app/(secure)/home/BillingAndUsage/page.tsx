@@ -52,7 +52,6 @@ export default function BillingAndUsage() {
       title: 'PaymentId',
       dataIndex: 'paymentId',
       key: 'paymentId',
-      
     },
     {
       title: 'Amount',
@@ -83,9 +82,9 @@ export default function BillingAndUsage() {
     setChat(response?.data?.chatbot);
     setMsg(response?.data?.message);
     setPlan(response?.data?.plan);
-    const newDate = new Date(response?.data?.nextRenewal)
-    const options : any = { year: 'numeric', month: 'short', day: '2-digit' };
-    const formattedDate : any = newDate.toLocaleDateString('en-US', options);
+    const newDate = new Date(response?.data?.nextRenewal);
+    const options: any = { year: 'numeric', month: 'short', day: '2-digit' };
+    const formattedDate: any = newDate.toLocaleDateString('en-US', options);
     setDate(formattedDate);
     setDataSource(response?.data?.paymentDetails);
     if (response?.data?.nextPlan == '') {
@@ -120,9 +119,7 @@ export default function BillingAndUsage() {
         </Modal>
         <div className='billing-main'>
           <div className='billing-head'>Billing & Usage</div>
-          <div className='message-count'>
-            <div className='message-head'></div>
-          </div>
+
           <div className='plan-head'>My Plan</div>
           <div className='plan-details'>
             <div className='name-features'>

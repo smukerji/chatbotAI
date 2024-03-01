@@ -109,8 +109,20 @@
 
     .right {
       width: 100%;
-      padding-left: 60px;
-      margin-top: 30px;
+      padding: 30px 20px 30px 40px;
+      // margin-top: 30px;
+
+      .guide-heading {
+        font-size: 30px;
+      }
+
+      .guide-step-title {
+        font-size: 22px;
+      }
+
+      .ordered-points {
+        font-size: 18px;
+      }
     }
   }
 }

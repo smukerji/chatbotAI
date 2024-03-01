@@ -207,6 +207,10 @@
     font-style: normal;
     font-weight: 600;
     line-height: 32px;
+
+    @media only screen and (max-width: 768px) {
+      margin-top: 20px;
+    }
   }
   .manage-plan-text {
     color: var(--Neutral-5, #777e90);
@@ -243,10 +247,11 @@
 
   @media only screen and (max-width: 768px) {
     // margin: 30px !important;
-    // width: 100%;
+    width: 90%;
+    margin: 20px auto;
 
     .plan-head {
-      margin-top: 0;
+      margin-top: 20px;
     }
 
     .plan-details {
@@ -276,4 +281,9 @@
 .payment-table {
   width: 80%;
   margin: 24px auto 0px auto;
+
+  @media only screen and (max-width: 768px) {
+    margin: 25px;
+    width: 90%;
+  }
 }

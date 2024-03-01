@@ -51,11 +51,12 @@
   @media only screen and (max-width: 767px) {
     display: flex;
     flex-direction: column;
+    padding: 20px;
 
     .left {
       h1 {
-        font-size: 45px;
-        line-height: 50px;
+        font-size: 30px;
+        line-height: 40px;
       }
     }
 

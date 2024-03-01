@@ -11,6 +11,11 @@
     font-style: normal;
     font-weight: 600;
     line-height: 68px;
+
+    @media only screen and (max-width: 768px) {
+      font-size: 40px;
+      line-height: 50px;
+    }
   }
   .price-offer-container {
     max-width: fit-content;
@@ -223,6 +228,10 @@
               &.price-number-even {
                 color: #fcfcfd;
               }
+
+              @media only screen and (max-width: 768px) {
+                font-size: 50px;
+              }
             }
           }
         }
@@ -370,7 +379,7 @@
             line-height: 28px; /* 140% */
           }
         }
-        .btn-add-ons:disabled{
+        .btn-add-ons:disabled {
           cursor: not-allowed;
         }
         .integration-list {
@@ -518,6 +527,11 @@
           font-style: normal;
           font-weight: 600;
           line-height: 68px;
+
+          @media only screen and (max-width: 768px) {
+            font-size: 35px;
+            line-height: 45px;
+          }
         }
       }
       .left-text {
@@ -602,7 +616,7 @@
     .plan-container {
       flex-direction: column;
       align-items: center;
-      margin: 0 10px;
+      padding: 0 20px !important;
 
       .plan-box {
         max-width: 100% !important;

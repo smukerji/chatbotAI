@@ -102,12 +102,17 @@
   @media only screen and (max-width: 767px) {
     display: flex;
     flex-direction: column;
-    padding: 30px;
+    padding: 20px;
     .left {
       padding-right: 0;
       display: flex;
       flex-direction: column;
       justify-content: center;
+
+      h1 {
+        font-size: 30px;
+        line-height: 40px;
+      }
 
       .input-container {
         .submit-btn {
