@@ -165,7 +165,7 @@ async function isWhatsappTokenVerified(req: NextRequest) {
 
   const db = (await connectDatabase())?.db();
   const collection = db?.collection('whatsappbot_details');
-  const tokenDetails = await collection?.findOne({ webhook_verification_token: whatsAppToken });
+  const tokenDetails = await collection?.findOne({ webhook_verification_token: whatsAppToken, isTokenVerified:true  });
 
   return {
    verifyMessage : tokenDetails?.isTokenVerified ? "verified token" : "invalid token",
