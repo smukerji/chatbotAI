@@ -141,6 +141,10 @@ async function saveWhatsappData(req: NextRequest) {
       if(updatedResult.modifiedCount > 0){
         return { message: "success" };
       }
+      if(updatedResult.modifiedCount === 0 && updatedResult.matchedCount > 0){
+        return { message: "No any record updated" };
+      }
+
       throw new Error("No any WhatsApp record found!");
       // return { message: "success" };
     }
@@ -161,11 +165,12 @@ async function isWhatsappTokenVerified(req: NextRequest) {
 
   const db = (await connectDatabase())?.db();
   const collection = db?.collection('whatsappbot_details');
-  const tokenDetails = await collection?.findOne({ webhook_verification_token: whatsAppToken });
+  const tokenDetails = await collection?.findOne({ webhook_verification_token: whatsAppToken, isTokenVerified:true  });
 
   return {
    verifyMessage : tokenDetails?.isTokenVerified ? "verified token" : "invalid token",
-   verifyValue: tokenDetails?.isTokenVerified ? true : false
+   verifyValue: tokenDetails?.isTokenVerified ? true : false,
+   whatsAppDetailsId: tokenDetails?._id
   }
 
 }
