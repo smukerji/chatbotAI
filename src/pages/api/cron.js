@@ -1,3 +1,12 @@
+const cron = require("node-cron");
+const { MongoClient, ObjectId } = require("mongodb");
+require("dotenv").config();
+// import { Stripe } from "stripe";
+const Stripe = require("stripe");
+
+const uri = process.env.NEXT_PUBLIC_MONGO_URI;
+const stripe = new Stripe(String(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY));
+
 export default async function handler(req, res) {
   if (req.headers.authorization !== `Bearer ${process.env.CRON_SECRET}`) {
     return res.status(401).end("Unauthorized");

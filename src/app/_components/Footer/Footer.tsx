@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, { useState } from "react";
 import Image from "next/image";
 import logoWhite from "../../../../public/svgs/lucifer-ai-logo-white.svg";
 import bluePhone from "../../../../public/svgs/bluephone.svg";
@@ -9,10 +10,18 @@ import Linkedinimg from "../../../../public/svgs/linkedin-icon-white.svg";
 import Instagramimg from "../../../../public/svgs/instagram-icon-white.svg";
 import Facebookimg from "../../../../public/svgs/facebook-icon-white.svg";
 import "./footer.scss";
+import SupportModal from "../../(secure)/chatbot/dashboard/_components/Modal/SupportModal";
 
 function Footer() {
+  /// state for opening support modal
+  const [openSupport, setOpenSupport] = useState(false);
   return (
     <div className="footer-section">
+      <SupportModal
+        openSupport={openSupport}
+        setOpenSupport={setOpenSupport}
+        centered={false}
+      />
       <div className="footer-container">
         {/*------------------------------------------company address container----------------------------------------------*/}
         <div className="company-details-container">
@@ -66,14 +75,14 @@ function Footer() {
           <h2>Company</h2>
           <ul>
             <li>
-              <a href="">About</a>
+              <a href="">Features</a>
             </li>
             <li>
-              <a href="">Contact Us </a>
+              <a href="">Service Offerings</a>
             </li>
-            <li>
+            {/* <li>
               <a href="">News</a>
-            </li>
+            </li> */}
             {/* <li>
               <a href="">Terms & Conditions</a>
             </li> */}
@@ -90,14 +99,14 @@ function Footer() {
             <li>
               <a href="">How It Works</a>
             </li>
-            <li>
+            {/* <li>
               <a href="">API</a>
-            </li>
+            </li> */}
             <li>
               <a href="/home/pricing">Pricing</a>
             </li>
-            <li>
-              <a href="">Support</a>
+            <li onClick={() => setOpenSupport(true)}>
+              <a>Support</a>
             </li>
           </ul>
         </div>
@@ -112,12 +121,12 @@ function Footer() {
             <li>
               <a href="/privacy">Privacy Policy</a>
             </li>
-            <li>
+            {/* <li>
               <a href="">License</a>
             </li>
             <li>
               <a href="">Security</a>
-            </li>
+            </li> */}
           </ul>
         </div>
 

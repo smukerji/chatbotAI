@@ -20,7 +20,7 @@ function Home() {
       <IndustrySection />
       <ServicesOffered />
       <CompatibilitySection />
-      <Testimonials />
+      {/* <Testimonials /> */}
       {/* <PlansSection /> */}
       <FAQ />
       <ContactSection />

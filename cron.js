@@ -8,7 +8,7 @@ const uri = process.env.NEXT_PUBLIC_MONGO_URI;
 const stripe = new Stripe(String(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY));
 
 // Define your cron job
-cron.schedule("*/10 * * * * *", () => {
+cron.schedule("1 0 * * *", () => {
   console.log("Cron job is running...");
   CronFunction();
 });
