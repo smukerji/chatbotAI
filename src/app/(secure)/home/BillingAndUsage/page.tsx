@@ -10,9 +10,11 @@ import { useSession } from "next-auth/react";
 import { getDate } from "@/app/_helpers/client/getTime";
 import { Table, Modal, message } from "antd";
 import { redirect, useRouter } from "next/navigation";
-import { UserDetailsContext } from "@/app/_helpers/client/Context/UserDetailsContext";
+import { UserDetailsContext } from "../../../_helpers/client/Context/UserDetailsContext";
+import { formatNumber } from "../../../_helpers/client/formatNumber";
+import dynamic from "next/dynamic";
 
-export default function BillingAndUsage() {
+function BillingAndUsage() {
   const [cookies, setCookie] = useCookies(["userId"]);
   const { status } = useSession();
   const [plan, setPlan] = useState("");
@@ -39,7 +41,7 @@ export default function BillingAndUsage() {
       `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/BillingAndUsage/api`,
       { u_id: cookies.userId }
     );
-    if (response.data.status == 1) {
+    if (response.data.status == true) {
       message.success(response.data.msg);
     } else {
       message.error(response.data.msg);
@@ -112,15 +114,17 @@ export default function BillingAndUsage() {
     return (
       <>
         <Modal
-          title="Cancel my plan"
+          title="Cancel My Plan"
           open={isModalOpen}
           onOk={handleOk}
           onCancel={handleCancel}
-          cancelText="Keep Plan"
-          okText="Cancel Plan"
+          cancelText="Keep"
+          okText="Cancel"
           closeIcon={null}
+          className="model"
+          centered
         >
-          <p>Are you sure to cancel the plan</p>
+          <p>Are you sure to cancel your plan?</p>
         </Modal>
         <div className="billing-main">
           <div className="billing-head">Billing & Usage</div>
@@ -138,14 +142,20 @@ export default function BillingAndUsage() {
               </div>
               <div className="plan-feature">
                 <div className="plan-message">
-                  {userDetails?.plan?.messageLimit} messages
+                  {" "}
+                  {formatNumber(
+                    userDetails?.plan?.messageLimit
+                      ? userDetails?.plan?.messageLimit
+                      : 0
+                  )}{" "}
+                  Messages
                 </div>
                 <div className="plan-chatbot">
-                  {userDetails?.plan?.numberOfChatbot} chatbots
+                  {userDetails?.plan?.numberOfChatbot} Chatbots
                 </div>
                 <div className="next-renewal-date">
                   <div className="next-renewal-date-text">
-                    Next renewal date
+                    Auto Renewal due on
                   </div>
                   <div className="next-renewal-date-date">{date}</div>
                 </div>
@@ -161,7 +171,9 @@ export default function BillingAndUsage() {
               onClick={showModal}
               disabled={disable}
             >
-              <span className="btn-text-cancel-plan">Cancel My Plan</span>
+              <span className="btn-text-cancel-plan">
+                {disable ? "Plan Cancelled" : "Cancel My Plan"}
+              </span>
             </button>
           </div>
           <div className="manage-plan">Payment history</div>
@@ -188,3 +200,7 @@ export default function BillingAndUsage() {
     redirect("/account/login");
   }
 }
+
+export default dynamic((): any => Promise.resolve(BillingAndUsage), {
+  ssr: false,
+});

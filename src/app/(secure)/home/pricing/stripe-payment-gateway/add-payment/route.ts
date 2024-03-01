@@ -34,7 +34,8 @@ async function addPaymentDetailsFail(req: any, res: NextResponse) {
 async function addPaymentDetails(req: any, res: NextResponse) {
   if (req.method === "POST") {
     try {
-      let { plan, u_id, duration, status, paymentId, price, isWhatsapp } = await req.json();
+      let { plan, u_id, duration, status, paymentId, price, isWhatsapp } =
+        await req.json();
       const db = (await connectDatabase())?.db();
 
       //ANCHOR - Get data of user by user_id
@@ -83,8 +84,7 @@ async function addPaymentDetails(req: any, res: NextResponse) {
           { userId: String(u_id) },
           {
             $set: {
-              messageLimit:
-                Number(userDataAdd?.messageLimit) + 8000,
+              messageLimit: Number(userDataAdd?.messageLimit) + 8000,
             },
           }
         );
@@ -104,11 +104,11 @@ async function addPaymentDetails(req: any, res: NextResponse) {
       }
       if (plan == 8) {
         const data = await collection.updateMany(
-          { _id: new ObjectId(u_id)  },
+          { _id: new ObjectId(u_id) },
           {
             $set: {
-              isWhatsapp:true,
-              nextIsWhatsapp:true
+              isWhatsapp: true,
+              nextIsWhatsapp: true,
             },
           }
         );
@@ -150,8 +150,7 @@ async function addPaymentDetails(req: any, res: NextResponse) {
               nextPlanId: plan_data?._id,
               nextPlanDuration: duration,
               isWhatsapp,
-              nextIsWhatsapp:isWhatsapp
-
+              nextIsWhatsapp: isWhatsapp,
             },
           }
         );
@@ -175,7 +174,7 @@ async function addPaymentDetails(req: any, res: NextResponse) {
               nextPlanId: plan_data?._id,
               nextPlanDuration: duration,
               isWhatsapp,
-              nextIsWhatsapp:isWhatsapp
+              nextIsWhatsapp: isWhatsapp,
             },
           }
         );

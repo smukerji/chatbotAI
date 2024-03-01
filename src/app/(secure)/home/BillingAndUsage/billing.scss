@@ -75,7 +75,6 @@
       align-items: flex-start;
       gap: 10px;
       .plan-name-container {
-        
         display: flex;
         gap: 10px;
         .plan-name {
@@ -278,4 +277,60 @@
 .payment-table {
   width: 80%;
   margin: 24px auto 0px auto;
+}
+.model {
+
+  .ant-modal-body{
+    p{
+      color: var(--Neutral-5, #777E90);
+
+font-size: 16px;
+font-style: normal;
+font-weight: 500;
+line-height: 24px; /* 150% */
+    }
+  }
+  .ant-modal-footer {
+    // margin-top: 48px;
+    .ant-btn-primary {
+      border-radius: 12px;
+      background: #db0000;
+      color: var(--Neutral-1, #fcfcfd);
+      text-align: center;
+      height: 52px;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 600;
+      line-height: 28px; /* 175% */
+      cursor: pointer;
+      box-shadow: none;
+
+      &:hover {
+        background: #db0000;
+      }
+    }
+
+    .ant-btn-default {
+      border-radius: 12px;
+      background: var(--Neutral-3, #e6e8ec);
+      color: var(--Neutral-8, #141416);
+      text-align: center;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 600;
+      line-height: 28px; /* 175% */
+      height: 52px;
+      border-color: #e6e8ec;
+      box-shadow: none;
+
+      &:hover {
+        background: #e6e8ec;
+        color: #141416;
+        border-color: #e6e8ec;
+      }
+    }
+  }
+  .ant-modal-content {
+    color: rgb(105, 128, 0);
+  }
 }
