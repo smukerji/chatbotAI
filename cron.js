@@ -30,12 +30,9 @@ async function CronFunction() {
     let price = 0;
     for (let i = 0; i < dataa.length; i++) {
       const data = dataa[i];
-      console.log(data.planId)
       const planDetails = await collectionPlan.findOne({_id: data.planId})
-      console.log(planDetails)
       if (data.nextPlan != "") {
         const h = data.paymentId;
-        console.log(String(data._id));
         // if (data.nextPlan == "individual") {
         if (data.nextPlanDuration == "month") {
           if (data.nextIsWhatsapp) {
@@ -86,7 +83,7 @@ async function CronFunction() {
                   nextPlan: data.nextPlan,
                   nextPlanId: data.nextPlanId,
                   nextPlanDuration: data.nextPlanDuration,
-                  isWhatsApp: data.nextIsWhatsapp,
+                  isWhatsapp: data.nextIsWhatsapp,
                   nextIsWhatsapp: data.nextIsWhatsapp,
                 },
               }
@@ -134,7 +131,7 @@ async function CronFunction() {
                   nextPlan: data.nextPlan,
                   nextPlanId: data.nextPlanId,
                   nextPlanDuration: data.nextPlanDuration,
-                  isWhatsApp: data.nextIsWhatsapp,
+                  isWhatsapp: data.nextIsWhatsapp,
                   nextIsWhatsapp: nextIsWhatsapp,
                 },
               }

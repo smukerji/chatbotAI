@@ -6,14 +6,14 @@ import telegramIcon from "../../../../../../../public/svgs/telegram-icon.svg";
 import WhatsappModal from "../Modal/WhatsappModal";
 
 function Integration() {
-  const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState<boolean>(false);
+  const [isWhatsappModalOpen, setisWhatsappModalOpen] = useState<boolean>(false);
 
   const openWhatsAppModal = () => {
-    setIsWhatsAppModalOpen(true);
+    setisWhatsappModalOpen(true);
   };
 
   const closeWhatsAppModal = () => {
-    setIsWhatsAppModalOpen(false);
+    setisWhatsappModalOpen(false);
   };
   return (
     <div className="integration-container">
@@ -36,7 +36,7 @@ function Integration() {
       </div>
 
           {/* Whatsapp Modal */}
-          <WhatsappModal isOpen={isWhatsAppModalOpen} onClose={closeWhatsAppModal} />
+          <WhatsappModal isOpen={isWhatsappModalOpen} onClose={closeWhatsAppModal} />
     </div>
   );
 }

@@ -10,9 +10,12 @@ import { useSession } from 'next-auth/react';
 import { getDate } from '@/app/_helpers/client/getTime';
 import { Table, Modal, message } from 'antd';
 import { redirect, useRouter } from 'next/navigation';
-import { UserDetailsContext } from '@/app/_helpers/client/Context/UserDetailsContext';
+import { UserDetailsContext } from '../../../_helpers/client/Context/UserDetailsContext';
+import { formatNumber } from '../../../_helpers/client/formatNumber';
+import dynamic from 'next/dynamic';
 
-export default function BillingAndUsage() {
+
+function BillingAndUsage() {
   const [cookies, setCookie] = useCookies(['userId']);
   const { status } = useSession();
   const [plan, setPlan] = useState('');
@@ -120,6 +123,7 @@ export default function BillingAndUsage() {
           cancelText='Keep Plan'
           okText='Cancel Plan'
           closeIcon={null}
+          className='model'
         >
           <p>Are you sure to cancel the plan</p>
         </Modal>
@@ -138,11 +142,11 @@ export default function BillingAndUsage() {
                 </div>
               </div>
               <div className='plan-feature'>
-                <div className='plan-message'>{userDetails?.plan?.messageLimit} messages</div>
-                <div className='plan-chatbot'>{userDetails?.plan?.numberOfChatbot} chatbots</div>
+                <div className='plan-message'> {formatNumber(userDetails?.plan?.messageLimit ? userDetails?.plan?.messageLimit : 0)} Messages</div>
+                <div className='plan-chatbot'>{userDetails?.plan?.numberOfChatbot} Chatbots</div>
                 <div className='next-renewal-date'>
                   <div className='next-renewal-date-text'>
-                    Next renewal date
+                  Auto Renewal due on 
                   </div>
                   <div className='next-renewal-date-date'>{date}</div>
                 </div>
@@ -185,3 +189,5 @@ export default function BillingAndUsage() {
     redirect('/account/login');
   }
 }
+
+export default dynamic((): any => Promise.resolve(BillingAndUsage), { ssr: false });

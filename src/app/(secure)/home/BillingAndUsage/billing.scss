@@ -75,7 +75,6 @@
       align-items: flex-start;
       gap: 10px;
       .plan-name-container {
-        
         display: flex;
         gap: 10px;
         .plan-name {
@@ -278,4 +277,21 @@
 .payment-table {
   width: 80%;
   margin: 24px auto 0px auto;
+}
+.model {
+  // background-color: #f00000;
+  .ant-modal-header {
+    color: blue;
+  }
+  
+  .ant-modal-body {
+    background-color: #f00000;
+  }
+
+  .ant-modal-footer {
+    color: green;
+  }
+  .ant-modal-content {
+    color: rgb(105, 128, 0);
+  }
 }

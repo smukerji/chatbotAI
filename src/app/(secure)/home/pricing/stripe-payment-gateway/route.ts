@@ -70,7 +70,7 @@ async function checkCurrentPlan(req: any, res: NextResponse) {
         prePrice: 15,
         duration: data.duration,
         text: "Current Plan",
-        whatsAppIntegration: data.isWhatsApp
+        whatsAppIntegration: data.isWhatsapp
       };
     }
     else{
@@ -83,6 +83,6 @@ async function checkCurrentPlan(req: any, res: NextResponse) {
       }
     }
   } else {
-    return { msg: 0, text:"Get started",whatsAppIntegration: data.isWhatsApp };
+    return { msg: 0, text:"Get started",whatsAppIntegration: data.isWhatsapp };
   }
 }
