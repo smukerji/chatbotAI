@@ -22,7 +22,7 @@ function Home() {
       <CompatibilitySection />
       {/* <Testimonials /> */}
       {/* <PlansSection /> */}
-      <FAQ />
+      {/* <FAQ /> */}
       <ContactSection />
       <Footer />
     </>

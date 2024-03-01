@@ -38,15 +38,15 @@ function SecondaryHeader() {
         <div className={`navbar `}>
           <ul>
             <li>
-              <a href="#">How It Works</a>
+              <a href="/#features">Features</a>
             </li>
 
             <li>
-              <a href="#">API</a>
+              <a href="/home/pricing">Pricing</a>
             </li>
 
             <li>
-              <a href="#">Pricing</a>
+              <a href="/#service-offerings">Service Offerings</a>
             </li>
           </ul>
         </div>

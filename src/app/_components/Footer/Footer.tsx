@@ -45,7 +45,7 @@ function Footer() {
           </ul>
 
           {/* <div className="social-media-icons-container"> */}
-          <ul className="social-media-icons-container">
+          {/* <ul className="social-media-icons-container">
             <li>
               <a href="">
                 <Image src={Twitterimg} alt={"twitter-image"} />
@@ -66,7 +66,7 @@ function Footer() {
                 <Image src={Linkedinimg} alt={"linked-image"} />
               </a>
             </li>
-          </ul>
+          </ul> */}
         </div>
         {/* </div> */}
 
@@ -75,10 +75,10 @@ function Footer() {
           <h2>Company</h2>
           <ul>
             <li>
-              <a href="">Features</a>
+              <a href="/#features">Features</a>
             </li>
             <li>
-              <a href="">Service Offerings</a>
+              <a href="/#service-offerings">Service Offerings</a>
             </li>
             {/* <li>
               <a href="">News</a>
@@ -87,7 +87,7 @@ function Footer() {
               <a href="">Terms & Conditions</a>
             </li> */}
             <li>
-              <a href="#contact-us">Book a Demo</a>
+              <a href="/#contact-us">Book a Demo</a>
             </li>
           </ul>
         </div>
@@ -96,9 +96,9 @@ function Footer() {
         <div className="links-container">
           <h2>Quick Links</h2>
           <ul>
-            <li>
-              <a href="">How It Works</a>
-            </li>
+            {/* <li>
+              <a href="/#how-it-works">How It Works</a>
+            </li> */}
             {/* <li>
               <a href="">API</a>
             </li> */}

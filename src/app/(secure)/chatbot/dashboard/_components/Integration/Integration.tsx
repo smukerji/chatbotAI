@@ -52,7 +52,6 @@ function Integration() {
   };
 
   useEffect(() => {
-    
     checkWhatsappAvailability();
   }, []);
   return (
@@ -63,22 +62,30 @@ function Integration() {
           <Image src={whatsAppIcon} alt="whatsapp-icon" />
           <span>Add to Whatsapp</span>
         </div>
-        <>{loader ? <Spin/>: <>{isWhatappVerified ? (
-          <div className="action" onClick={openWhatsAppModal}>
-            Connect
-          </div>
-        ) : (
-          <div
-            className="action"
-            onClick={() => {
-              router.push(`${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing`);
-            }}
-          >
-            Subscription required
-          </div>
-        )}</>}</>
-        
-        
+        <>
+          {loader ? (
+            <Spin />
+          ) : (
+            <>
+              {isWhatappVerified ? (
+                <div className="action" onClick={openWhatsAppModal}>
+                  Connect
+                </div>
+              ) : (
+                <div
+                  className="action"
+                  onClick={() => {
+                    router.push(
+                      `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing`
+                    );
+                  }}
+                >
+                  Subscription required
+                </div>
+              )}
+            </>
+          )}
+        </>
       </div>
 
       {/*------------------------------------------Telegram-integration----------------------------------------------*/}
@@ -88,6 +95,15 @@ function Integration() {
           <span>Add to Telegram</span>
         </div>
         <div className="action">Coming soon</div>
+      </div>
+
+      <div className="how-to-integrate">
+        <p
+          className="integrate-text"
+          onClick={() => router.push(`dashboard/whatsapp-integration-guide`)}
+        >
+          How to integrate my Chatbot?
+        </p>
       </div>
 
       {/* Whatsapp Modal */}

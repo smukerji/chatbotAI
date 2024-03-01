@@ -6,18 +6,14 @@ import "./facilities-section.scss";
 function FacilitiesSection() {
   return (
     <>
-      <div className="facilities-section-container">
+      <div className="facilities-section-container" id="features">
         {/* --------------------------left section------------------------------ */}
         <div className="left">
           {/* --------------------------description ------------------------------ */}
           <div className="description">
-            <h1 className="title">AI Chatbot Facilities</h1>
+            <h1 className="title">Lucifer.AI Features</h1>
             <p className="text">
-              Unlock the Power of Conversation with Lucifer.AI. Lucifer.AI
-              understands and responds in human-like language, making
-              interactions effortless and enjoyable. We invite you to explore
-              the power of Lucifer.AI through a personalised demo. Let us show
-              you how our AI chatbot can transform your digital conversations.
+            Utilising the latest advancements in AI and Large Language Models (LLMs), Lucifer.AI empowers users to obtain data-driven insights through simple conversation. This enhances the efficiency of data analysis and democratises access to complex data insights, making them available to users at all levels of technical expertise.
             </p>
           </div>
 
@@ -51,9 +47,7 @@ function FacilitiesSection() {
               <div className="description">
                 <h3>Data-Driven Insights</h3>
                 <p>
-                  Understand your audience better with powerful analytics.
-                  Lucifer.AI offers in-depth data to help you optimize your
-                  interactions and drive results.
+                Lucifer.AI is revolutionising how companies interact with their data through an advanced AI chatbot that learns directly from your organisation's knowledge base. By providing a conversational interface, it allows users to chat with their data, making the need for traditional dashboards obsolete.
                 </p>
               </div>
             </div>

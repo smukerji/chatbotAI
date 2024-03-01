@@ -446,7 +446,7 @@
 
     .add-ons-left {
       width: 33%;
-      
+
       .add-ons-integration {
         height: 338px;
         margin-bottom: 20px auto 16px auto;
@@ -542,10 +542,10 @@
                 font-size: 16px;
                 font-style: normal;
                 font-weight: 600;
-                line-height: 24px; 
+                line-height: 24px;
               }
             }
-            .app-integration-price-btn:disabled{
+            .app-integration-price-btn:disabled {
               cursor: not-allowed;
             }
 
@@ -677,10 +677,10 @@
                 font-size: 16px;
                 font-style: normal;
                 font-weight: 600;
-                line-height: 24px; 
+                line-height: 24px;
               }
             }
-            .app-integration-price-btn:disabled{
+            .app-integration-price-btn:disabled {
               cursor: not-allowed;
             }
           }
@@ -1206,11 +1206,6 @@
   right: 0;
   bottom: 0;
   z-index: 10;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255) 0%,
-    rgba(255, 255, 255) 100%
-  );
 }
 
 .ant-spin-dot {

@@ -122,13 +122,11 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
                 }
               );
               message.success("success");
-            }
-            else{
+            } else {
               window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing`;
               message.error(`Invalid card`);
             }
           } catch (error) {
-           
             window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing`;
           }
           // setLoading(false)
@@ -160,11 +158,12 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
                 )}
                 {plan == 2 && <div className="plan-name">Agency Plan</div>}
                 {plan == 5 && <div className="plan-name">Character add on</div>}
-                {plan == 6 ||
-                  (plan == 7 && (
-                    <div className="plan-name">Message add on</div>
-                  ))}
-                  {plan == 8 && <div className="plan-name">Whatsapp integration</div>}
+                {(plan == 6 || plan == 7) && (
+                  <div className="plan-name">Message add on</div>
+                )}
+                {plan == 8 && (
+                  <div className="plan-name">Whatsapp integration</div>
+                )}
                 <div className="price">
                   <span>${price}</span>
                   <span className="price-duration">Per {duration}</span>

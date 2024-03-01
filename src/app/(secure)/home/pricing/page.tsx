@@ -25,7 +25,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [cookies, setCookie] = useCookies(["userId"]);
   const [prePrice, setPrePrice] = useState(0);
-  const [text, setText] = useState("");
+  const [text, setText] = useState("Get 7 Dya Free Trial on First registration");
   const router = useRouter();
   const [whatsappDisable, setWhatsappDisable] = useState(false);
 
