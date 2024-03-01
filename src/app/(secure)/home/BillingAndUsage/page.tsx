@@ -13,6 +13,7 @@ import { redirect, useRouter } from "next/navigation";
 import { UserDetailsContext } from "../../../_helpers/client/Context/UserDetailsContext";
 import { formatNumber } from "../../../_helpers/client/formatNumber";
 import dynamic from "next/dynamic";
+import circle from "../../../../../public/svgs/Ellipse 58.svg"
 
 function BillingAndUsage() {
   const [cookies, setCookie] = useCookies(["userId"]);
@@ -136,9 +137,9 @@ function BillingAndUsage() {
             <div className="name-features">
               <div className="plan-name-container">
                 <span className="plan-name">{userDetails?.plan?.name}</span>
-                <div className="plan-duration">
+                {duration != "" && <div className="plan-duration">
                   <span className="plan-duration-text">{duration}</span>
-                </div>
+                </div>}
               </div>
               <div className="plan-feature">
                 <div className="plan-message">
@@ -150,9 +151,11 @@ function BillingAndUsage() {
                   )}{" "}
                   Messages
                 </div>
+                <Image className="dot-image" src={circle} alt="no image" />
                 <div className="plan-chatbot">
                   {userDetails?.plan?.numberOfChatbot} Chatbots
                 </div>
+                <Image className="dot-image" src={circle} alt="no image" />
                 <div className="next-renewal-date">
                   <div className="next-renewal-date-text">
                     Auto Renewal due on

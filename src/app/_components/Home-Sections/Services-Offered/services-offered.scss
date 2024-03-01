@@ -90,13 +90,13 @@
     }
   }
   @media only screen and (max-width: 767px) {
-    padding: 30px;
+    padding: 30px 20px;
     .top {
       flex-direction: column;
       .left-part {
         h1 {
-          font-size: 45px;
-          line-height: 50px;
+          font-size: 30px;
+          line-height: 40px;
         }
 
         p {
@@ -113,7 +113,7 @@
     .bottom {
       .services-container {
         .service {
-          width: 47%;
+          width: 100%;
         }
       }
     }

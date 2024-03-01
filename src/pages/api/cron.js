@@ -89,7 +89,6 @@ export default async function handler(req, res) {
                 },
               }
             );
-            console.log(paymentIntent);
             var formattedDate = currentDate.toLocaleString("en-US", {
               month: "short",
               day: "2-digit",
@@ -119,7 +118,6 @@ export default async function handler(req, res) {
             const endDate = new Date(
               currentDate.getTime() + 365 * 24 * 60 * 60 * 1000
             );
-            console.log(data._id);
             const updateData = await collection.updateMany(
               { _id: new ObjectId(data._id) },
               {
@@ -137,7 +135,6 @@ export default async function handler(req, res) {
                 },
               }
             );
-            console.log(paymentIntent);
             var formattedDate = currentDate.toLocaleString("en-US", {
               month: "short",
               day: "2-digit",

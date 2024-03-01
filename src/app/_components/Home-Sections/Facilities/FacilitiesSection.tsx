@@ -13,7 +13,11 @@ function FacilitiesSection() {
           <div className="description">
             <h1 className="title">Lucifer.AI Features</h1>
             <p className="text">
-            Utilising the latest advancements in AI and Large Language Models (LLMs), Lucifer.AI empowers users to obtain data-driven insights through simple conversation. This enhances the efficiency of data analysis and democratises access to complex data insights, making them available to users at all levels of technical expertise.
+              Utilising the latest advancements in AI and Large Language Models
+              (LLMs), Lucifer.AI empowers users to obtain data-driven insights
+              through simple conversation. This enhances the efficiency of data
+              analysis and democratises access to complex data insights, making
+              them available to users at all levels of technical expertise.
             </p>
           </div>
 
@@ -47,7 +51,11 @@ function FacilitiesSection() {
               <div className="description">
                 <h3>Data-Driven Insights</h3>
                 <p>
-                Lucifer.AI is revolutionising how companies interact with their data through an advanced AI chatbot that learns directly from your organisation's knowledge base. By providing a conversational interface, it allows users to chat with their data, making the need for traditional dashboards obsolete.
+                  Lucifer.AI is revolutionising how companies interact with
+                  their data through an advanced AI chatbot that learns directly
+                  from your organisation&apos;s knowledge base. By providing a
+                  conversational interface, it allows users to chat with their
+                  data, making the need for traditional dashboards obsolete.
                 </p>
               </div>
             </div>

@@ -77,6 +77,9 @@
     flex-wrap: wrap;
     gap: 40px;
     cursor: pointer;
+    @media only screen and (max-width: 768px) {
+      gap: 35px;
+    }
     .chatbot {
       display: flex;
       // flex: 1;
@@ -306,6 +309,7 @@
 
       h1 {
         font-size: 22px;
+        line-height: 32px;
       }
 
       .action-container {
@@ -321,6 +325,15 @@
   }
 
   @media only screen and (max-width: 767px) {
+    .title-container {
+      .action-container {
+        button {
+          font-size: 14px;
+          line-height: 24px;
+          padding: 6px 13px;
+        }
+      }
+    }
     .chatbot-grid {
       justify-content: center;
     }
