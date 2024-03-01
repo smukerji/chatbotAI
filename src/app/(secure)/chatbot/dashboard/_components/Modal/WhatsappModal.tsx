@@ -134,6 +134,8 @@ function WhatsappModal({ isOpen, onClose }: any) {
         next: { revalidate: 0 },
       });
       const res = await result.json();
+      setMetaDetails({...metaDetails,id:res.whatsAppDetailsId})
+      
       if (res?.verifyValue === true) {
         message.success(res?.verifyMessage);
         setStepState({ ...stepState, step2: true, step1: false });
