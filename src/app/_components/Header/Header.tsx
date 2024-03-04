@@ -14,17 +14,12 @@ import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { formatNumber } from "../../_helpers/client/formatNumber";
 import { UserDetailsContext } from "../../_helpers/client/Context/UserDetailsContext";
+import SupportModal from "../../(secure)/chatbot/dashboard/_components/Modal/SupportModal";
 
 function Header() {
   const router = useRouter();
-  /// state to store user plan
-  // const [userPlan, setUserPlan] = useState<{
-  //   _id: string;
-  //   name: string;
-  //   messageLimit: number;
-  //   numberOfChatbot: number;
-  //   trainingDataLimit: number;
-  // }>();
+  /// state for opening support modal
+  const [openSupport, setOpenSupport] = useState(false);
 
   const userDetailContext: any = useContext(UserDetailsContext);
   const userDetails = userDetailContext?.userDetails;
@@ -77,9 +72,23 @@ function Header() {
       );
 
       const userDetails = await response.json();
+      const date2: any = new Date(userDetails?.planExpiry);
+      const date1: any = new Date(); // Current date
+
+      // Calculate the difference in milliseconds
+      const differenceMs = date2 - date1;
+      const differenceDays = Math.round(differenceMs / (1000 * 60 * 60 * 24));
+      /// set the expiry
+      userDetailContext?.handleChange("planExpiry")(differenceDays);
       userDetailContext?.handleChange("totalMessageCount")(
         userDetails?.userDetails?.totalMessageCount
       );
+      /// set the username and email
+      userDetailContext?.handleChange("firstName")(userDetails?.firstName);
+      userDetailContext?.handleChange("lastName")(userDetails?.lastName);
+      userDetailContext?.handleChange("fullName")(userDetails?.fullName);
+      userDetailContext?.handleChange("email")(userDetails?.email);
+
       userDetailContext?.handleChange("plan")(userDetails?.plan);
       userDetailContext?.handleChange("noOfChatbotsUserCreated")(
         userDetails?.noOfChatbotsUserCreated
@@ -118,6 +127,7 @@ function Header() {
 
   return (
     <div className="header-container">
+      <SupportModal openSupport={openSupport} setOpenSupport={setOpenSupport} />
       {/*------------------------------------------logo----------------------------------------------*/}
       <Image
         className="logo"
@@ -167,7 +177,12 @@ function Header() {
               </button>
             </a>
             {/*------------------------------------------feedback-btn----------------------------------------------*/}
-            <button className="feedback-btn">Support</button>
+            <button
+              className="feedback-btn"
+              onClick={() => setOpenSupport(true)}
+            >
+              Support
+            </button>
           </>
         )}
         {/*------------------------------------------Profile Image----------------------------------------------*/}
@@ -199,16 +214,31 @@ function Header() {
               {/*------------------------------------------account actions menu----------------------------------------------*/}
               <div className="account-actions-container">
                 <ul>
-                  <li onClick={() => router.push("/home/account-settings")}>
+                  <li
+                    onClick={() => {
+                      setOpenMenu(!openMenu);
+                      router.push("/home/account-settings");
+                    }}
+                  >
                     <Image src={profileIcon} alt="profile-icon" />
                     Account settings
                   </li>
-                  <li>
+                  <li
+                    onClick={() => {
+                      setOpenMenu(!openMenu);
+                      router.push("/home/BillingAndUsage");
+                    }}
+                  >
                     <Image src={receiptIcon} alt="receipt-icon" />
                     Billing & Usage
                   </li>
 
-                  <li>
+                  <li
+                    onClick={() => {
+                      setOpenMenu(!openMenu);
+                      router.push("/home/pricing");
+                    }}
+                  >
                     <Image src={walletIcon} alt="wallet-icon" />
                     Pricing Plans
                   </li>
@@ -231,7 +261,7 @@ function Header() {
                         </a>
                       </li>
 
-                      <li>
+                      <li onClick={() => setOpenSupport(true)}>
                         <button className="feedback-btn">Support</button>
                       </li>
 
@@ -266,9 +296,9 @@ function Header() {
               <div className="plan-details-container">
                 <div className="plan">
                   <span>Your plan</span>
-                  <h1>Starter</h1>
+                  <h1>{userDetails?.plan?.name}</h1>
                 </div>
-                <p>Expires in 14 days</p>
+                <p>Expires in {userDetails?.planExpiry} days</p>
               </div>
 
               <hr />

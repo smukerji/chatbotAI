@@ -111,6 +111,10 @@
         align-items: center;
         gap: 8px;
         align-self: stretch;
+
+        @media only screen and (max-width: 767px) {
+          flex-wrap: wrap;
+        }
         input {
           @include commanStyle();
           display: flex;
@@ -207,7 +211,7 @@
 
   @media only screen and (max-width: 767px) {
     width: auto;
-
+    padding: 24px;
     .left {
       width: 100%;
 

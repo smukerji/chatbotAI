@@ -22,7 +22,12 @@ async function dataSources(request: any) {
   /// fetch the data sources of the chabot
   const db = (await connectDatabase())?.db();
   const collection = db?.collection("chatbots-data");
-  const cursor = await collection?.find({ chatbotId: chatbotId }).toArray();
+  const cursor = await collection?.find({ chatbotId: chatbotId });
+
+  const data = await cursor.toArray();
+
+  /// close the cursor
+  await cursor.close();
 
   /// get the chatbot name from ID (needed if user has updated the chatbot name)
   const chatbotCollection = db?.collection("user-chatbots");
@@ -47,7 +52,7 @@ async function dataSources(request: any) {
   let crawlDataLength = 0;
   let crawlData: any = [];
   const defaultFileList: any = [];
-  cursor.forEach((data: any) => {
+  data.forEach((data: any) => {
     /// extract the QA object
     if (data.source == "qa") {
       /// get the qa data if embedded previosuly

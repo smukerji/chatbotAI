@@ -75,6 +75,7 @@
         // resize: none;
         min-width: 100%;
         max-width: 100%;
+        width: 100% !important;
         color: #23262f;
 
         /* Body/Medium */
@@ -807,9 +808,40 @@
 
       .training-left-container {
         width: 100%;
+
+        .note {
+          text-align: left;
+        }
+
+        .auto-show-container {
+          .auto-show-container-title-section {
+            align-items: baseline;
+            .auto-show-container-title-text {
+              text-align: left;
+            }
+          }
+        }
       }
       .training-right-container {
         width: 100%;
+      }
+    }
+  }
+
+  @media only screen and (max-width: 991px) {
+    .training-container {
+      .training-left-container {
+        p {
+          text-align: left;
+        }
+
+        .auto-show-container {
+          .auto-show-container-title-section {
+            .auto-show-container-title-text {
+              text-align: left;
+            }
+          }
+        }
       }
     }
   }

@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useState } from 'react';
 
 export const UserDetailsContext = createContext({});
 
@@ -8,6 +8,11 @@ export const UserDetailsDataProvider = ({ children }: any) => {
     noOfChatbotsUserCreated: 0,
     plan: {},
     percent: 0,
+    planExpiry: null,
+    firstName: '',
+    lastName: '',
+    fullName: '',
+    email: '',
   };
 
   const [userDetails, setUserDetails] = useState(initialUserDetails);
@@ -19,8 +24,6 @@ export const UserDetailsDataProvider = ({ children }: any) => {
       [props]: value,
     }));
   };
-
-  //   console.log(userDetails);
 
   return (
     <UserDetailsContext.Provider value={{ userDetails, handleChange }}>

@@ -77,6 +77,14 @@
     }
   }
   @media only screen and (max-width: 767px) {
-    padding: 30px;
+    padding: 20px;
+    flex-direction: column;
+    gap: 30px;
+    .left {
+      h1 {
+        font-size: 30px;
+        line-height: 40px;
+      }
+    }
   }
 }

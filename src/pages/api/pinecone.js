@@ -88,6 +88,10 @@ export default async function handler(req, res) {
       }
       namespace = userId;
     }
+
+    /// close the cursor
+    await cursor.close();
+
     vectorId = [].concat(...vectorId);
     /// delete the vectors
     const deleteData = await collection.deleteMany({ chatbotId: chatbotId });
@@ -95,6 +99,10 @@ export default async function handler(req, res) {
     await userChatbots.deleteOne({ chatbotId: chatbotId });
     /// delete chatbot settings
     await userChatbotSettings.deleteOne({ chatbotId: chatbotId });
+
+    //delete the whatsapp details collection record against chatbotId
+    const whatsappDetails = db.collection("whatsappbot_details");//whatsappbot_details
+    await whatsappDetails.deleteOne({ chatbotId: chatbotId });
 
     /// deleting the chunks to avoid  Request Header Fields Too Large error
     const deleteBatchSize = 250;

@@ -238,17 +238,27 @@
       .sources-header {
         .options-container {
           flex-wrap: wrap;
+          padding-left: 0px;
+          gap: 4px;
+
+          li {
+            padding: 5px 15px;
+          }
+        }
+        p {
+          padding-left: 15px;
         }
       }
     }
 
     .bottom {
       flex-direction: column;
-      margin-left: 0;
+      margin-left: 0px !important;
+      margin-right: 0px !important;
 
       .left {
         .source-upload-container {
-          height: 300px;
+          // height: 370px;
 
           .drag-wrapper {
             .ant-upload-wrapper {

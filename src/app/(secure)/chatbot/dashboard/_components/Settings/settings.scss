@@ -65,7 +65,8 @@
         .general-setting-parent {
           width: auto;
           height: auto;
-          // padding-bottom: 30px;
+
+          padding-bottom: 30px;
 
           // .parent-name-btn {
           //   flex-direction: column;
@@ -85,7 +86,12 @@
     .top {
       .sources-header {
         .options-container {
-          padding-left: 30px;
+          padding-left: 0px;
+          gap: 5px;
+
+          li {
+            padding: 5px 15px;
+          }
         }
       }
     }

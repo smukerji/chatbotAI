@@ -5,9 +5,10 @@ import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import { connectDatabase } from "../../../../db";
 import { cookies } from "next/headers";
 import { ObjectId } from "mongodb";
+import { Adapter } from "next-auth/adapters";
 
 export const authOptions: NextAuthOptions = {
-  adapter: MongoDBAdapter(connectDatabase()),
+  adapter: MongoDBAdapter(connectDatabase()) as Adapter,
   //   session: {
   //     strategy: "jwt",
   //   },
@@ -25,12 +26,15 @@ export const authOptions: NextAuthOptions = {
   events: {
     signIn: async (message) => {
       /// db connection
+
+      let currentDate = new Date();
+      let endDate = new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+
       const db = (await connectDatabase()).db();
 
-      /// get the starter plan ID
       const starterPlan = await db
         .collection("plans")
-        .findOne({ name: "starter" });
+        .findOne({ name: "individual" });
 
       const username: string[] = message.user.name?.split(" ")!;
 
@@ -45,7 +49,10 @@ export const authOptions: NextAuthOptions = {
           { _id: new ObjectId(message.user.id) },
           {
             $set: {
+              startDate: currentDate,
+              endDate: endDate,
               planId: starterPlan?._id,
+              isWhatsapp: true,
               username:
                 username[0] + `${username?.[1] ? "_" + username?.[1] : ""}`,
             },
@@ -68,6 +75,10 @@ export const authOptions: NextAuthOptions = {
         await db.collection("user-details").insertOne({
           userId: userId,
           totalMessageCount: 0,
+          messageLimit: starterPlan?.messageLimit,
+          chatbotLimit: starterPlan?.numberOfChatbot,
+          trainingDataLimit: starterPlan?.trainingDataLimit,
+          websiteCrawlingLimit: starterPlan?.websiteCrawlingLimit,
         });
       }
     },

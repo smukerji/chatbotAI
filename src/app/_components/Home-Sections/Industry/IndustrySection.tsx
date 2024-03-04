@@ -15,7 +15,7 @@ export default function IndustrySection() {
         <div className="left">
           <h1>AI Chatbot in the Industrial sector</h1>
           <p>
-            Discover the future of conversational excellence with Lucifer.ai,
+            Discover the future of conversational excellence with Lucifer.AI,
             your intelligent AI companion. Elevate your online interactions with
             natural and intuitive conversations.
           </p>
@@ -29,7 +29,7 @@ export default function IndustrySection() {
               <Image src={healthcareIcon} alt="healthcare-icon" />
               <h3>Healthcare And Wellness</h3>
               <p>
-                Lucifer.ai is the AI chatbot that takes your digital presence to
+                Lucifer.AI is the AI chatbot that takes your digital presence to
                 the next level
               </p>
             </div>
@@ -37,23 +37,21 @@ export default function IndustrySection() {
               <Image src={healthcareIcon} alt="healthcare-icon" />
               <h3>Healthcare And Wellness</h3>
               <p>
-                Lucifer.ai is the AI chatbot that takes your digital presence to
-                the next level
+              No more long waits and queues for doctors. Use Lucifer.AI to have your personal doctor integrated into your life.
               </p>
             </div>
             <div className="filled-box">
               <Image src={hotlesIcon} alt="hotels-icon" />
               <h3>Hotels And Hospitality</h3>
               <p>
-                Lucifer.ai is the AI chatbot that takes your digital presence to
-                the next level
+              Hassel free booking and customer support with Lucifer.AI. Enhance the customer experience by having Lucifer.AI as your 24/7 hotel assistant.
               </p>
             </div>
             <div className="empty-box">
               <Image src={healthcareIcon} alt="healthcare-icon" />
               <h3>Healthcare And Wellness</h3>
               <p>
-                Lucifer.ai is the AI chatbot that takes your digital presence to
+                Lucifer.AI is the AI chatbot that takes your digital presence to
                 the next level
               </p>
             </div>
@@ -65,39 +63,35 @@ export default function IndustrySection() {
               <Image src={healthcareIcon} alt="healthcare-icon" />
               <h3>Healthcare And Wellness</h3>
               <p>
-                Lucifer.ai is the AI chatbot that takes your digital presence to
-                the next level
+              No more long waits and queues for doctors. Use Lucifer.AI to have your personal doctor integrated into your life.
               </p>
             </div>
             <div className="filled-box">
               <Image src={educationIcon} alt="education-icon" />
               <h3>Education And Institutes</h3>
               <p>
-                Lucifer.ai is the AI chatbot that takes your digital presence to
-                the next level
+              Lucifer.AI can be your teacher providing real-time feedback and assessment tools, simplifying creative learning, exam creation, and grading.
               </p>
             </div>
             <div className="filled-box">
               <Image src={businessIcon} alt="business-icon" />
               <h3>Small Medium Business</h3>
               <p>
-                Lucifer.ai is the AI chatbot that takes your digital presence to
-                the next level
+              Lucifer.AI can help businesses to engage with their customers in a personalized conversation.
               </p>
             </div>
             <div className="filled-box">
               <Image src={coinIcon} alt="business-icon" />
               <h3>Nonprofits or B2C</h3>
               <p>
-                Lucifer.ai is the AI chatbot that takes your digital presence to
-                the next level
+              Make your assistant with Lucifer.AI to support customer inquiries, internal training, FAQ distribution, etc.
               </p>
             </div>
             <div className="empty-box">
               <Image src={healthcareIcon} alt="healthcare-icon" />
               <h3>Healthcare And Wellness</h3>
               <p>
-                Lucifer.ai is the AI chatbot that takes your digital presence to
+                Lucifer.AI is the AI chatbot that takes your digital presence to
                 the next level
               </p>
             </div>

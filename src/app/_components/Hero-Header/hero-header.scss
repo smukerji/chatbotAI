@@ -54,7 +54,8 @@
     .header-content-container {
       padding: 20px;
       .header-text {
-        font-size: 50px;
+        font-size: 35px;
+        line-height: 45px;
       }
       .header-sub-text {
         font-size: 19px;
@@ -214,6 +215,10 @@
   align-items: center;
   gap: 40px;
   padding: 8.7vw 8vw 0 8vw;
+
+  @media only screen and (max-width: 991px) {
+    padding: 8.7vw 8vw 8.7vw 8vw;
+  }
 }
 
 .hero-header {

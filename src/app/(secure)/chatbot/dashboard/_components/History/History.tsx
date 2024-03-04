@@ -10,6 +10,10 @@ import { message } from "antd";
 import { ChatbotSettingContext } from "../../../../../_helpers/client/Context/ChatbotSettingContext";
 import { PrintingChats } from "../Printing-Chats/Printing";
 import ReactToPrint from "react-to-print";
+import {
+  AUTHORIZATION_FAILED,
+  JWT_EXPIRED,
+} from "../../../../../_helpers/errorConstants";
 
 function History({ chatbotId }: any) {
   let tempRef: any = useRef<HTMLDivElement>();
@@ -43,6 +47,13 @@ function History({ chatbotId }: any) {
         }
       );
       const content = await response.json();
+
+      if (content?.message === JWT_EXPIRED) {
+        message.error(AUTHORIZATION_FAILED).then(() => {
+          window.location.href = "/account/login";
+        });
+        return;
+      }
       setChatHistoryList(content?.chatHistory);
     };
 
