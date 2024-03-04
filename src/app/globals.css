@@ -167,6 +167,7 @@ margin-top: 0px !important;
 
 
 .telegram-token-container{
+  height: 114px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -240,4 +241,15 @@ border: 0px;
 }
 .telegram-modal .ant-modal-footer{
   display: none !important;
+}
+.telegram-switch-delete-container{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 30px;
+}
+.telegram-switch-container{
+  display: flex;
+  width: 22%;
+  justify-content: space-between;
 }
