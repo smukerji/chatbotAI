@@ -36,7 +36,6 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
         u_id: u_id,
       }
     );
-    console.log(whatsappData.data.msg);
     setDefault(whatsappData.data.msg);
     setIsChecked(whatsappData.data.msg);
   };
@@ -61,34 +60,33 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
     }
 
     setLoading(true);
+
     const cardNumber: any = elements.getElement(CardNumberElement);
     const cardCvc: any = elements.getElement(CardCvcElement);
     const cardExpiry: any = elements.getElement(CardExpiryElement);
-
     try {
+      
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/getCustomer`,
         {
           u_id: u_id,
         }
-      );
-      console.log("Payment method created:", response);
-    } catch {
-      message.error("error while getting customer data");
-      throw error;
-    }
-    try {
-      const paymentMethod = await stripe.createPaymentMethod({
-        type: "card",
-        card: cardNumber,
-      });
-      console.log(paymentMethod.paymentMethod?.id);
-      const id: any = paymentMethod.paymentMethod?.id;
-      if (paymentMethod.paymentMethod?.id) {
-        const update = await axios.post(
-          `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/updatePaymentMethod`,
-          { paymentId: paymentMethod.paymentMethod?.id, u_id: u_id }
         );
+      } catch {
+        message.error("error while getting customer data");
+        throw error;
+      }
+      try {
+        const paymentMethod = await stripe.createPaymentMethod({
+          type: "card",
+          card: cardNumber,
+        });
+        const id: any = paymentMethod.paymentMethod?.id;
+        if (paymentMethod.paymentMethod?.id) {
+          const update = await axios.post(
+            `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/updatePaymentMethod`,
+            { paymentId: paymentMethod.paymentMethod?.id, u_id: u_id }
+            );
 
         if (update.data.acknowledged) {
           //ANCHOR - api call to create paymentIntent
@@ -100,13 +98,14 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
           try {
             if (result.data.client_secret) {
               //ANCHOR - payment confirmation
+
               const r = stripe.confirmPayment({
                 clientSecret: result.data.client_secret,
                 confirmParams: {
                   return_url: `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot`,
                 },
               });
-
+              console.log(r)
               //ANCHOR - adding data to backend
               const a = await axios.post(
                 `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/add-payment`,
@@ -138,6 +137,15 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
             });
           }
           // setLoading(false)
+        }
+        else{
+          message.error(
+           update.data.code
+          )
+          .then(()=> {
+            window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing`;
+            return;
+          });
         }
       } else {
         message.error(

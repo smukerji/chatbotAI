@@ -14,7 +14,6 @@ export default function PlanOne({ setPlan, setPrice, price, enableOne, text }: a
   const { status } = useSession();
   const router = useRouter();
   const [cookies, setCookie] = useCookies(["userId"]);
-  console.log(cookies);
   const changePlan = async () => {
     if (cookies?.userId) {
       if (price == 15) {

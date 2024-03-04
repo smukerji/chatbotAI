@@ -84,7 +84,6 @@ export default function Home() {
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway`,
         { u_id: u_id }
       );
-      console.log(checkPlan);
       setText(checkPlan.data.text);
       setWhatsappDisable(checkPlan.data.whatsAppIntegration);
       if (checkPlan.data.msg == 1) {
