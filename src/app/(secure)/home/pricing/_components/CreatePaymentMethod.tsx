@@ -121,21 +121,32 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
                   nextIsWhatsapp: isChecked,
                 }
               );
-              message.success("success");
+              message.success("success")
             } else {
-              window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing`;
-              message.error(`Invalid card`);
+              message.error(`Invalid card`).then(()=> {
+                window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing`;
+                return;
+              });
             }
-          } catch (error) {
-            window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing`;
+          } catch (error: any) {
+            message.error(
+              error?.message
+            )
+            .then(()=> {
+              window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing`;
+              return;
+            });
           }
           // setLoading(false)
         }
       } else {
         message.error(
           "Finding error while making payment with this card, please check your card details"
-        );
-        window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing`;
+        )
+        .then(()=> {
+          window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing`;
+          return;
+        });
       }
     } catch (error) {
       message.error(`${error}`);

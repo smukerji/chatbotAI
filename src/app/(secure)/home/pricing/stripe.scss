@@ -1014,7 +1014,7 @@
       align-items: flex-start;
       gap: 22px;
       flex-shrink: 0;
-      height: 700px;
+      height: 650px;
 
       .top-left {
         display: flex;
@@ -1244,7 +1244,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  height: calc(100vh - 70px);
+  height: calc(100% - 70px);
   z-index: 10;
   background: linear-gradient(
     180deg,

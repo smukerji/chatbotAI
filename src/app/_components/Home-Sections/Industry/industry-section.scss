@@ -75,6 +75,10 @@
         opacity: 0.2;
         background: #fcfcfd;
 
+        @media only screen and (max-width: 400px){
+          display: none;
+        }
+
         h3,
         img,
         p {
@@ -163,6 +167,10 @@
         border-radius: 32px;
         opacity: 0.2;
         background: #fcfcfd;
+
+        @media only screen and (max-width: 400px){
+          display: none;
+        }
 
         h3,
         img,
