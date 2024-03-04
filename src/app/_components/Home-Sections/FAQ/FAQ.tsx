@@ -28,7 +28,7 @@ const FAQ = () => {
   };
 
   return (
-    <div className="faq-section">
+    <div className="faq-section" id="how-it-works">
       {/* --------------------------left section------------------------------ */}
       <div className="left">
         <h1>How It Works</h1>

@@ -70,7 +70,7 @@ function Settings({ chatbotId, chatbotName }: any) {
               <Icon Icon={SecurityIcon} />
               <h3>Security</h3>
             </li>
-            <li
+            {/* <li
               className={`${chabotSettings === "lead" ? "active" : ""}`}
               value={"lead"}
               onClick={() => botContext?.handleChange("chabotSettings")("lead")}
@@ -89,7 +89,7 @@ function Settings({ chatbotId, chatbotName }: any) {
             >
               <Icon Icon={NotificationsIcon} />
               <h3>Notifications</h3>
-            </li>
+            </li> */}
           </ul>
         </div>
       </div>

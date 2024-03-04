@@ -20,9 +20,9 @@ function Home() {
       <IndustrySection />
       <ServicesOffered />
       <CompatibilitySection />
-      <Testimonials />
+      {/* <Testimonials /> */}
       {/* <PlansSection /> */}
-      <FAQ />
+      {/* <FAQ /> */}
       <ContactSection />
       <Footer />
     </>
