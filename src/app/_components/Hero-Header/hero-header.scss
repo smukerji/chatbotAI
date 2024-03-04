@@ -123,6 +123,16 @@
         width: 75%;
         display: flex;
         justify-content: center;
+
+        @media only screen and (max-width: 1300px) and (min-width: 1151px){
+          width: 72%;
+        }
+
+        @media only screen and (max-width: 1150px) and (min-width: 992px){
+          width: 66%;
+        }
+
+      
       }
     }
 
@@ -182,6 +192,40 @@
   align-items: center;
   gap: 32px;
   margin-left: 30px;
+
+  @media only screen and (max-width: 1515px) and (min-width: 1241px){
+    gap: 25px !important;
+
+    .try-free-btn{
+      padding: 10px !important;
+      gap: 5px !important;
+      font-size: 18px !important;
+      line-height: 28px !important;
+    }
+  }
+
+  @media only screen and (max-width: 1240px) and (min-width: 1158px){
+    gap: 15px !important;
+
+    .try-free-btn{
+      padding: 10px 9px !important;
+      gap: 5px !important;
+      font-size: 18px !important;
+      line-height: 28px !important;
+    }
+  }
+
+  @media only screen and (max-width: 1157px) and (min-width: 992px){
+    gap: 15px !important;
+
+    .try-free-btn{
+      padding: 10px 9px !important;
+      gap: 5px !important;
+      font-size: 18px !important;
+      line-height: 28px !important;
+    }
+  }
+
   .login-btn {
     color: #fcfcfd;
     text-align: center;

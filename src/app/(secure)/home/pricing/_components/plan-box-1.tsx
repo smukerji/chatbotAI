@@ -159,15 +159,15 @@ export default function PlanOne({ setPlan, setPrice, price, enableOne, text }: a
           </div>
           <div className="plan-item-container">
             <div className="plan-item">
-              <Image src={tickCircle} alt="no-svg" />
-              <span className="plan-text  plan-text-even">Share & Delete Bots</span>
+              <Image src={unTickCircle} alt="no-svg" />
+              <span className="plan-text  plan-text-even plan-text-not">Share & Delete Bots</span>
             </div>
             <div className="coming-soon-even">Coming soon</div>
           </div>
           <div className="plan-item-container">
             <div className="plan-item">
-              <Image src={tickCircle} alt="no-svg" />
-              <span className="plan-text  plan-text-even">Lead collection</span>
+              <Image src={unTickCircle} alt="no-svg" />
+              <span className="plan-text  plan-text-even plan-text-not">Lead collection</span>
             </div>
             <div className="coming-soon-even">Coming soon</div>
           </div>

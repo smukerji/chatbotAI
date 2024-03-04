@@ -159,6 +159,32 @@
       border-radius: 16px;
       background: var(--Neutral-2, #f4f5f6);
 
+      @media only screen and (max-width: 1420px) and (min-width: 991px){
+        max-width: 40%;
+        gap: 30px;
+
+        .plan-container-list{
+          .pay-btn{
+            padding: 10px !important;
+            .btn-text{
+              font-size: 17px !important;
+            }
+          }
+        }
+      }
+
+      @media only screen and (max-width: 991px) and (min-width: 767px){
+
+        .plan-container-list{
+          .pay-btn{
+            padding: 10px !important;
+            .btn-text{
+              font-size: 15px !important;
+            }
+          }
+        }
+      }
+
       &.plan-box-even {
         background: #2e58ea;
       }
@@ -197,7 +223,7 @@
             font-style: normal;
             font-weight: 500;
             line-height: 24px;
-            width: 266px;
+            // width: 266px;
 
             &.plan-placeholder-even {
               color: #fcfcfd;

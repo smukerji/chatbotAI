@@ -25,25 +25,33 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [cookies, setCookie] = useCookies(["userId"]);
   const [prePrice, setPrePrice] = useState(0);
-  const [text, setText] = useState("Get 7 Dya Free Trial on First registration");
+  const [text, setText] = useState("Get 7 Day Free Trial on First registration");
   const router = useRouter();
   const [whatsappDisable, setWhatsappDisable] = useState(false);
 
   const u_id: any = cookies.userId;
 
   const CharacterAddOn = async () => {
+    if (cookies?.userId) {
     router.push(`/home/pricing/checkout/${5}`);
+    }
   };
 
   const MessageAddOn = async () => {
+    if (cookies?.userId) {
     router.push(`/home/pricing/checkout/${6}`);
+    }
   };
 
   const MessageAddOnAdvance = async () => {
+    if (cookies?.userId) {
     router.push(`/home/pricing/checkout/${7}`);
+    }
   };
   const WhatsappAddOn = async () => {
+    if (cookies?.userId) {
     router.push(`/home/pricing/checkout/${8}`);
+    }
   };
 
   const getPlanDetails = async () => {
