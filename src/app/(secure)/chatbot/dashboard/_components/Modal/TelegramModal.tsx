@@ -1,16 +1,25 @@
-import { Modal, Switch, message } from "antd";
+import { Button, Modal, Switch, message } from "antd";
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import Image from "next/image";
 
 import DeleteIcon from "../../../../../../../public/create-chatbot-svgs/delete-icon.svg";
+import EditIcon from "../../../../../../../public/sections-images/common/edit.svg";
+import axios from "axios";
+import { EditOutlined } from "@ant-design/icons";
 
 function TelegramModal({ setIsTelegramModalOpen }: any) {
   /// fetch the params
   const params: any = useSearchParams();
   const chatbot = JSON.parse(decodeURIComponent(params.get("chatbot")));
   const userID = useCookies(["userId"]);
+
+  //chat-bot name in telegram
+  const [botName, setBotName] = useState<string>("");
+
+  //For toggle
+  const [editName, setEditName] = useState<boolean>(false);
 
   // This is for active and inactive and delete btn
   const [status, setStatus] = useState<boolean>(false);
@@ -31,8 +40,8 @@ function TelegramModal({ setIsTelegramModalOpen }: any) {
   };
 
   //This function is called when onChange event occurs in switch
-  const onSwitchHandler=async()=>{
-    setSwitchEnabled(!switchEnabled)
+  const onSwitchHandler = async () => {
+    setSwitchEnabled(!switchEnabled);
     try {
       const url = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/telegram/telegramData/api`;
       const response = await fetch(url, {
@@ -41,24 +50,19 @@ function TelegramModal({ setIsTelegramModalOpen }: any) {
         },
         method: "PUT",
         next: { revalidate: 0 },
-        body:JSON.stringify({
-          chatbotId:chatbot.id,
-          isEnabled:!switchEnabled
-        })
+        body: JSON.stringify({
+          chatbotId: chatbot.id,
+          isEnabled: !switchEnabled,
+        }),
       });
       const resp = await response.json();
       if (resp.status === 200) {
-       
-       
-
         message.success(resp?.message);
       } else {
         message.error(resp?.message);
       }
-    } catch (error) {
-
-    }
-  } 
+    } catch (error) {}
+  };
 
   // This function is called when onChange event occurs in telegram input
   const inputChangeHandler = (e: any) => {
@@ -92,6 +96,56 @@ function TelegramModal({ setIsTelegramModalOpen }: any) {
     } catch (error) {}
   };
 
+  //This function will get bot name from telegram
+  const getBotName = async () => {
+    try {
+      let url = `https://api.telegram.org/bot${telegramToken}/getMyName`;
+      const response = await fetch(url, {
+        headers: {
+          cache: "no-store",
+        },
+        method: "GET",
+        next: { revalidate: 0 },
+      });
+      const resp = await response.json();
+      if (resp?.result?.name) {
+        setBotName(resp?.result?.name);
+        setStatus(true);
+      } else {
+        message.error("something went wrong please try again..");
+      }
+    } catch (error) {
+      console.log("error getting name from telegram");
+    }
+  };
+
+  //This function is for onchange of telegram bot name
+  const telegramBotNameInputhandler = (e: any) => {
+    setBotName(e.target.value);
+  };
+
+  //This function is for changing name of bot
+  const handleNameChange = async () => {
+    setEditName(false);
+    // const body = {
+    //   name: botName,
+    // };
+
+    // axios
+    //   .post(`https://api.telegram.org/bot${telegramToken}/setMyName`, body)
+    //   .then((res: any) => {
+
+    //     if (res.ok) {
+    //       message.success("Bot name changed successfully");
+    //     } else {
+    //       message.error(res?.description);
+    //     }
+    //   })
+    //   .catch((error) => {
+    //     message.error(error?.response?.data?.description);
+    //   });
+  };
+
   const setTelegramData = async () => {
     try {
       const url = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/telegram/telegramData/api`;
@@ -105,13 +159,13 @@ function TelegramModal({ setIsTelegramModalOpen }: any) {
           chatbotId: chatbot.id,
           telegramToken: telegramToken,
           userId: userID[0].userId,
-          isEnabled:true
+          isEnabled: true,
         }),
       });
       const resp = await response.json();
       if (resp.status === 200) {
+        getBotName();
         message.success(resp?.message);
-        setStatus(true);
       } else {
         message.error(resp?.message);
       }
@@ -140,8 +194,8 @@ function TelegramModal({ setIsTelegramModalOpen }: any) {
         } else {
           message.error("please check token and connect again");
         }
-      } catch (error:any) {
-        message.error('something went wrong please try again.. ')
+      } catch (error: any) {
+        message.error("something went wrong please try again.. ");
         console.log("error from telegram", error);
       }
     } else {
@@ -151,30 +205,31 @@ function TelegramModal({ setIsTelegramModalOpen }: any) {
 
   //This function will get all telegram details
 
-const fetchTelegramDetails=async()=>{
+  const fetchTelegramDetails = async () => {
     try {
       const url = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/telegram/telegramData/api?chatbotId=${chatbot.id}`;
-      const response = await fetch(url,{
+      const response = await fetch(url, {
         headers: {
           cache: "no-store",
         },
         method: "GET",
         next: { revalidate: 0 },
-      })
-      const resp = await response.json()
-      if(resp.status === 200){
-        setTelegramToken(resp?.data?.telegramToken)
-        setSwitchEnabled(resp?.data?.isEnabled) 
-        setError({telegramToken:''})
+      });
+      const resp = await response.json();
+      if (resp.status === 200) {
+        getBotName()
+        setTelegramToken(resp?.data?.telegramToken);
+        setSwitchEnabled(resp?.data?.isEnabled);
+        setError({ telegramToken: "" });
       }
     } catch (error) {
-      console.log("error",error)
+      console.log("error", error);
     }
-}
+  };
 
-  useEffect(()=>{
-    fetchTelegramDetails()
-  },[])
+  useEffect(() => {
+    fetchTelegramDetails();
+  }, []);
 
   return (
     <div className="telegram-container">
@@ -210,21 +265,48 @@ const fetchTelegramDetails=async()=>{
         {/* ------------ This code for status----------- */}
         {status && (
           <>
-          <div className="telegram-heading">Telegram Status</div>
+            <div className="telegram-heading">Telegram Status</div>
+
             <div className="telegram-switch-delete-container">
               <div className="telegram-switch-container">
-                {switchEnabled ? "Active" : "In-active"}
-                <Switch
-                  checked={switchEnabled}
-                  onChange={onSwitchHandler}
+                <div className="telegram-bot-name">
+                  {editName ? (
+                    <div className="telegram-input-save">
+                      <input
+                        className="telegram-bot-name-input"
+                        value={botName}
+                        onChange={telegramBotNameInputhandler}
+                      />
+                      <button
+                        className="telegram-button-save"
+                        onClick={handleNameChange}
+                      >
+                        Save
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="telegram-botname-edit">
+                      <div className="telegram-bot-name">{botName}</div>
+                      {/* <Image
+                        src={EditIcon}
+                        alt="edit-icon"
+                        onClick={() => setEditName(true)}
+                      /> */}
+                      <EditOutlined onClick={() => setEditName(true)}/>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="telegram-switch-delete">
+                <div className="telegram-active-inactive">{switchEnabled ? "Active" : "In-active"}</div>{" "}
+                <Switch checked={switchEnabled} onChange={onSwitchHandler} />
+                <Image
+                  src={DeleteIcon}
+                  alt="delete-icon"
+                  onClick={deleteHandler}
+                  className="telegram-delete"
                 />
               </div>
-              <Image
-                src={DeleteIcon}
-                alt="delete-icon"
-                onClick={deleteHandler}
-                className="telegram-delete"
-              />
             </div>
           </>
         )}

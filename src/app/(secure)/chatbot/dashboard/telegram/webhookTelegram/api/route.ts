@@ -111,5 +111,6 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  return NextResponse.json({ message: "success" });
+  return new Response("received", { status: 200 });
+
 }
