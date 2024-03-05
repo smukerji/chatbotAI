@@ -22,6 +22,7 @@ export default function Home() {
   const [planStatus, setStatus] = useState<number>(2);
   const [plan, setPlan] = useState(0);
   const [enableOne, setEnableOne] = useState(false);
+  const [enableTwo, setEnableTwo] = useState(false)
   const [isYearlyPlan, setIsYearlyPlan] = useState(false);
   const [price, setPrice] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -90,6 +91,10 @@ export default function Home() {
         setPrePrice(checkPlan.data.prePrice);
         setEnableOne(true);
       }
+      else if(checkPlan.data.msg == 2){
+        setEnableTwo(true); 
+        setEnableOne(true);
+      }
     } catch (error) {
       message.error(`${error}`);
     }
@@ -153,7 +158,7 @@ export default function Home() {
               setPlan={setPlan}
               setPrice={setPrice}
               price={isYearlyPlan ? 854 : 89}
-              enableTwo={true}
+              enableTwo={enableTwo}
               prePrice={prePrice}
               // disableMonth={isYearlyPlan ? false : disableMonth}
             />

@@ -125,11 +125,20 @@ async function addPaymentDetails(req: any, res: NextResponse) {
       //ANCHOR - getting plan details
       const collectionPlan = db.collection("plans");
       const plan_data = await collectionPlan.findOne({ name: plan_name });
-      let currentDate = null;
-      if (userData?.startDate != null) {
+      let currentDate = new Date();;
+      if (userData?.endDate > currentDate) {
         currentDate = userData.startDate;
       } else {
         currentDate = new Date();
+        const updateUserDetails = await collectionAdd.updateMany({userId: "u_id"},{
+          $set:{
+            totalMessageCount: 0,
+            chatbotLimit:plan_data.numberOfChatbot,
+            messageLimit:plan_data.messageLimit,
+            trainingDataLimit:plan_data.trainingDataLimit,
+            websiteCrawlingLimit:plan_data.websiteCrawlingLimit
+          }
+        })
       }
 
       if (duration == "month") {

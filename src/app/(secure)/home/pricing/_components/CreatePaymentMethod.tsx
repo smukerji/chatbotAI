@@ -41,7 +41,7 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
   };
 
   useEffect(() => {
-    if (isChecked && (plan == 1 || plan == 3)) {
+    if (isChecked && (plan == 1 || plan == 3 || plan == 2 || plan == 4)) {
       setNewPrice(Number(price) + Number(7));
     } else {
       setNewPrice(price);
@@ -175,7 +175,7 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
                 {(plan == 1 || plan == 3) && (
                   <div className="plan-name">Individual Plan</div>
                 )}
-                {plan == 2 && <div className="plan-name">Agency Plan</div>}
+                {(plan == 2 || plan == 4) && <div className="plan-name">Agency Plan</div>}
                 {plan == 5 && <div className="plan-name">Character add on</div>}
                 {(plan == 6 || plan == 7) && (
                   <div className="plan-name">Message add on</div>
@@ -189,7 +189,7 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
                 </div>
               </div>
               {/* <Image src={line} alt={"no image"} /> */}
-              {(plan == 1 || plan == 3) && (
+              {(plan == 1 || plan == 3 || plan == 2 || plan == 4) && (
                 <div className="checkbox">
                   <input
                     type="checkbox"

@@ -3,7 +3,8 @@ import React, { useEffect, useState } from "react";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import CreatePaymentMethod from "../../_components/CreatePaymentMethod";
-
+import { useSearchParams } from "next/navigation";
+import CryptoJS from 'crypto-js';
 const stripePromise = loadStripe(
   String(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY)
 );
@@ -22,6 +23,11 @@ const plans = [
 const CheckoutPage = ({ params }: any) => {
   const { planId } = params;
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
+  const param: any = useSearchParams();
+  const chatbot = (decodeURIComponent(param.get("a")));
+  
+    const bytes = CryptoJS.AES.decrypt(chatbot, "xyz");
+    const decryptedData = (bytes.toString(CryptoJS.enc.Utf8));  
 
   useEffect(() => {
     setSelectedPlan(plans.find((plan: any) => plan.id === Number(planId)));
@@ -32,7 +38,7 @@ const CheckoutPage = ({ params }: any) => {
       <Elements stripe={stripePromise}>
         <CreatePaymentMethod
           plan={selectedPlan?.id}
-          price={selectedPlan?.price}
+          price={selectedPlan?.id == 4 || selectedPlan?.id == 2  ? decryptedData : selectedPlan?.price}
           duration={selectedPlan?.days === 365 ? "year" : "month"}
         />
       </Elements>

@@ -25,6 +25,7 @@
     "axios": "^1.4.0",
     "bcrypt": "^5.1.1",
     "cron": "^3.1.6",
+    "crypto-js": "^4.2.0",
     "csv-parser": "^3.0.0",
     "dotenv": "^16.4.4",
     "eslint": "8.46.0",
@@ -62,6 +63,7 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
+    "@types/crypto-js": "^4.2.2",
     "@types/formidable": "^3.4.5",
     "@types/js-cookie": "^3.0.3",
     "@types/jsonwebtoken": "^9.0.2",

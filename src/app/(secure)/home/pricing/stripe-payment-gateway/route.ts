@@ -79,8 +79,7 @@ async function checkCurrentPlan(req: any, res: NextResponse) {
     }
     else if(data.plan == 'agency'){
       return {
-        msg: 1,
-        prePrice: 15,
+        msg: 2,
         duration: data.duration,
         text: "Current Plan",
         whatsAppIntegration: data.isWhatsapp
