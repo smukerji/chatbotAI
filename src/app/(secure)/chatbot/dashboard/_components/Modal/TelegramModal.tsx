@@ -140,7 +140,8 @@ function TelegramModal({ setIsTelegramModalOpen }: any) {
         } else {
           message.error("please check token and connect again");
         }
-      } catch (error) {
+      } catch (error:any) {
+        message.error('something went wrong please try again.. ')
         console.log("error from telegram", error);
       }
     } else {
@@ -222,6 +223,7 @@ const fetchTelegramDetails=async()=>{
                 src={DeleteIcon}
                 alt="delete-icon"
                 onClick={deleteHandler}
+                className="telegram-delete"
               />
             </div>
           </>

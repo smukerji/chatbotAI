@@ -200,9 +200,10 @@ font-style: normal;
 font-weight: 500;
 line-height: 24px; /* 150% */
 }
-.telegram-input:focus{
+.telegram-input:focus-visible{
   outline: none !important;
-  /* border: 0px !important; */
+  border: 1px solid  #E6E8EC !important;
+ 
 }
 .telegram-label{
   color:  #353945;
@@ -252,4 +253,7 @@ border: 0px;
   display: flex;
   width: 22%;
   justify-content: space-between;
+}
+.telegram-delete:hover{
+  cursor: pointer;
 }
