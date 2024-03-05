@@ -9,7 +9,7 @@ import unTickCircle from "../../../../../../public/svgs/untick-circle.svg";
 import line from "../../../../../../public/svgs/Vector 2189.svg";
 import { number } from "joi";
 
-export default function PlanTwo({ setPlan, price, setPrice, prePrice }: any) {
+export default function PlanTwo({ setPlan, price, setPrice, prePrice, enableTwo }: any) {
   const { status } = useSession();
   const router = useRouter();
 
@@ -38,7 +38,7 @@ export default function PlanTwo({ setPlan, price, setPrice, prePrice }: any) {
         </div>
       </div>
       <div className="plan-container-list">
-        <button className="pay-btn" disabled={true}>
+        <button className="pay-btn" disabled={enableTwo} onClick={changePlan}>
           <span className="btn-text">Coming soon</span>
         </button>
         <div className="plan-details">

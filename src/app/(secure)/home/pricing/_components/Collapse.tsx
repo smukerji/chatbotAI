@@ -28,7 +28,6 @@ const items: CollapseProps["items"] = [
 
 const Coll: React.FC = () => {
   const onChange = (key: string | string[]) => {
-    console.log(key);
   };
 
   return (

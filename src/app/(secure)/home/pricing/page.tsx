@@ -119,12 +119,12 @@ export default function Home() {
       {planStatus === 2 && loading == false && (
         <div className="main">
           <h2 className="price-header">Pricing Plans</h2>
-          {/* <div className="price-offer-container">
+          <div className="price-offer-container">
             <span className="price-offer">Early Bird&nbsp;</span>
             <span className="price-offer-normal">users will receive Flat</span>
             <span className="price-offer">&nbsp;20% discount.</span>
-          </div> */}
-          {/* <div className="plan-tab-container">
+          </div>
+          <div className="plan-tab-container">
             <button
               className={`plan-type ${!isYearlyPlan && "active"}`}
               onClick={handlePlanType}
@@ -137,8 +137,8 @@ export default function Home() {
             >
               Yearly
             </button>
-          </div> */}
-          {/* <div className="annual-discount">Save 20% annualy</div> */}
+          </div>
+          <div className="annual-discount">Save 20% annualy</div>
           <br></br>
 
           <div className="plan-container">
@@ -153,7 +153,7 @@ export default function Home() {
               setPlan={setPlan}
               setPrice={setPrice}
               price={isYearlyPlan ? 854 : 89}
-              // enableTwo={true}
+              enableTwo={true}
               prePrice={prePrice}
               // disableMonth={isYearlyPlan ? false : disableMonth}
             />
