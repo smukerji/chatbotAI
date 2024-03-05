@@ -27,7 +27,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [cookies, setCookie] = useCookies(["userId"]);
   const [prePrice, setPrePrice] = useState(0);
-  const [text, setText] = useState("Get 7 Day Free Trial on First registration");
+  const [text, setText] = useState("Get 7 Day Free Trial on First Registration");
   const router = useRouter();
   const [whatsappDisable, setWhatsappDisable] = useState(false);
 
@@ -218,7 +218,7 @@ export default function Home() {
                 <div className="integration-list">
                   <div className="app-integration">
                     <div className="integration-name-container">
-                      <p className="integration-name">5K messages</p>
+                      <p className="integration-name">5K Messages</p>
                     </div>
                     <button
                       className="app-integration-price-btn"
@@ -233,7 +233,7 @@ export default function Home() {
                   </div>
                   <div className="app-integration">
                     <div className="integration-name-container">
-                      <p className="integration-name">10K messages</p>
+                      <p className="integration-name">10K Messages</p>
                     </div>
                     <button
                       className="app-integration-price-btn"
@@ -257,12 +257,12 @@ export default function Home() {
                 </button> */}
               </div>
               <div className="add-ons-integration">
-                <p className="integration-head">Training data</p>
+                <p className="integration-head">Training Data</p>
                 <div className="integration-list">
                   <div className="app-integration">
                     <div className="integration-name-container">
                       <p className="integration-name">
-                        Total Characters for training - 1M
+                        1M Characters
                       </p>
                     </div>
                     <button
