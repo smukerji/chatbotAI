@@ -8,9 +8,9 @@ import { string } from "joi";
 const CHUNK_LIMIT = 200;
 const CHUNK_MINIMAL = 100;
 
-const PINECONE_API_KEY = String(process.env.PINECONE_KEY);
-const PINECONE_ENV = String(process.env.PINECONE_ENV);
-const PINECONE_INDEX = String(process.env.PINECONE_INDEX);
+const PINECONE_API_KEY = String(process.env.NEXT_PUBLIC_PINECONE_KEY);
+const PINECONE_ENV = String(process.env.NEXT_PUBLIC_PINECONE_ENV);
+const PINECONE_INDEX = String(process.env.NEXT_PUBLIC_PINECONE_INDEX);
 
 export const upsert = async (data: any, batchSize = 250) => {
   const pinecone = new PineconeClient();

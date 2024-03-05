@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 require("dotenv").config();
-const open_ai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const open_ai = new OpenAI({ apiKey: process.env.NEXT_PUBLIC_OPENAI_KEY });
 
 //ANCHOR - OpenAI call for data embedding
 export const createEmbeddings = async (data: any) => {

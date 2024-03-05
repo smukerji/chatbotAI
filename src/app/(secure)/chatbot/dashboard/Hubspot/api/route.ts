@@ -36,7 +36,7 @@ export async function POST(request: Request) {
       // This code is for fetching data from hubspot api 
 
       try {
-        let result = await fetch(`${process.env.NEXTAUTH_URL}/chatbot/dashboard/Hubspot/tasks`,{
+        let result = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard/Hubspot/tasks`,{
           method:'POST',
           body:JSON.stringify({chatbotId,accessToken})
         })
