@@ -38,6 +38,7 @@
       justify-content: space-between;
       .point {
         display: flex;
+        text-transform: capitalize;
         align-items: center;
         gap: 22px;
       }

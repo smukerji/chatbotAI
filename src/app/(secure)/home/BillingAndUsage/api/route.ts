@@ -54,7 +54,7 @@ async function delPlan(req: any, res: NextResponse) {
         },
       }
     );
-    return { msg: "Plan deleted successfully", status: 1 };
+    return { msg: "Plan deleted successfully", status: true };
   } catch (error) {
     return { msg: "finding error", status: 0 };
   }

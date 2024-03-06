@@ -170,13 +170,13 @@
       /* 140% */
       position: relative;
       &::after {
-        content: '';
+        content: "";
         width: calc(75vw - 700px);
         height: 200px;
         top: 50%;
         left: 100%;
         position: absolute;
-        background-image: url('../../../../../public/sections-images/facilities-section/zig-zag-line.svg');
+        background-image: url("../../../../../public/sections-images/facilities-section/zig-zag-line.svg");
         background-size: 100%;
         background-repeat: no-repeat;
         @media screen and (max-width: 1600px) {
@@ -188,13 +188,13 @@
       }
 
       &::before {
-        content: '';
+        content: "";
         width: calc(75vw - 700px);
         height: 200px;
         top: 31%;
         left: -537%;
         position: absolute;
-        background-image: url('../../../../../public/sections-images/facilities-section/zig-zag-line.svg');
+        background-image: url("../../../../../public/sections-images/facilities-section/zig-zag-line.svg");
         background-size: 100%;
         background-repeat: no-repeat;
         @media screen and (max-width: 1920px) {
@@ -318,9 +318,16 @@
       .points-container {
         margin-top: 30px;
         .point {
+          .number {
+            min-height: 40px;
+            min-width: 40px;
+            height: 40px;
+            width: 40px;
+          }
           .description {
             h3 {
               font-size: 20px;
+              line-height: 25px;
             }
 
             p {

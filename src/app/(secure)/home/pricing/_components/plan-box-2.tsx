@@ -39,21 +39,21 @@ export default function PlanTwo({ setPlan, price, setPrice, prePrice }: any) {
       </div>
       <div className="plan-container-list">
         <button className="pay-btn" disabled={true}>
-          <span className="btn-text">Coming soon ...</span>
+          <span className="btn-text">Coming soon</span>
         </button>
         <div className="plan-details">
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
-            <span className="plan-text">5 chatbots</span>
+            <span className="plan-text">5 Chatbots</span>
           </div>
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
-            <span className="plan-text">2k messages / chatBot / month</span>
+            <span className="plan-text">5k Messages / Month</span>
           </div>
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
             <span className="plan-text">
-              Limit to 20 links to train/chatbot
+            Unlimited links to train
             </span>
           </div>
           <div className="plan-item horizontal-line-2">
@@ -91,19 +91,21 @@ export default function PlanTwo({ setPlan, price, setPrice, prePrice }: any) {
             <span className="plan-text">Excel & CSV</span>
           </div>
 
-          <div className="plan-item">
+          {/* <div className="plan-item">
             <span className="plan-text-head">Integration </span>
-          </div>
-          <div className="plan-item horizontal-line-2">
+          </div> */}
+          <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
             <span className="plan-text">Embed on unlimited websites</span>
           </div>
 
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
-            <span className="plan-text">View Conversation History</span>
+            <span className="plan-text">
+              View & Export Conversation History
+            </span>
           </div>
-          <div className="plan-item horizontal-line-2">
+          <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
             <span className="plan-text">Optional Collect Leads</span>
           </div>
@@ -132,51 +134,86 @@ export default function PlanTwo({ setPlan, price, setPrice, prePrice }: any) {
           </div>
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
-            <span className="plan-text">Dashboard Analytics</span>
+            <span className="plan-text">Remove Branding</span>
           </div>
-          <div className="plan-item">
-            <Image src={tickCircle} alt="no-svg" />
-            <span className="plan-text">
-              Multilingual Support with Auto Translation
-            </span>
+          <div className="plan-item-container">
+            <div className="plan-item">
+              <Image src={tickCircle} alt="no-svg" />
+              <span className="plan-text">Share & Delete Bots</span>
+            </div>
+            <div className="coming-soon">Coming soon</div>
           </div>
-          <div className="plan-item">
+          <div className="plan-item-container">
+            <div className="plan-item">
+              <Image src={tickCircle} alt="no-svg" />
+              <span className="plan-text">Lead Collection</span>
+            </div>
+            <div className="coming-soon">Coming soon</div>
+          </div>
+          <div className="plan-item-container">
+            <div className="plan-item">
+              <Image src={tickCircle} alt="no-svg" />
+              <span className="plan-text">Dashboard Analytics</span>
+            </div>
+            <div className="coming-soon">Coming soon</div>
+          </div>
+          <div className="plan-item-container">
+            <div className="plan-item">
+              <Image src={tickCircle} alt="no-svg" />
+              <span className="plan-text">
+                Multilingual Support with Auto Translation
+              </span>
+            </div>
+            <div className="coming-soon">Coming soon</div>
+          </div>
+          {/* <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
             <span className="plan-text">Affliliation/API Access</span>
           </div>
-          <div className="plan-item">
-            <Image src={tickCircle} alt="no-svg" />
-            <span className="plan-text">Remove Branding</span>
+         */}
+          <div className="plan-item-container">
+            <div className="plan-item">
+              <Image src={tickCircle} alt="no-svg" />
+              <span className="plan-text">Duplicate Bots</span>
+            </div>
+            <div className="coming-soon">Coming soon</div>
           </div>
-          <div className="plan-item">
-            <Image src={tickCircle} alt="no-svg" />
-            <span className="plan-text">Duplicate Bots</span>
-          </div>
-          <div className="plan-item">
-            <Image src={tickCircle} alt="no-svg" />
-            <span className="plan-text">Share & Delete Bots</span>
-          </div>
+          <div className="plan-item-container">
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
             <span className="plan-text">Role Based Access</span>
           </div>
+          <div className="coming-soon">Coming soon</div>
+        </div>
+        <div className="plan-item-container">
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
             <span className="plan-text">Team Collaboration</span>
           </div>
+          <div className="coming-soon">Coming soon</div>
+        </div>
+        <div className="plan-item-container">
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
             <span className="plan-text">
               Organizing Data Sources into Folder
             </span>
           </div>
+          <div className="coming-soon">Coming soon</div>
+        </div>
+        <div className="plan-item-container">
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
             <span className="plan-text">Content Summarization</span>
           </div>
+          <div className="coming-soon">Coming soon</div>
+        </div>
+        <div className="plan-item-container">
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
             <span className="plan-text">Chrome Extension</span>
+          </div>
+          <div className="coming-soon">Coming soon</div>
           </div>
         </div>
       </div>

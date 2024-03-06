@@ -1,4 +1,4 @@
-import { Modal, Steps, Switch, message } from "antd";
+import { Modal, Spin, Steps, Switch, message } from "antd";
 import React, { useEffect, useRef, useState } from "react";
 import copyIcon from "../../../../../../../public/svgs/copy-icon.svg";
 import Image from "next/image";
@@ -134,6 +134,8 @@ function WhatsappModal({ isOpen, onClose }: any) {
         next: { revalidate: 0 },
       });
       const res = await result.json();
+      setMetaDetails({...metaDetails,id:res.whatsAppDetailsId})
+      
       if (res?.verifyValue === true) {
         message.success(res?.verifyMessage);
         setStepState({ ...stepState, step2: true, step1: false });
@@ -187,7 +189,7 @@ function WhatsappModal({ isOpen, onClose }: any) {
     ) {
       
       try {
-        const {id,...wrapMetaDetails} = metaDetails
+        // const {id,...wrapMetaDetails} = metaDetails
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/whatsapp/api`,
           {
@@ -196,7 +198,7 @@ function WhatsappModal({ isOpen, onClose }: any) {
             },
             method: "POST",
             body: JSON.stringify({
-              ...wrapMetaDetails,
+              ...metaDetails,
               chatbotId: chatbot.id,
               userId: userId[0].userId,
             }),
@@ -454,7 +456,9 @@ function WhatsappModal({ isOpen, onClose }: any) {
                   <p className="whatsapp-top-title">
                     Webhook Verification Token
                   </p>
+                 
                   <div className="whatsapp-input-copy-container">
+                    {!whatsAppWebhookToken ?  <div className="whatsapp-spin-token"><Spin /></div> :<>
                     <input
                       type="text"
                       className="whatsapp-input"
@@ -472,6 +476,8 @@ function WhatsappModal({ isOpen, onClose }: any) {
                         handleCopy(inputTokenRef.current?.value || "")
                       }
                     />
+                    </>
+}
                   </div>
                 </div>
               </div>

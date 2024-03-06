@@ -161,3 +161,6 @@ margin-top: 0px !important;
 .whatsapp-delete{
   cursor:  pointer !important;
 }
+.whatsapp-spin-token{
+  margin: 2px auto;
+}

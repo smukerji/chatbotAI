@@ -8,6 +8,8 @@
     position: sticky;
     width: 100%;
     top: 0;
+  z-index: 1;
+
 
     @media only screen and (max-width: 1440px) {
         padding: 12px 20px;

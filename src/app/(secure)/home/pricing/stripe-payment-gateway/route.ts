@@ -22,8 +22,8 @@ async function createPaymentIntent(req: any, res: NextResponse) {
       if (
         data.plan == "individual" &&
         data.endDate > currentDate &&
-        plan != 5 &&
-        plan != 6
+        plan == 1 &&
+        plan == 3 
       ) {
         return "You already have plan";
       }
@@ -34,7 +34,7 @@ async function createPaymentIntent(req: any, res: NextResponse) {
         //ANCHOR - stripe payment intent creation
         const paymentIntent = await stripe.paymentIntents.create({
           amount: amount,
-          currency: "inr",
+          currency: "usd",
           automatic_payment_methods: {
             enabled: true,
           },
@@ -61,6 +61,11 @@ async function checkCurrentPlan(req: any, res: NextResponse) {
   const collection = db.collection("users");
   const data = await collection.findOne({ _id: new ObjectId(u_id) });
   let currentDate = new Date();
+  const date2: any = new Date(data.endDate);
+  const date1: any = new Date();
+
+  const differenceMs = date2 - date1;
+  const differenceDays = Math.round(differenceMs / (1000 * 60 * 60 * 24))
   //ANCHOR - check current plan of the user
   if (data.endDate > currentDate) {
     if(data.plan){
@@ -69,7 +74,7 @@ async function checkCurrentPlan(req: any, res: NextResponse) {
         prePrice: 15,
         duration: data.duration,
         text: "Current Plan",
-        whatsAppIntegration: data.isWhatsApp
+        whatsAppIntegration: data.isWhatsapp
       };
     }
     else{
@@ -77,10 +82,11 @@ async function checkCurrentPlan(req: any, res: NextResponse) {
         msg: 1,
         prePrice: 15,
         duration: data.duration,
-        text: "7 days free trial is running ..."
+        text: `Trial Expiring in ${differenceDays} Days`,
+        whatsAppIntegration: true
       }
     }
   } else {
-    return { msg: 0, text:"Get started" };
+    return { msg: 0, text:"Get started",whatsAppIntegration: data.isWhatsapp };
   }
 }

@@ -70,6 +70,35 @@ async function initializeDb() {
   //   }
   // );
 
+  // const collection = db.collection("users");
+
+  // // Retrieve all user documents
+  // const users = await collection.find({}).toArray();
+
+  // // Iterate over each user document and remove specified fields
+  // for (const user of users) {
+  //   // Update the user document without the specified fields
+  //   const res = await collection.updateOne(
+  //     { _id: user._id },
+  //     {
+  //       $unset: {
+  //         customerId: 1,
+  //         paymentId: 1,
+  //       },
+  //     }
+  //   );
+  // }
+
+  // const userDetailsCollection = db.collection("users");
+
+  // await userDetailsCollection.updateMany(
+  //   {},
+  //   {
+  //     $set: {
+  //       isWhatsapp: true,
+  //     },
+  //   }
+  // );
   console.log("Database initialized successfully");
   process.exit();
 }

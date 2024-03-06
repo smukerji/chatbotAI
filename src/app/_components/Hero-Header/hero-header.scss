@@ -1,5 +1,5 @@
 .hero-header {
-  background: url('../.././../../public/sections-images/header-background/hero-header.svg');
+  background: url("../.././../../public/sections-images/header-background/hero-header.svg");
   height: 900px;
   background-repeat: no-repeat;
   background-size: cover;
@@ -7,7 +7,7 @@
   z-index: 999;
 
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     left: 0;
     top: 0;
@@ -54,7 +54,8 @@
     .header-content-container {
       padding: 20px;
       .header-text {
-        font-size: 50px;
+        font-size: 35px;
+        line-height: 45px;
       }
       .header-sub-text {
         font-size: 19px;
@@ -90,6 +91,11 @@
   align-items: center;
   background: rgba(255, 255, 255, 0.31);
   backdrop-filter: blur(4.199999809265137px);
+  position: fixed;
+  width: 100%;
+  top: 0;
+
+ 
 
   @media only screen and (max-width: 1440px) {
     padding: 12px 20px;
@@ -122,6 +128,16 @@
         width: 75%;
         display: flex;
         justify-content: center;
+
+        @media only screen and (max-width: 1300px) and (min-width: 1151px){
+          width: 72%;
+        }
+
+        @media only screen and (max-width: 1150px) and (min-width: 992px){
+          width: 66%;
+        }
+
+      
       }
     }
 
@@ -181,6 +197,40 @@
   align-items: center;
   gap: 32px;
   margin-left: 30px;
+
+  @media only screen and (max-width: 1515px) and (min-width: 1241px){
+    gap: 25px !important;
+
+    .try-free-btn{
+      padding: 10px !important;
+      gap: 5px !important;
+      font-size: 18px !important;
+      line-height: 28px !important;
+    }
+  }
+
+  @media only screen and (max-width: 1240px) and (min-width: 1158px){
+    gap: 15px !important;
+
+    .try-free-btn{
+      padding: 10px 9px !important;
+      gap: 5px !important;
+      font-size: 18px !important;
+      line-height: 28px !important;
+    }
+  }
+
+  @media only screen and (max-width: 1157px) and (min-width: 992px){
+    gap: 15px !important;
+
+    .try-free-btn{
+      padding: 10px 9px !important;
+      gap: 5px !important;
+      font-size: 18px !important;
+      line-height: 28px !important;
+    }
+  }
+
   .login-btn {
     color: #fcfcfd;
     text-align: center;
@@ -228,6 +278,10 @@
     font-style: normal;
     font-weight: 600;
     line-height: 72px;
+
+    @media only screen and (max-width: 767px){
+      padding-top: 100px !important;
+    }
     /* 120% */
   }
   .header-sub-text {

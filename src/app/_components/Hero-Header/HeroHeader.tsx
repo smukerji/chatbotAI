@@ -1,18 +1,18 @@
-'use client';
-'use client';
+"use client";
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import './hero-header.scss';
-import { Button, Input, Space } from 'antd';
-import Image from 'next/image';
-import LuciferLogo from '../../../../public/svgs/lucifer-ai-logo.svg';
-import smsIcon from '../../../../public/svgs/sms.svg';
-import { useRouter } from 'next/navigation';
-import { useCookies } from 'react-cookie';
-import { useSession } from 'next-auth/react';
-import dynamic from 'next/dynamic';
-import Link from 'next/link';
-const AuthBtn = dynamic(() => import('../AuthBtn'), { ssr: false });
+import React, { useEffect, useState } from "react";
+import "./hero-header.scss";
+import { Button, Input, Space } from "antd";
+import Image from "next/image";
+import LuciferLogo from "../../../../public/svgs/lucifer-ai-logo.svg";
+import smsIcon from "../../../../public/svgs/sms.svg";
+import { useRouter } from "next/navigation";
+import { useCookies } from "react-cookie";
+import { useSession } from "next-auth/react";
+import dynamic from "next/dynamic";
+import Link from "next/link";
+const AuthBtn = dynamic(() => import("../AuthBtn"), { ssr: false });
 
 function HeroHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -21,49 +21,53 @@ function HeroHeader() {
     setMenuOpen(!menuOpen);
   };
   return (
-    <div className='hero-header'>
-      <div className='header-title-container'>
-        <Image className='logo' src={LuciferLogo} alt='img-logo' />
+    <div className="hero-header">
+      <div className="header-title-container">
+        <Image className="logo" src={LuciferLogo} alt="img-logo" />
 
         <div className={`hamburger-menu-icon`} onClick={toggleMenu}>
-          <div className='bar'></div>
-          <div className='bar'></div>
-          <div className='bar'></div>
+          <div className="bar"></div>
+          <div className="bar"></div>
+          <div className="bar"></div>
         </div>
 
-        <div className={`hamburger-menu ${menuOpen ? 'open' : ''}`}>
+        <div className={`hamburger-menu ${menuOpen ? "open" : ""}`}>
           <div className={`navbar `}>
             <ul>
               <li>
-                <a href='#'>How It Works</a>
+                <a href="#features">Features</a>
               </li>
 
               <li>
-                <a href='#'>API</a>
+                <a href="/home/pricing">Pricing</a>
               </li>
 
-            <li>
-              <a href="/home/pricing">Pricing</a>
-            </li>
-          </ul>
-        </div>
+              <li>
+                <a href="#service-offerings">Service Offerings</a>
+              </li>
+            </ul>
+          </div>
 
-          <div className='login-register-container'>
+          <div className="login-register-container">
             {/* If user is logged in display my Chatbot else try for free */}
             <AuthBtn />
           </div>
         </div>
       </div>
 
-      <div className='header-content-container'>
-        <p className='header-text'>Welcome to AI Chatbot</p>
+      <div className="header-content-container">
+        <p className="header-text">
+        Enhance Your Business with Custom GPT: Revolutionise Customer & Insights
+        </p>
 
-        <p className='header-sub-text'>
-          At Lucifer.AI, we bring you the future of AI-driven conversations.
-          Step into a world where your online interactions are powered by
-          intelligent machines. We are thrilled to welcome you to a new era of
-          conversational excellence. Say Hello to Lucifer.AI, your intelligent
-          companion in the digital realm
+        <p className="header-sub-text">
+          Unlock the full potential of AI for your business with our Custom
+          ChatGPT solution. Lucifer AI is dedicated to transforming the way
+          businesses interact with data. By harnessing the power of advanced AI
+          technologies, Lucifer AI provides innovative solutions that streamline
+          data analysis and insight generation. Our mission is to make data
+          accessible and actionable for all, through the power of conversational
+          AI
         </p>
 
         <a

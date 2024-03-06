@@ -78,6 +78,7 @@
         display: flex;
         gap: 10px;
         .plan-name {
+          text-transform: capitalize;
           color: var(--Neutral-8, #141416);
           font-family: sans-serif;
           font-size: 24px;
@@ -138,6 +139,11 @@
           font-style: normal;
           font-weight: 500;
           line-height: 28px; /* 140% */
+        }
+        .dot-image {
+          @media only screen and (max-width: 767px) {
+            display: none;
+          }
         }
         .plan-chatbot {
           color: var(--Neutral-5, #777e90);

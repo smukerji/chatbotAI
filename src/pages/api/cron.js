@@ -1,45 +1,62 @@
+const cron = require("node-cron");
+const { MongoClient, ObjectId } = require("mongodb");
+require("dotenv").config();
+// import { Stripe } from "stripe";
+const Stripe = require("stripe");
+
+const uri = process.env.NEXT_PUBLIC_MONGO_URI;
+const stripe = new Stripe(String(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY));
+
 export default async function handler(req, res) {
-  console.log(req.headers.authorization);
   if (req.headers.authorization !== `Bearer ${process.env.CRON_SECRET}`) {
     return res.status(401).end("Unauthorized");
   }
   try {
     let client = new MongoClient(uri);
     let db = (await client.connect()).db();
+    const collectionPlan = db.collection("plans");
     const collection = db.collection("users");
+    const collectionPayment = db.collection("payment-history");
+    const collectionUserDetails = db.collection("user-details");
     const currentDate = new Date();
     const cursor = await collection.find({
       endDate: { $lt: currentDate },
     });
 
-    const data = await cursor.toArray();
+    const dataa = await cursor.toArray();
     /// close the cursor
     await cursor.close();
 
     let price = 0;
-    for (let i = 0; i < data.length; i++) {
-      const data = data[i];
+    for (let i = 0; i < dataa.length; i++) {
+      const data = dataa[i];
+      const planDetails = await collectionPlan.findOne({ _id: data.planId });
       if (data.nextPlan != "") {
         const h = data.paymentId;
-        if (data.nextPlan == "agency") {
-          if (data.nextPlanDuration == "month") {
-            price = 15;
+        console.log(String(data._id));
+        // if (data.nextPlan == "individual") {
+        if (data.nextPlanDuration == "month") {
+          if (data.nextIsWhatsapp) {
+            price = 22;
           } else {
-            price = 144;
+            price = 15;
           }
         } else {
-          if (data.nextPlanDuration == "month") {
-            price = 89;
-          } else {
-            price = 854;
-          }
+          price = 144;
         }
+        // } else {
+        //   if (data.nextPlanDuration == "month") {
+        //     price = 89;
+        //   } else {
+        //     price = 854;
+        //   }
+        // }
         if (h) {
           amount = price * 100;
           //ANCHOR - stripe payment intent creation
           const paymentIntent = await stripe.paymentIntents.create({
             amount: amount,
-            currency: "inr",
+            currency: "usd",
             automatic_payment_methods: {
               enabled: true,
             },
@@ -67,6 +84,33 @@ export default async function handler(req, res) {
                   nextPlan: data.nextPlan,
                   nextPlanId: data.nextPlanId,
                   nextPlanDuration: data.nextPlanDuration,
+                  isWhatsapp: data.nextIsWhatsapp,
+                  nextIsWhatsapp: data.nextIsWhatsapp,
+                },
+              }
+            );
+            var formattedDate = currentDate.toLocaleString("en-US", {
+              month: "short",
+              day: "2-digit",
+              year: "numeric",
+            });
+            const updatePayment = await collectionPayment.insertOne({
+              userId: String(data._id),
+              status: paymentIntent.status,
+              date: formattedDate,
+              price: "$" + price,
+              paymentId: paymentIntent.id,
+            });
+
+            const updateUserDetails = await collectionUserDetails.updateOne(
+              { userId: String(data._id) },
+              {
+                $set: {
+                  totalMessageCount: 0,
+                  messageLimit: planDetails.messageLimit,
+                  chatbotLimit: planDetails.numberOfChatbot,
+                  trainingDataLimit: planDetails.trainingDataLimit,
+                  websiteCrawlingLimit: planDetails.websiteCrawlingLimit,
                 },
               }
             );
@@ -74,7 +118,6 @@ export default async function handler(req, res) {
             const endDate = new Date(
               currentDate.getTime() + 365 * 24 * 60 * 60 * 1000
             );
-            console.log(data._id);
             const updateData = await collection.updateMany(
               { _id: new ObjectId(data._id) },
               {
@@ -87,9 +130,23 @@ export default async function handler(req, res) {
                   nextPlan: data.nextPlan,
                   nextPlanId: data.nextPlanId,
                   nextPlanDuration: data.nextPlanDuration,
+                  isWhatsapp: data.nextIsWhatsapp,
+                  nextIsWhatsapp: nextIsWhatsapp,
                 },
               }
             );
+            var formattedDate = currentDate.toLocaleString("en-US", {
+              month: "short",
+              day: "2-digit",
+              year: "numeric",
+            });
+            const updatePayment = await collectionPayment.insertOne({
+              userId: String(data._id),
+              status: paymentIntent.status,
+              date: formattedDate,
+              price: "$" + price,
+              paymentId: paymentIntent.id,
+            });
           }
         } else {
         }
@@ -98,6 +155,5 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error(error);
   }
-
   res.status(200).end("Sucess");
 }

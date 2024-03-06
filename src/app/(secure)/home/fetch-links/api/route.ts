@@ -256,26 +256,11 @@ async function fetchLinks(request: NextRequest) {
   if (urlRegex.test(sourceUrl)) {
     /// first check how much link user can crawl
     const db = (await connectDatabase())?.db();
-    /// get the user plan
-    const cursor = await db.collection("users").aggregate([
-      {
-        $match: { _id: new ObjectId(userId) },
-      },
-      {
-        $lookup: {
-          from: "plans",
-          localField: "planId",
-          foreignField: "_id",
-          as: "plan",
-        },
-      },
-    ]);
-    const planDetails = await cursor.toArray();
 
-    /// close the cursor
-    await cursor.close();
-
-    const plan = planDetails[0].plan[0];
+    /// get the user plan and allow only crawling of the amount of links left
+    const userDetails = await db
+      .collection("user-details")
+      .findOne({ userId: userId });
 
     /// find how many link are previously fetched  by this user for this bot
     const chatBotDataCollection = db.collection("chatbots-data");
@@ -283,12 +268,14 @@ async function fetchLinks(request: NextRequest) {
       chatbotId: chatbotId!,
       source: "crawling",
     });
+
     let limit = 0;
     /// if previousFetches are null then crawl link
     if (!previousFetches) {
-      limit = plan.websiteCrawlingLimit;
+      limit = userDetails?.websiteCrawlingLimit;
     } else {
-      limit = plan.websiteCrawlingLimit - previousFetches?.content.length;
+      limit =
+        userDetails?.websiteCrawlingLimit - previousFetches?.content.length;
     }
 
     if (limit === 0) {
