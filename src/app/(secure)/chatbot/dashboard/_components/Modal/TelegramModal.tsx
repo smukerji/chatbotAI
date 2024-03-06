@@ -9,7 +9,7 @@ import EditIcon from "../../../../../../../public/sections-images/common/edit.sv
 import axios from "axios";
 import { EditOutlined } from "@ant-design/icons";
 
-function TelegramModal({ setIsTelegramModalOpen }: any) {
+function TelegramModal({ setIsTelegramModalOpen,isTelegramEdit,setIsTelegramEdit }: any) {
   /// fetch the params
   const params: any = useSearchParams();
   const chatbot = JSON.parse(decodeURIComponent(params.get("chatbot")));
@@ -86,9 +86,10 @@ function TelegramModal({ setIsTelegramModalOpen }: any) {
       });
       const resp = await response.json();
       if (resp.status === 200) {
+        setIsTelegramEdit(false)
         setStatus(false);
         setIsTelegramModalOpen(false);
-
+        
         message.success(resp?.message);
       } else {
         message.error(resp?.message);
@@ -97,9 +98,10 @@ function TelegramModal({ setIsTelegramModalOpen }: any) {
   };
 
   //This function will get bot name from telegram
-  const getBotName = async () => {
+  const getBotName = async (token:any) => {
+    const newToken = token !== ''? token : telegramToken
     try {
-      let url = `https://api.telegram.org/bot${telegramToken}/getMyName`;
+      let url = `https://api.telegram.org/bot${newToken}/getMyName`;
       const response = await fetch(url, {
         headers: {
           cache: "no-store",
@@ -127,6 +129,9 @@ function TelegramModal({ setIsTelegramModalOpen }: any) {
   //This function is for changing name of bot
   const handleNameChange = async () => {
     setEditName(false);
+    if(botName.trim() !== ''){
+      
+    }
     // const body = {
     //   name: botName,
     // };
@@ -164,7 +169,8 @@ function TelegramModal({ setIsTelegramModalOpen }: any) {
       });
       const resp = await response.json();
       if (resp.status === 200) {
-        getBotName();
+        setIsTelegramEdit(true)
+        getBotName('');
         message.success(resp?.message);
       } else {
         message.error(resp?.message);
@@ -217,9 +223,9 @@ function TelegramModal({ setIsTelegramModalOpen }: any) {
       });
       const resp = await response.json();
       if (resp.status === 200) {
-        getBotName()
         setTelegramToken(resp?.data?.telegramToken);
         setSwitchEnabled(resp?.data?.isEnabled);
+        getBotName(resp?.data?.telegramToken)
         setError({ telegramToken: "" });
       }
     } catch (error) {
@@ -229,6 +235,9 @@ function TelegramModal({ setIsTelegramModalOpen }: any) {
 
   useEffect(() => {
     fetchTelegramDetails();
+    if(isTelegramEdit){
+      setStatus(true)
+    }
   }, []);
 
   return (

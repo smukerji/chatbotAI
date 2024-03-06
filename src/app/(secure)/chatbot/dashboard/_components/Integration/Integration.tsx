@@ -6,7 +6,7 @@ import telegramIcon from "../../../../../../../public/svgs/telegram-icon.svg";
 import WhatsappModal from "../Modal/WhatsappModal";
 import { useCookies } from "react-cookie";
 import { Spin, message } from "antd";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import TelegramModal from "../Modal/TelegramModal";
 
 function Integration() {
@@ -17,6 +17,11 @@ function Integration() {
     useState<boolean>(false);
   const [isWhatappVerified, setisWhatsappVerified] = useState<boolean>(false);
   const [loader, setLoader] = useState<boolean>(false);
+  const[telegramLoader,setTelegramLoader]=useState<boolean>(false)
+  const[isTelegramEdit,setIsTelegramEdit]=useState<boolean>(false)
+  const params: any = useSearchParams();
+
+  const chatbot = JSON.parse(decodeURIComponent(params.get("chatbot")));
   const userId = useCookies(["userId"]);
   const router = useRouter();
 
@@ -55,9 +60,38 @@ function Integration() {
     setLoader(false);
   };
 
-  useEffect(() => {
-    checkWhatsappAvailability();
-  }, []);
+
+  //This function will check where telegram is connected or not
+  const fetchTelegramDetails = async () => {
+    setTelegramLoader(true)
+    try {
+      const url = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/telegram/telegramData/api?chatbotId=${chatbot.id}`;
+      const response = await fetch(url, {
+        headers: {
+          cache: "no-store",
+        },
+        method: "GET",
+        next: { revalidate: 0 },
+      });
+      const resp = await response.json();
+      if (resp.status === 200) {
+        setIsTelegramEdit(true)
+      }
+    } catch (error) {
+      console.log("error", error);
+    }
+    setTelegramLoader(false)
+  };
+
+console.log('first',isTelegramEdit)
+useEffect(() => {
+  fetchTelegramDetails();
+}, [isTelegramEdit]);
+
+useEffect(() => {
+  checkWhatsappAvailability();
+}, []);
+
   return (
     <div className="integration-container">
       {/*------------------------------------------Whatsapp-integration----------------------------------------------*/}
@@ -98,7 +132,7 @@ function Integration() {
           <Image src={telegramIcon} alt="telegram-icon" />
           <span >Add to Telegram</span>
         </div>
-        <div className="action" onClick={()=>{setIsTelegramModalOpen(true)}}>Coming soon</div>
+        <div className="action" onClick={()=>{setIsTelegramModalOpen(true)}}>{telegramLoader ? <Spin/>: <>{isTelegramEdit?'Edit':'Connect'}</>}</div>
       </div>
 
       <div className="how-to-integrate">
@@ -116,7 +150,7 @@ function Integration() {
         onClose={closeWhatsAppModal}
       />
       {/* ----------Telegram modal */}
-      {isTelegramModalOpen && <TelegramModal setIsTelegramModalOpen={setIsTelegramModalOpen} />}
+      {isTelegramModalOpen && <TelegramModal setIsTelegramModalOpen={setIsTelegramModalOpen} isTelegramEdit={isTelegramEdit} setIsTelegramEdit={setIsTelegramEdit}/>}
     </div>
   );
 }
