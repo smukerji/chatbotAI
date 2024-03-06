@@ -50,6 +50,16 @@
       cursor: pointer;
     }
   }
+  .telegram-container{
+    display:flex;
+    align-items:center;
+  }
+  .telegram-i-btn{
+    margin-left: 10px;
+  }
+  .telegram-i-btn:hover{
+    cursor: pointer !important;
+  }
 
   @media only screen and (max-width: 991px) {
     .integration {
