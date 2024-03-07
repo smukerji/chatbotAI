@@ -89,6 +89,10 @@ function Register() {
   /// function to validate email
   const checkEmail = (e: any) => {
     let email: string = e?.target?.value;
+    if (email == "") {
+      setEmailMessage("Please enter email");
+      return;
+    }
     setEmail(email);
 
     const pattern = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
@@ -221,7 +225,7 @@ function Register() {
               <input
                 type="text"
                 placeholder="Enter your Email"
-                onChange={checkEmail}
+                onBlur={checkEmail}
                 onKeyDown={(e) => {
                   if (e.key == "Enter")
                     if (
