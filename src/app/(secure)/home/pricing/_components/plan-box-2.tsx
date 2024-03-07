@@ -30,14 +30,18 @@ export default function PlanTwo({
           JSON.stringify(fPrice),
           "xyz"
         ).toString();
-        router.push(`/home/pricing/checkout/${2}?a=${a}`);
+        console.log(a)
+        const data = encodeURIComponent(a)
+        console.log(data, a)
+        router.push(`/home/pricing/checkout/${2}?a=${data}`);
       } else {
         const fPrice = price - prePrice
         const a = CryptoJS.AES.encrypt(
           JSON.stringify(fPrice),
           "xyz"
         ).toString();
-        router.push(`/home/pricing/checkout/${4}?a=${a}`);
+        const data = encodeURIComponent(a)
+        router.push(`/home/pricing/checkout/${4}?a=${data}`);
       }
     } else {
       router.push("/account/login");

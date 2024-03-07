@@ -25,11 +25,10 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
   const [cookies, setCookie] = useCookies(["userId"]);
   const [loading, setLoading] = useState(false);
   const u_id: any = cookies.userId;
-  const [isChecked, setIsChecked] = useState(false);
+  const [isChecked, setIsChecked] = useState(true);
   const [newPrice, setNewPrice] = useState<any>(price);
   const [defaultChecked, setDefault] = useState(false);
   const WhatsappModal = async () => {
-    defaultChecked;
     const whatsappData = await axios.put(
       `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/getCustomer`,
       {
@@ -38,15 +37,17 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
     );
     setDefault(whatsappData.data.msg);
     setIsChecked(whatsappData.data.msg);
+    console.log(defaultChecked)
   };
 
   useEffect(() => {
-    if (isChecked && (plan == 1 || plan == 3 || plan == 2 || plan == 4)) {
+    if (isChecked && (plan == 1 || plan == 3 || plan == 2 || plan == 4) && defaultChecked) {
+      console.log("WHY HERE", defaultChecked)
       setNewPrice(Number(price) + Number(7));
     } else {
       setNewPrice(price);
     }
-  }, [isChecked]);
+  }, [isChecked, defaultChecked, newPrice]);
 
   useEffect(() => {
     setNewPrice(price);
@@ -54,13 +55,13 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
   }, []);
   const handleSubmit = async (event: any) => {
     event.preventDefault();
-
+    
     if (!stripe || !elements) {
       return;
     }
 
     setLoading(true);
-
+    
     const cardNumber: any = elements.getElement(CardNumberElement);
     const cardCvc: any = elements.getElement(CardCvcElement);
     const cardExpiry: any = elements.getElement(CardExpiryElement);
@@ -93,10 +94,10 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
           const result = await axios.post(
             `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway`,
             { plan: plan, price: newPrice, u_id: u_id }
-          );
+            );
 
-          try {
-            if (result.data.client_secret) {
+            try {
+              if (result.data.client_secret) {
               //ANCHOR - payment confirmation
 
               const r = stripe.confirmPayment({
@@ -141,8 +142,8 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
         else{
           message.error(
            update.data.code
-          )
-          .then(()=> {
+           )
+           .then(()=> {
             window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing`;
             return;
           });
@@ -163,6 +164,7 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
     }
   };
 
+          console.log(typeof(price), newPrice, price)
   return (
     <>
       {loading && <Loader />}
@@ -189,7 +191,7 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
                 </div>
               </div>
               {/* <Image src={line} alt={"no image"} /> */}
-              {(plan == 1 || plan == 3 || plan == 2 || plan == 4) && (
+              {(plan == 1 || plan == 3 || plan == 2 || plan == 4) && (defaultChecked) && (
                 <div className="checkbox">
                   <input
                     type="checkbox"
@@ -207,7 +209,7 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
               )}
               <div className="bottom-left">
                 <div className="total">Total</div>
-                <div className="total-price">${newPrice}</div>
+                <div className="total-price">${newPrice? newPrice : price}</div>
               </div>
             </div>
             <div className="right">

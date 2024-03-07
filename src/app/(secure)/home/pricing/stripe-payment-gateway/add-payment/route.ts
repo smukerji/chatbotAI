@@ -125,12 +125,22 @@ async function addPaymentDetails(req: any, res: NextResponse) {
       //ANCHOR - getting plan details
       const collectionPlan = db.collection("plans");
       const plan_data = await collectionPlan.findOne({ name: plan_name });
-      let currentDate = new Date();;
+      let currentDate = new Date();
       if (userData?.endDate > currentDate) {
         currentDate = userData.startDate;
+        const updateUserDetails = await collectionAdd.updateMany({userId: String(u_id)},{
+          $set:{
+            totalMessageCount: userDataAdd.totalMessageCount,
+            chatbotLimit:Number(plan_data.numberOfChatbot) + Number(userDataAdd.numberOfChatbot) - 1,
+            messageLimit:Number(plan_data.messageLimit) + Number(userDataAdd.messageLimit) - 2000,
+            trainingDataLimit:Number(plan_data.trainingDataLimit) + Number(userDataAdd.trainingDataLimit) - 1000000,
+            websiteCrawlingLimit:Number(plan_data.websiteCrawlingLimit) + Number(userDataAdd.websiteCrawlingLimit) - 10
+          }
+        })
       } else {
+        console.log("WE ARE HERE")
         currentDate = new Date();
-        const updateUserDetails = await collectionAdd.updateMany({userId: "u_id"},{
+        const updateUserDetails = await collectionAdd.updateMany({userId: String(u_id)},{
           $set:{
             totalMessageCount: 0,
             chatbotLimit:plan_data.numberOfChatbot,

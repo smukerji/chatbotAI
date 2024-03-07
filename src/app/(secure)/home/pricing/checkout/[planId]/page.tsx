@@ -5,6 +5,8 @@ import { loadStripe } from "@stripe/stripe-js";
 import CreatePaymentMethod from "../../_components/CreatePaymentMethod";
 import { useSearchParams } from "next/navigation";
 import CryptoJS from 'crypto-js';
+import { chat } from "googleapis/build/src/apis/chat";
+import { Spin } from "antd";
 const stripePromise = loadStripe(
   String(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY)
 );
@@ -25,22 +27,39 @@ const CheckoutPage = ({ params }: any) => {
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
   const param: any = useSearchParams();
   const chatbot = (decodeURIComponent(param.get("a")));
+  const [decryptedData , setDecryptedData] = useState("");
+  const [loader, setLoader] = useState(false)
   
+  const dataDecrypt =() => {
+    console.log('.....', chatbot);
+    
+    // const data: any = decodeURIComponent(chatbot)
+    // console.log(data)
     const bytes = CryptoJS.AES.decrypt(chatbot, "xyz");
-    const decryptedData = (bytes.toString(CryptoJS.enc.Utf8));  
+    console.log(bytes)
+    const decryptedData = (bytes.toString(CryptoJS.enc.Utf8)); 
+    setDecryptedData(decryptedData)  
+    console.log("Decrypted Data:", decryptedData);
+    setLoader(false)
+  }
 
   useEffect(() => {
+    setLoader(true)
     setSelectedPlan(plans.find((plan: any) => plan.id === Number(planId)));
+    dataDecrypt()
   }, []);
 
   return (
     <div>
       <Elements stripe={stripePromise}>
-        <CreatePaymentMethod
+        {loader ? <Spin /> : (
+
+          <CreatePaymentMethod
           plan={selectedPlan?.id}
-          price={selectedPlan?.id == 4 || selectedPlan?.id == 2  ? decryptedData : selectedPlan?.price}
+          price={(selectedPlan?.id == 4 || selectedPlan?.id == 2)  ? decryptedData : selectedPlan?.price}
           duration={selectedPlan?.days === 365 ? "year" : "month"}
-        />
+          />
+          )}
       </Elements>
     </div>
   );

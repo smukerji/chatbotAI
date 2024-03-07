@@ -31,7 +31,7 @@ async function initializeDb() {
       $set: {
         name: "agency",
         numberOfChatbot: 5,
-        messageLimit: 2000,
+        messageLimit: 5000,
         trainingDataLimit: 1000000,
         websiteCrawlingLimit: 20,
       },
