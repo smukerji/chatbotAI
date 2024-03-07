@@ -15,7 +15,7 @@ function Integration() {
     useState<boolean>(false);
   const [isWhatappVerified, setisWhatsappVerified] = useState<boolean>(false);
   const [isSlackModalOpen, setIsSlackModalOpen] = useState<boolean>(false);
-  const [isSlackVerified, setIsSlackVerified] = useState<boolean>(false);
+  const [isSlackConnected, setIsSlackConnected] = useState<boolean>(false);
   const [loader, setLoader] = useState<boolean>(false);
   const userId = useCookies(['userId']);
   const router = useRouter();
@@ -44,7 +44,6 @@ function Integration() {
         }
       );
       const data = await response.json();
-      console.log(data);
       if (
         data?.isWhatsappVerified === true ||
         data?.isWhatsappVerified === false
@@ -62,8 +61,6 @@ function Integration() {
   useEffect(() => {
     checkWhatsappAvailability();
   }, []);
-
-  console.log('chabot', chatbot);
 
   return (
     <div className='integration-container'>
@@ -116,6 +113,12 @@ function Integration() {
         <>
           {loader ? (
             <Spin />
+          ) : isSlackConnected ? (
+            <>
+              <div className='view' onClick={() => setIsSlackModalOpen(true)}>
+                View
+              </div>
+            </>
           ) : (
             <>
               <div className='action' onClick={() => setIsSlackModalOpen(true)}>
@@ -147,6 +150,8 @@ function Integration() {
         setIsSlackModalOpen={setIsSlackModalOpen}
         userId={userId[0].userId}
         chatbotId={chatbot.id}
+        setIsSlackConnected={setIsSlackConnected}
+        isSlackConnected={isSlackConnected}
       />
     </div>
   );
