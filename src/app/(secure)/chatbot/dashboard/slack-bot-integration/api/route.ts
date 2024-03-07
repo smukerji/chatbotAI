@@ -2,10 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { apiHandler } from "../../../../../_helpers/server/api/api-handler";
 import{connectDatabase} from '../../../../../../db';
 import validator  from 'validator';
+import { ObjectId } from "mongodb";
 
 module.exports = apiHandler({
     POST: saveSlackAppData,
-    GET:getSlackAppData
+    GET:getSlackAppData,
+    DELETE:deleteSlackAppData
   });
 
 interface SlackAppData {
@@ -16,7 +18,36 @@ interface SlackAppData {
   chatBotId:string;
 }
 
-export async function getSlackAppData(req: NextRequest) {
+async function deleteSlackAppData(req: NextRequest) {
+  try {
+    let recordId:string = req.nextUrl.searchParams.get("recordId") as string;
+
+    if(validator.isEmpty(recordId.trim())){
+      return { status: 400, message: "Invalid recordId" }
+    }
+
+    const db = (await connectDatabase())?.db();
+    const collection = db?.collection('slack-app-details');
+    const deleteResult = await collection?.findOne({ _id:new ObjectId(recordId)  });
+
+    if (deleteResult) {
+      let result = await collection?.deleteOne({ _id: new ObjectId(recordId)  });
+
+      if(result?.deletedCount > 0){
+        return { message: "delete success" };
+      }
+      return { message: "delete failed" };  
+
+    }
+
+    return { message: "data not found",status:404 };
+  }
+  catch (error: any) {
+    return { status: 503, message: error.message }
+  }
+}
+
+async function getSlackAppData(req: NextRequest) {
   try {
 
     //read the chatBotId
@@ -52,13 +83,18 @@ async function saveSlackAppData(req: NextRequest) {
     const db = (await connectDatabase())?.db();
 
     //check if the chatBotId is exist
-    let chatbotCollection = db.collection('user_chatbots');
-    let chatBotDetails = await chatbotCollection.findOne({ _id: slackAppData.chatBotId });
+    let chatbotCollection = db.collection('user-chatbots');
+    let chatBotDetails = await chatbotCollection.findOne({ chatbotId: slackAppData.chatBotId });
     if (!chatBotDetails) {
       return { status: 400, message: "Chatbot not available" }
     }
 
-    
+    //check if the user is exist
+    let userCollection = db.collection('users');
+    let userDetails = await userCollection.findOne({ _id: new ObjectId(slackAppData.userId) });
+    if (!userDetails) {
+      return { status: 400, message: "User not available" }
+    }
    
     let collection = db.collection('slack-app-details');
 
