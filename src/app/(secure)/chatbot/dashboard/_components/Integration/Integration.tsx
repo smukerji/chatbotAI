@@ -29,7 +29,7 @@ function Integration() {
   const openWhatsAppModal = () => {
     setisWhatsappModalOpen(true);
   };
-
+ 
   const closeWhatsAppModal = () => {
     setisWhatsappModalOpen(false);
   };
@@ -128,17 +128,17 @@ useEffect(() => {
       </div>
 
       {/*------------------------------------------Telegram-integration----------------------------------------------*/}
-      <div className="telegram-container" >
-
-      <div className="integration">
+      {/* <div className="telegram-container" > */}
+                   
+      <div className="integration i-btn">
         <div className="name">
           <Image src={telegramIcon} alt="telegram-icon" />
           <span >Add to Telegram</span>
         </div>
         <div className="action" onClick={()=>{setIsTelegramModalOpen(true)}}>{telegramLoader ? <Spin/>: <>{isTelegramEdit?'Edit':'Connect'}</>}</div>
-      </div>
       <div className="telegram-i-btn" onClick={() => router.push(`dashboard/telegram-guide`)}><InfoCircleOutlined /></div>
       </div>
+      {/* </div> */}
 
       <div className="how-to-integrate">
         <p

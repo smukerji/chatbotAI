@@ -30,7 +30,17 @@
     .action:hover {
       cursor: pointer;
     }
-  }
+    }
+
+    .i-btn{
+      position: relative;
+
+    }
+    .telegram-i-btn{
+      position: absolute;
+      right: -28px;
+    }
+
 
   .integration:nth-of-type(2) .action {
     color: #777e90;
@@ -53,10 +63,9 @@
   .telegram-container{
     display:flex;
     align-items:center;
+
   }
-  .telegram-i-btn{
-    margin-left: 10px;
-  }
+
   .telegram-i-btn:hover{
     cursor: pointer !important;
   }

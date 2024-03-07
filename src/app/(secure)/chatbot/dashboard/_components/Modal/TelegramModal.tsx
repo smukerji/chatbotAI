@@ -18,6 +18,9 @@ function TelegramModal({ setIsTelegramModalOpen,isTelegramEdit,setIsTelegramEdit
   //chat-bot name in telegram
   const [botName, setBotName] = useState<string>("");
 
+  //chat-bot name from telegram-api
+  const[botNameFromTelegram,setBotNameFromTelegram]=useState<string>()
+
   //For toggle
   const [editName, setEditName] = useState<boolean>(false);
 
@@ -112,6 +115,7 @@ function TelegramModal({ setIsTelegramModalOpen,isTelegramEdit,setIsTelegramEdit
       const resp = await response.json();
       if (resp?.result?.name) {
         setBotName(resp?.result?.name);
+        setBotNameFromTelegram(resp?.result?.name)
         setStatus(true);
       } else {
         message.error("something went wrong please try again..");
@@ -128,29 +132,35 @@ function TelegramModal({ setIsTelegramModalOpen,isTelegramEdit,setIsTelegramEdit
 
   //This function is for changing name of bot
   const handleNameChange = async () => {
-    setEditName(false);
-    if(botName.trim() !== ''){
-      
+    
+    if(botName.trim() === ''){
+      message.error('botName should not be empty')
+      return
     }
-    // const body = {
-    //   name: botName,
-    // };
+    if(botName === botNameFromTelegram){
+      message.error('please type some different value')
+      return
+    }
+    
+    const body = {
+      name: botName,
+    };
 
-    // axios
-    //   .post(`https://api.telegram.org/bot${telegramToken}/setMyName`, body)
-    //   .then((res: any) => {
+    axios
+      .post(`https://api.telegram.org/bot${telegramToken}/setMyName`, body)
+      .then((res: any) => {
 
-    //     if (res.ok) {
-    //       message.success("Bot name changed successfully");
-    //     } else {
-    //       message.error(res?.description);
-    //     }
-    //   })
-    //   .catch((error) => {
-    //     message.error(error?.response?.data?.description);
-    //   });
+        if (res?.data?.ok) {
+          message.success("Bot name changed successfully");
+          setEditName(false);
+        } else {
+          message.error(res?.data?.description);
+        }
+      })
+      .catch((error) => {
+        message.error(error?.response?.data?.description);
+      });
   };
-
   const setTelegramData = async () => {
     try {
       const url = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/telegram/telegramData/api`;
