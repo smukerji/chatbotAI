@@ -158,7 +158,25 @@ function TelegramModal({ setIsTelegramModalOpen,isTelegramEdit,setIsTelegramEdit
         }
       })
       .catch((error) => {
-        message.error(error?.response?.data?.description);
+        const description = error?.response?.data?.description;
+        if (description && error?.response?.data?.parameters?.retry_after) {
+
+          const retryAfterSeconds =  error?.response?.data?.parameters?.retry_after;
+
+          const hours = Math.floor(retryAfterSeconds / 3600);
+          const minutes = Math.floor((retryAfterSeconds % 3600) / 60);
+          if(retryAfterSeconds<60){
+            message.error(`Too Many Requests. Please try after ${retryAfterSeconds}seconds`);
+
+          }
+          else{
+
+            message.error(`Too Many Requests. Please try after ${hours} hours and ${minutes} minutes`);
+          }
+        } else {
+          // Handle other errors using the original message.error
+          message.error(description);
+        }
       });
   };
   const setTelegramData = async () => {

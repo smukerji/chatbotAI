@@ -53,7 +53,39 @@ export async function POST(request: NextRequest) {
       }
         return new Response("received", { status: 200 });
       }
+      // check whether message limit is reached or not 
+      try {
+        const db = (await connectDatabase())?.db();
+        const collections = db?.collection("user-details");
+        const result = await collections.findOne({ userId });
+        if(result.totalMessageCount >= result.messageLimit){
+           //--------------- This code is for sending message to telegram
+      const url = `https://api.telegram.org/bot${telegramToken}/sendMessage`;
 
+      const body = {
+        chat_id: chatId,
+        text: 'Your limit reached please upgrade your plan',
+      };
+
+      try {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        });
+
+        const responseData = await response.json();
+      } catch (error) {
+        console.log("Error sending message to Telegram:", error);
+      }
+      return new Response("received", { status: 200 });
+        }
+        
+      } catch (error) {
+        console.log("error",error)
+      }
 
   if (userId) {
     // write pinecone and open ai code
@@ -110,6 +142,28 @@ export async function POST(request: NextRequest) {
     );
 
     const openaiBody = JSON.parse(await responseOpenAI.text());
+      
+    //update message count and check message limit
+
+    try {
+      const db = (await connectDatabase())?.db();
+      const collections = db?.collection("user-details");
+      const result = await collections.findOne({ userId });
+      if (result?.totalMessageCount !== undefined && openaiBody.choices[0].message.content) {
+          // If totalMessageCount exists, update it by adding 1
+          await collections.updateOne(
+              { userId },
+              { $set: { totalMessageCount: result.totalMessageCount + 1 } }
+          );
+      }
+  } catch (error) {
+      console.log("error ", error);
+  }
+  
+
+
+
+
     // after getting response from open ai
     if (openaiBody.choices[0].message.content) {
       //--------------- This code is for sending message to telegram
