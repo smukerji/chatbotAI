@@ -42,7 +42,11 @@ function SlackModal({
         .then((res) => {
           console.log('pppppp', res);
 
-          message.success('Success');
+          message.success(res?.data?.message);
+          setIsSlackModalOpen(false);
+          setIsSlackConnected(true);
+          setDisableInput(true);
+          getSlackData();
         })
         .catch((error) => {
           console.log('ooooo', error);
@@ -58,12 +62,19 @@ function SlackModal({
   function handleDelete() {
     try {
       axios
-        .post(
+        .delete(
           `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard/slack-bot-integration/api?recordId=${recordId}
         `
         )
         .then((res) => {
-          message.success('Success');
+          message.success(res?.data?.message);
+          setIsSlackModalOpen(false);
+          setIsSlackConnected(false);
+          setDisableInput(false);
+          setSlackData({
+            appId: '',
+            authOToken: '',
+          });
         })
         .catch((error) => {
           console.log(error);
@@ -75,8 +86,7 @@ function SlackModal({
     }
   }
 
-  // useEffect to check if slack is connected or  not
-  useEffect(() => {
+  const getSlackData = () => {
     try {
       axios
         .get(
@@ -101,6 +111,11 @@ function SlackModal({
     } catch (error: any) {
       // message.error(error?.response?.data?.message);
     }
+  };
+
+  // useEffect to check if slack is connected or  not
+  useEffect(() => {
+    getSlackData();
   }, []);
 
   return (

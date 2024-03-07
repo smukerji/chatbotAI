@@ -115,8 +115,8 @@ function Integration() {
             <Spin />
           ) : isSlackConnected ? (
             <>
-              <div className='delete' onClick={() => setIsSlackModalOpen(true)}>
-                Delete
+              <div className='view' onClick={() => setIsSlackModalOpen(true)}>
+                View
               </div>
             </>
           ) : (
