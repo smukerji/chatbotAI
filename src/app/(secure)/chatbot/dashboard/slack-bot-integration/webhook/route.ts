@@ -74,6 +74,9 @@ async function writeInDataBase(data:any){
     //find is AppId is available
     const db = (await connectDatabase())?.db();
     let slackCollection = db.collection('slack-app-details');
+
+
+
     let appDetails:SlackAppData = await slackCollection.findOne({appId:appId});
     if(appDetails){
       const authOToken = appDetails.authOToken;
@@ -86,6 +89,7 @@ async function writeInDataBase(data:any){
         logLevel: LogLevel.DEBUG
       });
 
+    //if message is empty then return the message      
       if (message.length === 0) {
         await client.chat.postMessage({
           channel: channelId, //"C06MQEG1SCE",
@@ -150,12 +154,51 @@ async function writeInDataBase(data:any){
 
         // after getting response from open ai
         if (openaiBody.choices[0].message.content) {
-          await client.chat.postMessage({
-            channel: channelId, //"C06MQEG1SCE",
-            text: openaiBody.choices[0].message.content,
-            threadId: data.event.ts
-          });
-          
+         
+
+          //check if user chat count has reached the limit if not then increment the count
+          let userDetailsCollection:any = await db.collection('user-details');
+          // let userDetails = await userDetailsCollection.findOne({userId:userID});
+          let cursor = await userDetailsCollection.aggregate([
+            {
+              $match: { userId: userID }
+            },
+            {
+              $addFields:{
+                limitCross:{
+                  $cond:[
+                    {$gte:[
+                      "$totalMessageCount","$messageLimit"
+                    ]},true,false
+                  ]
+                }
+              }
+            }
+          ]);
+
+          let limitCrossResult = await cursor.toArray();
+
+          await cursor.close();
+
+          if(limitCrossResult[0].limitCross === false){
+
+            await client.chat.postMessage({
+              channel: channelId, //"C06MQEG1SCE",
+              text: openaiBody.choices[0].message.content,
+              threadId: data.event.ts
+            });
+
+            let result = await userDetailsCollection.updateOne({ userId: userID }, { $inc: { totalMessageCount: 1 } });
+            console.log('result',result);
+          }
+          else {
+            await client.chat.postMessage({
+              channel: channelId, //"C06MQEG1SCE",
+              text: "You have reached the limit of message count. Please try again later.",
+              threadId: data.event.ts
+            });
+          }
+
         }
         else {
           await client.chat.postMessage({
@@ -167,6 +210,7 @@ async function writeInDataBase(data:any){
         }
       }
     }
+
   }
   catch(error:any){
     console.log('error',error);
