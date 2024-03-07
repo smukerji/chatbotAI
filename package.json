@@ -13,6 +13,7 @@
     "@auth/mongodb-adapter": "^2.0.0",
     "@nextui-org/react": "^2.2.9",
     "@pinecone-database/pinecone": "^2.0.1",
+    "@slack/web-api": "^7.0.2",
     "@sparticuz/chromium-min": "^119.0.2",
     "@stripe/react-stripe-js": "^2.4.0",
     "@stripe/stripe-js": "^2.4.0",
@@ -57,6 +58,7 @@
     "twilio": "^4.14.1",
     "typescript": "5.1.6",
     "uuid": "^9.0.1",
+    "validator": "^13.11.0",
     "xls-to-json": "^2.1.1",
     "xlsx": "^0.18.5"
   },
@@ -66,6 +68,7 @@
     "@types/js-cookie": "^3.0.3",
     "@types/jsonwebtoken": "^9.0.2",
     "@types/uuid": "^9.0.2",
+    "@types/validator": "^13.11.9",
     "concurrently": "^8.2.2",
     "encoding": "^0.1.13",
     "sass": "^1.69.5"
