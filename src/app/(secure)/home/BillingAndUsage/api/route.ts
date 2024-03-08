@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { connectDatabase } from "@/db";
+import clientPromise from "@/db";
 import Stripe from "stripe";
 import { ObjectId } from "mongodb";
 import { apiHandler } from "@/app/_helpers/server/api/api-handler";
@@ -12,7 +12,7 @@ module.exports = apiHandler({
 
 async function getUserDetails(req: any, res: NextResponse) {
   try {
-    const db = (await connectDatabase())?.db();
+    const db = (await clientPromise!).db();
     let { u_id } = await req.json();
     const collectionUser = db.collection("users");
     const collectionPayment = db.collection("payment-history");
@@ -41,7 +41,7 @@ async function getUserDetails(req: any, res: NextResponse) {
 
 async function delPlan(req: any, res: NextResponse) {
   try {
-    const db = (await connectDatabase())?.db();
+    const db = (await clientPromise!).db();
     let { u_id } = await req.json();
     const collectionUser = db.collection("users");
     const deletePlan = await collectionUser.updateMany(

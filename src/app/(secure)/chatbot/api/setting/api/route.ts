@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { apiHandler } from "../../../../../_helpers/server/api/api-handler";
 import { NextApiRequest } from "next";
-import { connectDatabase } from "../../../../../../db";
+import clientPromise from "../../../../../../db";
 import { getDate } from "../../../../../_helpers/client/getTime";
 import joi from "joi";
 import { authOptions } from "../../../../../api/auth/[...nextauth]/route";
@@ -32,7 +32,7 @@ async function retriveChatbotSettings(request: NextRequest) {
   // Accessing chatbotId from body
   const chatbotId = body?.chatbotId;
 
-  const db = (await connectDatabase())?.db();
+  const db = (await clientPromise!).db();
   const collection = db.collection("chat-history");
 
   const cursor = await collection.find({
@@ -101,7 +101,7 @@ async function updateChatbotSettings(request: NextRequest) {
   /// Chatbot name if renaming is present
   const chatbotRename = body?.chatbotRename;
 
-  const db = (await connectDatabase())?.db();
+  const db = (await clientPromise!).db();
   /// if rename is not ""
   if (chatbotRename !== "" && chatbotRename !== undefined) {
     const collection = db.collection("user-chatbots");
