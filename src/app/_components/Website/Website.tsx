@@ -102,7 +102,8 @@ function Website({
 
       // Calculate total character count
       let retotalCharCount = 0;
-      data?.fetchedLinks.forEach((item: any) => {
+
+      data?.fetchedLinks?.forEach((item: any) => {
         retotalCharCount += parseInt(item.charCount);
       });
 

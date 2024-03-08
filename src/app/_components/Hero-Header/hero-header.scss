@@ -1,5 +1,5 @@
 .hero-header {
-  background: url('../.././../../public/sections-images/header-background/hero-header.svg');
+  background: url("../.././../../public/sections-images/header-background/hero-header.svg");
   height: 900px;
   background-repeat: no-repeat;
   background-size: cover;
@@ -7,7 +7,7 @@
   z-index: 999;
 
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     left: 0;
     top: 0;
@@ -54,7 +54,8 @@
     .header-content-container {
       padding: 20px;
       .header-text {
-        font-size: 50px;
+        font-size: 35px;
+        line-height: 45px;
       }
       .header-sub-text {
         font-size: 19px;

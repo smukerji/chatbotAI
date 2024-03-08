@@ -10,7 +10,7 @@ function ServiceSection() {
     <div className="service-section-container">
       {/* --------------------------top section------------------------------ */}
       <div className="top">
-        <h1 className="title">Our service process that we apply</h1>
+        <h1 className="title">Our Service Process that we apply</h1>
         <a
           style={{ color: "white", textDecoration: "none" }}
           href="#contact-us"

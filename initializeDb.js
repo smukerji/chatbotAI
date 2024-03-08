@@ -88,6 +88,17 @@ async function initializeDb() {
   //     }
   //   );
   // }
+
+  // const userDetailsCollection = db.collection("users");
+
+  // await userDetailsCollection.updateMany(
+  //   {},
+  //   {
+  //     $set: {
+  //       isWhatsapp: true,
+  //     },
+  //   }
+  // );
   console.log("Database initialized successfully");
   process.exit();
 }

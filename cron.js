@@ -8,7 +8,7 @@ const uri = process.env.NEXT_PUBLIC_MONGO_URI;
 const stripe = new Stripe(String(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY));
 
 // Define your cron job
-cron.schedule("*/10 * * * * *", () => {
+cron.schedule("01 00 * * *", () => {
   console.log("Cron job is running...");
   CronFunction();
 });
@@ -33,10 +33,9 @@ async function CronFunction() {
     let price = 0;
     for (let i = 0; i < dataa.length; i++) {
       const data = dataa[i];
-      const planDetails = await collectionPlan.findOne({ _id: data.planId });
+      const planDetails = await collectionPlan.findOne({_id: data.planId})
       if (data.nextPlan != "") {
         const h = data.paymentId;
-        console.log(String(data._id));
         // if (data.nextPlan == "individual") {
         if (data.nextPlanDuration == "month") {
           if (data.nextIsWhatsapp) {

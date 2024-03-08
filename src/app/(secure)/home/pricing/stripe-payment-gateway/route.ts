@@ -61,6 +61,11 @@ async function checkCurrentPlan(req: any, res: NextResponse) {
   const collection = db.collection("users");
   const data = await collection.findOne({ _id: new ObjectId(u_id) });
   let currentDate = new Date();
+  const date2: any = new Date(data.endDate);
+  const date1: any = new Date();
+
+  const differenceMs = date2 - date1;
+  const differenceDays = Math.round(differenceMs / (1000 * 60 * 60 * 24))
   //ANCHOR - check current plan of the user
   if (data.endDate > currentDate) {
     if(data.plan){
@@ -77,7 +82,7 @@ async function checkCurrentPlan(req: any, res: NextResponse) {
         msg: 1,
         prePrice: 15,
         duration: data.duration,
-        text: "Trial Expiring in 7 Days",
+        text: `Trial Expiring in ${differenceDays} Days`,
         whatsAppIntegration: true
       }
     }

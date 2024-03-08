@@ -238,6 +238,15 @@
       .sources-header {
         .options-container {
           flex-wrap: wrap;
+          padding-left: 0px;
+          gap: 4px;
+
+          li {
+            padding: 5px 15px;
+          }
+        }
+        p {
+          padding-left: 15px;
         }
       }
     }

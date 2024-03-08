@@ -45,8 +45,13 @@ function apiHandler(handler: any) {
 
         /// route handler
         const responseBody = await handler[method](req, ...args);
-        
-        return NextResponse.json(responseBody || {},{status:responseBody?.status ? typeof responseBody?.status === "number" ? responseBody?.status : 200 :  200});
+        return NextResponse.json(responseBody || {}, {
+          status: responseBody?.status
+            ? typeof responseBody?.status === "number"
+              ? responseBody?.status
+              : 200
+            : 200,
+        });
       } catch (err: any) {
         /// global error handler
         return errorHandler(err);

@@ -111,5 +111,19 @@
                 }
             }
         }
+        @media only screen and (max-width: 767px) {
+            .item-list-container {
+                .item {
+                    .file {
+                        p {
+                            text-wrap: wrap;
+                            word-break: break-all;
+                            width: 65%;
+                            text-align: left;
+                        }
+                    }
+                }
+            }
+        }
     }
 }

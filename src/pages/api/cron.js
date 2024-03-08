@@ -1,3 +1,12 @@
+const cron = require("node-cron");
+const { MongoClient, ObjectId } = require("mongodb");
+require("dotenv").config();
+// import { Stripe } from "stripe";
+const Stripe = require("stripe");
+
+const uri = process.env.NEXT_PUBLIC_MONGO_URI;
+const stripe = new Stripe(String(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY));
+
 export default async function handler(req, res) {
   if (req.headers.authorization !== `Bearer ${process.env.CRON_SECRET}`) {
     return res.status(401).end("Unauthorized");
@@ -80,7 +89,6 @@ export default async function handler(req, res) {
                 },
               }
             );
-            console.log(paymentIntent);
             var formattedDate = currentDate.toLocaleString("en-US", {
               month: "short",
               day: "2-digit",
@@ -110,7 +118,6 @@ export default async function handler(req, res) {
             const endDate = new Date(
               currentDate.getTime() + 365 * 24 * 60 * 60 * 1000
             );
-            console.log(data._id);
             const updateData = await collection.updateMany(
               { _id: new ObjectId(data._id) },
               {
@@ -128,7 +135,6 @@ export default async function handler(req, res) {
                 },
               }
             );
-            console.log(paymentIntent);
             var formattedDate = currentDate.toLocaleString("en-US", {
               month: "short",
               day: "2-digit",
