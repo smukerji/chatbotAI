@@ -1,10 +1,10 @@
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { apiHandler } from "../../../../../../_helpers/server/api/api-handler";
-import { connectDatabase } from "../../../../../../../db";
+import clientPromise from '../../../../../../../db'
 
 async function getChatbotId(telegramToken: any) {
-  const db = (await connectDatabase())?.db();
+  const db = (await clientPromise!).db();
   const collection = db?.collection("telegram-bot");
   const { chatbotId, userId,isEnabled } = await collection?.findOne({ telegramToken });
   return { chatbotId, userId,isEnabled };
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
       }
       // check whether message limit is reached or not 
       try {
-        const db = (await connectDatabase())?.db();
+        const db = (await clientPromise!).db();
         const collections = db?.collection("user-details");
         const result = await collections.findOne({ userId });
         if(result.totalMessageCount >= result.messageLimit){
@@ -146,7 +146,7 @@ export async function POST(request: NextRequest) {
     //update message count and check message limit
 
     try {
-      const db = (await connectDatabase())?.db();
+      const db = (await clientPromise!).db();
       const collections = db?.collection("user-details");
       const result = await collections.findOne({ userId });
       if (result?.totalMessageCount !== undefined && openaiBody.choices[0].message.content) {

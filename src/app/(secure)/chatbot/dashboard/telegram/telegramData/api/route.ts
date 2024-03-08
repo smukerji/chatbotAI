@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { apiHandler } from "../../../../../../_helpers/server/api/api-handler";
-import { connectDatabase } from "../../../../../../../db";
+import  clientPromise  from "../../../../../../../db";
 
 module.exports = apiHandler({
   GET:getAllTelegramDetails,
@@ -17,7 +17,7 @@ async function getAllTelegramDetails(request: NextRequest) {
       return { message: "chatbotId parameter is missing", status: 400 };
     }
 
-    const db = (await connectDatabase())?.db();
+    const db = (await clientPromise!).db();
     if (!db) {
       return { message: "Failed to connect to the database", status: 500 };
     }
@@ -43,7 +43,7 @@ async function getAllTelegramDetails(request: NextRequest) {
 //This function will delete telegram token
 async function deleteTelegramToken(request: NextRequest){
   const chatbotId:any = request.nextUrl.searchParams.get("chatbotId")
-  const db = (await connectDatabase())?.db();
+  const db = (await clientPromise!).db();
   const collection = db?.collection('telegram-bot');
   const deleteResult = await collection?.findOne({ chatbotId });
   if (deleteResult) {
@@ -69,7 +69,7 @@ async function editTelegramToken(request: NextRequest) {
     return { message: "chatbotId or isEnabled field missing in the request body", status: 400 };
   }
   
-  const db = (await connectDatabase())?.db();
+  const db = (await clientPromise!).db();
   const collection = db?.collection('telegram-bot');
   const updateResult = await collection?.updateOne(
     { chatbotId },
@@ -90,7 +90,7 @@ async function editTelegramToken(request: NextRequest) {
 async function setTelegramToken(request: NextRequest) {
   const { chatbotId, telegramToken, userId,isEnabled } = await request.json();
 
-  const db = (await connectDatabase())?.db();
+  const db = (await clientPromise!).db();
   const collection = db?.collection("telegram-bot");
 
   // step 1: First check whether telegram token is present in db or not
