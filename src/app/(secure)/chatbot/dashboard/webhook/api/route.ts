@@ -7,21 +7,23 @@ const getWhatsAppDetails = async (wa_id: any) => {
   try {
     const db = (await connectDatabase()).db();
     const collection = db.collection("whatsappbot_details");
-    const result = await collection.findOne({ phoneNumberID: wa_id, isEnabled: true})
+    const result = await collection.findOne({
+      phoneNumberID: wa_id,
+      isEnabled: true,
+    });
     if (result.chatbotId) {
       return result;
     }
     return null;
-
   } catch (error) {
-    console.log("error getting chatbotID")
-    return "error"
+    console.log("error getting chatbotID");
+    return "error";
   }
-}
+};
 
 const getResponseNumber = (res: any) => {
   return res?.entry?.[0]?.changes?.[0]?.value?.contacts[0]?.wa_id;
-}
+};
 
 export async function GET(req: NextRequest) {
   let hubMode = req.nextUrl.searchParams.get("hub.mode");
@@ -29,22 +31,28 @@ export async function GET(req: NextRequest) {
   let hubToken = req.nextUrl.searchParams.get("hub.verify_token");
 
   const db = (await connectDatabase())?.db();
-  const collection = db?.collection('whatsappbot_details');
+  const collection = db?.collection("whatsappbot_details");
   //find the token in database
-  const tokenDetails = await collection?.findOne({ webhook_verification_token: hubToken });
+  const tokenDetails = await collection?.findOne({
+    webhook_verification_token: hubToken,
+  });
   if (
     hubMode === "subscribe" &&
     hubToken === tokenDetails?.webhook_verification_token
     // hubToken === process.env.WHATSAPPCALLBACKTOKEN
   ) {
-
     // find whome the hubToken belongs to and update the isTokenVerified to true
-    const tokenDetails = await collection?.findOne({ webhook_verification_token: hubToken });
+    const tokenDetails = await collection?.findOne({
+      webhook_verification_token: hubToken,
+    });
     if (tokenDetails) {
-      await collection?.updateOne({ webhook_verification_token: hubToken }, { $set: { isTokenVerified: true } });
+      await collection?.updateOne(
+        { webhook_verification_token: hubToken },
+        { $set: { isTokenVerified: true } }
+      );
     }
 
-    console.log('verified successfully');
+    console.log("verified successfully");
     return new Response(hubChallenge);
   }
 
@@ -57,21 +65,24 @@ export async function POST(req: NextRequest) {
   let questionFromWhatsapp =
     res?.entry?.[0]?.changes?.[0]?.value?.messages?.[0]?.text?.body; // question received from whatsapp
 
-  if (questionFromWhatsapp == undefined || questionFromWhatsapp.trim().length <= 0) { //if the request is only about status don't move further
+  if (
+    questionFromWhatsapp == undefined ||
+    questionFromWhatsapp.trim().length <= 0
+  ) {
+    //if the request is only about status don't move further
     // return NextResponse.json({ message: "received" });
     return new Response("received", { status: 200 });
   }
 
-
   //get the phone number id from the response
-  const phoneNumberId = res?.entry?.[0]?.changes?.[0]?.value?.metadata["phone_number_id"];
+  const phoneNumberId =
+    res?.entry?.[0]?.changes?.[0]?.value?.metadata["phone_number_id"];
 
-  let whatsAppDetailsResult:any = await getWhatsAppDetails(phoneNumberId); //here you will recieved the chatbot unique id, based on this you would identify knowledge base
+  let whatsAppDetailsResult: any = await getWhatsAppDetails(phoneNumberId); //here you will recieved the chatbot unique id, based on this you would identify knowledge base
 
-
-  if(whatsAppDetailsResult.isEnabled === false){
+  if (whatsAppDetailsResult.isEnabled === false) {
     // return { message: "Chatbot with WhatsApp is disabled" };
-    console.log('Chatbot with WhatsApp is disabled ')
+    console.log("Chatbot with WhatsApp is disabled ");
     // return NextResponse.json({ message: "received" });
     return new Response("received", { status: 200 });
   }
@@ -83,7 +94,6 @@ export async function POST(req: NextRequest) {
     // }
     return new Response("received", { status: 200 });
   }
-
 
   const responseNumber = getResponseNumber(res);
 
@@ -97,6 +107,64 @@ export async function POST(req: NextRequest) {
     });
 
     const userID = cursor.userId;
+
+    //check whether limit is reached or not
+    const version = "v18.0"; // Replace with your desired version
+    // const phoneNumberId = process.env.WHATSAPPPHONENUMBERID; // Replace with your phone number ID
+    const phoneNumberId = whatsAppDetailsResult.phoneNumberID;
+    const recipientPhoneNumber = "+" + responseNumber;
+    // const accessToken = process.env.WHATSAPPTOKEN
+    const accessToken = whatsAppDetailsResult.whatsAppAccessToken;
+    try {
+      const db = (await connectDatabase())?.db();
+      const collections = db?.collection("user-details");
+      const result = await collections.findOne({ userId:userID});
+      if (result.totalMessageCount >= result.messageLimit) {
+        //--------------- This code is for sending message to telegram
+        const url = `https://graph.facebook.com/${version}/${phoneNumberId}/messages`;
+
+        // Define the data to be sent in the request body
+        const data = {
+          messaging_product: "whatsapp",
+          recipient_type: "individual",
+          to: `${recipientPhoneNumber}`,
+          type: "text",
+          text: {
+            preview_url: false,
+            body: "Your limit reached please upgrade your plan ",
+          },
+        };
+
+        // Define the options for the fetch request
+        const options = {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify(data),
+        };
+
+        // Make the POST request using fetch
+        try {
+          const response = await fetch(url, options);
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+
+          const data = await response.json();
+
+          // Handle the data as needed
+        } catch (error) {
+          // Handle the error as needed
+          console.log(error);
+        }
+        return new Response("received", { status: 200 });
+      }
+    } catch (error) {
+      console.log("error", error);
+    }
 
     // if we have user id
     const response: any = await fetch(
@@ -154,13 +222,35 @@ export async function POST(req: NextRequest) {
 
     const openaiBody = JSON.parse(await responseOpenAI.text());
 
+    //--------update message count if we have response from openai
+        //update message count and check message limit
+
+        try {
+          const db = (await connectDatabase())?.db();
+          const collections = db?.collection("user-details");
+          const result = await collections.findOne({userId: userID });
+          if (result?.totalMessageCount !== undefined && openaiBody.choices[0].message.content) {
+              // If totalMessageCount exists, update it by adding 1
+              await collections.updateOne(
+                  { userId:userID },
+                  { $set: { totalMessageCount: result.totalMessageCount + 1 } }
+              );
+          }
+      } catch (error) {
+          console.log("error ", error);
+      }
+
+
+
+
+
 
     // after getting response from open ai
     if (openaiBody.choices[0].message.content) {
       const version = "v18.0"; // Replace with your desired version
       // const phoneNumberId = process.env.WHATSAPPPHONENUMBERID; // Replace with your phone number ID
       const phoneNumberId = whatsAppDetailsResult.phoneNumberID;
-      const recipientPhoneNumber = '+' + responseNumber;
+      const recipientPhoneNumber = "+" + responseNumber;
       // const accessToken = process.env.WHATSAPPTOKEN
       const accessToken = whatsAppDetailsResult.whatsAppAccessToken;
 
@@ -175,8 +265,8 @@ export async function POST(req: NextRequest) {
         type: "text",
         text: {
           preview_url: false,
-          body: openaiBody.choices[0].message.content
-        }
+          body: openaiBody.choices[0].message.content,
+        },
       };
 
       // Define the options for the fetch request
@@ -184,7 +274,7 @@ export async function POST(req: NextRequest) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${accessToken}`
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(data),
       };
@@ -205,13 +295,10 @@ export async function POST(req: NextRequest) {
       }
     }
   } catch (error: any) {
-    console.log(error)
+    console.log(error);
     //mantain the error log in database, in case of unhandle error
   }
 
   // return NextResponse.json({ message: "received" });
   return new Response("received", { status: 200 });
 }
-
-
-
