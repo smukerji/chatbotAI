@@ -17,6 +17,7 @@ export default function PlanTwo({
   setPrice,
   prePrice,
   enableTwo,
+  text
 }: any) {
   const { status } = useSession();
   const [cookies, setCookie] = useCookies(["userId"]);
@@ -66,7 +67,7 @@ export default function PlanTwo({
       </div>
       <div className="plan-container-list">
         <button className="pay-btn" disabled={enableTwo} onClick={changePlan}>
-          <span className="btn-text">Coming soon</span>
+          <span className="btn-text">{text}</span>
         </button>
         <div className="plan-details">
           <div className="plan-item">

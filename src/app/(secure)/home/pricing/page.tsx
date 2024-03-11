@@ -28,7 +28,8 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [cookies, setCookie] = useCookies(["userId"]);
   const [prePrice, setPrePrice] = useState(0);
-  const [text, setText] = useState("Get 7 Day Free Trial on First registration");
+  const [textOne, setText] = useState("Get 7 Day Free Trial on First registration");
+  const [textTwo, setTextTwo] = useState("Get Plan")
   const router = useRouter();
   const [whatsappDisable, setWhatsappDisable] = useState(false);
 
@@ -85,15 +86,17 @@ export default function Home() {
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway`,
         { u_id: u_id }
       );
-      setText(checkPlan.data.text);
       setWhatsappDisable(checkPlan.data.whatsAppIntegration);
       if (checkPlan.data.msg == 1) {
         setPrePrice(checkPlan.data.prePrice);
         setEnableOne(true);
+        setText(checkPlan.data.text);
+        
       }
       else if(checkPlan.data.msg == 2){
         setEnableTwo(true); 
         setEnableOne(true);
+        setTextTwo(checkPlan.data.text);
       }
     } catch (error) {
       message.error(`${error}`);
@@ -152,7 +155,7 @@ export default function Home() {
               setPrice={setPrice}
               price={isYearlyPlan ? 144 : 15}
               enableOne={enableOne}
-              text={text}
+              text={textOne}
             />
             <PlanTwo
               setPlan={setPlan}
@@ -160,6 +163,7 @@ export default function Home() {
               price={isYearlyPlan ? 854 : 89}
               enableTwo={enableTwo}
               prePrice={prePrice}
+              text={textTwo}
               // disableMonth={isYearlyPlan ? false : disableMonth}
             />
           </div>

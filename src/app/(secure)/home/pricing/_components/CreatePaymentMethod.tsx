@@ -106,7 +106,6 @@ export default function CreatePaymentMethod({ plan, price, duration }: any) {
                   return_url: `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot`,
                 },
               });
-              console.log(r)
               //ANCHOR - adding data to backend
               const a = await axios.post(
                 `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/add-payment`,

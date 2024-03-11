@@ -6,7 +6,7 @@ import CreatePaymentMethod from "../../_components/CreatePaymentMethod";
 import { useSearchParams } from "next/navigation";
 import CryptoJS from 'crypto-js';
 import { chat } from "googleapis/build/src/apis/chat";
-import { Spin } from "antd";
+import Loader from "../../_components/Loader";
 const stripePromise = loadStripe(
   String(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY)
 );
@@ -39,20 +39,24 @@ const CheckoutPage = ({ params }: any) => {
     console.log(bytes)
     const decryptedData = (bytes.toString(CryptoJS.enc.Utf8)); 
     setDecryptedData(decryptedData)  
-    console.log("Decrypted Data:", decryptedData);
     setLoader(false)
   }
 
   useEffect(() => {
     setLoader(true)
     setSelectedPlan(plans.find((plan: any) => plan.id === Number(planId)));
-    dataDecrypt()
+    if(planId == 2 || planId ==4){
+      dataDecrypt()
+    }
+    else{
+      setLoader(false)
+    }
   }, []);
 
   return (
     <div>
       <Elements stripe={stripePromise}>
-        {loader ? <Spin /> : (
+        {loader ? <Loader /> : (
 
           <CreatePaymentMethod
           plan={selectedPlan?.id}

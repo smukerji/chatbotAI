@@ -55,7 +55,7 @@ async function getCustomerWhatsappDetails(req: any, res: NextResponse) {
     const collection = db.collection("users");
     const data = await collection.findOne({ _id: new ObjectId(u_id) });
     const currentDate = new Date()
-    if (data?.endDate > currentDate) {
+    if (data?.endDate > currentDate && data.plan != null) {
       return { msg: false };
     } else {
       return { msg: true };

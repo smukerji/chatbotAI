@@ -67,6 +67,7 @@
     "@types/formidable": "^3.4.5",
     "@types/js-cookie": "^3.0.3",
     "@types/jsonwebtoken": "^9.0.2",
+    "@types/mongodb": "^4.0.7",
     "@types/uuid": "^9.0.2",
     "concurrently": "^8.2.2",
     "encoding": "^0.1.13",

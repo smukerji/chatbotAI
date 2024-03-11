@@ -99,6 +99,17 @@ async function initializeDb() {
   //     },
   //   }
   // );
+  //   const userDetailsCollection = db.collection("user-details");
+  //   let currentDate = new Date();
+  //   let endDate = new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+  // await userDetailsCollection.updateMany(
+  //   {},
+  //   {
+  //     $set: {
+  //       limitEndDate: endDate
+  //     },
+  //   }
+  // );
   console.log("Database initialized successfully");
   process.exit();
 }

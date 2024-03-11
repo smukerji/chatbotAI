@@ -88,7 +88,7 @@ async function checkCurrentPlan(req: any, res: NextResponse) {
     else{
       return{
         msg: 1,
-        prePrice: 15,
+        prePrice: 0,
         duration: data.duration,
         text: `Trial Expiring in ${differenceDays} Days`,
         whatsAppIntegration: true
