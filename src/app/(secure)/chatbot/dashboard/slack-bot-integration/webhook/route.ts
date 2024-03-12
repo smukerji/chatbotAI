@@ -1,8 +1,6 @@
 import { connectDatabase } from "@/db";
 import { NextRequest, NextResponse } from "next/server";
-import { threadId } from "worker_threads";
 const { WebClient, LogLevel } = require("@slack/web-api");
-
 
 interface SlackAppData {
   appId:string;
@@ -14,31 +12,20 @@ interface SlackAppData {
 export async function POST(req: NextRequest) {
 
   try {
-
     //read the incomming parameter from webhook
     let resData: any = await req.json();
    
-    // return new NextResponse('', { status: 200 });
+    // return the challenge on first time verification
     if (resData.challenge) {
-      // return new Response(JSON.stringify({ challenge: resData.challenge }), { status: 200 });
       return new NextResponse(JSON.stringify({ challenge: resData.challenge }), { status: 200 });
-
     }
     else {
      if(resData.event.type === 'app_mention'){
-      //  console.log('app_mention',resData.event);
-      //  console.log('app_mention',resData.event.text);
-
-      //  slackEventsQueue.add({ event: resData });
-      writeInDataBase(resData);
+      writeInDataBase(resData);//my business logic
       return new NextResponse('', { status: 200 });
-
-      //  return new Response('', { status: 200 });
      }
-
     }
 
-    //find the token in database
     // const tokenDetails = await collection?.findOne({ webhook_verification_token: hubToken });
     // if (
     //   hubMode === "subscribe" &&
@@ -66,6 +53,13 @@ export async function POST(req: NextRequest) {
 
 
 async function writeInDataBase(data: any) {
+
+  let updatedMessageCount: { isUpdated: boolean, updatedResult: any, userInfo: any } = {
+    isUpdated: false,
+    updatedResult: null,
+    userInfo: null
+  }
+
   try {
 
     const appId = data.api_app_id;
@@ -74,8 +68,6 @@ async function writeInDataBase(data: any) {
     //find is AppId is available
     const db = (await connectDatabase())?.db();
     let slackCollection = db.collection('slack-app-details');
-
-
 
     let appDetails: SlackAppData = await slackCollection.findOne({ appId: appId });
     if (appDetails) {
@@ -126,11 +118,11 @@ async function writeInDataBase(data: any) {
 
         if (limitCrossResult[0].limitCross === false) {
 
-          let isUpdated = false;
           //increment the message count
           let updatedResult =  await userDetailsCollection.updateOne({ userId: userID }, { $inc: { totalMessageCount: 1 } });
           if(updatedResult.modifiedCount > 0){
-            isUpdated = true;
+            updatedMessageCount.isUpdated = true;
+            updatedMessageCount.userInfo = userID;
           }
           // Fetch the response from the Pinecone API
           const response: any = await fetch(
@@ -199,10 +191,11 @@ async function writeInDataBase(data: any) {
           else {
 
             //if update result is true and open ai didn't respond then decrement the message count
-            if(isUpdated){
+            if(updatedMessageCount.isUpdated){
               await userDetailsCollection.updateOne({ userId: userID }, { $inc: { totalMessageCount: -1 } });
             }
 
+            //if open ai didn't respond then send the message to slack
             await client.chat.postMessage({
               channel: channelId,
               text: "Lucifer AI is not able to answer for your query. Please try again later.",
@@ -222,7 +215,19 @@ async function writeInDataBase(data: any) {
 
   }
   catch (error: any) {
-    console.log('error', error);
+    //in case if any error occurs with open ai or slack api then decrement the message count
+    try {
+      const db = (await connectDatabase())?.db();
+      let userDetailsCollection: any = await db.collection('user-details');
+      if (updatedMessageCount.isUpdated) {
+        await userDetailsCollection.updateOne({ userId: updatedMessageCount.userInfo }, { $inc: { totalMessageCount: -1 } });
+      }
+
+    }
+    catch (error: any) {
+      console.log('error', error);
+    }
+   
   }
 
 }
