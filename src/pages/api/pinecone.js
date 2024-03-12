@@ -69,7 +69,7 @@ export default async function handler(req, res) {
     const userId = body?.userId;
 
     /// fetch the IDs and user namespace from the DB
-    const db =  (await clientPromise!).db();
+    const db =  (await clientPromise).db();
     const collection = db.collection("chatbots-data");
     const userChatbots = db.collection("user-chatbots");
     const userChatbotSettings = db.collection("chatbot-settings");
