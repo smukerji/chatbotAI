@@ -43,6 +43,7 @@ function BillingAndUsage() {
     setIsWhatsappModalOpen(true);
   };
 
+  //ANCHOR - API CALL TO CANCEL WHATSAPP INTEGRATION FOR NEXT BILLING CYCLE
   const handleWhatsappOk = async () => {
     if (whatsapp == true) {
       const response = await axios.put(`${process.env.NEXT_PUBLIC_WEBSITE_URL}home/BillingAndUsage/api`, {
@@ -59,6 +60,7 @@ function BillingAndUsage() {
     }
   };
 
+  //ANCHOR - API CALL TO CANCEL PLAN FOR NEXT BILLING CYCLE
   const handleOk = async () => {
     const response = await axios.put(`${process.env.NEXT_PUBLIC_WEBSITE_URL}home/BillingAndUsage/api`, {
       u_id: cookies.userId,
@@ -80,6 +82,7 @@ function BillingAndUsage() {
     setIsModalOpen(false);
   };
 
+  //ANCHOR - COLUMNS OF TABLE IN PAYMENT HISTORY
   const columns = [
     {
       title: 'PaymentId',
@@ -107,6 +110,7 @@ function BillingAndUsage() {
     router.push(`${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing`);
   };
 
+  //ANCHOR - API CALL FOR COLLECTING DATA FROM DATABASE
   const myFunction = async () => {
     const response = await axios.post(`${process.env.NEXT_PUBLIC_WEBSITE_URL}home/BillingAndUsage/api`, {
       u_id: cookies.userId
@@ -203,7 +207,10 @@ function BillingAndUsage() {
             <button className='btn-cancel-plan' onClick={showModal} disabled={disable}>
               <span className='btn-text-cancel-plan'>{disable ? 'Plan Cancelled' : 'Cancel My Plan'}</span>
             </button>
-            <button className='btn-cancel-plan btn-cancel-plan-whatsapp' onClick={whatsapp ? cancelWhatsapp : explorePlan}>
+            <button
+              className='btn-cancel-plan btn-cancel-plan-whatsapp'
+              onClick={whatsapp ? cancelWhatsapp : explorePlan}
+            >
               <span className='btn-text-cancel-plan'>
                 {whatsapp ? 'Cancel Whatsapp integration for next cycle' : 'Explore Whatsapp Integration Plan'}
               </span>

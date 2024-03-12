@@ -95,6 +95,7 @@ export default function CreatePaymentMethod({ plan, price, duration, name }: any
             );
 
         if (update.data.acknowledged) {
+
           //ANCHOR - api call to create paymentIntent
           const result = await axios.post(
             `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway`,
@@ -103,14 +104,15 @@ export default function CreatePaymentMethod({ plan, price, duration, name }: any
 
             try {
               if (result.data.client_secret) {
-              //ANCHOR - payment confirmation
 
+              //ANCHOR - payment confirmation
               const r = stripe.confirmPayment({
                 clientSecret: result.data.client_secret,
                 confirmParams: {
                   return_url: `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot`,
                 },
               });
+              
               //ANCHOR - adding data to backend
               const a = await axios.post(
                 `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/add-payment`,

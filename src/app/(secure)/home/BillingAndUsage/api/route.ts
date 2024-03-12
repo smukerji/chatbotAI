@@ -45,6 +45,8 @@ async function delPlan(req: any, res: NextResponse) {
     const db = (await connectDatabase())?.db();
     let { u_id, x } = await req.json();
     const collectionUser = db.collection('users');
+    
+    //ANCHOR -  DELETE PLAN FROM USER DETAILS
     if (x == 2) {
       const deletePlan = await collectionUser.updateMany(
         { _id: new ObjectId(u_id) },
@@ -58,6 +60,7 @@ async function delPlan(req: any, res: NextResponse) {
       );
       return { msg: 'Plan deleted successfully', status: true };
     }
+    //ANCHOR - UPDATE WHATSAPP STATUS IN USERS
     else if( x == 1){
       const deletePlan = await collectionUser.updateMany(
         { _id: new ObjectId(u_id) },
