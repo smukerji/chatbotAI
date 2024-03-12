@@ -20,7 +20,7 @@ async function deleteWhatsappData(req: NextRequest) {
     }
 
     //connect to database
-    const db = (await connectDatabase())?.db();
+    const db = (await clientPromise!).db();
 
     //checking if given whatsapp details is available or not
     const collection = db?.collection('whatsappbot_details');
@@ -63,7 +63,7 @@ async function getWhatsappData(req: NextRequest) {
     }
 
     //connect to database
-    const db = (await connectDatabase())?.db();
+    const db = (await clientPromise!).db();
 
     //checking if given chatbot is available or not
     const userChatbotCollection = db?.collection('user-chatbots');
