@@ -1,11 +1,11 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 // import { NextApiResponse } from "next";
-import { connectDatabase } from "@/db";
+import clientPromise from "@/db";
 
 const getWhatsAppDetails = async (wa_id: any) => {
   try {
-    const db = (await connectDatabase()).db();
+    const db = (await clientPromise!).db();
     const collection = db.collection("whatsappbot_details");
     const result = await collection.findOne({
       phoneNumberID: wa_id,
@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
   let hubChallenge = req.nextUrl.searchParams.get("hub.challenge");
   let hubToken = req.nextUrl.searchParams.get("hub.verify_token");
 
-  const db = (await connectDatabase())?.db();
+  const db = (await clientPromise!).db();
   const collection = db?.collection("whatsappbot_details");
   //find the token in database
   const tokenDetails = await collection?.findOne({
@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
 
   // retriving userId from database
   try {
-    const db = (await connectDatabase()).db();
+    const db = (await clientPromise!).db();
 
     const collection = db.collection("user-chatbots");
     const cursor = await collection.findOne({

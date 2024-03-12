@@ -1,11 +1,11 @@
-import { NextRequest } from 'next/server';
-import { apiHandler } from '../../../../../_helpers/server/api/api-handler';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '../../../../auth/[...nextauth]/route';
-import joi from 'joi';
-import { connectDatabase } from '../../../../../../db';
-import { ObjectId } from 'mongodb';
-import { USER_DETAILS_UPDATED } from '../../../../../_helpers/successConstans';
+import { NextRequest } from "next/server";
+import { apiHandler } from "../../../../../_helpers/server/api/api-handler";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../../../auth/[...nextauth]/route";
+import joi from "joi";
+import clientPromise from "../../../../../../db";
+import { ObjectId } from "mongodb";
+import { USER_DETAILS_UPDATED } from "../../../../../_helpers/successConstans";
 
 module.exports = apiHandler({
   POST: changeUserDetails,
@@ -14,8 +14,8 @@ module.exports = apiHandler({
 async function changeUserDetails(request: NextRequest) {
   /// get the session and then access the id
   const session: any = await getServerSession(authOptions);
-  const userId = request?.headers.get('userId')
-    ? request?.headers.get('userId')
+  const userId = request?.headers.get("userId")
+    ? request?.headers.get("userId")
     : session?.user?.id;
 
   const body = await request.json();
@@ -26,26 +26,26 @@ async function changeUserDetails(request: NextRequest) {
   const lastName = body?.lastName;
   const fullName = body?.fullName;
 
-  const db = (await connectDatabase()).db();
+  const db = (await clientPromise!).db();
 
   /// update the user
   if (isGoogleUser) {
-    const username: string[] = fullName?.split(' ')!;
-    await db.collection('users').updateOne(
+    const username: string[] = fullName?.split(" ")!;
+    await db.collection("users").updateOne(
       { _id: new ObjectId(userId) },
       {
         $set: {
           name: fullName,
-          username: username[0] + `${username?.[1] ? '_' + username?.[1] : ''}`,
+          username: username[0] + `${username?.[1] ? "_" + username?.[1] : ""}`,
         },
       }
     );
   } else {
-    await db.collection('users').updateOne(
+    await db.collection("users").updateOne(
       { _id: new ObjectId(userId) },
       {
         $set: {
-          username: firstName + '_' + lastName,
+          username: firstName + "_" + lastName,
         },
       }
     );
@@ -59,7 +59,7 @@ async function changeUserDetails(request: NextRequest) {
  */
 changeUserDetails.schema = joi.object({
   isGoogleUser: joi.boolean().required(),
-  firstName: joi.string().optional().allow(''),
-  lastName: joi.string().optional().allow(''),
-  fullName: joi.string().optional().allow(''),
+  firstName: joi.string().optional().allow(""),
+  lastName: joi.string().optional().allow(""),
+  fullName: joi.string().optional().allow(""),
 });

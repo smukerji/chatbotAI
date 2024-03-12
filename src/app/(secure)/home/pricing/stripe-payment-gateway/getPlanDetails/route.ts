@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { connectDatabase } from "@/db";
+import clientPromise from "@/db";
 import { ObjectId } from "mongodb";
 import { apiHandler } from "@/app/_helpers/server/api/api-handler";
 
@@ -11,7 +11,7 @@ module.exports = apiHandler({
 //ANCHOR - getting all plan details
 async function getPlanDetails(req: NextRequest, res: NextResponse) {
   try {
-    const db = (await connectDatabase())?.db();
+    const db = (await clientPromise!).db();
     const collection = db.collection("plans");
     const cursor = await collection.find();
     const data = await cursor.toArray();
@@ -26,7 +26,7 @@ async function getPlanDetails(req: NextRequest, res: NextResponse) {
 //ANCHOR - checking that user has payment-methodId or not
 async function checkUserPaymentMethod(req: any, res: NextResponse) {
   let { u_id } = await req.json();
-  const db = (await connectDatabase())?.db();
+  const db = (await clientPromise!).db();
   const collection = db.collection("users");
   const user = await collection.findOne({ _id: new ObjectId(u_id) });
   const h = user.paymentId;

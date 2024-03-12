@@ -15,9 +15,11 @@ import { Modal, message, Collapse } from "antd";
 import Loader from "./_components/Loader";
 import Coll from "./_components/Collapse";
 import { useRouter } from "next/navigation";
+import SecondaryHeader from "@/app/_components/Secondary-Header/SecondaryHeader";
+import { useSession } from "next-auth/react";
 
 export default function Home() {
-  const [status, setStatus] = useState<number>(2);
+  const [planStatus, setStatus] = useState<number>(2);
   const [plan, setPlan] = useState(0);
   const [enableOne, setEnableOne] = useState(false);
   const [isYearlyPlan, setIsYearlyPlan] = useState(false);
@@ -25,25 +27,43 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [cookies, setCookie] = useCookies(["userId"]);
   const [prePrice, setPrePrice] = useState(0);
-  const [text, setText] = useState("Get 7 Dya Free Trial on First registration");
+  const [text, setText] = useState("Get 7 Day Free Trial on First Registration");
   const router = useRouter();
   const [whatsappDisable, setWhatsappDisable] = useState(false);
+
+  const { status } = useSession();
 
   const u_id: any = cookies.userId;
 
   const CharacterAddOn = async () => {
+    if (cookies?.userId) {
     router.push(`/home/pricing/checkout/${5}`);
+    } else {
+      router.push("/account/login");
+    }
   };
 
   const MessageAddOn = async () => {
+    if (cookies?.userId) {
     router.push(`/home/pricing/checkout/${6}`);
+    } else {
+      router.push("/account/login");
+    }
   };
 
   const MessageAddOnAdvance = async () => {
+    if (cookies?.userId) {
     router.push(`/home/pricing/checkout/${7}`);
+    } else {
+      router.push("/account/login");
+    }
   };
   const WhatsappAddOn = async () => {
+    if (cookies?.userId) {
     router.push(`/home/pricing/checkout/${8}`);
+    } else {
+      router.push("/account/login");
+    }
   };
 
   const getPlanDetails = async () => {
@@ -64,7 +84,6 @@ export default function Home() {
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway`,
         { u_id: u_id }
       );
-      console.log(checkPlan);
       setText(checkPlan.data.text);
       setWhatsappDisable(checkPlan.data.whatsAppIntegration);
       if (checkPlan.data.msg == 1) {
@@ -87,7 +106,7 @@ export default function Home() {
     } else {
       setLoading(false);
     }
-  }, [plan, status]);
+  }, [plan, planStatus]);
 
   const handlePlanType = () => {
     setIsYearlyPlan(!isYearlyPlan);
@@ -95,8 +114,9 @@ export default function Home() {
 
   return (
     <>
+      {(status === "unauthenticated" && !u_id) && <SecondaryHeader/>}
       {loading && <Loader />}
-      {status === 2 && loading == false && (
+      {planStatus === 2 && loading == false && (
         <div className="main">
           <h2 className="price-header">Pricing Plans</h2>
           {/* <div className="price-offer-container">
@@ -198,7 +218,7 @@ export default function Home() {
                 <div className="integration-list">
                   <div className="app-integration">
                     <div className="integration-name-container">
-                      <p className="integration-name">5K messages</p>
+                      <p className="integration-name">5K Messages</p>
                     </div>
                     <button
                       className="app-integration-price-btn"
@@ -213,7 +233,7 @@ export default function Home() {
                   </div>
                   <div className="app-integration">
                     <div className="integration-name-container">
-                      <p className="integration-name">10K messages</p>
+                      <p className="integration-name">10K Messages</p>
                     </div>
                     <button
                       className="app-integration-price-btn"
@@ -237,12 +257,12 @@ export default function Home() {
                 </button> */}
               </div>
               <div className="add-ons-integration">
-                <p className="integration-head">Training data</p>
+                <p className="integration-head">Training Data</p>
                 <div className="integration-list">
                   <div className="app-integration">
                     <div className="integration-name-container">
                       <p className="integration-name">
-                        Total Characters for training - 1M
+                        1M Characters
                       </p>
                     </div>
                     <button

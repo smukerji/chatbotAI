@@ -159,6 +159,32 @@
       border-radius: 16px;
       background: var(--Neutral-2, #f4f5f6);
 
+      @media only screen and (max-width: 1420px) and (min-width: 991px){
+        max-width: 40%;
+        gap: 30px;
+
+        .plan-container-list{
+          .pay-btn{
+            padding: 10px !important;
+            .btn-text{
+              font-size: 17px !important;
+            }
+          }
+        }
+      }
+
+      @media only screen and (max-width: 991px) and (min-width: 767px){
+
+        .plan-container-list{
+          .pay-btn{
+            padding: 10px !important;
+            .btn-text{
+              font-size: 15px !important;
+            }
+          }
+        }
+      }
+
       &.plan-box-even {
         background: #2e58ea;
       }
@@ -197,7 +223,7 @@
             font-style: normal;
             font-weight: 500;
             line-height: 24px;
-            width: 266px;
+            // width: 266px;
 
             &.plan-placeholder-even {
               color: #fcfcfd;
@@ -340,13 +366,13 @@
             }
 
             .coming-soon-even {
-              color: var(--Neutral-1, #fcfcfd);
+              color:  var(--Primary-4, #99aef9);;
               font-family: sans-serif;
               font-size: 16px;
               font-style: normal;
               font-weight: 500;
               line-height: 24px;
-              opacity: 0.7;
+              opacity: 1;
               width: 32%;
               text-align: end;
             }
@@ -755,6 +781,7 @@
         width: 100%;
         border: none;
         background-color: #ffffff;
+        // z-index: -1;
 
         .ant-collapse-item {
           border: none;
@@ -988,7 +1015,7 @@
       align-items: flex-start;
       gap: 22px;
       flex-shrink: 0;
-      height: 700px;
+      height: 650px;
 
       .top-left {
         display: flex;
@@ -1218,7 +1245,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  height: calc(100vh - 70px);
+  height: calc(100% - 70px);
   z-index: 10;
   background: linear-gradient(
     180deg,

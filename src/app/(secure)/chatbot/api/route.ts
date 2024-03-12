@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { connectDatabase } from "../../../../db";
+import clientPromise from "../../../../db";
 import { apiHandler } from "../../../_helpers/server/api/api-handler";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../api/auth/[...nextauth]/route";
@@ -27,7 +27,7 @@ async function fetchBots(request: NextRequest) {
 
 // Fetch custom chatbots from the database
 async function fetchCustomBots(userId: string) {
-  const db = (await connectDatabase())?.db();
+  const db = (await clientPromise!).db();
   // console.log("Database ", db);
 
   const collection = db?.collection("user-chatbots");

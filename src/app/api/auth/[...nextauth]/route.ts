@@ -2,13 +2,13 @@ import NextAuth, { NextAuthOptions, getServerSession } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import GithubProvider from "next-auth/providers/github";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
-import { connectDatabase } from "../../../../db";
+import clientPromise from "../../../../db";
 import { cookies } from "next/headers";
 import { ObjectId } from "mongodb";
 import { Adapter } from "next-auth/adapters";
 
 export const authOptions: NextAuthOptions = {
-  adapter: MongoDBAdapter(connectDatabase()) as Adapter,
+  adapter: MongoDBAdapter(clientPromise!) as Adapter,
   //   session: {
   //     strategy: "jwt",
   //   },
@@ -30,7 +30,7 @@ export const authOptions: NextAuthOptions = {
       let currentDate = new Date();
       let endDate = new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000);
 
-      const db = (await connectDatabase()).db();
+      const db = (await clientPromise!).db();
 
       const starterPlan = await db
         .collection("plans")
@@ -95,7 +95,7 @@ export const authOptions: NextAuthOptions = {
     },
     // async signIn({ user, account, profile, email, credentials }) {
     //   /// db connection
-    //   const db = (await connectDatabase()).db();
+    //   const db =  (await clientPromise!).db();
 
     //   /// get the starter plan ID
     //   const starterPlan = await db

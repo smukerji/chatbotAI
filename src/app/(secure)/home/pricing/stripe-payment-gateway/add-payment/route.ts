@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { connectDatabase } from "@/db";
+import clientPromise from "@/db";
 import Stripe from "stripe";
 import { ObjectId } from "mongodb";
 import { apiHandler } from "@/app/_helpers/server/api/api-handler";
@@ -12,7 +12,7 @@ module.exports = apiHandler({
 
 async function addPaymentDetailsFail(req: any, res: NextResponse) {
   let { u_id, status, paymentId, price } = await req.json();
-  const db = (await connectDatabase())?.db();
+  const db = (await clientPromise!).db();
 
   const collectionPayment = db.collection("payment-history");
   var currentDat = new Date();
@@ -36,7 +36,7 @@ async function addPaymentDetails(req: any, res: NextResponse) {
     try {
       let { plan, u_id, duration, status, paymentId, price, isWhatsapp } =
         await req.json();
-      const db = (await connectDatabase())?.db();
+      const db = (await clientPromise!).db();
 
       //ANCHOR - Get data of user by user_id
       const collection = db.collection("users");

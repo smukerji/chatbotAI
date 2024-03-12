@@ -75,6 +75,10 @@
         opacity: 0.2;
         background: #fcfcfd;
 
+        @media only screen and (max-width: 430px){
+          display: none;
+        }
+
         h3,
         img,
         p {
@@ -149,6 +153,10 @@
       flex: 1;
       margin-top: -17%;
 
+      @media only screen and (max-width: 430px){
+        margin-top: 0% !important;
+      }
+
       .empty-box {
         display: flex;
         // width: 22vw;
@@ -163,6 +171,10 @@
         border-radius: 32px;
         opacity: 0.2;
         background: #fcfcfd;
+
+        @media only screen and (max-width: 430px){
+          display: none;
+        }
 
         h3,
         img,
@@ -231,6 +243,11 @@
         margin-top: -28%;
       }
     }
+  }
+
+  @media only screen and (max-width: 1496px) {
+ 
+    height: 100%;
   }
 
   @media only screen and (max-width: 767px) {
