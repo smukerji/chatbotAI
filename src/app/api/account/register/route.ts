@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { connectDatabase } from "../../../../db";
+import clientPromise from "../../../../db";
 import { apiHandler } from "../../../_helpers/server/api/api-handler";
 import joi from "joi";
 import bcrypt from "bcrypt";
@@ -11,7 +11,7 @@ module.exports = apiHandler({
 async function register(request: any) {
   const body = await request.json();
   const { username, email, password } = body;
-  const db = (await connectDatabase()).db();
+  const db = (await clientPromise!).db();
   const collection = db.collection("users");
   /// validate if user email already exists
   if (await collection.findOne({ email: email })) {

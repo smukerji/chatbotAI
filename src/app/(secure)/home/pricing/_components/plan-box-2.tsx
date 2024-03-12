@@ -44,11 +44,11 @@ export default function PlanTwo({ setPlan, price, setPrice, prePrice }: any) {
         <div className="plan-details">
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
-            <span className="plan-text">5 chatbots</span>
+            <span className="plan-text">5 Chatbots</span>
           </div>
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
-            <span className="plan-text">5k messages / chatBot / month</span>
+            <span className="plan-text">5k Messages / Month</span>
           </div>
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
@@ -146,7 +146,7 @@ export default function PlanTwo({ setPlan, price, setPrice, prePrice }: any) {
           <div className="plan-item-container">
             <div className="plan-item">
               <Image src={tickCircle} alt="no-svg" />
-              <span className="plan-text">Lead collection</span>
+              <span className="plan-text">Lead Collection</span>
             </div>
             <div className="coming-soon">Coming soon</div>
           </div>

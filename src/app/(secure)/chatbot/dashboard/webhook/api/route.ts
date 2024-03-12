@@ -1,11 +1,12 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 // import { NextApiResponse } from "next";
-import { connectDatabase } from "@/db";
+import clientPromise from "@/db";
+import { ObjectId } from "mongodb";
 
 const getWhatsAppDetails = async (wa_id: any) => {
   try {
-    const db = (await connectDatabase()).db();
+    const db = (await clientPromise!).db();
     const collection = db.collection("whatsappbot_details");
     const result = await collection.findOne({
       phoneNumberID: wa_id,
@@ -25,12 +26,63 @@ const getResponseNumber = (res: any) => {
   return res?.entry?.[0]?.changes?.[0]?.value?.contacts[0]?.wa_id;
 };
 
+
+//-----------------------------------------------------------This function will send message to whatsapp
+async function sendMessageToWhatsapp(phoneNumberId:any,recipientPhoneNumber:any,accessToken:any,message:any){
+  const version = "v18.0"; // Replace with your desired version
+  // const phoneNumberId = process.env.WHATSAPPPHONENUMBERID; // Replace with your phone number ID
+  // const phoneNumberId =phoneNumberId ;
+  // const recipientPhoneNumber =recipientPhoneNumber ;
+  // // const accessToken = process.env.WHATSAPPTOKEN
+  // const accessToken = accessToken;
+
+  // Define the URL for the POST request
+  const url = `https://graph.facebook.com/${version}/${phoneNumberId}/messages`;
+
+  // Define the data to be sent in the request body
+  const data = {
+    messaging_product: "whatsapp",
+    recipient_type: "individual",
+    to: `${recipientPhoneNumber}`,
+    type: "text",
+    text: {
+      preview_url: false,
+      body: message,
+    },
+  };
+
+  // Define the options for the fetch request
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify(data),
+  };
+  // Make the POST request using fetch
+  try {
+    const response = await fetch(url, options);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Handle the data as needed
+  } catch (error) {
+    // Handle the error as needed
+    console.log(error);
+  }
+}
+
 export async function GET(req: NextRequest) {
   let hubMode = req.nextUrl.searchParams.get("hub.mode");
   let hubChallenge = req.nextUrl.searchParams.get("hub.challenge");
   let hubToken = req.nextUrl.searchParams.get("hub.verify_token");
 
-  const db = (await connectDatabase())?.db();
+  const db = (await clientPromise!).db();
   const collection = db?.collection("whatsappbot_details");
   //find the token in database
   const tokenDetails = await collection?.findOne({
@@ -79,6 +131,36 @@ export async function POST(req: NextRequest) {
     res?.entry?.[0]?.changes?.[0]?.value?.metadata["phone_number_id"];
 
   let whatsAppDetailsResult: any = await getWhatsAppDetails(phoneNumberId); //here you will recieved the chatbot unique id, based on this you would identify knowledge base
+  const responseNumber = getResponseNumber(res);
+
+// -----------------------------------------------------This function will if the subscription is active or not of user
+try {
+  const db = (await clientPromise!).db();
+  const collections = db.collection("user-chatbots");
+  const cursor = await collections.findOne({
+    chatbotId: whatsAppDetailsResult.chatbotId,
+  });
+  const collection = db?.collection("users");
+  const data = await collection.findOne({ _id: new ObjectId(cursor.userId) });
+  const endDate = data?.endDate;
+  // const isTelegram = data?.isWhatsapp;
+
+  const currentDate = new Date();
+  if (currentDate > endDate) {
+   
+    sendMessageToWhatsapp(whatsAppDetailsResult.phoneNumberID,"+" + responseNumber,whatsAppDetailsResult.whatsAppAccessToken,'Your subscription has ended')
+        return new Response("received", { status: 200 });
+  } else {
+    console.log("continue..");
+  }
+} catch (error) {
+  console.log("error");
+}
+
+
+
+
+
 
   if (whatsAppDetailsResult.isEnabled === false) {
     // return { message: "Chatbot with WhatsApp is disabled" };
@@ -95,11 +177,10 @@ export async function POST(req: NextRequest) {
     return new Response("received", { status: 200 });
   }
 
-  const responseNumber = getResponseNumber(res);
 
   // retriving userId from database
   try {
-    const db = (await connectDatabase()).db();
+    const db = (await clientPromise!).db();
 
     const collection = db.collection("user-chatbots");
     const cursor = await collection.findOne({
@@ -116,50 +197,11 @@ export async function POST(req: NextRequest) {
     // const accessToken = process.env.WHATSAPPTOKEN
     const accessToken = whatsAppDetailsResult.whatsAppAccessToken;
     try {
-      const db = (await connectDatabase())?.db();
+      const db = (await clientPromise!).db();
       const collections = db?.collection("user-details");
       const result = await collections.findOne({ userId:userID});
       if (result.totalMessageCount >= result.messageLimit) {
-        //--------------- This code is for sending message to telegram
-        const url = `https://graph.facebook.com/${version}/${phoneNumberId}/messages`;
-
-        // Define the data to be sent in the request body
-        const data = {
-          messaging_product: "whatsapp",
-          recipient_type: "individual",
-          to: `${recipientPhoneNumber}`,
-          type: "text",
-          text: {
-            preview_url: false,
-            body: "Your limit reached please upgrade your plan ",
-          },
-        };
-
-        // Define the options for the fetch request
-        const options = {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify(data),
-        };
-
-        // Make the POST request using fetch
-        try {
-          const response = await fetch(url, options);
-
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
-
-          const data = await response.json();
-
-          // Handle the data as needed
-        } catch (error) {
-          // Handle the error as needed
-          console.log(error);
-        }
+        sendMessageToWhatsapp(whatsAppDetailsResult.phoneNumberID,"+" + responseNumber,whatsAppDetailsResult.whatsAppAccessToken,'Your limit reached please upgrade your plan')
         return new Response("received", { status: 200 });
       }
     } catch (error) {
@@ -226,7 +268,8 @@ export async function POST(req: NextRequest) {
         //update message count and check message limit
 
         try {
-          const db = (await connectDatabase())?.db();
+          const db = (await clientPromise!).db();
+          
           const collections = db?.collection("user-details");
           const result = await collections.findOne({userId: userID });
           if (result?.totalMessageCount !== undefined && openaiBody.choices[0].message.content) {
@@ -247,52 +290,8 @@ export async function POST(req: NextRequest) {
 
     // after getting response from open ai
     if (openaiBody.choices[0].message.content) {
-      const version = "v18.0"; // Replace with your desired version
-      // const phoneNumberId = process.env.WHATSAPPPHONENUMBERID; // Replace with your phone number ID
-      const phoneNumberId = whatsAppDetailsResult.phoneNumberID;
-      const recipientPhoneNumber = "+" + responseNumber;
-      // const accessToken = process.env.WHATSAPPTOKEN
-      const accessToken = whatsAppDetailsResult.whatsAppAccessToken;
-
-      // Define the URL for the POST request
-      const url = `https://graph.facebook.com/${version}/${phoneNumberId}/messages`;
-
-      // Define the data to be sent in the request body
-      const data = {
-        messaging_product: "whatsapp",
-        recipient_type: "individual",
-        to: `${recipientPhoneNumber}`,
-        type: "text",
-        text: {
-          preview_url: false,
-          body: openaiBody.choices[0].message.content,
-        },
-      };
-
-      // Define the options for the fetch request
-      const options = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(data),
-      };
-      // Make the POST request using fetch
-      try {
-        const response = await fetch(url, options);
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const data = await response.json();
-
-        // Handle the data as needed
-      } catch (error) {
-        // Handle the error as needed
-        console.log(error);
-      }
+      sendMessageToWhatsapp(whatsAppDetailsResult.phoneNumberID,"+" + responseNumber,whatsAppDetailsResult.whatsAppAccessToken,openaiBody.choices[0].message.content)
+    
     }
   } catch (error: any) {
     console.log(error);

@@ -3,7 +3,7 @@ import { apiHandler } from "../../../../../../_helpers/server/api/api-handler";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../../auth/[...nextauth]/route";
 import joi from "joi";
-import { connectDatabase } from "../../../../../../../db";
+import clientPromise from "../../../../../../../db";
 import { ObjectId } from "mongodb";
 import bcrypt from "bcrypt";
 import {
@@ -31,7 +31,7 @@ async function changeUserPassword(request: NextRequest) {
   const oldPassword = body?.oldPassword;
   const newPassword = body?.newPassword;
 
-  const db = (await connectDatabase()).db();
+  const db = (await clientPromise!).db();
 
   /// update the user
   if (isGoogleUser) {

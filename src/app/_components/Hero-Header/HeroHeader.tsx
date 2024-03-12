@@ -57,8 +57,7 @@ function HeroHeader() {
 
       <div className="header-content-container">
         <p className="header-text">
-          Enhance Your Business with Custom ChatGPT: Revolutionise Customer &
-          Business Interaction
+        Enhance Your Business with Custom GPT: Revolutionise Customer & Insights
         </p>
 
         <p className="header-sub-text">

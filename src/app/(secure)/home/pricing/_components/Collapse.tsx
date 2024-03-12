@@ -17,7 +17,7 @@ const items: CollapseProps["items"] = [
   {
     key: "2",
     label: "What if I exhaust my messages/Training Data before my renewal date?",
-    children: <p>You are purchase Add-ons for more messages of training data. We offer 5k messages for $5 USD and 10k messages for $8 USD. We offer 1M characters for $5USD.</p>,
+    children: <p>You can purchase Add-ons for more messages or training data. We offer 5k messages for $5 USD and 10k messages for $8 USD. We offer 1M characters for $5 USD.</p>,
   },
   {
     key: "3",
