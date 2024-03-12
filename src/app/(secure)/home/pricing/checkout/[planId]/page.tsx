@@ -12,14 +12,15 @@ const stripePromise = loadStripe(
 );
 
 const plans = [
-  { id: 1, name: "individual", price: 15, days: 30 },
-  { id: 2, name: "agency", price: 89, days: 30 },
-  { id: 3, name: "individual", price: 144, days: 365 },
-  { id: 4, name: "agency", price: 854, days: 365 },
+  { id: 1, name: "Individual Plan", price: 15, days: 30 },
+  { id: 2, name: "Agency Plan", price: 89, days: 30 },
+  { id: 3, name: "Individual Plan", price: 144, days: 365 },
+  { id: 4, name: "Agency Plan", price: 854, days: 365 },
   { id: 5, name: "Character add on", price: 5, days: 30 },
   { id: 6, name: "Message add on", price: 5, days: 30 },
   { id: 7, name: "Message add on", price: 8, days: 30 },
   { id: 8, name: "Whatsapp Integration", price: 7, days: 30 },
+  { id: 9, name: "Slack Integration", price: 7, days: 30 },
 ];
 
 const CheckoutPage = ({ params }: any) => {
@@ -62,6 +63,7 @@ const CheckoutPage = ({ params }: any) => {
           plan={selectedPlan?.id}
           price={(selectedPlan?.id == 4 || selectedPlan?.id == 2)  ? decryptedData : selectedPlan?.price}
           duration={selectedPlan?.days === 365 ? "year" : "month"}
+          name={selectedPlan?.name}
           />
           )}
       </Elements>

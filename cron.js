@@ -47,45 +47,48 @@ async function CronFunction() {
             messageLimit: plan_data.messageLimit,
             trainingDataLimit: plan_data.trainingDataLimit,
             websiteCrawlingLimit: plan_data.websiteCrawlingLimit,
-            limitEndDate: endDate
+            limitEndDate: endDate,
+            isSlack: false,
+            nextIsSlack: false
           }
         }
       );
-        if(data.nextIsWhatsapp == true){
-          const paymentIntent = await stripe.paymentIntents.create({
-            amount: 700,
-            currency: 'usd',
-            automatic_payment_methods: {
-              enabled: true
-            },
-            confirm: true,
-            customer: data.customerId,
-            payment_method: data.paymentId,
-            receipt_email: data.email,
-            off_session: true
-          });
+      if (data.nextIsWhatsapp == true) {
+        const paymentIntent = await stripe.paymentIntents.create({
+          amount: 700,
+          currency: 'usd',
+          automatic_payment_methods: {
+            enabled: true
+          },
+          confirm: true,
+          customer: data.customerId,
+          payment_method: data.paymentId,
+          receipt_email: data.email,
+          off_session: true
+        });
 
-          var formattedDate = currentDate.toLocaleString('en-US', {
-            month: 'short',
-            day: '2-digit',
-            year: 'numeric'
-          });
-          const updatePayment = await collectionPayment.insertOne({
-            userId: String(data._id),
-            status: paymentIntent.status,
-            date: formattedDate,
-            price: '$' + 7,
-            paymentId: paymentIntent.id
-          });
-
-        }
-        else{
-          const update = await collection.updateMany({_id: new ObjectId(limitData.userId)},{
-            $set:{
-              isWhatsapp:false
+        var formattedDate = currentDate.toLocaleString('en-US', {
+          month: 'short',
+          day: '2-digit',
+          year: 'numeric'
+        });
+        const updatePayment = await collectionPayment.insertOne({
+          userId: String(data._id),
+          status: paymentIntent.status,
+          date: formattedDate,
+          price: '$' + 7,
+          paymentId: paymentIntent.id
+        });
+      } else {
+        const update = await collection.updateMany(
+          { _id: new ObjectId(limitData.userId) },
+          {
+            $set: {
+              isWhatsapp: false
             }
-          })
-        }
+          }
+        );
+      }
       // const updateWhatsapp = await collection.updateMany(
       //   { _id: new ObjectId(limitData.userId) },
       //   {

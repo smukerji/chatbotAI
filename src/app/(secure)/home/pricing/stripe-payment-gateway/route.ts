@@ -59,6 +59,8 @@ async function checkCurrentPlan(req: any, res: NextResponse) {
   let { u_id } = await req.json();
   const db = (await connectDatabase())?.db();
   const collection = db.collection("users");
+  const collectionUserDetails = db.collection("user-details");
+  const details = await collectionUserDetails.findOne({userId: u_id})
   const data = await collection.findOne({ _id: new ObjectId(u_id) });
   let currentDate = new Date();
   const date2: any = new Date(data.endDate);
@@ -74,7 +76,8 @@ async function checkCurrentPlan(req: any, res: NextResponse) {
         prePrice: 15,
         duration: data.duration,
         text: "Current Plan",
-        whatsAppIntegration: data.isWhatsapp
+        whatsAppIntegration: data.isWhatsapp,
+        slackIntegration: details.isSlack
       };
     }
     else if(data.plan == 'agency'){
@@ -82,7 +85,8 @@ async function checkCurrentPlan(req: any, res: NextResponse) {
         msg: 2,
         duration: data.duration,
         text: "Current Plan",
-        whatsAppIntegration: data.isWhatsapp
+        whatsAppIntegration: data.isWhatsapp,
+        slackIntegration: details.isSlack
       };
     }
     else{
@@ -91,7 +95,8 @@ async function checkCurrentPlan(req: any, res: NextResponse) {
         prePrice: 0,
         duration: data.duration,
         text: `Trial Expiring in ${differenceDays} Days`,
-        whatsAppIntegration: true
+        whatsAppIntegration: true,
+        slackIntegration: true
       }
     }
   } else {
