@@ -29,6 +29,7 @@
     }
     .telegram-guide-img{
        max-width: 100%;
+       margin-left: -93px;
     }
     @media only screen and (max-width: 991px){
         .telegram-title{
@@ -40,6 +41,9 @@
                 font-size: 18px;
                 line-height: 26px;
             }
+        }
+        .telegram-guide-img{
+            margin-left: -34px;
         }
     }
     @media only screen and (max-width: 767px){
@@ -53,6 +57,9 @@
                 line-height: 27px;
                
             }
+        }
+        .telegram-guide-img{
+            margin-left: 29px;
         }
     }
 
