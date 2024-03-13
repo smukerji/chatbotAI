@@ -3,7 +3,7 @@ import {
   generateChunksNEmbedd,
   generateChunksNEmbeddForLinks,
 } from "../../app/_helpers/server/embeddings";
-import clientPromise  from "../../db";
+import clientPromise from "../../db";
 import { v4 as uuid } from "uuid";
 // import { authorize, uploadFile } from "../../app/_services/googleFileUpload";
 import { put } from "@vercel/blob";

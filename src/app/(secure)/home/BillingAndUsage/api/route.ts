@@ -35,26 +35,43 @@ async function getUserDetails(req: any, res: NextResponse) {
       duration: data.duration,
       paymentDetails,
       nextPlan: data.nextPlan,
+      whatsappIntegration: data.nextIsWhatsapp,
     };
   } catch (error) {}
 }
 
 async function delPlan(req: any, res: NextResponse) {
   try {
-    const db = (await clientPromise!).db();
-    let { u_id } = await req.json();
+    const db = (await clientPromise!)?.db();
+    let { u_id, x } = await req.json();
     const collectionUser = db.collection("users");
-    const deletePlan = await collectionUser.updateMany(
-      { _id: new ObjectId(u_id) },
-      {
-        $set: {
-          nextPlan: "",
-          nextPlanId: "",
-          nextPlanDuration: "",
-        },
-      }
-    );
-    return { msg: "Plan deleted successfully", status: true };
+
+    //ANCHOR -  DELETE PLAN FROM USER DETAILS
+    if (x == 2) {
+      const deletePlan = await collectionUser.updateMany(
+        { _id: new ObjectId(u_id) },
+        {
+          $set: {
+            nextPlan: "",
+            nextPlanId: "",
+            nextPlanDuration: "",
+          },
+        }
+      );
+      return { msg: "Plan deleted successfully", status: true };
+    }
+    //ANCHOR - UPDATE WHATSAPP STATUS IN USERS
+    else if (x == 1) {
+      const deletePlan = await collectionUser.updateMany(
+        { _id: new ObjectId(u_id) },
+        {
+          $set: {
+            nextIsWhatsapp: false,
+          },
+        }
+      );
+      return { msg: "Canceled whatsapp integration", status: true };
+    }
   } catch (error) {
     return { msg: "finding error", status: 0 };
   }

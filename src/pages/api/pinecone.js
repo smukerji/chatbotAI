@@ -1,7 +1,7 @@
 import { Pinecone } from "@pinecone-database/pinecone";
 
 import { createEmbedding } from "../../app/_helpers/server/embeddings";
-import clientPromise  from "../../db";
+import clientPromise from "../../db";
 import { deletevectors } from "../../app/_helpers/server/pinecone";
 
 export default async function handler(req, res) {
@@ -101,7 +101,7 @@ export default async function handler(req, res) {
     await userChatbotSettings.deleteOne({ chatbotId: chatbotId });
 
     //delete the whatsapp details collection record against chatbotId
-    const whatsappDetails = db.collection("whatsappbot_details");//whatsappbot_details
+    const whatsappDetails = db.collection("whatsappbot_details"); //whatsappbot_details
     await whatsappDetails.deleteOne({ chatbotId: chatbotId });
 
     //delete the telegram details collection's record against chatbotId

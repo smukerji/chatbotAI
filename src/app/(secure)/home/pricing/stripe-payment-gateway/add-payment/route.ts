@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
 import clientPromise from "@/db";
-import Stripe from "stripe";
 import { ObjectId } from "mongodb";
 import { apiHandler } from "@/app/_helpers/server/api/api-handler";
-import { number } from "joi";
 
 module.exports = apiHandler({
   POST: addPaymentDetails,
@@ -15,6 +13,7 @@ async function addPaymentDetailsFail(req: any, res: NextResponse) {
   const db = (await clientPromise!).db();
 
   const collectionPayment = db.collection("payment-history");
+  const collectionPurchase = db.collection("purchase");
   var currentDat = new Date();
 
   var formattedDate = currentDat.toLocaleString("en-US", {
@@ -34,9 +33,17 @@ async function addPaymentDetailsFail(req: any, res: NextResponse) {
 async function addPaymentDetails(req: any, res: NextResponse) {
   if (req.method === "POST") {
     try {
-      let { plan, u_id, duration, status, paymentId, price, isWhatsapp } =
-        await req.json();
-      const db = (await clientPromise!).db();
+      let {
+        plan,
+        u_id,
+        duration,
+        status,
+        paymentId,
+        price,
+        isWhatsapp,
+        isSlack,
+      } = await req.json();
+      const db = (await clientPromise!)?.db();
 
       //ANCHOR - Get data of user by user_id
       const collection = db.collection("users");
@@ -84,7 +91,7 @@ async function addPaymentDetails(req: any, res: NextResponse) {
           { userId: String(u_id) },
           {
             $set: {
-              messageLimit: Number(userDataAdd?.messageLimit) + 8000,
+              messageLimit: Number(userDataAdd?.messageLimit) + 10000,
             },
           }
         );
@@ -97,6 +104,18 @@ async function addPaymentDetails(req: any, res: NextResponse) {
           {
             $set: {
               messageLimit: Number(userDataAdd?.messageLimit) + 5000,
+            },
+          }
+        );
+        return data;
+      }
+      if (plan == 9) {
+        const data = await collectionAdd.updateMany(
+          { userId: String(u_id) },
+          {
+            $set: {
+              isSlack: true,
+              nextIsSlack: true,
             },
           }
         );
@@ -125,11 +144,53 @@ async function addPaymentDetails(req: any, res: NextResponse) {
       //ANCHOR - getting plan details
       const collectionPlan = db.collection("plans");
       const plan_data = await collectionPlan.findOne({ name: plan_name });
-      let currentDate = null;
-      if (userData?.startDate != null) {
+      let currentDate = new Date();
+      if (userData?.endDate > currentDate && userData.plan == "") {
         currentDate = userData.startDate;
+        const updateUserDetails = await collectionAdd.updateMany(
+          { userId: String(u_id) },
+          {
+            $set: {
+              totalMessageCount: userDataAdd.totalMessageCount,
+              chatbotLimit:
+                Number(plan_data.numberOfChatbot) +
+                Number(userDataAdd.chatbotLimit) -
+                1,
+              messageLimit:
+                Number(plan_data.messageLimit) +
+                Number(userDataAdd.messageLimit) -
+                2000,
+              trainingDataLimit:
+                Number(plan_data.trainingDataLimit) +
+                Number(userDataAdd.trainingDataLimit) -
+                1000000,
+              websiteCrawlingLimit:
+                Number(plan_data.websiteCrawlingLimit) +
+                Number(userDataAdd.websiteCrawlingLimit) -
+                10,
+            },
+          }
+        );
       } else {
         currentDate = new Date();
+        const endDate = new Date(
+          currentDate.getTime() + 30 * 24 * 60 * 60 * 1000
+        );
+        const updateUserDetails = await collectionAdd.updateMany(
+          { userId: String(u_id) },
+          {
+            $set: {
+              totalMessageCount: 0,
+              chatbotLimit: plan_data.numberOfChatbot,
+              messageLimit: plan_data.messageLimit,
+              trainingDataLimit: plan_data.trainingDataLimit,
+              websiteCrawlingLimit: plan_data.websiteCrawlingLimit,
+              limitEndDate: endDate,
+              isSlack,
+              nextIsSlack: isSlack,
+            },
+          }
+        );
       }
 
       if (duration == "month") {

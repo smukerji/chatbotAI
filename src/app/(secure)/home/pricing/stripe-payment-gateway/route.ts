@@ -59,6 +59,8 @@ async function checkCurrentPlan(req: any, res: NextResponse) {
   let { u_id } = await req.json();
   const db = (await clientPromise!).db();
   const collection = db.collection("users");
+  const collectionUserDetails = db.collection("user-details");
+  const details = await collectionUserDetails.findOne({userId: u_id})
   const data = await collection.findOne({ _id: new ObjectId(u_id) });
   let currentDate = new Date();
   const date2: any = new Date(data.endDate);
@@ -68,22 +70,33 @@ async function checkCurrentPlan(req: any, res: NextResponse) {
   const differenceDays = Math.round(differenceMs / (1000 * 60 * 60 * 24));
   //ANCHOR - check current plan of the user
   if (data.endDate > currentDate) {
-    if (data.plan) {
+    if(data.plan == 'individual'){
       return {
         msg: 1,
         prePrice: 15,
         duration: data.duration,
         text: "Current Plan",
         whatsAppIntegration: data.isWhatsapp,
+        slackIntegration: details.isSlack
+      };
+    }
+    else if(data.plan == 'agency'){
+      return {
+        msg: 2,
+        duration: data.duration,
+        text: "Current Plan",
+        whatsAppIntegration: data.isWhatsapp,
+        slackIntegration: details.isSlack
       };
     } else {
       return {
         msg: 1,
-        prePrice: 15,
+        prePrice: 0,
         duration: data.duration,
         text: `Trial Expiring in ${differenceDays} Days`,
         whatsAppIntegration: true,
-      };
+        slackIntegration: true
+      }
     }
   } else {
     return {
