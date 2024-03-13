@@ -111,6 +111,18 @@ async function addPaymentDetails(req: any, res: NextResponse) {
         );
         return data;
       }
+      if (plan == 10) {
+        const data = await collectionAdd.updateMany(
+          { userId: String(u_id) },
+          {
+            $set: {
+              isTelegram: true,
+              nextIsTelegram: true
+            }
+          }
+        );
+        return data;
+      }
       if (plan == 8) {
         const data = await collection.updateMany(
           { _id: new ObjectId(u_id) },
@@ -125,7 +137,7 @@ async function addPaymentDetails(req: any, res: NextResponse) {
       }
 
       //ANCHOR - plan name initialized
-      if (plan == 1) {
+      if (plan == 1 || plan == 3) {
         plan_name = 'individual';
       } else {
         plan_name = 'agency';

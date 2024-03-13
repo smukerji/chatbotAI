@@ -21,6 +21,7 @@ const plans = [
   { id: 7, name: "Message add on", price: 8, days: 30 },
   { id: 8, name: "Whatsapp Integration", price: 7, days: 30 },
   { id: 9, name: "Slack Integration", price: 7, days: 30 },
+  { id: 10, name: "Telegram Integration", price: 7, days: 30 },
 ];
 
 const CheckoutPage = ({ params }: any) => {
@@ -46,6 +47,7 @@ const CheckoutPage = ({ params }: any) => {
   useEffect(() => {
     setLoader(true)
     setSelectedPlan(plans.find((plan: any) => plan.id === Number(planId)));
+    if(planId )
     if(planId == 2 || planId ==4){
       dataDecrypt()
     }

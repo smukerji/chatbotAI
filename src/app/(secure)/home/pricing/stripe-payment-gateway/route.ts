@@ -77,7 +77,8 @@ async function checkCurrentPlan(req: any, res: NextResponse) {
         duration: data.duration,
         text: "Current Plan",
         whatsAppIntegration: data.isWhatsapp,
-        slackIntegration: details.isSlack
+        slackIntegration: details.isSlack,
+        telegramIntegration: details.isTelegram
       };
     }
     else if(data.plan == 'agency'){
@@ -86,7 +87,8 @@ async function checkCurrentPlan(req: any, res: NextResponse) {
         duration: data.duration,
         text: "Current Plan",
         whatsAppIntegration: data.isWhatsapp,
-        slackIntegration: details.isSlack
+        slackIntegration: details.isSlack,
+        telegramIntegration: details.isTelegram
       };
     }
     else{
@@ -96,7 +98,8 @@ async function checkCurrentPlan(req: any, res: NextResponse) {
         duration: data.duration,
         text: `Trial Expiring in ${differenceDays} Days`,
         whatsAppIntegration: true,
-        slackIntegration: true
+        slackIntegration: true,
+        telegramIntegration: true
       }
     }
   } else {

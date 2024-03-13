@@ -34,6 +34,7 @@ export default function Home() {
   const router = useRouter();
   const [whatsappDisable, setWhatsappDisable] = useState(false);
   const [slackDisable, setSlackDisable] = useState(false)
+  const [telegramDisable, setTelegramDisable] = useState(false)
 
   const { status } = useSession();
 
@@ -78,6 +79,14 @@ export default function Home() {
       }
   }
 
+   const TelegramAddOn = async () => {
+    if (cookies?.userId) {
+    router.push(`/home/pricing/checkout/${10}`);
+    } else {
+      router.push("/account/login");
+    }
+  };
+
   const getPlanDetails = async () => {
     try {
       //ANCHOR - getting all plans details
@@ -98,6 +107,7 @@ export default function Home() {
       );
       setSlackDisable(checkPlan.data.slackIntegration)
       setWhatsappDisable(checkPlan.data.whatsAppIntegration);
+      setTelegramDisable(checkPlan.data.telegramIntegration)
       if (checkPlan.data.msg == 1) {
         setPrePrice(checkPlan.data.prePrice);
         setEnableOne(true);
@@ -194,7 +204,7 @@ export default function Home() {
                     </div>
                     <button
                       className="app-integration-price-btn"
-                      disabled={whatsappDisable}
+                      disabled={whatsappDisable || !enableOne}
                       onClick={WhatsappAddOn}
                     >
                       <span className="app-integration-price-btn-text">
@@ -207,9 +217,18 @@ export default function Home() {
                       <Image src={telegram} alt="no image" />
                       <p className="integration-name">Telegram</p>
                     </div>
-                    <div className="app-integration-price coming-soon">
+                    <button
+                      className="app-integration-price-btn"
+                      disabled={telegramDisable || !enableOne}
+                      onClick={TelegramAddOn}
+                    >
+                      <span className="app-integration-price-btn-text">
+                        Get for $7 USD
+                      </span>
+                    </button>
+                    {/* <div className="app-integration-price coming-soon">
                       Coming soon
-                    </div>
+                    </div> */}
                   </div>
                   <div className="app-integration">
                     <div className="integration-name-container">
@@ -236,7 +255,7 @@ export default function Home() {
                     </div>
                     <button
                       className="app-integration-price-btn"
-                      disabled={slackDisable}
+                      disabled={slackDisable || !enableOne}
                       onClick={slackAddOn}
                     >
                       <span className="app-integration-price-btn-text">
