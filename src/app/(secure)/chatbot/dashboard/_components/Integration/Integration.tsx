@@ -30,9 +30,7 @@ function Integration() {
   const userId = useCookies(["userId"]);
   const router = useRouter();
 
-  const params: any = useSearchParams();
 
-  const chatbot = JSON.parse(decodeURIComponent(params.get('chatbot')));
 
   const openWhatsAppModal = () => {
     setisWhatsappModalOpen(true);
@@ -145,16 +143,14 @@ useEffect(() => {
         <div className='action' onClick={()=>{setIsTelegramModalOpen(true)}}>{telegramLoader ? <Spin/>: <>{isTelegramEdit?'Edit':'Connect'}</>}</div>
       <div className="telegram-i-btn" onClick={() => router.push(`dashboard/telegram-guide`)}><InfoCircleOutlined /></div>
       </div>
-
+{/* -----------------------------------------Slack-integration */}
       <div className='integration'>
         <div className='name'>
           <Image src={slackIcon} alt='slack-icon' height={35} width={35} />
           <span>Add to Slack</span>
         </div>
         <>
-          {loader ? (
-            <Spin />
-          ) : isSlackConnected ? (
+          { isSlackConnected ? (
             <>
               <div className='view' onClick={() => setIsSlackModalOpen(true)}>
                 View
