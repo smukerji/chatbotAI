@@ -9,7 +9,11 @@ import EditIcon from "../../../../../../../public/sections-images/common/edit.sv
 import axios from "axios";
 import { EditOutlined } from "@ant-design/icons";
 
-function TelegramModal({ setIsTelegramModalOpen,isTelegramEdit,setIsTelegramEdit }: any) {
+function TelegramModal({
+  setIsTelegramModalOpen,
+  isTelegramEdit,
+  setIsTelegramEdit,
+}: any) {
   /// fetch the params
   const params: any = useSearchParams();
   const chatbot = JSON.parse(decodeURIComponent(params.get("chatbot")));
@@ -19,7 +23,7 @@ function TelegramModal({ setIsTelegramModalOpen,isTelegramEdit,setIsTelegramEdit
   const [botName, setBotName] = useState<string>("");
 
   //chat-bot name from telegram-api
-  const[botNameFromTelegram,setBotNameFromTelegram]=useState<string>()
+  const [botNameFromTelegram, setBotNameFromTelegram] = useState<string>();
 
   //For toggle
   const [editName, setEditName] = useState<boolean>(false);
@@ -46,7 +50,7 @@ function TelegramModal({ setIsTelegramModalOpen,isTelegramEdit,setIsTelegramEdit
   const onSwitchHandler = async () => {
     setSwitchEnabled(!switchEnabled);
     try {
-      const url = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/telegram/telegramData/api`;
+      const url = `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard/telegram/telegramData/api`;
       const response = await fetch(url, {
         headers: {
           cache: "no-store",
@@ -79,7 +83,7 @@ function TelegramModal({ setIsTelegramModalOpen,isTelegramEdit,setIsTelegramEdit
   // this function will delete token
   const deleteHandler = async () => {
     try {
-      const url = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/telegram/telegramData/api?chatbotId=${chatbot.id}`;
+      const url = `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard/telegram/telegramData/api?chatbotId=${chatbot.id}`;
       const response = await fetch(url, {
         headers: {
           cache: "no-store",
@@ -89,10 +93,10 @@ function TelegramModal({ setIsTelegramModalOpen,isTelegramEdit,setIsTelegramEdit
       });
       const resp = await response.json();
       if (resp.status === 200) {
-        setIsTelegramEdit(false)
+        setIsTelegramEdit(false);
         setStatus(false);
         setIsTelegramModalOpen(false);
-        
+
         message.success(resp?.message);
       } else {
         message.error(resp?.message);
@@ -101,8 +105,8 @@ function TelegramModal({ setIsTelegramModalOpen,isTelegramEdit,setIsTelegramEdit
   };
 
   //This function will get bot name from telegram
-  const getBotName = async (token:any) => {
-    const newToken = token !== ''? token : telegramToken
+  const getBotName = async (token: any) => {
+    const newToken = token !== "" ? token : telegramToken;
     try {
       let url = `https://api.telegram.org/bot${newToken}/getMyName`;
       const response = await fetch(url, {
@@ -115,7 +119,7 @@ function TelegramModal({ setIsTelegramModalOpen,isTelegramEdit,setIsTelegramEdit
       const resp = await response.json();
       if (resp?.result?.name) {
         setBotName(resp?.result?.name);
-        setBotNameFromTelegram(resp?.result?.name)
+        setBotNameFromTelegram(resp?.result?.name);
         setStatus(true);
       } else {
         message.error("something went wrong please try again..");
@@ -132,16 +136,15 @@ function TelegramModal({ setIsTelegramModalOpen,isTelegramEdit,setIsTelegramEdit
 
   //This function is for changing name of bot
   const handleNameChange = async () => {
-    
-    if(botName.trim() === ''){
-      message.error('botName should not be empty')
-      return
+    if (botName.trim() === "") {
+      message.error("botName should not be empty");
+      return;
     }
-    if(botName === botNameFromTelegram){
-      message.error('please type some different value')
-      return
+    if (botName === botNameFromTelegram) {
+      message.error("please type some different value");
+      return;
     }
-    
+
     const body = {
       name: botName,
     };
@@ -149,7 +152,6 @@ function TelegramModal({ setIsTelegramModalOpen,isTelegramEdit,setIsTelegramEdit
     axios
       .post(`https://api.telegram.org/bot${telegramToken}/setMyName`, body)
       .then((res: any) => {
-
         if (res?.data?.ok) {
           message.success("Bot name changed successfully");
           setEditName(false);
@@ -160,18 +162,19 @@ function TelegramModal({ setIsTelegramModalOpen,isTelegramEdit,setIsTelegramEdit
       .catch((error) => {
         const description = error?.response?.data?.description;
         if (description && error?.response?.data?.parameters?.retry_after) {
-
-          const retryAfterSeconds =  error?.response?.data?.parameters?.retry_after;
+          const retryAfterSeconds =
+            error?.response?.data?.parameters?.retry_after;
 
           const hours = Math.floor(retryAfterSeconds / 3600);
           const minutes = Math.floor((retryAfterSeconds % 3600) / 60);
-          if(retryAfterSeconds<60){
-            message.error(`Too Many Requests. Please try after ${retryAfterSeconds}seconds`);
-
-          }
-          else{
-
-            message.error(`Too Many Requests. Please try after ${hours} hours and ${minutes} minutes`);
+          if (retryAfterSeconds < 60) {
+            message.error(
+              `Too Many Requests. Please try after ${retryAfterSeconds}seconds`
+            );
+          } else {
+            message.error(
+              `Too Many Requests. Please try after ${hours} hours and ${minutes} minutes`
+            );
           }
         } else {
           // Handle other errors using the original message.error
@@ -181,7 +184,7 @@ function TelegramModal({ setIsTelegramModalOpen,isTelegramEdit,setIsTelegramEdit
   };
   const setTelegramData = async () => {
     try {
-      const url = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/telegram/telegramData/api`;
+      const url = `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard/telegram/telegramData/api`;
       const response = await fetch(url, {
         headers: {
           cache: "no-store",
@@ -197,8 +200,8 @@ function TelegramModal({ setIsTelegramModalOpen,isTelegramEdit,setIsTelegramEdit
       });
       const resp = await response.json();
       if (resp.status === 200) {
-        setIsTelegramEdit(true)
-        getBotName('');
+        setIsTelegramEdit(true);
+        getBotName("");
         message.success(resp?.message);
       } else {
         message.error(resp?.message);
@@ -212,7 +215,7 @@ function TelegramModal({ setIsTelegramModalOpen,isTelegramEdit,setIsTelegramEdit
   const onConnect = async () => {
     if (error?.telegramToken === "") {
       try {
-        let url = `https://api.telegram.org/bot${telegramToken}/setWebhook?url=${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/telegram/webhookTelegram/api?token=${telegramToken}`;
+        let url = `https://api.telegram.org/bot${telegramToken}/setWebhook?url=${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard/telegram/webhookTelegram/api?token=${telegramToken}`;
         const response = await fetch(url, {
           headers: {
             cache: "no-store",
@@ -241,7 +244,7 @@ function TelegramModal({ setIsTelegramModalOpen,isTelegramEdit,setIsTelegramEdit
 
   const fetchTelegramDetails = async () => {
     try {
-      const url = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/telegram/telegramData/api?chatbotId=${chatbot.id}`;
+      const url = `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard/telegram/telegramData/api?chatbotId=${chatbot.id}`;
       const response = await fetch(url, {
         headers: {
           cache: "no-store",
@@ -253,7 +256,7 @@ function TelegramModal({ setIsTelegramModalOpen,isTelegramEdit,setIsTelegramEdit
       if (resp.status === 200) {
         setTelegramToken(resp?.data?.telegramToken);
         setSwitchEnabled(resp?.data?.isEnabled);
-        getBotName(resp?.data?.telegramToken)
+        getBotName(resp?.data?.telegramToken);
         setError({ telegramToken: "" });
       }
     } catch (error) {
@@ -263,8 +266,8 @@ function TelegramModal({ setIsTelegramModalOpen,isTelegramEdit,setIsTelegramEdit
 
   useEffect(() => {
     fetchTelegramDetails();
-    if(isTelegramEdit){
-      setStatus(true)
+    if (isTelegramEdit) {
+      setStatus(true);
     }
   }, []);
 
@@ -329,13 +332,15 @@ function TelegramModal({ setIsTelegramModalOpen,isTelegramEdit,setIsTelegramEdit
                         alt="edit-icon"
                         onClick={() => setEditName(true)}
                       /> */}
-                      <EditOutlined onClick={() => setEditName(true)}/>
+                      <EditOutlined onClick={() => setEditName(true)} />
                     </div>
                   )}
                 </div>
               </div>
               <div className="telegram-switch-delete">
-                <div className="telegram-active-inactive">{switchEnabled ? "Active" : "In-active"}</div>{" "}
+                <div className="telegram-active-inactive">
+                  {switchEnabled ? "Active" : "In-active"}
+                </div>{" "}
                 <Switch checked={switchEnabled} onChange={onSwitchHandler} />
                 <Image
                   src={DeleteIcon}
