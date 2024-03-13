@@ -27,6 +27,8 @@ function BillingAndUsage() {
   const [disable, setDisable] = useState(false);
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isWhatsappModalOpen, setIsWhatsappModalOpen] = useState(false);
+  const [whatsapp, setWhatsapp] = useState(false);
   const userDetailContext: any = useContext(UserDetailsContext);
   const userDetails = userDetailContext?.userDetails;
 
@@ -37,10 +39,38 @@ function BillingAndUsage() {
     setIsModalOpen(true);
   };
 
+  const cancelWhatsapp = () => {
+    setIsWhatsappModalOpen(true);
+  };
+
+  //ANCHOR - API CALL TO CANCEL WHATSAPP INTEGRATION FOR NEXT BILLING CYCLE
+  const handleWhatsappOk = async () => {
+    if (whatsapp == true) {
+      const response = await axios.put(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/BillingAndUsage/api`,
+        {
+          u_id: cookies.userId,
+          x: 1,
+        }
+      );
+      if (response.data.status == true) {
+        message.success(response.data.msg);
+      } else {
+        message.error(response.data.msg);
+      }
+      setWhatsapp(false);
+      setIsWhatsappModalOpen(false);
+    }
+  };
+
+  //ANCHOR - API CALL TO CANCEL PLAN FOR NEXT BILLING CYCLE
   const handleOk = async () => {
     const response = await axios.put(
       `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/BillingAndUsage/api`,
-      { u_id: cookies.userId }
+      {
+        u_id: cookies.userId,
+        x: 2,
+      }
     );
     if (response.data.status == true) {
       message.success(response.data.msg);
@@ -50,11 +80,15 @@ function BillingAndUsage() {
     setDisable(true);
     setIsModalOpen(false);
   };
+  const handleWhatsappCancel = () => {
+    setIsWhatsappModalOpen(false);
+  };
 
   const handleCancel = () => {
     setIsModalOpen(false);
   };
 
+  //ANCHOR - COLUMNS OF TABLE IN PAYMENT HISTORY
   const columns = [
     {
       title: 'PaymentId',
@@ -82,14 +116,18 @@ function BillingAndUsage() {
     router.push(`${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing`);
   };
 
+  //ANCHOR - API CALL FOR COLLECTING DATA FROM DATABASE
   const myFunction = async () => {
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/BillingAndUsage/api`,
-      { u_id: cookies.userId }
+      {
+        u_id: cookies.userId,
+      }
     );
     setChat(response?.data?.chatbot);
     setMsg(response?.data?.message);
     setPlan(response?.data?.plan);
+    setWhatsapp(response?.data?.whatsappIntegration);
     const newDate = new Date(response?.data?.nextRenewal);
     const options: any = { year: 'numeric', month: 'short', day: '2-digit' };
     const formattedDate: any = newDate.toLocaleDateString('en-US', options);
@@ -127,16 +165,44 @@ function BillingAndUsage() {
         >
           <p>Are you sure to cancel your plan?</p>
         </Modal>
+        <Modal
+          title='Cancel My Plan'
+          open={isWhatsappModalOpen}
+          onOk={handleWhatsappOk}
+          onCancel={handleWhatsappCancel}
+          cancelText='Keep'
+          okText='Cancel'
+          // closeIcon={null}
+          className='modelCancelWhatsapp'
+          centered
+        >
+          <p>Are you sure to cancel Whatsapp integration from next cycle?</p>
+        </Modal>
         <div className='billing-main'>
           <div className='billing-head'>Billing & Usage</div>
-
+          <div className='message-count'>
+            <div className='message-head'></div>
+          </div>
           <div className='plan-head'>My Plan</div>
           <div className='plan-details'>
             <div className='name-features'>
               <div className='plan-name-container'>
-                <span className='plan-name'>{plan}</span>
-                <div className='plan-duration'>
-                  <span className='plan-duration-text'>{duration}</span>
+                <span className='plan-name'>{userDetails?.plan?.name}</span>
+                {duration != '' && (
+                  <div className='plan-duration'>
+                    <span className='plan-duration-text'>{duration}</span>
+                  </div>
+                )}
+              </div>
+              <div className='plan-feature'>
+                <div className='plan-message'>
+                  {' '}
+                  {formatNumber(
+                    userDetails?.plan?.messageLimit
+                      ? userDetails?.plan?.messageLimit
+                      : 0
+                  )}{' '}
+                  Messages
                 </div>
                 <Image className='dot-image' src={circle} alt='no image' />
                 <div className='plan-chatbot'>
@@ -165,15 +231,18 @@ function BillingAndUsage() {
                 {disable ? 'Plan Cancelled' : 'Cancel My Plan'}
               </span>
             </button>
+            <button
+              className='btn-cancel-plan btn-cancel-plan-whatsapp'
+              onClick={whatsapp ? cancelWhatsapp : explorePlan}
+            >
+              <span className='btn-text-cancel-plan'>
+                {whatsapp
+                  ? 'Cancel Whatsapp integration for next cycle'
+                  : 'Explore Whatsapp Integration Plan'}
+              </span>
+            </button>
           </div>
           <div className='manage-plan'>Payment history</div>
-          {/* <div className="manage-plan-text">
-          Manage your payment methods or cancel your plan by clicking on the
-          link below
-        </div>
-        <button className="btn-manage-billing">
-          <span className="btn-text">Manage Billing</span>
-        </button> */}
         </div>
         <Table
           className='payment-table'

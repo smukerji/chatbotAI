@@ -1,4 +1,4 @@
-import { connectDatabase } from "../../db";
+import clientPromise  from "../../db";
 
 export default async function handler(req, res) {
   if (req.method === "POST") {
@@ -16,7 +16,7 @@ export default async function handler(req, res) {
     const startDate = sessionStartDate.split(" ")[0];
 
     /// db connection
-    const db = (await connectDatabase()).db();
+    const db =  (await clientPromise).db();
 
     /// get the collection to store chat history
     let collection = db.collection("chat-history");

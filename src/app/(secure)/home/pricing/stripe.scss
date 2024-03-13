@@ -166,6 +166,7 @@
         .plan-container-list {
           .pay-btn {
             padding: 10px !important;
+
             .btn-text {
               font-size: 17px !important;
             }
@@ -177,6 +178,7 @@
         .plan-container-list {
           .pay-btn {
             padding: 10px !important;
+
             .btn-text {
               font-size: 15px !important;
             }
@@ -302,6 +304,7 @@
           align-self: stretch;
           border-radius: 12px;
           border: 1px solid var(--Primary-7, #2e58ea);
+          cursor: pointer;
 
           .btn-text {
             color: var(--Primary-7, #2e58ea);
@@ -315,9 +318,9 @@
           }
         }
 
-        .plan1:hover {
-          cursor: pointer;
-        }
+        // .plan1:hover {
+        //   cursor: pointer;
+        // }
 
         .pay-btn:disabled {
           cursor: not-allowed;
@@ -556,6 +559,7 @@
                 line-height: 24px;
               }
             }
+
             .app-integration-price-btn {
               cursor: pointer;
               display: flex;
@@ -566,6 +570,7 @@
               border-radius: 12px;
               border: 1px solid var(--Primary-7, #2e58ea);
               background: var(--Primary-7, #2e58ea);
+
               .app-integration-price-btn-text {
                 color: var(--Neutral-1, #fcfcfd);
                 text-align: center;
@@ -576,6 +581,7 @@
                 line-height: 24px;
               }
             }
+
             .app-integration-price-btn:disabled {
               cursor: not-allowed;
             }
@@ -650,6 +656,7 @@
             /* 140% */
           }
         }
+
         .btn-add-ons:disabled {
           cursor: not-allowed;
         }
@@ -691,6 +698,7 @@
               font-weight: 500;
               line-height: 24px;
             }
+
             .app-integration-price-btn {
               cursor: pointer;
               display: flex;
@@ -701,6 +709,7 @@
               border-radius: 12px;
               border: 1px solid var(--Primary-7, #2e58ea);
               background: var(--Primary-7, #2e58ea);
+
               .app-integration-price-btn-text {
                 color: var(--Neutral-1, #fcfcfd);
                 text-align: center;
@@ -711,6 +720,7 @@
                 line-height: 24px;
               }
             }
+
             .app-integration-price-btn:disabled {
               cursor: not-allowed;
             }

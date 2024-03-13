@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { connectDatabase } from "@/db";
+import clientPromise from "@/db";
 import { Stripe as s } from "stripe";
 import { ObjectId } from "mongodb";
 import { apiHandler } from "@/app/_helpers/server/api/api-handler";
@@ -13,7 +13,7 @@ module.exports = apiHandler({
 async function createPaymentIntent(req: any, res: NextResponse) {
   if (req.method === "POST") {
     try {
-      const db = (await connectDatabase())?.db();
+      const db = (await clientPromise!).db();
       let { plan, price, u_id } = await req.json();
       const collection = db.collection("users");
       const data = await collection.findOne({ _id: new ObjectId(u_id) });
@@ -23,7 +23,7 @@ async function createPaymentIntent(req: any, res: NextResponse) {
         data.plan == "individual" &&
         data.endDate > currentDate &&
         plan == 1 &&
-        plan == 3 
+        plan == 3
       ) {
         return "You already have plan";
       }
@@ -57,36 +57,52 @@ async function createPaymentIntent(req: any, res: NextResponse) {
 
 async function checkCurrentPlan(req: any, res: NextResponse) {
   let { u_id } = await req.json();
-  const db = (await connectDatabase())?.db();
+  const db = (await clientPromise!).db();
   const collection = db.collection("users");
+  const collectionUserDetails = db.collection("user-details");
+  const details = await collectionUserDetails.findOne({userId: u_id})
   const data = await collection.findOne({ _id: new ObjectId(u_id) });
   let currentDate = new Date();
   const date2: any = new Date(data.endDate);
   const date1: any = new Date();
 
   const differenceMs = date2 - date1;
-  const differenceDays = Math.round(differenceMs / (1000 * 60 * 60 * 24))
+  const differenceDays = Math.round(differenceMs / (1000 * 60 * 60 * 24));
   //ANCHOR - check current plan of the user
   if (data.endDate > currentDate) {
-    if(data.plan){
+    if(data.plan == 'individual'){
       return {
         msg: 1,
         prePrice: 15,
         duration: data.duration,
         text: "Current Plan",
-        whatsAppIntegration: data.isWhatsapp
+        whatsAppIntegration: data.isWhatsapp,
+        slackIntegration: details.isSlack
       };
     }
-    else{
-      return{
+    else if(data.plan == 'agency'){
+      return {
+        msg: 2,
+        duration: data.duration,
+        text: "Current Plan",
+        whatsAppIntegration: data.isWhatsapp,
+        slackIntegration: details.isSlack
+      };
+    } else {
+      return {
         msg: 1,
-        prePrice: 15,
+        prePrice: 0,
         duration: data.duration,
         text: `Trial Expiring in ${differenceDays} Days`,
-        whatsAppIntegration: true
+        whatsAppIntegration: true,
+        slackIntegration: true
       }
     }
   } else {
-    return { msg: 0, text:"Get started",whatsAppIntegration: data.isWhatsapp };
+    return {
+      msg: 0,
+      text: "Get started",
+      whatsAppIntegration: data.isWhatsapp,
+    };
   }
 }

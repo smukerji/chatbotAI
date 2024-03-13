@@ -17,19 +17,23 @@ import Coll from "./_components/Collapse";
 import { useRouter } from "next/navigation";
 import SecondaryHeader from "@/app/_components/Secondary-Header/SecondaryHeader";
 import { useSession } from "next-auth/react";
+import slack from "../../../../../public/slack.png"
 
 export default function Home() {
   const [planStatus, setStatus] = useState<number>(2);
   const [plan, setPlan] = useState(0);
   const [enableOne, setEnableOne] = useState(false);
+  const [enableTwo, setEnableTwo] = useState(false)
   const [isYearlyPlan, setIsYearlyPlan] = useState(false);
   const [price, setPrice] = useState(0);
   const [loading, setLoading] = useState(true);
   const [cookies, setCookie] = useCookies(["userId"]);
   const [prePrice, setPrePrice] = useState(0);
-  const [text, setText] = useState("Get 7 Day Free Trial on First Registration");
+  const [textOne, setText] = useState("Get 7 Day Free Trial on First registration");
+  const [textTwo, setTextTwo] = useState("Get Plan")
   const router = useRouter();
   const [whatsappDisable, setWhatsappDisable] = useState(false);
+  const [slackDisable, setSlackDisable] = useState(false)
 
   const { status } = useSession();
 
@@ -66,6 +70,14 @@ export default function Home() {
     }
   };
 
+  const slackAddOn = async () => {
+    if (cookies?.userId) {
+      router.push(`/home/pricing/checkout/${9}`);
+      } else {
+        router.push("/account/login");
+      }
+  }
+
   const getPlanDetails = async () => {
     try {
       //ANCHOR - getting all plans details
@@ -84,11 +96,21 @@ export default function Home() {
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway`,
         { u_id: u_id }
       );
-      setText(checkPlan.data.text);
+      setSlackDisable(checkPlan.data.slackIntegration)
       setWhatsappDisable(checkPlan.data.whatsAppIntegration);
       if (checkPlan.data.msg == 1) {
         setPrePrice(checkPlan.data.prePrice);
         setEnableOne(true);
+        setText(checkPlan.data.text);
+        
+      }
+      else if(checkPlan.data.msg == 2){
+        setEnableTwo(true); 
+        setEnableOne(true);
+        setTextTwo(checkPlan.data.text);
+      }
+      else{
+        setText(checkPlan.data.text)
       }
     } catch (error) {
       message.error(`${error}`);
@@ -119,12 +141,12 @@ export default function Home() {
       {planStatus === 2 && loading == false && (
         <div className="main">
           <h2 className="price-header">Pricing Plans</h2>
-          {/* <div className="price-offer-container">
+          <div className="price-offer-container">
             <span className="price-offer">Early Bird&nbsp;</span>
             <span className="price-offer-normal">users will receive Flat</span>
             <span className="price-offer">&nbsp;20% discount.</span>
-          </div> */}
-          {/* <div className="plan-tab-container">
+          </div>
+          <div className="plan-tab-container">
             <button
               className={`plan-type ${!isYearlyPlan && "active"}`}
               onClick={handlePlanType}
@@ -137,8 +159,8 @@ export default function Home() {
             >
               Yearly
             </button>
-          </div> */}
-          {/* <div className="annual-discount">Save 20% annualy</div> */}
+          </div>
+          <div className="annual-discount">Save 20% annualy</div>
           <br></br>
 
           <div className="plan-container">
@@ -147,14 +169,15 @@ export default function Home() {
               setPrice={setPrice}
               price={isYearlyPlan ? 144 : 15}
               enableOne={enableOne}
-              text={text}
+              text={textOne}
             />
             <PlanTwo
               setPlan={setPlan}
               setPrice={setPrice}
               price={isYearlyPlan ? 854 : 89}
-              // enableTwo={true}
+              enableTwo={enableTwo}
               prePrice={prePrice}
+              text={textTwo}
               // disableMonth={isYearlyPlan ? false : disableMonth}
             />
           </div>
@@ -205,6 +228,21 @@ export default function Home() {
                     <div className="app-integration-price coming-soon">
                       Coming soon
                     </div>
+                  </div>
+                  <div className="app-integration">
+                    <div className="integration-name-container">
+                      <Image src={slack} height={40} width={40} alt="no image" />
+                      <p className="integration-name">Slack</p>
+                    </div>
+                    <button
+                      className="app-integration-price-btn"
+                      disabled={slackDisable}
+                      onClick={slackAddOn}
+                    >
+                      <span className="app-integration-price-btn-text">
+                        Get for $7 USD
+                      </span>
+                    </button>
                   </div>
                   {/* <button className="btn-add-ons" disabled={whatsappDisable}>
                     <span className="btn-text">Get Add-on</span>
