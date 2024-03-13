@@ -27,6 +27,26 @@
       font-weight: 500;
       line-height: 24px; /* 150% */
     }
+    .view {
+      color: #5cb85c;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 24px; /* 150% */
+    }
+    .view:hover {
+      cursor: pointer;
+    }
+    .delete {
+      color: red;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 24px; /* 150% */
+    }
+    .delete:hover {
+      cursor: pointer;
+    }
     .action:hover {
       cursor: pointer;
     }

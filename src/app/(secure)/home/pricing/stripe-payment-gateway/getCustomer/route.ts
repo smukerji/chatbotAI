@@ -51,11 +51,12 @@ async function getCustomer(req: any, res: NextResponse) {
 async function getCustomerWhatsappDetails(req: any, res: NextResponse) {
   try {
     let { u_id } = await req.json();
-    const db = (await clientPromise!).db();
-    const collection = db.collection("whatsappbot_details");
-    const data = await collection.findOne({ userId: u_id });
-    if (data?.phoneNumberID == null) {
-      return { msg: true };
+    const db = (await clientPromise!)?.db();
+    const collection = db.collection("users");
+    const data = await collection.findOne({ _id: new ObjectId(u_id) });
+    const currentDate = new Date();
+    if (data?.endDate > currentDate && data.plan != null) {
+      return { msg: false };
     } else {
       return { msg: true };
     }
