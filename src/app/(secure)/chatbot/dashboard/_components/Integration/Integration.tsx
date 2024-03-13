@@ -71,7 +71,7 @@ function Integration() {
   const fetchTelegramDetails = async () => {
     setTelegramLoader(true)
     try {
-      const url = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/telegram/telegramData/api?chatbotId=${chatbot.id}`;
+      const url = `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard/telegram/telegramData/api?chatbotId=${chatbot.id}`;
       const response = await fetch(url, {
         headers: {
           cache: "no-store",

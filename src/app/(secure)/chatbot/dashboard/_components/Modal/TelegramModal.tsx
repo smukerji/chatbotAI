@@ -46,7 +46,7 @@ function TelegramModal({ setIsTelegramModalOpen,isTelegramEdit,setIsTelegramEdit
   const onSwitchHandler = async () => {
     setSwitchEnabled(!switchEnabled);
     try {
-      const url = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/telegram/telegramData/api`;
+      const url = `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard/telegram/telegramData/api`;
       const response = await fetch(url, {
         headers: {
           cache: "no-store",
@@ -79,7 +79,7 @@ function TelegramModal({ setIsTelegramModalOpen,isTelegramEdit,setIsTelegramEdit
   // this function will delete token
   const deleteHandler = async () => {
     try {
-      const url = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/telegram/telegramData/api?chatbotId=${chatbot.id}`;
+      const url = `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard/telegram/telegramData/api?chatbotId=${chatbot.id}`;
       const response = await fetch(url, {
         headers: {
           cache: "no-store",
@@ -181,7 +181,7 @@ function TelegramModal({ setIsTelegramModalOpen,isTelegramEdit,setIsTelegramEdit
   };
   const setTelegramData = async () => {
     try {
-      const url = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/telegram/telegramData/api`;
+      const url = `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard/telegram/telegramData/api`;
       const response = await fetch(url, {
         headers: {
           cache: "no-store",
@@ -212,7 +212,7 @@ function TelegramModal({ setIsTelegramModalOpen,isTelegramEdit,setIsTelegramEdit
   const onConnect = async () => {
     if (error?.telegramToken === "") {
       try {
-        let url = `https://api.telegram.org/bot${telegramToken}/setWebhook?url=${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/telegram/webhookTelegram/api?token=${telegramToken}`;
+        let url = `https://api.telegram.org/bot${telegramToken}/setWebhook?url=${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard/telegram/webhookTelegram/api?token=${telegramToken}`;
         const response = await fetch(url, {
           headers: {
             cache: "no-store",
@@ -241,7 +241,7 @@ function TelegramModal({ setIsTelegramModalOpen,isTelegramEdit,setIsTelegramEdit
 
   const fetchTelegramDetails = async () => {
     try {
-      const url = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/telegram/telegramData/api?chatbotId=${chatbot.id}`;
+      const url = `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard/telegram/telegramData/api?chatbotId=${chatbot.id}`;
       const response = await fetch(url, {
         headers: {
           cache: "no-store",
