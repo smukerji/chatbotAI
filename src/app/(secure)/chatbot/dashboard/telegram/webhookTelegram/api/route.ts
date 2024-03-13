@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { apiHandler } from "../../../../../../_helpers/server/api/api-handler";
 import clientPromise from "../../../../../../../db";
 import { ObjectId } from "mongodb";
-
+export const maxDuration = 500;
 async function getChatbotId(telegramToken: any) {
   const db = (await clientPromise!).db();
   const collection = db?.collection("telegram-bot");
