@@ -64,7 +64,7 @@ export default async function handler(req, res) {
       user = await collection.findOne({
         userId,
         chatbotId,
-        date
+        date:startDate,
       });
     }
     else {
