@@ -26,9 +26,7 @@ function ServiceSection() {
           <Image src={discoveryIcon} alt="discovery-icon" />
           <h3>Discovery</h3>
           <p>
-            Our in-depth discovery phase, where we collaborate closely to
-            understand your unique needs and objectives, ensuring a personalised
-            approach.
+          Our in-depth discovery phase, where we collaborate closely to understand your unique needs and objectives, ensuring a personalised approach.
           </p>
         </div>
 
@@ -37,9 +35,7 @@ function ServiceSection() {
           <Image src={integrationIcon} alt="intergration-icon" />
           <h3>Intergration</h3>
           <p>
-            Our in-depth intergration phase, where we collaborate closely to
-            understand your unique needs and objectives, ensuring a personalised
-            approach.
+          By integrating with various platforms, organizations can create seamless and efficient experiences for users while leveraging existing infrastructure and resources.
           </p>
         </div>
 
@@ -48,9 +44,7 @@ function ServiceSection() {
           <Image src={analysisIcon} alt="analysis-icon" />
           <h3>Analysis</h3>
           <p>
-            Our in-depth discovery phase, where we collaborate closely to
-            understand your unique needs and objectives, ensuring a personalised
-            approach.
+          By analyzing chatbot performance and impact, organizations can gain valuable insights to optimize their chatbot solutions and achieve their business objectives.
           </p>
         </div>
 
@@ -59,9 +53,7 @@ function ServiceSection() {
           <Image src={resultIcon} alt="results-icon" />
           <h3>Results</h3>
           <p>
-            Our in-depth discovery phase, where we collaborate closely to
-            understand your unique needs and objectives, ensuring a personalised
-            approach.
+          Highly positive, offering tangible benefits such as improved customer service, cost savings, and efficiency gains, to ensure that the chatbot meets the needs of the user or organizations.
           </p>
         </div>
       </div>

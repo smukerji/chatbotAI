@@ -1,6 +1,6 @@
 // import { NextApiRequest, NextApiResponse } from "next";
 import { NextResponse } from "next/server";
-import { connectDatabase } from "@/db";
+import clientPromise from "@/db";
 import Stripe from "stripe";
 import { ObjectId } from "mongodb";
 import { apiHandler } from "@/app/_helpers/server/api/api-handler";
@@ -15,7 +15,7 @@ async function getCustomer(req: any, res: NextResponse) {
   if (req.method === "POST") {
     try {
       let { u_id } = await req.json();
-      const db = (await connectDatabase())?.db();
+      const db = (await clientPromise!).db();
       const collection = db.collection("users");
       const data = await collection.findOne({ _id: new ObjectId(u_id) });
 
@@ -51,10 +51,10 @@ async function getCustomer(req: any, res: NextResponse) {
 async function getCustomerWhatsappDetails(req: any, res: NextResponse) {
   try {
     let { u_id } = await req.json();
-    const db = (await connectDatabase())?.db();
+    const db = (await clientPromise!)?.db();
     const collection = db.collection("users");
     const data = await collection.findOne({ _id: new ObjectId(u_id) });
-    const currentDate = new Date()
+    const currentDate = new Date();
     if (data?.endDate > currentDate && data.plan != null) {
       return { msg: false };
     } else {

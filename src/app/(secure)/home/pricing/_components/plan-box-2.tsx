@@ -172,7 +172,7 @@ export default function PlanTwo({
           <div className="plan-item-container">
             <div className="plan-item">
               <Image src={tickCircle} alt="no-svg" />
-              <span className="plan-text">Lead collection</span>
+              <span className="plan-text">Lead Collection</span>
             </div>
             <div className="coming-soon">Coming soon</div>
           </div>

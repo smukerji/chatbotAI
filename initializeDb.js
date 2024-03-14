@@ -1,4 +1,4 @@
-// const { connectDatabase } = require("./src/db.js");
+// const clientPromise  = require("./src/db.js");
 const { MongoClient } = require("mongodb");
 require("dotenv").config({ path: ".env.local" });
 

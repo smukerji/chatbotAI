@@ -1,7 +1,7 @@
 import { Pinecone } from "@pinecone-database/pinecone";
 
 import { createEmbedding } from "../../app/_helpers/server/embeddings";
-import { connectDatabase } from "../../db";
+import clientPromise from "../../db";
 import { deletevectors } from "../../app/_helpers/server/pinecone";
 
 export default async function handler(req, res) {
@@ -69,7 +69,7 @@ export default async function handler(req, res) {
     const userId = body?.userId;
 
     /// fetch the IDs and user namespace from the DB
-    const db = (await connectDatabase()).db();
+    const db =  (await clientPromise).db();
     const collection = db.collection("chatbots-data");
     const userChatbots = db.collection("user-chatbots");
     const userChatbotSettings = db.collection("chatbot-settings");
@@ -101,8 +101,12 @@ export default async function handler(req, res) {
     await userChatbotSettings.deleteOne({ chatbotId: chatbotId });
 
     //delete the whatsapp details collection record against chatbotId
-    const whatsappDetails = db.collection("whatsappbot_details");//whatsappbot_details
+    const whatsappDetails = db.collection("whatsappbot_details"); //whatsappbot_details
     await whatsappDetails.deleteOne({ chatbotId: chatbotId });
+
+    //delete the telegram details collection's record against chatbotId
+    const telegramDetails = db.collection("telegram-bot");//whatsappbot_details
+    await telegramDetails.deleteOne({ chatbotId: chatbotId });
 
     /// deleting the chunks to avoid  Request Header Fields Too Large error
     const deleteBatchSize = 250;

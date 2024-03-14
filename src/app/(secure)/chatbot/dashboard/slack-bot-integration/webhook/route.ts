@@ -1,41 +1,38 @@
-import { connectDatabase } from "@/db";
+import clientPromise from "@/db";
 import { NextRequest, NextResponse } from "next/server";
 import { threadId } from "worker_threads";
 const { WebClient, LogLevel } = require("@slack/web-api");
 
-
 interface SlackAppData {
-  appId:string;
-  userId:string;
-  authOToken:string;
-  chatBotId:string;
+  appId: string;
+  userId: string;
+  authOToken: string;
+  chatBotId: string;
 }
 
 export async function POST(req: NextRequest) {
-
   try {
-
     //read the incomming parameter from webhook
     let resData: any = await req.json();
-   
+
     // return new NextResponse('', { status: 200 });
     if (resData.challenge) {
       // return new Response(JSON.stringify({ challenge: resData.challenge }), { status: 200 });
-      return new NextResponse(JSON.stringify({ challenge: resData.challenge }), { status: 200 });
+      return new NextResponse(
+        JSON.stringify({ challenge: resData.challenge }),
+        { status: 200 }
+      );
+    } else {
+      if (resData.event.type === "app_mention") {
+        //  console.log('app_mention',resData.event);
+        //  console.log('app_mention',resData.event.text);
 
-    }
-    else {
-     if(resData.event.type === 'app_mention'){
-      //  console.log('app_mention',resData.event);
-      //  console.log('app_mention',resData.event.text);
+        //  slackEventsQueue.add({ event: resData });
+        writeInDataBase(resData);
+        return new NextResponse("", { status: 200 });
 
-      //  slackEventsQueue.add({ event: resData });
-      writeInDataBase(resData);
-      return new NextResponse('', { status: 200 });
-
-      //  return new Response('', { status: 200 });
-     }
-
+        //  return new Response('', { status: 200 });
+      }
     }
 
     //find the token in database
@@ -57,67 +54,61 @@ export async function POST(req: NextRequest) {
     // }
 
     // return new Response("Invalid Credentials", { status: 400 });
+  } catch (error: any) {
+    console.log("error", error);
   }
-  catch (error: any) {
-    console.log('error', error);
-  }
-
 }
-
 
 async function writeInDataBase(data: any) {
   try {
-
     const appId = data.api_app_id;
     const channelId = data.event.channel;
 
     //find is AppId is available
-    const db = (await connectDatabase())?.db();
-    let slackCollection = db.collection('slack-app-details');
+    const db = (await clientPromise!)?.db();
+    let slackCollection = db.collection("slack-app-details");
 
-
-
-    let appDetails: SlackAppData = await slackCollection.findOne({ appId: appId });
+    let appDetails: SlackAppData = await slackCollection.findOne({
+      appId: appId,
+    });
     if (appDetails) {
       const authOToken = appDetails.authOToken;
       const chatBotId = appDetails.chatBotId;
-      const message = data.event.text.replace(/<@.*?>\s*\n?/, '');
+      const message = data.event.text.replace(/<@.*?>\s*\n?/, "");
       const userID = appDetails.userId;
 
       const client = new WebClient(authOToken, {
         // LogLevel can be imported and used to make debugging simpler
-        logLevel: LogLevel.DEBUG
+        logLevel: LogLevel.DEBUG,
       });
 
-      //if message is empty then return the message      
+      //if message is empty then return the message
       if (message.length === 0) {
         await client.chat.postMessage({
           channel: channelId,
           text: "I guess you sent me an empty message.",
-          threadId: data.event.ts
+          threadId: data.event.ts,
         });
-      }
-      else {
-
+      } else {
         //check if user chat count has reached the limit if not then increment the count
-        let userDetailsCollection: any = await db.collection('user-details');
+        let userDetailsCollection: any = await db.collection("user-details");
         let cursor = await userDetailsCollection.aggregate([
           {
-            $match: { userId: userID }
+            $match: { userId: userID },
           },
           {
             $addFields: {
               limitCross: {
                 $cond: [
                   {
-                    $gte: [
-                      "$totalMessageCount", "$messageLimit"
-                    ]
-                  }, true, false
-                ]
-              }
-            }
-          }
+                    $gte: ["$totalMessageCount", "$messageLimit"],
+                  },
+                  true,
+                  false,
+                ],
+              },
+            },
+          },
         ]);
 
         let limitCrossResult = await cursor.toArray();
@@ -125,11 +116,13 @@ async function writeInDataBase(data: any) {
         await cursor.close();
 
         if (limitCrossResult[0].limitCross === false) {
-
           let isUpdated = false;
           //increment the message count
-          let updatedResult =  await userDetailsCollection.updateOne({ userId: userID }, { $inc: { totalMessageCount: 1 } });
-          if(updatedResult.modifiedCount > 0){
+          let updatedResult = await userDetailsCollection.updateOne(
+            { userId: userID },
+            { $inc: { totalMessageCount: 1 } }
+          );
+          if (updatedResult.modifiedCount > 0) {
             isUpdated = true;
           }
           // Fetch the response from the Pinecone API
@@ -192,37 +185,33 @@ async function writeInDataBase(data: any) {
             await client.chat.postMessage({
               channel: channelId,
               text: openaiBody.choices[0].message.content,
-              thread_ts: data.event.ts
+              thread_ts: data.event.ts,
             });
-
-          }
-          else {
-
+          } else {
             //if update result is true and open ai didn't respond then decrement the message count
-            if(isUpdated){
-              await userDetailsCollection.updateOne({ userId: userID }, { $inc: { totalMessageCount: -1 } });
+            if (isUpdated) {
+              await userDetailsCollection.updateOne(
+                { userId: userID },
+                { $inc: { totalMessageCount: -1 } }
+              );
             }
 
             await client.chat.postMessage({
               channel: channelId,
               text: "Lucifer AI is not able to answer for your query. Please try again later.",
-              thread_ts: data.event.ts
+              thread_ts: data.event.ts,
             });
           }
-        }
-        else {
+        } else {
           await client.chat.postMessage({
             channel: channelId,
             text: "You have reached the limit of message count. Please try again later.",
-            thread_ts: data.event.ts
+            thread_ts: data.event.ts,
           });
         }
       }
     }
-
+  } catch (error: any) {
+    console.log("error", error);
   }
-  catch (error: any) {
-    console.log('error', error);
-  }
-
 }
