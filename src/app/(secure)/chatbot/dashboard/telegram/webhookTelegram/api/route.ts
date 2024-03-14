@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { apiHandler } from "../../../../../../_helpers/server/api/api-handler";
 import clientPromise from "../../../../../../../db";
 import { ObjectId } from "mongodb";
-export const maxDuration = 500;
+export const maxDuration = 300;
 async function getChatbotId(telegramToken: any) {
   const db = (await clientPromise!).db();
   const collection = db?.collection("telegram-bot");
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
 
     const currentDate = new Date();
     if (currentDate > endDate) {
-      sendMessageToTelegram(
+      await sendMessageToTelegram(
         telegramToken,
         chatId,
         "Your subscription has ended"
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
   }
   //---------------------------------------------------------- if user types /start
   if (req?.message?.text === "/start") {
-    sendMessageToTelegram(
+    await  sendMessageToTelegram(
       telegramToken,
       chatId,
       "Welcome how can we help you?"
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
     const collections = db?.collection("user-details");
     const result = await collections.findOne({ userId });
     if (result.totalMessageCount >= result.messageLimit) {
-      sendMessageToTelegram(
+      await sendMessageToTelegram(
         telegramToken,
         chatId,
         "Your limit reached please upgrade your plan"
@@ -186,7 +186,7 @@ export async function POST(request: NextRequest) {
 
     // after getting response from open ai
     if (openaiBody.choices[0].message.content) {
-      sendMessageToTelegram(
+      await sendMessageToTelegram(
         telegramToken,
         chatId,
         openaiBody.choices[0].message.content
