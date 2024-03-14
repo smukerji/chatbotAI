@@ -3,20 +3,24 @@ import { NextRequest, NextResponse } from "next/server";
 // import { NextApiResponse } from "next";
 import clientPromise from "@/db";
 import { ObjectId } from "mongodb";
-import openaiTokenCounter from 'openai-gpt-token-counter';
+import {encodeChat,
+  encode,
+  decode,
+  isWithinTokenLimit,
+} from 'gpt-tokenizer'
+
+import moment from 'moment';
 
 interface WhatsAppChatHistoryType {
   _id?: ObjectId;
   userId: string;
   chatbotId: string;
-  chat: {
-    number: {
-      messages: [
-        {
-          role: string;
-          content: string;
-        }
-      ],
+  chats: {
+    [key:string]: {
+      messages: {
+        role: string;
+        content: string;
+      }[],
       usage:{
         completion_tokens: number;
         prompt_tokens:number;
@@ -90,7 +94,7 @@ async function sendMessageToWhatsapp(phoneNumberId:any,recipientPhoneNumber:any,
     // Handle the data as needed
   } catch (error) {
     // Handle the error as needed
-    console.log(error);
+    console.log("whatsapp sending message error \n",error);
   }
 }
 
@@ -147,7 +151,9 @@ export async function POST(req: NextRequest) {
     let res: any = await req.json();
     let questionFromWhatsapp =
       res?.entry?.[0]?.changes?.[0]?.value?.messages?.[0]?.text?.body; // question received from whatsapp
-
+    if(questionFromWhatsapp === "this is a text message"){
+      return new Response("received", { status: 200 });
+    }
     if (
       questionFromWhatsapp == undefined ||
       questionFromWhatsapp.trim().length <= 0
@@ -176,7 +182,7 @@ export async function POST(req: NextRequest) {
     const currentDate = new Date();
     if (currentDate > endDate) {
 
-      sendMessageToWhatsapp(whatsAppDetailsResult.phoneNumberID, "+" + userPhoneNumber, whatsAppDetailsResult.whatsAppAccessToken, 'Your subscription has ended')
+     await sendMessageToWhatsapp(whatsAppDetailsResult.phoneNumberID, "+" + userPhoneNumber, whatsAppDetailsResult.whatsAppAccessToken, 'Your subscription has ended')
       return new Response("received", { status: 200 });
     } else {
       console.log("continue..");
@@ -206,7 +212,7 @@ export async function POST(req: NextRequest) {
     const userDetailsCollection = db?.collection("user-details");
     const userDetailsResult = await userDetailsCollection.findOne({ userId: userID });
     if (userDetailsResult.totalMessageCount >= userDetailsResult.messageLimit) {
-      sendMessageToWhatsapp(whatsAppDetailsResult.phoneNumberID, "+" + userPhoneNumber, whatsAppDetailsResult.whatsAppAccessToken, 'Your limit reached please upgrade your plan')
+      await sendMessageToWhatsapp(whatsAppDetailsResult.phoneNumberID, "+" + userPhoneNumber, whatsAppDetailsResult.whatsAppAccessToken, 'Your limit reached please upgrade your plan')
       return new Response("received", { status: 200 });
     }
 
@@ -227,10 +233,12 @@ export async function POST(req: NextRequest) {
     const respText = await response.text();
     const similaritySearchResults = JSON.parse(respText).join("\n");
 
+
     //get the user's chatbot history
     let userChatHistoryCollection = db.collection("whatsapp-chat-history");
     let userChatHistory: WhatsAppChatHistoryType = await userChatHistoryCollection.findOne({
       userId: userID,
+      date:moment().utc().format('YYYY-MM-DD')
     });
 
     //get the user's chatbot setting
@@ -241,7 +249,7 @@ export async function POST(req: NextRequest) {
       userId: userID,
     });
 
-    //if user chat history is not available, continue
+      //if user chat history is not available, create a new chat history
     if (!userChatHistory) {
          // Fetch the response from the OpenAI API
          const responseOpenAI: any = await fetch(
@@ -290,91 +298,176 @@ export async function POST(req: NextRequest) {
           // If totalMessageCount exists, update it by adding 1
           await collections.updateOne(
             { userId: userID },
-            { $set: { totalMessageCount: result.totalMessageCount + 1 } }
+            { $set: { totalMessageCount: result.totalMessageCount + 1   } }
           );
         }
 
         // after getting response from open ai
         if (openaiBody.choices[0].message.content) {
-          sendMessageToWhatsapp(whatsAppDetailsResult.phoneNumberID, "+" + userPhoneNumber, whatsAppDetailsResult.whatsAppAccessToken, openaiBody.choices[0].message.content)
+          await sendMessageToWhatsapp(whatsAppDetailsResult.phoneNumberID, "+" + userPhoneNumber, whatsAppDetailsResult.whatsAppAccessToken, openaiBody.choices[0].message.content);
 
+          //stores chat history
+          await userChatHistoryCollection.insertOne({
+            userId: userID,
+            chatbotId: whatsAppDetailsResult.chatbotId,
+            chats: {
+              [`${userPhoneNumber}`]: {
+                messages: [
+                  {
+                    role: "user",
+                    content: `${questionFromWhatsapp}`,
+                  },
+                  {
+                    role: "assistant",
+                    content: openaiBody.choices[0].message.content,
+                  },
+                ],
+                usage:{
+                  completion_tokens: openaiBody.usage.completion_tokens,
+                  prompt_tokens: openaiBody.usage.prompt_tokens,
+                  total_tokens: openaiBody.usage.total_tokens
+                }
+              }
+            },
+            date: moment().utc().format('YYYY-MM-DD')
+          });
         }
     }
     else {
 
       //calculate the total tokens based on user message
-      let previousTotalTokens = userChatHistory.chat.number.usage.total_tokens;
-      let currentTotalTokens = openaiTokenCounter.text(questionFromWhatsapp);
-      let totalTokens = previousTotalTokens + currentTotalTokens;
-      let conversationMessages = userChatHistory.chat.number.messages;
+      let previousTotalTokens = userChatHistory.chats[`${userPhoneNumber}`].usage.total_tokens as number;
+      let currentQuestionsTotalTokens:any = encode(questionFromWhatsapp);
+      let totalTokens = previousTotalTokens + currentQuestionsTotalTokens[1];
+      let conversationMessages = userChatHistory.chats[`${userPhoneNumber}`].messages;
+      if (tokenLimit[0].model === userChatBotModel.chatbotModel && totalTokens >= tokenLimit[0].tokens) {
+        const removeCount = Math.floor(conversationMessages.length / 3); // Calculate one-third of the array length
+        conversationMessages.splice(0, removeCount); // Remove one-third of the messages from the start of the array
+      }
+      else if (tokenLimit[1].model === userChatBotModel.chatbotModel && totalTokens >= tokenLimit[0].tokens) {
+        const removeCount = Math.floor(conversationMessages.length / 3); // Calculate one-third of the array length
+        conversationMessages.splice(0, removeCount); // Remove one-third of the messages from the start of the array
+      }
 
-      if(tokenLimit[0].model === userChatBotModel.chatbotModel && totalTokens >= tokenLimit[0].tokens){
-        const removeCount = Math.floor(conversationMessages.length / 3); // Calculate one-third of the array length
-        conversationMessages.splice(0, removeCount); // Remove one-third of the messages from the start of the array
-      }
-      else if(tokenLimit[1].model === userChatBotModel.chatbotModel && totalTokens >= tokenLimit[0].tokens){
-        const removeCount = Math.floor(conversationMessages.length / 3); // Calculate one-third of the array length
-        conversationMessages.splice(0, removeCount); // Remove one-third of the messages from the start of the array
-      }
-     
-        // Fetch the response from the OpenAI API
-        const responseOpenAI: any = await fetch(
-          "https://api.openai.com/v1/chat/completions",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENAI_KEY}`,
-            },
-            body: JSON.stringify({
-              model: "gpt-3.5-turbo",
-              temperature: 0.5,
-              top_p: 1,
-              messages: [
-                {
-                  role: "system",
-                  content: `Use the following pieces of context to answer the users question.
+      // Fetch the response from the OpenAI API
+      const responseOpenAI: any = await fetch(
+        "https://api.openai.com/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENAI_KEY}`,
+          },
+          body: JSON.stringify({
+            model: "gpt-3.5-turbo",
+            temperature: 0.5,
+            top_p: 1,
+            messages: [
+              {
+                role: "system",
+                content: `Use the following pieces of context to answer the users question.
                   If you don't know the answer, just say that you don't know, don't try to make up an answer.
                   ----------------
                   context:
                   ${similaritySearchResults}
                   
                   Answer user query and include images write respect to each line if available`,
-                },
-                ...conversationMessages,
-                {
-                  role: "user",
-                  content: `Answer user query and include images in response if available in the given context 
+              },
+              ...conversationMessages,
+              {
+                role: "user",
+                content: `Answer user query and include images in response if available in the given context 
                 
                   query: ${questionFromWhatsapp} `,
-                },
-              ],
-            }),
-          }
+              },
+            ],
+          }),
+        }
+      );
+
+      //parse the response to json
+      const openaiBody = JSON.parse(await responseOpenAI.text());
+
+      //--------update message count if we have response from openai
+      //update message count and check message limit
+      const collections = db?.collection("user-details");
+      const result = await collections.findOne({ userId: userID });
+      if (result?.totalMessageCount !== undefined && openaiBody.choices[0].message.content) {
+        // If totalMessageCount exists, update it by adding 1
+        await collections.updateOne(
+          { userId: userID },
+          { $set: { totalMessageCount: result.totalMessageCount + 1 } }
         );
+      }
 
-        const openaiBody = JSON.parse(await responseOpenAI.text());
+      // after getting response from open ai
+      if (openaiBody.choices[0].message.content) {
+        await sendMessageToWhatsapp(whatsAppDetailsResult.phoneNumberID, "+" + userPhoneNumber, whatsAppDetailsResult.whatsAppAccessToken, openaiBody.choices[0].message.content)
 
-        //--------update message count if we have response from openai
-        //update message count and check message limit
+        //update the chat history
+        //check if chat history has userPhoneNumber's chat history
+        if (!userChatHistory.chats[`${userPhoneNumber}`]) { //if userPhoneNumber's chat history is not available, add that to the chat history
+          userChatHistory.chats[`${userPhoneNumber}`] = {
+            messages: [
+              {
+                role: "user",
+                content: `${questionFromWhatsapp}`,
+              },
+              {
+                role: "assistant",
+                content: openaiBody.choices[0].message.content,
+              },
+            ],
+            usage: {
+              completion_tokens: openaiBody.usage.completion_tokens,
+              prompt_tokens: openaiBody.usage.prompt_tokens,
+              total_tokens: openaiBody.usage.total_tokens
+            }
+          }
 
-        const collections = db?.collection("user-details");
-        const result = await collections.findOne({ userId: userID });
-        if (result?.totalMessageCount !== undefined && openaiBody.choices[0].message.content) {
-          // If totalMessageCount exists, update it by adding 1
-          await collections.updateOne(
-            { userId: userID },
-            { $set: { totalMessageCount: result.totalMessageCount + 1 } }
+          //update the chat history
+          await userChatHistoryCollection.updateOne(
+            { userId: userID, date: moment().utc().format('YYYY-MM-DD') },
+            {
+              $set: {
+                chats: userChatHistory.chats,
+              },
+            }
           );
-        }
-
-        // after getting response from open ai
-        if (openaiBody.choices[0].message.content) {
-          sendMessageToWhatsapp(whatsAppDetailsResult.phoneNumberID, "+" + userPhoneNumber, whatsAppDetailsResult.whatsAppAccessToken, openaiBody.choices[0].message.content)
 
         }
+        else {
+     
+          //update the chat history
+          userChatHistory.chats[`${userPhoneNumber}`].messages.push({
+            role: "user",
+            content: `${questionFromWhatsapp}`,
+          }, {
+            role: "assistant",
+            content: openaiBody.choices[0].message.content,
+          });
 
-      
+          //add the new to previoius tokens
+          userChatHistory.chats[`${userPhoneNumber}`].usage = {
+            completion_tokens: userChatHistory.chats[`${userPhoneNumber}`].usage.completion_tokens + openaiBody.usage.completion_tokens,
+            prompt_tokens: userChatHistory.chats[`${userPhoneNumber}`].usage.prompt_tokens + openaiBody.usage.prompt_tokens,
+            total_tokens: userChatHistory.chats[`${userPhoneNumber}`].usage.total_tokens + openaiBody.usage.total_tokens
+          }
+
+          //update the chat history
+          await userChatHistoryCollection.updateOne(
+            { userId: userID, date: moment().utc().format('YYYY-MM-DD') },
+            {
+              $set: {
+                chats: userChatHistory.chats,
+              },
+            }
+          );
+
+        }
+
+      }
+
     }
 
   }
