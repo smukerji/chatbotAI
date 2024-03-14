@@ -323,7 +323,7 @@ function TelegramModal({ setIsTelegramModalOpen,isTelegramEdit,setIsTelegramEdit
                     </div>
                   ) : (
                     <div className="telegram-botname-edit">
-                      <div className="telegram-bot-name">{botName}</div>
+                      <div className="telegram-bot-name">{botName ? botName : 'loading...'}</div>
                       {/* <Image
                         src={EditIcon}
                         alt="edit-icon"
