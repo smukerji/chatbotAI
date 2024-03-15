@@ -89,8 +89,6 @@ async function sendMessageToWhatsapp(phoneNumberId:any,recipientPhoneNumber:any,
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
-    const data = await response.json();
-
     // Handle the data as needed
   } catch (error) {
     // Handle the error as needed
@@ -146,11 +144,15 @@ export async function POST(req: NextRequest) {
     }
   ]
 
+  let step = 1;
   try {
+
 
     let res: any = await req.json();
     let questionFromWhatsapp =
-      res?.entry?.[0]?.changes?.[0]?.value?.messages?.[0]?.text?.body; // question received from whatsapp
+      res?.entry?.[0]?.changes?.[0]?.value?.messages?.[0]?.text?.body;// question received from whatsapp
+    new Response("received", { status: 200 });
+
     if(questionFromWhatsapp === "this is a text message"){
       return new Response("received", { status: 200 });
     }
@@ -167,6 +169,7 @@ export async function POST(req: NextRequest) {
 
     // -----------------------------------------------------This function will if the subscription is active or not of user
 
+    step = 2;
     let whatsAppDetailsResult: any = await getWhatsAppDetails(binessAccountNumber); //here you will recieved the chatbot unique id, based on this you would identify knowledge base
     const userPhoneNumber = getResponseNumber(res);//user phone number
     const db = (await clientPromise!).db();
@@ -174,6 +177,8 @@ export async function POST(req: NextRequest) {
     const userChatBotResult = await userChatBotcollections.findOne({
       chatbotId: whatsAppDetailsResult.chatbotId,
     });
+
+    step = 3;
     const userCollection = db?.collection("users");
     const data = await userCollection.findOne({ _id: new ObjectId(userChatBotResult.userId) });
     const endDate = data?.endDate;
@@ -181,13 +186,14 @@ export async function POST(req: NextRequest) {
 
     const currentDate = new Date();
     if (currentDate > endDate) {
-
+     step = 4;
      await sendMessageToWhatsapp(whatsAppDetailsResult.phoneNumberID, "+" + userPhoneNumber, whatsAppDetailsResult.whatsAppAccessToken, 'Your subscription has ended')
       return new Response("received", { status: 200 });
     } else {
       console.log("continue..");
     }
 
+    step = 5;
     if (whatsAppDetailsResult.isEnabled === false) {
       // return { message: "Chatbot with WhatsApp is disabled" };
       console.log("Chatbot with WhatsApp is disabled ");
@@ -196,7 +202,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (!whatsAppDetailsResult || whatsAppDetailsResult === "error") {
-      return new Response("received", { status: 200 });
+      return new Response("received", { status: 200 });``
     }
 
     const userID = userChatBotResult.userId;
@@ -209,6 +215,7 @@ export async function POST(req: NextRequest) {
     // const accessToken = process.env.WHATSAPPTOKEN
     const accessToken = whatsAppDetailsResult.whatsAppAccessToken;
 
+    step = 6;
     const userDetailsCollection = db?.collection("user-details");
     const userDetailsResult = await userDetailsCollection.findOne({ userId: userID });
     if (userDetailsResult.totalMessageCount >= userDetailsResult.messageLimit) {
@@ -216,6 +223,7 @@ export async function POST(req: NextRequest) {
       return new Response("received", { status: 200 });
     }
 
+    step = 7;
     // if we have user id
     const response: any = await fetch(
       `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/pinecone`,
@@ -231,9 +239,9 @@ export async function POST(req: NextRequest) {
 
     /// parse the response and extract the similarity results
     const respText = await response.text();
-    const similaritySearchResults = JSON.parse(respText).join("\n");
+    let similaritySearchResults = JSON.parse(respText).join("\n");
 
-
+    step = 8;
     //get the user's chatbot history
     let userChatHistoryCollection = db.collection("whatsapp-chat-history");
     let userChatHistory: WhatsAppChatHistoryType = await userChatHistoryCollection.findOne({
@@ -249,6 +257,7 @@ export async function POST(req: NextRequest) {
       userId: userID,
     });
 
+    step = 9;
       //if user chat history is not available, create a new chat history
     if (!userChatHistory) {
          // Fetch the response from the OpenAI API
@@ -306,6 +315,7 @@ export async function POST(req: NextRequest) {
         if (openaiBody.choices[0].message.content) {
           await sendMessageToWhatsapp(whatsAppDetailsResult.phoneNumberID, "+" + userPhoneNumber, whatsAppDetailsResult.whatsAppAccessToken, openaiBody.choices[0].message.content);
 
+          step = 10;
           //stores chat history
           await userChatHistoryCollection.insertOne({
             userId: userID,
@@ -331,24 +341,38 @@ export async function POST(req: NextRequest) {
             },
             date: moment().utc().format('YYYY-MM-DD')
           });
+
+          //return response 
+          return new Response("received", { status: 200 });
         }
     }
     else {
-
+            
+      step = 11;
       //calculate the total tokens based on user message
-      let previousTotalTokens = userChatHistory.chats[`${userPhoneNumber}`].usage.total_tokens as number;
+      let previousTotalTokens = 0;
+      let conversationMessages:any = [] ;
       let currentQuestionsTotalTokens:any = encode(questionFromWhatsapp);
       let totalTokens = previousTotalTokens + currentQuestionsTotalTokens[1];
-      let conversationMessages = userChatHistory.chats[`${userPhoneNumber}`].messages;
-      if (tokenLimit[0].model === userChatBotModel.chatbotModel && totalTokens >= tokenLimit[0].tokens) {
-        const removeCount = Math.floor(conversationMessages.length / 3); // Calculate one-third of the array length
-        conversationMessages.splice(0, removeCount); // Remove one-third of the messages from the start of the array
-      }
-      else if (tokenLimit[1].model === userChatBotModel.chatbotModel && totalTokens >= tokenLimit[0].tokens) {
-        const removeCount = Math.floor(conversationMessages.length / 3); // Calculate one-third of the array length
-        conversationMessages.splice(0, removeCount); // Remove one-third of the messages from the start of the array
+      
+      if(userChatHistory.chats[`${userPhoneNumber}`]){
+        previousTotalTokens = userChatHistory.chats[`${userPhoneNumber}`].usage.total_tokens as number;
+        conversationMessages = userChatHistory.chats[`${userPhoneNumber}`].messages;
+            
+        if (tokenLimit[0].model === userChatBotModel.model && totalTokens >= tokenLimit[0].tokens) {
+          const removeCount = Math.floor(conversationMessages.length / 3); // Calculate one-third of the array length
+          conversationMessages.splice(0, removeCount); // Remove one-third of the messages from the start of the array
+        }
+        else if (tokenLimit[1].model === userChatBotModel.model && totalTokens >= tokenLimit[0].tokens) {
+          const removeCount = Math.floor(conversationMessages.length / 3); // Calculate one-third of the array length
+          conversationMessages.splice(0, removeCount); // Remove one-third of the messages from the start of the array
+        }
       }
 
+      // similaritySearchResults = "My name is rudresh"
+
+
+      step = 12;
       // Fetch the response from the OpenAI API
       const responseOpenAI: any = await fetch(
         "https://api.openai.com/v1/chat/completions",
@@ -404,6 +428,7 @@ export async function POST(req: NextRequest) {
       if (openaiBody.choices[0].message.content) {
         await sendMessageToWhatsapp(whatsAppDetailsResult.phoneNumberID, "+" + userPhoneNumber, whatsAppDetailsResult.whatsAppAccessToken, openaiBody.choices[0].message.content)
 
+        step = 13;
         //update the chat history
         //check if chat history has userPhoneNumber's chat history
         if (!userChatHistory.chats[`${userPhoneNumber}`]) { //if userPhoneNumber's chat history is not available, add that to the chat history
@@ -434,9 +459,13 @@ export async function POST(req: NextRequest) {
               },
             }
           );
-
+          
+          //return resonse
+          return new Response("received", { status: 200 });
         }
         else {
+
+          step = 14;
      
           //update the chat history
           userChatHistory.chats[`${userPhoneNumber}`].messages.push({
@@ -447,11 +476,22 @@ export async function POST(req: NextRequest) {
             content: openaiBody.choices[0].message.content,
           });
 
+          //count the total tokens of train data
+          // let conversationalMessageTokenencode(conversationMessages)
+          let totalTokenEncoded = encode(similaritySearchResults);
+          let totalPromptTokens = openaiBody.usage.prompt_tokens - totalTokenEncoded[1];
+          let calculatedPromptToken = totalPromptTokens + userChatHistory.chats[`${userPhoneNumber}`].usage.prompt_tokens;
+          let calculatedTotalToken = openaiBody.usage.completion_tokens + calculatedPromptToken;
+          // if (totalTokens < 0) {
+          //   openaiBody.usage.total_tokens += Math.abs(totalTokens);
+          // }
+          // else if(totalTokens > )
+
           //add the new to previoius tokens
           userChatHistory.chats[`${userPhoneNumber}`].usage = {
-            completion_tokens: userChatHistory.chats[`${userPhoneNumber}`].usage.completion_tokens + openaiBody.usage.completion_tokens,
-            prompt_tokens: userChatHistory.chats[`${userPhoneNumber}`].usage.prompt_tokens + openaiBody.usage.prompt_tokens,
-            total_tokens: userChatHistory.chats[`${userPhoneNumber}`].usage.total_tokens + openaiBody.usage.total_tokens
+            completion_tokens: openaiBody.usage.completion_tokens,
+            prompt_tokens: calculatedPromptToken,
+            total_tokens: calculatedTotalToken
           }
 
           //update the chat history
@@ -464,6 +504,9 @@ export async function POST(req: NextRequest) {
             }
           );
 
+          //return response
+          return new Response("received", { status: 200 });
+
         }
 
       }
@@ -472,6 +515,7 @@ export async function POST(req: NextRequest) {
 
   }
   catch (error: any) {
+    console.log("error at step", step);
     console.log("error", error);
   }
 
