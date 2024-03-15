@@ -10,13 +10,21 @@ import PlansSection from "../_components/Home-Sections/Plans-Section/PlansSectio
 import FAQ from "../_components/Home-Sections/FAQ/FAQ";
 import ContactSection from "../_components/Home-Sections/Contact-US/ContactSection";
 import Footer from "../_components/Footer/Footer";
+import SecondaryHeader from "../_components/Secondary-Header/SecondaryHeader";
+import HeroSection from "../_components/HeroSection/HeroSection";
+import CustomerQuestions from "../_components/Home-Sections/customer-question/CustomerQuestions";
+import FeaturesSection from "../_components/Features-Section/FeaturesSection";
 
 function Home() {
   return (
     <>
-      <HeroHeader />
-      <ServiceSection />
-      <FacilitiesSection />
+      {/* <HeroHeader /> */}
+      <SecondaryHeader />
+      <HeroSection />
+      {/* <ServiceSection /> */}
+      <CustomerQuestions />
+      <FeaturesSection />
+      {/* <FacilitiesSection /> */}
       <IndustrySection />
       <ServicesOffered />
       <CompatibilitySection />

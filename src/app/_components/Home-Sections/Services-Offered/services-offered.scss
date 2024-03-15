@@ -3,47 +3,53 @@
 
   /* --------------------------top section------------------------------ */
   .top {
-    display: flex;
-    .left-part {
-      flex: 1;
-      h1 {
-        color: #141416;
-        font-size: 60px;
-        font-style: normal;
-        font-weight: 600;
-        line-height: 72px; /* 120% */
-      }
-
-      p {
-        color: #777e90;
-        font-size: 20px;
-        font-style: normal;
-        font-weight: 500;
-        line-height: normal;
-      }
+    h1 {
+      color: #141416;
+      font-size: 60px;
+      font-style: normal;
+      font-weight: 600;
+      line-height: 72px; /* 120% */
     }
-
-    .right-part {
-      flex: 1;
+    .sub-parent {
       display: flex;
-      justify-content: flex-end;
-      button {
-        height: fit-content;
+
+      .left-part {
         display: flex;
-        padding: 16px;
+        flex: 1;
+
+        p {
+          color: #777e90;
+          font-size: 20px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: normal;
+          margin-top: 24px;
+        }
+      }
+
+      .right-part {
+        flex: 1;
+        display: flex;
+        justify-content: flex-end;
         align-items: center;
-        gap: 10px;
-        border-radius: 12px;
-        background: #0035f0;
-        border: none;
-        cursor: pointer;
-        color: #fff;
-        text-align: center;
-        font-size: 20px;
-        font-style: normal;
-        font-weight: 600;
-        line-height: 28px;
-        /* 140% */
+        button {
+          height: fit-content;
+          display: flex;
+          padding: 16px;
+          align-items: center;
+          gap: 10px;
+          border-radius: 12px;
+          background: #0035f0;
+          border: none;
+          cursor: pointer;
+          color: #fff;
+          text-align: center;
+          font-size: 20px;
+          font-style: normal;
+          font-weight: 600;
+          line-height: 28px;
+          /* 140% */
+        }
       }
     }
   }
@@ -89,28 +95,31 @@
       }
     }
   }
-  @media only screen and (max-width: 767px) {
+  @media only screen and (max-width: 768px) {
     padding: 30px 20px;
     .top {
       flex-direction: column;
-      .left-part {
-        h1 {
-          font-size: 30px;
-          line-height: 40px;
-        }
-
-        p {
-          margin-top: 10px;
-        }
+      h1 {
+        font-size: 30px;
+        line-height: 40px;
       }
+      .sub-parent {
+        flex-direction: column;
+        .left-part {
+          p {
+            margin-top: 10px;
+          }
+        }
 
-      .right-part {
-        justify-content: center;
-        margin-top: 20px;
+        .right-part {
+          justify-content: center;
+          margin-top: 20px;
+        }
       }
     }
 
     .bottom {
+      margin-top: 30px;
       .services-container {
         .service {
           width: 100%;
