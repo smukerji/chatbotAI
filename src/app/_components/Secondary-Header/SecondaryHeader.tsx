@@ -53,7 +53,7 @@ function SecondaryHeader() {
         </div>
 
         <div className='login-register-container'>
-          {/* If user is logged in display my Chatbot else try for free */}
+            {/* If user is logged in display my Chatbot else try for free */}
           <AuthBtn />
         </div>
       </div>
