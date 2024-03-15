@@ -7,10 +7,14 @@ export const maxDuration = 300;
 async function getChatbotId(telegramToken: any) {
   const db = (await clientPromise!).db();
   const collection = db?.collection("telegram-bot");
-  const { chatbotId, userId, isEnabled } = await collection?.findOne({
+  const result = await collection?.findOne({
     telegramToken,
   });
-  return { chatbotId, userId, isEnabled };
+  if(result){
+    const { chatbotId, userId, isEnabled } = result;
+    return {chatbotId, userId, isEnabled}
+  }
+  return null;
 }
 
 //--------------- This code is for sending message to telegram
@@ -49,8 +53,17 @@ export async function POST(request: NextRequest) {
 
   // This code is for getting chatbotId from telegram token
 
-  const { chatbotId, userId, isEnabled } = await getChatbotId(telegramToken);
+  const chatBotResult= await getChatbotId(telegramToken);
 
+  //check if object is empty - if yes return 
+  // ---------------------------------------------------- If user might have deleted bot but still messaging
+  if(!chatBotResult){
+    return new Response("received", { status: 200 });
+  }
+
+  const {chatbotId, userId, isEnabled} = chatBotResult;
+
+  
   // -----------------------------------------------------This function will if the subscription is active or not of user
   try {
     const db = (await clientPromise!).db();
