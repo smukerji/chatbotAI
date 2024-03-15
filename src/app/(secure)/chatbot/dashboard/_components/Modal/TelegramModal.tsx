@@ -79,25 +79,50 @@ function TelegramModal({ setIsTelegramModalOpen,isTelegramEdit,setIsTelegramEdit
   // this function will delete token
   const deleteHandler = async () => {
     try {
-      const url = `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard/telegram/telegramData/api?chatbotId=${chatbot.id}`;
-      const response = await fetch(url, {
-        headers: {
+      //First remove the webhook from telegram
+      const telegramRemoveWebhookUrl=`https://api.telegram.org/bot${telegramToken}/deleteWebhook`
+      const response1 = await fetch(telegramRemoveWebhookUrl,{
+          headers: {
           cache: "no-store",
         },
-        method: "DELETE",
+        method: "POST",
         next: { revalidate: 0 },
       });
-      const resp = await response.json();
-      if (resp.status === 200) {
-        setIsTelegramEdit(false)
-        setStatus(false);
-        setIsTelegramModalOpen(false);
-        
-        message.success(resp?.message);
-      } else {
-        message.error(resp?.message);
+      const resp1 = await response1.json();
+
+      if(resp1?.result){
+
+        const url = `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard/telegram/telegramData/api?chatbotId=${chatbot.id}`;
+        const response2 = await fetch(url, {
+          headers: {
+            cache: "no-store",
+          },
+          method: "DELETE",
+          next: { revalidate: 0 },
+        });
+        const resp2 = await response2.json();
+        if (resp2.status === 200) {
+          setIsTelegramEdit(false)
+          setStatus(false);
+          setIsTelegramModalOpen(false); 
+          message.success(resp2?.message);
+        } else {
+          message.error(resp2?.message);
+        }
       }
-    } catch (error) {}
+      else{
+        message.error('error deleting')
+      }
+
+
+
+
+
+
+
+    } catch (error) {
+      console.log("error deleting ",error)
+    }
   };
 
   //This function will get bot name from telegram
@@ -212,7 +237,7 @@ function TelegramModal({ setIsTelegramModalOpen,isTelegramEdit,setIsTelegramEdit
   const onConnect = async () => {
     if (error?.telegramToken === "") {
       try {
-        let url = `https://api.telegram.org/bot${telegramToken}/setWebhook?url=${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard/telegram/webhookTelegram/api?token=${telegramToken}`;
+        let url = `https://api.telegram.org/bot${telegramToken}/setWebhook?url=${process.env.NEXT_PUBLIC_NGROCKURL}/chatbot/dashboard/telegram/webhookTelegram/api?token=${telegramToken}&drop_pending_updates=true`;
         const response = await fetch(url, {
           headers: {
             cache: "no-store",
