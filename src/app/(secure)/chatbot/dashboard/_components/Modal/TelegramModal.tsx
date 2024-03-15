@@ -240,7 +240,7 @@ function TelegramModal({
   const onConnect = async () => {
     if (error?.telegramToken === "") {
       try {
-        let url = `https://api.telegram.org/bot${telegramToken}/setWebhook?url=${process.env.NEXT_PUBLIC_NGROCKURL}/chatbot/dashboard/telegram/webhookTelegram/api?token=${telegramToken}&drop_pending_updates=true`;
+        let url = `https://api.telegram.org/bot${telegramToken}/setWebhook?url=${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard/telegram/webhookTelegram/api?token=${telegramToken}&drop_pending_updates=true`;
         const response = await fetch(url, {
           headers: {
             cache: "no-store",
