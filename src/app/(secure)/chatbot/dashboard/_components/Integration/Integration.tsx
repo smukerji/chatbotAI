@@ -17,9 +17,9 @@ function Integration() {
   const [isTelegramModalOpen, setIsTelegramModalOpen] =
     useState<boolean>(false);
 
-  const [isWhatsappModalOpen, setisWhatsappModalOpen] =
+  const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] =
     useState<boolean>(false);
-  const [isWhatappVerified, setisWhatsappVerified] = useState<boolean>(false);
+  const [isWhatappVerified, setIsWhatsAppVerified] = useState<boolean>(false);
   const [isSlackModalOpen, setIsSlackModalOpen] = useState<boolean>(false);
   const [isSlackConnected, setIsSlackConnected] = useState<boolean>(false);
   const [loader, setLoader] = useState<boolean>(false);
