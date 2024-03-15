@@ -12,18 +12,28 @@ interface SlackAppData {
 export async function POST(req: NextRequest) {
 
   try {
+
+    let retryNum = req.headers.get('X-Slack-Retry-Num');
+    //if retryNum is available then return the response with status 200
+    if (retryNum) {
+      return new NextResponse('', { status: 200 });
+    }
     //read the incomming parameter from webhook
     let resData: any = await req.json();
-   
     // return the challenge on first time verification
     if (resData.challenge) {
       return new NextResponse(JSON.stringify({ challenge: resData.challenge }), { status: 200 });
     }
     else {
-     if(resData.event.type === 'app_mention'){
-      writeInDataBase(resData);//my business logic
-      return new NextResponse('', { status: 200 });
-     }
+      if (resData.event.type === 'app_mention') {
+
+        //schedules the callback to be called after the current event loop completes
+        setImmediate(async () => {
+          await writeInDataBase(resData);
+        });
+
+        return new NextResponse('', { status: 200 });
+      }
     }
 
     // const tokenDetails = await collection?.findOne({ webhook_verification_token: hubToken });
