@@ -170,7 +170,7 @@ export default function Home() {
               Yearly
             </button>
           </div>
-          <div className='annual-discount'>Save 20% annualy</div>
+          <div className='annual-discount'>Save 20% annually</div>
           <br></br>
 
           <div className='plan-container'>
