@@ -28,9 +28,24 @@ export async function POST(req: NextRequest) {
       if (resData.event.type === 'app_mention') {
 
         //schedules the callback to be called after the current event loop completes
-        setImmediate(async () => {
-          await writeInDataBase(resData);
-        });
+        // setImmediate(async () => {
+        //   await writeInDataBase(resData);
+        // });
+
+        //call fetch url
+        fetch(
+          `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/slack-bot-integration/worker-response`,
+          {
+            headers: {
+              cache: "no-store",
+            },
+            method: "POST",
+            body: JSON.stringify({
+              resData: resData
+            }),
+            next: { revalidate: 0 },
+          }
+        );
 
         return new NextResponse('', { status: 200 });
       }
