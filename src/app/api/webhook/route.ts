@@ -26,69 +26,129 @@ export async function POST(req: any, res: any) {
     }
     console.log('✅ Success:', event.id);
     // Handle the event
-    let plan
+    let plan;
     let planData;
-    let date
+    let date;
+    let addOns;
+    let status;
     switch (event.type) {
       case 'customer.subscription.created':
-        console.log('Checkout session completed:', event.data.object);
+        console.log('Checkout session completed:', event.data.object.items.data);
         date = new Date(event.data.object.current_period_end * 1000);
         if (event.data.object.plan.interval == 'month') {
           planData = await collectionPlan.findOne({ planIdMonth: event.data.object.plan.id });
-
+          if (planData == null) {
+            console.log(event.data.object.plan.id);
+            addOns = await collectionPlan.findOne({ planId: event.data.object.plan.id });
+            if (addOns.name == 'WhatsApp') {
+              await collection.updateOne(
+                { customerId: event.data.object.customer },
+                {
+                  $set: {
+                    isWhatsapp: true,
+                    subIdWhatsapp: event.data.object.id,
+                    nextIsWhatsapp: true
+                  }
+                }
+              );
+            }
+          }
         } else {
           planData = await collectionPlan.findOne({ planIdYear: event.data.object.plan.id });
         }
-        plan = planData.name;
-        await collection.updateOne(
-          { customerId: event.data.object.customer },
-          {
-            $set: {
-              subId: event.data.object.id,
-              stripePlanId: event.data.object.plan.id,
-              duration: event.data.object.plan.interval,
-              endDate: date,
-              plan,
-              planId: planData._id
-            }
-          }
-        );
-        break;
-      case 'customer.subscription.updated':
-        console.log('Checkout session completed:', event.data.object);
-        planData;
-        date = new Date(event.data.object.current_period_end * 1000);
-        if (event.data.object.plan.interval == 'month') {
-          planData = await collectionPlan.findOne({ planIdMonth: event.data.object.plan.id });
+        if (planData == null) {
         } else {
-          planData = await collectionPlan.findOne({ planIdYear: event.data.object.plan.id });
-        }
-        plan = planData.name;
-        await collection.updateOne(
-          { customerId: event.data.object.customer },
-          {
-            $set: {
-              subId: event.data.object.id,
-              stripePlanId: event.data.object.plan.id,
-              duration: event.data.object.plan.interval,
-              endDate: date,
-              plan,
-              planId: planData._id
+          plan = planData.name;
+          await collection.updateOne(
+            { customerId: event.data.object.customer },
+            {
+              $set: {
+                subId: event.data.object.id,
+                stripePlanId: event.data.object.plan.id,
+                duration: event.data.object.plan.interval,
+                endDate: date,
+                plan,
+                planId: planData._id,
+                status: 'active'
+              }
             }
-          }
-        );
+          );
+        }
         break;
+      // case 'customer.subscription.updated':
+      //   console.log('Checkout session completed:', event.data.object);
+      //   planData;
+      //   date = new Date(event.data.object.current_period_end * 1000);
+      //   if (event.data.object.plan.interval == 'month') {
+      //     planData = await collectionPlan.findOne({ planIdMonth: event.data.object.plan.id });
+      //   } else {
+      //     planData = await collectionPlan.findOne({ planIdYear: event.data.object.plan.id });
+      //   }
+      //   plan = planData.name;
+      //   await collection.updateOne(
+      //     { customerId: event.data.object.customer },
+      //     {
+      //       $set: {
+      //         subId: event.data.object.id,
+      //         stripePlanId: event.data.object.plan.id,
+      //         duration: event.data.object.plan.interval,
+      //         endDate: date,
+      //         plan,
+      //         planId: planData._id
+      //       }
+      //     }
+      //   );
+      //   break;
       case 'invoice.paid':
         console.log('Invoice paid:', event.data.object);
-        await collection.updateOne(
-          { customerId: event.data.object.customer },
-          {
-            $set: {
-              status: 'active'
-            }
-          }
-        );
+        planData = await collection.findOne({ customerId: event.data.object.customer });
+        console.log("**********************************************",String(planData._id));
+        if (event.data.object.status == 'paid') {
+          status = 'success';
+        } else {
+          status = 'failed';
+        }
+        var currentDat = new Date();
+
+        var formattedDate = currentDat.toLocaleString('en-US', {
+          month: 'short',
+          day: '2-digit',
+          year: 'numeric'
+        });
+        const updatePayment = await collectionPayment.insertOne({
+          userId: String(planData._id),
+          status,
+          date: formattedDate,
+          price: '$' + (event.data.object.amount_paid)/100,
+          paymentId: event.data.object.id
+        });
         break;
+      // case 'customer.subscription.deleted':
+      //   console.log(event.data.object);
+      //   const subData = await collection.findOne({ subId: event.data.object.id });
+      //   if (subData == null) {
+      //     if (event.data.object.plan.nickname == 'WhatsApp') {
+      //       const deletePlan = await collection.updateMany(
+      //         { customerId: event.data.object.customer },
+      //         {
+      //           $set: {
+      //             nextIsWhatsapp: false
+      //           }
+      //         }
+      //       );
+      //     }
+      //   } else {
+      //     const changeStatus = await collection.updateOne(
+      //       { customerId: event.data.object.customer },
+      //       {
+      //         $set: {
+      //           status: 'cancel'
+      //         }
+      //       }
+      //     );
+      //   }
+
+      //   break;
       default:
         console.warn('Unhandled event type:', event.type);
     }

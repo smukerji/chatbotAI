@@ -1,23 +1,24 @@
-import { NextResponse } from "next/server";
-import clientPromise from "@/db";
-import Stripe from "stripe";
-import { ObjectId } from "mongodb";
-import { apiHandler } from "@/app/_helpers/server/api/api-handler";
-import { number } from "joi";
+import { NextResponse } from 'next/server';
+import clientPromise from '@/db';
+import Stripe from 'stripe';
+import { apiHandler } from '@/app/_helpers/server/api/api-handler';
+import { number } from 'joi';
+import { ObjectId } from 'mongodb';
+const stripe = new Stripe(String(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY));
 
 module.exports = apiHandler({
   POST: getUserDetails,
-  PUT: delPlan,
+  PUT: delPlan
 });
 
 async function getUserDetails(req: any, res: NextResponse) {
   try {
     const db = (await clientPromise!).db();
     let { u_id } = await req.json();
-    const collectionUser = db.collection("users");
-    const collectionPayment = db.collection("payment-history");
-    const collectionPlan = db.collection("plans");
-    const collectionUserDetails = db.collection("users");
+    const collectionUser = db.collection('users');
+    const collectionPayment = db.collection('payment-history');
+    const collectionPlan = db.collection('plans');
+    const collectionUserDetails = db.collection('users');
     const data = await collectionUser.findOne({ _id: new ObjectId(u_id) });
     const planId = data.planId;
     const data_plan = await collectionPlan.findOne({ _id: planId });
@@ -34,8 +35,8 @@ async function getUserDetails(req: any, res: NextResponse) {
       chatbot: data_plan.numberOfChatbot,
       duration: data.duration,
       paymentDetails,
-      nextPlan: data.nextPlan,
-      whatsappIntegration: data.nextIsWhatsapp,
+      status: data.status,
+      whatsappIntegration: data.nextIsWhatsapp
     };
   } catch (error) {}
 }
@@ -44,35 +45,63 @@ async function delPlan(req: any, res: NextResponse) {
   try {
     const db = (await clientPromise!)?.db();
     let { u_id, x } = await req.json();
-    const collectionUser = db.collection("users");
-
-    //ANCHOR -  DELETE PLAN FROM USER DETAILS
+    const collectionUser = db.collection('users');
+    const userData = await collectionUser.findOne({
+      _id: new ObjectId(u_id)
+    });
     if (x == 2) {
+      //ANCHOR -  DELETE PLAN FROM USER DETAILS
+      const subscription = await stripe.subscriptions.update(userData.subId, {
+        cancel_at_period_end: true
+        // prorate: true
+      });
+      if (userData.isWhatsapp == true) {
+        const subscription = await stripe.subscriptions.update(userData.subIdWhatsapp, {
+          // prorate: true
+          cancel_at_period_end: true
+        });
+      }
       const deletePlan = await collectionUser.updateMany(
         { _id: new ObjectId(u_id) },
         {
           $set: {
-            nextPlan: "",
-            nextPlanId: "",
-            nextPlanDuration: "",
-          },
+            status: 'cancel',
+            nextIsWhatsapp: false
+          }
         }
       );
-      return { msg: "Plan deleted successfully", status: true };
+
+      return { msg: 'Plan deleted successfully', status: true };
     }
     //ANCHOR - UPDATE WHATSAPP STATUS IN USERS
     else if (x == 1) {
-      const deletePlan = await collectionUser.updateMany(
+
+      if (userData.isWhatsapp == true) {
+        const subscription = await stripe.subscriptions.update(userData.subIdWhatsapp, {
+          cancel_at_period_end: true
+        });
+      }
+      const deleteAddOn = await collectionUser.updateMany(
         { _id: new ObjectId(u_id) },
         {
           $set: {
-            nextIsWhatsapp: false,
-          },
+            nextIsWhatsapp: false
+          }
         }
       );
-      return { msg: "Canceled whatsapp integration", status: true };
+      return { msg: 'Canceled whatsapp integration', status: true };
     }
   } catch (error) {
-    return { msg: "finding error", status: 0 };
+    return { msg: 'finding error', status: 0 };
   }
 }
+      // const deletePlan = await collectionUser.updateMany(
+      //   { _id: new ObjectId(u_id) },
+      //   {
+      //     $set: {
+      //       nextPlan: '',
+      //       nextPlanId: '',
+      //       nextPlanDuration: ''
+      //     }
+      //   }
+      // );

@@ -17,6 +17,7 @@ async function createPaymentIntent(req: any, res: NextResponse) {
   if (req.method === 'POST') {
     try {
       const db = (await clientPromise!).db();
+      let planData
       let { plan, price, u_id, isWhatsapp, isSlack } = await req.json();
       const collection = db.collection('users');
       const collectionPlan = db.collection('plans');
@@ -54,11 +55,11 @@ async function createPaymentIntent(req: any, res: NextResponse) {
           name = 'agency';
         }
         if (plan == 1 || plan == 2) {
-          let planData = await collectionPlan.findOne({ name: name });
+          planData = await collectionPlan.findOne({ name: name });
           planID = planData.planIdMonth;
         }
         if (plan == 3 || plan == 4) {
-          let planData = await collectionPlan.findOne({ name: name });
+          planData = await collectionPlan.findOne({ name: name });
           planID = planData.planIdYear;
         }
         let subscription;
@@ -87,6 +88,20 @@ async function createPaymentIntent(req: any, res: NextResponse) {
               }
             ]
           });
+          let date = new Date(subscription.current_period_end * 1000);
+          await collection.updateOne(
+            { customerId: subscription.customer },
+            {
+              $set: {
+                subId: subscription.id,
+                stripePlanId: subscription.plan.id,
+                duration: subscription.plan.interval,
+                endDate: date,
+                plan: planData.name,
+                planId: planData._id
+              }
+            }
+          );
         }
         if(isWhatsapp == true){
           subscription = await stripe.subscriptions.create({
