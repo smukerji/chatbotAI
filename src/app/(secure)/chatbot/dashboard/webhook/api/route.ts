@@ -1,5 +1,8 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { Queue, Worker } from 'bullmq';
+
+
 // import { NextApiResponse } from "next";
 import clientPromise from "@/db";
 import  {ObjectId}  from "mongodb";
@@ -135,9 +138,30 @@ export async function POST(req: NextRequest) {
 
   let res: any = await req.json();
 
-  setImmediate(async () => {
-    await whatsAppOperation(res);
-  });
+  // setImmediate(async () => { //queueing
+  //   await whatsAppOperation(res);
+  // });
+  
+  //call fetch
+  try {
+    fetch(
+      `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/webhook/webhook-response-handler`,
+      {
+        headers: {
+          cache: "no-store",
+        },
+        method: "POST",
+        body: JSON.stringify({
+          res: res,
+        }),
+        next: { revalidate: 0 },
+      }
+    );
+  }
+  catch (error: any) {
+    console.log("error at step", error);
+  }
+
 
   // return NextResponse.json({ message: "received" });
   return new Response("received", { status: 200 });
