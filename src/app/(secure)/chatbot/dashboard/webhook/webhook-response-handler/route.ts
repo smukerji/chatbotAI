@@ -131,20 +131,19 @@ export async function POST(req: NextRequest) {
 
       let questionFromWhatsapp =
         res?.entry?.[0]?.changes?.[0]?.value?.messages?.[0]?.text?.body;// question received from whatsapp
-      new Response("received", { status: 200 });
 
-      if (questionFromWhatsapp === "this is a text message") {
-        return new Response("received", { status: 200 });
+      // if (questionFromWhatsapp === "this is a text message") {
+      //   return new Response("received", { status: 200 });
 
-      }
-      if (
-        questionFromWhatsapp == undefined ||
-        questionFromWhatsapp.trim().length <= 0
-      ) {
-        //if the request is only about status don't move further
-        // return NextResponse.json({ message: "received" });
-        return new Response("received", { status: 200 });
-      }
+      // }
+      // if (
+      //   questionFromWhatsapp == undefined ||
+      //   questionFromWhatsapp.trim().length <= 0
+      // ) {
+      //   //if the request is only about status don't move further
+      //   // return NextResponse.json({ message: "received" });
+      //   return new Response("received", { status: 200 });
+      // }
       //get the phone number id from the response
       const binessAccountNumber = res?.entry?.[0]?.changes?.[0]?.value?.metadata["phone_number_id"];
 
@@ -169,7 +168,7 @@ export async function POST(req: NextRequest) {
       if (currentDate > endDate) {
         step = 4;
         await sendMessageToWhatsapp(whatsAppDetailsResult.phoneNumberID, "+" + userPhoneNumber, whatsAppDetailsResult.whatsAppAccessToken, 'Your subscription has ended')
-        return new Response("received", { status: 200 });
+        return new NextResponse("received", { status: 200 });
       } else {
         console.log("continue..");
       }
@@ -179,11 +178,11 @@ export async function POST(req: NextRequest) {
         // return { message: "Chatbot with WhatsApp is disabled" };
         console.log("Chatbot with WhatsApp is disabled ");
         // return NextResponse.json({ message: "received" });
-        return new Response("received", { status: 200 });
+        return new NextResponse("received", { status: 200 });
       }
 
       if (!whatsAppDetailsResult || whatsAppDetailsResult === "error") {
-        return new Response("received", { status: 200 }); ``
+        return new NextResponse("received", { status: 200 });
       }
 
       const userID = userChatBotResult.userId;
@@ -201,7 +200,7 @@ export async function POST(req: NextRequest) {
       const userDetailsResult = await userDetailsCollection.findOne({ userId: userID });
       if (userDetailsResult.totalMessageCount >= userDetailsResult.messageLimit) {
         await sendMessageToWhatsapp(whatsAppDetailsResult.phoneNumberID, "+" + userPhoneNumber, whatsAppDetailsResult.whatsAppAccessToken, 'Your limit reached please upgrade your plan')
-        return new Response("received", { status: 200 });
+        return new NextResponse("received", { status: 200 });
       }
 
       step = 7;
@@ -540,15 +539,16 @@ export async function POST(req: NextRequest) {
 
       }
 
-      return new Response("received", { status: 200 }); 
+      return new NextResponse("received", { status: 200 });
 
     }
     catch (error: any) {
       console.log("error at step", step);
       console.log("error", error);
-    }
+  }
+  
+  return new NextResponse("received", { status: 200 });
 
   
-
 // __________________________________________________ended
 }

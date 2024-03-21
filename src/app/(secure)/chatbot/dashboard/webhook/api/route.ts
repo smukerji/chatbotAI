@@ -144,6 +144,23 @@ export async function POST(req: NextRequest) {
   
   //call fetch
   try {
+    let questionFromWhatsapp =
+      res?.entry?.[0]?.changes?.[0]?.value?.messages?.[0]?.text?.body;// question received from whatsapp
+    new Response("received", { status: 200 });
+
+    if (questionFromWhatsapp === "this is a text message") {
+      return new Response("received", { status: 200 });
+
+    }
+    if (
+      questionFromWhatsapp == undefined ||
+      questionFromWhatsapp.trim().length <= 0
+    ) {
+      //if the request is only about status don't move further
+      // return NextResponse.json({ message: "received" });
+      return new Response("received", { status: 200 });
+    }
+    
     fetch(
       `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/webhook/webhook-response-handler`,
       {
