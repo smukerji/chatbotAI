@@ -17,7 +17,7 @@ async function createPaymentIntent(req: any, res: NextResponse) {
   if (req.method === 'POST') {
     try {
       const db = (await clientPromise!).db();
-      let planData
+      let planData;
       let { plan, price, u_id, isWhatsapp, isSlack } = await req.json();
       const collection = db.collection('users');
       const collectionPlan = db.collection('plans');
@@ -76,18 +76,6 @@ async function createPaymentIntent(req: any, res: NextResponse) {
               }
             ]
           });
-        } else {
-          subscription = await stripe.subscriptions.create({
-            customer: data.customerId,
-            default_payment_method: data.paymentId,
-            off_session: true,
-            // cancel_at_period_end: true,
-            items: [
-              {
-                plan: planID
-              }
-            ]
-          });
           let date = new Date(subscription.current_period_end * 1000);
           await collection.updateOne(
             { customerId: subscription.customer },
@@ -102,8 +90,34 @@ async function createPaymentIntent(req: any, res: NextResponse) {
               }
             }
           );
+        } else {
+          if (plan == 5 || plan == 6 || plan == 7) {
+            subscription = await stripe.subscriptions.create({
+              customer: data.customerId,
+              default_payment_method: data.paymentId,
+              off_session: true,
+              cancel_at_period_end: true,
+              items: [
+                {
+                  plan: planID
+                }
+              ]
+            });
+          } else {
+            subscription = await stripe.subscriptions.create({
+              customer: data.customerId,
+              default_payment_method: data.paymentId,
+              off_session: true,
+              // cancel_at_period_end: true,
+              items: [
+                {
+                  plan: planID
+                }
+              ]
+            });
+          }
         }
-        if(isWhatsapp == true){
+        if (isWhatsapp == true) {
           subscription = await stripe.subscriptions.create({
             customer: data.customerId,
             default_payment_method: data.paymentId,
@@ -115,8 +129,17 @@ async function createPaymentIntent(req: any, res: NextResponse) {
               }
             ]
           });
+        } else if (isWhatsapp == false && !data.subIdWhatsapp) {
+          await collection.updateOne(
+            { customerId: subscription.customer },
+            {
+              $set: {
+                isWhatsapp: false
+              }
+            }
+          );
         }
-        if(isSlack == true){
+        if (isSlack == true) {
           subscription = await stripe.subscriptions.create({
             customer: data.customerId,
             default_payment_method: data.paymentId,

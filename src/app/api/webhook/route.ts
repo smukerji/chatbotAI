@@ -10,6 +10,7 @@ export async function POST(req: any, res: any) {
   if (req.method === 'POST') {
     const db = (await clientPromise!).db();
     const collection = db.collection('users');
+    const collectionDetails = db.collection('user-details');
     const collectionPlan = db.collection('plans');
     const collectionPayment = db.collection('payment-history');
 
@@ -30,6 +31,8 @@ export async function POST(req: any, res: any) {
     let planData;
     let date;
     let addOns;
+    let userData;
+    let Details
     let status;
     switch (event.type) {
       case 'customer.subscription.created':
@@ -38,7 +41,8 @@ export async function POST(req: any, res: any) {
         if (event.data.object.plan.interval == 'month') {
           planData = await collectionPlan.findOne({ planIdMonth: event.data.object.plan.id });
           if (planData == null) {
-            console.log(event.data.object.plan.id);
+            userData = await collection.findOne({customerId: event.data.object.customer})
+            Details = await collectionDetails.findOne({userId: String(userData._id)})
             addOns = await collectionPlan.findOne({ planId: event.data.object.plan.id });
             if (addOns.name == 'WhatsApp') {
               await collection.updateOne(
@@ -49,6 +53,37 @@ export async function POST(req: any, res: any) {
                     subIdWhatsapp: event.data.object.id,
                     nextIsWhatsapp: true
                   }
+                }
+              );
+            }
+            else if (addOns.name == 'MessageSmall') {
+              const data = await collectionDetails.updateMany(
+                { userId:  String(userData._id)},
+                {
+                  $set: {
+                    messageLimit: Number(Details?.messageLimit) + 5000,
+                  },
+                }
+              );
+            }
+            else if (addOns.name == 'MessageLarge') {
+              const data = await collectionDetails.updateMany(
+                { userId:  String(userData._id)},
+                {
+                  $set: {
+                    messageLimit: Number(Details?.messageLimit) + 10000,
+                  },
+                }
+              );
+            }
+            else if (addOns.name == 'Character') {
+              const data = await collectionDetails.updateMany(
+                { userId:  String(userData._id)},
+                {
+                  $set: {
+                    trainingDataLimit:
+                    Number(Details?.trainingDataLimit) + 1000000,
+                  },
                 }
               );
             }

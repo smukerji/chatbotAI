@@ -215,45 +215,48 @@ export default function Home() {
                       <Image src={telegram} alt='no image' />
                       <p className='integration-name'>Telegram</p>
                     </div>
-                    <button
+                    {/* <button
                       className='app-integration-price-btn'
                       disabled={telegramDisable || !enableOne}
                       onClick={TelegramAddOn}
                     >
                       <span className='app-integration-price-btn-text'>Get for $7 USD</span>
-                    </button>
-                    {/* <div className="app-integration-price coming-soon">
+                    </button> */}
+                    <div className="app-integration-price coming-soon">
                       Coming soon
-                    </div> */}
+                    </div>
                   </div>
                   <div className='app-integration'>
                     <div className='integration-name-container'>
                       <Image src={hubspot} alt='no image' />
                       <p className='integration-name'>Hubspot CRM</p>
                     </div>
-                    <button
+                    {/* <button
                       className='app-integration-price-btn'
                       disabled={hubspotDisable || !enableOne}
                       onClick={HubspotAddOn}
                     >
                       <span className='app-integration-price-btn-text'>Get for $7 USD</span>
-                    </button>
-                    {/* <div className="app-integration-price coming-soon">
+                    </button> */}
+                    <div className="app-integration-price coming-soon">
                       Coming soon
-                    </div> */}
+                    </div>
                   </div>
                   <div className='app-integration'>
                     <div className='integration-name-container'>
                       <Image src={slack} height={40} width={40} alt='no image' />
                       <p className='integration-name'>Slack</p>
                     </div>
-                    <button
+                    <div className="app-integration-price coming-soon">
+                      Coming soon
+                    </div>
+                    {/* <button
                       className='app-integration-price-btn'
                       disabled={slackDisable || !enableOne}
                       onClick={slackAddOn}
                     >
                       <span className='app-integration-price-btn-text'>Get for $7 USD</span>
-                    </button>
+                    </button> */}
                   </div>
                   {/* <button className="btn-add-ons" disabled={whatsappDisable}>
                     <span className="btn-text">Get Add-on</span>

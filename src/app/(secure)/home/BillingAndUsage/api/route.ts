@@ -55,12 +55,14 @@ async function delPlan(req: any, res: NextResponse) {
         cancel_at_period_end: true
         // prorate: true
       });
+      console.log("Here")
       if (userData.isWhatsapp == true) {
         const subscription = await stripe.subscriptions.update(userData.subIdWhatsapp, {
           // prorate: true
           cancel_at_period_end: true
         });
       }
+      console.log("Here i Am")
       const deletePlan = await collectionUser.updateMany(
         { _id: new ObjectId(u_id) },
         {

@@ -73,6 +73,8 @@ function BillingAndUsage() {
     }
     setDisable(true);
     setIsModalOpen(false);
+    setWhatsapp(false);
+    setIsWhatsappModalOpen(false);
   };
   const handleWhatsappCancel = () => {
     setIsWhatsappModalOpen(false);
@@ -124,7 +126,7 @@ function BillingAndUsage() {
     const formattedDate: any = newDate.toLocaleDateString('en-US', options);
     setDate(formattedDate);
     setDataSource(response?.data?.paymentDetails);
-    console.log(response?.data?.nextPlan)
+    console.log(response?.data?.nextPlan);
     if (response?.data?.status == 'cancel') {
       setDisable(true);
     }
