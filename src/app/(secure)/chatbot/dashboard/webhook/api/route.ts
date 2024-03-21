@@ -1,9 +1,6 @@
-import { cookies } from "next/headers";
+
 import { NextRequest, NextResponse } from "next/server";
-import { Queue, Worker } from 'bullmq';
 
-
-// import { NextApiResponse } from "next";
 import clientPromise from "@/db";
 import  {ObjectId}  from "mongodb";
 import {encodeChat,
@@ -138,11 +135,6 @@ export async function POST(req: NextRequest) {
 
   let res: any = await req.json();
 
-  // setImmediate(async () => { //queueing
-  //   await whatsAppOperation(res);
-  // });
-  
-  //call fetch
   try {
     let questionFromWhatsapp =
       res?.entry?.[0]?.changes?.[0]?.value?.messages?.[0]?.text?.body;// question received from whatsapp
@@ -160,28 +152,14 @@ export async function POST(req: NextRequest) {
       // return NextResponse.json({ message: "received" });
       return new Response("received", { status: 200 });
     }
-    
-    fetch(
-      `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/webhook/webhook-response-handler`,
-      {
-        headers: {
-          cache: "no-store",
-        },
-        method: "POST",
-        body: JSON.stringify({
-          res: res,
-        }),
-        next: { revalidate: 0 },
-      }
-    );
+
+    await whatsAppOperation(res);
+    return new Response("received", { status: 200 });
   }
   catch (error: any) {
     console.log("error at step", error);
   }
 
-
-  // return NextResponse.json({ message: "received" });
-  return new Response("received", { status: 200 });
 }
 
 async function whatsAppOperation(res: any) {
@@ -199,26 +177,12 @@ async function whatsAppOperation(res: any) {
 
   let step = 1;
 
-
   try {
-
 
     let questionFromWhatsapp =
       res?.entry?.[0]?.changes?.[0]?.value?.messages?.[0]?.text?.body;// question received from whatsapp
-    new Response("received", { status: 200 });
+   
 
-    if (questionFromWhatsapp === "this is a text message") {
-      return new Response("received", { status: 200 });
-    }
-    if (
-      questionFromWhatsapp == undefined ||
-      questionFromWhatsapp.trim().length <= 0
-    ) {
-      //if the request is only about status don't move further
-      // return NextResponse.json({ message: "received" });
-      return new Response("received", { status: 200 });
-    }
-    //get the phone number id from the response
     const binessAccountNumber = res?.entry?.[0]?.changes?.[0]?.value?.metadata["phone_number_id"];
 
     // -----------------------------------------------------This function will if the subscription is active or not of user
