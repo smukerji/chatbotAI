@@ -29,23 +29,23 @@ export async function POST(req: NextRequest) {
 
         //schedules the callback to be called after the current event loop completes
         // setImmediate(async () => {
-        //   await writeInDataBase(resData);
+          await writeInDataBase(resData);
         // });
 
         //call fetch url
-        fetch(
-          `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/slack-bot-integration/worker-response`,
-          {
-            // headers: {
-            //   cache: "no-store",
-            // },
-            method: "POST",
-            body: JSON.stringify({
-              resData: resData
-            }),
-            next: { revalidate: 0 },
-          }
-        );
+        // fetch(
+        //   `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/slack-bot-integration/worker-response`,
+        //   {
+        //     // headers: {
+        //     //   cache: "no-store",
+        //     // },
+        //     method: "POST",
+        //     body: JSON.stringify({
+        //       resData: resData
+        //     }),
+        //     next: { revalidate: 0 },
+        //   }
+        // );
 
         return new NextResponse('', { status: 200 });
       }
@@ -113,6 +113,8 @@ async function writeInDataBase(data: any) {
           text: "I guess you sent me an empty message.",
           threadId: data.event.ts
         });
+
+        return new NextResponse('', { status: 200 });
       }
       else {
 
@@ -140,7 +142,7 @@ async function writeInDataBase(data: any) {
         let limitCrossResult = await cursor.toArray();
 
         await cursor.close();
-
+        //if limitCross is false then increment the message count
         if (limitCrossResult[0].limitCross === false) {
 
           //increment the message count
@@ -212,6 +214,8 @@ async function writeInDataBase(data: any) {
               thread_ts: data.event.ts
             });
 
+            return new NextResponse('', { status: 200 });
+
           }
           else {
 
@@ -226,6 +230,8 @@ async function writeInDataBase(data: any) {
               text: "Lucifer AI is not able to answer for your query. Please try again later.",
               thread_ts: data.event.ts
             });
+
+            return new NextResponse('', { status: 200 });
           }
         }
         else {
@@ -234,6 +240,7 @@ async function writeInDataBase(data: any) {
             text: "You have reached the limit of message count. Please try again later.",
             thread_ts: data.event.ts
           });
+          return new NextResponse('', { status: 200 });
         }
       }
     }
