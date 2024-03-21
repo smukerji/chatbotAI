@@ -4,7 +4,7 @@ import Image from "next/image";
 import contactBGImg from "../../../../../public/sections-images/common/contact-us-bg.png";
 import "./contact-section.scss";
 import contact from "../../../../../public/sections-images/common/connect.svg";
-import { Form, Input } from "antd";
+import { Form, Input, message } from "antd";
 
 function ContactSection() {
   const [form] = Form.useForm();
@@ -18,7 +18,22 @@ function ContactSection() {
   };
 
   const onFinish = async (values: any) => {
-    console.log("hi", values);
+    try {
+      const result = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}api/contact-mail/api`,{
+        method:'POST',
+        body:JSON.stringify({values}),
+        next: { revalidate: 0 },
+      }) 
+      const resp = await result.json()
+      if(resp.status !== 200){
+        message.error(resp.message)
+      }
+      else{
+        message.success(resp.message)
+      }
+    } catch (error) {
+      console.log("error sending mail.")
+    }
   };
 
   return (
