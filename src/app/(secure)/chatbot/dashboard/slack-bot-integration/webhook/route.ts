@@ -36,9 +36,9 @@ export async function POST(req: NextRequest) {
         fetch(
           `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/slack-bot-integration/worker-response`,
           {
-            headers: {
-              cache: "no-store",
-            },
+            // headers: {
+            //   cache: "no-store",
+            // },
             method: "POST",
             body: JSON.stringify({
               resData: resData
