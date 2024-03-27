@@ -236,6 +236,9 @@
   @media only screen and (max-width: 767px) {
     .top {
       .sources-header {
+        p {
+          padding-left: 15px;
+        }
         .options-container {
           flex-wrap: wrap;
           padding-left: 0px;
@@ -244,9 +247,6 @@
           li {
             padding: 5px 15px;
           }
-        }
-        p {
-          padding-left: 15px;
         }
       }
     }

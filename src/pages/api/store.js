@@ -3,7 +3,7 @@ import {
   generateChunksNEmbedd,
   generateChunksNEmbeddForLinks,
 } from "../../app/_helpers/server/embeddings";
-import clientPromise  from "../../db";
+import clientPromise from "../../db";
 import { v4 as uuid } from "uuid";
 // import { authorize, uploadFile } from "../../app/_services/googleFileUpload";
 import { put } from "@vercel/blob";
@@ -53,7 +53,7 @@ export default async function handler(req, res) {
         const updateChatbot = JSON.parse(fields?.updateChatbot[0]);
 
         /// db connection
-        const db =  (await clientPromise!).db();
+        const db =  (await clientPromise).db();
 
         /// first check if user can create the chatbot or not
         const noOfChatbotsUserCreated = await db

@@ -293,6 +293,55 @@ try {
       sendMessageToWhatsapp(whatsAppDetailsResult.phoneNumberID,"+" + responseNumber,whatsAppDetailsResult.whatsAppAccessToken,openaiBody.choices[0].message.content)
     
     }
+    else{
+      const version = "v18.0"; // Replace with your desired version
+      // const phoneNumberId = process.env.WHATSAPPPHONENUMBERID; // Replace with your phone number ID
+      const phoneNumberId = whatsAppDetailsResult.phoneNumberID;
+      const recipientPhoneNumber = '+' + responseNumber;
+      // const accessToken = process.env.WHATSAPPTOKEN
+      const accessToken = whatsAppDetailsResult.whatsAppAccessToken;
+
+      // Define the URL for the POST request
+      const url = `https://graph.facebook.com/${version}/${phoneNumberId}/messages`;
+
+      // Define the data to be sent in the request body
+      const data = {
+        messaging_product: "whatsapp",
+        recipient_type: "individual",
+        to: `${recipientPhoneNumber}`,
+        type: "text",
+        text: {
+          preview_url: false,
+          body: "Lucifer AI is not able to answer for your query. Please try again later."
+        }
+      };
+
+      // Define the options for the fetch request
+      const options = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${accessToken}`
+        },
+        body: JSON.stringify(data),
+      };
+      // Make the POST request using fetch
+      try {
+        const response = await fetch(url, options);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // Handle the data as needed
+      } catch (error) {
+        // Handle the error as needed
+        console.log(error);
+      }
+    }
+
   } catch (error: any) {
     console.log(error);
     //mantain the error log in database, in case of unhandle error

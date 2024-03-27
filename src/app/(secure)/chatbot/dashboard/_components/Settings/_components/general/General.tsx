@@ -7,10 +7,16 @@ import { useCookies } from "react-cookie";
 import { message } from "antd";
 import DeleteModal from "../../../Modal/DeleteModal";
 import { CreateBotContext } from "../../../../../../../_helpers/client/Context/CreateBotContext";
+import { UserDetailsContext } from "../../../../../../../_helpers/client/Context/UserDetailsContext";
+import { formatNumber } from "../../../../../../../_helpers/client/formatNumber";
 
 function General({ chatbotId, chatbotName }: any) {
   const botContext: any = useContext(CreateBotContext);
   const botDetails = botContext?.createBotInfo;
+
+  /// get userDetails context
+  const userDetailContext: any = useContext(UserDetailsContext);
+  const userDetails = userDetailContext?.userDetails;
 
   const [cookies, setCookies]: any = useCookies(["userId"]);
 
@@ -84,7 +90,14 @@ function General({ chatbotId, chatbotName }: any) {
         <div className="characters-details">Characters Used</div>
         <div>
           {botDetails?.totalCharCount}
-          <span className="span">/12000</span>
+          <span className="span">
+            /
+            {formatNumber(
+              userDetails?.plan?.trainingDataLimit
+                ? userDetails?.plan?.trainingDataLimit
+                : 0
+            )}
+          </span>
         </div>
       </div>
       <div className="parent-name-btn">

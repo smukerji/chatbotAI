@@ -12,12 +12,12 @@
     font-style: normal;
     font-weight: 600;
     line-height: 68px;
+
     @media only screen and (max-width: 768px) {
       font-size: 40px;
       line-height: 50px;
     }
   }
-
   .price-offer-container {
     max-width: fit-content;
     margin-left: auto;
@@ -159,26 +159,27 @@
       border-radius: 16px;
       background: var(--Neutral-2, #f4f5f6);
 
-      @media only screen and (max-width: 1420px) and (min-width: 991px){
+      @media only screen and (max-width: 1420px) and (min-width: 991px) {
         max-width: 40%;
         gap: 30px;
 
-        .plan-container-list{
-          .pay-btn{
+        .plan-container-list {
+          .pay-btn {
             padding: 10px !important;
-            .btn-text{
+
+            .btn-text {
               font-size: 17px !important;
             }
           }
         }
       }
 
-      @media only screen and (max-width: 991px) and (min-width: 767px){
-
-        .plan-container-list{
-          .pay-btn{
+      @media only screen and (max-width: 991px) and (min-width: 767px) {
+        .plan-container-list {
+          .pay-btn {
             padding: 10px !important;
-            .btn-text{
+
+            .btn-text {
               font-size: 15px !important;
             }
           }
@@ -278,15 +279,14 @@
               &.price-number-even {
                 color: #fcfcfd;
               }
+
               @media only screen and (max-width: 768px) {
                 font-size: 50px;
               }
-
             }
           }
         }
       }
-
       .plan-container-list {
         display: flex;
         flex-direction: column;
@@ -304,6 +304,7 @@
           align-self: stretch;
           border-radius: 12px;
           border: 1px solid var(--Primary-7, #2e58ea);
+          cursor: pointer;
 
           .btn-text {
             color: var(--Primary-7, #2e58ea);
@@ -317,9 +318,9 @@
           }
         }
 
-        .plan1:hover {
-          cursor: pointer;
-        }
+        // .plan1:hover {
+        //   cursor: pointer;
+        // }
 
         .pay-btn:disabled {
           cursor: not-allowed;
@@ -366,7 +367,7 @@
             }
 
             .coming-soon-even {
-              color:  var(--Primary-4, #99aef9);;
+              color: var(--Primary-4, #99aef9);
               font-family: sans-serif;
               font-size: 16px;
               font-style: normal;
@@ -526,7 +527,6 @@
             /* 140% */
           }
         }
-
         .btn-add-ons:disabled {
           cursor: not-allowed;
         }
@@ -559,6 +559,7 @@
                 line-height: 24px;
               }
             }
+
             .app-integration-price-btn {
               cursor: pointer;
               display: flex;
@@ -569,6 +570,7 @@
               border-radius: 12px;
               border: 1px solid var(--Primary-7, #2e58ea);
               background: var(--Primary-7, #2e58ea);
+
               .app-integration-price-btn-text {
                 color: var(--Neutral-1, #fcfcfd);
                 text-align: center;
@@ -579,6 +581,7 @@
                 line-height: 24px;
               }
             }
+
             .app-integration-price-btn:disabled {
               cursor: not-allowed;
             }
@@ -653,6 +656,7 @@
             /* 140% */
           }
         }
+
         .btn-add-ons:disabled {
           cursor: not-allowed;
         }
@@ -694,6 +698,7 @@
               font-weight: 500;
               line-height: 24px;
             }
+
             .app-integration-price-btn {
               cursor: pointer;
               display: flex;
@@ -704,6 +709,7 @@
               border-radius: 12px;
               border: 1px solid var(--Primary-7, #2e58ea);
               background: var(--Primary-7, #2e58ea);
+
               .app-integration-price-btn-text {
                 color: var(--Neutral-1, #fcfcfd);
                 text-align: center;
@@ -714,6 +720,7 @@
                 line-height: 24px;
               }
             }
+
             .app-integration-price-btn:disabled {
               cursor: not-allowed;
             }
@@ -753,14 +760,13 @@
           font-style: normal;
           font-weight: 600;
           line-height: 68px;
+
           @media only screen and (max-width: 768px) {
             font-size: 35px;
             line-height: 45px;
           }
-
         }
       }
-
       .left-text {
         color: var(--Neutral-5, #777e90);
         font-family: sans-serif;

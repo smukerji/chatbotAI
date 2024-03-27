@@ -45,11 +45,11 @@
               color: #2e58ea;
               position: relative;
               &::before {
-                content: "";
+                content: '';
                 position: absolute;
                 width: 100%;
-                // top: 32px;
-                bottom: -9px;
+                top: 32px;
+                // bottom: -9px;
                 left: 0;
                 border: 1px solid #2e58ea;
 
