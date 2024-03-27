@@ -11,16 +11,21 @@ export default async function handler(req, res) {
     const sessionStartDate = body?.sessionStartDate;
     const sessionEndDate = body?.sessionEndDate;
     const initialMessageLength = body?.initialMessageLength;
+    const historyCollectionName = body?.historyCollectionName;
 
     /// for storing the history date wise
     const startDate = sessionStartDate.split(" ")[0];
 
     /// db connection
-    const db =  (await clientPromise).db();
+    const db = await clientPromise.db();
 
     /// get the collection to store chat history
     let collection = db.collection("chat-history");
-
+    /// get the collection to store chat history
+    if(historyCollectionName === "whatsapp"){
+      collection = db.collection("whatsapp-chat-history");
+    }
+ 
     /// update the chat count
     const updateBotCount = await db.collection("user-details").updateOne(
       { userId: userId },
@@ -53,13 +58,24 @@ export default async function handler(req, res) {
       }
     );
 
-    /// check if the user already interacted with the chatbot
-    const user = await collection.findOne({
-      userId,
-      chatbotId,
-      date: startDate,
-    });
-
+    let user = undefined;
+    if (historyCollectionName === "whatsapp") {
+      /// check if the user already interacted with the chatbot
+      user = await collection.findOne({
+        userId,
+        chatbotId,
+        date:startDate,
+      });
+    }
+    else {
+      /// check if the user already interacted with the chatbot
+      user = await collection.findOne({
+        userId,
+        chatbotId,
+        date: startDate,
+      });
+    }
+   
     try {
       if (!user) {
         /// if it return null store the history
@@ -67,7 +83,12 @@ export default async function handler(req, res) {
           userId,
           chatbotId,
           chats: {
-            [sessionID]: {
+            [sessionID]: historyCollectionName === "whatsapp" ? {
+              messages,
+              initialMessageLength: initialMessageLength,
+            } 
+            :
+            {
               messages,
               sessionStartDate,
               sessionEndDate,
@@ -82,7 +103,15 @@ export default async function handler(req, res) {
           { userId, chatbotId, date: startDate },
           {
             $set: {
-              chats: {
+              chats: historyCollectionName === "whatsapp" ? {
+                ...user?.chats,
+                [sessionID]: {
+                  messages,
+                  initialMessageLength: initialMessageLength,
+                },
+              } 
+              :
+              {
                 ...user?.chats,
                 [sessionID]: {
                   messages,
@@ -101,3 +130,5 @@ export default async function handler(req, res) {
     }
   }
 }
+
+
