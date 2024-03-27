@@ -36,17 +36,17 @@ export async function POST(req: any, res: any) {
     switch (event.type) {
       case "customer.subscription.created":
         date = new Date(event.data.object.current_period_end * 1000);
+        userData = await collection.findOne({
+          customerId: event.data.object.customer,
+        });
+        Details = await collectionDetails.findOne({
+          userId: String(userData._id),
+        });
         if (event.data.object.plan.interval == "month") {
           planData = await collectionPlan.findOne({
             planIdMonth: event.data.object.plan.id,
           });
           if (planData == null) {
-            userData = await collection.findOne({
-              customerId: event.data.object.customer,
-            });
-            Details = await collectionDetails.findOne({
-              userId: String(userData._id),
-            });
             addOns = await collectionPlan.findOne({
               planId: event.data.object.plan.id,
             });
@@ -113,6 +113,17 @@ export async function POST(req: any, res: any) {
               },
             }
           );
+          await collectionDetails.updateMany(
+            { userId: String(userData._id) },
+            {
+              $set: {
+                trainingDataLimit: planData.trainingDataLimit,
+                totalMessageCount: 0,
+                messageLimit: planData.messageLimit,
+                chatbotLimit: planData.numberOfChatbot,
+              },
+            }
+          );
         }
         break;
       // case 'customer.subscription.updated':
@@ -140,6 +151,8 @@ export async function POST(req: any, res: any) {
       //   );
       //   break;
       case "invoice.paid":
+        date = new Date(event.data.object.lines.data[0].period.end * 1000);
+        console.log(date);
         planData = await collection.findOne({
           customerId: event.data.object.customer,
         });
@@ -162,6 +175,16 @@ export async function POST(req: any, res: any) {
           price: "$" + event.data.object.amount_paid / 100,
           paymentId: event.data.object.id,
         });
+
+        await collection.updateOne(
+          { customerId: event.data.object.customer },
+          {
+            $set: {
+              endDate: date,
+            },
+          }
+        );
+
         break;
 
       case "subscription_schedule.canceled":
