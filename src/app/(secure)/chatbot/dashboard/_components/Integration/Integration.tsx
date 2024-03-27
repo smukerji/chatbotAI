@@ -10,7 +10,7 @@ import { Spin, message } from 'antd';
 import { useRouter, useSearchParams } from 'next/navigation';
 import SlackModal from '../Modal/SlackModal';
 import TelegramModal from '../Modal/TelegramModal';
-import { InfoCircleOutlined } from '@ant-design/icons';
+import { EditOutlined, InfoCircleOutlined } from '@ant-design/icons';
 
 function Integration() {
   //This state if for telegram modal open close
@@ -20,6 +20,8 @@ function Integration() {
   const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] =
     useState<boolean>(false);
   const [isWhatappVerified, setIsWhatsAppVerified] = useState<boolean>(false);
+  const [whatsappConnectbtn, setWhatsappConnectbtn] = useState<boolean>(false);
+  const[onEditClicked,setOnEditClicked]=useState<boolean>(false)
   const [isSlackModalOpen, setIsSlackModalOpen] = useState<boolean>(false);
   const [isSlackConnected, setIsSlackConnected] = useState<boolean>(false);
   const [loader, setLoader] = useState<boolean>(false);
@@ -86,14 +88,40 @@ function Integration() {
     }
     setTelegramLoader(false);
   };
-
-  console.log('first', isTelegramEdit);
+// This is for fetching values if present
+const fetchWhatsappDetails = async () => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/whatsapp/account?chatBotId=${chatbot.id}`,
+      {
+        headers: {
+          cache: "no-store",
+        },
+        method: "GET",
+        next: { revalidate: 0 },
+      }
+    );
+    const data = await response.json();
+    if (data?.phoneBusinessID) {
+      setWhatsappConnectbtn(true);
+    }
+    // console.log('data',data.phoneBusinessID)
+  } catch (error) {
+    message.error("error getting data");
+  }
+};
+//This function is called when edit btn is clicked
+const onEditHandler=()=>{
+  openWhatsAppModal()
+  setOnEditClicked(true)
+}
   useEffect(() => {
     fetchTelegramDetails();
   }, [isTelegramEdit]);
 
   useEffect(() => {
     checkWhatsappAvailability();
+    fetchWhatsappDetails()
   }, []);
 
   return (
@@ -103,6 +131,9 @@ function Integration() {
         <div className='name'>
           <Image src={whatsAppIcon} alt='whatsapp-icon' />
           <span>Add to Whatsapp</span>
+          {whatsappConnectbtn && (
+            <span onClick={onEditHandler} className='whatsapp-edit-icon'><EditOutlined/></span>
+          )}
         </div>
         <>
           {loader ? (
@@ -110,10 +141,16 @@ function Integration() {
           ) : (
             <>
               {isWhatappVerified ? (
-                <div className='action' onClick={openWhatsAppModal}>
-                  Connect
-                </div>
-              ) : (
+                <>
+                  {whatsappConnectbtn ? (
+                    <div className="action">Connected</div>
+                  ) : (
+                    <div className="action" onClick={openWhatsAppModal}>
+                      Connect
+                    </div>
+                  )}
+                </>
+              ): (
                 <div
                   className='action'
                   onClick={() => {
@@ -194,6 +231,9 @@ function Integration() {
       <WhatsappModal
         isOpen={isWhatsAppModalOpen}
         onClose={closeWhatsAppModal}
+        onEditClicked={onEditClicked}
+        setOnEditClicked={setOnEditClicked}
+        setWhatsappConnectbtn={setWhatsappConnectbtn}
       />
       {/* ----------Telegram modal */}
       {isTelegramModalOpen && (

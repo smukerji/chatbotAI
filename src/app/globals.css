@@ -164,7 +164,12 @@ margin-top: 0px !important;
 .whatsapp-spin-token{
   margin: 2px auto;
 }
-
+.whatsapp-edit-icon{
+  color: #2e58ea;
+}
+.whatsapp-edit-icon:hover{
+  cursor: pointer !important;
+}
 
 .telegram-token-container{
   height: 114px;
