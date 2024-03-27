@@ -179,6 +179,7 @@ margin-top: 0px !important;
 .whatsapp-edit-icon-s{
   height: 18px;
   width: 18px;
+  margin-left: -12px;
 }
 .whatsapp-edit-icon-s:hover{
   cursor: pointer !important;
