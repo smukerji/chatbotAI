@@ -62,10 +62,9 @@ async function createPaymentIntent(req: any, res: NextResponse) {
           planData = await collectionPlan.findOne({ name: name });
           planID = planData.planIdYear;
         }
-        let subscription;
+        let subscription: any;
         if (data.status == 'active' && (plan == 2 || plan == 4)) {
           const subscriptionId = await stripe.subscriptions.retrieve(data.subId);
-          console.log(subscriptionId.items.data[0].id, data.subId);
           subscription = await stripe.subscriptions.update(data.subId, {
             proration_behavior: 'always_invoice',
             off_session: true,
@@ -163,8 +162,6 @@ async function createPaymentIntent(req: any, res: NextResponse) {
         //   payment_method: data.paymentId,
         //   receipt_email: data.email,
         // });
-        console.log(subscription);
-        console.log(':::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::');
         return subscription;
       } else {
         return { status: 500 };

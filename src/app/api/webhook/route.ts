@@ -17,7 +17,7 @@ export async function POST(req: any, res: any) {
     const sig = req.headers.get('stripe-signature');
     const endpointSecret = 'whsec_1846bb71690a6f8876922cd471237f8972a2cd00716f96c1aef7a2ed211c5c1c';
 
-    let event;
+    let event: any;
     const body = await req.text();
     try {
       event = stripe.webhooks.constructEvent(body, sig, endpointSecret);
@@ -25,7 +25,6 @@ export async function POST(req: any, res: any) {
       console.error('Webhook signature verification failed.', err);
       return res.status(400).end();
     }
-    console.log('✅ Success:', event.id);
     // Handle the event
     let plan;
     let planData;
@@ -36,7 +35,6 @@ export async function POST(req: any, res: any) {
     let status;
     switch (event.type) {
       case 'customer.subscription.created':
-        console.log('Checkout session completed:', event.data.object.items.data);
         date = new Date(event.data.object.current_period_end * 1000);
         if (event.data.object.plan.interval == 'month') {
           planData = await collectionPlan.findOne({ planIdMonth: event.data.object.plan.id });
@@ -135,9 +133,7 @@ export async function POST(req: any, res: any) {
       //   );
       //   break;
       case 'invoice.paid':
-        console.log('Invoice paid:', event.data.object);
         planData = await collection.findOne({ customerId: event.data.object.customer });
-        console.log("**********************************************",String(planData._id));
         if (event.data.object.status == 'paid') {
           status = 'success';
         } else {
@@ -158,6 +154,10 @@ export async function POST(req: any, res: any) {
           paymentId: event.data.object.id
         });
         break;
+
+        case 'subscription_schedule.canceled':
+          console.log('subscription_schedule.canceled', event.data.object);
+          break;
       // case 'customer.subscription.deleted':
       //   console.log(event.data.object);
       //   const subData = await collection.findOne({ subId: event.data.object.id });
