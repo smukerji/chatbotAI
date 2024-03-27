@@ -84,20 +84,12 @@ async function CronFunction() {
           { _id: new ObjectId(limitData.userId) },
           {
             $set: {
-              isWhatsapp: false
+              isWhatsapp: false,
+              nextIsWhatsapp: false
             }
           }
         );
       }
-      // const updateWhatsapp = await collection.updateMany(
-      //   { _id: new ObjectId(limitData.userId) },
-      //   {
-      //     $set: {
-      //       isWhatsapp: false,
-      //       nextIsWhatsapp: false
-      //     }
-      //   }
-      // );
     }
 
     const dataa = await cursor.toArray();

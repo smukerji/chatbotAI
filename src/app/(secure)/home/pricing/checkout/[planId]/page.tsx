@@ -7,6 +7,7 @@ import { useSearchParams } from "next/navigation";
 import CryptoJS from 'crypto-js';
 import { chat } from "googleapis/build/src/apis/chat";
 import Loader from "../../_components/Loader";
+import { useRouter } from 'next/navigation';
 const stripePromise = loadStripe(
   String(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY)
 );
@@ -21,6 +22,8 @@ const plans = [
   { id: 7, name: "Message add on", price: 8, days: 30 },
   { id: 8, name: "Whatsapp Integration", price: 7, days: 30 },
   { id: 9, name: "Slack Integration", price: 7, days: 30 },
+  { id: 10, name: "Telegram Integration", price: 7, days: 30 },
+  { id: 11, name: "Hubspot Integration", price: 7, days: 30 }
 ];
 
 const CheckoutPage = ({ params }: any) => {
@@ -29,10 +32,9 @@ const CheckoutPage = ({ params }: any) => {
   const param: any = useSearchParams();
   const chatbot = (decodeURIComponent(param.get("a")));
   const [decryptedData , setDecryptedData] = useState("");
-  const [loader, setLoader] = useState(false)
-  
+  const [loader, setLoader] = useState(true)
+  const router = useRouter();
   const dataDecrypt =() => {
-    console.log('.....', chatbot);
     
     // const data: any = decodeURIComponent(chatbot)
     // console.log(data)
@@ -46,6 +48,9 @@ const CheckoutPage = ({ params }: any) => {
   useEffect(() => {
     setLoader(true)
     setSelectedPlan(plans.find((plan: any) => plan.id === Number(planId)));
+    if(planId > 11){
+      router.push('/home/pricing');
+    }
     if(planId == 2 || planId ==4){
       dataDecrypt()
     }
