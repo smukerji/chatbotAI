@@ -46,10 +46,13 @@ function BillingAndUsage() {
   //ANCHOR - API CALL TO CANCEL WHATSAPP INTEGRATION FOR NEXT BILLING CYCLE
   const handleWhatsappOk = async () => {
     if (whatsapp == true) {
-      const response = await axios.put(`${process.env.NEXT_PUBLIC_WEBSITE_URL}home/BillingAndUsage/api`, {
-        u_id: cookies.userId,
-        x: 1
-      });
+      const response = await axios.put(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/BillingAndUsage/api`,
+        {
+          u_id: cookies.userId,
+          x: 1,
+        }
+      );
       if (response.data.status == true) {
         message.success(response.data.msg);
       } else {
@@ -62,10 +65,13 @@ function BillingAndUsage() {
 
   //ANCHOR - API CALL TO CANCEL PLAN FOR NEXT BILLING CYCLE
   const handleOk = async () => {
-    const response = await axios.put(`${process.env.NEXT_PUBLIC_WEBSITE_URL}home/BillingAndUsage/api`, {
-      u_id: cookies.userId,
-      x: 2
-    });
+    const response = await axios.put(
+      `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/BillingAndUsage/api`,
+      {
+        u_id: cookies.userId,
+        x: 2,
+      }
+    );
     if (response.data.status == true) {
       message.success(response.data.msg);
     } else {
@@ -89,23 +95,23 @@ function BillingAndUsage() {
     {
       title: 'PaymentId',
       dataIndex: 'paymentId',
-      key: 'paymentId'
+      key: 'paymentId',
     },
     {
       title: 'Amount',
       dataIndex: 'price',
-      key: 'price'
+      key: 'price',
     },
     {
       title: 'Date',
       dataIndex: 'date',
-      key: 'date'
+      key: 'date',
     },
     {
       title: 'Status',
       dataIndex: 'status',
-      key: 'status'
-    }
+      key: 'status',
+    },
   ];
 
   const explorePlan = async () => {
@@ -114,9 +120,12 @@ function BillingAndUsage() {
 
   //ANCHOR - API CALL FOR COLLECTING DATA FROM DATABASE
   const myFunction = async () => {
-    const response = await axios.post(`${process.env.NEXT_PUBLIC_WEBSITE_URL}home/BillingAndUsage/api`, {
-      u_id: cookies.userId
-    });
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/BillingAndUsage/api`,
+      {
+        u_id: cookies.userId,
+      }
+    );
     setChat(response?.data?.chatbot);
     setMsg(response?.data?.message);
     setPlan(response?.data?.plan);
@@ -191,13 +200,22 @@ function BillingAndUsage() {
               <div className='plan-feature'>
                 <div className='plan-message'>
                   {' '}
-                  {formatNumber(userDetails?.plan?.messageLimit ? userDetails?.plan?.messageLimit : 0)} Messages
+                  {formatNumber(
+                    userDetails?.plan?.messageLimit
+                      ? userDetails?.plan?.messageLimit
+                      : 0
+                  )}{' '}
+                  Messages
                 </div>
                 <Image className='dot-image' src={circle} alt='no image' />
-                <div className='plan-chatbot'>{userDetails?.plan?.numberOfChatbot} Chatbots</div>
+                <div className='plan-chatbot'>
+                  {userDetails?.plan?.numberOfChatbot} Chatbots
+                </div>
                 <Image className='dot-image' src={circle} alt='no image' />
                 <div className='next-renewal-date'>
-                  <div className='next-renewal-date-text'>Auto Renewal due on</div>
+                  <div className='next-renewal-date-text'>
+                    Auto Renewal due on
+                  </div>
                   <div className='next-renewal-date-date'>{date}</div>
                 </div>
               </div>
@@ -207,15 +225,23 @@ function BillingAndUsage() {
             <button className='btn-upgrade' onClick={explorePlan}>
               <span className='btn-text'>Explore Plans</span>
             </button>
-            <button className='btn-cancel-plan' onClick={showModal} disabled={disable}>
-              <span className='btn-text-cancel-plan'>{disable ? 'Plan Cancelled' : 'Cancel My Plan'}</span>
+            <button
+              className='btn-cancel-plan'
+              onClick={showModal}
+              disabled={disable}
+            >
+              <span className='btn-text-cancel-plan'>
+                {disable ? 'Plan Cancelled' : 'Cancel My Plan'}
+              </span>
             </button>
             <button
               className='btn-cancel-plan btn-cancel-plan-whatsapp'
               onClick={whatsapp ? cancelWhatsapp : explorePlan}
             >
               <span className='btn-text-cancel-plan'>
-                {whatsapp ? 'Cancel Whatsapp integration for next cycle' : 'Explore Whatsapp Integration Plan'}
+                {whatsapp
+                  ? 'Cancel Whatsapp integration for next cycle'
+                  : 'Explore Whatsapp Integration Plan'}
               </span>
             </button>
           </div>
@@ -226,7 +252,7 @@ function BillingAndUsage() {
           dataSource={dataSource}
           columns={columns}
           scroll={{
-            x: 600
+            x: 600,
           }}
         />
         ;
@@ -238,5 +264,5 @@ function BillingAndUsage() {
 }
 
 export default dynamic((): any => Promise.resolve(BillingAndUsage), {
-  ssr: false
+  ssr: false,
 });

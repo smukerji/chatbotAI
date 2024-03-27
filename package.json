@@ -49,6 +49,7 @@
     "pdf-parse": "^1.1.1",
     "pinecone-client": "^1.1.0",
     "playwright": "^1.39.0",
+    "postmark": "^4.0.2",
     "puppeteer": "^21.3.8",
     "react": "18.2.0",
     "react-cookie": "^5.0.0",

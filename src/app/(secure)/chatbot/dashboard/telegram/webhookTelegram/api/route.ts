@@ -3,14 +3,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { apiHandler } from "../../../../../../_helpers/server/api/api-handler";
 import clientPromise from "../../../../../../../db";
 import { ObjectId } from "mongodb";
-
+export const maxDuration = 300;
 async function getChatbotId(telegramToken: any) {
   const db = (await clientPromise!).db();
   const collection = db?.collection("telegram-bot");
-  const { chatbotId, userId, isEnabled } = await collection?.findOne({
+  const result = await collection?.findOne({
     telegramToken,
   });
-  return { chatbotId, userId, isEnabled };
+  if(result){
+    const { chatbotId, userId, isEnabled } = result;
+    return {chatbotId, userId, isEnabled}
+  }
+  return null;
 }
 
 //--------------- This code is for sending message to telegram
@@ -49,8 +53,17 @@ export async function POST(request: NextRequest) {
 
   // This code is for getting chatbotId from telegram token
 
-  const { chatbotId, userId, isEnabled } = await getChatbotId(telegramToken);
+  const chatBotResult= await getChatbotId(telegramToken);
 
+  //check if object is empty - if yes return 
+  // ---------------------------------------------------- If user might have deleted bot but still messaging
+  if(!chatBotResult){
+    return new Response("received", { status: 200 });
+  }
+
+  const {chatbotId, userId, isEnabled} = chatBotResult;
+
+  
   // -----------------------------------------------------This function will if the subscription is active or not of user
   try {
     const db = (await clientPromise!).db();
@@ -61,7 +74,7 @@ export async function POST(request: NextRequest) {
 
     const currentDate = new Date();
     if (currentDate > endDate) {
-      sendMessageToTelegram(
+      await sendMessageToTelegram(
         telegramToken,
         chatId,
         "Your subscription has ended"
@@ -84,7 +97,7 @@ export async function POST(request: NextRequest) {
   }
   //---------------------------------------------------------- if user types /start
   if (req?.message?.text === "/start") {
-    sendMessageToTelegram(
+    await  sendMessageToTelegram(
       telegramToken,
       chatId,
       "Welcome how can we help you?"
@@ -97,7 +110,7 @@ export async function POST(request: NextRequest) {
     const collections = db?.collection("user-details");
     const result = await collections.findOne({ userId });
     if (result.totalMessageCount >= result.messageLimit) {
-      sendMessageToTelegram(
+      await sendMessageToTelegram(
         telegramToken,
         chatId,
         "Your limit reached please upgrade your plan"
@@ -186,7 +199,7 @@ export async function POST(request: NextRequest) {
 
     // after getting response from open ai
     if (openaiBody.choices[0].message.content) {
-      sendMessageToTelegram(
+      await sendMessageToTelegram(
         telegramToken,
         chatId,
         openaiBody.choices[0].message.content

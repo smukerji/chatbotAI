@@ -1,25 +1,25 @@
-import React, { useEffect, useState } from "react";
-import "./integration.scss";
-import Image from "next/image";
-import whatsAppIcon from "../../../../../../../public/svgs/whatsapp-icon.svg";
-import telegramIcon from "../../../../../../../public/svgs/telegram-icon.svg";
-import slackIcon from "../../../../../../../public/slack.png";
-import WhatsappModal from "../Modal/WhatsappModal";
-import { useCookies } from "react-cookie";
-import { Spin, message } from "antd";
-import { useRouter, useSearchParams } from "next/navigation";
-import SlackModal from "../Modal/SlackModal";
-import TelegramModal from "../Modal/TelegramModal";
-import { InfoCircleOutlined } from "@ant-design/icons";
+import React, { useEffect, useState } from 'react';
+import './integration.scss';
+import Image from 'next/image';
+import whatsAppIcon from '../../../../../../../public/svgs/whatsapp-icon.svg';
+import telegramIcon from '../../../../../../../public/svgs/telegram-icon.svg';
+import slackIcon from '../../../../../../../public/slack.png';
+import WhatsappModal from '../Modal/WhatsappModal';
+import { useCookies } from 'react-cookie';
+import { Spin, message } from 'antd';
+import { useRouter, useSearchParams } from 'next/navigation';
+import SlackModal from '../Modal/SlackModal';
+import TelegramModal from '../Modal/TelegramModal';
+import { InfoCircleOutlined } from '@ant-design/icons';
 
 function Integration() {
   //This state if for telegram modal open close
   const [isTelegramModalOpen, setIsTelegramModalOpen] =
     useState<boolean>(false);
 
-  const [isWhatsappModalOpen, setisWhatsappModalOpen] =
+  const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] =
     useState<boolean>(false);
-  const [isWhatappVerified, setisWhatsappVerified] = useState<boolean>(false);
+  const [isWhatappVerified, setIsWhatsAppVerified] = useState<boolean>(false);
   const [isSlackModalOpen, setIsSlackModalOpen] = useState<boolean>(false);
   const [isSlackConnected, setIsSlackConnected] = useState<boolean>(false);
   const [loader, setLoader] = useState<boolean>(false);
@@ -27,16 +27,16 @@ function Integration() {
   const [isTelegramEdit, setIsTelegramEdit] = useState<boolean>(false);
   const params: any = useSearchParams();
 
-  const chatbot = JSON.parse(decodeURIComponent(params.get("chatbot")));
-  const userId = useCookies(["userId"]);
+  const chatbot = JSON.parse(decodeURIComponent(params.get('chatbot')));
+  const userId = useCookies(['userId']);
   const router = useRouter();
 
   const openWhatsAppModal = () => {
-    setisWhatsappModalOpen(true);
+    setIsWhatsAppModalOpen(true);
   };
 
   const closeWhatsAppModal = () => {
-    setisWhatsappModalOpen(false);
+    setIsWhatsAppModalOpen(false);
   };
 
   const checkWhatsappAvailability = async () => {
@@ -45,8 +45,8 @@ function Integration() {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard/integrationApi/api?userId=${userId[0].userId}`,
         {
-          method: "GET",
-          cache: "no-cache",
+          method: 'GET',
+          cache: 'no-cache',
           next: { revalidate: 0 },
         }
       );
@@ -55,12 +55,12 @@ function Integration() {
         data?.isWhatsappVerified === true ||
         data?.isWhatsappVerified === false
       ) {
-        setisWhatsappVerified(data?.isWhatsappVerified);
+        setIsWhatsAppVerified(data?.isWhatsappVerified);
       } else {
-        message.error("unable to get whatsapp status");
+        message.error('unable to get whatsapp status');
       }
     } catch (error: any) {
-      message.error("unable to get whatsapp status");
+      message.error('unable to get whatsapp status');
     }
     setLoader(false);
   };
@@ -72,9 +72,9 @@ function Integration() {
       const url = `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard/telegram/telegramData/api?chatbotId=${chatbot.id}`;
       const response = await fetch(url, {
         headers: {
-          cache: "no-store",
+          cache: 'no-store',
         },
-        method: "GET",
+        method: 'GET',
         next: { revalidate: 0 },
       });
       const resp = await response.json();
@@ -82,12 +82,12 @@ function Integration() {
         setIsTelegramEdit(true);
       }
     } catch (error) {
-      console.log("error", error);
+      console.log('error', error);
     }
     setTelegramLoader(false);
   };
 
-  console.log("first", isTelegramEdit);
+  console.log('first', isTelegramEdit);
   useEffect(() => {
     fetchTelegramDetails();
   }, [isTelegramEdit]);
@@ -97,11 +97,11 @@ function Integration() {
   }, []);
 
   return (
-    <div className="integration-container">
+    <div className='integration-container'>
       {/*------------------------------------------Whatsapp-integration----------------------------------------------*/}
-      <div className="integration">
-        <div className="name">
-          <Image src={whatsAppIcon} alt="whatsapp-icon" />
+      <div className='integration'>
+        <div className='name'>
+          <Image src={whatsAppIcon} alt='whatsapp-icon' />
           <span>Add to Whatsapp</span>
         </div>
         <>
@@ -110,12 +110,12 @@ function Integration() {
           ) : (
             <>
               {isWhatappVerified ? (
-                <div className="action" onClick={openWhatsAppModal}>
+                <div className='action' onClick={openWhatsAppModal}>
                   Connect
                 </div>
               ) : (
                 <div
-                  className="action"
+                  className='action'
                   onClick={() => {
                     router.push(
                       `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing`
@@ -133,13 +133,13 @@ function Integration() {
       {/*------------------------------------------Telegram-integration----------------------------------------------*/}
       {/* <div className="telegram-container" > */}
 
-      <div className="integration i-btn">
-        <div className="name">
-          <Image src={telegramIcon} alt="telegram-icon" />
+      <div className='integration i-btn'>
+        <div className='name'>
+          <Image src={telegramIcon} alt='telegram-icon' />
           <span>Add to Telegram</span>
         </div>
         <div
-          className="action"
+          className='action'
           onClick={() => {
             setIsTelegramModalOpen(true);
           }}
@@ -147,32 +147,32 @@ function Integration() {
           {telegramLoader ? (
             <Spin />
           ) : (
-            <>{isTelegramEdit ? "Edit" : "Connect"}</>
+            <>{isTelegramEdit ? 'Edit' : 'Connect'}</>
           )}
         </div>
         <div
-          className="telegram-i-btn"
+          className='telegram-i-btn'
           onClick={() => router.push(`dashboard/telegram-guide`)}
         >
           <InfoCircleOutlined />
         </div>
       </div>
       {/* -----------------------------------------Slack-integration */}
-      <div className="integration">
-        <div className="name">
-          <Image src={slackIcon} alt="slack-icon" height={35} width={35} />
+      <div className='integration'>
+        <div className='name'>
+          <Image src={slackIcon} alt='slack-icon' height={35} width={35} />
           <span>Add to Slack</span>
         </div>
         <>
           {isSlackConnected ? (
             <>
-              <div className="view" onClick={() => setIsSlackModalOpen(true)}>
+              <div className='view' onClick={() => setIsSlackModalOpen(true)}>
                 View
               </div>
             </>
           ) : (
             <>
-              <div className="action" onClick={() => setIsSlackModalOpen(true)}>
+              <div className='action' onClick={() => setIsSlackModalOpen(true)}>
                 Connect
               </div>
             </>
@@ -181,9 +181,9 @@ function Integration() {
       </div>
       {/* </div> */}
 
-      <div className="how-to-integrate">
+      <div className='how-to-integrate'>
         <p
-          className="integrate-text"
+          className='integrate-text'
           onClick={() => router.push(`dashboard/whatsapp-integration-guide`)}
         >
           How to integrate my Chatbot?
@@ -192,7 +192,7 @@ function Integration() {
 
       {/* Whatsapp Modal */}
       <WhatsappModal
-        isOpen={isWhatsappModalOpen}
+        isOpen={isWhatsAppModalOpen}
         onClose={closeWhatsAppModal}
       />
       {/* ----------Telegram modal */}
