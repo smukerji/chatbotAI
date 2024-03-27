@@ -274,6 +274,7 @@ const checkIfDirty = (data: any) => {
   const handleCancel = () => {
     //before closing ckheck whether onEditClicked is true or not
     if (!onEditClicked) {
+      
       setStepState({ step1: true, step2: false, step3: false });
       setItems([
         { status: "process" }, // Update the status of the first step
@@ -281,6 +282,31 @@ const checkIfDirty = (data: any) => {
         { status: "wait" },
       ]);
       setAccountStatus(false);
+
+      //Empty the state here for meta details 
+      setMetaDetails({
+       ...metaDetails,
+        whatsAppAccessToken: "",
+        facebookAppSecret: "",
+        whatsAppPhoneNumber: "",
+        phoneNumberID: "",
+        phoneBusinessID: "",
+      })
+      //also set errors
+      setErrors({...errors,whatsAppAccessToken: null,
+        facebookAppSecret: null,
+        whatsAppPhoneNumber: null,
+        phoneNumberID: null,
+        phoneBusinessID: null})
+    }
+    else{
+      setItems([
+        { status: "finish" }, // Update the status of the first step
+        { status: "finish" }, // Update the status of the second step
+        { status: "process" },
+      ]);
+      setStepState({ step1: false, step2: false, step3: false });
+      setAccountStatus(true);
     }
     onClose();
   };
@@ -380,9 +406,6 @@ const checkIfDirty = (data: any) => {
       else{
         whatsAppDetailsId=metaDetails?.id
       }
-    
-        
-   
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/whatsapp/account?whatsAppDetailsId=${whatsAppDetailsId}`, {
         headers: {
@@ -446,7 +469,7 @@ const checkIfDirty = (data: any) => {
       
       
       })
-
+      
      
     } catch (error) {
       message.error("error getting data");

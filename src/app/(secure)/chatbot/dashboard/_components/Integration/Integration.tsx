@@ -11,6 +11,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import SlackModal from '../Modal/SlackModal';
 import TelegramModal from '../Modal/TelegramModal';
 import { EditOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import editIcon from "../../../../../../../public/sections-images/common/edit.svg";
+
 
 function Integration() {
   //This state if for telegram modal open close
@@ -132,7 +134,7 @@ const onEditHandler=()=>{
           <Image src={whatsAppIcon} alt='whatsapp-icon' />
           <span>Add to Whatsapp</span>
           {whatsappConnectbtn && (
-            <span onClick={onEditHandler} className='whatsapp-edit-icon'><EditOutlined/></span>
+            <Image src={editIcon} alt='edit' onClick={onEditHandler} className='whatsapp-edit-icon-s'/>
           )}
         </div>
         <>
