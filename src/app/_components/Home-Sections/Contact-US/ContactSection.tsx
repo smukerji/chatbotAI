@@ -30,6 +30,8 @@ function ContactSection() {
       }
       else{
         message.success(resp.message)
+         // Clear form fields after successful submission
+      form.resetFields();
       }
     } catch (error) {
       console.log("error sending mail.")
