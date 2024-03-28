@@ -27,48 +27,17 @@ export async function POST(req: NextRequest) {
     else {
       if (resData.event.type === 'app_mention') {
 
-        //schedules the callback to be called after the current event loop completes
-        // setImmediate(async () => {
+        setImmediate(async () => {
           await writeInDataBase(resData);
-        // });
-
-        //call fetch url
-        // fetch(
-        //   `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/slack-bot-integration/worker-response`,
-        //   {
-        //     // headers: {
-        //     //   cache: "no-store",
-        //     // },
-        //     method: "POST",
-        //     body: JSON.stringify({
-        //       resData: resData
-        //     }),
-        //     next: { revalidate: 0 },
-        //   }
-        // );
+        });
 
         return new NextResponse('', { status: 200 });
       }
+      else {
+        //handle else part here.
+      }
     }
 
-    // const tokenDetails = await collection?.findOne({ webhook_verification_token: hubToken });
-    // if (
-    //   hubMode === "subscribe" &&
-    //   hubToken === tokenDetails?.webhook_verification_token
-    //   // hubToken === process.env.WHATSAPPCALLBACKTOKEN
-    // ) {
-
-    //   // find whome the hubToken belongs to and update the isTokenVerified to true
-    //   const tokenDetails = await collection?.findOne({ webhook_verification_token: hubToken });
-    //   if (tokenDetails) {
-    //     await collection?.updateOne({ webhook_verification_token: hubToken }, { $set: { isTokenVerified: true } });
-    //   }
-
-    //   console.log('verified successfully');
-    //   return new Response(hubChallenge);
-    // }
-
-    // return new Response("Invalid Credentials", { status: 400 });
   }
   catch (error: any) {
     console.log('error', error);
