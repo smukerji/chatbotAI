@@ -6,7 +6,7 @@ import clientPromise from "../../../../db";
 import { cookies } from "next/headers";
 import { ObjectId } from "mongodb";
 import { Adapter } from "next-auth/adapters";
-import { useEmailService } from "../../../_services/emailService";
+import { emailService } from "../../../_services/emailService";
 import {
   logo,
   registerationMail,
@@ -91,7 +91,7 @@ export const authOptions: NextAuthOptions = {
     createUser: async (message) => {
       const user = message.user;
       /// send the registration mail
-      const emailService = useEmailService();
+      const emailService = emailService();
       await emailService.send(
         "registration-mail-template",
         [

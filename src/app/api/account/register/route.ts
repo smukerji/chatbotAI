@@ -3,7 +3,7 @@ import clientPromise from "../../../../db";
 import { apiHandler } from "../../../_helpers/server/api/api-handler";
 import joi from "joi";
 import bcrypt from "bcrypt";
-import { useEmailService } from "../../../_services/emailService";
+import { emailService } from "../../../_services/emailService";
 import {
   logo,
   logoBase64,
@@ -58,7 +58,7 @@ async function register(request: any) {
   });
 
   /// send the registration mail
-  const emailService = useEmailService();
+  const emailService = emailService();
   await emailService.send(
     "registration-mail-template",
     [

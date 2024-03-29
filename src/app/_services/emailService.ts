@@ -4,8 +4,8 @@ const client: postmark.ServerClient = new postmark.ServerClient(
 );
 
 /// email service to send email to users based on the actions of users
-export { useEmailService };
-function useEmailService(): IEmailService {
+export { emailService };
+function emailService(): IEmailService {
   return {
     send: async (
       templateName: string,
