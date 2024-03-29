@@ -18,7 +18,6 @@ async function getUserDetails(req: any, res: NextResponse) {
     const collectionUser = db.collection('users');
     const collectionPayment = db.collection('payment-history');
     const collectionPlan = db.collection('plans');
-    const collectionUserDetails = db.collection('users');
     const data = await collectionUser.findOne({ _id: new ObjectId(u_id) });
     const planId = data.planId;
     const data_plan = await collectionPlan.findOne({ _id: planId });
@@ -46,6 +45,8 @@ async function delPlan(req: any, res: NextResponse) {
     const db = (await clientPromise!)?.db();
     let { u_id, x } = await req.json();
     const collectionUser = db.collection('users');
+    const collectionUserDetails = db.collection('user-details');
+    const details = await collectionUserDetails.findOne({userId: u_id})
     const userData = await collectionUser.findOne({
       _id: new ObjectId(u_id)
     });
@@ -55,14 +56,24 @@ async function delPlan(req: any, res: NextResponse) {
         cancel_at_period_end: true
         // prorate: true
       });
-      console.log("Here")
       if (userData.isWhatsapp == true) {
         const subscription = await stripe.subscriptions.update(userData.subIdWhatsapp, {
           // prorate: true
           cancel_at_period_end: true
         });
       }
-      console.log("Here i Am")
+      if(details.isTelegram == true){
+        const subscription = await stripe.subscriptions.update(details.subIdTelegram, {
+          // prorate: true
+          cancel_at_period_end: true
+        });
+      }
+      if(details.isSlack == true){
+        const subscription = await stripe.subscriptions.update(details.subIdTelegram, {
+          // prorate: true
+          cancel_at_period_end: true
+        });
+      }
       const deletePlan = await collectionUser.updateMany(
         { _id: new ObjectId(u_id) },
         {

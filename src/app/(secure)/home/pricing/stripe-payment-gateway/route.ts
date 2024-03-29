@@ -46,6 +46,9 @@ async function createPaymentIntent(req: any, res: NextResponse) {
         if (plan == 9) {
           planID = 'plan_PlVDDEMmnGFxiX';
         }
+        if (plan == 10) {
+          planID = 'plan_PpD1ZgTGa4nAlY';
+        }
 
         let name;
         if (plan == 1 || plan == 3) {

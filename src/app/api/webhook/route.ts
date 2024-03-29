@@ -61,6 +61,26 @@ export async function POST(req: any, res: any) {
                   },
                 }
               );
+            } else if (addOns.name == "Slack") {
+              const data = await collectionDetails.updateMany(
+                { userId: String(userData._id) },
+                {
+                  $set: {
+                    isSlack: true,
+                    subIdSlack: event.data.object.id,
+                  },
+                }
+              );
+            } else if (addOns.name == "Telegram") {
+              const data = await collectionDetails.updateMany(
+                { userId: String(userData._id) },
+                {
+                  $set: {
+                    isTelegram: true,
+                    subIdTelegram: event.data.object.id,
+                  },
+                }
+              );
             } else if (addOns.name == "MessageSmall") {
               const data = await collectionDetails.updateMany(
                 { userId: String(userData._id) },
@@ -187,8 +207,58 @@ export async function POST(req: any, res: any) {
 
         break;
 
-      case "subscription_schedule.canceled":
+      case "customer.subscription.deleted":
         console.log("subscription_schedule.canceled", event.data.object);
+        userData = await collection.findOne({
+          customerId: event.data.object.customer,
+        });
+        Details = await collectionDetails.findOne({
+          userId: String(userData._id),
+        });
+        addOns = await collectionPlan.findOne({
+          planId: event.data.object.plan.id,
+        });
+        if (addOns != null) {
+          if (addOns.name == "WhatsApp") {
+            await collection.updateOne(
+              { customerId: event.data.object.customer },
+              {
+                $set: {
+                  isWhatsapp: false,
+                  subIdWhatsapp: "",
+                },
+              }
+            );
+          } else if (addOns.name == "MessageSmall") {
+            const data = await collectionDetails.updateMany(
+              { userId: String(userData._id) },
+              {
+                $set: {
+                  messageLimit: Number(Details?.messageLimit) - 5000,
+                },
+              }
+            );
+          } else if (addOns.name == "MessageLarge") {
+            const data = await collectionDetails.updateMany(
+              { userId: String(userData._id) },
+              {
+                $set: {
+                  messageLimit: Number(Details?.messageLimit) - 10000,
+                },
+              }
+            );
+          } else if (addOns.name == "Character") {
+            const data = await collectionDetails.updateMany(
+              { userId: String(userData._id) },
+              {
+                $set: {
+                  trainingDataLimit:
+                    Number(Details?.trainingDataLimit) - 1000000,
+                },
+              }
+            );
+          }
+        }
         break;
       // case 'customer.subscription.deleted':
       //   console.log(event.data.object);
