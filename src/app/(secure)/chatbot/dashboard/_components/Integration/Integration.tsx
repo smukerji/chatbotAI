@@ -3,7 +3,7 @@ import './integration.scss';
 import Image from 'next/image';
 import whatsAppIcon from '../../../../../../../public/svgs/whatsapp-icon.svg';
 import telegramIcon from '../../../../../../../public/telegram.svg';
-import slackIcon from '../../../../../../../public/slack.png';
+import slackIcon from '../../../../../../../public/Slack_icon_2019.svg';
 import WhatsappModal from '../Modal/WhatsappModal';
 import { useCookies } from 'react-cookie';
 import { Spin, message } from 'antd';
@@ -12,6 +12,8 @@ import SlackModal from '../Modal/SlackModal';
 import TelegramModal from '../Modal/TelegramModal';
 import { EditOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import editIcon from "../../../../../../../public/sections-images/common/edit.svg";
+import viewIcon from '../../../../../../../public/eye-close-svgrepo-com.svg'
+
 
 
 function Integration() {
@@ -203,17 +205,19 @@ const onEditHandler=()=>{
           <InfoCircleOutlined />
         </div>
       </div>
-      {/* -----------------------------------------Slack-integration */}
+      {/* -----------------------------------------Slack-integration------------------------------------------------------------- */}
       <div className='integration'>
         <div className='name'>
           <Image src={slackIcon} alt='slack-icon' height={35} width={35} />
           <span>Add to Slack</span>
+          {isSlackConnected && <Image src={viewIcon} alt='edit' className='slack-edit-icon' onClick={() => setIsSlackModalOpen(true)}/>}
+
         </div>
         <>
           {isSlackConnected ? (
             <>
-              <div className='view' onClick={() => setIsSlackModalOpen(true)}>
-                View
+              <div className='view'>
+                Connected
               </div>
             </>
           ) : (
