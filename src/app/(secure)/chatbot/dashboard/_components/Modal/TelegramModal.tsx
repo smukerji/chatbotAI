@@ -6,6 +6,7 @@ import Image from "next/image";
 
 import DeleteIcon from "../../../../../../../public/create-chatbot-svgs/delete-icon.svg";
 import EditIcon from "../../../../../../../public/sections-images/common/edit.svg";
+import BotUserIcon from "../../../../../../../public/telegram-user-bot.svg";
 import axios from "axios";
 import { EditOutlined } from "@ant-design/icons";
 
@@ -13,6 +14,7 @@ function TelegramModal({
   setIsTelegramModalOpen,
   isTelegramEdit,
   setIsTelegramEdit,
+  setIsTelegramConnected
 }: any) {
   /// fetch the params
   const params: any = useSearchParams();
@@ -228,6 +230,8 @@ function TelegramModal({
         setIsTelegramEdit(true);
         getBotName("");
         message.success(resp?.message);
+        //This is for when telegram is connnected
+        setIsTelegramConnected(true)
       } else {
         message.error(resp?.message);
       }
@@ -351,13 +355,20 @@ function TelegramModal({
                     </div>
                   ) : (
                     <div className="telegram-botname-edit">
+                    
+                        <Image
+                        src={BotUserIcon}
+                        alt="bot-user-icon"
+                        className="bot-user-img"
+                        />
+                     
                       <div className="telegram-bot-name">{botName ? botName : 'loading...'}</div>
-                      {/* <Image
+                      <Image
                         src={EditIcon}
                         alt="edit-icon"
                         onClick={() => setEditName(true)}
-                      /> */}
-                      <EditOutlined onClick={() => setEditName(true)} />
+                        className="telegram-edit-icon"
+                      />
                     </div>
                   )}
                 </div>

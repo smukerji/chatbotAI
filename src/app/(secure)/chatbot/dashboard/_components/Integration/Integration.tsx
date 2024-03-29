@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './integration.scss';
 import Image from 'next/image';
 import whatsAppIcon from '../../../../../../../public/svgs/whatsapp-icon.svg';
-import telegramIcon from '../../../../../../../public/svgs/telegram-icon.svg';
+import telegramIcon from '../../../../../../../public/telegram.svg';
 import slackIcon from '../../../../../../../public/slack.png';
 import WhatsappModal from '../Modal/WhatsappModal';
 import { useCookies } from 'react-cookie';
@@ -29,6 +29,9 @@ function Integration() {
   const [loader, setLoader] = useState<boolean>(false);
   const [telegramLoader, setTelegramLoader] = useState<boolean>(false);
   const [isTelegramEdit, setIsTelegramEdit] = useState<boolean>(false);
+
+  //This state is for checking if telegram is connected
+  const[isTelegramConnected,setIsTelegramConnected]=useState<boolean>(false)
   const params: any = useSearchParams();
 
   const chatbot = JSON.parse(decodeURIComponent(params.get('chatbot')));
@@ -84,6 +87,7 @@ function Integration() {
       const resp = await response.json();
       if (resp.status === 200) {
         setIsTelegramEdit(true);
+        setIsTelegramConnected(true)
       }
     } catch (error) {
       console.log('error', error);
@@ -174,19 +178,22 @@ const onEditHandler=()=>{
 
       <div className='integration i-btn'>
         <div className='name'>
-          <Image src={telegramIcon} alt='telegram-icon' />
+          <Image className='telegram-img' src={telegramIcon} alt='telegram-icon' />
           <span>Add to Telegram</span>
+         {isTelegramEdit && <Image src={editIcon} alt='edit' className='telegram-edit-icon-s' onClick={() => {
+            setIsTelegramModalOpen(true);
+          }}/>}
         </div>
         <div
           className='action'
-          onClick={() => {
-            setIsTelegramModalOpen(true);
-          }}
+          
         >
           {telegramLoader ? (
             <Spin />
           ) : (
-            <>{isTelegramEdit ? 'Edit' : 'Connect'}</>
+            <>{isTelegramEdit ? 'Connected' : <div onClick={() => {
+              setIsTelegramModalOpen(true);
+            }}>Connect</div>}</>
           )}
         </div>
         <div
@@ -243,6 +250,7 @@ const onEditHandler=()=>{
           setIsTelegramModalOpen={setIsTelegramModalOpen}
           isTelegramEdit={isTelegramEdit}
           setIsTelegramEdit={setIsTelegramEdit}
+          setIsTelegramConnected={setIsTelegramConnected}
         />
       )}
 
