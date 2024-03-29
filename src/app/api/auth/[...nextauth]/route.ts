@@ -91,8 +91,8 @@ export const authOptions: NextAuthOptions = {
     createUser: async (message) => {
       const user = message.user;
       /// send the registration mail
-      const emailService = emailService();
-      await emailService.send(
+      const temailService = emailService();
+      await temailService.send(
         "registration-mail-template",
         [
           registerationMail.heroImage,

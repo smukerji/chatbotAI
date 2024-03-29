@@ -58,8 +58,8 @@ async function register(request: any) {
   });
 
   /// send the registration mail
-  const emailService = emailService();
-  await emailService.send(
+  const temailService = emailService();
+  await temailService.send(
     "registration-mail-template",
     [
       registerationMail.heroImage,
