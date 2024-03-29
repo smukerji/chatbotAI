@@ -15,7 +15,14 @@ async function TelegramStatusCheck(request: any) {
   const collection = db?.collection("user-details");
   try {
     const data = await collection.findOne({ userId});
-    return { isTelegramVerified: data?.isTelegram };
+    let isTelegram 
+    if(data?.isTelegram == null){
+        isTelegram = false
+    }
+    else{
+        isTelegram = data?.isTelegram
+    }
+    return { isTelegramVerified: isTelegram };
   } catch (error) {
     return { error: "unable to get Telegram status" };
   }
