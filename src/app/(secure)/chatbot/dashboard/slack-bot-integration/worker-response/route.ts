@@ -1,4 +1,4 @@
-import { connectDatabase } from "@/db";
+import clientPromise from "@/db";
 import { NextRequest, NextResponse } from "next/server";
 const { WebClient, LogLevel } = require("@slack/web-api");
 
@@ -9,9 +9,7 @@ interface SlackAppData {
   chatBotId: string;
 }
 
-
 export async function POST(req: NextRequest) {
-
   //read the incomming parameter from webhook
   let resData: any = await req.json();
   let data = resData.resData;
@@ -19,65 +17,68 @@ export async function POST(req: NextRequest) {
   let step = 1;
   // ________________________________________________________start
 
-  let updatedMessageCount: { isUpdated: boolean, updatedResult: any, userInfo: any } = {
+  let updatedMessageCount: {
+    isUpdated: boolean;
+    updatedResult: any;
+    userInfo: any;
+  } = {
     isUpdated: false,
     updatedResult: null,
-    userInfo: null
-  }
+    userInfo: null,
+  };
 
   try {
-
     const appId = data.api_app_id;
     const channelId = data.event.channel;
 
     step = 2;
     //find is AppId is available
-    const db = (await connectDatabase())?.db();
-    let slackCollection = db.collection('slack-app-details');
+    const db = (await clientPromise!)?.db();
+    let slackCollection = db.collection("slack-app-details");
 
-    let appDetails: SlackAppData = await slackCollection.findOne({ appId: appId });
+    let appDetails: SlackAppData = await slackCollection.findOne({
+      appId: appId,
+    });
     if (appDetails) {
       const authOToken = appDetails.authOToken;
       const chatBotId = appDetails.chatBotId;
-      const message = data.event.text.replace(/<@.*?>\s*\n?/, '');
+      const message = data.event.text.replace(/<@.*?>\s*\n?/, "");
       const userID = appDetails.userId;
 
       step = 3;
       const client = new WebClient(authOToken, {
         // LogLevel can be imported and used to make debugging simpler
-        logLevel: LogLevel.DEBUG
+        logLevel: LogLevel.DEBUG,
       });
 
-      //if message is empty then return the message      
+      //if message is empty then return the message
       if (message.length === 0) {
         await client.chat.postMessage({
           channel: channelId,
           text: "I guess you sent me an empty message.",
-          threadId: data.event.ts
+          threadId: data.event.ts,
         });
-      }
-      else {
-
+      } else {
         step = 4;
         //check if user chat count has reached the limit if not then increment the count
-        let userDetailsCollection: any = await db.collection('user-details');
+        let userDetailsCollection: any = await db.collection("user-details");
         let cursor = await userDetailsCollection.aggregate([
           {
-            $match: { userId: userID }
+            $match: { userId: userID },
           },
           {
             $addFields: {
               limitCross: {
                 $cond: [
                   {
-                    $gte: [
-                      "$totalMessageCount", "$messageLimit"
-                    ]
-                  }, true, false
-                ]
-              }
-            }
-          }
+                    $gte: ["$totalMessageCount", "$messageLimit"],
+                  },
+                  true,
+                  false,
+                ],
+              },
+            },
+          },
         ]);
 
         let limitCrossResult = await cursor.toArray();
@@ -86,9 +87,11 @@ export async function POST(req: NextRequest) {
         await cursor.close();
 
         if (limitCrossResult[0].limitCross === false) {
-
           //increment the message count
-          let updatedResult = await userDetailsCollection.updateOne({ userId: userID }, { $inc: { totalMessageCount: 1 } });
+          let updatedResult = await userDetailsCollection.updateOne(
+            { userId: userID },
+            { $inc: { totalMessageCount: 1 } }
+          );
           if (updatedResult.modifiedCount > 0) {
             updatedMessageCount.isUpdated = true;
             updatedMessageCount.userInfo = userID;
@@ -155,61 +158,56 @@ export async function POST(req: NextRequest) {
             await client.chat.postMessage({
               channel: channelId,
               text: openaiBody.choices[0].message.content,
-              thread_ts: data.event.ts
+              thread_ts: data.event.ts,
             });
-
-          }
-          else {
-
+          } else {
             step = 8;
             //if update result is true and open ai didn't respond then decrement the message count
             if (updatedMessageCount.isUpdated) {
-              await userDetailsCollection.updateOne({ userId: userID }, { $inc: { totalMessageCount: -1 } });
+              await userDetailsCollection.updateOne(
+                { userId: userID },
+                { $inc: { totalMessageCount: -1 } }
+              );
             }
 
             //if open ai didn't respond then send the message to slack
             await client.chat.postMessage({
               channel: channelId,
               text: "Lucifer AI is not able to answer for your query. Please try again later.",
-              thread_ts: data.event.ts
+              thread_ts: data.event.ts,
             });
           }
-        }
-        else {
+        } else {
           step = 9;
           await client.chat.postMessage({
             channel: channelId,
             text: "You have reached the limit of message count. Please try again later.",
-            thread_ts: data.event.ts
+            thread_ts: data.event.ts,
           });
         }
       }
     }
-
-  }
-  catch (error: any) {
-    console.log('error', error);
-    console.log('step', step);
+  } catch (error: any) {
+    console.log("error", error);
+    console.log("step", step);
     //in case if any error occurs with open ai or slack api then decrement the message count
     try {
       step = 10;
-      const db = (await connectDatabase())?.db();
-      let userDetailsCollection: any = await db.collection('user-details');
+      const db = (await clientPromise!)?.db();
+      let userDetailsCollection: any = await db.collection("user-details");
       if (updatedMessageCount.isUpdated) {
-        await userDetailsCollection.updateOne({ userId: updatedMessageCount.userInfo }, { $inc: { totalMessageCount: -1 } });
+        await userDetailsCollection.updateOne(
+          { userId: updatedMessageCount.userInfo },
+          { $inc: { totalMessageCount: -1 } }
+        );
       }
-
+    } catch (error: any) {
+      console.log("error @", error);
+      console.log("step @", step);
     }
-    catch (error: any) {
-      console.log('error @', error);
-      console.log('step @', step);
-    }
-
   }
 
-  return NextResponse.json({ status: 'success' });
+  return NextResponse.json({ status: "success" });
 
   // ________________________________________________________end
-
-
 }
