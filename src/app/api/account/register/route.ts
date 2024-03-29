@@ -3,6 +3,12 @@ import clientPromise from "../../../../db";
 import { apiHandler } from "../../../_helpers/server/api/api-handler";
 import joi from "joi";
 import bcrypt from "bcrypt";
+import { useEmailService } from "../../../_services/emailService";
+import {
+  logo,
+  logoBase64,
+  registerationMail,
+} from "../../../_helpers/emailImagesBase64Constants";
 
 module.exports = apiHandler({
   POST: register,
@@ -50,6 +56,23 @@ async function register(request: any) {
     trainingDataLimit: starterPlan?.trainingDataLimit,
     websiteCrawlingLimit: starterPlan?.websiteCrawlingLimit,
   });
+
+  /// send the registration mail
+  const emailService = useEmailService();
+  await emailService.send(
+    "registration-mail-template",
+    [
+      registerationMail.heroImage,
+      registerationMail.avatarIcon,
+      registerationMail.icon1,
+      registerationMail.icon2,
+      logo,
+    ],
+    email,
+    {
+      name: username,
+    }
+  );
 
   return { message: "Registered successfully... Please login to continue" };
 }
