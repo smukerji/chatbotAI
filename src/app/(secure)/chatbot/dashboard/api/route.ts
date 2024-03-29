@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { connectDatabase } from "../../../../../db";
+import clientPromise from "../../../../../db";
 import { apiHandler } from "../../../../_helpers/server/api/api-handler";
 import joi from "joi";
 import { getServerSession } from "next-auth";
@@ -20,7 +20,7 @@ async function dataSources(request: any) {
   const { chatbotId } = await request.json();
 
   /// fetch the data sources of the chabot
-  const db = (await connectDatabase())?.db();
+  const db = (await clientPromise!).db();
   const collection = db?.collection("chatbots-data");
   const cursor = await collection?.find({ chatbotId: chatbotId });
 
@@ -110,7 +110,7 @@ async function getChatBotSettings(request: NextRequest) {
   const userId = params.get("userId");
 
   /// get chatbot Setting
-  const db = (await connectDatabase())?.db();
+  const db = (await clientPromise!).db();
   const chatBotSettingCollection = db.collection("chatbot-settings");
   const chatbotSetting = await chatBotSettingCollection.findOne({
     chatbotId: chatbotId,

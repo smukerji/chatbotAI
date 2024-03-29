@@ -44,6 +44,7 @@ import step6_3 from "../../../../../../public/whataspp-guide-images/step6_3.png"
 import step6_4 from "../../../../../../public/whataspp-guide-images/step6_4.png";
 import step7_1 from "../../../../../../public/whataspp-guide-images/step7_1.png";
 import Image from "next/image";
+import arrowIcon from "../../../../../../public/svgs/Feather Icon.svg";
 
 function WhatsAppIntegrationGuide() {
   const { status } = useSession();
@@ -94,6 +95,20 @@ function WhatsAppIntegrationGuide() {
     <>
       <div className="whatsapp-container">
         <div className="left">
+          <div
+            className="back-arrow"
+            onClick={() => {
+              window.history.back();
+            }}
+            style={{ cursor: "pointer" }}
+          >
+            <Image
+              src={arrowIcon}
+              alt="arrow-icon"
+              style={{ transform: "rotate(180deg)" }}
+            />
+            <span>back</span>
+          </div>
           <ul className="step-list">
             {[1, 2, 3, 4, 5, 6, 7].map((step) => (
               <li

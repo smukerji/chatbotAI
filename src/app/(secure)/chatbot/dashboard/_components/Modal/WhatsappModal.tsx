@@ -8,7 +8,8 @@ import editIcon from "../../../../../../../public/sections-images/common/edit.sv
 import { useSearchParams } from "next/navigation";
 import { useCookies } from "react-cookie";
 
-function WhatsappModal({ isOpen, onClose }: any) {
+function WhatsappModal({ isOpen, onClose,setWhatsappConnectbtn,onEditClicked,
+  setOnEditClicked, }: any) {
   // This state is where the user currently is
   const [stepState, setStepState] = useState({
     step1: true,
@@ -31,6 +32,7 @@ function WhatsappModal({ isOpen, onClose }: any) {
   const [whatsAppWebhookToken, setWhatsAppWebHookToken] = useState<string>();
 
   const [accountStatus, setAccountStatus] = useState<boolean>(false);
+  const [isDirty, setIsDirty] = useState<boolean>(false);
 
   // This is state where there is all credentials for meta app
   const [metaDetails, setMetaDetails] = useState<any>({
@@ -61,8 +63,19 @@ function WhatsappModal({ isOpen, onClose }: any) {
       ...errors,
       [field]: trimmedValue ? "" : `Please fill in this field`,
     });
+    // Check if any field has changed after updating metaDetails
+    checkIfDirty({ [field]: trimmedValue });
   };
-
+// Function to check if any field has changed
+const checkIfDirty = (data: any) => {
+  for (const key in data) {
+    if (data[key] !== metaDetails[key]) {
+      setIsDirty(true);
+      return;
+    }
+  }
+  setIsDirty(false);
+};
   // WhatsApp Change handler
   const whatsappChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     handleChange("whatsAppAccessToken", e.target.value);
@@ -187,6 +200,10 @@ function WhatsappModal({ isOpen, onClose }: any) {
       errors.phoneNumberID == "" &&
       errors.phoneBusinessID == ""
     ) {
+      if (!isDirty) {
+        message.error("No changes made");
+        return;
+      }
       
       try {
         // const {id,...wrapMetaDetails} = metaDetails
@@ -223,6 +240,10 @@ function WhatsappModal({ isOpen, onClose }: any) {
             message.success(resp.message);
             setStepState({ step1: false, step2: false, step3: false });
             setAccountStatus(true);
+            // Reset isDirty to false after successful save
+          setIsDirty(false);
+            //for whatsapp edit icon
+            setWhatsappConnectbtn(true)
         }
        
       } catch (error) {
@@ -249,6 +270,55 @@ function WhatsappModal({ isOpen, onClose }: any) {
 
   const handleOk = () => {
     onClose();
+  };
+  const handleCancel = () => {
+    //before closing ckheck whether onEditClicked is true or not
+    if (!onEditClicked) {
+      
+      setStepState({ step1: true, step2: false, step3: false });
+      setItems([
+        { status: "process" }, // Update the status of the first step
+        { status: "wait" }, // Update the status of the second step
+        { status: "wait" },
+      ]);
+      setAccountStatus(false);
+
+      //Empty the state here for meta details 
+      setMetaDetails({
+       ...metaDetails,
+        whatsAppAccessToken: "",
+        facebookAppSecret: "",
+        whatsAppPhoneNumber: "",
+        phoneNumberID: "",
+        phoneBusinessID: "",
+      })
+      //also set errors
+      setErrors({...errors,whatsAppAccessToken: null,
+        facebookAppSecret: null,
+        whatsAppPhoneNumber: null,
+        phoneNumberID: null,
+        phoneBusinessID: null})
+    }
+    else{
+      setItems([
+        { status: "finish" }, // Update the status of the first step
+        { status: "finish" }, // Update the status of the second step
+        { status: "process" },
+      ]);
+      setStepState({ step1: false, step2: false, step3: false });
+      setAccountStatus(true);
+    }
+    onClose();
+  };
+  // This function in called when in final step edit button is clicked
+  const onWhatsappEdit = () => {
+    setStepState({ step1: true, step2: false, step3: false });
+    setItems([
+      { status: "process" }, // Update the status of the first step
+      { status: "wait" }, // Update the status of the second step
+      { status: "wait" },
+    ]);
+    setAccountStatus(false);
   };
 
   // This function is for changing switch status in last step
@@ -336,9 +406,6 @@ function WhatsappModal({ isOpen, onClose }: any) {
       else{
         whatsAppDetailsId=metaDetails?.id
       }
-    
-        
-   
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot/dashboard/whatsapp/account?whatsAppDetailsId=${whatsAppDetailsId}`, {
         headers: {
@@ -402,7 +469,7 @@ function WhatsappModal({ isOpen, onClose }: any) {
       
       
       })
-
+      
      
     } catch (error) {
       message.error("error getting data");
@@ -410,17 +477,25 @@ function WhatsappModal({ isOpen, onClose }: any) {
   };
 
   useEffect(() => {
+    if (onEditClicked) {
+      setItems([
+        { status: "finish" }, // Update the status of the first step
+        { status: "finish" }, // Update the status of the second step
+        { status: "process" },
+      ]);
+      setStepState({ step1: false, step2: false, step3: false });
+      setAccountStatus(true);
+    }
     fetchWebhookToken();
     // fetch details if already present
     fetchWhatsappDetails();
-  }, []);
-  console.log("switch",switchStatus)
+  }, [onEditClicked]);
   return (
     <div className="whatsapp-modal-container">
       <Modal
         open={isOpen}
         onOk={handleOk}
-        onCancel={onClose}
+        onCancel={handleCancel}
         // closable={false} // Set closable prop to false to remove the cancel icon
         okButtonProps={{ style: { display: "none" } }} // Hide ok button
         cancelButtonProps={{ style: { display: "none" } }} // Hide cancel button
@@ -621,7 +696,12 @@ function WhatsappModal({ isOpen, onClose }: any) {
                 <div className="whatsapp-status-container-switch-section">
                   <div>{switchStatus ? "Active" : "Inactive"}</div>
                   <Switch checked={switchStatus} onChange={onChangeSwitch} />
-                  {/* <Image src={editIcon} alt="edit" /> */}
+                  <Image
+                    src={editIcon}
+                    alt="edit"
+                    className="whatsapp-edit-icon"
+                    onClick={onWhatsappEdit}
+                  />
                   <Image src={DeleteIcon} className="whatsapp-delete" alt="delete" onClick={deleteWhatsAppAccountDetails}/>
                 </div>
               </div>

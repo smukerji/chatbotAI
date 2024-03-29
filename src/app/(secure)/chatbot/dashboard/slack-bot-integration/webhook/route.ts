@@ -1,16 +1,15 @@
-import { connectDatabase } from "@/db";
+import clientPromise from "@/db";
 import { NextRequest, NextResponse } from "next/server";
 const { WebClient, LogLevel } = require("@slack/web-api");
 
 interface SlackAppData {
-  appId:string;
-  userId:string;
-  authOToken:string;
-  chatBotId:string;
+  appId: string;
+  userId: string;
+  authOToken: string;
+  chatBotId: string;
 }
 
 export async function POST(req: NextRequest) {
-
   try {
 
     let retryNum = req.headers.get('X-Slack-Retry-Num');
@@ -42,9 +41,7 @@ export async function POST(req: NextRequest) {
   catch (error: any) {
     console.log('error', error);
   }
-
 }
-
 
 async function writeInDataBase(data: any) {
 
@@ -55,7 +52,6 @@ async function writeInDataBase(data: any) {
   }
 
   try {
-
     const appId = data.api_app_id;
     const channelId = data.event.channel;
 
@@ -63,24 +59,26 @@ async function writeInDataBase(data: any) {
     const db = (await connectDatabase())?.db();
     let slackCollection = db.collection('slack-app-details');
 
-    let appDetails: SlackAppData = await slackCollection.findOne({ appId: appId });
+    let appDetails: SlackAppData = await slackCollection.findOne({
+      appId: appId,
+    });
     if (appDetails) {
       const authOToken = appDetails.authOToken;
       const chatBotId = appDetails.chatBotId;
-      const message = data.event.text.replace(/<@.*?>\s*\n?/, '');
+      const message = data.event.text.replace(/<@.*?>\s*\n?/, "");
       const userID = appDetails.userId;
 
       const client = new WebClient(authOToken, {
         // LogLevel can be imported and used to make debugging simpler
-        logLevel: LogLevel.DEBUG
+        logLevel: LogLevel.DEBUG,
       });
 
-      //if message is empty then return the message      
+      //if message is empty then return the message
       if (message.length === 0) {
         await client.chat.postMessage({
           channel: channelId,
           text: "I guess you sent me an empty message.",
-          threadId: data.event.ts
+          threadId: data.event.ts,
         });
 
         return new NextResponse('', { status: 200 });
@@ -88,24 +86,24 @@ async function writeInDataBase(data: any) {
       else {
 
         //check if user chat count has reached the limit if not then increment the count
-        let userDetailsCollection: any = await db.collection('user-details');
+        let userDetailsCollection: any = await db.collection("user-details");
         let cursor = await userDetailsCollection.aggregate([
           {
-            $match: { userId: userID }
+            $match: { userId: userID },
           },
           {
             $addFields: {
               limitCross: {
                 $cond: [
                   {
-                    $gte: [
-                      "$totalMessageCount", "$messageLimit"
-                    ]
-                  }, true, false
-                ]
-              }
-            }
-          }
+                    $gte: ["$totalMessageCount", "$messageLimit"],
+                  },
+                  true,
+                  false,
+                ],
+              },
+            },
+          },
         ]);
 
         let limitCrossResult = await cursor.toArray();
@@ -180,7 +178,7 @@ async function writeInDataBase(data: any) {
             await client.chat.postMessage({
               channel: channelId,
               text: openaiBody.choices[0].message.content,
-              thread_ts: data.event.ts
+              thread_ts: data.event.ts,
             });
 
             return new NextResponse('', { status: 200 });
@@ -197,17 +195,16 @@ async function writeInDataBase(data: any) {
             await client.chat.postMessage({
               channel: channelId,
               text: "Lucifer AI is not able to answer for your query. Please try again later.",
-              thread_ts: data.event.ts
+              thread_ts: data.event.ts,
             });
 
             return new NextResponse('', { status: 200 });
           }
-        }
-        else {
+        } else {
           await client.chat.postMessage({
             channel: channelId,
             text: "You have reached the limit of message count. Please try again later.",
-            thread_ts: data.event.ts
+            thread_ts: data.event.ts,
           });
           return new NextResponse('', { status: 200 });
         }
@@ -230,5 +227,3 @@ async function writeInDataBase(data: any) {
     }
    
   }
-
-}

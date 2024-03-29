@@ -8,16 +8,44 @@ import tickCircle from "../../../../../../public/svgs/tick-circle.svg";
 import unTickCircle from "../../../../../../public/svgs/untick-circle.svg";
 import line from "../../../../../../public/svgs/Vector 2189.svg";
 import { number } from "joi";
+import { useCookies } from "react-cookie";
+import CryptoJS from "crypto-js";
 
-export default function PlanTwo({ setPlan, price, setPrice, prePrice }: any) {
+export default function PlanTwo({
+  setPlan,
+  price,
+  setPrice,
+  prePrice,
+  enableTwo,
+  text
+}: any) {
   const { status } = useSession();
+  const [cookies, setCookie] = useCookies(["userId"]);
   const router = useRouter();
 
   const changePlan = async () => {
-    if (status === "authenticated") {
-      setPrice(Number(price) - Number(prePrice));
-      console.log(prePrice);
-      setPlan(2);
+    if (cookies?.userId) {
+      if (price == 89) {
+        const fPrice = price - prePrice
+        const a = CryptoJS.AES.encrypt(
+          JSON.stringify(fPrice),
+          "xyz"
+        ).toString();
+        console.log(a)
+        const data = encodeURIComponent(a)
+        console.log(data, a)
+        router.push(`/home/pricing/checkout/${2}?a=${data}`);
+      } else {
+        const fPrice = price - prePrice
+        const a = CryptoJS.AES.encrypt(
+          JSON.stringify(fPrice),
+          "xyz"
+        ).toString();
+        const data = encodeURIComponent(a)
+        router.push(`/home/pricing/checkout/${4}?a=${data}`);
+      }
+    } else {
+      router.push("/account/login");
     }
   };
 
@@ -33,28 +61,26 @@ export default function PlanTwo({ setPlan, price, setPrice, prePrice }: any) {
         <div className="plan-price-container">
           <div className="plan-price-frame">
             <span className="price-sign">$</span>
-            <span className="price-number">{price}</span>
+            <span className="price-number">{price - prePrice}</span>
           </div>
         </div>
       </div>
       <div className="plan-container-list">
-        <button className="pay-btn" disabled={true}>
-          <span className="btn-text">Coming soon</span>
+        <button className="pay-btn" disabled={enableTwo} onClick={changePlan}>
+          <span className="btn-text">{text}</span>
         </button>
         <div className="plan-details">
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
-            <span className="plan-text">5 chatbots</span>
+            <span className="plan-text">5 Chatbots</span>
           </div>
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
-            <span className="plan-text">5k messages / chatBot / month</span>
+            <span className="plan-text">5k Messages / Month</span>
           </div>
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
-            <span className="plan-text">
-            Unlimited links to train
-            </span>
+            <span className="plan-text">Unlimited links to train</span>
           </div>
           <div className="plan-item horizontal-line-2">
             <Image src={tickCircle} alt="no-svg" />
@@ -146,7 +172,7 @@ export default function PlanTwo({ setPlan, price, setPrice, prePrice }: any) {
           <div className="plan-item-container">
             <div className="plan-item">
               <Image src={tickCircle} alt="no-svg" />
-              <span className="plan-text">Lead collection</span>
+              <span className="plan-text">Lead Collection</span>
             </div>
             <div className="coming-soon">Coming soon</div>
           </div>
@@ -179,41 +205,41 @@ export default function PlanTwo({ setPlan, price, setPrice, prePrice }: any) {
             <div className="coming-soon">Coming soon</div>
           </div>
           <div className="plan-item-container">
-          <div className="plan-item">
-            <Image src={tickCircle} alt="no-svg" />
-            <span className="plan-text">Role Based Access</span>
+            <div className="plan-item">
+              <Image src={tickCircle} alt="no-svg" />
+              <span className="plan-text">Role Based Access</span>
+            </div>
+            <div className="coming-soon">Coming soon</div>
           </div>
-          <div className="coming-soon">Coming soon</div>
-        </div>
-        <div className="plan-item-container">
-          <div className="plan-item">
-            <Image src={tickCircle} alt="no-svg" />
-            <span className="plan-text">Team Collaboration</span>
+          <div className="plan-item-container">
+            <div className="plan-item">
+              <Image src={tickCircle} alt="no-svg" />
+              <span className="plan-text">Team Collaboration</span>
+            </div>
+            <div className="coming-soon">Coming soon</div>
           </div>
-          <div className="coming-soon">Coming soon</div>
-        </div>
-        <div className="plan-item-container">
-          <div className="plan-item">
-            <Image src={tickCircle} alt="no-svg" />
-            <span className="plan-text">
-              Organizing Data Sources into Folder
-            </span>
+          <div className="plan-item-container">
+            <div className="plan-item">
+              <Image src={tickCircle} alt="no-svg" />
+              <span className="plan-text">
+                Organizing Data Sources into Folder
+              </span>
+            </div>
+            <div className="coming-soon">Coming soon</div>
           </div>
-          <div className="coming-soon">Coming soon</div>
-        </div>
-        <div className="plan-item-container">
-          <div className="plan-item">
-            <Image src={tickCircle} alt="no-svg" />
-            <span className="plan-text">Content Summarization</span>
+          <div className="plan-item-container">
+            <div className="plan-item">
+              <Image src={tickCircle} alt="no-svg" />
+              <span className="plan-text">Content Summarization</span>
+            </div>
+            <div className="coming-soon">Coming soon</div>
           </div>
-          <div className="coming-soon">Coming soon</div>
-        </div>
-        <div className="plan-item-container">
-          <div className="plan-item">
-            <Image src={tickCircle} alt="no-svg" />
-            <span className="plan-text">Chrome Extension</span>
-          </div>
-          <div className="coming-soon">Coming soon</div>
+          <div className="plan-item-container">
+            <div className="plan-item">
+              <Image src={tickCircle} alt="no-svg" />
+              <span className="plan-text">Chrome Extension</span>
+            </div>
+            <div className="coming-soon">Coming soon</div>
           </div>
         </div>
       </div>

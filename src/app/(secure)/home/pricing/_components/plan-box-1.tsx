@@ -14,7 +14,6 @@ export default function PlanOne({ setPlan, setPrice, price, enableOne, text }: a
   const { status } = useSession();
   const router = useRouter();
   const [cookies, setCookie] = useCookies(["userId"]);
-  console.log(cookies);
   const changePlan = async () => {
     if (cookies?.userId) {
       if (price == 15) {
@@ -59,12 +58,12 @@ export default function PlanOne({ setPlan, setPrice, price, enableOne, text }: a
         <div className="plan-details">
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
-            <span className="plan-text  plan-text-even">1 chatbots</span>
+            <span className="plan-text  plan-text-even">1 Chatbot</span>
           </div>
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
             <span className="plan-text  plan-text-even">
-              2k messages / month
+              2k Messages / Month
             </span>
           </div>
           <div className="plan-item">
@@ -167,7 +166,7 @@ export default function PlanOne({ setPlan, setPrice, price, enableOne, text }: a
           <div className="plan-item-container">
             <div className="plan-item">
               <Image src={unTickCircle} alt="no-svg" />
-              <span className="plan-text  plan-text-even plan-text-not">Lead collection</span>
+              <span className="plan-text  plan-text-even plan-text-not">Lead Collection</span>
             </div>
             <div className="coming-soon-even">Coming soon</div>
           </div>
