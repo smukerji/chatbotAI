@@ -338,3 +338,23 @@ line-height: 24px; /* 150% */
 .telegram-active-inactive{
   width: 38%;
 }
+.telegram-edit-icon-s{
+  height: 18px;
+  width: 18px;
+  margin-left: -12px;
+}
+.telegram-edit-icon-s:hover{
+  cursor: pointer;
+}
+.telegram-edit-icon{
+  height: 19px;
+  width: 19px;
+}
+.telegram-edit-icon:hover{
+  cursor: pointer;
+}
+.bot-user-img{
+  height: 35px;
+  width: 35px;
+  margin-right: 5px;
+}
