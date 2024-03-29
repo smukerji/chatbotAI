@@ -27,9 +27,9 @@ export async function POST(req: NextRequest) {
     else {
       if (resData.event.type === 'app_mention') {
 
-        setImmediate(async () => {
+        // setImmediate(async () => {
           await writeInDataBase(resData);
-        });
+        // });
 
         return new NextResponse('', { status: 200 });
       }
