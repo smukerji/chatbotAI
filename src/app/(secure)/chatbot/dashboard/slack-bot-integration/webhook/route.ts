@@ -56,7 +56,7 @@ async function writeInDataBase(data: any) {
     const channelId = data.event.channel;
 
     //find is AppId is available
-    const db = (await connectDatabase())?.db();
+    const db = (await clientPromise!)?.db();
     let slackCollection = db.collection('slack-app-details');
 
     let appDetails: SlackAppData = await slackCollection.findOne({
@@ -113,8 +113,8 @@ async function writeInDataBase(data: any) {
         if (limitCrossResult[0].limitCross === false) {
 
           //increment the message count
-          let updatedResult =  await userDetailsCollection.updateOne({ userId: userID }, { $inc: { totalMessageCount: 1 } });
-          if(updatedResult.modifiedCount > 0){
+          let updatedResult = await userDetailsCollection.updateOne({ userId: userID }, { $inc: { totalMessageCount: 1 } });
+          if (updatedResult.modifiedCount > 0) {
             updatedMessageCount.isUpdated = true;
             updatedMessageCount.userInfo = userID;
           }
@@ -187,7 +187,7 @@ async function writeInDataBase(data: any) {
           else {
 
             //if update result is true and open ai didn't respond then decrement the message count
-            if(updatedMessageCount.isUpdated){
+            if (updatedMessageCount.isUpdated) {
               await userDetailsCollection.updateOne({ userId: userID }, { $inc: { totalMessageCount: -1 } });
             }
 
@@ -215,7 +215,7 @@ async function writeInDataBase(data: any) {
   catch (error: any) {
     //in case if any error occurs with open ai or slack api then decrement the message count
     try {
-      const db = (await connectDatabase())?.db();
+      const db = (await clientPromise!)?.db();
       let userDetailsCollection: any = await db.collection('user-details');
       if (updatedMessageCount.isUpdated) {
         await userDetailsCollection.updateOne({ userId: updatedMessageCount.userInfo }, { $inc: { totalMessageCount: -1 } });
@@ -227,3 +227,4 @@ async function writeInDataBase(data: any) {
     }
    
   }
+}
