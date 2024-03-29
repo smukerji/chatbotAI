@@ -6,6 +6,11 @@ import clientPromise from "../../../../db";
 import { cookies } from "next/headers";
 import { ObjectId } from "mongodb";
 import { Adapter } from "next-auth/adapters";
+import { emailService } from "../../../_services/emailService";
+import {
+  logo,
+  registerationMail,
+} from "../../../_helpers/emailImagesBase64Constants";
 
 export const authOptions: NextAuthOptions = {
   adapter: MongoDBAdapter(clientPromise!) as Adapter,
@@ -81,6 +86,26 @@ export const authOptions: NextAuthOptions = {
           websiteCrawlingLimit: starterPlan?.websiteCrawlingLimit,
         });
       }
+    },
+
+    createUser: async (message) => {
+      const user = message.user;
+      /// send the registration mail
+      const temailService = emailService();
+      await temailService.send(
+        "registration-mail-template",
+        [
+          registerationMail.heroImage,
+          registerationMail.avatarIcon,
+          registerationMail.icon1,
+          registerationMail.icon2,
+          logo,
+        ],
+        user.email!,
+        {
+          name: user.name,
+        }
+      );
     },
   },
 

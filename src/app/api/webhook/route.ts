@@ -63,7 +63,7 @@ export async function POST(req: any, res: any) {
                   }
                 }
               );
-            }else if (addOns.name == 'Telegram') {
+            } else if (addOns.name == 'Telegram') {
               const data = await collectionDetails.updateMany(
                 { userId: String(userData._id) },
                 {
@@ -73,7 +73,7 @@ export async function POST(req: any, res: any) {
                   }
                 }
               );
-            }else if (addOns.name == 'MessageSmall') {
+            } else if (addOns.name == 'MessageSmall') {
               const data = await collectionDetails.updateMany(
                 { userId: String(userData._id) },
                 {
@@ -161,7 +161,7 @@ export async function POST(req: any, res: any) {
       //   break;
       case 'invoice.paid':
         date = new Date(event.data.object.lines.data[0].period.end * 1000);
-        console.log(date)
+        console.log(event.data.object);
         planData = await collection.findOne({ customerId: event.data.object.customer });
         if (event.data.object.status == 'paid') {
           status = 'success';
@@ -182,15 +182,16 @@ export async function POST(req: any, res: any) {
           price: '$' + event.data.object.amount_paid / 100,
           paymentId: event.data.object.id
         });
-
-        await collection.updateOne(
-          { customerId: event.data.object.customer },
-          {
-            $set: {
-              endDate: date
+        if (event.data.object.total > 1000) {
+          await collection.updateOne(
+            { customerId: event.data.object.customer },
+            {
+              $set: {
+                endDate: date
+              }
             }
-          }
-        );
+          );
+        }
 
         break;
 
@@ -199,14 +200,14 @@ export async function POST(req: any, res: any) {
         userData = await collection.findOne({ customerId: event.data.object.customer });
         Details = await collectionDetails.findOne({ userId: String(userData._id) });
         addOns = await collectionPlan.findOne({ planId: event.data.object.plan.id });
-        if(addOns != null){
+        if (addOns != null) {
           if (addOns.name == 'WhatsApp') {
             await collection.updateOne(
               { customerId: event.data.object.customer },
               {
                 $set: {
                   isWhatsapp: false,
-                  subIdWhatsapp: '',
+                  subIdWhatsapp: ''
                 }
               }
             );
