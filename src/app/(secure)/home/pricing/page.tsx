@@ -6,10 +6,10 @@ import '../pricing/stripe.scss';
 import Image from 'next/image';
 import PlanOne from './_components/plan-box-1';
 import PlanTwo from './_components/plan-box-2';
-import zoho from '../../../../../public/Rectangle 159.png';
-import whatsapp from '../../../../../public/whatsapp.png';
-import telegram from '../../../../../public/telegram.png';
-import hubspot from '../../../../../public/hubspot.png';
+import zoho from '../../../../../public/zoho.svg';
+import whatsapp from '../../../../../public/whatsapp.svg';
+import telegram from '../../../../../public/telegram.svg';
+import hubspot from '../../../../../public/hubspot.svg';
 import { useCookies } from 'react-cookie';
 import { Modal, message, Collapse } from 'antd';
 import Loader from './_components/Loader';
@@ -17,7 +17,7 @@ import Coll from './_components/Collapse';
 import { useRouter } from 'next/navigation';
 import SecondaryHeader from '@/app/_components/Secondary-Header/SecondaryHeader';
 import { useSession } from 'next-auth/react';
-import slack from '../../../../../public/slack.png';
+import slack from '../../../../../public/slack.svg';
 
 export default function Home() {
   const [planStatus, setStatus] = useState<number>(2);
@@ -199,7 +199,7 @@ export default function Home() {
                 <div className='integration-list'>
                   <div className='app-integration'>
                     <div className='integration-name-container'>
-                      <Image src={whatsapp} alt='no image' />
+                      <Image src={whatsapp} alt='no image' style={{ width: '40px', height: '40px' }} />
                       <p className='integration-name'>Whatsapp</p>
                     </div>
                     <button
@@ -212,23 +212,23 @@ export default function Home() {
                   </div>
                   <div className='app-integration'>
                     <div className='integration-name-container'>
-                      <Image src={telegram} alt='no image' />
+                      <Image src={telegram} alt='no image' style={{ width: '40px', height: '40px' }} />
                       <p className='integration-name'>Telegram</p>
                     </div>
-                    {/* <button
+                    <button
                       className='app-integration-price-btn'
                       disabled={telegramDisable || !enableOne}
                       onClick={TelegramAddOn}
                     >
                       <span className='app-integration-price-btn-text'>Get for $7 USD</span>
-                    </button> */}
-                    <div className="app-integration-price coming-soon">
+                    </button>
+                    {/* <div className="app-integration-price coming-soon">
                       Coming soon
-                    </div>
+                    </div> */}
                   </div>
                   <div className='app-integration'>
                     <div className='integration-name-container'>
-                      <Image src={hubspot} alt='no image' />
+                      <Image src={hubspot} height={40} width={40} alt='no image' />
                       <p className='integration-name'>Hubspot CRM</p>
                     </div>
                     {/* <button
@@ -238,32 +238,28 @@ export default function Home() {
                     >
                       <span className='app-integration-price-btn-text'>Get for $7 USD</span>
                     </button> */}
-                    <div className="app-integration-price coming-soon">
-                      Coming soon
-                    </div>
+                    <div className='app-integration-price coming-soon'>Coming soon</div>
                   </div>
                   <div className='app-integration'>
                     <div className='integration-name-container'>
                       <Image src={slack} height={40} width={40} alt='no image' />
                       <p className='integration-name'>Slack</p>
                     </div>
-                    <div className="app-integration-price coming-soon">
-                      Coming soon
-                    </div>
-                    {/* <button
+                    {/* <div className='app-integration-price coming-soon'>Coming soon</div> */}
+                    <button
                       className='app-integration-price-btn'
                       disabled={slackDisable || !enableOne}
                       onClick={slackAddOn}
                     >
                       <span className='app-integration-price-btn-text'>Get for $7 USD</span>
-                    </button> */}
+                    </button>
                   </div>
                   {/* <button className="btn-add-ons" disabled={whatsappDisable}>
                     <span className="btn-text">Get Add-on</span>
                   </button> */}
                   <div className='app-integration'>
                     <div className='integration-name-container'>
-                      <Image src={zoho} alt='no image' />
+                      <Image src={zoho} height={40} width={40} alt='no image' />
                       <p className='integration-name'>Zoho CRM</p>
                     </div>
                     <div className='app-integration-price coming-soon'>Coming soon</div>

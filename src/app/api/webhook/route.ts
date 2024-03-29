@@ -15,7 +15,7 @@ export async function POST(req: any, res: any) {
     const collectionPayment = db.collection('payment-history');
 
     const sig = req.headers.get('stripe-signature');
-    const endpointSecret = 'whsec_1846bb71690a6f8876922cd471237f8972a2cd00716f96c1aef7a2ed211c5c1c';
+    const endpointSecret: any = process.env.NEXT_PUBLIC_STRIPE_WEBHOOK_PUBLIC;
 
     let event: any;
     const body = await req.text();
@@ -31,16 +31,16 @@ export async function POST(req: any, res: any) {
     let date;
     let addOns;
     let userData;
-    let Details
+    let Details;
     let status;
     switch (event.type) {
       case 'customer.subscription.created':
         date = new Date(event.data.object.current_period_end * 1000);
+        userData = await collection.findOne({ customerId: event.data.object.customer });
+        Details = await collectionDetails.findOne({ userId: String(userData._id) });
         if (event.data.object.plan.interval == 'month') {
           planData = await collectionPlan.findOne({ planIdMonth: event.data.object.plan.id });
           if (planData == null) {
-            userData = await collection.findOne({customerId: event.data.object.customer})
-            Details = await collectionDetails.findOne({userId: String(userData._id)})
             addOns = await collectionPlan.findOne({ planId: event.data.object.plan.id });
             if (addOns.name == 'WhatsApp') {
               await collection.updateOne(
@@ -53,35 +53,51 @@ export async function POST(req: any, res: any) {
                   }
                 }
               );
-            }
-            else if (addOns.name == 'MessageSmall') {
+            } else if (addOns.name == 'Slack') {
               const data = await collectionDetails.updateMany(
-                { userId:  String(userData._id)},
+                { userId: String(userData._id) },
                 {
                   $set: {
-                    messageLimit: Number(Details?.messageLimit) + 5000,
-                  },
+                    isSlack: true,
+                    subIdSlack: event.data.object.id
+                  }
                 }
               );
-            }
-            else if (addOns.name == 'MessageLarge') {
+            }else if (addOns.name == 'Telegram') {
               const data = await collectionDetails.updateMany(
-                { userId:  String(userData._id)},
+                { userId: String(userData._id) },
                 {
                   $set: {
-                    messageLimit: Number(Details?.messageLimit) + 10000,
-                  },
+                    isTelegram: true,
+                    subIdTelegram: event.data.object.id
+                  }
                 }
               );
-            }
-            else if (addOns.name == 'Character') {
+            }else if (addOns.name == 'MessageSmall') {
               const data = await collectionDetails.updateMany(
-                { userId:  String(userData._id)},
+                { userId: String(userData._id) },
                 {
                   $set: {
-                    trainingDataLimit:
-                    Number(Details?.trainingDataLimit) + 1000000,
-                  },
+                    messageLimit: Number(Details?.messageLimit) + 5000
+                  }
+                }
+              );
+            } else if (addOns.name == 'MessageLarge') {
+              const data = await collectionDetails.updateMany(
+                { userId: String(userData._id) },
+                {
+                  $set: {
+                    messageLimit: Number(Details?.messageLimit) + 10000
+                  }
+                }
+              );
+            } else if (addOns.name == 'Character') {
+              const data = await collectionDetails.updateMany(
+                { userId: String(userData._id) },
+                {
+                  $set: {
+                    trainingDataLimit: Number(Details?.trainingDataLimit) + 1000000
+                  }
                 }
               );
             }
@@ -103,6 +119,17 @@ export async function POST(req: any, res: any) {
                 plan,
                 planId: planData._id,
                 status: 'active'
+              }
+            }
+          );
+          await collectionDetails.updateMany(
+            { userId: String(userData._id) },
+            {
+              $set: {
+                trainingDataLimit: planData.trainingDataLimit,
+                totalMessageCount: 0,
+                messageLimit: planData.messageLimit,
+                chatbotLimit: planData.numberOfChatbot
               }
             }
           );
@@ -133,6 +160,8 @@ export async function POST(req: any, res: any) {
       //   );
       //   break;
       case 'invoice.paid':
+        date = new Date(event.data.object.lines.data[0].period.end * 1000);
+        console.log(date)
         planData = await collection.findOne({ customerId: event.data.object.customer });
         if (event.data.object.status == 'paid') {
           status = 'success';
@@ -150,14 +179,67 @@ export async function POST(req: any, res: any) {
           userId: String(planData._id),
           status,
           date: formattedDate,
-          price: '$' + (event.data.object.amount_paid)/100,
+          price: '$' + event.data.object.amount_paid / 100,
           paymentId: event.data.object.id
         });
+
+        await collection.updateOne(
+          { customerId: event.data.object.customer },
+          {
+            $set: {
+              endDate: date
+            }
+          }
+        );
+
         break;
 
-        case 'subscription_schedule.canceled':
-          console.log('subscription_schedule.canceled', event.data.object);
-          break;
+      case 'customer.subscription.deleted':
+        console.log('subscription_schedule.canceled', event.data.object);
+        userData = await collection.findOne({ customerId: event.data.object.customer });
+        Details = await collectionDetails.findOne({ userId: String(userData._id) });
+        addOns = await collectionPlan.findOne({ planId: event.data.object.plan.id });
+        if(addOns != null){
+          if (addOns.name == 'WhatsApp') {
+            await collection.updateOne(
+              { customerId: event.data.object.customer },
+              {
+                $set: {
+                  isWhatsapp: false,
+                  subIdWhatsapp: '',
+                }
+              }
+            );
+          } else if (addOns.name == 'MessageSmall') {
+            const data = await collectionDetails.updateMany(
+              { userId: String(userData._id) },
+              {
+                $set: {
+                  messageLimit: Number(Details?.messageLimit) - 5000
+                }
+              }
+            );
+          } else if (addOns.name == 'MessageLarge') {
+            const data = await collectionDetails.updateMany(
+              { userId: String(userData._id) },
+              {
+                $set: {
+                  messageLimit: Number(Details?.messageLimit) - 10000
+                }
+              }
+            );
+          } else if (addOns.name == 'Character') {
+            const data = await collectionDetails.updateMany(
+              { userId: String(userData._id) },
+              {
+                $set: {
+                  trainingDataLimit: Number(Details?.trainingDataLimit) - 1000000
+                }
+              }
+            );
+          }
+        }
+        break;
       // case 'customer.subscription.deleted':
       //   console.log(event.data.object);
       //   const subData = await collection.findOne({ subId: event.data.object.id });
