@@ -162,7 +162,7 @@ function Integration() {
   return (
     <div className='integration-container'>
       {/*------------------------------------------Whatsapp-integration----------------------------------------------*/}
-      <div className='integration'>
+      <div className='integration i-btn'>
         <div className='name'>
           <Image src={whatsAppIcon} alt='whatsapp-icon' />
           <span>Add to Whatsapp</span>
@@ -200,6 +200,12 @@ function Integration() {
             </>
           )}
         </>
+        <div
+          className='telegram-i-btn'
+          onClick={() => router.push(`dashboard/whatsapp-integration-guide`)}
+        >
+          <InfoCircleOutlined />
+        </div>
       </div>
 
       {/*------------------------------------------Telegram-integration----------------------------------------------*/}

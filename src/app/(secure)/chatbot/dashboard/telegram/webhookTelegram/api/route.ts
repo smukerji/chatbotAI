@@ -204,6 +204,11 @@ export async function POST(request: NextRequest) {
           userId: userId,
           date: moment().utc().format("YYYY-MM-DD"),
         });
+      
+      //find the user's chatbot model
+      let userChatBotModel = await userChatBotSetting.findOne({
+        userId: userId,
+      });
 
         step = 9;
       //if user chat history is not available, create a new chat history
@@ -217,8 +222,8 @@ export async function POST(request: NextRequest) {
               Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENAI_KEY}`,
             },
             body: JSON.stringify({
-              model: "gpt-3.5-turbo",
-              temperature: 0.5,
+              model: userChatBotModel.model,
+              temperature: userChatBotModel.temperature,
               top_p: 1,
               messages: [
                 {
@@ -370,8 +375,8 @@ export async function POST(request: NextRequest) {
               Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENAI_KEY}`,
             },
             body: JSON.stringify({
-              model: "gpt-3.5-turbo",
-              temperature: 0.5,
+              model: userChatBotModel.model,
+              temperature: userChatBotModel.temperature,
               top_p: 1,
               messages: [
                 {

@@ -1,3 +1,25 @@
+.telegram-guide-parent{
+   position: relative;
+.back-arrow {
+    position: absolute;
+    top:23px;
+    left:12vw;
+    display: flex;
+    align-items: center;
+    color: var(--Neutral-6, #353945);
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 28px;
+    width: 100%;
+    // @media only screen and (max-width: 991px){
+    //     right: -100px;
+    // }
+    @media only screen and (max-width: 767px){
+        top: 0px;
+        left: 5vw;
+    }
+  }
 .telegram-guide-container {
     display: flex;
     flex-direction: column;
@@ -47,9 +69,11 @@
         }
     }
     @media only screen and (max-width: 767px){
+       
         .telegram-title{
             font-size: 32px;
             line-height: 43px;
+            margin-top: 14px;
         }
         .telegram-steps{
             .telegram-step {
@@ -63,4 +87,5 @@
         }
     }
 
+}
 }
