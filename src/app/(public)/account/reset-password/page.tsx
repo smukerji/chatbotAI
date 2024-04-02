@@ -7,8 +7,10 @@ import { Spin, message } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import "./reset-password.scss";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 function ResetPassword() {
+  const router = useRouter();
   /// first name, last name, email and password messages state
   const [emailMessage, setEmailMessage]: any = useState("");
   /// first name, last name, email and password storing state
@@ -51,7 +53,9 @@ function ResetPassword() {
           email: email,
         });
 
-        message.success(response.data?.message);
+        message.success(response.data.message).then(() => {
+          router.push("/account/login");
+        });
       } catch (error: any) {
         if (error?.response?.data?.message) {
           message.error(error?.response?.data?.message);

@@ -6,8 +6,11 @@ import luciferIcon from "../../../../../public/svgs/lucifer-ai-logo.svg";
 import { message } from "antd";
 import "../reset-password/reset-password.scss";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 function ResetPasswordForm() {
+  const router = useRouter();
+
   const [newPasswordMessage, setNewPasswordMessage] = useState("");
   const [newConfirmPasswordMessage, setNewConfirmPasswordMessage] =
     useState("");
@@ -78,7 +81,7 @@ function ResetPasswordForm() {
             message.error(response.data.message);
           } else {
             message.success(response.data.message).then(() => {
-              window.location.href = "/account.login";
+              router.push("/account/login");
             });
           }
         } catch (error) {}
