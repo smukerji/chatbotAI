@@ -38,15 +38,15 @@ function SecondaryHeader() {
       <div className={`hamburger-menu ${menuOpen ? "open" : ""}`}>
         <div className={`navbar `}>
           <ul>
-            <li>
+            <li onClick={toggleMenu}>
               <a href="/#features">Features</a>
             </li>
 
-            <li>
+            <li onClick={toggleMenu}>
               <a href="/home/pricing">Pricing</a>
             </li>
 
-            <li>
+            <li onClick={toggleMenu}>
               <a href="/#service-offerings">Service Offerings</a>
             </li>
           </ul>

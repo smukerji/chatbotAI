@@ -14,7 +14,7 @@
       line-height: 72px; /* 120% */
     }
 
-    p {
+    .description {
       margin-top: 24px;
       color: #777e90;
       font-size: 20px;
@@ -35,6 +35,13 @@
         align-items: center;
         gap: 22px;
         padding: 10px 0;
+
+        .details {
+          font-size: 20px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 28px;
+        }
       }
 
       @media only screen and (max-width: 991px) {
@@ -45,9 +52,19 @@
 
   /* --------------------------right section------------------------------ */
   .right {
+    flex: 1;
     img {
       width: 100%;
-      height: 100%;
+      height: auto;
+    }
+  }
+
+  @media only screen and (max-width: 1440px) {
+    .left {
+      h1 {
+        font-size: 38px;
+        line-height: 44px;
+      }
     }
   }
 

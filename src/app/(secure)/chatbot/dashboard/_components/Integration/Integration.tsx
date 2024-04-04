@@ -149,6 +149,7 @@ function Integration() {
     openWhatsAppModal()
     setOnEditClicked(true)
   }
+
   useEffect(() => {
     checkTelegramAvailability()
     fetchTelegramDetails();
@@ -309,6 +310,7 @@ function Integration() {
         setIsSlackConnected={setIsSlackConnected}
         isSlackConnected={isSlackConnected}
       />
+     
     </div>
   );
 }
