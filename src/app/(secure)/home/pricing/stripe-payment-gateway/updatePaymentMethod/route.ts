@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { connectDatabase } from "@/db";
+import clientPromise from "@/db";
 import Stripe from "stripe";
 import { ObjectId } from "mongodb";
 import { apiHandler } from "@/app/_helpers/server/api/api-handler";
@@ -13,7 +13,7 @@ async function updateUserPaymentMethod(req: any, res: NextResponse) {
   if (req.method === "POST") {
     try {
       let { paymentId, u_id } = await req.json();
-      const db = (await connectDatabase())?.db();
+      const db = (await clientPromise!).db();
       const collection = db.collection("users");
 
       //ANCHOR - Get data of user by user_id

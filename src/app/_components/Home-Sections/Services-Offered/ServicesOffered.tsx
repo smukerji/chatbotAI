@@ -29,7 +29,7 @@ function ServicesOffered() {
           <div className='right-part'>
             <a
               style={{ color: 'white', textDecoration: 'none' }}
-              href='#contact-us'
+              href='/account/register'
             >
               <button className='request-demo-btn'>Register for free</button>
             </a>

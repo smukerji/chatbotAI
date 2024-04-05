@@ -1,4 +1,4 @@
-// const { connectDatabase } = require("./src/db.js");
+// const clientPromise  = require("./src/db.js");
 const { MongoClient } = require("mongodb");
 require("dotenv").config({ path: ".env.local" });
 
@@ -31,7 +31,7 @@ async function initializeDb() {
       $set: {
         name: "agency",
         numberOfChatbot: 5,
-        messageLimit: 2000,
+        messageLimit: 5000,
         trainingDataLimit: 1000000,
         websiteCrawlingLimit: 20,
       },
@@ -99,6 +99,44 @@ async function initializeDb() {
   //     },
   //   }
   // );
+  //   const userDetailsCollection = db.collection("user-details");
+  //   let currentDate = new Date();
+  //   let endDate = new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+  // await userDetailsCollection.updateMany(
+  //   {},
+  //   {
+  //     $set: {
+  //       limitEndDate: endDate
+  //     },
+  //   }
+  // );
+
+  // const insertPlanId = await planCollection.insertMany([
+  //   {
+  //     name: "WhatsApp",
+  //     planId: "",
+  //   },
+  //   {
+  //     name: "Character",
+  //     planId: "",
+  //   },
+  //   {
+  //     name: "MessageSmall",
+  //     planId: "",
+  //   },
+  //   {
+  //     name: "MessageLarge",
+  //     planId: "",
+  //   },
+  //   {
+  //     name: "Telegram",
+  //     planId: "",
+  //   },
+  //   {
+  //     name: "Slack",
+  //     planId: "",
+  //   },
+  // ]);
   console.log("Database initialized successfully");
   process.exit();
 }

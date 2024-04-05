@@ -1,5 +1,5 @@
 import joi from "joi";
-import { connectDatabase } from "../../../../db";
+import clientPromise from "../../../../db";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
 import { apiHandler } from "../../../_helpers/server/api/api-handler";
@@ -13,7 +13,7 @@ async function login(request: any) {
   const body = await request.json();
   const { username, password } = body;
 
-  const db = (await connectDatabase()).db();
+  const db = (await clientPromise!).db();
   const collection = db.collection("users");
   /// check if user is valid
   const user: any = await collection.findOne({

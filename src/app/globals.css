@@ -155,6 +155,10 @@ margin-top: 0px !important;
   align-items: center;
 
 }
+.whatsapp-copy-icon{
+  height: 22px;
+  width: 22px;
+}
 .whatsapp-copy-icon:hover{
   cursor:  pointer !important;
 }
@@ -163,4 +167,194 @@ margin-top: 0px !important;
 }
 .whatsapp-spin-token{
   margin: 2px auto;
+}
+.whatsapp-edit-icon{
+  color: #2e58ea;
+  height: 20px;
+  width: 20px;
+}
+.whatsapp-edit-icon:hover{
+  cursor: pointer !important;
+}
+.whatsapp-edit-icon-s{
+  height: 18px;
+  width: 18px;
+  margin-left: -12px;
+}
+.whatsapp-edit-icon-s:hover{
+  cursor: pointer !important;
+
+}
+
+.telegram-token-container{
+  height: 114px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-top: 10px;
+  gap: 2px;
+}
+.telegram-heading{
+  color:  #141416;
+
+/* Subtitle/Large */
+font-size: 20px;
+font-style: normal;
+font-weight: 500;
+line-height: 28px; /* 140% */
+}
+.telegram-input{
+  display: flex;
+padding: 12px 16px;
+align-items: center;
+gap: 10px;
+align-self: stretch;
+border-radius: 12px;
+border: 1px solid  #E6E8EC;
+background: #FFF;
+color:   #23262F;
+
+/* Body/Medium */
+font-size: 16px;
+font-style: normal;
+font-weight: 500;
+line-height: 24px; /* 150% */
+}
+.telegram-input:focus-visible{
+  outline: none !important;
+  border: 1px solid  #E6E8EC !important;
+ 
+}
+.telegram-label{
+  color:  #353945;
+text-align: center;
+
+/* Body/Medium */
+font-size: 16px;
+font-style: normal;
+font-weight: 500;
+line-height: 24px; /* 150% */
+}
+.telegram-error{
+  color: red !important;
+  margin: 0px !important;
+  font-size: 14px !important;
+}
+.telegram-button{
+  margin-left: auto;
+  display: flex;
+padding: 12px 16px;
+justify-content: center;
+align-items: center;
+gap: 10px;
+border-radius: 12px;
+background: #2E58EA;
+color:  #FCFCFD;
+text-align: center;
+font-size: 16px;
+font-style: normal;
+font-weight: 600;
+line-height: 28px; /* 175% */
+border: 0px;
+}
+.telegram-button-save{
+padding: 4px 14px;
+border-radius: 12px;
+background: #2E58EA;
+color:  #FCFCFD;
+text-align: center;
+font-size: 15px;
+font-style: normal;
+font-weight: 600;
+line-height: 28px; /* 175% */
+border: 0px;
+
+}
+.telegram-button-save:hover{
+  cursor: pointer !important;
+}
+
+.telegram-button:hover{
+  cursor: pointer !important;
+}
+.telegram-modal .ant-modal-footer{
+  display: none !important;
+}
+.telegram-switch-delete-container{
+  margin-top: 15px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* margin-top: 30px; */
+}
+.telegram-switch-container{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.telegram-delete:hover{
+  cursor: pointer;
+}
+.telegram-bot-name{
+  margin-right: 6px;
+
+  color:  #353945;
+
+/* Body/Medium */
+font-size: 17px;
+font-style: normal;
+font-weight: 500;
+line-height: 24px; /* 150% */
+}
+.telegram-bot-name-input{
+  padding: 8px !important;
+  font-size: 16px;
+  line-height: 24px;
+  gap: 10px;
+    border-radius: 12px;
+    border: 1px solid #E6E8EC !important;
+    margin-right: 7px;
+}
+.telegram-bot-name-input:focus-visible{
+  outline: none !important;
+}
+.telegram-switch-delete{
+  display: flex;
+  justify-content: space-between;
+  width: 30%;
+}
+.telegram-input-save{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.telegram-botname-edit{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+}
+.telegram-active-inactive{
+  width: 38%;
+}
+.telegram-edit-icon-s{
+  height: 18px;
+  width: 18px;
+  margin-left: -12px;
+}
+.telegram-edit-icon-s:hover{
+  cursor: pointer;
+}
+.telegram-edit-icon{
+  height: 19px;
+  width: 19px;
+}
+.telegram-edit-icon:hover{
+  cursor: pointer;
+}
+.bot-user-img{
+  height: 35px;
+  width: 35px;
+  margin-right: 5px;
 }

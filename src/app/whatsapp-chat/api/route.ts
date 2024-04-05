@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import twilio from "twilio";
-import { connectDatabase } from "../../../db";
+import clientPromise from "../../../db";
 
 // Extract Twilio credentials from environment variables
 const { NEXT_PUBLIC_TWILIO_TOKEN, NEXT_PUBLIC_TWILIO_SID } = process.env;
@@ -37,7 +37,7 @@ export async function POST(request: any) {
   });
 
   try {
-    const db = (await connectDatabase()).db();
+    const db = (await clientPromise!).db();
     const userMessage = body.Body;
     const whatsAppCollection = db.collection("whatsapp-users");
     /// handle the talk-to message

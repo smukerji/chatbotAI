@@ -202,7 +202,7 @@ import { apiHandler } from "../../../../_helpers/server/api/api-handler";
 import * as puppeteer from "puppeteer";
 import { parse } from "node-html-parser";
 import chromium from "@sparticuz/chromium-min";
-import { connectDatabase } from "../../../../../db";
+import clientPromise from "../../../../../db";
 import { ObjectId } from "mongodb";
 
 module.exports = apiHandler({
@@ -255,7 +255,7 @@ async function fetchLinks(request: NextRequest) {
   const urlRegex = /^https?:\/\/[^\s/$.?#].[^\s]*$/;
   if (urlRegex.test(sourceUrl)) {
     /// first check how much link user can crawl
-    const db = (await connectDatabase())?.db();
+    const db = (await clientPromise!).db();
 
     /// get the user plan and allow only crawling of the amount of links left
     const userDetails = await db

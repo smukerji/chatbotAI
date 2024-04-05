@@ -1,10 +1,10 @@
-'use client';
-import React, { useState } from 'react';
-import Image from 'next/image';
-import LuciferLogo from '../../../../public/svgs/lucifer-ai-logo.svg';
-import dynamic from 'next/dynamic';
-import './secondary-header.scss';
-import { useRouter } from 'next/navigation';
+"use client";
+import React, { useState } from "react";
+import Image from "next/image";
+import LuciferLogo from "../../../../public/svgs/lucifer-ai-logo.svg";
+import dynamic from "next/dynamic";
+import "./secondary-header.scss";
+import { useRouter } from "next/navigation";
 
 const AuthBtn = dynamic(() => import('../../_components/AuthBtn'), {
   ssr: false,
@@ -38,16 +38,16 @@ function SecondaryHeader() {
       <div className={`hamburger-menu ${menuOpen ? 'open' : ''}`}>
         <div className={`navbar `}>
           <ul>
-            <li>
-              <a href='/#features'>Features</a>
+            <li onClick={toggleMenu}>
+              <a href="/#features">Features</a>
             </li>
 
-            <li>
-              <a href='/home/pricing'>Pricing</a>
+            <li onClick={toggleMenu}>
+              <a href="/home/pricing">Pricing</a>
             </li>
 
-            <li>
-              <a href='/#service-offerings'>Service Offerings</a>
+            <li onClick={toggleMenu}>
+              <a href="/#service-offerings">Service Offerings</a>
             </li>
           </ul>
         </div>

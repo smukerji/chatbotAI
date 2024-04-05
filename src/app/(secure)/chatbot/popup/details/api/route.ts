@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { connectDatabase } from "../../../../../../db";
+import clientPromise from "../../../../../../db";
 
 export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
   const chatbotId: string = params?.get("chatbotId")!;
 
   /// fetch the chatbot details
-  const db = (await connectDatabase())?.db();
+  const db = (await clientPromise!).db();
   const collection = db?.collection("user-chatbots");
 
   const cursor = await collection.aggregate([

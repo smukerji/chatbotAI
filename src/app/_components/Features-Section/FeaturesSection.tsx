@@ -14,7 +14,7 @@ function FeaturesSection() {
   const [activeKey, setActiveKey] = useState("1");
   return (
     <>
-      <div className="feature-section-container">
+      <div className="feature-section-container" id="features">
         <div className="top">
           <Image src={LuciferLogo} alt="Lucifer logo" />
           <h1 className="title">Features</h1>

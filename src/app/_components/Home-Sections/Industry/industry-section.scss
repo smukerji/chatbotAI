@@ -7,6 +7,22 @@
   // height: 56vw;
   height: 974px;
   overflow: hidden;
+  background-image: url("../../../../../public/sections-images/industry-section/Lines.png");
+  background-repeat: no-repeat;
+
+  @media only screen and (max-width: 1500px) {
+    background-size: 70%;
+  }
+  @media only screen and (max-width: 1380px) {
+    background-size: 80%;
+  }
+  @media only screen and (max-width: 1280px) {
+    background-size: 100%;
+  }
+  @media only screen and (max-width: 1140px) {
+    // background-size: 100%;
+    background-image: none;
+  }
 
   /* --------------------------left section------------------------------ */
   .left {
@@ -23,9 +39,9 @@
       //     font-size: 40px;
       // }
 
-      // @media only screen and (max-width: 1440px) {
-      //     font-size: 35px;
-      // }
+      @media only screen and (max-width: 1440px) {
+        font-size: 38px;
+      }
     }
 
     p {
@@ -75,7 +91,7 @@
         opacity: 0.2;
         background: #fcfcfd;
 
-        @media only screen and (max-width: 430px){
+        @media only screen and (max-width: 430px) {
           display: none;
         }
 
@@ -153,7 +169,7 @@
       flex: 1;
       margin-top: -17%;
 
-      @media only screen and (max-width: 430px){
+      @media only screen and (max-width: 430px) {
         margin-top: 0% !important;
       }
 
@@ -172,7 +188,7 @@
         opacity: 0.2;
         background: #fcfcfd;
 
-        @media only screen and (max-width: 430px){
+        @media only screen and (max-width: 430px) {
           display: none;
         }
 
@@ -246,11 +262,10 @@
   }
 
   @media only screen and (max-width: 1496px) {
- 
     height: 100%;
   }
 
-  @media only screen and (max-width: 767px) {
+  @media only screen and (max-width: 800px) {
     display: flex;
     flex-direction: column;
     height: auto;

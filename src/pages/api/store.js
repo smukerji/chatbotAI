@@ -3,12 +3,13 @@ import {
   generateChunksNEmbedd,
   generateChunksNEmbeddForLinks,
 } from "../../app/_helpers/server/embeddings";
-import { connectDatabase } from "../../db";
+import clientPromise from "../../db";
 import { v4 as uuid } from "uuid";
 // import { authorize, uploadFile } from "../../app/_services/googleFileUpload";
 import { put } from "@vercel/blob";
 import fs from "fs";
-
+import { emailService } from '../../app/_services/emailService';
+import { createNewChatbotMail } from '../../app/_helpers/emailImagesBase64Constants'
 import {
   chatbotBubbleAlignment,
   defaultChatBubbleIconColor,
@@ -53,7 +54,7 @@ export default async function handler(req, res) {
         const updateChatbot = JSON.parse(fields?.updateChatbot[0]);
 
         /// db connection
-        const db = (await connectDatabase()).db();
+        const db = (await clientPromise).db();
 
         /// first check if user can create the chatbot or not
         const noOfChatbotsUserCreated = await db
@@ -596,7 +597,24 @@ export default async function handler(req, res) {
             createdAt: currrentTime,
             noOfMessagesSent: 0,
           });
-
+          //send email once chatbot is created 
+          try {
+            const result = await db.collection("users").findOne({_id:new ObjectId(userId)})
+            const email=result?.email
+            const temailService = emailService();
+           await temailService.send(
+             "create-chatbot-template",
+            [
+               createNewChatbotMail
+              ],
+            email,
+             {
+                name: result?.username,
+               }
+           );
+          } catch (error) {
+            return res.status(400).send(error);
+          }
           /// set the default settings for the chatbot in DB
           await db.collection("chatbot-settings").insertOne({
             userId: userId,

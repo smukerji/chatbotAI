@@ -1,8 +1,14 @@
 import { NextResponse } from "next/server";
-import { connectDatabase } from "../../../../db";
+import clientPromise from "../../../../db";
 import { apiHandler } from "../../../_helpers/server/api/api-handler";
 import joi from "joi";
 import bcrypt from "bcrypt";
+import { emailService } from "../../../_services/emailService";
+import {
+  logo,
+  logoBase64,
+  registerationMail,
+} from "../../../_helpers/emailImagesBase64Constants";
 
 module.exports = apiHandler({
   POST: register,
@@ -11,7 +17,7 @@ module.exports = apiHandler({
 async function register(request: any) {
   const body = await request.json();
   const { username, email, password } = body;
-  const db = (await connectDatabase()).db();
+  const db = (await clientPromise!).db();
   const collection = db.collection("users");
   /// validate if user email already exists
   if (await collection.findOne({ email: email })) {
@@ -50,6 +56,23 @@ async function register(request: any) {
     trainingDataLimit: starterPlan?.trainingDataLimit,
     websiteCrawlingLimit: starterPlan?.websiteCrawlingLimit,
   });
+
+  /// send the registration mail
+  const temailService = emailService();
+  await temailService.send(
+    "registration-mail-template",
+    [
+      registerationMail.heroImage,
+      registerationMail.avatarIcon,
+      registerationMail.icon1,
+      registerationMail.icon2,
+      logo,
+    ],
+    email,
+    {
+      name: username,
+    }
+  );
 
   return { message: "Registered successfully... Please login to continue" };
 }

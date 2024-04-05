@@ -16,7 +16,7 @@ function CustomerQuestions() {
           and more. Train the chatbot with your own data.
         </p>
 
-        <a style={{ color: 'white', textDecoration: 'none' }} href=''>
+        <a style={{ color: 'white', textDecoration: 'none' }} href='/account/register'>
           <button className='sign-up-btn'>Sign up for free</button>
         </a>
       </div>

@@ -13,7 +13,7 @@ import { redirect, useRouter } from "next/navigation";
 import { UserDetailsContext } from "../../../_helpers/client/Context/UserDetailsContext";
 import { formatNumber } from "../../../_helpers/client/formatNumber";
 import dynamic from "next/dynamic";
-import circle from "../../../../../public/svgs/Ellipse 58.svg"
+import circle from "../../../../../public/svgs/Ellipse 58.svg";
 
 function BillingAndUsage() {
   const [cookies, setCookie] = useCookies(["userId"]);
@@ -25,22 +25,51 @@ function BillingAndUsage() {
   const [duration, setDuration] = useState("");
   const [dataSource, setDataSource] = useState([]);
   const [disable, setDisable] = useState(false);
+  const [buttonDisable, setButtonDisable] = useState(false);
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isWhatsappModalOpen, setIsWhatsappModalOpen] = useState(false);
+  const [whatsapp, setWhatsapp] = useState(false);
   const userDetailContext: any = useContext(UserDetailsContext);
   const userDetails = userDetailContext?.userDetails;
-
-  console.log(userDetails);
   // const [columns, setColumns] = useState([])
 
   const showModal = () => {
     setIsModalOpen(true);
   };
 
+  const cancelWhatsapp = () => {
+    setIsWhatsappModalOpen(true);
+  };
+
+  //ANCHOR - API CALL TO CANCEL WHATSAPP INTEGRATION FOR NEXT BILLING CYCLE
+  const handleWhatsappOk = async () => {
+    if (whatsapp == true) {
+      const response = await axios.put(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/BillingAndUsage/api`,
+        {
+          u_id: cookies.userId,
+          x: 1,
+        }
+      );
+      if (response.data.status == true) {
+        message.success(response.data.msg);
+      } else {
+        message.error(response.data.msg);
+      }
+      setWhatsapp(false);
+      setIsWhatsappModalOpen(false);
+    }
+  };
+
+  //ANCHOR - API CALL TO CANCEL PLAN FOR NEXT BILLING CYCLE
   const handleOk = async () => {
     const response = await axios.put(
       `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/BillingAndUsage/api`,
-      { u_id: cookies.userId }
+      {
+        u_id: cookies.userId,
+        x: 2,
+      }
     );
     if (response.data.status == true) {
       message.success(response.data.msg);
@@ -49,12 +78,18 @@ function BillingAndUsage() {
     }
     setDisable(true);
     setIsModalOpen(false);
+    setWhatsapp(false);
+    setIsWhatsappModalOpen(false);
+  };
+  const handleWhatsappCancel = () => {
+    setIsWhatsappModalOpen(false);
   };
 
   const handleCancel = () => {
     setIsModalOpen(false);
   };
 
+  //ANCHOR - COLUMNS OF TABLE IN PAYMENT HISTORY
   const columns = [
     {
       title: "PaymentId",
@@ -82,29 +117,42 @@ function BillingAndUsage() {
     router.push(`${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing`);
   };
 
+  //ANCHOR - API CALL FOR COLLECTING DATA FROM DATABASE
   const myFunction = async () => {
-    const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/BillingAndUsage/api`,
-      { u_id: cookies.userId }
-    );
-    setChat(response?.data?.chatbot);
-    setMsg(response?.data?.message);
-    setPlan(response?.data?.plan);
-    const newDate = new Date(response?.data?.nextRenewal);
-    const options: any = { year: "numeric", month: "short", day: "2-digit" };
-    const formattedDate: any = newDate.toLocaleDateString("en-US", options);
-    setDate(formattedDate);
-    setDataSource(response?.data?.paymentDetails);
-    if (response?.data?.nextPlan == "") {
-      setDisable(true);
-    }
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/BillingAndUsage/api`,
+        {
+          u_id: cookies.userId,
+        }
+      );
+      setChat(response?.data?.chatbot);
+      setMsg(response?.data?.message);
+      setPlan(response?.data?.plan);
+      setWhatsapp(response?.data?.whatsappIntegration);
+      const newDate = new Date(response?.data?.nextRenewal);
+      const options: any = { year: "numeric", month: "short", day: "2-digit" };
+      const formattedDate: any = newDate.toLocaleDateString("en-US", options);
+      setDate(formattedDate);
+      setDataSource(response?.data?.paymentDetails);
+      if (response?.data?.status == "cancel") {
+        setDisable(true);
+        setButtonDisable(true);
+      } else if (response?.data?.status == undefined) {
+        setButtonDisable(false);
+      } else {
+        setButtonDisable(true);
+      }
 
-    if (!response?.data?.duration) {
-      setDuration("7 days free trial");
-    } else if (response?.data?.duration == "month") {
-      setDuration("Billed monthly");
-    } else {
-      setDuration("Billed yearly");
+      if (!response?.data?.duration) {
+        setDuration("7 days free trial");
+      } else if (response?.data?.duration == "month") {
+        setDuration("Billed monthly");
+      } else {
+        setDuration("Billed yearly");
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
   useEffect(() => {
@@ -127,6 +175,19 @@ function BillingAndUsage() {
         >
           <p>Are you sure to cancel your plan?</p>
         </Modal>
+        <Modal
+          title="Cancel My Plan"
+          open={isWhatsappModalOpen}
+          onOk={handleWhatsappOk}
+          onCancel={handleWhatsappCancel}
+          cancelText="Keep"
+          okText="Cancel"
+          // closeIcon={null}
+          className="modelCancelWhatsapp"
+          centered
+        >
+          <p>Are you sure to cancel Whatsapp integration from next cycle?</p>
+        </Modal>
         <div className="billing-main">
           <div className="billing-head">Billing & Usage</div>
           <div className="message-count">
@@ -137,9 +198,11 @@ function BillingAndUsage() {
             <div className="name-features">
               <div className="plan-name-container">
                 <span className="plan-name">{userDetails?.plan?.name}</span>
-                {duration != "" && <div className="plan-duration">
-                  <span className="plan-duration-text">{duration}</span>
-                </div>}
+                {duration != "" && (
+                  <div className="plan-duration">
+                    <span className="plan-duration-text">{duration}</span>
+                  </div>
+                )}
               </div>
               <div className="plan-feature">
                 <div className="plan-message">
@@ -169,24 +232,29 @@ function BillingAndUsage() {
             <button className="btn-upgrade" onClick={explorePlan}>
               <span className="btn-text">Explore Plans</span>
             </button>
+            {buttonDisable && (
+              <button
+                className="btn-cancel-plan"
+                onClick={showModal}
+                disabled={disable}
+              >
+                <span className="btn-text-cancel-plan">
+                  {disable ? "Plan Cancelled" : "Cancel My Plan"}
+                </span>
+              </button>
+            )}
             <button
-              className="btn-cancel-plan"
-              onClick={showModal}
-              disabled={disable}
+              className="btn-cancel-plan btn-cancel-plan-whatsapp"
+              onClick={whatsapp ? cancelWhatsapp : explorePlan}
             >
               <span className="btn-text-cancel-plan">
-                {disable ? "Plan Cancelled" : "Cancel My Plan"}
+                {whatsapp
+                  ? "Cancel Whatsapp integration for next cycle"
+                  : "Explore Whatsapp Integration Plan"}
               </span>
             </button>
           </div>
           <div className="manage-plan">Payment history</div>
-          {/* <div className="manage-plan-text">
-          Manage your payment methods or cancel your plan by clicking on the
-          link below
-        </div>
-        <button className="btn-manage-billing">
-          <span className="btn-text">Manage Billing</span>
-        </button> */}
         </div>
         <Table
           className="payment-table"

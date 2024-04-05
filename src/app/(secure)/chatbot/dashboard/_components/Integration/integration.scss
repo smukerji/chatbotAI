@@ -20,6 +20,18 @@
       gap: 20px;
     }
 
+    .telegram-img {
+      height: 40px;
+      width: 40px;
+    }
+
+    .slack-edit-icon {
+      height: 19px;
+      width: 19px;
+      cursor: pointer;
+      margin-left: -15px;
+    }
+
     .action {
       color: #fe632f;
       font-size: 16px;
@@ -27,9 +39,43 @@
       font-weight: 500;
       line-height: 24px; /* 150% */
     }
+    .telegram-action {
+      color: #fe632f;
+    }
+    .telegram-action:hover{
+      cursor: pointer;
+    }
+    .view {
+      color: #5cb85c;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 24px; /* 150% */
+    }
+    .view:hover {
+      cursor: pointer;
+    }
+    .delete {
+      color: red;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 24px; /* 150% */
+    }
+    .delete:hover {
+      cursor: pointer;
+    }
     .action:hover {
       cursor: pointer;
     }
+  }
+
+  .i-btn {
+    position: relative;
+  }
+  .telegram-i-btn {
+    position: absolute;
+    right: -28px;
   }
 
   .integration:nth-of-type(2) .action {
@@ -49,6 +95,14 @@
       text-decoration-line: underline;
       cursor: pointer;
     }
+  }
+  .telegram-container {
+    display: flex;
+    align-items: center;
+  }
+
+  .telegram-i-btn:hover {
+    cursor: pointer !important;
   }
 
   @media only screen and (max-width: 991px) {

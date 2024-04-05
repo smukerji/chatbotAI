@@ -1,31 +1,31 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { connectDatabase } from '../../../../../db';
-import { ObjectId } from 'mongodb';
-import { apiHandler } from '../../../../_helpers/server/api/api-handler';
+import { NextRequest, NextResponse } from "next/server";
+import clientPromise from "../../../../../db";
+import { ObjectId } from "mongodb";
+import { apiHandler } from "../../../../_helpers/server/api/api-handler";
 module.exports = apiHandler({
   GET: userDetails,
 });
 
 async function userDetails(request: NextRequest) {
   const params = request.nextUrl.searchParams;
-  const userId: string = params.get('userId')!;
+  const userId: string = params.get("userId")!;
   /// first check id user is able to create chatbot or not
   /// get the number of chatbot create by user
-  const db = (await connectDatabase()).db();
+  const db = (await clientPromise!).db();
 
   const noOfChatbotsUserCreated = await db
-    .collection('user-chatbots')
+    .collection("user-chatbots")
     .countDocuments({ userId: userId });
 
   /// get the number of chatbot user can create from plan table
   const userCollection = await db
-    .collection('users')
+    .collection("users")
     .findOne({ _id: new ObjectId(userId) });
 
   /// get the plan name with the help of planId
 
   const planCollection = await db
-    .collection('plans')
+    .collection("plans")
     .findOne({ _id: userCollection?.planId });
   // .aggregate([
   //   {
@@ -42,17 +42,17 @@ async function userDetails(request: NextRequest) {
   // ])
   // .toArray();
 
-  const userDetails = await db.collection('user-details').findOne({
+  const userDetails = await db.collection("user-details").findOne({
     userId: userId,
   });
 
   /// split the first name and the last name
-  let username = '',
-    firstName = '',
-    lastName = '';
+  let username = "",
+    firstName = "",
+    lastName = "";
 
   if (userCollection?.username) {
-    username = userCollection?.username?.split('_');
+    username = userCollection?.username?.split("_");
     firstName = username[0];
     lastName = username[1];
   }
@@ -70,7 +70,7 @@ async function userDetails(request: NextRequest) {
     planExpiry: userCollection?.endDate,
     firstName: firstName,
     lastName: lastName,
-    fullName: userCollection?.name ? userCollection?.name : '',
+    fullName: userCollection?.name ? userCollection?.name : "",
     email: userCollection?.email,
   };
 
