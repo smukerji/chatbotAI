@@ -1253,11 +1253,7 @@
   bottom: 0;
   height: calc(100% - 70px);
   z-index: 10;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255) 0%,
-    rgba(255, 255, 255) 100%
-  );
+  background: linear-gradient(180deg, rgba(255, 255, 255) 0%, rgba(255, 255, 255) 100%);
 }
 
 .ant-spin-dot {

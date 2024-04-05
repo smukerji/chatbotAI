@@ -110,6 +110,33 @@ async function initializeDb() {
   //     },
   //   }
   // );
+
+  // const insertPlanId = await planCollection.insertMany([
+  //   {
+  //     name: "WhatsApp",
+  //     planId: "",
+  //   },
+  //   {
+  //     name: "Character",
+  //     planId: "",
+  //   },
+  //   {
+  //     name: "MessageSmall",
+  //     planId: "",
+  //   },
+  //   {
+  //     name: "MessageLarge",
+  //     planId: "",
+  //   },
+  //   {
+  //     name: "Telegram",
+  //     planId: "",
+  //   },
+  //   {
+  //     name: "Slack",
+  //     planId: "",
+  //   },
+  // ]);
   console.log("Database initialized successfully");
   process.exit();
 }
