@@ -20,14 +20,14 @@ async function TelegramStatusCheck(request: any) {
       _id: new ObjectId(userId),
     });
     let isTelegram;
-    if (data?.isTelegram == null) {
+    if (data?.isTelegram == false) {
       if (userData?.status == undefined) {
         isTelegram = true;
       } else {
         isTelegram = false;
       }
     } else {
-      isTelegram = data?.isTelegram;
+      isTelegram = data?.isTelegram ? data?.isTelegram : true;
     }
     return { isTelegramVerified: isTelegram };
   } catch (error) {
