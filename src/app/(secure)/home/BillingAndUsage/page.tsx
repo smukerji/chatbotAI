@@ -25,6 +25,7 @@ function BillingAndUsage() {
   const [duration, setDuration] = useState("");
   const [dataSource, setDataSource] = useState([]);
   const [disable, setDisable] = useState(false);
+  const [buttonDisable, setButtonDisable] = useState(false);
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isWhatsappModalOpen, setIsWhatsappModalOpen] = useState(false);
@@ -134,9 +135,13 @@ function BillingAndUsage() {
       const formattedDate: any = newDate.toLocaleDateString("en-US", options);
       setDate(formattedDate);
       setDataSource(response?.data?.paymentDetails);
-      console.log(response?.data?.nextPlan);
       if (response?.data?.status == "cancel") {
         setDisable(true);
+        setButtonDisable(true);
+      } else if (response?.data?.status == undefined) {
+        setButtonDisable(false);
+      } else {
+        setButtonDisable(true);
       }
 
       if (!response?.data?.duration) {
@@ -227,15 +232,17 @@ function BillingAndUsage() {
             <button className="btn-upgrade" onClick={explorePlan}>
               <span className="btn-text">Explore Plans</span>
             </button>
-            <button
-              className="btn-cancel-plan"
-              onClick={showModal}
-              disabled={disable}
-            >
-              <span className="btn-text-cancel-plan">
-                {disable ? "Plan Cancelled" : "Cancel My Plan"}
-              </span>
-            </button>
+            {buttonDisable && (
+              <button
+                className="btn-cancel-plan"
+                onClick={showModal}
+                disabled={disable}
+              >
+                <span className="btn-text-cancel-plan">
+                  {disable ? "Plan Cancelled" : "Cancel My Plan"}
+                </span>
+              </button>
+            )}
             <button
               className="btn-cancel-plan btn-cancel-plan-whatsapp"
               onClick={whatsapp ? cancelWhatsapp : explorePlan}
