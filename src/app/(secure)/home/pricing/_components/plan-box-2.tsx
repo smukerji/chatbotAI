@@ -17,7 +17,7 @@ export default function PlanTwo({
   setPrice,
   prePrice,
   enableTwo,
-  text
+  text,
 }: any) {
   const { status } = useSession();
   const [cookies, setCookie] = useCookies(["userId"]);
@@ -26,22 +26,22 @@ export default function PlanTwo({
   const changePlan = async () => {
     if (cookies?.userId) {
       if (price == 89) {
-        const fPrice = price - prePrice
+        const fPrice = price - prePrice;
         const a = CryptoJS.AES.encrypt(
           JSON.stringify(fPrice),
           "xyz"
         ).toString();
-        console.log(a)
-        const data = encodeURIComponent(a)
-        console.log(data, a)
+        console.log(a);
+        const data = encodeURIComponent(a);
+        console.log(data, a);
         router.push(`/home/pricing/checkout/${2}?a=${data}`);
       } else {
-        const fPrice = price - prePrice
+        const fPrice = price - prePrice;
         const a = CryptoJS.AES.encrypt(
           JSON.stringify(fPrice),
           "xyz"
         ).toString();
-        const data = encodeURIComponent(a)
+        const data = encodeURIComponent(a);
         router.push(`/home/pricing/checkout/${4}?a=${data}`);
       }
     } else {
@@ -66,8 +66,8 @@ export default function PlanTwo({
         </div>
       </div>
       <div className="plan-container-list">
-        <button className="pay-btn" disabled={enableTwo} onClick={changePlan}>
-          <span className="btn-text">{text}</span>
+        <button className="pay-btn" disabled={true}>
+          <span className="btn-text">Coming Soon...</span>
         </button>
         <div className="plan-details">
           <div className="plan-item">

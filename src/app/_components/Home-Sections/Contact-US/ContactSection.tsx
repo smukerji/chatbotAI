@@ -19,22 +19,23 @@ function ContactSection() {
 
   const onFinish = async (values: any) => {
     try {
-      const result = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}api/contact-mail/api`,{
-        method:'POST',
-        body:JSON.stringify({values}),
-        next: { revalidate: 0 },
-      }) 
-      const resp = await result.json()
-      if(resp.status !== 200){
-        message.error(resp.message)
-      }
-      else{
-        message.success(resp.message)
-         // Clear form fields after successful submission
-      form.resetFields();
+      const result = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/contact-mail/api`,
+        {
+          method: "POST",
+          body: JSON.stringify({ values }),
+          next: { revalidate: 0 },
+        }
+      );
+      const resp = await result.json();
+      if (resp.status !== 200) {
+        message.error(resp.message);
+      } else {
+        message.success(resp.message);
+        form.resetFields();
       }
     } catch (error) {
-      console.log("error sending mail.")
+      console.log("error sending mail.");
     }
   };
 

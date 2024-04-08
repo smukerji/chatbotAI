@@ -30,24 +30,39 @@ async function createPaymentIntent(req: any, res: NextResponse) {
 
       const paymentMethod = data.paymentId;
       if (paymentMethod) {
+        let name;
         let planID;
         if (plan == 6) {
-          planID = 'plan_PlVDfwvIk4Rq64';
+          name = 'MessageSmall';
+          planData = await collectionPlan.findOne({ name: name });
+          planID = planData.planId;
         }
         if (plan == 7) {
-          planID = 'plan_PlVD6HvJjRARCd';
+          name = 'MessageLarge';
+          planData = await collectionPlan.findOne({ name: name });
+          planID = planData.planId;
         }
         if (plan == 5) {
-          planID = 'plan_PlVDnbgUmFjlrB';
+          name = 'Character';
+          planData = await collectionPlan.findOne({ name: name });
+          planID = planData.planId;
         }
         if (plan == 8) {
-          planID = 'plan_PlVD83jK9SUwwM';
+          name = 'WhatsApp';
+          planData = await collectionPlan.findOne({ name: name });
+          planID = planData.planId;
         }
         if (plan == 9) {
-          planID = 'plan_PlVDDEMmnGFxiX';
+          name = 'Slack';
+          planData = await collectionPlan.findOne({ name: name });
+          planID = planData.planId;
+        }
+        if (plan == 10) {
+          name = 'Telegram';
+          planData = await collectionPlan.findOne({ name: name });
+          planID = planData.planIdMonth;
         }
 
-        let name;
         if (plan == 1 || plan == 3) {
           name = 'individual';
         }
@@ -117,6 +132,9 @@ async function createPaymentIntent(req: any, res: NextResponse) {
           }
         }
         if (isWhatsapp == true) {
+          let name = 'WhatsApp';
+          planData = await collectionPlan.findOne({ name: name });
+          let plan_ID = planData.planIdMonth;
           subscription = await stripe.subscriptions.create({
             customer: data.customerId,
             default_payment_method: data.paymentId,
@@ -124,7 +142,7 @@ async function createPaymentIntent(req: any, res: NextResponse) {
             // cancel_at_period_end: true,
             items: [
               {
-                plan: 'plan_PlVD83jK9SUwwM'
+                plan: plan_ID
               }
             ]
           });
@@ -139,6 +157,9 @@ async function createPaymentIntent(req: any, res: NextResponse) {
           );
         }
         if (isSlack == true) {
+          name = 'Slack';
+          planData = await collectionPlan.findOne({ name: name });
+          let plan_ID = planData.planIdMonth;
           subscription = await stripe.subscriptions.create({
             customer: data.customerId,
             default_payment_method: data.paymentId,
@@ -146,22 +167,12 @@ async function createPaymentIntent(req: any, res: NextResponse) {
             // cancel_at_period_end: true,
             items: [
               {
-                plan: 'plan_PlVDDEMmnGFxiX'
+                plan: plan_ID
               }
             ]
           });
         }
-        //ANCHOR - stripe payment intent creation
-        // const paymentIntent = await stripe.paymentIntents.create({
-        //   amount: amount,
-        //   currency: "usd",
-        //   automatic_payment_methods: {
-        //     enabled: true,
-        //   },
-        //   customer: data.customerId,
-        //   payment_method: data.paymentId,
-        //   receipt_email: data.email,
-        // });
+
         return subscription;
       } else {
         return { status: 500 };
@@ -231,96 +242,4 @@ async function checkCurrentPlan(req: any, res: NextResponse) {
     };
   }
 }
-// let amount: number = price * 100;
-// console.log(plan);
-// const plan1 = await stripe.plans.create({
-//   currency: 'INR',
-//   interval: 'day',
-//   product: 'prod_PjdBr09Yx1TH5c',
-//   nickname: 'monthly heathly plan',
-//   amount: 1500,
-//   usage_type: 'licensed'
-// });
-// console.log(plan1)
-// const plan2 = await stripe.plans.create({
-//   currency: 'INR',
-//   interval: 'month',
-//   product: 'prod_PjdBjXgPn0lgah',
-//   nickname: 'monthly heathly plan',
-//   amount: 89,
-//   usage_type: 'licensed'
-// });
-// const plan3 = await stripe.plans.create({
-//   currency: 'INR',
-//   interval: 'year',
-//   product: 'prod_PjdBr09Yx1TH5c',
-//   nickname: 'monthly heathly plan',
-//   amount: 144,
-//   usage_type: 'licensed'
-// });
-// const plan4 = await stripe.plans.create({
-//   currency: 'INR',
-//   interval: 'year',
-//   product: 'prod_PjdBjXgPn0lgah',
-//   nickname: 'monthly heathly plan',
-//   amount: 854,
-//   usage_type: 'licensed'
-// // });
-// const prod1 = await stripe.products.create({
-//   name: 'message add ons',
-// });
-// const prod2 = await stripe.products.create({
-//   name: 'message add ons',
-// });
-// const prod3 = await stripe.products.create({
-//   name: 'character add on',
-// });
-// const prod4 = await stripe.products.create({
-//   name: 'whats app integration',
-// });
-// const prod5 = await stripe.products.create({
-//   name: 'slack integration',
-// });
-// const plan1 = await stripe.plans.create({
-//   currency: 'INR',
-//   interval: 'month',
-//   nickname: 'messageAddOn',
-//   product:  prod1.id,
-//   amount: 500,
-//   usage_type: 'licensed'
-// });
-// console.log(plan1);
-// const plan2 = await stripe.plans.create({
-//   currency: 'INR',
-//   interval: 'month',
-//   nickname: 'messageAddOnLarge',
-//   product:  prod2.id,
-//   amount: 800,
-//   usage_type: 'licensed'
-// });
-// const plan3 = await stripe.plans.create({
-//   currency: 'INR',
-//   interval: 'month',
-//   nickname: 'CharacterAddOn',
-//   product:  prod3.id,
-//   amount: 500,
-//   usage_type: 'licensed'
-// });
-// const plan4 = await stripe.plans.create({
-//   currency: 'INR',
-//   interval: 'month',
-//   nickname: 'WhatsApp',
-//   product:  prod4.id,
-//   amount: 700,
-//   usage_type: 'licensed'
-// });
-// const plan5 = await stripe.plans.create({
-//   currency: 'INR',
-//   interval: 'month',
-//   nickname: 'Slack',
-//   product:  prod5.id,
-//   amount: 700,
-//   usage_type: 'licensed'
-// });
-// console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
-// console.log(plan1, plan2, plan3, plan4, plan5);
+

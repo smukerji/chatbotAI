@@ -172,7 +172,7 @@ function Login() {
                 {passwordMessage}
               </p>
             </div>
-            <a href="">Forgot password?</a>
+            <a href="reset-password">Forgot password?</a>
           </div>
 
           <div className="login-register-cotainer">

@@ -10,54 +10,31 @@ interface SlackAppData {
 }
 
 export async function POST(req: NextRequest) {
-  try {
+  //read the incomming parameter from webhook
+  let resData: any = await req.json();
+  let data = resData.resData;
 
-    let retryNum = req.headers.get('X-Slack-Retry-Num');
-    //if retryNum is available then return the response with status 200
-    if (retryNum) {
-      return new NextResponse('', { status: 200 });
-    }
-    //read the incomming parameter from webhook
-    let resData: any = await req.json();
-    // return the challenge on first time verification
-    if (resData.challenge) {
-      return new NextResponse(JSON.stringify({ challenge: resData.challenge }), { status: 200 });
-    }
-    else {
-      if (resData.event.type === 'app_mention') {
+  let step = 1;
+  // ________________________________________________________start
 
-        // setImmediate(async () => {
-          await writeInDataBase(resData);
-        // });
-
-        return new NextResponse('', { status: 200 });
-      }
-      else {
-        //handle else part here.
-      }
-    }
-
-  }
-  catch (error: any) {
-    console.log('error', error);
-  }
-}
-
-async function writeInDataBase(data: any) {
-
-  let updatedMessageCount: { isUpdated: boolean, updatedResult: any, userInfo: any } = {
+  let updatedMessageCount: {
+    isUpdated: boolean;
+    updatedResult: any;
+    userInfo: any;
+  } = {
     isUpdated: false,
     updatedResult: null,
-    userInfo: null
-  }
+    userInfo: null,
+  };
 
   try {
     const appId = data.api_app_id;
     const channelId = data.event.channel;
 
+    step = 2;
     //find is AppId is available
     const db = (await clientPromise!)?.db();
-    let slackCollection = db.collection('slack-app-details');
+    let slackCollection = db.collection("slack-app-details");
 
     let appDetails: SlackAppData = await slackCollection.findOne({
       appId: appId,
@@ -68,6 +45,7 @@ async function writeInDataBase(data: any) {
       const message = data.event.text.replace(/<@.*?>\s*\n?/, "");
       const userID = appDetails.userId;
 
+      step = 3;
       const client = new WebClient(authOToken, {
         // LogLevel can be imported and used to make debugging simpler
         logLevel: LogLevel.DEBUG,
@@ -80,11 +58,8 @@ async function writeInDataBase(data: any) {
           text: "I guess you sent me an empty message.",
           threadId: data.event.ts,
         });
-
-        return new NextResponse('', { status: 200 });
-      }
-      else {
-
+      } else {
+        step = 4;
         //check if user chat count has reached the limit if not then increment the count
         let userDetailsCollection: any = await db.collection("user-details");
         let cursor = await userDetailsCollection.aggregate([
@@ -108,12 +83,15 @@ async function writeInDataBase(data: any) {
 
         let limitCrossResult = await cursor.toArray();
 
+        step = 5;
         await cursor.close();
-        //if limitCross is false then increment the message count
-        if (limitCrossResult[0].limitCross === false) {
 
+        if (limitCrossResult[0].limitCross === false) {
           //increment the message count
-          let updatedResult = await userDetailsCollection.updateOne({ userId: userID }, { $inc: { totalMessageCount: 1 } });
+          let updatedResult = await userDetailsCollection.updateOne(
+            { userId: userID },
+            { $inc: { totalMessageCount: 1 } }
+          );
           if (updatedResult.modifiedCount > 0) {
             updatedMessageCount.isUpdated = true;
             updatedMessageCount.userInfo = userID;
@@ -131,6 +109,7 @@ async function writeInDataBase(data: any) {
             }
           );
 
+          step = 6;
           /// parse the response and extract the similarity results
           const respText = await response.text();
           const similaritySearchResults = JSON.parse(respText).join("\n");
@@ -173,6 +152,7 @@ async function writeInDataBase(data: any) {
 
           const openaiBody = JSON.parse(await responseOpenAI.text());
 
+          step = 7;
           // after getting response from open ai send the response to slack
           if (openaiBody.choices[0].message.content) {
             await client.chat.postMessage({
@@ -180,15 +160,14 @@ async function writeInDataBase(data: any) {
               text: openaiBody.choices[0].message.content,
               thread_ts: data.event.ts,
             });
-
-            return new NextResponse('', { status: 200 });
-
-          }
-          else {
-
+          } else {
+            step = 8;
             //if update result is true and open ai didn't respond then decrement the message count
             if (updatedMessageCount.isUpdated) {
-              await userDetailsCollection.updateOne({ userId: userID }, { $inc: { totalMessageCount: -1 } });
+              await userDetailsCollection.updateOne(
+                { userId: userID },
+                { $inc: { totalMessageCount: -1 } }
+              );
             }
 
             //if open ai didn't respond then send the message to slack
@@ -197,34 +176,38 @@ async function writeInDataBase(data: any) {
               text: "Lucifer AI is not able to answer for your query. Please try again later.",
               thread_ts: data.event.ts,
             });
-
-            return new NextResponse('', { status: 200 });
           }
         } else {
+          step = 9;
           await client.chat.postMessage({
             channel: channelId,
             text: "You have reached the limit of message count. Please try again later.",
             thread_ts: data.event.ts,
           });
-          return new NextResponse('', { status: 200 });
         }
       }
     }
-
-  }
-  catch (error: any) {
+  } catch (error: any) {
+    console.log("error", error);
+    console.log("step", step);
     //in case if any error occurs with open ai or slack api then decrement the message count
     try {
+      step = 10;
       const db = (await clientPromise!)?.db();
-      let userDetailsCollection: any = await db.collection('user-details');
+      let userDetailsCollection: any = await db.collection("user-details");
       if (updatedMessageCount.isUpdated) {
-        await userDetailsCollection.updateOne({ userId: updatedMessageCount.userInfo }, { $inc: { totalMessageCount: -1 } });
+        await userDetailsCollection.updateOne(
+          { userId: updatedMessageCount.userInfo },
+          { $inc: { totalMessageCount: -1 } }
+        );
       }
-
+    } catch (error: any) {
+      console.log("error @", error);
+      console.log("step @", step);
     }
-    catch (error: any) {
-      console.log('error', error);
-    }
-   
   }
+
+  return NextResponse.json({ status: "success" });
+
+  // ________________________________________________________end
 }
