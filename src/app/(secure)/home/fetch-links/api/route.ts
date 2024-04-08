@@ -323,7 +323,7 @@ async function fetchLinks(request: NextRequest) {
         await page.goto(url, {
           // waitUntil: "networkidle",
           waitUntil: "networkidle2",
-          timeout: 120000,
+          timeout: 180000,
         });
 
         /// if it is image skip that link
