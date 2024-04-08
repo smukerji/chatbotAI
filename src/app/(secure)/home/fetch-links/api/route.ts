@@ -290,7 +290,8 @@ async function fetchLinks(request: NextRequest) {
       args: [...chromium.args, "--hide-scrollbars", "--disable-web-security"],
       defaultViewport: chromium.defaultViewport,
       executablePath: await chromium.executablePath(
-        `https://github.com/Sparticuz/chromium/releases/download/v119.0.2/chromium-v119.0.2-pack.tar`
+        // `https://github.com/Sparticuz/chromium/releases/download/v119.0.2/chromium-v119.0.2-pack.tar`
+        `https://github.com/Sparticuz/chromium/releases/download/v122.0.0/chromium-v122.0.0-pack.tar`
       ),
       headless: chromium.headless,
       ignoreHTTPSErrors: true,
@@ -298,8 +299,15 @@ async function fetchLinks(request: NextRequest) {
       /// to run puppeteer on local
       // headless: true,
     });
+    // const browser = await puppeteer.launch({
+    //  headless:false
+    // });
     // const context = await browser.newContext();
+
+    console.log("browser launched !")
+
     const page = await browser.newPage();
+    console.log(" page created !")
 
     const visitedUrls = new Map();
     const pendingUrls = [sourceUrl];
@@ -314,7 +322,7 @@ async function fetchLinks(request: NextRequest) {
       try {
         await page.goto(url, {
           // waitUntil: "networkidle",
-          waitUntil: "networkidle0",
+          waitUntil: "networkidle2",
           timeout: 120000,
         });
 
