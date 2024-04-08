@@ -67,7 +67,7 @@ function Login() {
 
   /// function to validate email
   const checkEmail = (e: any) => {
-    let email: string = e?.target?.value;
+    let email: string = e?.target?.value.toLowerCase();
     if (email == "") {
       setEmailMessage("Please enter email");
       return;
