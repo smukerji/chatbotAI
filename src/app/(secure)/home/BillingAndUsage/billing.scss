@@ -1,0 +1,390 @@
+.billing-main {
+  width: 80%;
+  margin: 20px auto;
+
+  .billing-head {
+    color: var(--Neutral-8, #141416);
+    font-family: sans-serif;
+    font-size: 30px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 40px;
+  }
+
+  .message-count {
+    margin-top: 40px;
+    display: flex;
+    width: 376px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 16px;
+
+    .message-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      align-self: stretch;
+
+      .message-head-text {
+        color: var(--Neutral-8, #141416);
+        font-family: sans-serif;
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 28px;
+      }
+
+      .message-head-count {
+        .message-head-count-used {
+          color: var(--Neutral-8, #141416);
+          font-family: sans-serif;
+          font-size: 20px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 28px;
+        }
+
+        .message-head-count-limit {
+          color: var(--Neutral-5, #777e90);
+          font-family: sans-serif;
+          font-size: 20px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 28px;
+        }
+      }
+    }
+  }
+
+  .plan-head {
+    color: var(--Neutral-8, #141416);
+    font-family: sans-serif;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 32px;
+    margin-top: 40px;
+  }
+
+  .plan-details {
+    margin-top: 20px;
+    display: flex;
+    width: 100%;
+    padding: 16px 24px;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 16px;
+    border: 1px solid var(--Primary-7, #2e58ea);
+    background: var(--Neutral-1, #fcfcfd);
+
+    .name-features {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+
+      .plan-name-container {
+        display: flex;
+        gap: 10px;
+
+        .plan-name {
+          text-transform: capitalize;
+          color: var(--Neutral-8, #141416);
+          font-family: sans-serif;
+          font-size: 24px;
+          font-style: normal;
+          font-weight: 600;
+          line-height: 32px;
+        }
+
+        .plan-duration {
+          display: flex;
+          padding: 4px 8px;
+          justify-content: center;
+          align-items: center;
+          gap: 10px;
+          border-radius: 12px;
+          background: var(--Neutral-3, #e6e8ec);
+
+          .plan-duration-text {
+            color: var(--Neutral-6, #353945);
+            font-family: sans-serif;
+            font-size: 14px;
+            font-style: normal;
+            font-weight: 600;
+            line-height: 24px;
+            /* 171.429% */
+          }
+        }
+      }
+
+      .plan-feature {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+
+        .next-renewal-date {
+          display: inline-flex;
+          align-items: flex-start;
+          gap: 16px;
+
+          // margin-top: 24px;
+          .next-renewal-date-text {
+            color: var(--Neutral-5, #777e90);
+            font-family: sans-serif;
+            font-size: 20px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 28px;
+          }
+
+          .next-renewal-date-date {
+            color: var(--Neutral-8, #141416);
+            font-family: sans-serif;
+            font-size: 20px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 28px;
+          }
+        }
+
+        .plan-message {
+          color: var(--Neutral-5, #777e90);
+
+          /* Subtitle/Large */
+          font-family: sans-serif;
+          font-size: 20px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 28px;
+          /* 140% */
+        }
+
+        .dot-image {
+          @media only screen and (max-width: 767px) {
+            display: none;
+          }
+        }
+
+        .plan-chatbot {
+          color: var(--Neutral-5, #777e90);
+          font-family: sans-serif;
+          font-size: 20px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 28px;
+        }
+      }
+    }
+  }
+
+  .btn-class {
+    display: flex;
+    justify-content: space-between;
+
+    .btn-cancel-plan {
+      cursor: pointer;
+      margin-top: 24px;
+      display: flex;
+      padding: 12px 16px;
+      justify-content: center;
+      align-items: center;
+      background-color: #fff;
+      gap: 10px;
+      border: none;
+
+      .btn-text-cancel-plan {
+        color: var(--Red, #f00000);
+        font-family: sans-serif;
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 28px;
+      }
+    }
+
+    .btn-cancel-plan:disabled {
+      cursor: not-allowed;
+    }
+
+    .btn-upgrade {
+      cursor: pointer;
+      margin-top: 24px;
+      display: flex;
+      padding: 12px 16px;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      border-radius: 12px;
+      background: var(--Primary-7, #2e58ea);
+      border: none;
+
+      .btn-text {
+        color: var(--Neutral-1, #fcfcfd);
+        text-align: center;
+        font-family: sans-serif;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 28px;
+        /* 175% */
+      }
+    }
+  }
+
+  .manage-plan {
+    color: var(--Neutral-8, #141416);
+    margin-top: 40px;
+    font-family: sans-serif;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 32px;
+
+    @media only screen and (max-width: 768px) {
+      margin-top: 20px;
+    }
+  }
+
+  .manage-plan-text {
+    color: var(--Neutral-5, #777e90);
+    font-family: sans-serif;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px;
+    margin-top: 12px;
+  }
+
+  .btn-manage-billing {
+    display: inline-flex;
+    padding: 12px 16px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border: none;
+    border-radius: 12px;
+    background: var(--Primary-7, #2e58ea);
+
+    .btn-text {
+      color: var(--Neutral-1, #fcfcfd);
+      text-align: center;
+      font-family: sans-serif;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 600;
+      line-height: 28px;
+      /* 175% */
+    }
+  }
+
+  @media only screen and (max-width: 991px) {
+    // margin: 30px !important;
+  }
+
+  @media only screen and (max-width: 768px) {
+    // margin: 30px !important;
+    width: 90%;
+    margin: 20px auto;
+
+    .plan-head {
+      margin-top: 20px;
+    }
+
+    .plan-details {
+      .name-features {
+        .plan-feature {
+          flex-wrap: wrap;
+
+          .plan-message {
+            word-break: break-word;
+          }
+
+          .plan-chatbot {
+            word-break: break-word;
+          }
+
+          .next-renewal-date {
+            word-break: break-word;
+
+            .next-renewal-date-text {
+              word-break: break-word;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.payment-table {
+  width: 80%;
+  margin: 24px auto 0px auto;
+
+  @media only screen and (max-width: 768px) {
+    margin: 25px;
+    width: 90%;
+  }
+}
+
+.model {
+  .ant-modal-body {
+    p {
+      color: var(--Neutral-5, #777e90);
+
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 24px;
+      /* 150% */
+    }
+  }
+
+  .ant-modal-footer {
+    // margin-top: 48px;
+    .ant-btn-primary {
+      border-radius: 12px;
+      background: #db0000;
+      color: var(--Neutral-1, #fcfcfd);
+      text-align: center;
+      height: 52px;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 600;
+      line-height: 28px;
+      /* 175% */
+      cursor: pointer;
+      box-shadow: none;
+
+      &:hover {
+        background: #db0000;
+      }
+    }
+
+    .ant-btn-default {
+      border-radius: 12px;
+      background: var(--Neutral-3, #e6e8ec);
+      color: var(--Neutral-8, #141416);
+      text-align: center;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 600;
+      line-height: 28px;
+      /* 175% */
+      height: 52px;
+      border-color: #e6e8ec;
+      box-shadow: none;
+
+      &:hover {
+        background: #e6e8ec;
+        color: #141416;
+        border-color: #e6e8ec;
+      }
+    }
+  }
+
+  .ant-modal-content {
+    color: rgb(105, 128, 0);
+  }
+}

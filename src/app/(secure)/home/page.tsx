@@ -1,20 +1,30 @@
 "use client";
-import { Button, Spin, Radio, RadioChangeEvent, message } from "antd";
-import "./app.css";
-import { useState } from "react";
-import { useCookies } from "react-cookie";
-import Website from "../../_components/Website/Website";
+import React, { useContext, useEffect, useState } from "react";
+import Image from "next/image";
+import Icon from "../../_components/Icon/Icon";
+import DocumentIcon from "../../../assets/svg/DocumentIcon";
+import arrowIcon from "../../../../public/svgs/Feather Icon.svg";
+import "./app.scss";
+import TextIcon from "../../../assets/svg/TextIcon";
+import QAIcon from "../../../assets/svg/QAIcon";
+import WebsiteIcon from "../../../assets/svg/WebsiteIcon";
+import SpreadSheetIcon from "../../../assets/svg/SpreadSheetIcon";
+import { CreateBotContext } from "../../_helpers/client/Context/CreateBotContext";
 import SourceUpload from "../../_components/Source-Upload/SourceUpload";
 import Text from "../../_components/Text/Text";
 import QA from "../../_components/QA/QA";
-import ChatbotNameModal from "../../_components/Modal/ChatbotNameModal";
-import ChatbotName from "../../_helpers/server/ChatbotName";
+import Website from "../../_components/Website/Website";
 import { useSession } from "next-auth/react";
-import { redirect } from "next/navigation";
+import { Spin, message } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
+import { useCookies } from "react-cookie";
+import { redirect, useRouter } from "next/navigation";
+import { UserDetailsContext } from "../../_helpers/client/Context/UserDetailsContext";
+import { formatNumber } from "../../_helpers/client/formatNumber";
+import LoaderModal from "../chatbot/dashboard/_components/Modal/LoaderModal";
 const crypto = require("crypto");
 
-export default function Home({
+function Home({
   updateChatbot = false,
   qaData,
   textData,
@@ -24,12 +34,54 @@ export default function Home({
   chatbotName,
 }: any) {
   const { status } = useSession();
-  // const status = "authenticated";
+  const router = useRouter();
+
+  /// loading state for loader component
+  const [loadingComponent, setLoadingComponent]: any = useState(false);
 
   /// loading icon
   const antIcon = (
     <LoadingOutlined style={{ fontSize: 24, color: "black" }} spin />
   );
+
+  const [cookies, setCookie] = useCookies(["userId"]);
+  const [messageApi, contextHolder] = message.useMessage();
+  const [isResponseOk, setIsResponseOk] = useState(false);
+
+  const botContext: any = useContext(CreateBotContext);
+  const botDetails = botContext?.createBotInfo;
+
+  /// get userDetails context
+  const userDetailContext: any = useContext(UserDetailsContext);
+  const userDetails = userDetailContext?.userDetails;
+
+  /// check if chatbot is being updated
+  const isUpdateChatbot = botDetails?.isUpdateChatbot;
+  /// get the total char count
+  const totalCharCount = botDetails?.totalCharCount;
+  /// get the total files char count
+  const filesCharCount = botDetails?.filesCharCount;
+  /// get the total text char count
+  const textCharCount = botDetails?.textCharCount;
+  /// get the total qa char count and qa count
+  const qaCharCount = botDetails?.qaCharCount;
+  const qaCount = botDetails?.qaCount;
+  /// get the total website char count
+  const websiteCharCount = botDetails?.websiteCharCount;
+
+  /// get default file to preview if any
+  const defaultFileList = botDetails?.defaultFileList;
+  /// check for any ongoing process
+  const isLoading = botDetails?.isLoading;
+
+  /// check which source is active
+  const activeSource = botDetails?.activeSource;
+
+  /// get new file list
+  const newFileList = botDetails?.newFileList;
+  /// get delete file list
+  const deleteFileList = botDetails?.deleteFileList;
+  const crawledList = botDetails?.crawledList;
 
   /// creating the hash of initial text to compare it later with current text hash
   const initialTextData = textData?.text ? textData.text : "";
@@ -46,288 +98,177 @@ export default function Home({
     .update(JSON.stringify(initialQAData))
     .digest("hex");
 
-  /// creating the hash of initial website data to compare it later with current website hash
-  const initialCrawlData = crawlingData?.crawledData[0]
-    ? crawlingData?.crawledData[0]
-    : [];
-
-  const initialCrawlDataHash = crypto
+  /// creating the hash of latest QA
+  const currentQAHash = crypto
     .createHash("sha1")
-    .update(JSON.stringify(initialCrawlData))
+    .update(JSON.stringify(botDetails?.qaList))
     .digest("hex");
 
-  const [cookies, setCookie] = useCookies(["userId"]);
-  /// check if the unique id of the user exists else set the cookie with expiration of 1 year
-  // if (cookies?.userId == undefined)
-  //   setCookie("userId", cookies.userId, { path: "/", maxAge: 31536000 });
+  /// creating the hash of initial website data to compare it later with current website hash
 
-  /// hadling event of radio buttons
-  const [source, setSource] = useState("document");
-  const onChange = (e: RadioChangeEvent) => {
-    setSource(e.target.value);
-  };
-
-  /// loading state
-  const [loading, setLoading] = useState(false);
+  const initialCrawlData =
+    crawlingData != undefined &&
+    crawlingData?.crawledData != undefined &&
+    crawlingData?.crawledData.length > 0
+      ? crawlingData?.crawledData[0]
+      : [];
+  const initialCrawlDataHash = initialCrawlData?.length;
 
   /// total characters count
   const tempQaCharCount = qaData ? qaData.qaCharCount : 0;
   const tempTextCharCount = textData ? textData.textLength : 0;
   const tempFileTextCount = fileData ? fileData.fileTextLength : 0;
   const tempCrawlDataCount = crawlingData ? crawlingData?.crawledDataLength : 0;
-  const [charCount, setCharCount] = useState(
-    tempQaCharCount + tempTextCharCount + tempFileTextCount + tempCrawlDataCount
-  );
-  function updateCharCount(count: number) {
-    setCharCount(count);
-  }
 
-  /// text cahracter count and text
-  const [textLength, setTextLength] = useState(tempTextCharCount);
-  const [text, setText] = useState(initialTextData);
   /// creating the hash of latest text
+  const text = botDetails?.text;
   const currentTextHash = crypto.createHash("sha1").update(text).digest("hex");
 
-  /// QA cahracter count
-  const [qaCount, setQACount] = useState(qaData ? qaData.qaCount : 0);
-  const [qaCharCount, setQACharCount] = useState(tempQaCharCount);
-  /// QA state array
-  const [qaList, setQAList]: any = useState(initialQAData);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     /// get the user and plan details
+  //     const userDetailsresponse = await fetch(
+  //       `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/account/user/details?userId=${cookies?.userId}`,
+  //       {
+  //         method: "GET",
+  //         next: { revalidate: 0 },
+  //       }
+  //     );
+  //     const userDetails = await userDetailsresponse.json();
+  //     botContext.handleChange("plan")(userDetails?.plan);
+  //   };
 
-  /// creating the hash of latest QA
-  const currentQAHash = crypto
-    .createHash("sha1")
-    .update(JSON.stringify(qaList))
-    .digest("hex");
-  /// state for maintaining qa when updating the sources
-  const [deleteQAList, setDeleteQAList]: any = useState([]);
+  //   fetchData();
+  // }, []);
 
-  /// file sources
-  const [defaultFileList, setDefaultFileList] = useState(
-    fileData ? fileData.defaultFileList : []
-  );
-  /// state for maintaining file when updating the sources
-  const [deleteFileList, setDeleteFileList]: any = useState([]);
-  const [newFileList, setNewFileList] = useState([]);
-  /// file cahracter count
-  const [fileTextLength, setFileTextLength] = useState(tempFileTextCount);
+  useEffect(() => {
+    /// set chatbot name
+    // Accessing search parameters using window.location.search to get chatbotname
+    const searchParams = new URLSearchParams(window.location.search);
+    const paramValue = searchParams.get("chatbotName");
 
-  /// crawledLinks count
-  const [crawledList, setCrawledList] = useState(initialCrawlData);
-  const [websiteCharCount, setWebsiteCharCount] = useState(tempCrawlDataCount);
-  /// state for maintaining qa when updating the sources
-  const [deleteCrawlList, setDeleteCrawlList]: any = useState([]);
-
-  const [messageApi, contextHolder] = message.useMessage();
-
-  /// chatbot name pop up state
-  const [open, setOpen] = useState(false);
-  const [chatbotText, setChatbotText] = useState("");
-
-  /// create the chatbase chatbot
-  async function createChatBaseBot() {
-    if (
-      (crawledList.length != 0 && defaultFileList.length !== 0) ||
-      (crawledList.length != 0 && textLength !== 0) ||
-      (crawledList.length != 0 && qaCount !== 0)
-    ) {
-      messageApi.open({
-        type: "info",
-        content:
-          "Sorry!!! currently you cannot upload other documents when crawling for websites...",
-      });
+    /// return the use to chatbot screen if chatbot name is empty
+    if ((paramValue == "" || !paramValue) && !chatbotName) {
+      router.push("/chatbot");
       return;
     }
 
-    // if (crawledList.length != 0) {
-    //   let headers = {
-    //     Authorization: `Bearer ${process.env.NEXT_PUBLIC_AUTHORIZATION}`,
-    //     "Content-Type": "application/json",
-    //     cache: "no-store",
-    //   };
-    //   /// filtering the crawledUrls
-    //   let crawledUrls = crawledList.map((item: any) => item.url);
+    if (botDetails?.chatbotName == "")
+      botContext.handleChange("chatbotName")(paramValue);
 
-    //   let chatbotName = `Chatbot ${ChatbotName()}`;
+    // /// total characters count
+    // botContext.handleChange("totalCharCount")(
+    //   tempQaCharCount +
+    //     tempTextCharCount +
+    //     tempFileTextCount +
+    //     tempCrawlDataCount
+    // );
 
-    //   /// creating bot through urls
-    //   const options = {
-    //     method: "POST",
-    //     headers,
-    //     body: JSON.stringify({
-    //       chatbotName: chatbotName,
-    //       urlsToScrape: crawledUrls,
-    //     }),
-    //     next: { revalidate: 0 },
-    //   };
+    /// text cahracter count and text
+    botContext.handleChange("textCharCount")(tempTextCharCount);
+    botContext.handleChange("text")(initialTextData);
 
-    //   try {
-    //     messageApi.open({
-    //       type: "info",
-    //       content: "Please wait while your chatbot is getting trained",
-    //     });
-    //     const res = await fetch(
-    //       "https://www.chatbase.co/api/v1/create-chatbot",
-    //       options
-    //     );
-    //     const data = await res.json();
-    //     if (data.chatbotId) {
-    //       messageApi
-    //         .open({
-    //           type: "success",
-    //           content: "Chabot trained successfully",
-    //         })
-    //         .then(() => {
-    //           window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot`;
-    //         });
-    //     } else {
-    //       messageApi.open({
-    //         type: "error",
-    //         content: data.message,
-    //       });
-    //     }
-    //   } catch (error) {
-    //     messageApi.open({
-    //       type: "error",
-    //       content: "Error while creating chatbot",
-    //     });
-    //   }
-    // } else {
-    //   messageApi.open({
-    //     type: "error",
-    //     content: "No links found to create chatbot",
-    //   });
-    // }
+    /// file sources
+    botContext.handleChange("defaultFileList")(
+      fileData ? fileData.defaultFileList : []
+    );
+    /// file cahracter count
+    botContext.handleChange("filesCharCount")(tempFileTextCount);
 
-    if (crawledList.length != 0) {
-      setLoading(true);
-      /// send the data
-      try {
-        messageApi.open({
-          type: "info",
-          content: "Please wait while your chatbot is getting trained",
-        });
-        const formData = new FormData();
+    /// set the isUpdatechatbot to true if chatbot is getting retrained
+    botContext.handleChange("isUpdateChatbot")(updateChatbot);
 
-        // Append other data to the formData object
-        formData.append("crawledList", JSON.stringify(crawledList));
-        formData.append("updateChatbot", updateChatbot);
-        formData.append("chatbotId", chatbotId);
-        formData.append("userId", cookies.userId);
-        formData.append("updateChatbot", updateChatbot);
-        formData.append("chatbotText", "crawling-ichefpos");
-        formData.append("deleteCrawlList", JSON.stringify(deleteCrawlList));
+    /// QA cahracter count
+    botContext.handleChange("qaCount")(qaData ? qaData.qaCount : 0);
+    botContext.handleChange("qaCharCount")(tempQaCharCount);
+    /// QA state array
+    botContext.handleChange("qaList")(initialQAData);
 
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/store2`,
-          {
-            headers: {
-              cache: "no-store",
-            },
-            method: "POST",
-            body: formData,
-            next: { revalidate: 0 },
-          }
-        );
-
-        if (!response.ok) {
-          messageApi
-            .open({
-              type: "error",
-              content: "Something went wrong while creating bot",
-            })
-            .then(() => {
-              setLoading(false);
-            });
-          return;
-        }
-
-        if (response.status == 200) {
-          message.success(await response.text()).then(() => {
-            // window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot`;
-          });
-        } else if (response.status == 201) {
-          message.success(await response.text()).then(() => {
-            // window.location.href = `${
-            //   process.env.NEXT_PUBLIC_WEBSITE_URL
-            // }chatbot/dashboard?${encodeURIComponent(
-            //   "chatbot"
-            // )}=${encodeURIComponent(
-            //   JSON.stringify({
-            //     id: chatbotId,
-            //     name: chatbotName,
-            //   })
-            // )}`;
-          });
-        } else {
-          message.error(await response.text()).then(() => {
-            window.location.href = `${
-              process.env.NEXT_PUBLIC_WEBSITE_URL
-            }chatbot/dashboard?${encodeURIComponent(
-              "chatbot"
-            )}=${encodeURIComponent(
-              JSON.stringify({
-                id: chatbotId,
-                name: chatbotName,
-              })
-            )}`;
-          });
-        }
-      } catch (e: any) {
-        message.error(e.message);
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      messageApi.open({
-        type: "error",
-        content: "No links found to create chatbot",
-      });
-    }
-  }
+    /// crawledLinks count
+    botContext.handleChange("crawledList")(initialCrawlData);
+    botContext.handleChange("websiteCharCount")(tempCrawlDataCount);
+  }, [
+    updateChatbot,
+    qaData,
+    textData,
+    fileData,
+    crawlingData,
+    chatbotId,
+    chatbotName,
+  ]);
 
   /// creating custom chatbot
   async function createCustomBot() {
-    setLoading(true);
+    /// check if user is able to create the bot
+    const canCreate =
+      userDetails?.noOfChatbotsUserCreated + 1 <=
+      userDetails?.plan?.numberOfChatbot;
+
+    if (!canCreate && !updateChatbot) {
+      message.error(
+        `Sorry you cannot create the chatbot. Please upgrade your plan.`
+      );
+      botContext?.handleChange("isLoading")(false);
+      return;
+    }
+
+    /// check if the crawling links are as per user plan
+    if (crawledList?.length > userDetails?.plan?.websiteCrawlingLimit) {
+      message.warning(
+        `Oops! You have reached the crawling limit of your plan. Please delete few links or upgrade the plan.`
+      );
+      botContext?.handleChange("isLoading")(false);
+      return;
+    }
+
+    /// if the training data limit is exceeded  then show error message
+    if (totalCharCount > userDetails?.plan?.trainingDataLimit) {
+      message.warning(
+        "Oops! You have reached the data limit of your plan. Please upgrade to train more data."
+      );
+      botContext?.handleChange("isLoading")(false);
+      return;
+    }
+
     if (
       qaCount === 0 &&
-      textLength === 0 &&
+      textCharCount === 0 &&
       defaultFileList.length === 0 &&
       crawledList.length === 0
     ) {
-      message.error("Please add some content to create the bot").then(() => {
-        setLoading(false);
+      message.warning("Please add some content to create the bot").then(() => {
+        botContext?.handleChange("isLoading")(false);
       });
       return;
     }
-    if (charCount < 100) {
-      message.error("Not enough content to create the bot").then(() => {
-        setLoading(false);
+    if (totalCharCount < 100) {
+      message.warning("Not enough content to create the bot").then(() => {
+        botContext?.handleChange("isLoading")(false);
       });
       return;
     }
-    for await (const item of qaList) {
+    for await (const item of botDetails?.qaList) {
       if (item.question.length < 10 || item.answer.length < 20) {
         message
-          .error(
+          .warning(
             "Question/Answer length too short in Q&A section. Min length : q = 10, a = 20"
           )
           .then(() => {
-            setLoading(false);
+            botContext?.handleChange("isLoading")(false);
           });
         return;
       }
     }
     /// send the data
     try {
-      messageApi.open({
-        type: "info",
-        content: "Please wait while your chatbot is getting trained",
-      });
+      // messageApi.open({
+      //   type: "info",
+      //   content: "Please wait while your chatbot is getting trained",
+      // });
       const formData = new FormData();
 
       // Append the QA data including images to the formData object
-      for (const [index, qa] of qaList.entries()) {
+      for (const [index, qa] of botDetails?.qaList.entries()) {
         // formData.append(`qaList[${index}].question`, qa.question);
         // formData.append(`qaList[${index}].answer`, qa.answer);
         if (qa.image && typeof qa.image != "string") {
@@ -337,22 +278,42 @@ export default function Home({
 
       // Append other data to the formData object
       formData.append("updateChatbot", updateChatbot);
+      formData.append(
+        "isTextUpdated",
+        initialTextHash === currentTextHash ? "false" : "true"
+      );
       formData.append("chatbotId", chatbotId);
       formData.append("defaultFileList", JSON.stringify(defaultFileList));
       formData.append("deleteFileList", JSON.stringify(deleteFileList));
-      formData.append("deleteQAList", JSON.stringify(deleteQAList));
+      formData.append("deleteQAList", JSON.stringify(botDetails?.deleteQaList));
       formData.append("crawledList", JSON.stringify(crawledList));
-      formData.append("deleteCrawlList", JSON.stringify(deleteCrawlList));
+      formData.append("numberOfCharacterTrained", totalCharCount);
+      formData.append(
+        "deleteCrawlList",
+        JSON.stringify(botDetails?.deleteCrawlList)
+      );
       //// default chatbot set
       formData.append(
         "userId",
-        chatbotId === "123d148a-be02-4749-a612-65be9d96266c"
-          ? "651d111b8158397ebd0e65fb"
-          : cookies.userId
+        // chatbotId === "123d148a-be02-4749-a612-65be9d96266c"
+        //   ? "651d111b8158397ebd0e65fb"
+        //   : chatbotId === "34cceb84-07b9-4b3e-ad6f-567a1c8f3557"
+        //   ? "65795294269d08529b8cd743"
+        //   : chatbotId === "f0893732-3302-46b2-922a-95e79ef3524c"
+        //   ? "651d111b8158397ebd0e65fb"
+        //   : chatbotId === "f8095ef4-6cd0-4373-a45e-8fe15cb6dd0f"
+        //   ? "6523fee523c290d75609a1fa"
+        cookies.userId
       );
-      formData.append("qaList", JSON.stringify(qaList));
+      formData.append("qaList", JSON.stringify(botDetails?.qaList));
       formData.append("text", text);
-      formData.append("chatbotText", chatbotText);
+      formData.append(
+        "chatbotText",
+        chatbotName ? chatbotName : botDetails?.chatbotName
+      );
+
+      // botContext?.handleChange("isLoading")(true);
+      setLoadingComponent(true);
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/store`,
@@ -367,21 +328,28 @@ export default function Home({
       );
 
       if (!response.ok) {
+        const errorMessage = await response?.text();
         messageApi
           .open({
-            type: "error",
-            content: "Something went wrong while creating custom bot",
+            type: "warning",
+            // content:
+            // "Something went wrong while creating custom bot. Please refresh the page and try again!",
+            // content: errorMessage,
+            content:
+              "Something went wrong. Please refresh the page and try again! ",
           })
           .then(() => {
-            setLoading(false);
+            // botContext?.handleChange("isLoading")(false);
+            setLoadingComponent(false);
           });
         return;
       }
 
       if (response.status == 200) {
-        message.success(await response.text()).then(() => {
-          window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot`;
-        });
+        setIsResponseOk(true);
+        // message.success(await response.text()).then(() => {
+        //   // window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/chatbot`;
+        // });
       } else if (response.status == 201) {
         message.success(await response.text()).then(() => {
           window.location.href = `${
@@ -391,7 +359,7 @@ export default function Home({
           )}=${encodeURIComponent(
             JSON.stringify({
               id: chatbotId,
-              name: chatbotName,
+              name: chatbotName ? chatbotName : botDetails?.chatbotName,
             })
           )}`;
         });
@@ -404,7 +372,7 @@ export default function Home({
           )}=${encodeURIComponent(
             JSON.stringify({
               id: chatbotId,
-              name: chatbotName,
+              name: chatbotName ? chatbotName : botDetails?.chatbotName,
             })
           )}`;
         });
@@ -412,25 +380,10 @@ export default function Home({
     } catch (e: any) {
       message.error(e.message);
     } finally {
-      setLoading(false);
+      // botContext?.handleChange("isLoading")(false);
+      setLoadingComponent(false);
     }
   }
-
-  /// chatbot name giver
-  async function openChatbotModal() {
-    /// open the chatbot naming dialog box when creating bot
-    setOpen(true);
-  }
-
-  /// handling the chatbot ok action
-  const handleOk = async () => {
-    if (chatbotText.length < 5) {
-      message.error("Please provide a valid chatbot name");
-      return;
-    }
-    setOpen(false);
-    createCustomBot();
-  };
 
   if (status === "loading") {
     return (
@@ -440,189 +393,238 @@ export default function Home({
     );
   } else if (status === "authenticated" || cookies?.userId) {
     return (
-      <>
+      <div className="create-chatbot-container">
+        {(loadingComponent == true || isResponseOk) && (
+          <LoaderModal
+            isResponseOk={isResponseOk}
+            setIsResponseOk={setIsResponseOk}
+          />
+        )}
         {contextHolder}
+        {/*------------------------------------------top-section----------------------------------------------*/}
+        <div className="top">
+          {/*------------------------------------------header----------------------------------------------*/}
+          <div className="sources-header">
+            <div className="title">
+              <Image
+                src={arrowIcon}
+                alt="arrow-icon"
+                style={{ transform: "rotate(180deg)", cursor: "pointer" }}
+                onClick={() => {
+                  window.history.back();
+                }}
+              />
+              <h1>{botDetails?.chatbotName}</h1>
+            </div>
 
-        <div className="data-source-container">
-          <center>
-            {!updateChatbot && <p className="title">Data Sources</p>}
-            <Radio.Group onChange={onChange} value={source} disabled={loading}>
-              <Radio name="source" value={"document"}>
-                Document
-              </Radio>
-              <Radio name="source" value={"text"}>
-                Text
-              </Radio>
-              <Radio name="source" value={"qa"}>
-                Q&A
-              </Radio>
-              <Radio name="source" value={"website"}>
-                Website
-              </Radio>
-            </Radio.Group>
-            {source == "document" && (
-              <SourceUpload
-                defaultFileList={defaultFileList}
-                setDefaultFileList={setDefaultFileList}
-                updateCharCount={updateCharCount}
-                getCharCount={charCount}
-                setLoadingPage={setLoading}
-                fileTextLength={fileTextLength}
-                setFileTextLength={setFileTextLength}
-                updateChatbot={updateChatbot}
-                newFileList={newFileList}
-                setNewFileList={setNewFileList}
-                deleteFileList={deleteFileList}
-                setDeleteFileList={setDeleteFileList}
-              />
-            )}
-            {source == "website" && (
-              <Website
-                updateCharCount={updateCharCount}
-                getCharCount={charCount}
-                setLoadingPage={setLoading}
-                setCrawledList={setCrawledList}
-                crawledList={crawledList}
-                websiteCharCount={websiteCharCount}
-                setWebsiteCharCount={setWebsiteCharCount}
-                updateChatbot={updateChatbot}
-                deleteCrawlList={deleteCrawlList}
-                setDeleteCrawlList={setDeleteCrawlList}
-              />
-            )}
-            {source == "text" && (
-              <Text
-                text={text}
-                setText={setText}
-                textLength={textLength}
-                setTextLength={setTextLength}
-                updateCharCount={updateCharCount}
-                getCharCount={charCount}
-              />
-            )}
-            {source == "qa" && (
-              <QA
-                qaList={qaList}
-                setQAList={setQAList}
-                qaCount={qaCount}
-                setQACount={setQACount}
-                qaCharCount={qaCharCount}
-                setQACharCount={setQACharCount}
-                updateCharCount={updateCharCount}
-                getCharCount={charCount}
-                deleteQAList={deleteQAList}
-                setDeleteQAList={setDeleteQAList}
-                updateChatbot={updateChatbot}
-              />
-            )}
-            <div className="included-source">
-              <span
-                style={{
-                  fontSize: "20px",
-                  fontFamily: "sans-serif",
-                  marginBottom: "10px",
+            <p>Add your data sources to train your chatbot</p>
+
+            {/*------------------------------------------options-container----------------------------------------------*/}
+            <ul className="options-container">
+              <li
+                className={`${activeSource === "document" ? "active" : ""}`}
+                value={"document"}
+                onClick={() => {
+                  if (
+                    botDetails?.activeSource === "website" &&
+                    botDetails?.isLoading
+                  ) {
+                    alert("Crawling in progress. Cannot interrupt");
+                    return;
+                  }
+                  botContext?.handleChange("activeSource")("document");
                 }}
               >
-                Included Sources:
-              </span>
+                <Icon Icon={DocumentIcon} />
+                <h3>Document</h3>
+              </li>
+              <li
+                className={`${activeSource === "text" ? "active" : ""}`}
+                value={"text"}
+                onClick={() => {
+                  if (
+                    botDetails?.activeSource === "website" &&
+                    botDetails?.isLoading
+                  ) {
+                    alert("Crawling in progress. Cannot interrupt");
+                    return;
+                  }
+                  botContext?.handleChange("activeSource")("text");
+                }}
+              >
+                <Icon Icon={TextIcon} />
+                <h3>Text</h3>
+              </li>
+              <li
+                className={`${activeSource === "qa" ? "active" : ""}`}
+                value={"qa"}
+                onClick={() => {
+                  if (
+                    botDetails?.activeSource === "website" &&
+                    botDetails?.isLoading
+                  ) {
+                    alert("Crawling in progress. Cannot interrupt");
+                    return;
+                  }
+                  botContext?.handleChange("activeSource")("qa");
+                }}
+              >
+                <Icon Icon={QAIcon} />
+                <h3>Q&A</h3>
+              </li>
+              <li
+                className={`${activeSource === "website" ? "active" : ""}`}
+                value={"website"}
+                onClick={() =>
+                  botContext?.handleChange("activeSource")("website")
+                }
+              >
+                <Icon Icon={WebsiteIcon} />
+                <h3>Website</h3>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        {/*------------------------------------------bottom-section----------------------------------------------*/}
+        <div className="bottom">
+          <div className="left">
+            {activeSource === "document" && (
+              <SourceUpload
+                totalCharCount={totalCharCount}
+                filesCharCount={filesCharCount}
+              />
+            )}
+            {activeSource === "text" && (
+              <Text
+                totalCharCount={totalCharCount}
+                textCharCount={textCharCount}
+              />
+            )}
+            {activeSource === "qa" && (
+              <QA
+                isUpdateChatbot={isUpdateChatbot}
+                totalCharCount={totalCharCount}
+                qaCharCount={qaCharCount}
+              />
+            )}
+            {activeSource === "website" && (
+              <Website
+                websiteCharCount={websiteCharCount}
+                totalCharCount={totalCharCount}
+                isUpdateChatbot={isUpdateChatbot}
+                chatbotId={chatbotId}
+                userId={cookies?.userId}
+              />
+            )}
+          </div>
+          <div className="right" style={{ marginTop: "20px" }}>
+            <div className="character-count-container">
+              {/*------------------------------------------items-character-count----------------------------------------------*/}
               <div className="items-character-count-container">
-                {(defaultFileList?.length == 1 && (
+                {defaultFileList?.length > 0 && (
                   <p>
-                    {defaultFileList.length} File ({fileTextLength} detected
+                    {defaultFileList.length}{" "}
+                    {defaultFileList.length > 1 ? "Files" : "File"} (
+                    {filesCharCount} detected chars)
+                  </p>
+                )}
+                {/* {(defaultFileList?.length == 1 && (
+                <p>
+                  {defaultFileList.length} File ({fileTextLength} detected
+                  chars)
+                </p>
+              )) ||
+                (defaultFileList?.length > 1 && (
+                  <p>
+                    {defaultFileList.length} Files ({fileTextLength} detected
                     chars)
                   </p>
-                )) ||
-                  (defaultFileList?.length > 1 && (
-                    <p>
-                      {defaultFileList.length} Files ({fileTextLength} detected
-                      chars)
-                    </p>
-                  ))}
-                {textLength > 0 && defaultFileList.length > 0 && (
+                ))}
+              {textLength > 0 && defaultFileList.length > 0 && (
+                <p className="margin-pipe">|</p>
+              )}
+              {textLength > 0 && <p>{textLength} text input chars</p>}
+              {qaCount > 0 &&
+                (defaultFileList.length > 0 || textLength > 0) && (
                   <p className="margin-pipe">|</p>
                 )}
-                {textLength > 0 && <p>{textLength} text input chars</p>}
-                {qaCount > 0 &&
-                  (defaultFileList.length > 0 || textLength > 0) && (
-                    <p className="margin-pipe">|</p>
-                  )}
-                {qaCount > 0 && (
-                  <p>
-                    {qaCount} Q&A ({qaCharCount} chars)
-                  </p>
-                )}
-                {crawledList.length > 0 &&
+              {qaCount > 0 && (
+                <p>
+                  {qaCount} Q&A ({qaCharCount} chars)
+                </p>
+              )}
+              */}
+                {/* {crawledList.length > 0 &&
                   (defaultFileList.length > 0 ||
                     textLength > 0 ||
-                    qaCount > 0) && <p className="margin-pipe">|</p>}
-                {crawledList.length > 0 && (
+                    qaCount > 0) && <p className="margin-pipe">|</p>} */}
+                {qaCount > 0 && (
                   <p>
-                    {crawledList.length} Links ({websiteCharCount} detected
-                    chars)
+                    {qaCount} Q&A ({qaCharCount} detected chars)
+                  </p>
+                )}
+                {textCharCount > 0 && (
+                  <p>Text ({textCharCount} detected chars)</p>
+                )}
+
+                {crawledList?.length > 0 && (
+                  <p>
+                    {crawledList.length}{" "}
+                    {crawledList.length > 1 ? "Links" : "Link"} (
+                    {websiteCharCount} detected chars)
                   </p>
                 )}
               </div>
-              <span
-                style={{
-                  fontSize: "15px",
-                  fontFamily: "sans-serif",
-                  marginTop: "20px",
-                  marginBottom: "10px",
-                }}
-              >
-                Total detected characters:{" "}
-                <span
-                  style={{
-                    fontSize: "15px",
-                    fontFamily: "sans-serif",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {charCount}
-                </span>{" "}
-                <span
-                  style={{
-                    color: "#a39999",
-                  }}
-                >
-                  / 11,000,000 limit
+
+              <hr />
+
+              <div className="total-count-container">
+                <p>Total detected characters</p>
+
+                <span>
+                  {totalCharCount}
+                  <span>
+                    /
+                    {userDetails?.plan?.trainingDataLimit
+                      ? formatNumber(userDetails?.plan?.trainingDataLimit)
+                      : 0}{" "}
+                    limit
+                  </span>
                 </span>
-              </span>
-              <Button
-                style={{ width: "100%" }}
-                type="primary"
-                disabled={
-                  loading == true
-                    ? true
-                    : updateChatbot && currentTextHash === initialTextHash
-                    ? deleteFileList.length + newFileList.length
-                      ? false
-                      : initialQAHash === currentQAHash
-                      ? deleteCrawlList.length > 0
-                        ? false
-                        : true
-                      : false
-                    : false
-                }
-                onClick={
-                  // createChatBaseBot
-                  // (crawledList.length != 0 && createChatBaseBot) ||
-                  (!updateChatbot && openChatbotModal) || createCustomBot
-                }
-              >
-                {(!updateChatbot && "Create Chatbot") || "Retrain Chatbot"}
-              </Button>
+              </div>
             </div>
-          </center>
+
+            {/*------------------------------------------chatbot-naming----------------------------------------------*/}
+            {/* <div className="name-chatbot-container">
+              <h2>Name your Chatbot</h2>
+              <input type="text" placeholder="Enter your chatbot name" />
+            </div> */}
+
+            <button
+              disabled={
+                isLoading == true
+                  ? true
+                  : isUpdateChatbot == "true" &&
+                    currentTextHash === initialTextHash
+                  ? deleteFileList.length + newFileList.length
+                    ? false
+                    : initialQAHash === currentQAHash
+                    ? botDetails?.deleteCrawlList.length > 0
+                      ? false
+                      : initialCrawlDataHash != crawledList?.length
+                      ? false
+                      : true
+                    : false
+                  : false
+              }
+              onClick={createCustomBot}
+            >
+              {(!updateChatbot && "Create") || "Retrain Bot"}
+            </button>
+          </div>
         </div>
-        <ChatbotNameModal
-          open={open}
-          setOpen={setOpen}
-          chatbotText={chatbotText}
-          setChatbotText={setChatbotText}
-          handleOk={handleOk}
-        />
-      </>
+      </div>
     );
   } else if (status === "unauthenticated") {
     redirect("/account/login");
@@ -630,3 +632,5 @@ export default function Home({
     return <></>;
   }
 }
+
+export default Home;

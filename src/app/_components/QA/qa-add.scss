@@ -1,0 +1,76 @@
+.question {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    p {
+        color: #777e90;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 24px; /* 150% */
+    }
+
+    textarea {
+        border-radius: 8px;
+        border: 1px solid #e6e8ec;
+        background: #fff;
+        height: 71px;
+        padding: 8px;
+    }
+}
+
+.answer {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    p {
+        color: #777e90;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 24px; /* 150% */
+    }
+
+    textarea {
+        border-radius: 8px;
+        border: 1px solid #e6e8ec;
+        background: #fff;
+        height: 154px;
+        padding: 8px;
+    }
+}
+
+.qa-action-container {
+    display: flex;
+    justify-content: space-between;
+
+    .qa-image-container {
+        div {
+            display: flex;
+            gap: 18px;
+        }
+        .file-input {
+            display: flex;
+            gap: 8px;
+            color: #2e58ea;
+            font-size: 16px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 24px; /* 150% */
+            cursor: pointer;
+        }
+
+        .file-name {
+            color: #777e90;
+            font-size: 16px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 24px; /* 150% */
+        }
+    }
+
+    .delete {
+        cursor: pointer;
+    }
+}

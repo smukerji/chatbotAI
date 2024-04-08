@@ -1,27 +1,24 @@
-import { Button } from "antd";
-import React, { useState } from "react";
-import "./qa.css";
+import React, { useContext } from "react";
+import { CreateBotContext } from "../../_helpers/client/Context/CreateBotContext";
 import QAAdd from "./QAAdd";
-import { DeleteOutlined } from "@ant-design/icons";
+import "./qa.scss";
 
-export default function QA({
-  qaList,
-  setQAList,
-  qaCount,
-  setQACount,
-  qaCharCount,
-  setQACharCount,
-  updateCharCount,
-  getCharCount,
-  deleteQAList,
-  setDeleteQAList,
-  updateChatbot,
-}: // qaImage,
-any) {
+function QA({ totalCharCount, qaCharCount, isUpdateChatbot }: any) {
+  const botContext: any = useContext(CreateBotContext);
+  const botDetails = botContext?.createBotInfo;
+
+  /// get the qaList from context and qa count
+  const qaList = botDetails?.qaList;
+  const qaCount = botDetails?.qaCount;
+  const deleteQaList = botDetails?.deleteQaList;
+
   /// Adding QA
   function addQA() {
-    setQAList([...qaList, { question: "", answer: "", image: "" }]);
-    setQACount(qaCount + 1);
+    botContext?.handleChange("qaList")([
+      ...qaList,
+      { question: "", answer: "", image: "" },
+    ]);
+    botContext?.handleChange("qaCount")(qaCount + 1);
   }
 
   /// Removing QA
@@ -31,27 +28,63 @@ any) {
     });
 
     /// add the qa that need to be deleted while updating the chatbot
-    if (updateChatbot && qaList[indexToRemove]?.id) {
-      setDeleteQAList([...deleteQAList, qaList[indexToRemove]]);
+    if (isUpdateChatbot && qaList[indexToRemove]?.id) {
+      botContext?.handleChange("deleteQaList")([
+        ...deleteQaList,
+        qaList[indexToRemove],
+      ]);
     }
 
     /// update the overall count
-    updateCharCount(
-      getCharCount -
+    botContext?.handleChange("totalCharCount")(
+      totalCharCount -
         qaList[indexToRemove].question.length -
         qaList[indexToRemove].answer.length
     );
 
     /// update the character count
-    setQACharCount(
+    botContext?.handleChange("qaCharCount")(
       qaCharCount -
         qaList[indexToRemove].question.length -
         qaList[indexToRemove].answer.length
     );
 
     /// update the state
-    setQAList(newQa);
-    setQACount(qaCount - 1);
+    botContext?.handleChange("qaList")(newQa);
+    botContext?.handleChange("qaCount")(qaCount - 1);
+  }
+
+  /// Removing QA
+  function removeAllQA() {
+    // Calculate total length of all QA pairs
+    let totalLength = 0;
+    const newDeleteQa = qaList.filter((qa: any, index: number) => {
+      // Calculate length of each QA pair
+      const qaLength = qa?.question.length + qa?.answer.length;
+
+      // Subtract length from total counts
+      totalLength += qaLength;
+
+      return qa?.id != "" && qa?.id != undefined;
+    });
+
+    /// add all qa that need to be deleted while updating the chatbot
+    if (isUpdateChatbot) {
+      botContext?.handleChange("deleteQaList")([
+        ...deleteQaList,
+        ...newDeleteQa,
+      ]);
+    }
+
+    /// update the overall count
+    botContext?.handleChange("totalCharCount")(totalCharCount - totalLength);
+
+    /// update the character count
+    botContext?.handleChange("qaCharCount")(qaCharCount - totalLength);
+
+    /// update the state
+    botContext?.handleChange("qaList")([]);
+    botContext?.handleChange("qaCount")(0);
   }
 
   /// Update QA
@@ -79,53 +112,89 @@ any) {
         image: newImage,
       };
     /// update the state
-    setQAList(updatedQAList);
+    botContext?.handleChange("qaList")(updatedQAList);
 
     /// update the count of qa
     const count =
       updatedQAList[index].question.length + updatedQAList[index].answer.length;
-    setQACharCount(qaCharCount - prev + count);
-    updateCharCount(getCharCount - prev + count);
+    botContext?.handleChange("qaCharCount")(qaCharCount - prev + count);
+    botContext?.handleChange("totalCharCount")(totalCharCount - prev + count);
   }
-
-  // console.log(qaList);
 
   return (
     <>
-      {qaList &&
-        qaList.map((qa: any, index: number) => {
-          return (
-            <div className="add-qa-container" key={index}>
-              <QAAdd
-                onQuestionChange={(newQuestion: any) => {
-                  updateQA(index, newQuestion, qa.answer, qa.image);
-                }}
-                onAnswerChange={(newAnswer: any) =>
-                  updateQA(index, qa.question, newAnswer, qa.image)
-                }
-                onImageChange={(newImage: any) => {
-                  updateQA(index, qa.question, qa.answer, newImage);
-                }}
-                onDelete={() => removeQA(index)}
-                question={qa.question}
-                answer={qa.answer}
-                fileName={qa.image != "" ? qa.image : "No file uploaded"}
-                index={index}
-              />
-            </div>
-          );
-        })}
-      <div className="qa-source-btn-container">
-        <Button
-          className="add-button"
-          type="primary"
-          shape="round"
-          size={"small"}
-          onClick={addQA}
-        >
-          Add
-        </Button>
+      <div className="qa-container">
+        <div className="qa-lists">
+          {qaList &&
+            qaList.map((qa: any, index: number) => {
+              return (
+                <div className="add-qa-container" key={index}>
+                  <QAAdd
+                    onQuestionChange={(newQuestion: any) => {
+                      updateQA(index, newQuestion, qa.answer, qa.image);
+                    }}
+                    onAnswerChange={(newAnswer: any) =>
+                      updateQA(index, qa.question, newAnswer, qa.image)
+                    }
+                    onImageChange={(newImage: any) => {
+                      updateQA(index, qa.question, qa.answer, newImage);
+                    }}
+                    onDelete={() => removeQA(index)}
+                    question={qa.question}
+                    answer={qa.answer}
+                    fileName={qa.image != "" ? qa.image : "No file uploaded"}
+                    index={index}
+                  />
+                </div>
+              );
+            })}
+        </div>
+        <div className="qa-action-container">
+          <span>{qaCharCount} characters</span>
+          <div className="action-btns">
+            <button onClick={addQA}>Add</button>
+            <button onClick={removeAllQA} disabled={qaCount > 0 ? false : true}>
+              Delete All
+            </button>
+          </div>
+        </div>
       </div>
+      {/* {qaList &&
+            qaList.map((qa: any, index: number) => {
+              return (
+                <div className="add-qa-container" key={index}>
+                  <QAAdd
+                    onQuestionChange={(newQuestion: any) => {
+                      updateQA(index, newQuestion, qa.answer, qa.image);
+                    }}
+                    onAnswerChange={(newAnswer: any) =>
+                      updateQA(index, qa.question, newAnswer, qa.image)
+                    }
+                    onImageChange={(newImage: any) => {
+                      updateQA(index, qa.question, qa.answer, newImage);
+                    }}
+                    onDelete={() => removeQA(index)}
+                    question={qa.question}
+                    answer={qa.answer}
+                    fileName={qa.image != "" ? qa.image : "No file uploaded"}
+                    index={index}
+                  />
+                </div>
+              );
+            })}
+          <div className="qa-source-btn-container">
+            <Button
+              className="add-button"
+              type="primary"
+              shape="round"
+              size={"small"}
+              onClick={addQA}
+            >
+              Add
+            </Button>
+          </div> */}
     </>
   );
 }
+
+export default QA;

@@ -12,7 +12,16 @@ async function validateMiddleware(req: NextRequest, schema: joi.ObjectSchema) {
     stripUnknown: true, // remove unknown props
   };
 
-  const body = await req.json();
+  /// check which method is it and make sure that it has only those payload which has been mentioned in schema
+  const method = req.method;
+  let body;
+  if (method == "GET") {
+    body = Object.fromEntries(req.nextUrl.searchParams);
+  } else if (method == "POST") {
+    body = await req.json();
+  } else {
+    body = await req.json();
+  }
 
   const { error, value } = schema.validate(body, options);
 

@@ -1,8 +1,9 @@
 import joi from "joi";
-import { connectDatabase } from "../../../../db";
+import clientPromise from "../../../../db";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
 import { apiHandler } from "../../../_helpers/server/api/api-handler";
+import bcrypt from "bcrypt";
 
 module.exports = apiHandler({
   POST: login,
@@ -12,7 +13,7 @@ async function login(request: any) {
   const body = await request.json();
   const { username, password } = body;
 
-  const db = (await connectDatabase()).db();
+  const db = (await clientPromise!).db();
   const collection = db.collection("users");
   /// check if user is valid
   const user: any = await collection.findOne({
@@ -20,13 +21,15 @@ async function login(request: any) {
   });
 
   if (user) {
-    if (password === user?.password) {
+    const isPasswordValid = await bcrypt.compare(password, user?.password);
+
+    if (isPasswordValid) {
       // create a jwt token that is valid for 7 days
       const token = jwt.sign(
         { sub: user?._id?.toString() },
         process.env.NEXT_PUBLIC_JWT_SECRET!,
         {
-          expiresIn: "1h",
+          expiresIn: "7d",
         }
       );
 
@@ -35,13 +38,16 @@ async function login(request: any) {
 
       /// set the userId cookie
       cookies().set("userId", user?._id?.toString());
-      //   return { message: "Login successfull..." };
-      return user;
+
+      /// set the username
+      cookies().set("username", user?.username?.toString());
+
+      return { message: "Login successfull...", username: user?.username };
     } else {
-      throw "Username or password is incorrect";
+      throw "Invalid email or password.";
     }
   } else {
-    throw `User doesn't exists`;
+    throw `User doesn’t exist!`;
   }
 }
 

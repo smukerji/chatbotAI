@@ -1,9 +1,12 @@
-import React from "react";
-import "./qa-add.css";
-import { DeleteOutlined } from "@ant-design/icons";
 import { message } from "antd";
+import React from "react";
+import deleteIcon from "../../../../public/create-chatbot-svgs/delete-icon.svg";
+import uploadIcon from "../../../../public/create-chatbot-svgs/image-upload-icon.svg";
+import deleteImgIcon from "../../../../public/create-chatbot-svgs/img-delete-icon.svg";
+import Image from "next/image";
+import "./qa-add.scss";
 
-export default function QAAdd({
+function QAAdd({
   onQuestionChange,
   onAnswerChange,
   onDelete,
@@ -20,9 +23,13 @@ export default function QAAdd({
       onImageChange(selectedFile);
     } else {
       // Display an error message or handle the invalid file selection as needed
-      message.error("Invalid file format. Please select an image.");
+      message.error("Invalid file format.");
       return;
     }
+  };
+
+  const removeImage = () => {
+    onImageChange("");
   };
 
   // Function to check if a file is an image
@@ -33,9 +40,6 @@ export default function QAAdd({
 
   return (
     <>
-      <div className="delete">
-        <DeleteOutlined onClick={onDelete} />
-      </div>
       <div className="question">
         <p>Question</p>
         <textarea
@@ -54,31 +58,58 @@ export default function QAAdd({
           }}
         ></textarea>
       </div>
-      <div className="qa-image-container">
-        <p>Optional</p>
-        <input
-          id={`fileInput${index}`}
-          type="file"
-          onChange={handleFileChange}
-          style={{ display: "none" }}
-        />
-        <div style={{ display: "flex", padding: "5 5px" }}>
-          <label
-            htmlFor={`fileInput${index}`}
-            className={"file-input"}
-            // onChange={handleFileChange}
-          >
-            Choose file
-          </label>
-          <span style={{ margin: "5px 5px" }}>
-            {typeof fileName == "string"
-              ? fileName
-              : fileName
-              ? fileName.name
-              : "No file chosen"}
-          </span>
+
+      <div className="qa-action-container">
+        <div className="qa-image-container">
+          <input
+            id={`fileInput${index}`}
+            type="file"
+            onChange={handleFileChange}
+            style={{ display: "none" }}
+          />
+          <div>
+            <label
+              htmlFor={`fileInput${index}`}
+              className={"file-input"}
+              // onChange={handleFileChange}
+            >
+              <Image src={uploadIcon} alt="upload-icon" />
+              Upload Image
+            </label>
+            <span className="file-name">
+              {typeof fileName == "string" ? (
+                <>
+                  {fileName}{" "}
+                  {fileName.toLowerCase() !=
+                    "No file uploaded".toLowerCase() && (
+                    <Image
+                      src={deleteImgIcon}
+                      alt="img-delete-icon"
+                      onClick={removeImage}
+                    />
+                  )}
+                </>
+              ) : fileName ? (
+                <>
+                  {fileName.name}{" "}
+                  <Image
+                    src={deleteImgIcon}
+                    alt="img-delete-icon"
+                    onClick={removeImage}
+                  />
+                </>
+              ) : (
+                "No file chosen"
+              )}
+            </span>
+          </div>
+        </div>
+        <div className="delete">
+          <Image src={deleteIcon} alt="delete-icon" onClick={onDelete} />
         </div>
       </div>
     </>
   );
 }
+
+export default QAAdd;

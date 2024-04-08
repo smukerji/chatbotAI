@@ -1,10 +1,8 @@
-import { PineconeClient } from "@pinecone-database/pinecone";
+import { Pinecone } from "@pinecone-database/pinecone";
 
 import { createEmbedding } from "../../app/_helpers/server/embeddings";
-import { connectDatabase } from "../../db";
+import clientPromise from "../../db";
 import { deletevectors } from "../../app/_helpers/server/pinecone";
-
-export const pinecone = new PineconeClient();
 
 export default async function handler(req, res) {
   if (req.method === "POST") {
@@ -16,7 +14,7 @@ export default async function handler(req, res) {
     // const index = pinecone.Index(process.env.NEXT_PUBLIC_PINECONE_INDEX);
     // const tr = await index.delete1({
     //   deleteAll: true,
-    //   namespace: "651d111b8158397ebd0e65fb",
+    //   namespace: undefined,
     // });
     // return res.status(200).send(tr);
     /// parse the request object
@@ -32,37 +30,36 @@ export default async function handler(req, res) {
     const queryRequest = {
       vector: embed,
       topK: 5,
-      includeValues: false,
       includeMetadata: true,
       filter: {
         chatbotId: chatbotId,
       },
-      namespace: userId,
     };
 
     try {
+      const pinecone = new Pinecone({
+        apiKey: process.env.NEXT_PUBLIC_PINECONE_KEY,
+      });
+      const index = pinecone.index(process.env.NEXT_PUBLIC_PINECONE_INDEX);
+
       try {
-        await pinecone.init({
-          environment: process.env.NEXT_PUBLIC_PINECONE_ENV,
-          apiKey: process.env.NEXT_PUBLIC_PINECONE_KEY,
-        });
+        /// query embeddings
+        const ns = index.namespace(userId);
+        const response = await ns.query(queryRequest);
+        /// extract the content
+        const extractedContents = response?.matches?.map(
+          (item) => item.metadata["content"]
+        );
+        return res.status(200).send(extractedContents);
       } catch (error) {
-        console.error("Error initializing Pinecone client:", error);
-        throw new Error("Failed to initialize Pinecone client");
+        console.error("Error during queryfetch:", error);
+        return res.status(200).send(error.message);
       }
-
-      const index = pinecone.Index(process.env.NEXT_PUBLIC_PINECONE_INDEX);
-
-      /// query embeddings
-      const response = await index.query({ queryRequest });
-      /// extract the content
-      const extractedContents = response?.matches?.map(
-        (item) => item.metadata["content"]
-      );
-      return res.status(200).send(extractedContents);
     } catch (error) {
-      console.error("Error during queryfetch:", error);
-      return res.status(200).send(error.message);
+      console.error("Error initializing Pinecone client:", error);
+      throw new Error(
+        "Failed to initialize Pinecone client while retriving the similarity results"
+      );
     }
   } else {
     /// deleting the chatbot data from pinecone
@@ -72,9 +69,10 @@ export default async function handler(req, res) {
     const userId = body?.userId;
 
     /// fetch the IDs and user namespace from the DB
-    const db = (await connectDatabase()).db();
+    const db =  (await clientPromise).db();
     const collection = db.collection("chatbots-data");
     const userChatbots = db.collection("user-chatbots");
+    const userChatbotSettings = db.collection("chatbot-settings");
     const cursor = collection.find({ chatbotId: chatbotId });
 
     let vectorId = [];
@@ -85,15 +83,30 @@ export default async function handler(req, res) {
         doc.content.forEach((content) => {
           vectorId.push(content.dataID);
         });
+      } else {
+        vectorId.push(doc.dataID);
       }
-      vectorId.push(doc.dataID);
       namespace = userId;
     }
+
+    /// close the cursor
+    await cursor.close();
+
     vectorId = [].concat(...vectorId);
     /// delete the vectors
     const deleteData = await collection.deleteMany({ chatbotId: chatbotId });
     /// delete the chatbot
     await userChatbots.deleteOne({ chatbotId: chatbotId });
+    /// delete chatbot settings
+    await userChatbotSettings.deleteOne({ chatbotId: chatbotId });
+
+    //delete the whatsapp details collection record against chatbotId
+    const whatsappDetails = db.collection("whatsappbot_details"); //whatsappbot_details
+    await whatsappDetails.deleteOne({ chatbotId: chatbotId });
+
+    //delete the telegram details collection's record against chatbotId
+    const telegramDetails = db.collection("telegram-bot");//whatsappbot_details
+    await telegramDetails.deleteOne({ chatbotId: chatbotId });
 
     /// deleting the chunks to avoid  Request Header Fields Too Large error
     const deleteBatchSize = 250;

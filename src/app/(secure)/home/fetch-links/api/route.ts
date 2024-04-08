@@ -201,10 +201,15 @@ import { apiHandler } from "../../../../_helpers/server/api/api-handler";
 // import { chromium } from "playwright";
 import * as puppeteer from "puppeteer";
 import { parse } from "node-html-parser";
+import chromium from "@sparticuz/chromium-min";
+import clientPromise from "../../../../../db";
+import { ObjectId } from "mongodb";
 
 module.exports = apiHandler({
-  GET: fetchLinks,
+  POST: fetchLinks,
 });
+
+export const maxDuration = 300;
 
 const imageLinkRegex =
   /^https?:\/\/(?:[\w\-]+\.)+[a-zA-Z]{2,20}(?:\/[^\s?]+)*(?:\.(?:jpg|jpeg|png|gif|bmp|svg|webp|tiff))(?:\?.*)?$/i;
@@ -239,13 +244,60 @@ function extractTextAndImageSrc(element: any) {
 
 async function fetchLinks(request: NextRequest) {
   /// get the website to crawl
-  const params = request.nextUrl.searchParams;
-  const sourceUrl: string = params?.get("sourceURL")!;
+  // const params = request.nextUrl.searchParams;
+  // const sourceUrl: string = params?.get("sourceURL")!;
+  const data = await request.json();
+  const sourceUrl = data?.sourceURL;
+  const chatbotId = data?.chatbotId;
+  const userId = data?.userId;
 
   /// check if valid URl
   const urlRegex = /^https?:\/\/[^\s/$.?#].[^\s]*$/;
   if (urlRegex.test(sourceUrl)) {
-    const browser = await puppeteer.launch({ headless: true });
+    /// first check how much link user can crawl
+    const db = (await clientPromise!).db();
+
+    /// get the user plan and allow only crawling of the amount of links left
+    const userDetails = await db
+      .collection("user-details")
+      .findOne({ userId: userId });
+
+    /// find how many link are previously fetched  by this user for this bot
+    const chatBotDataCollection = db.collection("chatbots-data");
+    const previousFetches = await chatBotDataCollection.findOne({
+      chatbotId: chatbotId!,
+      source: "crawling",
+    });
+
+    let limit = 0;
+    /// if previousFetches are null then crawl link
+    if (!previousFetches) {
+      limit = userDetails?.websiteCrawlingLimit;
+    } else {
+      limit =
+        userDetails?.websiteCrawlingLimit - previousFetches?.content.length;
+    }
+
+    if (limit === 0) {
+      return {
+        error:
+          "Oops! You have reached the crawling limit of your plan. Please upgrade to crawl more websites.",
+      };
+    }
+
+    const browser = await puppeteer.launch({
+      /// this code only run for vercel dvelopment
+      args: [...chromium.args, "--hide-scrollbars", "--disable-web-security"],
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(
+        `https://github.com/Sparticuz/chromium/releases/download/v119.0.2/chromium-v119.0.2-pack.tar`
+      ),
+      headless: chromium.headless,
+      ignoreHTTPSErrors: true,
+
+      /// to run puppeteer on local
+      // headless: true,
+    });
     // const context = await browser.newContext();
     const page = await browser.newPage();
 
@@ -294,6 +346,12 @@ async function fetchLinks(request: NextRequest) {
           charCount: text.length,
         });
 
+        if (crawledData.length === limit) {
+          return {
+            fetchedLinks: crawledData,
+          };
+        }
+
         const newUrls = await extractUrls(page, sourceUrl);
         newUrls.forEach((newUrl: any) => {
           if (!visitedUrls.get(newUrl)) {
@@ -318,6 +376,8 @@ async function fetchLinks(request: NextRequest) {
 }
 
 async function extractUrls(page: any, baseUrl: any) {
+  console.log(baseUrl);
+
   // console.log('user input', baseUrl);
   const hrefs = await page.$$eval(
     "a",

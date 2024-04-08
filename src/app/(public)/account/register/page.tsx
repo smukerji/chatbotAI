@@ -1,16 +1,35 @@
 "use client";
-import { Button, Form, Input, Spin, message } from "antd";
-import Image from "next/image";
 import React, { useState } from "react";
-import "./register.css";
-import { useUserService } from "../../../_services/useUserService";
-import googlelogo from "../../../../../public/google-logo.svg";
-import githublogo from "../../../../../public/github-logo.svg";
+import Image from "next/image";
+import registerBg from "../../../../../public/sections-images/common/contact-us-bg-cover.png";
+import luciferIcon from "../../../../../public/svgs/lucifer-ai-logo.svg";
+import googleIcon from "../../../../../public/google-icon-blue.svg";
+import githubIcon from "../../../../../public/github-icon-blue.svg";
+import "./register.scss";
 import { signIn, useSession } from "next-auth/react";
-import { redirect } from "next/navigation";
 import { LoadingOutlined } from "@ant-design/icons";
+import { redirect, useRouter } from "next/navigation";
+import { useUserService } from "../../../_services/useUserService";
+import { Spin, message } from "antd";
+import openEyeIcon from "../../../../../public/svgs/open-eye.svg";
+import closeEyeIcon from "../../../../../public/svgs/close-eye.svg";
 
 function Register() {
+  const router = useRouter();
+
+  /// irst name, last name, email and password messages state
+  const [emailMessage, setEmailMessage]: any = useState("");
+  const [passwordMessage, setPasswordMessage]: any = useState("");
+  const [firstNameMessage, setFirstNameMessage]: any = useState("");
+  const [lastNameMessage, setLastNameMessage]: any = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  /// first name, last name, email and password storing state
+  const [email, setEmail]: any = useState(null);
+  const [password, setPassword]: any = useState(null);
+  const [firstName, setFirstName]: any = useState(null);
+  const [lastName, setLastName]: any = useState(null);
+
   const { status } = useSession();
   const [loading, setLoading] = useState(false);
   const antIcon = (
@@ -21,234 +40,292 @@ function Register() {
   );
 
   if (status === "authenticated") {
-    redirect("/home");
+    // redirect("/chatbot");
+    // router.push("/chatbot");
+    window.location.href = "/chatbot";
   }
   const userService = useUserService();
 
   /// when the form is submitted
-  const onFinish = async (values: any) => {
+  const register = async () => {
+    /// check if anything is empty
+    if (firstName == null) {
+      setFirstNameMessage("Please input your First Name!");
+      return;
+    }
+
+    if (lastName == null) {
+      setLastNameMessage("Please input your Last Name!");
+      return;
+    }
+
+    if (email == null) {
+      setEmailMessage("Invalid email address format");
+      return;
+    }
+
+    if (password == null) {
+      setPasswordMessage("Please input your password!");
+      return;
+    }
     setLoading(true);
-    await userService.register(values).then((data: any) => {
-      if (data) {
-        if (data?.message) message.success(data?.message);
-        else message.error(data);
-      }
-      setLoading(false);
-    });
+
+    await userService
+      .register({
+        username: `${firstName}_${lastName}`,
+        email,
+        password,
+        id: "",
+      })
+      .then((data: any) => {
+        if (data) {
+          if (data?.message) message.success(data?.message);
+          else message.error(data);
+        }
+        setLoading(false);
+      });
   };
 
-  // const onFinishFailed = (errorInfo: any) => {
-  //   message.error(errorInfo.errorFields[0].errors[0]);
-  // };
+  /// function to validate email
+  const checkEmail = (e: any) => {
+    let email: string = e?.target?.value;
+    if (email == "") {
+      setEmailMessage("Please enter email");
+      return;
+    }
+    setEmail(email);
 
-  type FieldType = {
-    username?: string;
-    password?: string;
-    email?: string;
+    const pattern = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
+
+    /// validate email
+    const result = email?.match(pattern);
+
+    if (!result) {
+      setEmailMessage("Invalid email address format");
+    } else {
+      setEmailMessage("");
+    }
+
+    // const email.(pattern)
+  };
+
+  /// function to validate password
+  const checkPassword = (e: any) => {
+    let password: string = e?.target?.value;
+    setPassword(password);
+
+    if (!password.length) {
+      setPasswordMessage("Please input your password!");
+    } else {
+      setPasswordMessage("");
+    }
+  };
+
+  /// function to validate first name
+  const checkFirstName = (e: any) => {
+    let firstName: string = e?.target?.value;
+    setFirstName(firstName);
+
+    if (!firstName.length) {
+      setFirstNameMessage("Please input your First Name!");
+    } else {
+      setFirstNameMessage("");
+    }
+  };
+
+  /// function to validate last name
+  const checklastName = (e: any) => {
+    let lastName: string = e?.target?.value;
+    setLastName(lastName);
+
+    if (!lastName.length) {
+      setLastNameMessage("Please input your Last Name!");
+    } else {
+      setLastNameMessage("");
+    }
+  };
+
+  /// to toggle eye icon
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
     <div className="register-container">
-      <h1 className="register-title">Welcome! Glad to see you, here!</h1>
-      <Form
-        layout="vertical"
-        name="basic"
-        labelCol={{ span: 8 }}
-        wrapperCol={{ span: 16 }}
-        style={{ maxWidth: 600 }}
-        initialValues={{ remember: true }}
-        onFinish={onFinish}
-        // onFinishFailed={onFinishFailed}
-        autoComplete="off"
-      >
-        <Form.Item<FieldType>
-          name="username"
-          rules={[{ required: true, message: "Please input your username!" }]}
-        >
-          <Input placeholder="Enter your username" />
-        </Form.Item>
+      {/* --------------------------left section------------------------------ */}
+      <div className="left">
+        <Image src={registerBg} alt="register-background" />
+      </div>
+      {/* --------------------------right section------------------------------ */}
+      <div className="right">
+        <Image
+          src={luciferIcon}
+          alt="lucifer-logo"
+          onClick={() => (window.location.href = "/")}
+          style={{ cursor: "pointer" }}
+        />
+        <div className="register-form">
+          <h1>
+            <span>Welcome! </span>
+            <span>Get Started for Free!</span>
+          </h1>
 
-        <Form.Item<FieldType>
-          name="email"
-          rules={[
-            { required: true, message: "Please input your email!" },
-            {
-              pattern: /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/,
-              message: "Invalid email address format",
-            },
-          ]}
-        >
-          <Input placeholder="Enter you email" />
-        </Form.Item>
-
-        <Form.Item<FieldType>
-          name="password"
-          rules={[
-            { required: true, message: "Please input your password!" },
-            {
-              pattern:
-                /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
-              message:
-                "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character (@ $ ! % * ? &)",
-            },
-          ]}
-        >
-          <Input.Password placeholder="Enter your password" />
-        </Form.Item>
-
-        <div className="login-register-container">
-          <Button
-            className="register-btn"
-            type="primary"
-            htmlType="submit"
-            style={{
-              width: "191.46px",
-              marginBottom: "10px",
-            }}
-          >
-            Create account
-          </Button>
-          {loading && <Spin indicator={antIcon} />}
-          {/* <hr />
-          <div className="social-login-buttons">
-            <Button
-              type="primary"
-              className="social-login-button"
-              onClick={() => signIn("google")}
-            >
-              <Image src={googlelogo} alt="" />
-              Sign up with Google
-            </Button>
-            <Button
-              type="primary"
-              className="social-login-button"
-              onClick={() => signIn("github")}
-            >
-              <Image src={githublogo} alt="" height={24} width={24} />
-              Sign up with Github
-            </Button>
-          </div> */}
-          <div className="register-with-text-container">
-            <hr />
-            <span className="register-with-text">Or Register with</span>
-            <hr />
+          <div className="input-container">
+            <div>
+              <input
+                type="text"
+                placeholder="Enter your First Name"
+                onChange={checkFirstName}
+                onKeyDown={(e) => {
+                  if (e.key == "Enter")
+                    if (
+                      emailMessage == "" &&
+                      passwordMessage == "" &&
+                      firstNameMessage == "" &&
+                      lastNameMessage == ""
+                    )
+                      register();
+                }}
+              />
+              <p
+                style={{
+                  color: "red",
+                  margin: "5px 0 0 5px",
+                }}
+              >
+                {firstNameMessage}
+              </p>
+            </div>
+            <div>
+              <input
+                type="text"
+                placeholder="Enter your Last Name"
+                onChange={checklastName}
+                onKeyDown={(e) => {
+                  if (e.key == "Enter")
+                    if (
+                      emailMessage == "" &&
+                      passwordMessage == "" &&
+                      firstNameMessage == "" &&
+                      lastNameMessage == ""
+                    )
+                      register();
+                }}
+              />
+              <p
+                style={{
+                  color: "red",
+                  margin: "5px 0 0 5px",
+                }}
+              >
+                {lastNameMessage}
+              </p>
+            </div>
+            <div>
+              <input
+                type="text"
+                placeholder="Enter your Email"
+                onBlur={checkEmail}
+                onKeyDown={(e) => {
+                  if (e.key == "Enter")
+                    if (
+                      emailMessage == "" &&
+                      passwordMessage == "" &&
+                      firstNameMessage == "" &&
+                      lastNameMessage == ""
+                    )
+                      register();
+                }}
+              />
+              <p
+                style={{
+                  color: "red",
+                  margin: "5px 0 0 5px",
+                }}
+              >
+                {emailMessage}
+              </p>
+            </div>
+            <div className="password-container">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your Password"
+                onChange={checkPassword}
+                onKeyDown={(e) => {
+                  if (e.key == "Enter")
+                    if (
+                      emailMessage == "" &&
+                      passwordMessage == "" &&
+                      firstNameMessage == "" &&
+                      lastNameMessage == ""
+                    )
+                      register();
+                }}
+              />
+              <Image
+                className="eye-icon"
+                src={showPassword ? openEyeIcon : closeEyeIcon}
+                alt="eye-icon"
+                width={24}
+                height={24}
+                onClick={togglePasswordVisibility}
+              />
+              <p
+                style={{
+                  color: "red",
+                  margin: "5px 0 0 5px",
+                }}
+              >
+                {passwordMessage}
+              </p>
+            </div>
           </div>
-          <div className="social-login-buttons">
-            <Button
-              type="primary"
-              className="social-login-button"
-              onClick={() => signIn("google")}
-            >
-              <Image src={googlelogo} alt="" />
-            </Button>
-            <Button
-              type="primary"
-              className="social-login-button"
-              onClick={() => signIn("github")}
-            >
-              <Image src={githublogo} alt="" height={24} width={24} />
-            </Button>
-          </div>
-          <div className="link-to-login">
-            Already have an account? <a href="/account/login">Log in</a>
+
+          <div className="login-register-cotainer">
+            <div style={{ width: "fit-content" }}>
+              <button
+                className="register-btn"
+                onClick={() => {
+                  if (
+                    emailMessage == "" &&
+                    passwordMessage == "" &&
+                    firstNameMessage == "" &&
+                    lastNameMessage == ""
+                  )
+                    register();
+                }}
+              >
+                Create Account
+              </button>
+              {loading && (
+                <Spin style={{ width: "100%" }} indicator={antIcon} />
+              )}
+            </div>
+
+            <div className="section">
+              <label>Or Register with</label>
+
+              <button onClick={() => signIn("google")}>
+                <Image src={googleIcon} alt="" />
+                <span>Google</span>
+              </button>
+
+              <button onClick={() => signIn("github")}>
+                <Image src={githubIcon} alt="" />
+                <span>Github</span>
+              </button>
+            </div>
+
+            <div className="section">
+              <label>Already have an account?</label>
+
+              <a href="/account/login">Log In</a>
+            </div>
           </div>
         </div>
-      </Form>
+      </div>
     </div>
   );
-
-  // return (
-  //   <div className="register-container">
-  //     <div className="register-form-container">
-  //       <h2 className="register-title">Create an Account</h2>
-  //       <Form
-  //         layout="vertical"
-  //         name="basic"
-  //         labelCol={{ span: 8 }}
-  //         wrapperCol={{ span: 16 }}
-  //         style={{ maxWidth: 600 }}
-  //         initialValues={{ remember: true }}
-  //         onFinish={onFinish}
-  //         // onFinishFailed={onFinishFailed}
-  //         autoComplete="off"
-  //       >
-  //         <Form.Item<FieldType>
-  //           label="Username"
-  //           name="username"
-  //           rules={[{ required: true, message: "Please input your username!" }]}
-  //         >
-  //           <Input />
-  //         </Form.Item>
-
-  //         <Form.Item<FieldType>
-  //           label="Email"
-  //           name="email"
-  //           rules={[
-  //             { required: true, message: "Please input your email!" },
-  //             {
-  //               pattern: /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/,
-  //               message: "Invalid email address format",
-  //             },
-  //           ]}
-  //         >
-  //           <Input />
-  //         </Form.Item>
-
-  //         <Form.Item<FieldType>
-  //           label="Password"
-  //           name="password"
-  //           rules={[
-  //             { required: true, message: "Please input your password!" },
-  //             {
-  //               pattern:
-  //                 /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
-  //               message:
-  //                 "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character (@ $ ! % * ? &)",
-  //             },
-  //           ]}
-  //         >
-  //           <Input.Password />
-  //         </Form.Item>
-
-  //         <div className="login-register-container">
-  //           <Button
-  //             type="primary"
-  //             htmlType="submit"
-  //             style={{
-  //               width: "191.46px",
-  //               marginBottom: "10px",
-  //             }}
-  //           >
-  //             Create account
-  //           </Button>
-  //           {loading && <Spin indicator={antIcon} />}
-  //           <hr />
-  //           <div className="social-login-buttons">
-  //             <Button
-  //               type="primary"
-  //               className="social-login-button"
-  //               onClick={() => signIn("google")}
-  //             >
-  //               <Image src={googlelogo} alt="" />
-  //               Sign up with Google
-  //             </Button>
-  //             <Button
-  //               type="primary"
-  //               className="social-login-button"
-  //               onClick={() => signIn("github")}
-  //             >
-  //               <Image src={githublogo} alt="" height={24} width={24} />
-  //               Sign up with Github
-  //             </Button>
-  //           </div>
-  //           <div className="link-to-login">
-  //             Have an account? <a href="/account/login">Log in</a>
-  //           </div>
-  //         </div>
-  //       </Form>
-  //     </div>
-  //   </div>
-  // );
 }
 
 export default Register;

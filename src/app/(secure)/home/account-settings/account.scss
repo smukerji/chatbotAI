@@ -1,0 +1,20 @@
+.account-setting-container {
+  margin-top: 24px;
+  padding: 0 12.2vw;
+  .acc-setting-heading {
+    color: var(--Neutral-8, #141416);
+    font-size: 30px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 40px; /* 133.333% */
+  }
+
+  @media only screen and (max-width: 767px) {
+    margin-top: 18px;
+    padding: 20px 30px;
+
+    .account-form {
+      margin-top: 20px;
+    }
+  }
+}

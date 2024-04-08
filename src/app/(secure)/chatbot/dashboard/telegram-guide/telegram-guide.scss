@@ -1,0 +1,91 @@
+.telegram-guide-parent{
+   position: relative;
+.back-arrow {
+    position: absolute;
+    top:23px;
+    left:12vw;
+    display: flex;
+    align-items: center;
+    color: var(--Neutral-6, #353945);
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 28px;
+    width: 100%;
+    // @media only screen and (max-width: 991px){
+    //     right: -100px;
+    // }
+    @media only screen and (max-width: 767px){
+        top: 0px;
+        left: 5vw;
+    }
+  }
+.telegram-guide-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 20px;
+    .telegram-title {
+        color: var(--Neutral-8, #141416);
+        font-size: 36px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 44px;
+    }
+    .telegram-steps {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-top: 20px; /* Adjust spacing between steps */
+        .telegram-step {
+            color: var(--Neutral-6, #353945);
+            font-size: 20px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 28px;
+            span {
+                font-weight: bold; /* Adjust styling for span if needed */
+            }
+        }
+    }
+    .telegram-guide-img{
+       max-width: 100%;
+       margin-left: -93px;
+    }
+    @media only screen and (max-width: 991px){
+        .telegram-title{
+            font-size: 34px;
+            line-height: 42px;
+        }
+        .telegram-steps{
+            .telegram-step {
+                font-size: 18px;
+                line-height: 26px;
+            }
+        }
+        .telegram-guide-img{
+            margin-left: -34px;
+        }
+    }
+    @media only screen and (max-width: 767px){
+       
+        .telegram-title{
+            font-size: 32px;
+            line-height: 43px;
+            margin-top: 14px;
+        }
+        .telegram-steps{
+            .telegram-step {
+                font-size: 16px;
+                line-height: 27px;
+               
+            }
+        }
+        .telegram-guide-img{
+            margin-left: 29px;
+        }
+    }
+
+}
+}

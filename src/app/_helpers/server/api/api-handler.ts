@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import errorHandler from "./error-handler";
-import { jwtMiddleware } from "./jwt-middlerware";
+import { isPublicPath, jwtMiddleware } from "./jwt-middlerware";
 import { validateMiddleware } from "./validate-middleware";
+import { getSession } from "next-auth/react";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../../../api/auth/[...nextauth]/route";
 
 function apiHandler(handler: any) {
   const wrappedHandler: any = {};
@@ -26,12 +29,29 @@ function apiHandler(handler: any) {
           /// global middleware
           await jwtMiddleware(req);
           await validateMiddleware(req, handler[method].schema);
+        } else {
+          /// first check if it is public like login, logout request the bypass it
+          if (isPublicPath(req)) {
+            await validateMiddleware(req, handler[method].schema);
+          } else {
+            const session = await getServerSession(authOptions);
+            // console.log(session);
+
+            /// if there is no session the throw message
+            if (!session) throw new Error("Please login to continue");
+            await validateMiddleware(req, handler[method].schema);
+          }
         }
 
         /// route handler
         const responseBody = await handler[method](req, ...args);
-
-        return NextResponse.json(responseBody || {});
+        return NextResponse.json(responseBody || {}, {
+          status: responseBody?.status
+            ? typeof responseBody?.status === "number"
+              ? responseBody?.status
+              : 200
+            : 200,
+        });
       } catch (err: any) {
         /// global error handler
         return errorHandler(err);

@@ -1,16 +1,30 @@
 "use client";
-import { Button, Form, Input, Spin, message } from "antd";
 import React, { useEffect, useState } from "react";
-import "./login.css";
 import Image from "next/image";
-import { useUserService } from "../../../_services/useUserService";
-import googlelogo from "../../../../../public/google-logo.svg";
-import githublogo from "../../../../../public/github-logo.svg";
+import loginBg from "../../../../../public/sections-images/common/contact-us-bg-cover.png";
+import luciferIcon from "../../../../../public/svgs/lucifer-ai-logo.svg";
+import googleIcon from "../../../../../public/google-icon-blue.svg";
+import githubIcon from "../../../../../public/github-icon-blue.svg";
+import openEyeIcon from "../../../../../public/svgs/open-eye.svg";
+import closeEyeIcon from "../../../../../public/svgs/close-eye.svg";
+
+import "./login.scss";
 import { signIn, useSession } from "next-auth/react";
-import { redirect } from "next/navigation";
 import { LoadingOutlined } from "@ant-design/icons";
+import { redirect } from "next/navigation";
+import { useUserService } from "../../../_services/useUserService";
+import { Spin, message } from "antd";
 
 function Login() {
+  /// email and password messages state
+  const [emailMessage, setEmailMessage]: any = useState("");
+  const [passwordMessage, setPasswordMessage]: any = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  /// email and password storing state
+  const [email, setEmail]: any = useState(null);
+  const [password, setPassword]: any = useState(null);
+
   const { status } = useSession();
   const [loading, setLoading] = useState(false);
   const antIcon = (
@@ -21,187 +35,183 @@ function Login() {
   );
 
   if (status === "authenticated") {
-    redirect("/home");
+    window.location.href = "/chatbot"; /// used this to load the header
+    // router.push("/chatbot");
   }
 
   const userService = useUserService();
   /// when the form is submitted
-  const onFinish = (values: any) => {
+  const login = () => {
+    /// check if anything is empty
+    if (email == null) {
+      setEmailMessage("Email required.");
+      return;
+    }
+
+    if (password == null) {
+      setPasswordMessage("Please input your password!");
+      return;
+    }
+
     setLoading(true);
-    userService.login(values?.username, values?.password).then((data: any) => {
+    userService.login(email, password).then((data: any) => {
       if (!data?.username) {
         message.error(data);
       } else {
-        message.success(`Welcome back ${data?.username}`);
+        message.info(`Welcome back ${data?.username}!`);
         window.location.reload(); // Refresh the page
       }
       setLoading(false);
     });
   };
 
-  // const onFinishFailed = (errorInfo: any) => {
-  //   message.error(errorInfo.errorFields[0].errors[0]);
-  // };
+  /// function to validate email
+  const checkEmail = (e: any) => {
+    let email: string = e?.target?.value;
+    if (email == "") {
+      setEmailMessage("Please enter email");
+      return;
+    }
+    setEmail(email);
 
-  type FieldType = {
-    username?: string;
-    password?: string;
+    const pattern = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
+    //   message: "Invalid email address format",
+
+    /// validate email
+    const result = email?.match(pattern);
+
+    if (!result) {
+      setEmailMessage("Invalid email format.");
+    } else {
+      setEmailMessage("");
+    }
+
+    // const email.(pattern)
   };
 
+  /// function to validate password
+  const checkPassword = (e: any) => {
+    let password: string = e?.target?.value;
+    setPassword(password);
+
+    if (!password.length) {
+      setPasswordMessage("Password required.");
+    } else {
+      setPasswordMessage("");
+    }
+  };
+
+  /// to toggle eye icon
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
   return (
     <div className="login-container">
-      <h1 className="welcome-text">Welcome back! Glad to see you, Again!</h1>
-      <Form
-        name="basic"
-        labelCol={{ span: 8 }}
-        layout="vertical"
-        wrapperCol={{ span: 16 }}
-        style={{ maxWidth: 600 }}
-        initialValues={{ remember: true }}
-        onFinish={onFinish}
-        // onFinishFailed={onFinishFailed}
-        autoComplete="off"
-      >
-        <Form.Item<FieldType>
-          name="username"
-          rules={[
-            { required: true, message: "Please input your email!" },
-            {
-              pattern: /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/,
-              message: "Invalid email address format",
-            },
-          ]}
-        >
-          <Input placeholder="Enter your email" />
-        </Form.Item>
+      {/* --------------------------left section------------------------------ */}
+      <div className="left">
+        <Image src={loginBg} alt="login-background" />
+      </div>
+      {/* --------------------------right section------------------------------ */}
+      <div className="right">
+        <Image
+          src={luciferIcon}
+          alt="lucifer-logo"
+          onClick={() => (window.location.href = "/")}
+          style={{ cursor: "pointer" }}
+        />
+        <div className="login-form">
+          <h1>
+            <span>Welcome back!</span>
+            <span>Glad to see you again!</span>
+          </h1>
 
-        <Form.Item<FieldType>
-          name="password"
-          rules={[{ required: true, message: "Please input your password!" }]}
-        >
-          <Input.Password placeholder="Enter your password" />
-        </Form.Item>
-
-        <p className="forgot-password-label">Forgot Password?</p>
-
-        <div className="login-register-container">
-          <Button
-            className="login-btn"
-            type="primary"
-            htmlType="submit"
-            style={{
-              width: "191.46px",
-              marginBottom: "10px",
-            }}
-          >
-            Log in
-          </Button>
-          {loading && <Spin indicator={antIcon} />}
-          <div className="login-with-text-container">
-            <hr />
-            <span className="login-with-text">Or Login with</span>
-            <hr />
+          <div className="input-container">
+            <div>
+              <input
+                type="text"
+                placeholder="Enter your Email"
+                onBlur={checkEmail}
+                onKeyDown={(e) => {
+                  if (e.key == "Enter")
+                    if (emailMessage == "" && passwordMessage == "") login();
+                }}
+              />
+              <p
+                style={{
+                  color: "red",
+                  margin: "5px 0 0 5px",
+                }}
+              >
+                {emailMessage}
+              </p>
+            </div>
+            <div className="password-container">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your Password"
+                onChange={checkPassword}
+                onKeyDown={(e) => {
+                  if (e.key == "Enter")
+                    if (emailMessage == "" && passwordMessage == "") login();
+                }}
+              />
+              <Image
+                className="eye-icon"
+                src={showPassword ? openEyeIcon : closeEyeIcon}
+                alt="eye-icon"
+                width={24}
+                height={24}
+                onClick={togglePasswordVisibility}
+              />
+              <p
+                style={{
+                  color: "red",
+                  margin: "5px 0 0 5px",
+                }}
+              >
+                {passwordMessage}
+              </p>
+            </div>
+            <a href="reset-password">Forgot password?</a>
           </div>
-          <div className="social-login-buttons">
-            <Button
-              type="primary"
-              className="social-login-button"
-              onClick={() => signIn("google")}
-            >
-              <Image src={googlelogo} alt="" />
-            </Button>
-            <Button
-              type="primary"
-              className="social-login-button"
-              onClick={() => signIn("github")}
-            >
-              <Image src={githublogo} alt="" height={24} width={24} />
-            </Button>
-          </div>
-          <div className="link-to-signup">
-            Don’t have an account? <a href="/account/register">Register Now</a>
+
+          <div className="login-register-cotainer">
+            <div>
+              <button
+                className="login-btn"
+                onClick={() => {
+                  if (emailMessage == "" && passwordMessage == "") login();
+                }}
+              >
+                Log In
+              </button>
+              {loading && <Spin style={{ width: "20%" }} indicator={antIcon} />}
+            </div>
+
+            <div className="section">
+              <label>Or Login with</label>
+
+              <button onClick={() => signIn("google")}>
+                <Image src={googleIcon} alt="" />
+                <span>Google</span>
+              </button>
+
+              <button onClick={() => signIn("github")}>
+                <Image src={githubIcon} alt="" />
+                <span>Github</span>
+              </button>
+            </div>
+
+            <div className="section">
+              <label>Don&rsquo;t have account?</label>
+
+              <a href="/account/register">Register Now</a>
+            </div>
           </div>
         </div>
-      </Form>
+      </div>
     </div>
   );
-
-  // return (
-  //   <div className="login-container">
-  //     <div className="login-form-container">
-  //       <h2 className="login-title">Login</h2>
-  //       <Form
-  //         name="basic"
-  //         labelCol={{ span: 8 }}
-  //         layout="vertical"
-  //         wrapperCol={{ span: 16 }}
-  //         style={{ maxWidth: 600 }}
-  //         initialValues={{ remember: true }}
-  //         onFinish={onFinish}
-  //         // onFinishFailed={onFinishFailed}
-  //         autoComplete="off"
-  //       >
-  //         <Form.Item<FieldType>
-  //           label="Email"
-  //           name="username"
-  //           rules={[
-  //             { required: true, message: "Please input your email!" },
-  //             {
-  //               pattern: /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/,
-  //               message: "Invalid email address format",
-  //             },
-  //           ]}
-  //         >
-  //           <Input />
-  //         </Form.Item>
-
-  //         <Form.Item<FieldType>
-  //           label="Password"
-  //           name="password"
-  //           rules={[{ required: true, message: "Please input your password!" }]}
-  //         >
-  //           <Input.Password />
-  //         </Form.Item>
-
-  //         <div className="login-register-container">
-  //           <Button
-  //             type="primary"
-  //             htmlType="submit"
-  //             style={{
-  //               width: "191.46px",
-  //               marginBottom: "10px",
-  //             }}
-  //           >
-  //             Log in
-  //           </Button>
-  //           {loading && <Spin indicator={antIcon} />}
-  //           <hr />
-  //           <div className="social-login-buttons">
-  //             <Button
-  //               type="primary"
-  //               className="social-login-button"
-  //               onClick={() => signIn("google")}
-  //             >
-  //               <Image src={googlelogo} alt="" />
-  //               Sign in with Google
-  //             </Button>
-  //             <Button
-  //               type="primary"
-  //               className="social-login-button"
-  //               onClick={() => signIn("github")}
-  //             >
-  //               <Image src={githublogo} alt="" height={24} width={24} />
-  //               Sign in with Github
-  //             </Button>
-  //           </div>
-  //           <div className="link-to-signup">
-  //             No account? <a href="/account/register">Sign up</a>
-  //           </div>
-  //         </div>
-  //       </Form>
-  //     </div>
-  //   </div>
-  // );
 }
 
 export default Login;

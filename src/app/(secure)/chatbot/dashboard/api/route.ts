@@ -1,18 +1,46 @@
-import { NextResponse } from "next/server";
-import { connectDatabase } from "../../../../../db";
+import { NextRequest, NextResponse } from "next/server";
+import clientPromise from "../../../../../db";
 import { apiHandler } from "../../../../_helpers/server/api/api-handler";
+import joi from "joi";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../../../api/auth/[...nextauth]/route";
 
 module.exports = apiHandler({
   POST: dataSources,
+  GET: getChatBotSettings,
 });
 
 async function dataSources(request: any) {
-  const { chatbotId, userId } = await request.json();
+  /// get the session and then access the id
+  const session: any = await getServerSession(authOptions);
+  const userId = request?.headers.get("userId")
+    ? request?.headers.get("userId")
+    : session?.user?.id;
+
+  const { chatbotId } = await request.json();
 
   /// fetch the data sources of the chabot
-  const db = (await connectDatabase())?.db();
+  const db = (await clientPromise!).db();
   const collection = db?.collection("chatbots-data");
-  const cursor = await collection?.find({ chatbotId: chatbotId }).toArray();
+  const cursor = await collection?.find({ chatbotId: chatbotId });
+
+  const data = await cursor.toArray();
+
+  /// close the cursor
+  await cursor.close();
+
+  /// get the chatbot name from ID (needed if user has updated the chatbot name)
+  const chatbotCollection = db?.collection("user-chatbots");
+  const chatbotDetails = await chatbotCollection?.findOne({
+    chatbotId: chatbotId,
+  });
+
+  /// get chatbot Setting
+  const chatBotSettingCollection = db.collection("chatbot-settings");
+  const chatbotSetting = await chatBotSettingCollection.findOne({
+    chatbotId: chatbotId,
+    userId: userId,
+  });
 
   /// filter the source as per home component
   let qaCount = 0;
@@ -24,7 +52,7 @@ async function dataSources(request: any) {
   let crawlDataLength = 0;
   let crawlData: any = [];
   const defaultFileList: any = [];
-  cursor.forEach((data: any) => {
+  data.forEach((data: any) => {
     /// extract the QA object
     if (data.source == "qa") {
       /// get the qa data if embedded previosuly
@@ -33,7 +61,7 @@ async function dataSources(request: any) {
       qaList.push({
         question: data.content.question,
         answer: data.content.answer,
-        image: data.content.image,
+        image: data.content.filename,
         id: data._id,
       });
     } else if (data.source == "text") {
@@ -67,5 +95,41 @@ async function dataSources(request: any) {
     fileTextLength,
     crawlData,
     crawlDataLength,
+    chatbotName: chatbotDetails?.chatbotName,
+    chatbotSetting,
   };
 }
+
+/**
+ * currrently commented as there was no use
+ */
+
+async function getChatBotSettings(request: NextRequest) {
+  const params = await request.nextUrl.searchParams;
+  const chatbotId = params.get("chatbotId");
+  const userId = params.get("userId");
+
+  /// get chatbot Setting
+  const db = (await clientPromise!).db();
+  const chatBotSettingCollection = db.collection("chatbot-settings");
+  const chatbotSetting = await chatBotSettingCollection.findOne({
+    chatbotId: chatbotId,
+    userId: userId,
+  });
+
+  return { chatbotSetting };
+}
+
+/**
+ * defining schema for /chatbot/dashboard/api GET route
+ */
+getChatBotSettings.schema = joi.object({
+  chatbotId: joi.string().required(),
+});
+
+/**
+ * defining schema for /chatbot/dashboard/api POST route
+ */
+dataSources.schema = joi.object({
+  chatbotId: joi.string().required(),
+});

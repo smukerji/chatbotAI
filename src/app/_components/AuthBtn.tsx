@@ -3,10 +3,12 @@ import { useUserService } from "../_services/useUserService";
 import { signOut, useSession } from "next-auth/react";
 import { useCookies } from "react-cookie";
 import jwt from "jsonwebtoken";
+import { useRouter } from "next/navigation";
 
 export default function AuthBtn() {
   const { data: session } = useSession();
   const userService = useUserService();
+  const router = useRouter();
   const [cookies, setCookie, removeCookie] = useCookies([
     "userId",
     "authorization",
@@ -16,18 +18,19 @@ export default function AuthBtn() {
     await userService.logout();
   }
 
-  useEffect(() => {
-    // Make a request to the server to get the data you need
-    const verifyJwt = async () => {
-      await fetch("/api/account/verify-jwt").then(async (res) => {
-        const data = await res.json();
-        if (data?.message === "jwt expired") {
-          window.location.reload();
-        }
-      });
-    };
-    verifyJwt();
-  }, []);
+  /// check if the the user has an active session
+  // useEffect(() => {
+  //   // Make a request to the server to get the data you need
+  //   const verifyJwt = async () => {
+  //     await fetch("/api/account/verify-jwt").then(async (res) => {
+  //       const data = await res.json();
+  //       if (data?.message === "jwt expired") {
+  //         window.location.reload();
+  //       }
+  //     });
+  //   };
+  //   verifyJwt();
+  // }, []);
 
   const userId = cookies.userId;
 
@@ -35,7 +38,7 @@ export default function AuthBtn() {
 
   return (
     <>
-      <div
+      {/* <div
         className="login-signup"
         onClick={async (e) => {
           if (!isLoggedIn) {
@@ -55,7 +58,34 @@ export default function AuthBtn() {
         >
           {isLoggedIn ? "Log out" : "Sign up / Login"}
         </span>
-      </div>
+      </div> */}
+      {isLoggedIn ? (
+        <div
+          className="try-free-btn"
+          onClick={() => {
+            window.location.href = "/chatbot";
+            // router.push("/chatbot");
+          }}
+        >
+          My Chatbots
+        </div>
+      ) : (
+        <>
+          <div
+            className="login-btn"
+            onClick={() => {
+              // window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot`;
+              window.location.href = `/account/login`;
+            }}
+          >
+            Log In
+          </div>
+
+          <a href="/account/register" style={{ textDecoration: "none" }}>
+            <div className="try-free-btn">Register for Free</div>
+          </a>
+        </>
+      )}
     </>
   );
 }

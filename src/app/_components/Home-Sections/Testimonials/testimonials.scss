@@ -1,0 +1,112 @@
+.testimonials-section {
+  padding: 5.2vw 12.2vw;
+  /* --------------------------top section------------------------------ */
+  .top {
+    display: flex;
+    padding: 0px 20px;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    align-self: stretch;
+
+    h1 {
+      color: #141416;
+      text-align: center;
+      font-size: 60px;
+      font-style: normal;
+      font-weight: 600;
+      line-height: 72px; /* 120% */
+    }
+
+    p {
+      color: #4478f9;
+      text-align: center;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 600;
+      line-height: 24px; /* 150% */
+      text-transform: uppercase;
+    }
+  }
+
+  /* --------------------------bottom section------------------------------ */
+  .bottom {
+    display: flex;
+    gap: 40px;
+    margin-top: 64px;
+    .testimonial-container {
+      flex: 1;
+      display: flex;
+      padding: 48px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 24px;
+      align-self: stretch;
+      border-radius: 16px;
+      background: #eff3fd;
+      .quote-img {
+        min-height: 13%;
+      }
+
+      p {
+        color: #000;
+        font-size: 18px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 28px; /* 155.556% */
+        letter-spacing: -0.24px;
+        min-height: 33%;
+      }
+
+      .author-details {
+        min-height: 33%;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        img {
+          border-radius: 100px;
+          border: 1px solid rgba(0, 0, 0, 0.08);
+          background: #4478f9;
+          object-fit: contain;
+          padding: 6px 0 0 0;
+        }
+
+        h4 {
+          color: #000;
+          font-size: 20px;
+          font-style: normal;
+          font-weight: 600;
+          line-height: 24px;
+        }
+
+        p {
+          color: #000;
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 400;
+          line-height: 24px; /* 150% */
+          letter-spacing: -0.24px;
+        }
+      }
+    }
+  }
+
+  @media only screen and (max-width: 767px) {
+    padding: 20px;
+    .top {
+      h1 {
+        font-size: 30px;
+        line-height: 40px;
+      }
+    }
+    .bottom {
+      flex-wrap: wrap;
+
+      .testimonial-container {
+        p {
+          min-height: unset;
+        }
+      }
+    }
+  }
+}
