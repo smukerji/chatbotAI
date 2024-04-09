@@ -9,10 +9,17 @@ import {
   logoBase64,
   registerationMail,
 } from "../../../_helpers/emailImagesBase64Constants";
+import jwt ,{ Secret } from "jsonwebtoken";
 
 module.exports = apiHandler({
   POST: register,
 });
+
+function generateJWTToken(email: string) {
+  return jwt.sign({ email }, process.env.NEXT_PUBLIC_JWT_SECRET as Secret, {
+    expiresIn: process.env.NEXT_PUBLIC_JWT_EXPIRES_IN,
+  });
+}
 
 async function register(request: any) {
   const body = await request.json();
@@ -20,7 +27,8 @@ async function register(request: any) {
   const db = (await clientPromise!).db();
   const collection = db.collection("users");
   /// validate if user email already exists
-  if (await collection.findOne({ email: email })) {
+  const user = await collection.findOne({ email: email })
+  if (user && user.isVerified == true) {
     throw 'Email "' + email + '" is already in use';
   }
 
@@ -43,6 +51,7 @@ async function register(request: any) {
     startDate: currentDate,
     isWhatsapp: true,
     endDate: endDate,
+    isVerified: false
   });
 
   const userId = userResult?.insertedId.toString();
@@ -58,23 +67,35 @@ async function register(request: any) {
   });
 
   /// send the registration mail
-  const temailService = emailService();
-  await temailService.send(
-    "registration-mail-template",
-    [
-      registerationMail.heroImage,
-      registerationMail.avatarIcon,
-      registerationMail.icon1,
-      registerationMail.icon2,
-      logo,
-    ],
-    email,
-    {
-      name: username,
-    }
-  );
+  // const temailService = emailService();
+  // await temailService.send(
+  //   "registration-mail-template",
+  //   [
+  //     registerationMail.heroImage,
+  //     registerationMail.avatarIcon,
+  //     registerationMail.icon1,
+  //     registerationMail.icon2,
+  //     logo,
+  //   ],
+  //   email,
+  //   {
+  //     name: username,
+  //   }
+  // );
 
-  return { message: "Registered successfully... Please login to continue" };
+  // //send the registration verification  email
+  // const jwtToken = generateJWTToken(email);
+  // const link = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/verify-email?jwt=${jwtToken}`
+  // await temailService.send(
+  //   "verify-email-register-template",
+  //   [],
+  //   email,
+  //   {
+  //     link: link,
+  //   }
+  // );
+
+  return { message: "Please check your email  to verify your account." };
 }
 
 register.schema = joi.object({

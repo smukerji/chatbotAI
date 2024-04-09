@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useRef, useState,useEffect } from "react";
 import Image from "next/image";
 import LuciferLogo from "../../../../public/svgs/lucifer-ai-logo.svg";
 import dynamic from "next/dynamic";
@@ -12,11 +12,38 @@ const AuthBtn = dynamic(() => import("../../_components/AuthBtn"), {
 
 function SecondaryHeader() {
   const router = useRouter();
+  const menuRef = useRef<HTMLDivElement | null>(null); // Define the type of menuRef
   const [menuOpen, setMenuOpen] = useState(false);
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
+
+  useEffect(() => {
+    function handleOutsideClick(event: MouseEvent) {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Node)
+      ) {
+        setMenuOpen(false);
+      }
+    }
+
+    // Add event listener when menu is open
+    if (menuOpen) {
+      document.addEventListener("click", handleOutsideClick);
+    } else {
+      // Remove event listener when menu is closed
+      document.removeEventListener("click", handleOutsideClick);
+    }
+
+    return () => {
+      // Cleanup: remove event listener when component unmounts
+      document.removeEventListener("click", handleOutsideClick);
+    };
+  }, [menuOpen]);
+
+
   return (
     <div className="header-title-container">
       <Image
@@ -35,7 +62,7 @@ function SecondaryHeader() {
         <div className="bar"></div>
       </div>
 
-      <div className={`hamburger-menu ${menuOpen ? "open" : ""}`}>
+      <div  ref={menuRef} className={`hamburger-menu ${menuOpen ? "open" : ""}`}>
         <div className={`navbar `}>
           <ul>
             <li onClick={toggleMenu}>
