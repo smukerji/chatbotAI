@@ -16,9 +16,6 @@ import { useUserService } from '../../../_services/useUserService';
 import { Spin, message } from 'antd';
 
 function Login() {
-  const searchParams = new URLSearchParams(window.location.search);
-  const key = searchParams.get('key');
-  console.log(key);
   /// email and password messages state
   const [emailMessage, setEmailMessage]: any = useState('');
   const [passwordMessage, setPasswordMessage]: any = useState('');
@@ -31,6 +28,8 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const antIcon = <LoadingOutlined style={{ fontSize: 24, color: 'black', margin: '10px 0' }} spin />;
   if (status === 'authenticated') {
+    const searchParams = new URLSearchParams(window.location.search);
+    const key = searchParams.get('key');
     window.location.href = String(key);
   }
 
@@ -53,6 +52,8 @@ function Login() {
       if (!data?.username) {
         message.error(data);
       } else {
+        const searchParams = new URLSearchParams(window.location.search);
+        const key = searchParams.get('key');
         message.info(`Welcome back ${data?.username}!`);
         if (key == null) {
           window.location.href = '/chatbot';
