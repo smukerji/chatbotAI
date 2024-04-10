@@ -34,6 +34,7 @@ function useUserService(): IUserService {
           `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/account/register`,
           user
         );
+        localStorage.setItem('email', user.email);
         router.push("/account/verify-email");
         return data;
       } catch (error: any) {
@@ -47,7 +48,6 @@ function useUserService(): IUserService {
           `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/account/verify-email`,
           email
         );
-        console.log(data)
         return data;
       }
       catch(error: any){
