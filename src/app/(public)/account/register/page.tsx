@@ -48,7 +48,7 @@ function Register() {
 
   /// when the form is submitted
   const register = async () => {
-    /// check if anything is empty
+    /// check if anything is empty or not
     if (firstName == null) {
       setFirstNameMessage("Please input your First Name!");
       return;
