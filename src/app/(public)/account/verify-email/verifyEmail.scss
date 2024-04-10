@@ -1,4 +1,4 @@
-.login-container {
+.verify-email-container {
   display: flex;
   flex-wrap: wrap;
   height: 100vh;
@@ -20,7 +20,7 @@
     overflow-y: auto;
     max-height: 100vh;
 
-    .login-form {
+    .verify-email-main{
       h1 {
         margin-top: 137px;
         color: #141416;
@@ -96,7 +96,7 @@
       }
 
       /* --------------------------login-register-actions------------------------------ */
-      .login-register-cotainer {
+      .resend-container {
         display: flex;
         flex-direction: column;
         gap: 40px;
@@ -134,7 +134,7 @@
       flex: 1 1;
       padding: 30px 50px;
 
-      .login-form {
+      .verify-email-main {
         h1 {
           font-size: 34px;
           line-height: 50px;
@@ -146,7 +146,7 @@
           }
         }
 
-        .login-register-cotainer {
+        .resend-container {
           div {
             width: 100%;
 
@@ -168,14 +168,14 @@
       flex: 1 1;
       padding: 30px 50px;
 
-      .login-form {
+      .verify-email-main {
         .input-container {
           input {
             width: 100%;
           }
         }
 
-        .login-register-cotainer {
+        .resend-container {
           div {
             width: 100%;
 

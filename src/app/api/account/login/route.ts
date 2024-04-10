@@ -1,12 +1,12 @@
-import joi from "joi";
-import clientPromise from "../../../../db";
-import jwt from "jsonwebtoken";
-import { cookies } from "next/headers";
-import { apiHandler } from "../../../_helpers/server/api/api-handler";
-import bcrypt from "bcrypt";
+import joi from 'joi';
+import clientPromise from '../../../../db';
+import jwt from 'jsonwebtoken';
+import { cookies } from 'next/headers';
+import { apiHandler } from '../../../_helpers/server/api/api-handler';
+import bcrypt from 'bcrypt';
 
 module.exports = apiHandler({
-  POST: login,
+  POST: login
 });
 
 async function login(request: any) {
@@ -14,44 +14,44 @@ async function login(request: any) {
   const { username, password } = body;
 
   const db = (await clientPromise!).db();
-  const collection = db.collection("users");
+  const collection = db.collection('users');
   /// check if user is valid
   const user: any = await collection.findOne({
-    email: username,
+    email: username
   });
 
-  if (user) {
+  if (user && user.isVerified == true) {
     const isPasswordValid = await bcrypt.compare(password, user?.password);
 
     if (isPasswordValid) {
       // create a jwt token that is valid for 7 days
-      const token = jwt.sign(
-        { sub: user?._id?.toString() },
-        process.env.NEXT_PUBLIC_JWT_SECRET!,
-        {
-          expiresIn: "7d",
-        }
-      );
+      const token = jwt.sign({ sub: user?._id?.toString() }, process.env.NEXT_PUBLIC_JWT_SECRET!, {
+        expiresIn: '7d'
+      });
 
       // return jwt token in http only cookie
-      cookies().set("authorization", token, { httpOnly: true });
+      cookies().set('authorization', token, { httpOnly: true });
 
       /// set the userId cookie
-      cookies().set("userId", user?._id?.toString());
+      cookies().set('userId', user?._id?.toString());
 
       /// set the username
-      cookies().set("username", user?.username?.toString());
+      cookies().set('username', user?.username?.toString());
 
-      return { message: "Login successfull...", username: user?.username };
+      return { message: 'Login successfull...', username: user?.username };
     } else {
-      throw "Invalid email or password.";
+      throw 'Invalid email or password.';
     }
   } else {
-    throw `User doesn’t exist!`;
+    if (user && user.isVerified == false) {
+      throw `User is not verified`;
+    } else {
+      throw `User doesn’t exist!`;
+    }
   }
 }
 
 login.schema = joi.object({
   username: joi.string().required(),
-  password: joi.string().required(),
+  password: joi.string().required()
 });
