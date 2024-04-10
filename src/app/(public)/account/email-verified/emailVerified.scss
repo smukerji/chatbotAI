@@ -1,0 +1,125 @@
+.verify-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  height: 100vh;
+  overflow: hidden;
+
+  .verify-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3.2vw 10.2vw;
+    max-height: 100vh;
+
+    .img-container{
+      margin-top:56px;
+      padding:47px 0px
+    }
+    .description-verify {
+      h1 {
+        margin-top: 24px;
+        align-items: center;
+        color: #141416;
+        font-size: 48px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 68px;
+        display: flex;
+        flex-direction: column;
+      }
+      .para {
+        margin-top: 19px;
+        text-align: center;
+        color: var(--Neutral-5, #777e90);
+        font-family: 'General Sans';
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 24px; /* 150% */
+      }
+      .go-login-container {
+        align-items: center;
+        margin-top: 40px;
+        justify-content: center;
+        display: flex;
+        .login-btn {
+          display: inline-flex;
+          padding: 12px 24px;
+          justify-content: center;
+          align-items: center;
+          gap: 10px;
+          border: none;
+          cursor: pointer;
+          border-radius: 12px;
+          background: var(--Primary-7, #2e58ea);
+          .btnText {
+            color: var(--Neutral-1, #fcfcfd);
+            text-align: center;
+            font-family: sans-serif;
+            font-size: 20px;
+            font-style: normal;
+            font-weight: 600;
+            line-height: 28px;
+          }
+        }
+      }
+    }
+  }
+
+  @media only screen and (max-width: 767px) {
+    .left {
+      display: none;
+    }
+
+    .verify-main {
+      flex: 1 1;
+      padding: 30px 50px;
+
+      .description-verify {
+        h1 {
+          font-size: 34px;
+          line-height: 50px;
+          margin-top: 80px;
+        }
+
+        .go-login-container {
+          div {
+            width: 100%;
+
+            .login-btn {
+              width: 100%;
+            }
+
+            .ant-spin {
+              width: 100% !important;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @media only screen and (max-width: 991px) {
+    .verify-main {
+      flex: 1 1;
+      padding: 30px 50px;
+
+      .description-verify {
+        .go-login-container {
+          div {
+            width: 100%;
+
+            .login-btn {
+              width: 100%;
+            }
+
+            .ant-spin {
+              width: 100% !important;
+            }
+          }
+        }
+      }
+    }
+  }
+}

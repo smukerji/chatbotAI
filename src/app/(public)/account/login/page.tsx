@@ -18,6 +18,7 @@ import { Spin, message } from 'antd';
 function Login() {
   const searchParams = new URLSearchParams(window.location.search);
   const key = searchParams.get('key');
+  console.log(key);
   /// email and password messages state
   const [emailMessage, setEmailMessage]: any = useState('');
   const [passwordMessage, setPasswordMessage]: any = useState('');
@@ -30,8 +31,7 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const antIcon = <LoadingOutlined style={{ fontSize: 24, color: 'black', margin: '10px 0' }} spin />;
   if (status === 'authenticated') {
-    window.location.href = String(key); /// used this to load the header
-    // router.push("/chatbot");
+    window.location.href = String(key);
   }
 
   const userService = useUserService();
@@ -54,9 +54,13 @@ function Login() {
         message.error(data);
       } else {
         message.info(`Welcome back ${data?.username}!`);
-        window.location.href = String(key); // Refresh the page
+        if (key == null) {
+          window.location.href = '/chatbot';
+        } else {
+          window.location.href = String(key);
+        }
       }
-      
+
       setLoading(false);
     });
   };
