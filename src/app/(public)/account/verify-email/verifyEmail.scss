@@ -121,6 +121,9 @@
           justify-content: center;
           /* 140% */
         }
+        :disabled{
+          cursor: not-allowed;
+        }
       }
     }
   }
