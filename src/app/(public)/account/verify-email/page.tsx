@@ -12,6 +12,7 @@ import axios from 'axios';
 
 function VerifyEmail() {
   const [email, setEmail] = useState("")
+  const [cooldown, setCooldown] = useState(0);
   const [loading, setLoading] = useState(false);
   const antIcon = <LoadingOutlined style={{ fontSize: 24, color: 'black', margin: '10px 0' }} spin />;
   const handleClick = async () => {
@@ -20,12 +21,23 @@ function VerifyEmail() {
       email: email,
     });
     message.success(response.data.message)
+    setCooldown(60);
   }
   
   useEffect(()=>{
     let email: any = localStorage.getItem('email')
     setEmail(email)
   }, [])
+
+  useEffect(() => {
+    let timer: any;
+    if (cooldown > 0) {
+      timer = setTimeout(() => {
+        setCooldown(cooldown - 1);
+      }, 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [cooldown]);
   
   return (
     <div className='verify-email-container'>
@@ -57,8 +69,9 @@ function VerifyEmail() {
               <button
                 className='login-btn'
                 onClick={handleClick}
+                disabled={cooldown > 0}
               >
-               Resend Email
+                {cooldown > 0 ? `Resend (${cooldown}s)` : 'Resend'}
               </button>
               {loading && <Spin style={{ width: '20%' }} indicator={antIcon} />}
             </div>
