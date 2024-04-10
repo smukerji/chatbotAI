@@ -10,8 +10,7 @@ import { LoadingOutlined } from '@ant-design/icons';
 import { Spin, message } from 'antd';
 
 function VerifyEmail() {
-  const searchParams = new URLSearchParams(window.location.search);
-  const key = searchParams.get('key');
+
   const [loading, setLoading] = useState(false);
   const antIcon = <LoadingOutlined style={{ fontSize: 24, color: 'black', margin: '10px 0' }} spin />;
   
