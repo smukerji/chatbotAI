@@ -670,7 +670,7 @@ function Chat({
             );
           })}
         </div>
-        <span className="powered-by">Powered by Lucifer.AI</span>
+        <span className="powered-by">Powered by Torri.AI</span>
         <div
           className="chat-question"
           style={{

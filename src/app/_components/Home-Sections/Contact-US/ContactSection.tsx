@@ -43,10 +43,10 @@ function ContactSection() {
     <div className="contact-section" id="contact-us">
       {/* --------------------------left section------------------------------ */}
       <div className="left">
-        <h1>Join the future of AI chatbots today with Lucifer.AI</h1>
+        <h1>Join the future of AI chatbots today with Torri.AI</h1>
         <p>
           We&rsquo;d love to talk about your right-now challenges and share our
-          insights on how to conquer them with Lucifer.AI
+          insights on how to conquer them with Torri.AI
         </p>
 
         {/* --------------------------input container------------------------------ */}

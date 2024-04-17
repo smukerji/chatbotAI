@@ -685,7 +685,7 @@ function ChatInterface({ chatbotId }: any) {
                   color: botSettings?.theme === "dark" ? "#B1B5C3" : "",
                 }}
               >
-                Powered by Lucifer.AI
+                Powered by Torri.AI
               </div>
             </div>
             <div

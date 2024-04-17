@@ -138,7 +138,7 @@ function Footer() {
         </div>
       </div>
 
-      <div className="copyright-section">Copyright © 2023 SAP Alliance</div>
+      <div className="copyright-section">Copyright © 2023 SAP Alliance & Creole Studios</div>
     </div>
   );
 }

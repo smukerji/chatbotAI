@@ -15,7 +15,7 @@ export default function IndustrySection() {
         <div className="left">
           <h1>AI Chatbot in the Industrial sector</h1>
           <p>
-            Discover the future of conversational excellence with Lucifer.AI,
+            Discover the future of conversational excellence with Torri.AI,
             your intelligent AI companion. Elevate your online interactions with
             natural and intuitive conversations.
           </p>
@@ -29,7 +29,7 @@ export default function IndustrySection() {
               <Image src={healthcareIcon} alt="healthcare-icon" />
               <h3>Healthcare And Wellness</h3>
               <p>
-                Lucifer.AI is the AI chatbot that takes your digital presence to
+                Torri.AI is the AI chatbot that takes your digital presence to
                 the next level
               </p>
             </div>
@@ -37,21 +37,21 @@ export default function IndustrySection() {
               <Image src={healthcareIcon} alt="healthcare-icon" />
               <h3>Healthcare And Wellness</h3>
               <p>
-              No more long waits and queues for doctors. Use Lucifer.AI to have your personal doctor integrated into your life.
+              No more long waits and queues for doctors. Use Torri.AI to have your personal doctor integrated into your life.
               </p>
             </div>
             <div className="filled-box">
               <Image src={hotlesIcon} alt="hotels-icon" />
               <h3>Hotels And Hospitality</h3>
               <p>
-              Hassel free booking and customer support with Lucifer.AI. Enhance the customer experience by having Lucifer.AI as your 24/7 hotel assistant.
+              Hassel free booking and customer support with Torri.AI. Enhance the customer experience by having Torri.AI as your 24/7 hotel assistant.
               </p>
             </div>
             <div className="empty-box">
               <Image src={healthcareIcon} alt="healthcare-icon" />
               <h3>Healthcare And Wellness</h3>
               <p>
-                Lucifer.AI is the AI chatbot that takes your digital presence to
+                Torri.AI is the AI chatbot that takes your digital presence to
                 the next level
               </p>
             </div>
@@ -63,7 +63,7 @@ export default function IndustrySection() {
               <Image src={healthcareIcon} alt="healthcare-icon" />
               <h3>Healthcare And Wellness</h3>
               <p>
-              No more long waits and queues for doctors. Use Lucifer.AI to have your personal doctor integrated into your life.
+              No more long waits and queues for doctors. Use Torri.AI to have your personal doctor integrated into your life.
               </p>
             </div>
             <div className="filled-box">

@@ -23,7 +23,7 @@ function Terms() {
             the Terms & Conditions available under the following address:
             <a href={`/terms`}>{process.env.NEXT_PUBLIC_WEBSITE_URL}terms</a>
             (“Terms & Conditions”) which include the terms of the Privacy Policy
-            set forth below. Lucifer.AI (“Company”) operates the Service.We use
+            set forth below. Torri.AI (“Company”) operates the Service.We use
             your data to provide and improve Service. By using Service, you
             agree to the collection and use of information in accordance with
             this policy. Unless otherwise defined in this Privacy Policy, the
@@ -95,7 +95,7 @@ function Terms() {
         <div className="term-container">
           <p>3. Use of Data</p>
           <p>
-            Lucifer.AI uses the collected Personal Data for various purposes:
+            Torri.AI uses the collected Personal Data for various purposes:
           </p>
 
           <ul>

@@ -131,10 +131,10 @@ function WhatsAppIntegrationGuide() {
             </h2>
 
             <ol className="ordered-points">
-              <li>Sign in to Lucifer.AI and Create Your Bot:</li>
+              <li>Sign in to Torri.AI and Create Your Bot:</li>
               <ul className="unordered-sub-points">
                 <li>
-                  Make sure you have access to your Lucifer.Ai account. If you
+                  Make sure you have access to your Torri.Ai account. If you
                   don&apos;t have one, create an account.
                 </li>
                 <li>
@@ -626,7 +626,7 @@ function WhatsAppIntegrationGuide() {
                   Copy the <span className="point-bold-text">Callback URL</span>{" "}
                   and{" "}
                   <span className="point-bold-text">Verification Token</span>{" "}
-                  from Lucifer.ai WhatsApp Integration modal to your WhatsApp
+                  from Torri.ai WhatsApp Integration modal to your WhatsApp
                   Developer Dashboard.
                 </li>
 
@@ -666,7 +666,7 @@ function WhatsAppIntegrationGuide() {
                 </div>
 
                 <li>
-                  Return to Lucifer.ai and click{" "}
+                  Return to Torri.ai and click{" "}
                   <span className="point-bold-text">Verify.</span>
                 </li>
 
