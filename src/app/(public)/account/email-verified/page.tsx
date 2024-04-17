@@ -46,7 +46,7 @@ function EmailVerified() {
       <div className='verify-main'>
         <Image
           src={luciferIcon}
-          alt='lucifer-logo'
+          alt='torri-logo'
           onClick={() => (window.location.href = '/')}
           style={{ cursor: 'pointer' }}
         />

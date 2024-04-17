@@ -8,10 +8,10 @@ function CustomerQuestions() {
     <div className='customer-question-section'>
       <div className='left'>
         <h1 className='title'>
-          Resolve 90% of your customer questions with Lucifer AI
+          Resolve 90% of your customer questions with Torri AI
         </h1>
         <p className='description'>
-          Build a own Lucifer bot with 1-click, embed it on your website and let
+          Build a own Torri bot with 1-click, embed it on your website and let
           it handle customer support, lead generation, engage with your users,
           and more. Train the chatbot with your own data.
         </p>

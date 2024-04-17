@@ -194,7 +194,7 @@ async function writeInDataBase(data: any) {
             //if open ai didn't respond then send the message to slack
             await client.chat.postMessage({
               channel: channelId,
-              text: "Lucifer AI is not able to answer for your query. Please try again later.",
+              text: "Torri AI is not able to answer for your query. Please try again later.",
               thread_ts: data.event.ts,
             });
 

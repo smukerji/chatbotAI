@@ -62,9 +62,9 @@ function HeroHeader() {
 
         <p className="header-sub-text">
           Unlock the full potential of AI for your business with our Custom
-          ChatGPT solution. Lucifer AI is dedicated to transforming the way
+          ChatGPT solution. Torri AI is dedicated to transforming the way
           businesses interact with data. By harnessing the power of advanced AI
-          technologies, Lucifer AI provides innovative solutions that streamline
+          technologies, Torri AI provides innovative solutions that streamline
           data analysis and insight generation. Our mission is to make data
           accessible and actionable for all, through the power of conversational
           AI

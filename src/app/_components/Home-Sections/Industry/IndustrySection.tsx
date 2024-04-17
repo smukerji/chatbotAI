@@ -70,28 +70,28 @@ export default function IndustrySection() {
               <Image src={educationIcon} alt="education-icon" />
               <h3>Education And Institutes</h3>
               <p>
-              Lucifer.AI can be your teacher providing real-time feedback and assessment tools, simplifying creative learning, exam creation, and grading.
+              Torri.AI can be your teacher providing real-time feedback and assessment tools, simplifying creative learning, exam creation, and grading.
               </p>
             </div>
             <div className="filled-box">
               <Image src={businessIcon} alt="business-icon" />
               <h3>Small Medium Business</h3>
               <p>
-              Lucifer.AI can help businesses to engage with their customers in a personalized conversation.
+              Torri.AI can help businesses to engage with their customers in a personalized conversation.
               </p>
             </div>
             <div className="filled-box">
               <Image src={coinIcon} alt="business-icon" />
               <h3>Nonprofits or B2C</h3>
               <p>
-              Make your assistant with Lucifer.AI to support customer inquiries, internal training, FAQ distribution, etc.
+              Make your assistant with Torri.AI to support customer inquiries, internal training, FAQ distribution, etc.
               </p>
             </div>
             <div className="empty-box">
               <Image src={healthcareIcon} alt="healthcare-icon" />
               <h3>Healthcare And Wellness</h3>
               <p>
-                Lucifer.AI is the AI chatbot that takes your digital presence to
+                Torri.AI is the AI chatbot that takes your digital presence to
                 the next level
               </p>
             </div>

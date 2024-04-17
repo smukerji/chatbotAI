@@ -151,7 +151,7 @@ function WhatsAppIntegrationGuide() {
                 </li>
                 <li>
                   Follow the displayed steps to connect your WhatsApp business
-                  account to Lucifer.
+                  account to Torri.
                 </li>
               </ul>
             </ol>
@@ -679,7 +679,7 @@ function WhatsAppIntegrationGuide() {
 
           <div className="step-6">
             <h2 className="guide-step-title">
-              Step 6: Add WhatsApp Account to your Lucifer Chatbot
+              Step 6: Add WhatsApp Account to your Torri Chatbot
             </h2>
 
             <ol className="ordered-points">
@@ -693,7 +693,7 @@ function WhatsAppIntegrationGuide() {
                   </span>
                 </li>
                 <li>
-                  Copy App secret and paste it in Lucifer integration modal in{" "}
+                  Copy App secret and paste it in Torri integration modal in{" "}
                   <span className="point-bold-text">Facebook App Secret</span>
                 </li>
 
@@ -703,7 +703,7 @@ function WhatsAppIntegrationGuide() {
 
                 <li>
                   Paste the permanent access token generated from{" "}
-                  <span className="point-bold-text">Step 4.3</span> in lucifer
+                  <span className="point-bold-text">Step 4.3</span> in torri
                   integration modal in{" "}
                   <span className="point-bold-text">
                     WhatsApp Access Token.
@@ -722,7 +722,7 @@ function WhatsAppIntegrationGuide() {
                   <span className="point-bold-text">
                     WhatsApp Business Account ID
                   </span>{" "}
-                  into the Lucifer WhatsApp Integration modal.
+                  into the Torri WhatsApp Integration modal.
                 </li>
 
                 <div className="steps-img">
