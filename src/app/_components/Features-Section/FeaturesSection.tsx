@@ -16,12 +16,12 @@ function FeaturesSection() {
     <>
       <div className="feature-section-container" id="features">
         <div className="top">
-          <Image src={LuciferLogo} alt="Lucifer logo" />
+          <Image src={LuciferLogo} alt="Torri logo" />
           <h1 className="title">Features</h1>
 
           <p className="description">
             Everything you need for your no-code AI chatbot. Add your data
-            sources, train the Lucifer bot, customize it to your liking, and add
+            sources, train the Torri bot, customize it to your liking, and add
             it to your website, whatsapp, and telegram.
           </p>
         </div>
@@ -40,7 +40,7 @@ function FeaturesSection() {
               </h2>
               <p className="description">
                 Engage your website visitors, customers, and clients with
-                natural, intuitive conversations. Lucifer ensures every
+                natural, intuitive conversations. Torri ensures every
                 interaction is personalised, relevant, and memorable.
               </p>
             </div>
@@ -55,7 +55,7 @@ function FeaturesSection() {
                 </span>
               </h2>
               <p className="description">
-                Seamlessly integrate Lucifer with your website, WhatsApp, or
+                Seamlessly integrate Torri with your website, WhatsApp, or
                 preferred tools for a unified experience.
               </p>
             </div>
@@ -70,7 +70,7 @@ function FeaturesSection() {
                 </span>
               </h2>
               <p className="description">
-                Lucifer is revolutionising how companies interact with their
+                Torri is revolutionising how companies interact with their
                 data through an advanced AI chatbot that learns directly from
                 your organisation&apos;s knowledge base.
               </p>

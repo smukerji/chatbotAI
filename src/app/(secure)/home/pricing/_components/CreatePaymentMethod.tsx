@@ -32,7 +32,7 @@ export default function CreatePaymentMethod({ plan, price, duration, name }: any
     );
     setDefault(whatsappData.data.msg);
     setIsChecked(whatsappData.data.msg);
-    setIsCheckedSlack(whatsappData.data.msg)
+    setIsCheckedSlack(whatsappData.data.msg);
     console.log(defaultChecked);
   };
 
@@ -47,7 +47,6 @@ export default function CreatePaymentMethod({ plan, price, duration, name }: any
       setNewPrice(Number(price) + Number(7));
     } else {
       setNewPrice(price);
-
     }
   }, [isChecked, defaultChecked, isCheckedSlack, newPrice]);
 
@@ -169,11 +168,14 @@ export default function CreatePaymentMethod({ plan, price, duration, name }: any
                     defaultChecked={defaultChecked}
                     checked={isChecked}
                     className='price-checkbox'
+                    id='whatsappIntegrationCheckbox'
                     onChange={(e) => {
                       setIsChecked(e.target.checked);
                     }}
                   />
-                  <label className='checkbox-label'>Add whatsapp Integration</label>
+                  <label htmlFor='whatsappIntegrationCheckbox' className='checkbox-label'>
+                    Add whatsapp Integration
+                  </label>
                 </div>
               )}
               {(plan == 1 || plan == 3 || plan == 2 || plan == 4) && defaultChecked && (
@@ -182,12 +184,15 @@ export default function CreatePaymentMethod({ plan, price, duration, name }: any
                     type='checkbox'
                     defaultChecked={defaultChecked}
                     checked={isCheckedSlack}
+                    id='slackIntegrationCheckbox'
                     className='price-checkbox'
                     onChange={(e) => {
                       setIsCheckedSlack(e.target.checked);
                     }}
                   />
-                  <label className='checkbox-label'>Add Slack Integration</label>
+                  <label htmlFor='slackIntegrationCheckbox' className='checkbox-label'>
+                    Add Slack Integration
+                  </label>
                 </div>
               )}
               <div className='bottom-left'>

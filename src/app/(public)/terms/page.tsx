@@ -17,7 +17,7 @@ function Terms() {
             These Terms & Conditions (“Terms & Conditions”) are used to
             determine the rules of the Service and to clarify the legal
             relationship between the entity using the Service and the Company.
-            Lucifer.AI. (“Company”) operates web pages located at Lucifer.AI
+            Torri.AI. (“Company”) operates web pages located at Torri.AI
             (“Website”) and offers Service (as defined below in Section 2).The
             Service is dedicated to the professional entities to help them to
             conduct their business. Using the Website and/or the Service in any

@@ -34,13 +34,27 @@ function useUserService(): IUserService {
           `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/account/register`,
           user
         );
-        router.push("/account/login");
+        localStorage.setItem('email', user.email);
+        router.push("/account/verify-email");
         return data;
       } catch (error: any) {
         console.log("Error while registering user", error);
         return error;
       }
-    },
+    },   
+    verify: async (email) => {
+      try{
+        const data = await fetch.post(
+          `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/account/verify-email`,
+          email
+        );
+        return data;
+      }
+      catch(error: any){
+        console.log("Error while verify user", error);
+        return error;
+      }
+    }
   };
 }
 
@@ -56,4 +70,5 @@ interface IUserService {
   login: (username: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   register: (user: IUser) => Promise<void>;
+  verify: (email:string)=>Promise<void>;
 }

@@ -19,9 +19,9 @@ function ServicesOffered() {
         <div className='sub-parent'>
           <div className='left-part'>
             <p>
-              Lucifer.Ai is the AI chatbot that takes your digital presence to
+              Torri.Ai is the AI chatbot that takes your digital presence to
               the next level. Join us on this extraordinary journey, where
-              conversation meets innovation. Experience Lucifer.Ai today, and
+              conversation meets innovation. Experience Torri.Ai today, and
               never look back.
             </p>
           </div>
@@ -64,7 +64,7 @@ function ServicesOffered() {
             <Image src={boxIcon} alt='service-icons' />
             <h3>Multi-Channel</h3>
             <p>
-              Lucifer.AI is present on your website, WhatsApp, and other social
+              Torri.AI is present on your website, WhatsApp, and other social
               channels.
             </p>
           </div>
@@ -73,7 +73,7 @@ function ServicesOffered() {
             <Image src={textImgIcon} alt="service-icons" />
             <h3>Text-Image-Audio chatbot</h3>
             <p>
-              Lucifer.AI is the AI chatbot that takes your digital presence to
+              Torri.AI is the AI chatbot that takes your digital presence to
               the next level
             </p>
           </div>
@@ -82,7 +82,7 @@ function ServicesOffered() {
             <Image src={costIcon} alt="service-icons" />
             <h3>Chatbot Cost Estimation</h3>
             <p>
-              Lucifer.AI is the AI chatbot that takes your digital presence to
+              Torri.AI is the AI chatbot that takes your digital presence to
               the next level
             </p>
           </div> */}

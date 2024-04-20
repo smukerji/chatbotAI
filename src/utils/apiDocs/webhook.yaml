@@ -1,0 +1,54 @@
+# swagger/webhook.yaml
+
+openapi: 3.0.3
+info:
+  title: Webhook API Documentation
+  description: API documentation for webhook endpoints.
+  version: 1.0.0
+servers:
+  - url: https://your-api-url.com
+tags:
+  - name: Webhook
+    description: Operations related to webhook handling
+paths:
+  /api/webhook:
+    post:
+      tags:
+        - Webhook
+      summary: Handle webhook events
+      description: Endpoint to handle events from Stripe webhook
+      operationId: handleWebhookEvents
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              # Define the schema for the request body if needed
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  received:
+                    type: boolean
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string

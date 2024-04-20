@@ -31,7 +31,7 @@ function Page() {
           <p className='telegram-step'>3. Choose name for your bot</p>
           <p className='telegram-step'>4. Choose username for your bot</p>
           <p className='telegram-step'>5. Now you will receive token</p>
-          <p className='telegram-step'>6. Copy token and paste in our lucifer.AI telegram modal and <span>click</span> connect</p>
+          <p className='telegram-step'>6. Copy token and paste in our torri.AI telegram modal and <span>click</span> connect</p>
         </div>
         <Image className='telegram-guide-img' src={telegramImage} alt='telegram-image' />
       </div>

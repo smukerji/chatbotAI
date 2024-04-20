@@ -16,7 +16,7 @@ function HeroSection() {
         <p className='description'>
           Elevate your customer service experience to new heights by empowering
           your audience with the instant, reliable answers they seek, any time
-          of the day. Lucifer AI scans your website, help center or other
+          of the day. Torri AI scans your website, help center or other
           sources to provide quick and accurate AI-generated answers to customer
           questions.
         </p>

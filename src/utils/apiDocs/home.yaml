@@ -1,0 +1,175 @@
+openapi: 3.0.3
+info:
+  title: Home API Documentation
+  description: API documentation for home-related endpoints.
+  version: 1.0.0
+servers:
+  - url: https://your-api-url.com
+tags:
+  - name: BillingAndUsage
+    description: Operations related to billing and usage information
+  - name: FetchLinks
+    description: Operations related to fetching links from a website
+paths:
+  /api/home/billingandusage:
+    post:
+      tags:
+        - BillingAndUsage
+      summary: Get user billing and usage details
+      description: Endpoint to retrieve billing and usage details for a user.
+      operationId: getUserBillingAndUsage
+      requestBody:
+        description: Request body for getting user billing and usage details
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                u_id:
+                  type: string
+                  example: "123456789"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  plan:
+                    type: string
+                    example: "Premium"
+                  nextRenewal:
+                    type: string
+                    format: date-time
+                    example: "2024-04-30T00:00:00.000Z"
+                  message:
+                    type: integer
+                    example: 10000
+                  chatbot:
+                    type: integer
+                    example: 3
+                  duration:
+                    type: string
+                    example: "Monthly"
+                  paymentDetails:
+                    type: array
+                    items:
+                      type: object
+                  status:
+                    type: string
+                    example: "Active"
+                  whatsappIntegration:
+                    type: boolean
+                    example: true
+    put:
+      tags:
+        - BillingAndUsage
+      summary: Cancel user plan or WhatsApp integration
+      description: Endpoint to cancel user plan or WhatsApp integration.
+      operationId: cancelUserPlanOrWhatsAppIntegration
+      requestBody:
+        description: Request body for cancelling user plan or WhatsApp integration
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                u_id:
+                  type: string
+                  example: "123456789"
+                x:
+                  type: integer
+                  example: 1
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    example: "Canceled whatsapp integration"
+                  status:
+                    type: boolean
+                    example: true
+  /api/home/fetch-links:
+    post:
+      tags:
+        - FetchLinks
+      summary: Fetch links from a website
+      description: Endpoint to fetch links from a website and extract relevant information.
+      operationId: fetchLinks
+      requestBody:
+        description: Request body for fetching links from a website
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sourceURL:
+                  type: string
+                  example: "https://example.com"
+                chatbotId:
+                  type: string
+                  example: "chatbot123"
+                userId:
+                  type: string
+                  example: "user123"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fetchedLinks:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        crawlLink:
+                          type: string
+                          example: "https://example.com/page1"
+                        cleanedText:
+                          type: array
+                          items:
+                            type: string
+                          example:
+                            - "Cleaned text chunk 1"
+                            - "Cleaned text chunk 2"
+                        charCount:
+                          type: integer
+                          example: 1000
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Please enter a valid URL"
+                required:
+                  - error
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error"
+                required:
+                  - error
+components:
+  schemas: {}

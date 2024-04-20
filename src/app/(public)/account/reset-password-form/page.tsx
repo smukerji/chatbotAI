@@ -99,7 +99,7 @@ function ResetPasswordForm() {
       <div className="right">
         <Image
           src={luciferIcon}
-          alt="lucifer-logo"
+          alt="torri-logo"
           onClick={() => (window.location.href = "/")}
           style={{ cursor: "pointer" }}
         />

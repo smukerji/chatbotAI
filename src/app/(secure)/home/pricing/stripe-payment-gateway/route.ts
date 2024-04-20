@@ -134,7 +134,7 @@ async function createPaymentIntent(req: any, res: NextResponse) {
         if (isWhatsapp == true) {
           let name = 'WhatsApp';
           planData = await collectionPlan.findOne({ name: name });
-          let plan_ID = planData.planIdMonth;
+          let plan_ID = planData.planId;
           subscription = await stripe.subscriptions.create({
             customer: data.customerId,
             default_payment_method: data.paymentId,
@@ -159,7 +159,7 @@ async function createPaymentIntent(req: any, res: NextResponse) {
         if (isSlack == true) {
           name = 'Slack';
           planData = await collectionPlan.findOne({ name: name });
-          let plan_ID = planData.planIdMonth;
+          let plan_ID = planData.planId;
           subscription = await stripe.subscriptions.create({
             customer: data.customerId,
             default_payment_method: data.paymentId,
