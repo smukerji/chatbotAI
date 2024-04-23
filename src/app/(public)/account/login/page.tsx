@@ -70,6 +70,9 @@ function Login() {
         } else {
           window.location.href = String(key);
         }
+
+        // Replace the current history entry
+        window.history.replaceState(null, "", window.location.href);
       }
 
       setLoading(false);
@@ -116,6 +119,18 @@ function Login() {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+
+ // Google and Github signin method
+  const handleSignIn = async (provider : string) => {
+    try {
+      await signIn(provider);
+      // After successful sign-in, replace the current history entry
+      window.history.replaceState(null, "", window.location.href);
+    } catch (error) {
+      console.error("Sign-in error:", error);
+    }
+  };
+  
   return (
     <div className="login-container">
       {/* --------------------------left section------------------------------ */}
@@ -202,12 +217,12 @@ function Login() {
             <div className="section">
               <label>Or Login with</label>
 
-              <button onClick={() => signIn("google")}>
+              <button onClick={() => handleSignIn("google")}>
                 <Image src={googleIcon} alt="" />
                 <span>Google</span>
               </button>
 
-              <button onClick={() => signIn("github")}>
+              <button onClick={() => handleSignIn("github")}>
                 <Image src={githubIcon} alt="" />
                 <span>Github</span>
               </button>
