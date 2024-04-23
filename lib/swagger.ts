@@ -4,37 +4,37 @@ import fs from "fs";
 export const getApiDocs = async () => {
   // Load YAML files for Backend API Documentation
   const accountDocument: any = yaml.load(
-    fs.readFileSync("src/utils/apiDocs/account.yaml", "utf8")
+    fs.readFileSync("apiDocs/account.yaml", "utf8")
   );
   const authDocument: any = yaml.load(
-    fs.readFileSync("src/utils/apiDocs/auth.yaml", "utf8")
+    fs.readFileSync("apiDocs/auth.yaml", "utf8")
   );
   const contactMailDocument: any = yaml.load(
-    fs.readFileSync("src/utils/apiDocs/contact-mail.yaml", "utf8")
+    fs.readFileSync("apiDocs/contact-mail.yaml", "utf8")
   );
   const userDocument: any = yaml.load(
-    fs.readFileSync("src/utils/apiDocs/user.yaml", "utf8")
+    fs.readFileSync("apiDocs/user.yaml", "utf8")
   );
   const webhookDocument: any = yaml.load(
-    fs.readFileSync("src/utils/apiDocs/webhook.yaml", "utf8")
+    fs.readFileSync("apiDocs/webhook.yaml", "utf8")
   );
   const chatbotDocument: any = yaml.load(
-    fs.readFileSync("src/utils/apiDocs/chatbot.yaml", "utf8")
+    fs.readFileSync("apiDocs/chatbot.yaml", "utf8")
   );
   const homeDocument: any = yaml.load(
-    fs.readFileSync("src/utils/apiDocs/home.yaml", "utf8")
+    fs.readFileSync("apiDocs/home.yaml", "utf8")
   );
   const stripeDocument: any = yaml.load(
-    fs.readFileSync("src/utils/apiDocs/stripe-payment.yaml", "utf8")
+    fs.readFileSync("apiDocs/stripe-payment.yaml", "utf8")
   );
   const whatsappDocument: any = yaml.load(
-    fs.readFileSync("src/utils/apiDocs/whatsapp-chat.yaml", "utf8")
+    fs.readFileSync("apiDocs/whatsapp-chat.yaml", "utf8")
   );
   const dashboardDocument: any = yaml.load(
-    fs.readFileSync("src/utils/apiDocs/dashboard.yaml", "utf8")
+    fs.readFileSync("apiDocs/dashboard.yaml", "utf8")
   );
   const mainDocument: any = yaml.load(
-    fs.readFileSync("src/utils/apiDocs/main.yaml", "utf8")
+    fs.readFileSync("apiDocs/main.yaml", "utf8")
   );
   // Create Swagger Specification
   const spec = createSwaggerSpec({
