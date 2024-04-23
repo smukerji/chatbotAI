@@ -1,0 +1,441 @@
+openapi: 3.0.3
+info:
+  title: Chatbot API Documentation
+  description: API documentation for dashboard-related endpoints.
+  version: 1.0.0
+servers:
+  - url: https://your-api-url.com
+tags:
+  - name: Dashboard
+    description: Operations related to dashboard operation
+paths:  
+  /chatbot/dashboard:
+    post:
+      summary: "Retrieve data sources for a chatbot"
+      description: "Endpoint to retrieve data sources associated with a chatbot."
+      tags:
+        - "Dashboard"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                chatbotId:
+                  type: string
+                  description: "The ID of the chatbot for which data sources are to be retrieved."
+      responses:
+        '200':
+          description: "Successful response containing data sources"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  qaList:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        question:
+                          type: string
+                        answer:
+                          type: string
+                        image:
+                          type: string
+                        id:
+                          type: string
+                    description: "List of QA data associated with the chatbot"
+                  qaCount:
+                    type: integer
+                    description: "Total count of QA data associated with the chatbot"
+                  qaCharCount:
+                    type: integer
+                    description: "Total character count of QA data associated with the chatbot"
+                  text:
+                    type: string
+                    description: "Text data associated with the chatbot"
+                  textLength:
+                    type: integer
+                    description: "Total character count of text data associated with the chatbot"
+                  defaultFileList:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        charLength:
+                          type: integer
+                        id:
+                          type: string
+                    description: "List of files associated with the chatbot"
+                  fileTextLength:
+                    type: integer
+                    description: "Total character count of text data in files associated with the chatbot"
+                  crawlData:
+                    type: array
+                    items:
+                      type: string
+                    description: "List of crawling data associated with the chatbot"
+                  crawlDataLength:
+                    type: integer
+                    description: "Total character count of crawling data associated with the chatbot"
+                  chatbotName:
+                    type: string
+                    description: "Name of the chatbot"
+                  chatbotSetting:
+                    type: object
+                    description: "Settings of the chatbot"
+    get:
+      summary: "Get chatbot settings"
+      description: "Endpoint to get settings of a chatbot."
+      tags:
+        - "Dashboard"
+      parameters:
+        - name: chatbotId
+          in: query
+          description: "The ID of the chatbot for which settings are to be retrieved."
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: query
+          description: "The ID of the user who owns the chatbot."
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "Successful response containing chatbot settings"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  chatbotSetting:
+                    type: object
+                    description: "Settings of the chatbot"
+  /chatbot/dashboard/feedback:
+    post:
+      summary: "Submit feedback for a chatbot"
+      description: "Endpoint to submit feedback for a chatbot."
+      tags:
+        - "Dashboard"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                chatbotId:
+                  type: string
+                  description: "The ID of the chatbot for which feedback is being submitted."
+                messages:
+                  type: array
+                  description: "An array of messages exchanged during the interaction."
+                  items:
+                    type: string
+                feedback:
+                  type: string
+                  description: "The feedback message."
+      responses:
+        '200':
+          description: "Feedback submitted successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "Thank you for your valuable feedback message"
+  /chatbot/dashboard/integrationApi:
+    get:
+      summary: "Check WhatsApp Integration Status"
+      description: "Endpoint to check the WhatsApp integration status for a user."
+      tags:
+        - "Dashboard"
+      parameters:
+        - name: userId
+          in: query
+          description: "The ID of the user for which WhatsApp integration status is being checked."
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "WhatsApp integration status retrieved successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isWhatsappVerified:
+                    type: boolean
+                    description: "Indicates whether WhatsApp integration is verified for the user."
+        '500':
+          description: "Error retrieving WhatsApp integration status"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: "Error message indicating the failure to retrieve WhatsApp integration status."
+  /chatbot/dashboard/integrationApiTelegram:
+    get:
+      summary: "Check Telegram Integration Status"
+      description: "Endpoint to check the Telegram integration status for a user."
+      tags:
+        - "Dashboard"
+      parameters:
+        - name: userId
+          in: query
+          description: "The ID of the user for which Telegram integration status is being checked."
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "Telegram integration status retrieved successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isTelegramVerified:
+                    type: boolean
+                    description: "Indicates whether Telegram integration is verified for the user."
+        '500':
+          description: "Error retrieving Telegram integration status"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: "Error message indicating the failure to retrieve Telegram integration status."
+  /chatbot/dashboard/slack-bot-integration:
+    post:
+      summary: "Save Slack App Data"
+      description: "Endpoint to save Slack App data for integration with a chatbot."
+      tags:
+        - "Dashboard"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                appId:
+                  type: string
+                  description: "The ID of the Slack App."
+                userId:
+                  type: string
+                  description: "The ID of the user."
+                authOToken:
+                  type: string
+                  description: "The authorization token for the Slack App."
+                chatBotId:
+                  type: string
+                  description: "The ID of the chatbot."
+      responses:
+        '200':
+          description: "Slack App Data saved successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "Confirmation message indicating successful saving of Slack App data."
+        '400':
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "Error message indicating a bad request."
+    get:
+      summary: "Get Slack App Data"
+      description: "Endpoint to retrieve Slack App data for integration with a chatbot."
+      tags:
+        - "Dashboard"
+      parameters:
+        - name: chatBotId
+          in: query
+          description: "The ID of the chatbot."
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "Slack App Data retrieved successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "Confirmation message indicating successful retrieval of Slack App data."
+                  data:
+                    type: object
+                    description: "Details of the Slack App."
+        '400':
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "Error message indicating a bad request."
+    delete:
+      summary: "Delete Slack App Data"
+      description: "Endpoint to delete Slack App data for integration with a chatbot."
+      tags:
+        - "Dashboard"
+      parameters:
+        - name: recordId
+          in: query
+          description: "The ID of the Slack App data record."
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "Slack App Data deleted successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "Confirmation message indicating successful deletion of Slack App data."
+        '400':
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "Error message indicating a bad request."
+        '404':
+          description: "Data not found"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "Error message indicating that the data to be deleted was not found."
+        '503':
+          description: "Service unavailable"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "Error message indicating that the service is unavailable."
+  /chatbot/dashboard/webhook:
+    post:
+      summary: "Handle Slack Webhook Events"
+      description: "Endpoint to handle events from Slack webhooks."
+      tags:
+        - "Dashboard"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                event:
+                  type: object
+                  description: "The Slack event data."
+      responses:
+        '200':
+          description: "Webhook event handled successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "Confirmation message indicating successful handling of webhook event."
+        '400':
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "Error message indicating a bad request."
+        '503':
+          description: "Service unavailable"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "Error message indicating that the service is unavailable."
+  /chatbot/dashboard/worker-response:
+    post:
+      summary: "Handle Worker Responses"
+      description: "Endpoint to handle responses from worker."
+      tags:
+        - "Dashboard"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                resData:
+                  type: object
+                  description: "The data received from the worker."
+      responses:
+        '200':
+          description: "Worker response handled successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: "Confirmation message indicating successful handling of worker response."
+        '503':
+          description: "Service unavailable"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: "Error message indicating that the service is unavailable."
