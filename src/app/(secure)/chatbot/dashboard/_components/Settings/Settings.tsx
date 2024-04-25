@@ -13,6 +13,7 @@ import "./../Settings/settings.scss";
 import Model from "./_components/model/Model";
 import ChatInterface from "./_components/chatInterface/ChatInterface";
 import Security from "./_components/security/Security";
+import Lead from "./_components/lead/Lead";
 
 function Settings({ chatbotId, chatbotName }: any) {
   const botContext: any = useContext(CreateBotContext);
@@ -70,7 +71,7 @@ function Settings({ chatbotId, chatbotName }: any) {
               <Icon Icon={SecurityIcon} />
               <h3>Security</h3>
             </li>
-            {/* <li
+            <li
               className={`${chabotSettings === "lead" ? "active" : ""}`}
               value={"lead"}
               onClick={() => botContext?.handleChange("chabotSettings")("lead")}
@@ -78,7 +79,7 @@ function Settings({ chatbotId, chatbotName }: any) {
               <Icon Icon={LeadIcon} />
               <h3>Lead</h3>
             </li>
-            <li
+            {/* <li
               className={`${
                 chabotSettings === "notifications" ? "active" : ""
               }`}
@@ -104,7 +105,7 @@ function Settings({ chatbotId, chatbotName }: any) {
             <ChatInterface chatbotId={chatbotId} />
           )}
           {chabotSettings === "security" && <Security />}
-          {chabotSettings === "lead" && <h1>lead</h1>}
+          {chabotSettings === "lead" && <Lead />}
           {chabotSettings === "notifications" && <h1>notifications</h1>}
         </div>
       </div>
