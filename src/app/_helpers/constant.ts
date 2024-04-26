@@ -18,3 +18,5 @@ export const chatbotBubbleAlignment = {
 };
 export const defaultUserMessageColor = "#fe632f";
 export const defaultChatBubbleIconColor = "#9b00fb";
+export const defaultLeadTitle = "Let us know how to contact you";
+export const defaultLeadUserDetails = "do-not-collect";

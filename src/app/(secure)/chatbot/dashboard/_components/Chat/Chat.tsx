@@ -9,7 +9,7 @@ import { useCookies } from "react-cookie";
 import "./chat.scss";
 import { DislikeOutlined, SendOutlined, LikeOutlined } from "@ant-design/icons";
 import Image from "next/image";
-import { Slider, message } from "antd";
+import { Button, Slider, message } from "antd";
 import ChatbotNameModal from "../../../../../_components/Modal/ChatbotNameModal";
 import { getDate, getTime } from "../../../../../_helpers/client/getTime";
 import copyIcon from "../../../../../../../public/svgs/copy-icon.svg";
@@ -51,6 +51,9 @@ function Chat({
   suggestedMessages,
   initialMessage,
   profilePictureUrl,
+  leadFields,
+  leadTitle,
+  userLeadDetails,
 }: any) {
   let tempRef: any = useRef<HTMLDivElement>();
 
@@ -66,6 +69,8 @@ function Chat({
   const botSettingContext: any = useContext(ChatbotSettingContext);
   const botSettings = botSettingContext?.chatbotSettings;
 
+  console.log(botSettings);
+
   const [cookies, setCookies] = useCookies(["userId"]);
 
   /// storing the input value
@@ -77,6 +82,13 @@ function Chat({
   /// loading state
   const [loading, setLoading] = useState(false);
 
+  /// skip leading form
+  const [skipLeadForm, setSkipLeadForm] = useState(false);
+
+  /// isLeadform submitted
+  const [isLeadFormSubmitted, setIsLeadFormSubmitted] = useState(false);
+  const [leadError, setLeadError] = useState("");
+
   const chatWindowRef: any = useRef(null);
 
   /// chatbot messages feedback pop up state
@@ -84,6 +96,13 @@ function Chat({
   const [feedbackText, setfeedbackText] = useState("");
   const [feedbackIndex, setFeedbackIndex] = useState(0);
   const [feedbackStatus, setfeedbackStatus] = useState("");
+
+  /// chatbot lead section state
+  const [leadDetails, setLeadDetails] = useState({
+    name: "",
+    email: "",
+    number: "",
+  });
 
   /// handling the chatbot ok action
   const handleOk = async () => {
@@ -176,6 +195,11 @@ function Chat({
   /// get the chatbase response
   async function getReply(event: any) {
     if (event.key === "Enter" || event === "click") {
+      if (userQuery.trim() == "") {
+        message.error("Please enter the message");
+        return;
+      }
+      setLoading(true);
       const tempUserMessageTime = getDate();
       /// clear the response
       setUserQuery("");
@@ -212,124 +236,123 @@ function Chat({
         message.error(
           "Sorry you have exceeded the chat limit. PLease upgrade your plan"
         );
+        setLoading(false);
+
         return;
       } else {
-        if (userQuery.trim() == "") {
-          alert("Please enter the message");
-        } else {
-          try {
-            setLoading(true);
-            /// get similarity search
-            const response: any = await fetch(
-              `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/pinecone`,
-              {
-                method: "POST",
-                body: JSON.stringify({
-                  userQuery,
-                  chatbotId: chatbot?.id,
-                  // userId: cookies.userId,
-                  //// default chatbot set
-                  userId:
-                    // chatbot?.id === "123d148a-be02-4749-a612-65be9d96266c"
-                    //   ? "651d111b8158397ebd0e65fb"
-                    //   : chatbot?.id === "34cceb84-07b9-4b3e-ad6f-567a1c8f3557"
-                    //   ? "65795294269d08529b8cd743"
-                    //   : chatbot?.id === "f0893732-3302-46b2-922a-95e79ef3524c"
-                    //   ? "651d111b8158397ebd0e65fb"
-                    //   : chatbot?.id === "f8095ef4-6cd0-4373-a45e-8fe15cb6dd0f"
-                    //   ? "6523fee523c290d75609a1fa"
-                    cookies.userId ? cookies.userId : userId,
-                }),
-              }
-            );
+        try {
+          // setLoading(true);
+          /// get similarity search
+          const response: any = await fetch(
+            `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/pinecone`,
+            {
+              method: "POST",
+              body: JSON.stringify({
+                userQuery,
+                chatbotId: chatbot?.id,
+                // userId: cookies.userId,
+                //// default chatbot set
+                userId:
+                  // chatbot?.id === "123d148a-be02-4749-a612-65be9d96266c"
+                  //   ? "651d111b8158397ebd0e65fb"
+                  //   : chatbot?.id === "34cceb84-07b9-4b3e-ad6f-567a1c8f3557"
+                  //   ? "65795294269d08529b8cd743"
+                  //   : chatbot?.id === "f0893732-3302-46b2-922a-95e79ef3524c"
+                  //   ? "651d111b8158397ebd0e65fb"
+                  //   : chatbot?.id === "f8095ef4-6cd0-4373-a45e-8fe15cb6dd0f"
+                  //   ? "6523fee523c290d75609a1fa"
+                  cookies.userId ? cookies.userId : userId,
+              }),
+            }
+          );
 
-            /// parse the response and extract the similarity results
-            const respText = await response.text();
+          /// parse the response and extract the similarity results
+          const respText = await response.text();
 
-            const similaritySearchResults = JSON.parse(respText).join("\n");
-            console.log(similaritySearchResults);
+          const similaritySearchResults = JSON.parse(respText).join("\n");
 
-            /// get response from backend in streaming
-            const responseFromBackend: any = await fetch(
-              `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/chat`,
-              {
-                method: "POST",
-                body: JSON.stringify({
-                  similaritySearchResults,
-                  messages,
-                  userQuery,
-                  chatbotId: chatbot?.id,
-                  //// default chatbot set
-                  userId:
-                    // chatbot?.id === "123d148a-be02-4749-a612-65be9d96266c"
-                    //   ? "651d111b8158397ebd0e65fb"
-                    //   : chatbot?.id === "34cceb84-07b9-4b3e-ad6f-567a1c8f3557"
-                    //   ? "65795294269d08529b8cd743"
-                    //   : chatbot?.id === "f0893732-3302-46b2-922a-95e79ef3524c"
-                    //   ? "651d111b8158397ebd0e65fb"
-                    //   : chatbot?.id === "f8095ef4-6cd0-4373-a45e-8fe15cb6dd0f"
-                    //   ? "6523fee523c290d75609a1fa"
-                    cookies.userId ? cookies.userId : userId,
-                }),
-                next: { revalidate: 0 },
-              }
-            );
-            let resptext = "";
-            const reader = responseFromBackend.body
-              .pipeThrough(new TextDecoderStream())
-              .getReader();
-            while (true) {
-              const { value, done } = await reader.read();
-              if (done) {
-                /// setting the response when completed
-                setMessages((prev: any) => [
-                  ...prev,
-                  { role: "assistant", content: resptext },
-                ]);
-                /// setting the response time when completed
-                setMessagesTime((prev: any) => [
-                  ...prev,
-                  {
-                    role: "assistant",
-                    content: resptext,
-                    messageTime: getDate(),
-                  },
-                ]);
-                /// store history
-                const userLatestQuery = {
-                  role: "user",
-                  content: userQuery,
-                  messageTime: tempUserMessageTime,
-                };
-                const gptLatestResponse = {
+          /// get response from backend in streaming
+          const responseFromBackend: any = await fetch(
+            `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/chat`,
+            {
+              method: "POST",
+              body: JSON.stringify({
+                similaritySearchResults,
+                messages,
+                userQuery,
+                chatbotId: chatbot?.id,
+                //// default chatbot set
+                userId:
+                  // chatbot?.id === "123d148a-be02-4749-a612-65be9d96266c"
+                  //   ? "651d111b8158397ebd0e65fb"
+                  //   : chatbot?.id === "34cceb84-07b9-4b3e-ad6f-567a1c8f3557"
+                  //   ? "65795294269d08529b8cd743"
+                  //   : chatbot?.id === "f0893732-3302-46b2-922a-95e79ef3524c"
+                  //   ? "651d111b8158397ebd0e65fb"
+                  //   : chatbot?.id === "f8095ef4-6cd0-4373-a45e-8fe15cb6dd0f"
+                  //   ? "6523fee523c290d75609a1fa"
+                  cookies.userId ? cookies.userId : userId,
+              }),
+              next: { revalidate: 0 },
+            }
+          );
+          let resptext = "";
+          const reader = responseFromBackend.body
+            .pipeThrough(new TextDecoderStream())
+            .getReader();
+          while (true) {
+            const { value, done } = await reader.read();
+            if (done) {
+              /// setting the response when completed
+              setMessages((prev: any) => [
+                ...prev,
+                { role: "assistant", content: resptext },
+              ]);
+              /// setting the response time when completed
+              setMessagesTime((prev: any) => [
+                ...prev,
+                {
                   role: "assistant",
                   content: resptext,
                   messageTime: getDate(),
-                };
+                },
+              ]);
+              /// store history
+              const userLatestQuery = {
+                role: "user",
+                content: userQuery,
+                messageTime: tempUserMessageTime,
+              };
+              const gptLatestResponse = {
+                role: "assistant",
+                content: resptext,
+                messageTime: getDate(),
+              };
 
-                storeHistory(userLatestQuery, gptLatestResponse);
-                setResponse("");
-                setLoading(false);
-                break;
-              }
-
-              resptext += value;
-              setResponse(resptext);
+              storeHistory(userLatestQuery, gptLatestResponse);
+              setResponse("");
+              setLoading(false);
+              break;
             }
-          } catch (e: any) {
-            console.log(
-              "Error while getting completion from custom chatbot",
-              e,
-              e.message
-            );
-          } finally {
-            setLoading(false);
+
+            resptext += value;
+            setResponse(resptext);
           }
+        } catch (e: any) {
+          console.log(
+            "Error while getting completion from custom chatbot",
+            e,
+            e.message
+          );
+        } finally {
+          setLoading(false);
         }
       }
     }
     // }
   }
+
+  console.log(botSettings, "lllll");
 
   /// refresh the chat window
   const refreshChat = () => {
@@ -392,6 +415,53 @@ function Chat({
     } catch (err: any) {
       message.error("Copy Failed!", err.message);
     }
+  };
+
+  /// function for submitting lead
+  const submitLeadDetail = async () => {
+    console.log("clicked on submit button", leadDetails);
+    setLeadError("");
+
+    try {
+      if (
+        (botSettings?.leadFields?.name.isChecked == true &&
+          leadDetails.name === "") ||
+        (botSettings?.leadFields?.email.isChecked == true &&
+          leadDetails.email === "") ||
+        (botSettings?.leadFields?.number.isChecked == true &&
+          leadDetails.number === "")
+      ) {
+        setLeadError("Please, fill out all required  fields.");
+        return;
+      }
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/api/lead`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            chatbotId: chatbot.id,
+            userId: cookies.userId ? cookies.userId : userId,
+            leadDetails: leadDetails,
+          }),
+          next: { revalidate: 0 },
+        }
+      );
+
+      if (!res.ok) {
+        throw await res.json();
+      }
+      /// displaying status
+      const data = await res.json();
+
+      // message.success(data?.message);
+      setIsLeadFormSubmitted(true);
+    } catch (error) {}
+  };
+
+  /// function for skipping lead detail
+
+  const skipLeadDetail = () => {
+    setSkipLeadForm(true);
   };
 
   return (
@@ -611,6 +681,117 @@ function Chat({
                 </div>
               );
           })}
+
+          {loading == false &&
+            // isPopUp &&
+            !isLeadFormSubmitted &&
+            !skipLeadForm &&
+            messages.length > 1 &&
+            messages.length % 2 == 1 &&
+            userLeadDetails !== "do-not-collect" && (
+              <div className="lead-generation-container">
+                <h2>
+                  {leadTitle ? leadTitle : "Let us know how to contact you"}
+                </h2>
+
+                <div className="collect-details">
+                  {leadFields?.name.isChecked == true && (
+                    <div className="detail-field">
+                      <p className="title">
+                        {leadFields?.name.value
+                          ? leadFields?.name.value
+                          : "Name"}
+                      </p>
+                      <input
+                        type="text"
+                        className="title-input"
+                        placeholder="Enter your name..."
+                        onChange={(e: any) => {
+                          setLeadDetails({
+                            ...leadDetails,
+                            name: e.target.value,
+                          });
+                          setLeadError("");
+                        }}
+                        value={leadDetails.name}
+                      />
+                    </div>
+                  )}
+
+                  {leadFields?.email.isChecked == true && (
+                    <div className="detail-field">
+                      <p className="title">
+                        {leadFields?.email.value
+                          ? leadFields?.email.value
+                          : "Email Address"}
+                      </p>
+                      <input
+                        type="email"
+                        className="title-input"
+                        placeholder="Enter your email address..."
+                        onChange={(e) => {
+                          setLeadDetails({
+                            ...leadDetails,
+                            email: e.target.value,
+                          });
+                          setLeadError("");
+                        }}
+                        value={leadDetails?.email}
+                      />
+                    </div>
+                  )}
+
+                  {leadFields?.number.isChecked == true && (
+                    <div className="detail-field">
+                      <p className="title">
+                        {leadFields?.number.value
+                          ? leadFields?.number.value
+                          : "Phone Number"}
+                      </p>
+                      <input
+                        type="number"
+                        className="title-input"
+                        placeholder="Enter your phone number..."
+                        onChange={(e) => {
+                          setLeadDetails({
+                            ...leadDetails,
+                            number: e.target.value,
+                          });
+                          setLeadError("");
+                        }}
+                        value={leadDetails?.number}
+                      />
+                    </div>
+                  )}
+                  {leadError && (
+                    <div className="lead-error">
+                      <p>{leadError}</p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="submit-skip-btn">
+                  <Button
+                    type="primary"
+                    className="save-btn"
+                    onClick={submitLeadDetail}
+                  >
+                    Submit
+                  </Button>
+
+                  {userLeadDetails !== "mandatory" && (
+                    <Button
+                      type="text"
+                      className="skip-btn"
+                      onClick={skipLeadDetail}
+                    >
+                      Skip
+                    </Button>
+                  )}
+                </div>
+              </div>
+            )}
+
           {loading && response.length == 0 && (
             <div className="assistant-message-container">
               <div

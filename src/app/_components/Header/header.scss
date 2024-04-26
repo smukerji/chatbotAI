@@ -21,6 +21,10 @@
         margin-bottom: 0;
         max-height: 4px;
 
+        &.ant-progress-status-success .ant-progress-bg {
+          background-color: red;
+        }
+
         .ant-progress-inner {
           height: 4px;
         }

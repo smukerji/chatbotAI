@@ -36,6 +36,11 @@ function Chatbot() {
   const [bubbleIconUrl, setBubbleIconUrl] = useState();
   const [profilePictureUrl, setProfilePictureUrl] = useState();
 
+  /// lead details
+  const [leadFields, setLeadFields] = useState({});
+  const [leadTitle, setLeadTitle] = useState();
+  const [userDetails, setUserDetails] = useState();
+
   /// state to keep the chatbot open or close
   const [state, setState] = useState(false);
   function toggleChatbot() {
@@ -65,6 +70,9 @@ function Chatbot() {
       setUserId(botDetails?.userId);
       setSuggestedMessages(botDetails?.chatbotSettings[0]?.suggestedMessages);
       setInitialMessage(botDetails?.chatbotSettings[0]?.initialMessage);
+      setLeadFields(botDetails?.chatbotSettings[0]?.leadFields);
+      setLeadTitle(botDetails?.chatbotSettings[0]?.leadTitle);
+      setUserDetails(botDetails?.chatbotSettings[0]?.userDetails);
       botDetails?.chatbotSettings[0]?.initialMessage?.map((message, index) => {
         // setMessages((prev): any => {
         //   [
@@ -119,6 +127,9 @@ function Chatbot() {
             suggestedMessages={suggestedMessages}
             initialMessage={initialMessage}
             profilePictureUrl={profilePictureUrl}
+            leadFields={leadFields}
+            leadTitle={leadTitle}
+            userLeadDetails={userDetails}
           />
         </div>
       )}

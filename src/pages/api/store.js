@@ -16,6 +16,8 @@ import {
 import {
   chatbotBubbleAlignment,
   defaultChatBubbleIconColor,
+  defaultLeadTitle,
+  defaultLeadUserDetails,
   defaultModelInstruction,
   defaultPlaceholderMessage,
   defaultSuggestedMessage,
@@ -639,6 +641,13 @@ export default async function handler(req, res) {
             lastTrained: currrentTime,
             chatbotBubbleAlignment: chatbotBubbleAlignment.LEFT,
             noOfMessagesSent: 0,
+            leadFields: {
+              name: { isChecked: false, value: "name" },
+              email: { isChecked: false, value: "email" },
+              number: { isChecked: false, value: "number" },
+            },
+            leadTitle: defaultLeadTitle,
+            userDetails: defaultLeadUserDetails,
           });
         } else {
           /// if chatbot is being updated just update the timestamp and characters
