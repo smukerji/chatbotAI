@@ -133,17 +133,17 @@
                             }
                         }
                     }
-                    // .ant-radio-wrapper .ant-radio-checked .ant-radio-inner {
-                    //     content: ""; /* Remove the default dot */
-                    // }
-                    // /* Define custom styles for checked and unchecked states */
-                    // .ant-radio-wrapper .ant-radio-checked .ant-radio-inner {
-                    //     background-color: unset;
-                    //     color: unset;
-                    //     width: 24px;
-                    //     height: 24px;
-                    //     background: url("../../../../../../../../../public/svgs/tick-circle.svg") !important; /* Custom checked icon */
-                    // }
+                    .ant-radio-wrapper .ant-radio-checked .ant-radio-inner {
+                        content: ""; /* Remove the default dot */
+                    }
+                    /* Define custom styles for checked and unchecked states */
+                    .ant-radio-wrapper .ant-radio-checked .ant-radio-inner {
+                        background-color: #2e58ea;
+                        color: unset;
+                        width: 24px;
+                        height: 24px;
+                        // background-image: url("../../../../../../../../../public/svgs/radio-tick.svg") !important; /* Custom checked icon */
+                    }
                 }
             }
         }
@@ -177,9 +177,9 @@
             }
         }
 
-        .ant-switch {
-            background: rgb(0 0 0 / 10%);
-        }
+        // .ant-switch {
+        //     // background: rgb(0 0 0 / 10%);
+        // }
     }
 
     .save-btn {
@@ -207,11 +207,11 @@
             }
         }
 
-        .leads-field{
-            .title{
+        .leads-field {
+            .title {
                 font-size: 18px;
             }
-            .sub-title{
+            .sub-title {
                 font-size: 15px;
             }
         }
