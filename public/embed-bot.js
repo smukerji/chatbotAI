@@ -40,7 +40,7 @@
   document.body.insertAdjacentHTML(
     "beforeend",
     `<iframe
-      src="http://localhost:3000/embed-bot?chatbotID=${param1}";
+      src="https://chatbot-ai-silk.vercel.app/embed-bot?chatbotID=${param1}";
       frameborder="0"
       ></iframe>`
   );
