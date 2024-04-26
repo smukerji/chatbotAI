@@ -1,11 +1,11 @@
-import { NextRequest } from "next/server";
-import { apiHandler } from "../../../../../_helpers/server/api/api-handler";
-import { NextApiRequest } from "next";
-import clientPromise from "../../../../../../db";
-import { getDate } from "../../../../../_helpers/client/getTime";
-import joi from "joi";
-import { authOptions } from "../../../../../api/auth/[...nextauth]/route";
-import { getServerSession } from "next-auth";
+import { NextRequest } from 'next/server';
+import { apiHandler } from '../../../../../_helpers/server/api/api-handler';
+import { NextApiRequest } from 'next';
+import clientPromise from '../../../../../../db';
+import { getDate } from '../../../../../_helpers/client/getTime';
+import joi from 'joi';
+import { authOptions } from '../../../../../api/auth/[...nextauth]/route';
+import { getServerSession } from 'next-auth';
 
 module.exports = apiHandler({
   POST: retriveChatbotSettings,
@@ -25,15 +25,15 @@ type Chats = {
 async function retriveChatbotSettings(request: NextRequest) {
   /// get the session and then access the id
   const session: any = await getServerSession(authOptions);
-  const userId = request?.headers.get("userId")
-    ? request?.headers.get("userId")
+  const userId = request?.headers.get('userId')
+    ? request?.headers.get('userId')
     : session?.user?.id;
   const body = await request.json();
   // Accessing chatbotId from body
   const chatbotId = body?.chatbotId;
 
   const db = (await clientPromise!).db();
-  const collection = db.collection("chat-history");
+  const collection = db.collection('chat-history');
 
   const cursor = await collection.find({
     userId: userId,
@@ -51,7 +51,7 @@ async function retriveChatbotSettings(request: NextRequest) {
   let lastSevenDay: any = {};
   let moreThanLastSevenDay: any = {};
 
-  const todaysDate: any = new Date(getDate().split(" ")[0].replace(/\//g, "-"));
+  const todaysDate: any = new Date(getDate().split(' ')[0].replace(/\//g, '-'));
 
   ///  the number of milliseconds in a yesterday
   const yesterDayInMillis = 24 * 60 * 60 * 1000;
@@ -62,22 +62,22 @@ async function retriveChatbotSettings(request: NextRequest) {
   ///  the number of milliseconds in a more than last 7 days
   const moreThanSevenDayInMillis = 24 * 60 * 60 * 1000 * 7;
   data?.forEach((obj: any) => {
-    const date: any = new Date(obj.date.replace(/\//g, "-"));
+    const date: any = new Date(obj.date.replace(/\//g, '-'));
 
     // Calculate the difference in milliseconds
     const timeDiff = Math.abs(date - todaysDate);
 
     /// get today chat conversation
-    if (timeDiff == 0) today["chats"] = obj.chats;
+    if (timeDiff == 0) today['chats'] = obj.chats;
     /// get yesterday chat conversation
-    else if (timeDiff == yesterDayInMillis) yesterday["chats"] = obj.chats;
+    else if (timeDiff == yesterDayInMillis) yesterday['chats'] = obj.chats;
     /// get last 7 days chat conversation
     else if (timeDiff > yesterDayInMillis)
-      lastSevenDay["chats"] = { ...lastSevenDay["chats"], ...obj.chats };
+      lastSevenDay['chats'] = { ...lastSevenDay['chats'], ...obj.chats };
     /// get more than last 7 days chat conversation
     else if (timeDiff > sevenDayInMillis)
-      moreThanLastSevenDay["chats"] = {
-        ...moreThanLastSevenDay["chats"],
+      moreThanLastSevenDay['chats'] = {
+        ...moreThanLastSevenDay['chats'],
         ...obj.chats,
       };
   });
@@ -90,8 +90,8 @@ async function retriveChatbotSettings(request: NextRequest) {
 async function updateChatbotSettings(request: NextRequest) {
   /// get the session and then access the id
   const session: any = await getServerSession(authOptions);
-  const userId = request?.headers.get("userId")
-    ? request?.headers.get("userId")
+  const userId = request?.headers.get('userId')
+    ? request?.headers.get('userId')
     : session?.user?.id;
 
   const body = await request.json();
@@ -103,8 +103,8 @@ async function updateChatbotSettings(request: NextRequest) {
 
   const db = (await clientPromise!).db();
   /// if rename is not ""
-  if (chatbotRename !== "" && chatbotRename !== undefined) {
-    const collection = db.collection("user-chatbots");
+  if (chatbotRename !== '' && chatbotRename !== undefined) {
+    const collection = db.collection('user-chatbots');
 
     /// update the name
     await collection.updateOne(
@@ -135,6 +135,9 @@ async function updateChatbotSettings(request: NextRequest) {
       tempprofilePictureName,
       tempbubbleIconName,
       chatbotDisplayName,
+      leadTitle,
+      userDetails,
+      leadFields,
     } = body;
 
     /// extract only the field that need to be updated
@@ -169,8 +172,11 @@ async function updateChatbotSettings(request: NextRequest) {
         chatbotDisplayName,
       }),
       ...(chatbotBubbleAlignment !== undefined && { chatbotBubbleAlignment }),
+      ...(leadTitle !== undefined && { leadTitle }),
+      ...(userDetails !== undefined && { userDetails }),
+      ...(leadFields !== undefined && { leadFields }),
     };
-    const collection = db.collection("chatbot-settings");
+    const collection = db.collection('chatbot-settings');
 
     /// update the name
     await collection.updateOne(
@@ -182,7 +188,7 @@ async function updateChatbotSettings(request: NextRequest) {
     );
   }
 
-  return { message: "Chatbot Updated successfully..." };
+  return { message: 'Chatbot Updated successfully...' };
 }
 
 /**
@@ -209,11 +215,14 @@ updateChatbotSettings.schema = joi.object({
   theme: joi.string().optional(),
   userMessageColor: joi.string().optional(),
   chatbotIconColor: joi.string().optional(),
-  tempprofilePictureUrl: joi.string().optional().allow(""),
-  tempbubbleIconUrl: joi.string().optional().allow(""),
+  tempprofilePictureUrl: joi.string().optional().allow(''),
+  tempbubbleIconUrl: joi.string().optional().allow(''),
   lastTrained: joi.date().optional(),
-  chatbotBubbleAlignment: joi.string().optional().allow(""),
-  tempprofilePictureName: joi.string().optional().allow(""),
-  tempbubbleIconName: joi.string().optional().allow(""),
+  chatbotBubbleAlignment: joi.string().optional().allow(''),
+  tempprofilePictureName: joi.string().optional().allow(''),
+  tempbubbleIconName: joi.string().optional().allow(''),
   chatbotDisplayName: joi.string().optional(),
+  leadTitle: joi.string().optional(),
+  userDetails: joi.string().optional(),
+  leadFields: joi.array().optional(),
 });
