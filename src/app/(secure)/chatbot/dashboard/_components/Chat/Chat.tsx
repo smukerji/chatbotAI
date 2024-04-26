@@ -424,12 +424,9 @@ function Chat({
 
     try {
       if (
-        (botSettings?.leadFields?.name.isChecked == true &&
-          leadDetails.name === "") ||
-        (botSettings?.leadFields?.email.isChecked == true &&
-          leadDetails.email === "") ||
-        (botSettings?.leadFields?.number.isChecked == true &&
-          leadDetails.number === "")
+        (leadFields?.name.isChecked == true && leadDetails.name === "") ||
+        (leadFields?.email.isChecked == true && leadDetails.email === "") ||
+        (leadFields?.number.isChecked == true && leadDetails.number === "")
       ) {
         setLeadError("Please, fill out all required  fields.");
         return;
@@ -683,7 +680,7 @@ function Chat({
           })}
 
           {loading == false &&
-            // isPopUp &&
+            isPopUp &&
             !isLeadFormSubmitted &&
             !skipLeadForm &&
             messages.length > 1 &&
