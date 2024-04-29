@@ -67,7 +67,9 @@ export default function RootLayout({
           pathName !== "/home/pricing" &&
           pathName &&
           pathName.length > 0 &&
-          !pathName.includes("/home/pricing/checkout")
+          !pathName.includes("/home/pricing/checkout") &&
+          pathName !== "/home/account-settings" &&
+          pathName !== "/home/BillingAndUsage"
         ) {
           setIsPlanNotification(true);
         }
@@ -78,7 +80,9 @@ export default function RootLayout({
       pathName === "/home/pricing" ||
       (pathName &&
         pathName.length > 0 &&
-        pathName.includes("/home/pricing/checkout"))
+        pathName.includes("/home/pricing/checkout")) ||
+      pathName === "/home/account-settings" ||
+      pathName === "/home/BillingAndUsage"
     ) {
       setIsPlanNotification(false);
     }
