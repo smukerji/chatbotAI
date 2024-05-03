@@ -848,7 +848,9 @@ function Chat({
             );
           })}
         </div>
-        <span className="powered-by">Powered by Torri.AI</span>
+        <a className="powered-by" target="_blank" href="https://torri.ai">
+          Powered by Torri.AI
+        </a>
         <div
           className="chat-question"
           style={{
