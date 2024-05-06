@@ -10,7 +10,6 @@ import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import Header from "./_components/Header/Header";
 import { UserDetailsDataProvider } from "./_helpers/client/Context/UserDetailsContext";
-import { usePathname } from "next/navigation";
 import "./layout.scss";
 
 // const AuthBtn = dynamic(() => import("./_components/AuthBtn"), { ssr: false });
@@ -24,71 +23,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   // const { Header } = Layout;
-  const pathName = usePathname();
   const [path, setPath] = useState("");
   const [cookies, setCookie] = useCookies(["userId"]);
-  const [isPlanNotification, setIsPlanNotification] = useState(false);
-  const [user, setUser] = useState<any>(null);
-
-  const getUser = async () => {
-    if (
-      ![
-        "/",
-        "/account/login",
-        "/account/register",
-        "/home/pricing/checkout",
-      ].includes(pathName ?? "")
-    ) {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/user?userId=${cookies.userId}`
-      );
-
-      setUser(response.data.user);
-    }
-  };
 
   useEffect(() => {
-    getUser();
     setPath(window.location.pathname);
   }, []);
-
-  const handleUpgradePlan = () => {
-    setIsPlanNotification(false);
-    window.location.href = "/home/pricing";
-  };
-
-  useEffect(() => {
-    const planEndTimer = setInterval(() => {
-      if (user) {
-        const planEndDate = new Date(user?.endDate);
-
-        if (
-          new Date() > planEndDate &&
-          pathName !== "/home/pricing" &&
-          pathName &&
-          pathName.length > 0 &&
-          !pathName.includes("/home/pricing/checkout") &&
-          pathName !== "/home/account-settings" &&
-          pathName !== "/home/BillingAndUsage"
-        ) {
-          setIsPlanNotification(true);
-        }
-      }
-    }, 1000);
-
-    if (
-      pathName === "/home/pricing" ||
-      (pathName &&
-        pathName.length > 0 &&
-        pathName.includes("/home/pricing/checkout")) ||
-      pathName === "/home/account-settings" ||
-      pathName === "/home/BillingAndUsage"
-    ) {
-      setIsPlanNotification(false);
-    }
-
-    return () => clearInterval(planEndTimer);
-  }, [user, pathName]);
 
   return (
     <html lang="en">
@@ -111,22 +51,22 @@ export default function RootLayout({
               path !== "/privacy" && <AuthHeader />}
             {children}
 
-            <Modal
-              title="Upgrade Now to create new Chatbots!"
+            {/* <Modal
+              title='Upgrade Now to create new Chatbots!'
               open={isPlanNotification}
               onCancel={() => {}}
               footer={[
-                <Button key="submit" type="primary" onClick={handleUpgradePlan}>
+                <Button key='submit' type='primary' onClick={handleUpgradePlan}>
                   Upgrade Now
                 </Button>,
               ]}
               closable={false}
               centered
-              className="subscription-expire-popup"
+              className='subscription-expire-popup'
               width={800}
             >
               <p>Upgrade now to access your chatbots!</p>
-            </Modal>
+            </Modal> */}
           </UserDetailsDataProvider>
         </SessionProvider>
       </body>
