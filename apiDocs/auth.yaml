@@ -1,0 +1,25 @@
+# swagger/auth.yaml
+
+openapi: 3.0.3
+info:
+  title: Authentication API Documentation
+  description: API documentation for authentication-related endpoints.
+  version: 1.0.0
+servers:
+  - url: https://your-api-url.com
+tags:
+  - name: Auth
+    description: Operations related to user authentication
+paths:
+  /api/auth/[...nextauth]:
+    post:
+      tags:
+        - Auth
+      summary: NextAuth API route
+      description: Route to handle NextAuth authentication requests.
+      operationId: nextAuthRoute
+      responses:
+        '200':
+          description: Successful operation
+        '404':
+          description: Route not found

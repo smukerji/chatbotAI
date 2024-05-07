@@ -1,7 +1,12 @@
 .ant-modal-root {
   .ant-modal-mask {
-    backdrop-filter: blur(7px);
+    backdrop-filter: blur(4px);
     background: none;
+    margin-top: 70px;
+  }
+  .ant-modal-wrap {
+    height: calc(100% - 70px);
+    margin-top: 70px;
   }
   .subscription-expire-popup {
     .ant-modal-content {
@@ -9,7 +14,7 @@
       background: transparent !important;
       text-align: center;
       .ant-modal-body {
-        font-family: 'General Sans';
+        font-family: "General Sans";
         font-size: 20px;
         font-style: normal;
         font-weight: 500;
@@ -20,7 +25,7 @@
         background: transparent !important;
         text-align: center;
         .ant-modal-title {
-          font-family: 'General Sans';
+          font-family: "General Sans";
           font-size: 30px;
           font-weight: 600;
           line-height: 40px;

@@ -20,10 +20,10 @@
       gap: 16px;
       .title {
         color: #141416;
-        font-size: 48px;
+        font-size: 40px;
         font-style: normal;
         font-weight: 600;
-        line-height: 4vw; /* 141.667% */
+        line-height: 48px; /* 141.667% */
 
         @media only screen and (max-width: 1920px) {
           font-size: 40px;
@@ -31,6 +31,11 @@
 
         @media only screen and (max-width: 1440px) {
           font-size: 35px;
+        }
+
+        @media only screen and (min-width: 1440px) {
+          font-size: 48px;
+          line-height: 60px;
         }
       }
       .text {

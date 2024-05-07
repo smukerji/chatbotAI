@@ -1,35 +1,47 @@
-import { NextResponse } from 'next/server';
-import clientPromise from '../../../../db';
-import { apiHandler } from '../../../_helpers/server/api/api-handler';
-import joi from 'joi';
-import bcrypt from 'bcrypt';
-import { emailService } from '../../../_services/emailService';
-import { logo, logoBase64, registerationMail } from '../../../_helpers/emailImagesBase64Constants';
-import jwt, { Secret } from 'jsonwebtoken';
+import { NextResponse } from "next/server";
+import clientPromise from "../../../../db";
+import { apiHandler } from "../../../_helpers/server/api/api-handler";
+import joi from "joi";
+import bcrypt from "bcrypt";
+import { emailService } from "../../../_services/emailService";
+import {
+  logo,
+  logoBase64,
+  registerationMail,
+} from "../../../_helpers/emailImagesBase64Constants";
+import jwt, { Secret } from "jsonwebtoken";
 
 module.exports = apiHandler({
-  POST: register
+  POST: register,
 });
 
 function generateJWTToken(email: string) {
   return jwt.sign({ email }, process.env.NEXT_PUBLIC_JWT_SECRET as Secret, {
-    expiresIn: process.env.NEXT_PUBLIC_JWT_EXPIRES_IN
+    expiresIn: process.env.NEXT_PUBLIC_JWT_EXPIRES_IN,
   });
 }
 
 async function register(request: any) {
   const body = await request.json();
-  let msg
+  let msg;
   const { username, email, password } = body;
   const db = (await clientPromise!).db();
-  const collection = db.collection('users');
+  const collection = db.collection("users");
   /// validate if user email already exists
   const user = await collection.findOne({ email: email });
-  if (user && user.isVerified == true) {
-    throw 'Email "' + email + '" is already in use';
-  }
-  if (user && user.isVerified == false) {
-    msg = 'This email is already registered kindly check your email to verify'
+  const temailService = emailService();
+  if (user) {
+    if (user?.isVerified == true) {
+      throw 'Email "' + email + '" is already in use';
+    } else if (user?.isVerified == false) {
+      msg =
+        "This email is already registered kindly check your email to verify";
+    } else if (user?.image) {
+      throw "This email is already used by a social account.";
+    } else {
+      msg =
+        "This email is already registered kindly check your email to verify";
+    }
   } else {
     /// generate the password hash
     const saltRounds = 10;
@@ -37,7 +49,9 @@ async function register(request: any) {
     let currentDate = new Date();
     let endDate = new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000);
     /// get the starter plan ID
-    const starterPlan = await db.collection('plans').findOne({ name: 'individual' });
+    const starterPlan = await db
+      .collection("plans")
+      .findOne({ name: "individual" });
 
     /// register new user
     const userResult = await collection.insertOne({
@@ -48,39 +62,44 @@ async function register(request: any) {
       startDate: currentDate,
       isWhatsapp: true,
       endDate: endDate,
-      isVerified: false
+      isVerified: false,
     });
-    
+
     const userId = userResult?.insertedId.toString();
-    
+
     /// set the user details
-    await db.collection('user-details').insertOne({
+    await db.collection("user-details").insertOne({
       userId: userId,
       totalMessageCount: 0,
       messageLimit: starterPlan?.messageLimit,
       chatbotLimit: starterPlan?.numberOfChatbot,
       trainingDataLimit: starterPlan?.trainingDataLimit,
-      websiteCrawlingLimit: starterPlan?.websiteCrawlingLimit
+      websiteCrawlingLimit: starterPlan?.websiteCrawlingLimit,
     });
-    msg = 'Please check your email to verify your account.'
-  }
+    msg = "Please check your email to verify your account.";
 
-  // send the registration mail
-  const temailService = emailService();
-  await temailService.send(
-    'registration-mail-template',
-    [registerationMail.heroImage, registerationMail.avatarIcon, registerationMail.icon1, registerationMail.icon2, logo],
-    email,
-    {
-      name: username
-    }
-  );
+    // send the registration mail
+    await temailService.send(
+      "registration-mail-template",
+      [
+        registerationMail.heroImage,
+        registerationMail.avatarIcon,
+        registerationMail.icon1,
+        registerationMail.icon2,
+        logo,
+      ],
+      email,
+      {
+        name: username,
+      }
+    );
+  }
 
   //send the registration verification  email
   const jwtToken = generateJWTToken(email);
   const link = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/account/email-verified?jwt=${jwtToken}`;
-  await temailService.send('verify-email-register-template', [], email, {
-    link: link
+  await temailService.send("verify-email-register-template", [], email, {
+    link: link,
   });
 
   return { message: msg };
@@ -89,5 +108,5 @@ async function register(request: any) {
 register.schema = joi.object({
   username: joi.string().required(),
   password: joi.string().min(6).required(),
-  email: joi.string().required()
+  email: joi.string().required(),
 });

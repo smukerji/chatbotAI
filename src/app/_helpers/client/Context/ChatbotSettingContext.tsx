@@ -2,6 +2,8 @@
 import { createContext, useState } from "react";
 import {
   chatbotBubbleAlignment,
+  defaultLeadTitle,
+  defaultLeadUserDetails,
   models,
   theme,
   visibility,
@@ -30,6 +32,13 @@ export const ChatbotSettingDataProvider = ({ children }: any) => {
     lastTrained: currrentTime,
     chatbotDisplayName: "",
     chatbotBubbleAlignment: chatbotBubbleAlignment.LEFT,
+    leadFields: {
+      name: { isChecked: false, value: "name" },
+      email: { isChecked: false, value: "email" },
+      number: { isChecked: false, value: "number" },
+    },
+    leadTitle: defaultLeadTitle,
+    userDetails: defaultLeadUserDetails,
   };
   const [chatbotSettings, setChatbotSettings] = useState(
     initialChatbotSettings

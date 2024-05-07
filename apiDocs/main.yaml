@@ -1,0 +1,469 @@
+openapi: 3.0.3
+info:
+  title: Chatbot API Documentation
+  description: API documentation for chatbot-related endpoints.
+  version: 1.0.0
+servers:
+  - url: https://your-api-url.com
+tags:
+  - name: Default
+    description: Operations related to chatbot management
+paths:  
+  /chat:
+    post:
+      tags:
+          - Default
+      summary: "Chat with Chatbot"
+      description: "Endpoint to chat with the chatbot."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                similaritySearchResults:
+                  type: string
+                  description: "Contextual information for the chatbot."
+                messages:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      role:
+                        type: string
+                        description: "Role of the message (system or user)."
+                      content:
+                        type: string
+                        description: "Content of the message."
+                userQuery:
+                  type: string
+                  description: "User query."
+                chatbotId:
+                  type: string
+                  description: "ID of the chatbot."
+                userId:
+                  type: string
+                  description: "ID of the user."
+      responses:
+        '200':
+          description: "Chatbot response stream initiated successfully"
+          content:
+            text/event-stream:
+              schema:
+                type: string
+                description: "Chatbot response stream"
+        '400':
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "Error message indicating a bad request."
+        '503':
+          description: "Service unavailable"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "Error message indicating that the service is unavailable."
+  /chathistory:
+    post:
+      tags:
+        - Default
+      summary: "Store Chat History"
+      description: "Endpoint to store chat history."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                messages:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      role:
+                        type: string
+                        description: "Role of the message (system or user)."
+                      content:
+                        type: string
+                        description: "Content of the message."
+                chatbotId:
+                  type: string
+                  description: "ID of the chatbot."
+                userId:
+                  type: string
+                  description: "ID of the user."
+                sessionID:
+                  type: string
+                  description: "ID of the chat session."
+                sessionStartDate:
+                  type: string
+                  description: "Start date of the chat session."
+                sessionEndDate:
+                  type: string
+                  description: "End date of the chat session."
+                initialMessageLength:
+                  type: integer
+                  description: "Length of the initial message."
+                historyCollectionName:
+                  type: string
+                  description: "Name of the collection to store chat history."
+      responses:
+        '200':
+          description: "Chat history saved successfully"
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: "Success message indicating that the chat history was saved successfully."
+        '400':
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "Error message indicating a bad request."
+        '503':
+          description: "Service unavailable"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "Error message indicating that the service is unavailable."
+  /cron:
+    post:
+      tags:
+          - Default
+      summary: "Handle Scheduled Tasks"
+      description: "Endpoint to handle scheduled tasks using cron."
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Bearer token for authorization."
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: "Success"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+                description: "Success message indicating that the scheduled tasks were handled successfully."
+        '401':
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+                description: "Error message indicating unauthorized access."
+        '500':
+          description: "Internal Server Error"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+                description: "Error message indicating an internal server error."
+  /pinecone:
+    post:
+      tags:
+          - Default
+      summary: "Handle Pinecone Requests"
+      description: "Endpoint to handle requests related to Pinecone embeddings."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  type: "string"
+                description: "Array of extracted contents."
+        '500':
+          description: "Internal Server Error"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+                description: "Error message indicating an internal server error."
+    delete:
+      tags:
+          - Default
+      summary: "Delete Chatbot Data from Pinecone"
+      description: "Endpoint to delete chatbot data from Pinecone."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  text:
+                    type: "string"
+                    description: "Success message indicating that the chatbot data was deleted successfully."
+        '500':
+          description: "Internal Server Error"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+                description: "Error message indicating an internal server error."
+  /delete-img:
+    post:
+      tags:
+          - Default
+      summary: "Delete Image"
+      description: "Endpoint to delete an image from the blob storage."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                url:
+                  type: string
+                  description: "URL of the image to be deleted."
+      responses:
+        '200':
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: "string"
+                    description: "Success message indicating that the image was deleted successfully."
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: "string"
+                    description: "Error message indicating an internal server error."
+  /store:
+    post:
+      tags:
+          - Default
+      summary: "Store Chatbot Data"
+      description: "Endpoint to store chatbot data including text, files, QA pairs, and crawled links."
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                  description: "ID of the user creating or updating the chatbot."
+                chatbotId:
+                  type: string
+                  description: "ID of the chatbot being created or updated."
+                updateChatbot:
+                  type: boolean
+                  description: "Flag indicating whether the chatbot is being updated or not."
+                numberOfCharacterTrained:
+                  type: number
+                  description: "Number of characters trained for the chatbot."
+                defaultFileList:
+                  type: string
+                  description: "List of files to be stored with the chatbot."
+                qaList:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: "ID of the QA pair."
+                      question:
+                        type: string
+                        description: "Question in the QA pair."
+                      answer:
+                        type: string
+                        description: "Answer in the QA pair."
+                      image:
+                        type: string
+                        description: "URL of the image associated with the QA pair."
+                      updated:
+                        type: boolean
+                        description: "Flag indicating whether the QA pair is being updated or not."
+                text:
+                  type: string
+                  description: "Text data to be stored with the chatbot."
+                crawledList:
+                  type: array
+                  description: "List of crawled links to be stored with the chatbot."
+                deleteFileList:
+                  type: array
+                  description: "List of files to be deleted from the chatbot data."
+                deleteQAList:
+                  type: array
+                  description: "List of QA pairs to be deleted from the chatbot data."
+                deleteCrawlList:
+                  type: array
+                  description: "List of crawled links to be deleted from the chatbot data."
+      responses:
+        '201':
+          description: "Chatbot Created/Updated Successfully"
+        '200':
+          description: "Chatbot Created/Updated Successfully"
+        '400':
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: "string"
+                    description: "Error message indicating the cause of the bad request."
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: "string"
+                    description: "Error message indicating an internal server error."
+      deprecated: false
+  /upload-img:
+    post:
+      tags:
+        - Default
+      summary: "Upload Image"
+      description: "Endpoint to upload an image file to a cloud storage service."
+      parameters:
+        - name: filename
+          in: query
+          description: "Name of the image file."
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: "The image file to be uploaded."
+      responses:
+        '200':
+          description: "Image Uploaded Successfully"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  uploadUrl:
+                    type: "string"
+                    format: "url"
+                    description: "URL of the uploaded image."
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: "string"
+                    description: "Error message indicating an internal server error."
+      deprecated: false
+  /upload:
+    post:
+      tags:
+        - Default
+      summary: "Upload File"
+      description: "Endpoint to upload a file."
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: "The file to be uploaded."
+      responses:
+        '200':
+          description: "File Uploaded Successfully"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  charLength:
+                    type: "integer"
+                    description: "Length of the file content."
+                  filepath:
+                    type: "string"
+                    description: "Path of the uploaded file."
+                  fileType:
+                    type: "string"
+                    description: "Type of the uploaded file."
+                  fileText:
+                    type: "string"
+                    description: "Text content of the uploaded file."
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: "string"
+                    description: "Error message indicating an internal server error."
+      deprecated: false
+

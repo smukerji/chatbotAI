@@ -4,6 +4,7 @@ import * as postmark from "postmark";
 import { ServerClient } from "postmark";
 import {
   contactUsBase64,
+  logo,
   logoBase64,
 } from "../../../_helpers/emailImagesBase64Constants";
 
@@ -37,12 +38,7 @@ export async function POST(req: NextRequest) {
           //   name: res?.values?.name,
         },
         Attachments: [
-          {
-            ContentID: "cid:part1.01030607.logo",
-            ContentType: "image/png",
-            Name: "luciferai-logo.png",
-            Content: logoBase64,
-          },
+          logo,
           {
             ContentID: "cid:part1.01030607.contactus-img",
             ContentType: "image/png",

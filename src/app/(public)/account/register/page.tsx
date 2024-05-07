@@ -171,6 +171,17 @@ function Register() {
     setIsModalOpen(false);
   };
 
+   // Google and Github signin method
+   const handleSignIn = async (provider : string) => {
+    try {
+      window.history.replaceState(null, "", window.location.href);
+      await signIn(provider);
+      // After successful sign-in, replace the current history entry
+    } catch (error) {
+      console.error("Sign-in error:", error);
+    }
+  };
+
   return (
     <>
     
@@ -377,12 +388,12 @@ function Register() {
               <div className='section'>
                 <label>Or Register with</label>
 
-                <button onClick={() => signIn('google')}>
+                <button onClick={() => handleSignIn('google')}>
                   <Image src={googleIcon} alt='' />
                   <span>Google</span>
                 </button>
 
-                <button onClick={() => signIn('github')}>
+                <button onClick={() => handleSignIn('github')}>
                   <Image src={githubIcon} alt='' />
                   <span>Github</span>
                 </button>

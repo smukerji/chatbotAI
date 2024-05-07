@@ -8,7 +8,7 @@ module.exports = apiHandler({
 async function feedBack(request: any) {
   const { chatbotId, messages, feedback } = await request.json();
 
-  /// fetch the data sources of the chabot
+  /// fetch the data sources of the chabot  
   const db = (await clientPromise!).db();
   const collection = db?.collection("chatbots-feebback-data");
   /// store the feedback response

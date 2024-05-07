@@ -11,34 +11,34 @@ async function initializeDb() {
   const planCollection = db.collection("plans");
 
   /// update/insert starter plan
-  await planCollection.updateOne(
-    { name: "individual" },
-    {
-      $set: {
-        name: "individual",
-        numberOfChatbot: 1,
-        messageLimit: 2000,
-        trainingDataLimit: 1000000,
-        websiteCrawlingLimit: 10,
-      },
-    },
+  // await planCollection.updateOne(
+  //   { name: "individual" },
+  //   {
+  //     $set: {
+  //       name: "individual",
+  //       numberOfChatbot: 1,
+  //       messageLimit: 2000,
+  //       trainingDataLimit: 1000000,
+  //       websiteCrawlingLimit: 10,
+  //     },
+  //   },
 
-    { upsert: true }
-  );
-  await planCollection.updateOne(
-    { name: "agency" },
-    {
-      $set: {
-        name: "agency",
-        numberOfChatbot: 5,
-        messageLimit: 5000,
-        trainingDataLimit: 1000000,
-        websiteCrawlingLimit: 20,
-      },
-    },
+  //   { upsert: true }
+  // );
+  // await planCollection.updateOne(
+  //   { name: "agency" },
+  //   {
+  //     $set: {
+  //       name: "agency",
+  //       numberOfChatbot: 5,
+  //       messageLimit: 5000,
+  //       trainingDataLimit: 1000000,
+  //       websiteCrawlingLimit: 20,
+  //     },
+  //   },
 
-    { upsert: true }
-  );
+  //   { upsert: true }
+  // );
 
   // const plan_data = await planCollection.findOne({ name: "individual" });
   // const userCollection = db.collection("users");
@@ -137,6 +137,22 @@ async function initializeDb() {
   //     planId: "",
   //   },
   // ]);
+
+  const chatbotSettingCollection = db.collection("chatbot-settings");
+  // await chatbotSettingCollection.updateMany(
+  //   {},
+  //   {
+  //     $set: {
+  //       leadFields: {
+  //         name: { isChecked: false, value: "name" },
+  //         email: { isChecked: false, value: "email" },
+  //         number: { isChecked: false, value: "number" },
+  //       },
+  //       leadTitle: "Let us know how to contact you",
+  //       userDetails: "do-not-collect",
+  //     },
+  //   }
+  // );
   console.log("Database initialized successfully");
   process.exit();
 }

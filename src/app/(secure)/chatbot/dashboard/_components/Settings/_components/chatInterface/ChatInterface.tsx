@@ -61,7 +61,7 @@ function ChatInterface({ chatbotId }: any) {
   // for reset input button
 
   const [initialMessageReset, setInitialMessageReset] = useState<string>(
-    "Hello! What can I help you today?"
+    initialMessage[0]
   );
   // const [suggestedMessageReset, setSuggestedMessageReset] = useState<string[]>([
   //   "This is suggested message ",

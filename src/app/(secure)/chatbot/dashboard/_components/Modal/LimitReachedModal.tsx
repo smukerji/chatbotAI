@@ -1,10 +1,12 @@
 import React, { useEffect, useRef } from "react";
 import "./limitReachedModal.scss";
+import { useRouter } from "next/navigation";
 
 function LimitReachedModal({ setOpenLimitModel }: any) {
+  const router = useRouter();
   const modalRef: any = useRef(null);
   const upgradeHandler = () => {
-    console.log("upgrade");
+    router.push("/home/pricing");
   };
   const closeHandler = () => {
     setOpenLimitModel(false);
