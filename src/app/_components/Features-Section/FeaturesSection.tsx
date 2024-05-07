@@ -16,7 +16,7 @@ function FeaturesSection() {
     <>
       <div className="feature-section-container" id="features">
         <div className="top">
-          <Image src={LuciferLogo} alt="Torri logo" />
+          {/* <Image src={LuciferLogo} alt="Torri logo" /> */}
           <h1 className="title">Features</h1>
 
           <p className="description">
@@ -70,9 +70,9 @@ function FeaturesSection() {
                 </span>
               </h2>
               <p className="description">
-                Torri is revolutionising how companies interact with their
-                data through an advanced AI chatbot that learns directly from
-                your organisation&apos;s knowledge base.
+                Torri is revolutionising how companies interact with their data
+                through an advanced AI chatbot that learns directly from your
+                organisation&apos;s knowledge base.
               </p>
             </div>
           </div>

@@ -1,5 +1,5 @@
 .feature-section-container {
-  margin-top: 60px;
+  // margin-top: 60px;
   padding: 0 12.2vw;
   .top {
     text-align: center;
@@ -8,10 +8,10 @@
     .title {
       color: var(--Neutral-8, #141416);
       text-align: center;
-      font-size: 60px;
+      font-size: 40px;
       font-style: normal;
       font-weight: 600;
-      line-height: 72px; /* 120% */
+      line-height: 48px; /* 120% */
     }
 
     .description {
@@ -34,7 +34,7 @@
       flex: 1;
 
       .feature {
-        padding: 24px;
+        padding: 16px;
         gap: 20px;
         cursor: pointer;
         .title {
@@ -75,9 +75,27 @@
 
     .right {
       flex: 1;
+      display: flex;
+      justify-content: center;
       img {
-        width: 100%;
+        width: 80%;
         height: auto;
+      }
+    }
+  }
+
+  @media only screen and (min-width: 1440px) {
+    .feature-section-container {
+      .top {
+        .title {
+          font-size: 48px;
+          line-height: 60px;
+        }
+      }
+    }
+    .right {
+      img {
+        width: 55% !important;
       }
     }
   }

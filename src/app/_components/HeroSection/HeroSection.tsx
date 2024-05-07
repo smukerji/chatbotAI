@@ -1,8 +1,10 @@
 import React from "react";
 import "./hero-section.scss";
 import Image from "next/image";
-import smsIcon from "../../../../public/svgs/sms.svg";
 import HeaderImage from "../../../../public/sections-images/header-background/Group1.png";
+import freeTrialIcon from "../../../../public/sections-images/header-background/discount-shape.svg";
+import creditCardIcon from "../../../../public/sections-images/header-background/card-pos.svg";
+import cancelIcon from "../../../../public/sections-images/header-background/clipboard-close.svg";
 
 function HeroSection() {
   return (
@@ -22,10 +24,9 @@ function HeroSection() {
         </p>
 
         <div className="request-demo-email-container">
-          <div className="email-input">
-            {/* <Image src={smsIcon} alt='sms-icon' /> */}
+          {/* <div className="email-input">
             <input type="text" placeholder="Enter your email" />
-          </div>
+          </div> */}
           <a
             style={{ color: "white", textDecoration: "none" }}
             href="#contact-us"
@@ -33,7 +34,28 @@ function HeroSection() {
             <button className="request-demo-btn">Book a Demo</button>
           </a>
         </div>
-        <p className="free-trial">Free 7-day trial No credit card required</p>
+        <div className="schemes-list">
+          <ul>
+            <li>
+              <span>
+                <Image src={freeTrialIcon} alt="free-trial-icon" />
+              </span>
+              <span>Free 7-day trial</span>
+            </li>
+            <li>
+              <span>
+                <Image src={creditCardIcon} alt="credit-card-icon" />
+              </span>
+              <span>No credit card required</span>
+            </li>
+            <li>
+              <span>
+                <Image src={cancelIcon} alt="cancel-icon" />
+              </span>
+              <span>Cancel anytime</span>
+            </li>
+          </ul>
+        </div>
 
         <div className="grp-img">
           <Image src={HeaderImage} alt="image" />

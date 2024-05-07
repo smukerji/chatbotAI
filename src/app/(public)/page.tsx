@@ -17,39 +17,23 @@ import FeaturesSection from "../_components/Features-Section/FeaturesSection";
 
 function Home() {
   return (
-    <div className="scroll-container">
+    <>
       {/* <HeroHeader /> */}
       <SecondaryHeader />
-      <div className="scroll-area">
-        <HeroSection />
-      </div>
+      <HeroSection />
       {/* <ServiceSection /> */}
-      <div className="scroll-area">
-        <CustomerQuestions />
-      </div>
-      <div className="scroll-area">
-        <FeaturesSection />
-      </div>
+      <CustomerQuestions />
+      <FeaturesSection />
       {/* <FacilitiesSection /> */}
-      <div className="scroll-area">
-        <IndustrySection />
-      </div>
-      <div className="scroll-area">
-        <ServicesOffered />
-      </div>
-      <div className="scroll-area">
-        <CompatibilitySection />
-      </div>
+      <IndustrySection />
+      <ServicesOffered />
+      <CompatibilitySection />
       {/* <Testimonials /> */}
       {/* <PlansSection /> */}
       {/* <FAQ /> */}
-      <div className="scroll-area">
-        <ContactSection />
-        {/* <div className="scroll-area"> */}
-        <Footer />
-      </div>
-      {/* </div> */}
-    </div>
+      <ContactSection />
+      <Footer />
+    </>
   );
 }
 

@@ -16,10 +16,10 @@
     h1 {
       color: #141416;
       /* Heading/H1 */
-      font-size: 60px;
+      font-size: 40px;
       font-style: normal;
       font-weight: 600;
-      line-height: 72px; /* 120% */
+      line-height: 48px; /* 120% */
       width: 586px;
       @media only screen and (max-width: 1920px) {
         font-size: 50px;
@@ -28,6 +28,11 @@
 
       @media only screen and (max-width: 1440px) {
         font-size: 35px;
+      }
+
+      @media only screen and (min-width: 1440px) {
+        font-size: 48px;
+        line-height: 60px;
       }
     }
     button {
