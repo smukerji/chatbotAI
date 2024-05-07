@@ -135,6 +135,9 @@ async function updateChatbotSettings(request: NextRequest) {
       tempprofilePictureName,
       tempbubbleIconName,
       chatbotDisplayName,
+      leadTitle,
+      userDetails,
+      leadFields,
     } = body;
 
     /// extract only the field that need to be updated
@@ -169,6 +172,9 @@ async function updateChatbotSettings(request: NextRequest) {
         chatbotDisplayName,
       }),
       ...(chatbotBubbleAlignment !== undefined && { chatbotBubbleAlignment }),
+      ...(leadTitle !== undefined && { leadTitle }),
+      ...(userDetails !== undefined && { userDetails }),
+      ...(leadFields !== undefined && { leadFields }),
     };
     const collection = db.collection("chatbot-settings");
 
@@ -216,4 +222,7 @@ updateChatbotSettings.schema = joi.object({
   tempprofilePictureName: joi.string().optional().allow(""),
   tempbubbleIconName: joi.string().optional().allow(""),
   chatbotDisplayName: joi.string().optional(),
+  leadTitle: joi.string().optional(),
+  userDetails: joi.string().optional(),
+  leadFields: joi.object().optional(),
 });

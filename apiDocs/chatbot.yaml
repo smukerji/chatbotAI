@@ -1,0 +1,302 @@
+openapi: 3.0.3
+info:
+  title: Chatbot API Documentation
+  description: API documentation for chatbot-related endpoints.
+  version: 1.0.0
+servers:
+  - url: https://your-api-url.com
+tags:
+  - name: Chatbot
+    description: Operations related to chatbot management
+paths:
+  /api/chatbot:
+    post:
+      tags:
+        - Chatbot
+      summary: Fetch chatbot data
+      description: Endpoint to fetch chatbot data from the database.
+      operationId: fetchChatbotData
+      requestBody:
+        description: Request body for fetching chatbot data
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                  example: "123456789"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  chatbots:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: "123d148a-be02-4749-a612-65be9d96266c"
+                        name:
+                          type: string
+                          example: "Custom Chatbot 1"
+                        lastUsed:
+                          type: string
+                          example: "2024-04-19T10:00:00.000Z"
+                        noOfMessagesSent:
+                          type: integer
+                          example: 100
+                        lastTrained:
+                          type: string
+                          example: "2024-04-18T10:00:00.000Z"
+                        numberOfCharacterTrained:
+                          type: integer
+                          example: 5000
+  /api/chatbot/setting:
+    post:
+      tags:
+        - Chatbot
+      summary: Retrieve chatbot settings
+      description: Endpoint to retrieve chatbot settings from the database.
+      operationId: retrieveChatbotSettings
+      requestBody:
+        description: Request body for retrieving chatbot settings
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                  example: "123456789"
+                chatbotId:
+                  type: string
+                  example: "123d148a-be02-4749-a612-65be9d96266c"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  chatHistory:
+                    type: object
+                    properties:
+                      today:
+                        type: object
+                        properties:
+                          chats:
+                            type: array
+                            items:
+                              type: object
+                      yesterday:
+                        type: object
+                        properties:
+                          chats:
+                            type: array
+                            items:
+                              type: object
+                      lastSevenDay:
+                        type: object
+                        properties:
+                          chats:
+                            type: array
+                            items:
+                              type: object
+                      moreThanLastSevenDay:
+                        type: object
+                        properties:
+                          chats:
+                            type: array
+                            items:
+                              type: object
+    put:
+      tags:
+        - Chatbot
+      summary: Update chatbot settings
+      description: Endpoint to update chatbot settings in the database.
+      operationId: updateChatbotSettings
+      requestBody:
+        description: Request body for updating chatbot settings
+        required: false
+        content:
+          application/json:
+            schema:
+              type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /api/chatbot/details:
+    get:
+      summary: "Get Chatbot Details"
+      description: "Endpoint to fetch details of a specific chatbot."
+      tags:
+        - "Chatbot"
+      parameters:
+        - name: chatbotId
+          in: query
+          description: "The ID of the chatbot whose details are to be fetched."
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "Chatbot details fetched successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                description: "Details of the specified chatbot."
+        '404':
+          description: "Chatbot not found"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "Error message indicating that the specified chatbot was not found."
+        '503':
+          description: "Service unavailable"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: "Error message indicating that the service is unavailable."
+  /api/chatbot/popup/detail:
+    get:
+      summary: "Get Chatbot Popup Detail"
+      description: "Endpoint to fetch detailed information about a chatbot for displaying in a popup."
+      tags:
+        - "Chatbot"
+      parameters:
+        - name: chatbotId
+          in: query
+          description: "The ID of the chatbot for which details are to be fetched."
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "Chatbot popup detail fetched successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                description: "Detailed information about the specified chatbot."
+        '404':
+          description: "Chatbot not found"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "Error message indicating that the specified chatbot was not found."
+        '503':
+          description: "Service unavailable"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: "Error message indicating that the service is unavailable."                     
+components:
+  schemas:
+    UpdateChatbotSettings:
+      type: object
+      properties:
+        chatbotId:
+          type: string
+          example: "123d148a-be02-4749-a612-65be9d96266c"
+        chatbotRename:
+          type: string
+          example: "My Custom Chatbot"
+        model:
+          type: string
+          example: "GPT-3"
+        visibility:
+          type: string
+          example: "Public"
+        temperature:
+          type: number
+          example: 0.7
+        numberOfCharacterTrained:
+          type: string
+          example: "5000"
+        instruction:
+          type: string
+          example: "Type your message here..."
+        initialMessage:
+          type: array
+          items:
+            type: string
+          example: ["Hello!", "How can I assist you today?"]
+        suggestedMessages:
+          type: array
+          items:
+            type: string
+          example: ["Help", "Contact Support"]
+        messagePlaceholder:
+          type: string
+          example: "Type your message here..."
+        theme:
+          type: string
+          example: "Light"
+        userMessageColor:
+          type: string
+          example: "#333333"
+        chatbotIconColor:
+          type: string
+          example: "#3366FF"
+        profilePictureUrl:
+          type: string
+          example: "https://example.com/profile.jpg"
+        bubbleIconUrl:
+          type: string
+          example: "https://example.com/bubble.jpg"
+        lastTrained:
+          type: string
+          format: date-time
+          example: "2024-04-18T10:00:00.000Z"
+        chatbotBubbleAlignment:
+          type: string
+          example: "left"
+        profilePictureName:
+          type: string
+          example: "profile.jpg"
+        bubbleIconName:
+          type: string
+          example: "bubble.jpg"
+        chatbotDisplayName:
+          type: string
+          example: "My Chatbot"
+security:
+  - jwt: []
+securitySchemes:
+  jwt:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT

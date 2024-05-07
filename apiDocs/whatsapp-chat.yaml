@@ -1,0 +1,56 @@
+openapi: 3.0.3
+info:
+  title: WhatsApp Chat API Documentation
+  description: API documentation for WhatsApp chat integration endpoints.
+  version: 1.0.0
+servers:
+  - url: https://your-api-url.com
+tags:
+  - name: WhatsApp Integration
+    description: Operations related to WhatsApp chat integration
+paths:
+  /api/whatsapp-chat:
+    post:
+      tags:
+        - WhatsApp Integration
+      summary: Receive WhatsApp messages and handle chatbot interactions
+      description: Endpoint to receive WhatsApp messages and handle chatbot interactions.
+      operationId: receiveWhatsAppMessages
+      requestBody:
+        description: Request body for receiving WhatsApp messages
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                Body:
+                  type: string
+                  example: "talk-to+chatbot123"
+                From:
+                  type: string
+                  example: "+1234567890"
+                To:
+                  type: string
+                  example: "+0987654321"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  messageSid:
+                    type: string
+                    example: "SMXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error"

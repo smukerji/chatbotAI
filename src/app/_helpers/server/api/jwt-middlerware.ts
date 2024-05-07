@@ -17,6 +17,7 @@ export function isPublicPath(req: NextRequest) {
     "POST:/api/account/logout",
     "POST:/api/account/register",
     "POST:/api/account/reset-password",
+    "POST:/chatbot/api/lead",
   ];
 
   return publicPaths.includes(`${req.method}:${req.nextUrl.pathname}`);

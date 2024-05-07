@@ -21,6 +21,10 @@
         margin-bottom: 0;
         max-height: 4px;
 
+        &.ant-progress-status-success .ant-progress-bg {
+          background-color: red;
+        }
+
         .ant-progress-inner {
           height: 4px;
         }
@@ -101,7 +105,7 @@
       position: absolute;
       top: 45px;
       right: 0px;
-      z-index: 999;
+      z-index: 9999;
 
       .username {
         color: #141416;
@@ -155,6 +159,7 @@
         border-radius: 8px;
         border: 1px solid #2e58ea;
         background: #fcfcfd;
+        cursor: auto;
         .plan {
           span {
             color: #b1b5c3;

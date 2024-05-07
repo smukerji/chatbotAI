@@ -19,6 +19,7 @@ function EmailVerified() {
 
   const handleClick = async () => {
     router.push("/account/login");
+    window.history.replaceState(null, "", window.location.href);
     // window.location.href = '/account/login';
   }
 

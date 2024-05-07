@@ -12,10 +12,10 @@
   .title {
     color: var(--Neutral-1, #fcfcfd);
     text-align: center;
-    font-size: 48px;
+    font-size: 40px;
     font-style: normal;
     font-weight: 600;
-    line-height: 68px; /* 141.667% */
+    line-height: 48px; /* 141.667% */
   }
 
   .description {
@@ -34,7 +34,7 @@
     align-items: center;
     gap: 10px;
     border-radius: 12px;
-    background: #0035f0;
+    background: #fe632f;
     border: none;
     cursor: pointer;
     color: #fff;
@@ -47,13 +47,9 @@
   }
   .request-demo-email-container {
     display: flex;
-    width: 500px;
-    padding: 8px 8px 8px 16px;
-    justify-content: space-between;
-    align-items: center;
-    border-radius: 16px;
-    margin: 40px auto 20px auto;
-    background: #fcfcfd;
+    width: 100%;
+    padding: 16px 8px 16px 16px;
+    justify-content: center;
 
     .email-input {
       display: flex;
@@ -72,7 +68,7 @@
     }
   }
 
-  .free-trial {
+  .schemes-list {
     color: var(--Primary-3, #ccd7fc);
     text-align: center;
     font-size: 20px;
@@ -80,7 +76,24 @@
     font-weight: 500;
     line-height: 28px; /* 140% */
     margin-top: 20px;
-    margin-bottom: 48px;
+    // margin-bottom: 48px;
+
+    ul {
+      list-style: none;
+      display: flex;
+      gap: 26px;
+      justify-content: center;
+
+      li {
+        display: flex;
+        gap: 10px;
+        span {
+          display: flex;
+          align-items: center;
+          color: white;
+        }
+      }
+    }
   }
 
   .grp-img {
@@ -92,6 +105,15 @@
       position: absolute;
       max-height: 700px;
       // bottom: 0;
+    }
+  }
+
+  @media screen and (min-width: 1440px) {
+    .hero-section-container {
+      .title {
+        font-size: 48px;
+        line-height: 68px;
+      }
     }
   }
 
@@ -113,6 +135,21 @@
     //   padding: 14px;
     //   font-size: 16px;
     // }
+    .schemes-list {
+      font-size: 16px;
+
+      ul {
+        gap: 16px;
+        li {
+          gap: 2px;
+          span {
+            img {
+              width: 80%;
+            }
+          }
+        }
+      }
+    }
   }
 
   @media only screen and (max-width: 991px) {
@@ -150,6 +187,18 @@
       padding: 14px;
       font-size: 14px;
       line-height: 20px;
+    }
+
+    .schemes-list {
+      margin-top: 0;
+      ul {
+        gap: 0;
+        flex-direction: column;
+        li {
+          justify-content: center;
+          gap: 0;
+        }
+      }
     }
   }
 }

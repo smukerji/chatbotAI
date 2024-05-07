@@ -1,0 +1,389 @@
+openapi: 3.0.3
+info:
+  title: Stripe Payment API Documentation
+  description: API documentation for Stripe payment-related endpoints.
+  version: 1.0.0
+servers:
+  - url: https://your-api-url.com
+tags:
+  - name: Payment
+    description: Operations related to adding payment methods
+paths:
+  /api/home/pricing/stripe-payment/add-payment:
+    post:
+      tags:
+        - Payment
+      summary: Add payment method
+      description: Endpoint to add a new payment method for a customer.
+      operationId: addPaymentMethod
+      requestBody:
+        description: Request body for adding a new payment method
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                u_id:
+                  type: string
+                  example: "user123"
+                status:
+                  type: string
+                  example: "success"
+                paymentId:
+                  type: string
+                  example: "payment123"
+                price:
+                  type: number
+                  example: 50.0
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Payment method added successfully"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error"
+  /api/home/pricing/stripe-payment/getCustomer:
+    post:
+      tags:
+        - Payment
+      summary: Get customer details
+      description: Endpoint to get customer details or create a new customer if not exists.
+      operationId: getCustomerDetails
+      requestBody:
+        description: Request body for getting customer details
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                u_id:
+                  type: string
+                  example: "user123"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  customerId:
+                    type: string
+                    example: "cus_123456789"
+                  message:
+                    type: string
+                    example: "success"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error"
+  /api/home/pricing/stripe-payment/getCustomerWhatsappDetails:
+    put:
+      tags:
+        - Payment
+      summary: Get customer WhatsApp details
+      description: Endpoint to check if a customer's WhatsApp details are available.
+      operationId: getCustomerWhatsAppDetails
+      requestBody:
+        description: Request body for getting customer WhatsApp details
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                u_id:
+                  type: string
+                  example: "user123"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: boolean
+                    example: false
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error"
+  /api/home/pricing/stripe-payment/getPlanDetails:
+    get:
+      tags:
+        - Payment
+      summary: Get plan details
+      description: Endpoint to retrieve details of all available plans.
+      operationId: getPlanDetails
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                      example: "60763d4de1cfa9468ae4a7b7"
+                    name:
+                      type: string
+                      example: "Plan A"
+                    description:
+                      type: string
+                      example: "This is Plan A"
+                    price:
+                      type: number
+                      example: 50.00
+                    duration:
+                      type: string
+                      example: "monthly"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error"
+  /api/home/pricing/stripe-payment/checkUserPaymentMethod:
+    post:
+      tags:
+        - Payment
+      summary: Check user payment method
+      description: Endpoint to check if a user has a payment method.
+      operationId: checkUserPaymentMethod
+      requestBody:
+        description: Request body for checking user payment method
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                u_id:
+                  type: string
+                  example: "user123"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: string
+                example: "success"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: number
+                    example: 500
+  /api/home/pricing/stripe-payment/updatePaymentMethod:
+    post:
+      tags:
+        - Payment
+      summary: Update user payment method
+      description: Endpoint to update the payment method for a user.
+      operationId: updateUserPaymentMethod
+      requestBody:
+        description: Request body for updating user payment method
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                paymentId:
+                  type: string
+                  example: "pm_1JMU4sABCDEFgijKLMNOPQR"
+                u_id:
+                  type: string
+                  example: "user123"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  acknowledged:
+                    type: boolean
+                    example: true
+                  matchedCount:
+                    type: integer
+                    example: 1
+                  modifiedCount:
+                    type: integer
+                    example: 1
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error"
+  /api/home/pricing/stripe-payment:
+    post:
+      tags:
+        - Payment
+      summary: Create payment intent
+      description: Endpoint to create a payment intent for a user.
+      operationId: createPaymentIntent
+      requestBody:
+        description: Request body for creating payment intent
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                plan:
+                  type: integer
+                  example: 5
+                price:
+                  type: number
+                  example: 10.99
+                u_id:
+                  type: string
+                  example: "user123"
+                isWhatsapp:
+                  type: boolean
+                  example: true
+                isSlack:
+                  type: boolean
+                  example: false
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  customerId:
+                    type: string
+                    example: "cus_JbJ1C05VbAjx9E"
+                  subscriptionId:
+                    type: string
+                    example: "sub_JbJ1C05VbAjx9E"
+                  plan:
+                    type: string
+                    example: "WhatsApp"
+                  endDate:
+                    type: string
+                    example: "2024-04-30T23:59:59.999Z"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error"
+
+  /api/home/pricing/stripe-payment/checkCurrentPlan:
+    put:
+      tags:
+        - Payment
+      summary: Check current plan
+      description: Endpoint to check the current plan of a user.
+      operationId: checkCurrentPlan
+      requestBody:
+        description: Request body for checking current plan
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                u_id:
+                  type: string
+                  example: "user123"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: integer
+                    example: 1
+                  prePrice:
+                    type: number
+                    example: 15
+                  duration:
+                    type: string
+                    example: "month"
+                  text:
+                    type: string
+                    example: "Current Plan"
+                  whatsAppIntegration:
+                    type: boolean
+                    example: true
+                  slackIntegration:
+                    type: boolean
+                    example: false
+                  telegramIntegration:
+                    type: boolean
+                    example: true
+                  hubspotIntegration:
+                    type: boolean
+                    example: false
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error"
+components:
+  schemas: {}

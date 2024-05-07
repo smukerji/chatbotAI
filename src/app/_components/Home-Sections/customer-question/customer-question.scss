@@ -10,10 +10,10 @@
 
     .title {
       color: var(--Neutral-8, #141416);
-      font-size: 48px;
+      font-size: 40px;
       font-style: normal;
       font-weight: 600;
-      line-height: 60px; /* 141.667% */
+      line-height: 48px; /* 141.667% */
     }
 
     .description {
@@ -50,7 +50,18 @@
     }
   }
 
+  @media screen and (min-width: 1440px) {
+    .left {
+      .title {
+        font-size: 48px;
+        line-height: 60px;
+      }
+    }
+  }
+
   @media screen and (max-width: 1440px) {
+    margin-top: 0;
+
     .left {
       .title {
         font-size: 38px;

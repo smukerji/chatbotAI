@@ -3,6 +3,7 @@ import { apiHandler } from "../../../_helpers/server/api/api-handler";
 import clientPromise from "../../../../db";
 import { emailService } from "../../../_services/emailService";
 import * as jwt from "jsonwebtoken";
+import { logo } from "../../../_helpers/emailImagesBase64Constants";
 
 module.exports = apiHandler({
   POST: resetPassword,
@@ -29,7 +30,7 @@ async function resetPassword(request: NextRequest) {
     );
     /// send the password reset mail to the user with a unique token generated
     const temailService = emailService();
-    await temailService.send("forgot-password", [], email, {
+    await temailService.send("forgot-password", [logo], email, {
       reset_password_url: `${process.env.NEXTAUTH_URL}/account/reset-password-form?token=${token}`,
     });
 

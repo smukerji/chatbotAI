@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useState,useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import LuciferLogo from "../../../../public/svgs/lucifer-ai-logo.svg";
 import dynamic from "next/dynamic";
@@ -21,10 +21,7 @@ function SecondaryHeader() {
 
   useEffect(() => {
     function handleOutsideClick(event: MouseEvent) {
-      if (
-        menuRef.current &&
-        !menuRef.current.contains(event.target as Node)
-      ) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setMenuOpen(false);
       }
     }
@@ -42,7 +39,6 @@ function SecondaryHeader() {
       document.removeEventListener("click", handleOutsideClick);
     };
   }, [menuOpen]);
-
 
   return (
     <div className='header-title-container'>
@@ -62,7 +58,7 @@ function SecondaryHeader() {
         <div className='bar'></div>
       </div>
 
-      <div  ref={menuRef} className={`hamburger-menu ${menuOpen ? "open" : ""}`}>
+      <div ref={menuRef} className={`hamburger-menu ${menuOpen ? "open" : ""}`}>
         <div className={`navbar `}>
           <ul>
             <li onClick={toggleMenu}>

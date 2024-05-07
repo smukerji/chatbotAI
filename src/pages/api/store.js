@@ -8,11 +8,16 @@ import { v4 as uuid } from "uuid";
 // import { authorize, uploadFile } from "../../app/_services/googleFileUpload";
 import { put } from "@vercel/blob";
 import fs from "fs";
-import { emailService } from '../../app/_services/emailService';
-import { createNewChatbotMail } from '../../app/_helpers/emailImagesBase64Constants'
+import { emailService } from "../../app/_services/emailService";
+import {
+  createNewChatbotMail,
+  logo,
+} from "../../app/_helpers/emailImagesBase64Constants";
 import {
   chatbotBubbleAlignment,
   defaultChatBubbleIconColor,
+  defaultLeadTitle,
+  defaultLeadUserDetails,
   defaultModelInstruction,
   defaultPlaceholderMessage,
   defaultSuggestedMessage,
@@ -597,21 +602,21 @@ export default async function handler(req, res) {
             createdAt: currrentTime,
             noOfMessagesSent: 0,
           });
-          //send email once chatbot is created 
+          //send email once chatbot is created
           try {
-            const result = await db.collection("users").findOne({_id:new ObjectId(userId)})
-            const email=result?.email
+            const result = await db
+              .collection("users")
+              .findOne({ _id: new ObjectId(userId) });
+            const email = result?.email;
             const temailService = emailService();
-           await temailService.send(
-             "create-chatbot-template",
-            [
-               createNewChatbotMail
-              ],
-            email,
-             {
+            await temailService.send(
+              "create-chatbot-template",
+              [createNewChatbotMail, logo],
+              email,
+              {
                 name: result?.username,
-               }
-           );
+              }
+            );
           } catch (error) {
             return res.status(400).send(error);
           }
@@ -636,6 +641,13 @@ export default async function handler(req, res) {
             lastTrained: currrentTime,
             chatbotBubbleAlignment: chatbotBubbleAlignment.LEFT,
             noOfMessagesSent: 0,
+            leadFields: {
+              name: { isChecked: false, value: "name" },
+              email: { isChecked: false, value: "email" },
+              number: { isChecked: false, value: "number" },
+            },
+            leadTitle: defaultLeadTitle,
+            userDetails: defaultLeadUserDetails,
           });
         } else {
           /// if chatbot is being updated just update the timestamp and characters
