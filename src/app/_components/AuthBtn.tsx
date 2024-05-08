@@ -74,7 +74,9 @@ export default function AuthBtn() {
           <div
             className="login-btn"
             onClick={() => {
-              const dataToSend = { key: window.location.pathname + window.location.hash };
+              const dataToSend = {
+                key: window.location.pathname + window.location.hash,
+              };
               const queryString = new URLSearchParams(dataToSend).toString();
               window.location.href = `/account/login?${queryString}`;
             }}
@@ -83,7 +85,7 @@ export default function AuthBtn() {
           </div>
 
           <a href="/account/register" style={{ textDecoration: "none" }}>
-            <div className="try-free-btn">Register for Free</div>
+            <div className="try-free-btn">Join Beta</div>
           </a>
         </>
       )}
