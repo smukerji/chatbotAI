@@ -31,7 +31,7 @@ function ServicesOffered() {
               style={{ color: "white", textDecoration: "none" }}
               href="/account/register"
             >
-              <button className="request-demo-btn">Join Beta</button>
+              <button className="request-demo-btn">Join Beta!</button>
             </a>
           </div>
         </div>

@@ -1,0 +1,65 @@
+.custom-modal-wrapper {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: rgba($color: #ffffff, $alpha: 0.7);
+    // background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
+    // backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .custom-modal-inner {
+        box-shadow: 8px 8px 2px rgb(137, 137, 137, 5);
+        border: 1px solid;
+        background: #fff;
+        padding: 20px;
+        border-radius: 4px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        .custom-modal-header {
+            font-family: "General Sans";
+            font-size: 30px;
+            font-weight: 600;
+            line-height: 40px;
+            font-style: normal;
+            color: #141416;
+        }
+        .custom-modal-content {
+            color: #777e90;
+            font-size: 16px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 24px;
+            margin-top: 16px;
+        }
+        .custom-modal-footer {
+            display: flex;
+            justify-content: center;
+            margin-top: 40px;
+            button {
+                box-shadow: 0 2px 0 rgba(5, 145, 255, 0.1);
+                border-radius: 12px;
+                background: #2e58ea;
+                color: #fff;
+                font-size: 14px;
+                line-height: 1.5714285714285714;
+                height: 32px;
+                padding: 4px 15px;
+                outline: none;
+                position: relative;
+                display: inline-block;
+                font-weight: 400;
+                white-space: nowrap;
+                text-align: center;
+                border: 1px solid transparent;
+                cursor: pointer;
+                transition: all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+                user-select: none;
+                touch-action: manipulation;
+            }
+        }
+    }
+}

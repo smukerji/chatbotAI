@@ -281,7 +281,7 @@ function Chatbot() {
               setChatbotId={setChatbotId}
               setOpenDeleteModal={setOpenDeleteModal}
               setOpenRenameModal={setOpenRenameModal}
-              disabled={user && new Date(user?.endDate) < new Date()}
+              // disabled={user && new Date(user?.endDate) < new Date()}
             />
           </>
         )}
@@ -298,7 +298,7 @@ function Chatbot() {
             setChatbotId={setChatbotId}
             setOpenDeleteModal={setOpenDeleteModal}
             setOpenRenameModal={setOpenRenameModal}
-            disabled={user && new Date(user?.endDate) < new Date()}
+            // disabled={user && new Date(user?.endDate) < new Date()}
           />
         )}
         <DeleteModal
@@ -339,22 +339,24 @@ function Chatbot() {
         )}
         {loading && <Spin indicator={antIcon} />}
 
-        <Modal
-          title="Upgrade Now to create new Chatbots!"
-          open={isPlanNotification}
-          onCancel={() => {}}
-          footer={[
-            <Button key="submit" type="primary" onClick={handleUpgradePlan}>
-              Upgrade Now
-            </Button>,
-          ]}
-          closable={false}
-          centered
-          className="subscription-expire-popup"
-          width={800}
-        >
-          <p>Upgrade now to access your chatbots!</p>
-        </Modal>
+        {!loading && chatbotData?.length == 0 && (
+          <Modal
+            title="Upgrade Now to create new Chatbots!"
+            open={isPlanNotification}
+            onCancel={() => {}}
+            footer={[
+              <Button key="submit" type="primary" onClick={handleUpgradePlan}>
+                Upgrade Now
+              </Button>,
+            ]}
+            closable={false}
+            centered
+            className="subscription-expire-popup"
+            width={800}
+          >
+            <p>Upgrade now to access your chatbots!</p>
+          </Modal>
+        )}
       </div>
     );
   } else if (status === "unauthenticated") {

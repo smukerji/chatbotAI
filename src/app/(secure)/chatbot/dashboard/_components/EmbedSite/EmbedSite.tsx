@@ -3,22 +3,21 @@ import React from "react";
 import copyIcon from "../../../../../../../public/svgs/copy-icon.svg";
 import Image from "next/image";
 import "./embed-site.scss";
+import CustomModal from "../CustomModal/CustomModal";
+import { useRouter } from "next/navigation";
 
-function EmbedSite({ chatbotId }: any) {
+function EmbedSite({
+  chatbotId,
+  isPlanNotification,
+  setIsPlanNotification,
+}: any) {
+  const router = useRouter();
   const script = `<script
     src="${process.env.NEXT_PUBLIC_WEBSITE_URL}embed-bot.js"
     chatbotID=${chatbotId}
     ></script>`;
 
   const handleOk = async () => {
-    // await navigator.clipboard
-    //   .writeText(script)
-    //   .then(() => {
-    //     message.success("Script copied to clipboard");
-    //   })
-    //   .catch((err) => {
-    //     console.error("Failed to copy text: ", err);
-    //   });
     try {
       await navigator.clipboard.writeText(script);
       message.success("Content copied to clipboard");
@@ -28,6 +27,21 @@ function EmbedSite({ chatbotId }: any) {
   };
   return (
     <div className="emebed-site-container">
+      <CustomModal
+        open={isPlanNotification}
+        setOpen={setIsPlanNotification}
+        header={"Upgrade Now to create new Chatbots!"}
+        content={"Upgrade now to access your chatbots!"}
+        footer={
+          <button
+            onClick={() => {
+              router.push("/home/pricing");
+            }}
+          >
+            Upgrade Now
+          </button>
+        }
+      />
       <div className="script">
         <p className="share-note">
           To add a chat bubble to the bottom right of your website add this

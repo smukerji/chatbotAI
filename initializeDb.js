@@ -138,7 +138,7 @@ async function initializeDb() {
   //   },
   // ]);
 
-  const chatbotSettingCollection = db.collection("chatbot-settings");
+  // const chatbotSettingCollection = db.collection("chatbot-settings");
   // await chatbotSettingCollection.updateMany(
   //   {},
   //   {

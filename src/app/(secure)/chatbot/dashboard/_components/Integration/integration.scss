@@ -3,6 +3,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  position: relative;
 
   .integration {
     display: flex;
@@ -42,7 +43,7 @@
     .telegram-action {
       color: #fe632f;
     }
-    .telegram-action:hover{
+    .telegram-action:hover {
       cursor: pointer;
     }
     .view {

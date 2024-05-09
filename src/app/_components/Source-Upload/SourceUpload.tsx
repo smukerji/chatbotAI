@@ -7,7 +7,11 @@ import "./source-upload.scss";
 import { CreateBotContext } from "../../_helpers/client/Context/CreateBotContext";
 import deleteIcon from "../../../../public/create-chatbot-svgs/delete-icon.svg";
 
-function SourceUpload({ totalCharCount, filesCharCount }: any) {
+function SourceUpload({
+  totalCharCount,
+  filesCharCount,
+  isPlanNotification,
+}: any) {
   const botContext: any = useContext(CreateBotContext);
   const botDetails = botContext?.createBotInfo;
 
@@ -124,7 +128,10 @@ function SourceUpload({ totalCharCount, filesCharCount }: any) {
   return (
     <div className="source-upload-container">
       <div className="dragger-wrapper">
-        <Dragger {...props}>
+        <Dragger
+          {...props}
+          style={{ position: isPlanNotification ? "unset" : "relative" }}
+        >
           <p className="ant-upload-drag-icon">
             <Image src={documentUploadIcon} alt="doc-icon" />
           </p>

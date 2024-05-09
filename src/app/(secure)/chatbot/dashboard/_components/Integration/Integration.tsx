@@ -13,8 +13,9 @@ import TelegramModal from "../Modal/TelegramModal";
 import { EditOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import editIcon from "../../../../../../../public/sections-images/common/edit.svg";
 import viewIcon from "../../../../../../../public/eye-close-svgrepo-com.svg";
+import CustomModal from "../CustomModal/CustomModal";
 
-function Integration() {
+function Integration({ isPlanNotification, setIsPlanNotification }: any) {
   //This state if for telegram modal open close
   const [isTelegramModalOpen, setIsTelegramModalOpen] =
     useState<boolean>(false);
@@ -162,8 +163,26 @@ function Integration() {
 
   return (
     <div className="integration-container">
+      <CustomModal
+        open={isPlanNotification}
+        setOpen={setIsPlanNotification}
+        header={"Upgrade Now to create new Chatbots!"}
+        content={"Upgrade now to access your chatbots!"}
+        footer={
+          <button
+            onClick={() => {
+              router.push("/home/pricing");
+            }}
+          >
+            Upgrade Now
+          </button>
+        }
+      />
       {/*------------------------------------------Whatsapp-integration----------------------------------------------*/}
-      <div className="integration i-btn">
+      <div
+        className="integration i-btn"
+        style={{ zIndex: isPlanNotification ? -1 : 0 }}
+      >
         <div className="name">
           <Image src={whatsAppIcon} alt="whatsapp-icon" />
           <span>Add to Whatsapp</span>
@@ -178,7 +197,7 @@ function Integration() {
         </div>
         <>
           {loader ? (
-            <Spin />
+            <Spin style={{ opacity: isPlanNotification ? 0 : 1 }} />
           ) : (
             <>
               {isWhatappVerified ? (
@@ -207,6 +226,7 @@ function Integration() {
           )}
         </>
         <div
+          // style={{ position: isPlanNotification ? "unset" : "relative" }}
           className="telegram-i-btn"
           onClick={() => router.push(`dashboard/whatsapp-integration-guide`)}
         >
@@ -217,7 +237,10 @@ function Integration() {
       {/*------------------------------------------Telegram-integration----------------------------------------------*/}
       {/* <div className="telegram-container" > */}
 
-      <div className="integration i-btn">
+      <div
+        className="integration i-btn"
+        style={{ zIndex: isPlanNotification ? -1 : 0 }}
+      >
         <div className="name">
           <Image
             className="telegram-img"
@@ -238,7 +261,7 @@ function Integration() {
         </div>
         <div className="telegram-action">
           {telegramLoader ? (
-            <Spin />
+            <Spin style={{ opacity: isPlanNotification ? 0 : 1 }} />
           ) : (
             <>
               {isTelegramVerified ? (
@@ -271,6 +294,7 @@ function Integration() {
           )}
         </div>
         <div
+          // style={{ position: isPlanNotification ? "unset" : "relative" }}
           className="telegram-i-btn"
           onClick={() => router.push(`dashboard/telegram-guide`)}
         >

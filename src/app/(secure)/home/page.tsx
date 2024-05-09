@@ -22,6 +22,7 @@ import { redirect, useRouter } from "next/navigation";
 import { UserDetailsContext } from "../../_helpers/client/Context/UserDetailsContext";
 import { formatNumber } from "../../_helpers/client/formatNumber";
 import LoaderModal from "../chatbot/dashboard/_components/Modal/LoaderModal";
+import CustomModal from "../chatbot/dashboard/_components/CustomModal/CustomModal";
 const crypto = require("crypto");
 
 function Home({
@@ -32,6 +33,8 @@ function Home({
   crawlingData,
   chatbotId,
   chatbotName,
+  isPlanNotification,
+  setIsPlanNotification,
 }: any) {
   const { status } = useSession();
   const router = useRouter();
@@ -394,6 +397,21 @@ function Home({
   } else if (status === "authenticated" || cookies?.userId) {
     return (
       <div className="create-chatbot-container">
+        <CustomModal
+          open={isPlanNotification}
+          setOpen={setIsPlanNotification}
+          header={"Upgrade Now to create new Chatbots!"}
+          content={"Upgrade now to access your chatbots!"}
+          footer={
+            <button
+              onClick={() => {
+                router.push("/home/pricing");
+              }}
+            >
+              Upgrade Now
+            </button>
+          }
+        />
         {(loadingComponent == true || isResponseOk) && (
           <LoaderModal
             isResponseOk={isResponseOk}
@@ -493,6 +511,7 @@ function Home({
               <SourceUpload
                 totalCharCount={totalCharCount}
                 filesCharCount={filesCharCount}
+                isPlanNotification={isPlanNotification}
               />
             )}
             {activeSource === "text" && (

@@ -31,7 +31,7 @@ function HeroSection() {
             style={{ color: "white", textDecoration: "none" }}
             href="#contact-us"
           >
-            <button className="request-demo-btn">Book a Demo</button>
+            <button className="request-demo-btn">Join Beta!</button>
           </a>
         </div>
         <div className="schemes-list">

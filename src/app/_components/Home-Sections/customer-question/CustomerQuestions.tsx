@@ -20,7 +20,7 @@ function CustomerQuestions() {
           style={{ color: "white", textDecoration: "none" }}
           href="/account/register"
         >
-          <button className="sign-up-btn">Join Beta</button>
+          <button className="sign-up-btn">Join Beta!</button>
         </a>
       </div>
       <div className="right">

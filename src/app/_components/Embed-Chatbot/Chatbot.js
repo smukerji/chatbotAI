@@ -49,6 +49,30 @@ function Chatbot() {
 
   /// used to fetch the bot details
   const [isBotDetailsFetched, setIsBotDetailsFetched] = useState(false);
+  const [user, setUser] = useState(null);
+  const [isPlanNotification, setIsPlanNotification] = useState(false);
+
+  const getUser = async (userId) => {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/user?userId=${userId}`
+    );
+
+    setUser(response.data.user);
+  };
+
+  useEffect(() => {
+    const planEndTimer = setInterval(() => {
+      if (user) {
+        const planEndDate = new Date(user?.endDate);
+
+        if (new Date() > planEndDate) {
+          setIsPlanNotification(true);
+        }
+      }
+    }, 1000);
+
+    return () => clearInterval(planEndTimer);
+  }, [user]);
 
   useEffect(() => {
     setSessionID(uuid());
@@ -67,6 +91,9 @@ function Chatbot() {
       setChatbotIconColor(botDetails?.chatbotSettings[0]?.chatbotIconColor);
       setBubbleIconUrl(botDetails?.chatbotSettings[0]?.bubbleIconUrl);
       setProfilePictureUrl(botDetails?.chatbotSettings[0]?.profilePictureUrl);
+
+      getUser(botDetails?.userId);
+
       setUserId(botDetails?.userId);
       setSuggestedMessages(botDetails?.chatbotSettings[0]?.suggestedMessages);
       setInitialMessage(botDetails?.chatbotSettings[0]?.initialMessage);
@@ -130,6 +157,8 @@ function Chatbot() {
             leadFields={leadFields}
             leadTitle={leadTitle}
             userLeadDetails={userDetails}
+            isPlanNotification={isPlanNotification}
+            setIsPlanNotification={setIsPlanNotification}
           />
         </div>
       )}

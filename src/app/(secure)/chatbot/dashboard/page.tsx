@@ -21,6 +21,7 @@ import EmbedSite from "./_components/EmbedSite/EmbedSite";
 import Integration from "./_components/Integration/Integration";
 import { ChatbotSettingContext } from "../../../_helpers/client/Context/ChatbotSettingContext";
 import { JWT_EXPIRED } from "../../../_helpers/errorConstants";
+import axios from "axios";
 
 function Dashboard() {
   const { status } = useSession();
@@ -65,6 +66,32 @@ function Dashboard() {
   /// sesstion Id and date for current chat window
   const [sessionID, setSessionID]: any = useState();
   const [sessionStartDate, setSessionStartDate]: any = useState();
+
+  const [isPlanNotification, setIsPlanNotification] = useState(false);
+  const [user, setUser] = useState<any>(null);
+
+  const getUser = async () => {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/user?userId=${cookies.userId}`
+    );
+
+    setUser(response.data.user);
+  };
+
+  useEffect(() => {
+    const planEndTimer = setInterval(() => {
+      if (user) {
+        const planEndDate = new Date(user?.endDate);
+
+        if (new Date() > planEndDate) {
+          setIsPlanNotification(true);
+        }
+      }
+    }, 1000);
+
+    return () => clearInterval(planEndTimer);
+  }, [user]);
+
   useEffect(() => {
     setSessionID(uuid());
     setSessionStartDate(getDate());
@@ -77,6 +104,7 @@ function Dashboard() {
   };
 
   useEffect(() => {
+    getUser();
     const fetchData = async () => {
       try {
         setLoading(true);
@@ -281,6 +309,8 @@ function Dashboard() {
                 sessionStartDate={sessionStartDate}
                 setSessionID={setSessionID}
                 setSessionStartDate={setSessionStartDate}
+                isPlanNotification={isPlanNotification}
+                setIsPlanNotification={setIsPlanNotification}
               />
             </>
           )}
@@ -290,6 +320,8 @@ function Dashboard() {
               <Settings
                 chatbotId={chatbot.id}
                 chatbotName={botDetails?.chatbotName}
+                isPlanNotification={isPlanNotification}
+                setIsPlanNotification={setIsPlanNotification}
               />
             </>
           )}
@@ -305,6 +337,8 @@ function Dashboard() {
                 crawlingData={crawlData}
                 chatbotId={chatbot.id}
                 chatbotName={chatbot.name}
+                isPlanNotification={isPlanNotification}
+                setIsPlanNotification={setIsPlanNotification}
               />
             </>
           )}
@@ -312,14 +346,21 @@ function Dashboard() {
           {/*------------------------------------------integrations-component----------------------------------------------*/}
           {editChatbot == "integrations" && !loading && (
             <>
-              <Integration />
+              <Integration
+                isPlanNotification={isPlanNotification}
+                setIsPlanNotification={setIsPlanNotification}
+              />
             </>
           )}
 
           {/*------------------------------------------embed-on-site-component----------------------------------------------*/}
           {editChatbot == "embedSite" && !loading && (
             <>
-              <EmbedSite chatbotId={chatbot.id} />
+              <EmbedSite
+                chatbotId={chatbot.id}
+                isPlanNotification={isPlanNotification}
+                setIsPlanNotification={setIsPlanNotification}
+              />
             </>
           )}
 

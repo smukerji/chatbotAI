@@ -9,7 +9,7 @@ import { useCookies } from "react-cookie";
 import "./chat.scss";
 import { DislikeOutlined, SendOutlined, LikeOutlined } from "@ant-design/icons";
 import Image from "next/image";
-import { Button, Slider, message } from "antd";
+import { Button, Modal, Slider, message } from "antd";
 import ChatbotNameModal from "../../../../../_components/Modal/ChatbotNameModal";
 import { getDate, getTime } from "../../../../../_helpers/client/getTime";
 import copyIcon from "../../../../../../../public/svgs/copy-icon.svg";
@@ -33,6 +33,8 @@ import {
   AUTHORIZATION_FAILED,
   JWT_EXPIRED,
 } from "../../../../../_helpers/errorConstants";
+import { useRouter } from "next/navigation";
+import CustomModal from "../CustomModal/CustomModal";
 
 function Chat({
   chatbot,
@@ -54,8 +56,11 @@ function Chat({
   leadFields,
   leadTitle,
   userLeadDetails,
+  isPlanNotification,
+  setIsPlanNotification,
 }: any) {
   let tempRef: any = useRef<HTMLDivElement>();
+  const router = useRouter();
 
   /// get the bot context
   const botContext: any = useContext(CreateBotContext);
@@ -138,6 +143,11 @@ function Chat({
     message.info(body?.message);
   };
 
+  const handleUpgradePlan = () => {
+    // setIsPlanNotification(false);
+    router.push("/home/pricing");
+  };
+
   /// Messages feedback opener
   async function openChatbotModal(index: number, status: string) {
     /// set the like/dislike btn check and the index to store the message history
@@ -197,6 +207,10 @@ function Chat({
     if (event.key === "Enter" || event === "click") {
       if (userQuery.trim() == "") {
         message.error("Please enter the message");
+        return;
+      }
+      if (isPlanNotification) {
+        message.error("Please contact administrator to renew the plan");
         return;
       }
       setLoading(true);
@@ -352,8 +366,6 @@ function Chat({
     // }
   }
 
-  console.log(botSettings, "lllll");
-
   /// refresh the chat window
   const refreshChat = () => {
     setMessages([]);
@@ -463,6 +475,41 @@ function Chat({
 
   return (
     <div className="chat-container">
+      {!isPopUp && (
+        <CustomModal
+          open={isPlanNotification}
+          setOpen={setIsPlanNotification}
+          header={"Upgrade Now to create new Chatbots!"}
+          content={"Upgrade now to access your chatbots!"}
+          footer={
+            <button
+              onClick={() => {
+                router.push("/home/pricing");
+              }}
+            >
+              Upgrade Now
+            </button>
+          }
+        />
+      )}
+      {/* 
+      <Modal
+        title="Upgrade Now to create new Chatbots!"
+        open={isPlanNotification}
+        onCancel={() => {}}
+        footer={[
+          <Button key="submit" type="primary" onClick={handleUpgradePlan}>
+            Upgrade Now
+          </Button>,
+        ]}
+        closable={false}
+        centered
+        className="subscription-expire-popup"
+        width={800}
+      >
+        <p>Upgrade now to access your chatbots!</p>
+      </Modal> */}
+
       {/*------------------------------------------left-section----------------------------------------------*/}
       {!isPopUp && (
         <div className="chatbot-details">
@@ -514,6 +561,7 @@ function Chat({
             </div>
 
             <Slider
+              style={{ zIndex: isPlanNotification ? -1 : 0 }}
               min={0}
               max={1}
               onChange={onChange}
@@ -539,7 +587,6 @@ function Chat({
           </div>
         </div>
       )}
-
       {/*------------------------------------------right-section----------------------------------------------*/}
       <div
         className="messages-section"
@@ -618,6 +665,11 @@ function Chat({
                         `${messagesTime[index].messageType}` === "initial"
                           ? "10px"
                           : "0",
+
+                      position:
+                        messagesTime[index].messageType === "initial"
+                          ? "unset"
+                          : "relative",
                     }}
                   >
                     <div
@@ -873,11 +925,13 @@ function Chat({
                 : botSettings?.messagePlaceholder
             }
             value={userQuery}
+            // disabled={isPlanNotification}
           />
           <button
             className="icon"
             onClick={() => getReply("click")}
             style={{ backgroundColor: botSettings?.userMessageColor }}
+            // disabled={isPlanNotification}
           >
             <Image src={sendChatIcon} alt="send-chat-icon" />
           </button>
