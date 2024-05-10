@@ -226,8 +226,10 @@ function Chat({
         ...prev,
         { role: "user", content: userQuery, messageTime: tempUserMessageTime },
       ]);
+
+      const filterUserId = cookies?.userId ? cookies?.userId : userId;
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/account/user/details?userId=${cookies?.userId}`,
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/account/user/details?userId=${filterUserId}`,
         {
           method: "GET",
           next: { revalidate: 0 },

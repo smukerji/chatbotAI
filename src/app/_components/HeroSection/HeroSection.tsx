@@ -29,7 +29,7 @@ function HeroSection() {
           </div> */}
           <a
             style={{ color: "white", textDecoration: "none" }}
-            href="#contact-us"
+            href="/account/register"
           >
             <button className="request-demo-btn">Join Beta!</button>
           </a>

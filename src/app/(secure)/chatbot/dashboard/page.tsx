@@ -85,12 +85,18 @@ function Dashboard() {
 
         if (new Date() > planEndDate) {
           setIsPlanNotification(true);
+
+          // setSource("history");
         }
       }
     }, 1000);
 
     return () => clearInterval(planEndTimer);
   }, [user]);
+
+  useEffect(() => {
+    if (isPlanNotification) botContext?.handleChange("editChatbot")("history");
+  }, [isPlanNotification]);
 
   useEffect(() => {
     setSessionID(uuid());
