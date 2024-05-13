@@ -191,7 +191,7 @@ function Chatbot() {
             return data.id == id;
           })[0]
         )
-      )}`
+      )}&editChatbotSource=${isPlanNotification ? "history" : "chatbot"}`
     );
     // window.location.href = `${
     //   process.env.NEXT_PUBLIC_WEBSITE_URL
