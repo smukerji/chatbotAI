@@ -1,18 +1,18 @@
-import { readContent } from "../../app/_helpers/server/ReadContent";
+import { readContent } from '../../app/_helpers/server/ReadContent';
 import {
   generateChunksNEmbedd,
   generateChunksNEmbeddForLinks,
-} from "../../app/_helpers/server/embeddings";
-import clientPromise from "../../db";
-import { v4 as uuid } from "uuid";
+} from '../../app/_helpers/server/embeddings';
+import clientPromise from '../../db';
+import { v4 as uuid } from 'uuid';
 // import { authorize, uploadFile } from "../../app/_services/googleFileUpload";
-import { put } from "@vercel/blob";
-import fs from "fs";
-import { emailService } from "../../app/_services/emailService";
+import { put } from '@vercel/blob';
+import fs from 'fs';
+import { emailService } from '../../app/_services/emailService';
 import {
   createNewChatbotMail,
   logo,
-} from "../../app/_helpers/emailImagesBase64Constants";
+} from '../../app/_helpers/emailImagesBase64Constants';
 import {
   chatbotBubbleAlignment,
   defaultChatBubbleIconColor,
@@ -26,26 +26,26 @@ import {
   models,
   theme,
   visibility,
-} from "../../app/_helpers/constant";
+} from '../../app/_helpers/constant';
 
 import {
   deleteFileVectorsById,
   updateVectorsById,
   upsert,
-} from "../../app/_helpers/server/pinecone";
-import { ObjectId } from "mongodb";
-const formidable = require("formidable");
+} from '../../app/_helpers/server/pinecone';
+import { ObjectId } from 'mongodb';
+const formidable = require('formidable');
 
-export const maxDuration = 300;
+export const maxDuration = 60;
 
 export default async function handler(req, res) {
-  if (req.method === "POST") {
+  if (req.method === 'POST') {
     try {
       const form = new formidable.IncomingForm();
       form.parse(req, async (err, fields, QAfiles) => {
         if (err) {
           console.error(err);
-          res.status(500).send("Error parsing formdata");
+          res.status(500).send('Error parsing formdata');
           return;
         }
         // const qaImage = QAfiles?.qaImage ? QAfiles?.qaImage[0] : null;
@@ -63,11 +63,11 @@ export default async function handler(req, res) {
 
         /// first check if user can create the chatbot or not
         const noOfChatbotsUserCreated = await db
-          .collection("user-chatbots")
+          .collection('user-chatbots')
           .countDocuments({ userId: userId });
 
         /// get the number of chatbot user can create from plan table
-        const planDetails = await db.collection("user-details").findOne({
+        const planDetails = await db.collection('user-details').findOne({
           userId: userId,
         });
 
@@ -78,14 +78,14 @@ export default async function handler(req, res) {
           res
             .status(500)
             .send(
-              "Sorry you cannot create the chatbot. Please upgrade your plan."
+              'Sorry you cannot create the chatbot. Please upgrade your plan.'
             );
 
           return;
         }
 
         const chatbotId =
-          fields?.chatbotId[0] !== "undefined" ? fields?.chatbotId[0] : uuid();
+          fields?.chatbotId[0] !== 'undefined' ? fields?.chatbotId[0] : uuid();
         const qaList = JSON.parse(fields?.qaList);
         const text = fields?.text[0];
         const crawledList = JSON.parse(fields?.crawledList[0]);
@@ -114,7 +114,7 @@ export default async function handler(req, res) {
 
             /// store the images files in server
             if (imageFile) {
-              qa.image = uuid() + "-" + imageFile[0].originalFilename;
+              qa.image = uuid() + '-' + imageFile[0].originalFilename;
               /// store the images
               var oldPath = imageFile[0].filepath;
 
@@ -122,15 +122,15 @@ export default async function handler(req, res) {
 
               /// store image on vercel
               put(imageFile[0].originalFilename, readStream, {
-                access: "public",
+                access: 'public',
               })
                 .then((blob) => {
                   qa.image = blob.url;
-                  console.log("Stored file to vercel", qa.image);
+                  console.log('Stored file to vercel', qa.image);
                   resolve(1);
                 })
                 .catch((err) => {
-                  console.log("Error storing file", err);
+                  console.log('Error storing file', err);
                   reject(err);
                 });
 
@@ -157,7 +157,7 @@ export default async function handler(req, res) {
               //   console.log("Error storing file", err);
               // });
             } else {
-              qa.image = qa.image == "" ? null : qa.image; // Use the file path or null if no image
+              qa.image = qa.image == '' ? null : qa.image; // Use the file path or null if no image
               resolve(1);
             }
           });
@@ -175,7 +175,7 @@ export default async function handler(req, res) {
         // console.log(qaList);
 
         /// if new chatbot is being created the new chatbot entry
-        let collection = db.collection("chatbots-data");
+        let collection = db.collection('chatbots-data');
 
         /// deleting files that needs to be deleted
         if (deleteFileList.length > 0) {
@@ -220,7 +220,7 @@ export default async function handler(req, res) {
           /// get all the links to remove to match the links to delete
           const cursor = await collection.findOne({
             chatbotId: chatbotId,
-            source: "crawling",
+            source: 'crawling',
           });
           const currentCrawlList = cursor?.content;
 
@@ -244,7 +244,7 @@ export default async function handler(req, res) {
           await collection.updateOne(
             {
               chatbotId: chatbotId,
-              source: "crawling",
+              source: 'crawling',
             },
             {
               $set: { content: updatedCrawltList },
@@ -264,7 +264,7 @@ export default async function handler(req, res) {
                 /// generating chunks and embedding
                 const chunks = await generateChunksNEmbedd(
                   content,
-                  "file",
+                  'file',
                   chatbotId,
                   userId,
                   file.name
@@ -279,7 +279,7 @@ export default async function handler(req, res) {
           const valuesPromiseContainer = await Promise.allSettled(fileData);
           /// filter only the resolved promises
           const valuesPromise = valuesPromiseContainer.filter(
-            (result) => result.status === "fulfilled"
+            (result) => result.status === 'fulfilled'
           );
           /// get the filenames and vectors created ID
           const fileSource = valuesPromise.map((values) => {
@@ -308,7 +308,7 @@ export default async function handler(req, res) {
               fileName: file.name,
               dataID: file.dataID,
               contentLength: file.contentLength,
-              source: "file",
+              source: 'file',
             });
           });
           //   }
@@ -320,7 +320,7 @@ export default async function handler(req, res) {
           /// fetch the text to get the data IDs of vector stores
           const dbText = await collection.findOne({
             chatbotId: chatbotId,
-            source: "text",
+            source: 'text',
           });
           if (dbText != null) {
             /// deleting the files by id
@@ -328,7 +328,7 @@ export default async function handler(req, res) {
             /// delete the id from db
             await collection.deleteOne({
               chatbotId: chatbotId,
-              source: "text",
+              source: 'text',
             });
           }
         }
@@ -336,9 +336,9 @@ export default async function handler(req, res) {
           /// generating chunks and embedding
           const chunks = await generateChunksNEmbedd(
             text,
-            "text",
+            'text',
             chatbotId,
-            ""
+            ''
           );
 
           /// store the emebeddings in pinecone database
@@ -350,15 +350,15 @@ export default async function handler(req, res) {
             chatbotId,
             dataID: chunks.dataIDs,
             content: text,
-            source: "text",
+            source: 'text',
           });
         } else if (text.length > 0 && updateChatbot && isTextUpdated) {
           /// generating chunks and embedding
           const chunks = await generateChunksNEmbedd(
             text,
-            "text",
+            'text',
             chatbotId,
-            ""
+            ''
           );
 
           /// store the emebeddings in pinecone database
@@ -370,7 +370,7 @@ export default async function handler(req, res) {
             chatbotId,
             dataID: chunks.dataIDs,
             content: text,
-            source: "text",
+            source: 'text',
           });
         }
 
@@ -403,9 +403,9 @@ export default async function handler(req, res) {
                         answer: qa.answer,
                         // filename: qa.image,
                       }),
-                  "qa",
+                  'qa',
                   chatbotId,
-                  ""
+                  ''
                 );
 
                 chunks.data[0].id = dbQA?.dataID[0];
@@ -442,9 +442,9 @@ export default async function handler(req, res) {
                         answer: qa.answer,
                         // filename: qa.image,
                       }),
-                  "qa",
+                  'qa',
                   chatbotId,
-                  ""
+                  ''
                 );
                 // qaListEmbbedingIndex.push(index);
                 /// insert the data to DB
@@ -456,7 +456,7 @@ export default async function handler(req, res) {
                     answer: qa.answer,
                     filename: qa.image,
                   },
-                  source: "qa",
+                  source: 'qa',
                 });
                 resolve(chunks);
               } else {
@@ -467,7 +467,7 @@ export default async function handler(req, res) {
           const valuesPromiseContainer = await Promise.allSettled(qaData);
           /// filter only the resolved promises
           const valuesPromise = valuesPromiseContainer.filter(
-            (result) => result.status === "fulfilled"
+            (result) => result.status === 'fulfilled'
           );
           const values = [].concat(...valuesPromise);
           /// store the emebeddings in pinecone database
@@ -508,14 +508,14 @@ export default async function handler(req, res) {
           try {
             await generateChunksNEmbeddForLinks(
               crwaledLinkUpsertData,
-              "crawling",
+              'crawling',
               chatbotId,
               userId
             ).then(() => {
               collection.insertOne({
                 chatbotId,
                 content: dbCrawlSource,
-                source: "crawling",
+                source: 'crawling',
               });
             });
           } catch (err) {
@@ -552,7 +552,7 @@ export default async function handler(req, res) {
           try {
             await generateChunksNEmbeddForLinks(
               crwaledLinkUpsertData,
-              "crawling",
+              'crawling',
               chatbotId,
               userId
             ).then(async () => {
@@ -560,13 +560,13 @@ export default async function handler(req, res) {
 
               const previousLinksContent = await collection.findOne({
                 chatbotId: chatbotId,
-                source: "crawling",
+                source: 'crawling',
               });
 
-              console.log("Db crawlinfg source", dbCrawlSource);
+              console.log('Db crawlinfg source', dbCrawlSource);
 
               collection.findOneAndUpdate(
-                { chatbotId: chatbotId, source: "crawling" },
+                { chatbotId: chatbotId, source: 'crawling' },
                 {
                   $set: {
                     content:
@@ -579,21 +579,21 @@ export default async function handler(req, res) {
               );
             });
           } catch (err) {
-            console.log("Error while processing links", err);
+            console.log('Error while processing links', err);
             return res.status(400).send(err);
           }
         }
         /// send the response
         const responseCode = updateChatbot ? 201 : 200;
         const responseText = updateChatbot
-          ? "Chatbot re-trained successfully"
-          : "Chabot trained successfully";
+          ? 'Chatbot re-trained successfully'
+          : 'Chabot trained successfully';
 
         if (!updateChatbot) {
           const currrentTime = new Date().getTime();
           /// create the chatbot entry in DB
           const chatbotName = fields?.chatbotText[0];
-          let userChatbotsCollection = db.collection("user-chatbots");
+          let userChatbotsCollection = db.collection('user-chatbots');
           await userChatbotsCollection.insertOne({
             userId,
             chatbotId,
@@ -605,12 +605,12 @@ export default async function handler(req, res) {
           //send email once chatbot is created
           try {
             const result = await db
-              .collection("users")
+              .collection('users')
               .findOne({ _id: new ObjectId(userId) });
             const email = result?.email;
             const temailService = emailService();
             await temailService.send(
-              "create-chatbot-template",
+              'create-chatbot-template',
               [createNewChatbotMail, logo],
               email,
               {
@@ -621,7 +621,7 @@ export default async function handler(req, res) {
             return res.status(400).send(error);
           }
           /// set the default settings for the chatbot in DB
-          await db.collection("chatbot-settings").insertOne({
+          await db.collection('chatbot-settings').insertOne({
             userId: userId,
             chatbotId: chatbotId,
             model: models[0],
@@ -635,23 +635,23 @@ export default async function handler(req, res) {
             theme: theme.LIGHT,
             userMessageColor: defaultUserMessageColor,
             chatbotIconColor: defaultChatBubbleIconColor,
-            profilePictureUrl: "",
-            bubbleIconUrl: "",
+            profilePictureUrl: '',
+            bubbleIconUrl: '',
             chatbotDisplayName: chatbotName,
             lastTrained: currrentTime,
             chatbotBubbleAlignment: chatbotBubbleAlignment.LEFT,
             noOfMessagesSent: 0,
             leadFields: {
-              name: { isChecked: false, value: "name" },
-              email: { isChecked: false, value: "email" },
-              number: { isChecked: false, value: "number" },
+              name: { isChecked: false, value: 'name' },
+              email: { isChecked: false, value: 'email' },
+              number: { isChecked: false, value: 'number' },
             },
             leadTitle: defaultLeadTitle,
             userDetails: defaultLeadUserDetails,
           });
         } else {
           /// if chatbot is being updated just update the timestamp and characters
-          await db.collection("chatbot-settings").updateOne(
+          await db.collection('chatbot-settings').updateOne(
             { userId: userId, chatbotId: chatbotId },
             {
               $set: {
@@ -664,11 +664,11 @@ export default async function handler(req, res) {
         return res.status(responseCode).send(responseText);
       });
     } catch (error) {
-      console.log("Error >>>>>", error);
+      console.log('Error >>>>>', error);
       return res.status(400).send(error);
     }
   } else {
-    res.status(405).send("Method not allowed");
+    res.status(405).send('Method not allowed');
   }
 }
 
