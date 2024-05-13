@@ -1,19 +1,19 @@
-"use client";
-import Link from "next/link";
-import "./globals.css";
-import { Layout, Modal, Button } from "antd";
-import { SessionProvider } from "next-auth/react";
-import axios from "axios";
-import { useCookies } from "react-cookie";
+'use client';
+import Link from 'next/link';
+import './globals.css';
+import { Layout, Modal, Button } from 'antd';
+import { SessionProvider } from 'next-auth/react';
+import axios from 'axios';
+import { useCookies } from 'react-cookie';
 // import AuthBtn from "./_components/AuthBtn";
-import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
-import Header from "./_components/Header/Header";
-import { UserDetailsDataProvider } from "./_helpers/client/Context/UserDetailsContext";
-import "./layout.scss";
+import dynamic from 'next/dynamic';
+import { useEffect, useState } from 'react';
+import Header from './_components/Header/Header';
+import { UserDetailsDataProvider } from './_helpers/client/Context/UserDetailsContext';
+import './layout.scss';
 
 // const AuthBtn = dynamic(() => import("./_components/AuthBtn"), { ssr: false });
-const AuthHeader = dynamic(() => import("./_components/AuthHeader"), {
+const AuthHeader = dynamic(() => import('./_components/AuthHeader'), {
   ssr: false,
 });
 
@@ -23,32 +23,55 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   // const { Header } = Layout;
-  const [path, setPath] = useState("");
-  const [cookies, setCookie] = useCookies(["userId"]);
+  const [path, setPath] = useState('');
+  const [cookies, setCookie] = useCookies(['userId']);
 
   useEffect(() => {
     setPath(window.location.pathname);
   }, []);
 
   return (
-    <html lang="en">
+    <html lang='en'>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Josefin+Sans&family=Poppins&family=Quicksand&display=swap"
-          rel="stylesheet"
+        {/* Google Tag Manager  */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','GTM-P7SNSPF3');`,
+          }}
         />
+        {/* End Google Tag Manager  */}
+
+        <link rel='preconnect' href='https://fonts.googleapis.com' />
+        <link rel='preconnect' href='https://fonts.gstatic.com' />
+        <link
+          href='https://fonts.googleapis.com/css2?family=Josefin+Sans&family=Poppins&family=Quicksand&display=swap'
+          rel='stylesheet'
+        />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
 
       <body>
+        {/* Google Tag Manager (noscript) */}
+        <noscript>
+          <iframe
+            src='https://www.googletagmanager.com/ns.html?id=GTM-P7SNSPF3'
+            height='0'
+            width='0'
+            style={{ display: 'none', visibility: 'hidden' }}
+          ></iframe>
+        </noscript>
+        {/* End Google Tag Manager (noscript)  */}
         <SessionProvider>
           <UserDetailsDataProvider>
-            {path !== "/" &&
-              path !== "/account/login" &&
-              path !== "/account/register" &&
-              path !== "/terms" &&
-              path !== "/privacy" && <AuthHeader />}
+            {path !== '/' &&
+              path !== '/account/login' &&
+              path !== '/account/register' &&
+              path !== '/terms' &&
+              path !== '/privacy' && <AuthHeader />}
             {children}
 
             {/* <Modal
@@ -69,6 +92,16 @@ export default function RootLayout({
             </Modal> */}
           </UserDetailsDataProvider>
         </SessionProvider>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.$zoho=window.$zoho || {};$zoho.salesiq=$zoho.salesiq||{ready:function(){}}`,
+          }}
+        />
+        <script
+          id='zsiqscript'
+          src='https://salesiq.zohopublic.in/widget?wc=siq992fbe92f9ef9a36617ac4c9babe51c3d7778f44133f1fe66ec7795c68a6c396'
+          defer
+        ></script>
       </body>
     </html>
   );
