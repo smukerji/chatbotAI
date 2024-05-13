@@ -91,6 +91,16 @@ export default function RootLayout({
             </Modal> */}
           </UserDetailsDataProvider>
         </SessionProvider>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.$zoho=window.$zoho || {};$zoho.salesiq=$zoho.salesiq||{ready:function(){}}`,
+          }}
+        />
+        <script
+          id='zsiqscript'
+          src='https://salesiq.zohopublic.in/widget?wc=siq992fbe92f9ef9a36617ac4c9babe51c3d7778f44133f1fe66ec7795c68a6c396'
+          defer
+        ></script>
       </body>
     </html>
   );
