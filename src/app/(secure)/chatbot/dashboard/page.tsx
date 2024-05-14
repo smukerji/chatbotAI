@@ -40,6 +40,7 @@ function Dashboard() {
   /// fetch the params
   const params: any = useSearchParams();
   const chatbot = JSON.parse(decodeURIComponent(params.get("chatbot")));
+  const editChatbotSource = params.get("editChatbotSource");
 
   const [cookies, setCookies] = useCookies(["userId"]);
 
@@ -85,12 +86,18 @@ function Dashboard() {
 
         if (new Date() > planEndDate) {
           setIsPlanNotification(true);
+
+          // setSource("history");
         }
       }
     }, 1000);
 
     return () => clearInterval(planEndTimer);
   }, [user]);
+
+  // useEffect(() => {
+  //   if (isPlanNotification) botContext?.handleChange("editChatbot")("history");
+  // }, [isPlanNotification]);
 
   useEffect(() => {
     setSessionID(uuid());
@@ -104,6 +111,7 @@ function Dashboard() {
   };
 
   useEffect(() => {
+    botContext?.handleChange("editChatbot")(editChatbotSource);
     getUser();
     const fetchData = async () => {
       try {

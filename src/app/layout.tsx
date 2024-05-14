@@ -18,15 +18,75 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <head>
+        {/* Google Tag Manager  */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','GTM-P7SNSPF3');`,
+          }}
+        />
+        {/* End Google Tag Manager  */}
+
         <link rel='preconnect' href='https://fonts.googleapis.com' />
         <link rel='preconnect' href='https://fonts.gstatic.com' />
         <link
           href='https://fonts.googleapis.com/css2?family=Josefin+Sans&family=Poppins&family=Quicksand&display=swap'
           rel='stylesheet'
         />
+        <link rel='icon' href='/favicon.ico' sizes='any' />
       </head>
 
       <body>
+        {/* Google Tag Manager (noscript) */}
+        <noscript>
+          <iframe
+            src='https://www.googletagmanager.com/ns.html?id=GTM-P7SNSPF3'
+            height='0'
+            width='0'
+            style={{ display: 'none', visibility: 'hidden' }}
+          ></iframe>
+        </noscript>
+        {/* End Google Tag Manager (noscript)  */}
+        <SessionProvider>
+          <UserDetailsDataProvider>
+            {path !== '/' &&
+              path !== '/account/login' &&
+              path !== '/account/register' &&
+              path !== '/terms' &&
+              path !== '/privacy' && <AuthHeader />}
+            {children}
+
+            {/* <Modal
+              title='Upgrade Now to create new Chatbots!'
+              open={isPlanNotification}
+              onCancel={() => {}}
+              footer={[
+                <Button key='submit' type='primary' onClick={handleUpgradePlan}>
+                  Upgrade Now
+                </Button>,
+              ]}
+              closable={false}
+              centered
+              className='subscription-expire-popup'
+              width={800}
+            >
+              <p>Upgrade now to access your chatbots!</p>
+            </Modal> */}
+          </UserDetailsDataProvider>
+        </SessionProvider>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.$zoho=window.$zoho || {};$zoho.salesiq=$zoho.salesiq||{ready:function(){}}`,
+          }}
+        />
+        <script
+          id='zsiqscript'
+          src='https://salesiq.zohopublic.in/widget?wc=siq992fbe92f9ef9a36617ac4c9babe51c3d7778f44133f1fe66ec7795c68a6c396'
+          defer
+        ></script>
         <LayoutWrapper>{children}</LayoutWrapper>
       </body>
     </html>
