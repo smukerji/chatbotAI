@@ -4,7 +4,7 @@ import LayoutWrapper from './_components/LayoutWrapper';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('http://localhost:3000'),
+  metadataBase: new URL('https://torri.ai'),
   title: { default: 'TORRI.AI', template: `%s | TORRI.AI` },
   description:
     'Torri is the personalized custom chatbot solution. You can create your personal chatbot with specific respective data and interact with it to minimize time and effort',
