@@ -1,17 +1,11 @@
 import React from 'react';
 import PricingWrapper from './_components/pricingWrapper';
-import { Metadata } from 'next';
+import { generateMetadata } from '@/app/_helpers/pageSeo';
 
-export const metadata: Metadata = {
+export const metadata = generateMetadata({
   title: 'Pricing',
-  alternates: {
-    canonical: '/home/pricing',
-    languages: {
-      en: '/en-us/home/pricing',
-      zh: '/zh/home/pricing',
-    },
-  },
-};
+  canonical: '/home/pricing',
+});
 
 export default function Home() {
   return <PricingWrapper />;

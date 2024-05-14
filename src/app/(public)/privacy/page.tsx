@@ -2,13 +2,13 @@ import React from 'react';
 import '../terms/terms.scss';
 import SecondaryHeader from '../../_components/Secondary-Header/SecondaryHeader';
 import Footer from '../../_components/Footer/Footer';
-import { Metadata } from 'next';
-export const metadata: Metadata = {
-  title: 'privacy',
-  alternates: {
-    canonical: '/privacy',
-  },
-};
+import { generateMetadata } from '@/app/_helpers/pageSeo';
+
+export const metadata = generateMetadata({
+  title: 'Privacy Policy',
+  canonical: '/privacy',
+});
+
 function Terms() {
   return (
     <>

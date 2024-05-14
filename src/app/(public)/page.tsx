@@ -14,7 +14,9 @@ import CustomerQuestions from '../_components/Home-Sections/customer-question/Cu
 import HeroSection from '../_components/HeroSection/HeroSection';
 import SecondaryHeader from '../_components/Secondary-Header/SecondaryHeader';
 import FeaturesSection from '../_components/Features-Section/FeaturesSection';
+import { generateMetadata } from '../_helpers/pageSeo';
 
+export const metadata = generateMetadata({ canonical: '/' });
 function Home() {
   return (
     <>

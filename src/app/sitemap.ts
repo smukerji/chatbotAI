@@ -7,22 +7,22 @@ type Sitemap = Array<{
 export default function sitemap(): Sitemap {
   return [
     {
-      url: 'http://localhost:3000/',
+      url: 'https://torri.ai',
       lastModified: new Date(),
       priority: 1,
     },
     {
-      url: 'http://localhost:3000/home/pricing',
+      url: 'https://torri.ai/home/pricing',
       lastModified: new Date(),
       priority: 0.9,
     },
     {
-      url: 'http://localhost:3000/terms',
+      url: 'https://torri.ai/terms',
       lastModified: new Date(),
       priority: 0.11,
     },
     {
-      url: 'http://localhost:3000/privacy',
+      url: 'https://torri.ai/privacy',
       lastModified: new Date(),
       priority: 0.12,
     },

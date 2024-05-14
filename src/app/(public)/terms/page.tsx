@@ -2,14 +2,13 @@ import React from 'react';
 import './terms.scss';
 import SecondaryHeader from '../../_components/Secondary-Header/SecondaryHeader';
 import Footer from '../../_components/Footer/Footer';
-import { Metadata } from 'next';
+import { generateMetadata } from '@/app/_helpers/pageSeo';
 
-export const metadata: Metadata = {
-  title: 'Terms',
-  alternates: {
-    canonical: '/terms',
-  },
-};
+export const metadata = generateMetadata({
+  title: 'Terms & Conditions',
+  canonical: '/terms',
+});
+
 function Terms() {
   return (
     <>
