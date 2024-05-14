@@ -50,33 +50,7 @@ export default function RootLayout({
           ></iframe>
         </noscript>
         {/* End Google Tag Manager (noscript)  */}
-        <SessionProvider>
-          <UserDetailsDataProvider>
-            {path !== '/' &&
-              path !== '/account/login' &&
-              path !== '/account/register' &&
-              path !== '/terms' &&
-              path !== '/privacy' && <AuthHeader />}
-            {children}
-
-            {/* <Modal
-              title='Upgrade Now to create new Chatbots!'
-              open={isPlanNotification}
-              onCancel={() => {}}
-              footer={[
-                <Button key='submit' type='primary' onClick={handleUpgradePlan}>
-                  Upgrade Now
-                </Button>,
-              ]}
-              closable={false}
-              centered
-              className='subscription-expire-popup'
-              width={800}
-            >
-              <p>Upgrade now to access your chatbots!</p>
-            </Modal> */}
-          </UserDetailsDataProvider>
-        </SessionProvider>
+        <LayoutWrapper>{children}</LayoutWrapper>
         <script
           dangerouslySetInnerHTML={{
             __html: `window.$zoho=window.$zoho || {};$zoho.salesiq=$zoho.salesiq||{ready:function(){}}`,
@@ -87,7 +61,6 @@ export default function RootLayout({
           src='https://salesiq.zohopublic.in/widget?wc=siq992fbe92f9ef9a36617ac4c9babe51c3d7778f44133f1fe66ec7795c68a6c396'
           defer
         ></script>
-        <LayoutWrapper>{children}</LayoutWrapper>
       </body>
     </html>
   );
