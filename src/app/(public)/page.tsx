@@ -15,6 +15,7 @@ import HeroSection from '../_components/HeroSection/HeroSection';
 import SecondaryHeader from '../_components/Secondary-Header/SecondaryHeader';
 import FeaturesSection from '../_components/Features-Section/FeaturesSection';
 import { generateMetadata } from '../_helpers/pageSeo';
+import ReactGoogleReCaptcha from '../_components/ReactGoogleRecaptcha';
 
 export const metadata = generateMetadata({ canonical: '/' });
 function Home() {
@@ -33,7 +34,9 @@ function Home() {
       {/* <Testimonials /> */}
       {/* <PlansSection /> */}
       {/* <FAQ /> */}
-      <ContactSection />
+      <ReactGoogleReCaptcha>
+        <ContactSection />
+      </ReactGoogleReCaptcha>
       <Footer />
     </>
   );

@@ -1,4 +1,5 @@
 'use client';
+
 import { SessionProvider } from 'next-auth/react';
 import React, { useEffect, useState } from 'react';
 import { UserDetailsDataProvider } from '../_helpers/client/Context/UserDetailsContext';
