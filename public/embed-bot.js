@@ -25,8 +25,6 @@
   // Access the data attributes
   const param1 = scriptElement.getAttribute("chatbotID");
 
-  console.log(document.body);
-
   //   const param2 = scriptElement.getAttribute("userID");
 
   // Use the values as needed

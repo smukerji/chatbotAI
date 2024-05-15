@@ -29,6 +29,8 @@ import ChatBotIcon from "../../../../../../../public/create-chatbot-svgs/ChatBot
 import { UserDetailsContext } from "../../../../../_helpers/client/Context/UserDetailsContext";
 import ReactToPrint from "react-to-print";
 import { PrintingChats } from "../Printing-Chats/Printing";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
 import {
   AUTHORIZATION_FAILED,
   JWT_EXPIRED,
@@ -463,15 +465,16 @@ function Chat({
 
     try {
       // if(emailError =)
-      // if (
-      //   (leadFields?.name.isChecked == true && leadDetails.name === "") ||
-      //   (leadFields?.email.isChecked == true && leadDetails.email === "") ||
-      //   (leadFields?.number.isChecked == true && leadDetails.number === "")
-      // ) {
-      //   setLeadError("Please, fill out all required  fields.");
-      //   return;
-      // }
+      if (
+        (leadFields?.name.isChecked == true && leadDetails.name === "") ||
+        (leadFields?.email.isChecked == true && leadDetails.email === "") ||
+        (leadFields?.number.isChecked == true && leadDetails.number === "")
+      ) {
+        setLeadError("Please, fill out all required  fields.");
+        return;
+      }
 
+      if (nameError !== "" || emailError !== "" || numberError !== "") return;
       // if (leadFields?.name.isChecked == true && leadDetails.name === "") {
       //   setNameError("Please enter your name");
       //   return;
@@ -877,7 +880,7 @@ function Chat({
                           ? leadFields?.number.value
                           : "Phone Number"}
                       </p>
-                      <input
+                      {/* <input
                         id="mobile_code"
                         type="text"
                         className="title-input"
@@ -890,6 +893,18 @@ function Chat({
                           setLeadError("");
                         }}
                         value={leadDetails?.number}
+                      /> */}
+
+                      <PhoneInput
+                        country={"us"}
+                        value={leadDetails?.number}
+                        placeholder="Enter your phone number..."
+                        onChange={(phone) => {
+                          setLeadDetails({
+                            ...leadDetails,
+                            number: phone,
+                          });
+                        }}
                       />
                     </div>
                   )}
