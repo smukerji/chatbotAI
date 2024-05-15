@@ -52,8 +52,6 @@ export default function RootLayout({
         </noscript>
         {/* End Google Tag Manager (noscript)  */}
         <LayoutWrapper>{children}</LayoutWrapper>
-        <script src='https://www.google.com/recaptcha/api.js'></script>
-
         <script
           dangerouslySetInnerHTML={{
             __html: `window.$zoho=window.$zoho || {};$zoho.salesiq=$zoho.salesiq||{ready:function(){}}`,
