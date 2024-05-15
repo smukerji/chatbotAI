@@ -602,7 +602,10 @@ function Home({
                 <p>Total detected characters</p>
 
                 <span>
-                  {totalCharCount}
+                  {totalCharCount < 100 && (
+                    <span style={{ color: "red" }}>{totalCharCount}</span>
+                  )}
+                  {totalCharCount >= 100 && <span>{totalCharCount}</span>}
                   <span>
                     /
                     {userDetails?.plan?.trainingDataLimit

@@ -21,6 +21,7 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
       clientSecret: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET!,
+      allowDangerousEmailAccountLinking: true,
     }),
     GithubProvider({
       clientId: process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID!,
@@ -114,7 +115,8 @@ export const authOptions: NextAuthOptions = {
       cookies().set("profile-img", user.image!);
       cookies().set("userId", user.id);
       /// set the username
-      cookies().set("username", user?.name!);
+      if (user?.name) cookies().set("username", user?.name!);
+      else if (user?.username) cookies().set("username", user?.username!);
       session.user.id = user.id;
       return session;
     },
