@@ -28,6 +28,7 @@ export default function RootLayout({
             })(window,document,'script','dataLayer','GTM-P7SNSPF3');`,
           }}
         />
+
         {/* End Google Tag Manager  */}
 
         <link rel='preconnect' href='https://fonts.googleapis.com' />
