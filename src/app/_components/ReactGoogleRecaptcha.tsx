@@ -4,7 +4,7 @@ import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 
 const ReactGoogleReCaptcha = ({ children }: { children: React.ReactNode }) => {
   return (
-    <GoogleReCaptchaProvider reCaptchaKey='6Lf2E9wpAAAAABZ_PYDsZZLpr2uPSmXjJDlQv8oX'>
+    <GoogleReCaptchaProvider reCaptchaKey='6Ldi49wpAAAAAIsSAtfJu7KD2oGAxdFzw-ViZi2K'>
       {children}
     </GoogleReCaptchaProvider>
   );
