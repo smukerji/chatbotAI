@@ -1,5 +1,6 @@
 {
   "editor.scrollbar.ignoreHorizontalScrollbarInContentHeight": false,
   "editor.scrollbar.horizontalScrollbarSize": 12,
-  "editor.scrollPredominantAxis": true
+  "editor.scrollPredominantAxis": true,
+  "cSpell.words": ["sitekey"]
 }
