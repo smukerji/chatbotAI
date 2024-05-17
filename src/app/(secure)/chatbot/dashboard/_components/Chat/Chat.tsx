@@ -76,8 +76,6 @@ function Chat({
   const botSettingContext: any = useContext(ChatbotSettingContext);
   const botSettings = botSettingContext?.chatbotSettings;
 
-  console.log(botSettings);
-
   const [cookies, setCookies] = useCookies(["userId"]);
 
   /// storing the input value
@@ -171,7 +169,8 @@ function Chat({
         chatWindowRef.current?.scrollTo(0, chatWindowRef.current.scrollHeight);
       }, 50);
     }
-  }, [response]);
+  }, [response, messages, loading]);
+
   async function storeHistory(userLatestQuery: any, gptLatestResponse: any) {
     /// update the message count
     if (!isPopUp) {
@@ -1021,13 +1020,13 @@ function Chat({
                 : botSettings?.messagePlaceholder
             }
             value={userQuery}
-            // disabled={isPlanNotification}
+            disabled={loading ? true : false}
           />
           <button
             className="icon"
             onClick={() => getReply("click")}
             style={{ backgroundColor: botSettings?.userMessageColor }}
-            // disabled={isPlanNotification}
+            disabled={loading ? true : false}
           >
             <Image src={sendChatIcon} alt="send-chat-icon" />
           </button>
