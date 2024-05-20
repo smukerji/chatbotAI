@@ -1,22 +1,24 @@
-import React from 'react';
-import '../terms/terms.scss';
-import SecondaryHeader from '../../_components/Secondary-Header/SecondaryHeader';
-import Footer from '../../_components/Footer/Footer';
-import { generateMetadata } from '@/app/_helpers/pageSeo';
+import React from "react";
+import "../terms/terms.scss";
+import SecondaryHeader from "../../_components/Secondary-Header/SecondaryHeader";
+import Footer from "../../_components/Footer/Footer";
+import { generateMetadata } from "@/app/_helpers/pageSeo";
 
 export const metadata = generateMetadata({
-  title: 'Privacy Policy',
-  canonical: '/privacy',
+  title: "Torri.AI Privacy Policy | Data Use & Protection",
+  description:
+    "Understand how Torri.AI collects, uses, and protects your data. Learn about our Privacy Policy for the Service. Contact us for inquiries.",
+  canonical: "/privacy",
 });
 
 function Terms() {
   return (
     <>
       <SecondaryHeader />
-      <div className='terms-privacy-container'>
+      <div className="terms-privacy-container">
         <h1>Privacy Policy</h1>
-        <p className='last-modified'>Last modified: February 27, 2024</p>
-        <div className='term-container'>
+        <p className="last-modified">Last modified: February 27, 2024</p>
+        <div className="term-container">
           <p>1. Introduction</p>
           <p>
             Please read this Privacy Policy (“Privacy Policy”) before using our
@@ -36,7 +38,7 @@ function Terms() {
             Terms & Conditions.
           </p>
         </div>
-        <div className='term-container'>
+        <div className="term-container">
           <p>2. Types of Data Collected</p>
           <h3>Personal Data</h3>
           <p>
@@ -97,7 +99,7 @@ function Terms() {
           </ul>
         </div>
 
-        <div className='term-container'>
+        <div className="term-container">
           <p>3. Use of Data</p>
           <p>Torri.AI uses the collected Personal Data for various purposes:</p>
 
@@ -178,7 +180,7 @@ function Terms() {
           </ul>
         </div>
 
-        <div className='term-container'>
+        <div className="term-container">
           <p>4. Retention of Data</p>
           <p>
             We will retain your Personal Data only for as long as is necessary
@@ -196,7 +198,7 @@ function Terms() {
             obligated to retain this data for longer time periods.
           </p>
         </div>
-        <div className='term-container'>
+        <div className="term-container">
           <p>5. Transfer of Data</p>
           <p>
             Your information, including Personal Data, may be transferred to –
@@ -220,7 +222,7 @@ function Terms() {
           </p>
         </div>
 
-        <div className='term-container'>
+        <div className="term-container">
           <p>6. Security of Data</p>
           <p>
             The security of your data is important to us but remember that no
@@ -233,7 +235,7 @@ function Terms() {
           </p>
         </div>
 
-        <div className='term-container'>
+        <div className="term-container">
           <p>7. Service Providers</p>
           <p>
             We may employ third party companies and individuals to facilitate
@@ -244,7 +246,7 @@ function Terms() {
             to disclose or use it for any other purpose.
           </p>
         </div>
-        <div className='term-container'>
+        <div className="term-container">
           <p>8. Payments</p>
           <p>
             We may provide paid products and/or services within Service. In that
@@ -268,7 +270,7 @@ function Terms() {
           </ul>
         </div>
 
-        <div className='term-container'>
+        <div className="term-container">
           <p>9. Contact Us</p>
           <p>
             If you have any questions about this Privacy Policy, please contact

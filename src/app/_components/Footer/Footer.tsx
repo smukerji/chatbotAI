@@ -105,9 +105,7 @@ function Footer() {
             <li>
               <a href="/home/pricing">Pricing</a>
             </li>
-            <li onClick={() => setOpenSupport(true)}>
-              <a>Support</a>
-            </li>
+            <li onClick={() => setOpenSupport(true)}>Support</li>
           </ul>
         </div>
 
@@ -138,7 +136,9 @@ function Footer() {
         </div>
       </div>
 
-      <div className="copyright-section">Copyright © 2023 SAP Alliance & Creole Studios</div>
+      <div className="copyright-section">
+        Copyright © 2023 SAP Alliance & Creole Studios
+      </div>
     </div>
   );
 }
