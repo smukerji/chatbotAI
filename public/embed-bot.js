@@ -25,8 +25,6 @@
   // Access the data attributes
   const param1 = scriptElement.getAttribute("chatbotID");
 
-  console.log(document.body);
-
   //   const param2 = scriptElement.getAttribute("userID");
 
   // Use the values as needed
@@ -40,7 +38,7 @@
   document.body.insertAdjacentHTML(
     "beforeend",
     `<iframe
-      src="https://torri.ai/embed-bot?chatbotID=${param1}";
+      src="https://chatbot-ai-silk.vercel.app/mbed-bot?chatbotID=${param1}";
       frameborder="0"
       ></iframe>`
   );

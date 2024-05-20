@@ -29,6 +29,8 @@ import ChatBotIcon from "../../../../../../../public/create-chatbot-svgs/ChatBot
 import { UserDetailsContext } from "../../../../../_helpers/client/Context/UserDetailsContext";
 import ReactToPrint from "react-to-print";
 import { PrintingChats } from "../Printing-Chats/Printing";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
 import {
   AUTHORIZATION_FAILED,
   JWT_EXPIRED,
@@ -74,8 +76,6 @@ function Chat({
   const botSettingContext: any = useContext(ChatbotSettingContext);
   const botSettings = botSettingContext?.chatbotSettings;
 
-  console.log(botSettings);
-
   const [cookies, setCookies] = useCookies(["userId"]);
 
   /// storing the input value
@@ -101,6 +101,11 @@ function Chat({
   const [feedbackText, setfeedbackText] = useState("");
   const [feedbackIndex, setFeedbackIndex] = useState(0);
   const [feedbackStatus, setfeedbackStatus] = useState("");
+
+  /// lead form errors
+  const [emailError, setEmailError] = useState("");
+  const [numberError, setNumberError] = useState("");
+  const [nameError, setNameError] = useState("");
 
   /// chatbot lead section state
   const [leadDetails, setLeadDetails] = useState({
@@ -164,7 +169,7 @@ function Chat({
         chatWindowRef.current?.scrollTo(0, chatWindowRef.current.scrollHeight);
       }, 50);
     }
-  }, [response]);
+  }, [response, messages, loading]);
 
   async function storeHistory(userLatestQuery: any, gptLatestResponse: any) {
     /// update the message count
@@ -419,6 +424,28 @@ function Chat({
     setSessionStartDate(getDate());
   };
 
+  /// function to validate email
+  // const checkEmail = (email: any) => {
+  //   if (email == "") {
+  //     return ;
+  //   }
+  //   setEmail(email);
+
+  //   const pattern = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
+  //   //   message: "Invalid email address format",
+
+  //   /// validate email
+  //   const result = email?.match(pattern);
+
+  //   if (!result) {
+  //     setEmailMessage("Invalid email format.");
+  //   } else {
+  //     setEmailMessage("");
+  //   }
+
+  //   // const email.(pattern)
+  // };
+
   // console.log(messageImages);
 
   /// to copy chatbot Id
@@ -433,10 +460,10 @@ function Chat({
 
   /// function for submitting lead
   const submitLeadDetail = async () => {
-    console.log("clicked on submit button", leadDetails);
     setLeadError("");
 
     try {
+      // if(emailError =)
       if (
         (leadFields?.name.isChecked == true && leadDetails.name === "") ||
         (leadFields?.email.isChecked == true && leadDetails.email === "") ||
@@ -445,6 +472,23 @@ function Chat({
         setLeadError("Please, fill out all required  fields.");
         return;
       }
+
+      if (nameError !== "" || emailError !== "" || numberError !== "") return;
+      // if (leadFields?.name.isChecked == true && leadDetails.name === "") {
+      //   setNameError("Please enter your name");
+      //   return;
+      // }
+
+      // if (leadFields?.email.isChecked == true && leadDetails.email === "") {
+      //   setNameError("Please enter your email");
+      //   return;
+      // }
+
+      // if (leadFields?.number.isChecked == true && leadDetails.number === "") {
+      //   setNameError("Please enter your number");
+      //   return;
+      // }
+
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/api/lead`,
         {
@@ -763,9 +807,22 @@ function Chat({
                             name: e.target.value,
                           });
                           setLeadError("");
+                          setNameError("");
+                        }}
+                        onBlur={() => {
+                          if (
+                            leadFields?.name.isChecked == true &&
+                            leadDetails.name === ""
+                          ) {
+                            setNameError("Please enter your name");
+                            return;
+                          }
                         }}
                         value={leadDetails.name}
                       />
+                      <div className="lead-error">
+                        <p>{nameError}</p>
+                      </div>
                     </div>
                   )}
 
@@ -786,9 +843,32 @@ function Chat({
                             email: e.target.value,
                           });
                           setLeadError("");
+                          setEmailError("");
+                        }}
+                        onBlur={() => {
+                          if (
+                            leadFields?.email.isChecked == true &&
+                            leadDetails.email === ""
+                          ) {
+                            setEmailError("Please enter your email");
+                            return;
+                          }
+                          const pattern =
+                            /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
+                          //   message: "Invalid email address format",
+
+                          /// validate email
+                          const result = leadDetails.email?.match(pattern);
+
+                          if (!result) {
+                            setEmailError("Invalid email format.");
+                          }
                         }}
                         value={leadDetails?.email}
                       />
+                      <div className="lead-error">
+                        <p>{emailError}</p>
+                      </div>
                     </div>
                   )}
 
@@ -799,8 +879,9 @@ function Chat({
                           ? leadFields?.number.value
                           : "Phone Number"}
                       </p>
-                      <input
-                        type="number"
+                      {/* <input
+                        id="mobile_code"
+                        type="text"
                         className="title-input"
                         placeholder="Enter your phone number..."
                         onChange={(e) => {
@@ -811,6 +892,18 @@ function Chat({
                           setLeadError("");
                         }}
                         value={leadDetails?.number}
+                      /> */}
+
+                      <PhoneInput
+                        country={"us"}
+                        value={leadDetails?.number}
+                        placeholder="Enter your phone number..."
+                        onChange={(phone) => {
+                          setLeadDetails({
+                            ...leadDetails,
+                            number: phone,
+                          });
+                        }}
                       />
                     </div>
                   )}
@@ -927,13 +1020,13 @@ function Chat({
                 : botSettings?.messagePlaceholder
             }
             value={userQuery}
-            // disabled={isPlanNotification}
+            disabled={loading ? true : false}
           />
           <button
             className="icon"
             onClick={() => getReply("click")}
             style={{ backgroundColor: botSettings?.userMessageColor }}
-            // disabled={isPlanNotification}
+            disabled={loading ? true : false}
           >
             <Image src={sendChatIcon} alt="send-chat-icon" />
           </button>
