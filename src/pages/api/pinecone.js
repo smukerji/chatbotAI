@@ -29,7 +29,7 @@ export default async function handler(req, res) {
     /// set the params of pinecone embeddings retrival
     const queryRequest = {
       vector: embed,
-      topK: 5,
+      topK: 3,
       includeMetadata: true,
       filter: {
         chatbotId: chatbotId,
@@ -69,7 +69,7 @@ export default async function handler(req, res) {
     const userId = body?.userId;
 
     /// fetch the IDs and user namespace from the DB
-    const db =  (await clientPromise).db();
+    const db = (await clientPromise).db();
     const collection = db.collection("chatbots-data");
     const userChatbots = db.collection("user-chatbots");
     const userChatbotSettings = db.collection("chatbot-settings");
@@ -105,7 +105,7 @@ export default async function handler(req, res) {
     await whatsappDetails.deleteOne({ chatbotId: chatbotId });
 
     //delete the telegram details collection's record against chatbotId
-    const telegramDetails = db.collection("telegram-bot");//whatsappbot_details
+    const telegramDetails = db.collection("telegram-bot"); //whatsappbot_details
     await telegramDetails.deleteOne({ chatbotId: chatbotId });
 
     /// deleting the chunks to avoid  Request Header Fields Too Large error
