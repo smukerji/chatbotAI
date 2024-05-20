@@ -18,14 +18,12 @@
 
   // Get the script element
   const scriptElement = document.querySelector(
-    'script[src="http://localhost:3000/embed-bot.js"]'
+    'script[src="https://chatbot-ai-silk.vercel.app/embed-bot.js"]'
     // 'script[src="http://192.168.1.76:3000/embed-bot.js"]'
   );
 
   // Access the data attributes
   const param1 = scriptElement.getAttribute("chatbotID");
-
-  console.log(document.body);
 
   //   const param2 = scriptElement.getAttribute("userID");
 
@@ -40,7 +38,7 @@
   document.body.insertAdjacentHTML(
     "beforeend",
     `<iframe
-      src="http://localhost:3000/embed-bot?chatbotID=${param1}";
+      src="https://chatbot-ai-silk.vercel.app/mbed-bot?chatbotID=${param1}";
       frameborder="0"
       ></iframe>`
   );
