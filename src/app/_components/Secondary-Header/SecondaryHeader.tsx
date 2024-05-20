@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import LuciferLogo from "../../../../public/svgs/lucifer-ai-logo.svg";
@@ -6,7 +7,7 @@ import dynamic from "next/dynamic";
 import "./secondary-header.scss";
 import { useRouter } from "next/navigation";
 
-const AuthBtn = dynamic(() => import('../../_components/AuthBtn'), {
+const AuthBtn = dynamic(() => import("../../_components/AuthBtn"), {
   ssr: false,
 });
 
@@ -41,21 +42,21 @@ function SecondaryHeader() {
   }, [menuOpen]);
 
   return (
-    <div className='header-title-container'>
+    <div className="header-title-container">
       <Image
-        className='logo'
+        className="logo"
         src={LuciferLogo}
-        alt='img-logo'
+        alt="img-logo"
         onClick={() => {
-          router.push('/');
+          router.push("/");
         }}
-        style={{ cursor: 'pointer' }}
+        style={{ cursor: "pointer" }}
       />
 
       <div className={`hamburger-menu-icon`} onClick={toggleMenu}>
-        <div className='bar'></div>
-        <div className='bar'></div>
-        <div className='bar'></div>
+        <div className="bar"></div>
+        <div className="bar"></div>
+        <div className="bar"></div>
       </div>
 
       <div ref={menuRef} className={`hamburger-menu ${menuOpen ? "open" : ""}`}>
@@ -72,11 +73,15 @@ function SecondaryHeader() {
             <li onClick={toggleMenu}>
               <a href="/#service-offerings">Service Offerings</a>
             </li>
+
+            <li onClick={toggleMenu}>
+              <a href="/blog">Blog</a>
+            </li>
           </ul>
         </div>
 
-        <div className='login-register-container'>
-            {/* If user is logged in display my Chatbot else try for free */}
+        <div className="login-register-container">
+          {/* If user is logged in display my Chatbot else try for free */}
           <AuthBtn />
         </div>
       </div>

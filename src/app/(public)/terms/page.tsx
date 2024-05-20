@@ -1,22 +1,22 @@
-import React from 'react';
-import './terms.scss';
-import SecondaryHeader from '../../_components/Secondary-Header/SecondaryHeader';
-import Footer from '../../_components/Footer/Footer';
-import { generateMetadata } from '@/app/_helpers/pageSeo';
+import React from "react";
+import "./terms.scss";
+import SecondaryHeader from "../../_components/Secondary-Header/SecondaryHeader";
+import Footer from "../../_components/Footer/Footer";
+import { generateMetadata } from "@/app/_helpers/pageSeo";
 
 export const metadata = generateMetadata({
-  title: 'Terms & Conditions',
-  canonical: '/terms',
+  title: "Terms & Conditions",
+  canonical: "/terms",
 });
 
 function Terms() {
   return (
     <>
       <SecondaryHeader />
-      <div className='terms-privacy-container'>
+      <div className="terms-privacy-container">
         <h1>Terms & Conditions</h1>
-        <p className='last-modified'>Last modified: February 27, 2024</p>
-        <div className='term-container'>
+        <p className="last-modified">Last modified: February 27, 2024</p>
+        <div className="term-container">
           <p>1. Introduction</p>
           <p>
             These Terms & Conditions (“Terms & Conditions”) are used to
@@ -38,7 +38,7 @@ function Terms() {
             can try to find a solution.
           </p>
         </div>
-        <div className='term-container'>
+        <div className="term-container">
           <p>2. General Rules </p>
           <p>
             Using the Service means full acceptance of the Terms. The Terms
@@ -99,7 +99,7 @@ function Terms() {
             the Mobile Device.
           </p>
         </div>
-        <div className='term-container'>
+        <div className="term-container">
           <p>3. Account</p>
           <p>
             Account set-up is possible through the Website. Account set-up
@@ -124,7 +124,7 @@ function Terms() {
             offensive, vulgar or obscene.
           </p>
         </div>
-        <div className='term-container'>
+        <div className="term-container">
           <p>4. Subscriptions</p>
           <p>
             Some parts of Service are billed on a subscription basis
@@ -160,7 +160,7 @@ function Terms() {
             responsibility of the person submitting the order.
           </p>
         </div>
-        <div className='term-container'>
+        <div className="term-container">
           <p>5. Content</p>
           <p>
             Our Service and Website allows you to post, link, store, share and
@@ -183,7 +183,7 @@ function Terms() {
             or through Service.
           </p>
         </div>
-        <div className='term-container'>
+        <div className="term-container">
           <p>6. Prohibited Uses</p>
           <p>
             You may use Service or Website only for lawful purposes and in
@@ -264,7 +264,7 @@ function Terms() {
             </li>
           </ul>
         </div>
-        <div className='term-container'>
+        <div className="term-container">
           <p>7. Intellectual Property</p>
           <p>
             The Service, the Website and their original content (excluding
@@ -302,7 +302,7 @@ function Terms() {
             (that is by machine or computer program).
           </p>
         </div>
-        <div className='term-container'>
+        <div className="term-container">
           <p>8. Copyright Policy</p>
           <p>
             We respect the intellectual property rights of others. It is our
@@ -322,7 +322,7 @@ function Terms() {
             copyright.
           </p>
         </div>
-        <div className='term-container'>
+        <div className="term-container">
           <p>9. DMCA Notice and Procedure for Copyright Infringement Claims</p>
           <p>
             You may submit a notification pursuant to the Digital Millennium
@@ -362,7 +362,7 @@ function Terms() {
             You can contact our Copyright Agent via email at info@sapahk.ai.
           </p>
         </div>
-        <div className='term-container'>
+        <div className="term-container">
           <p>10. Error Reporting and Feedback</p>
           <p>
             The Company tries – to the best of its ability – to support the
@@ -390,7 +390,7 @@ function Terms() {
             commercialize) Feedback in any manner and for any purpose.
           </p>
         </div>
-        <div className='term-container'>
+        <div className="term-container">
           <p>11. Disclaimer of Warranty</p>
           <p>
             THE SERVICES ARE PROVIDED BY COMPANY ON AN “AS IS” AND “AS
@@ -417,7 +417,7 @@ function Terms() {
             WHICH CANNOT BE EXCLUDED OR LIMITED UNDER APPLICABLE LAW.
           </p>
         </div>
-        <div className='term-container'>
+        <div className="term-container">
           <p>12. Limitation of Liability</p>
           <p>
             The Company shall not be liable for the consequences of complying
@@ -457,7 +457,7 @@ function Terms() {
             EXCLUSION MAY NOT APPLY TO YOU.
           </p>
         </div>
-        <div className='term-container'>
+        <div className="term-container">
           <p>13. Personal Data Protection and Security</p>
           <p>
             The Company processes personal data with due diligence and ensuring
@@ -476,7 +476,7 @@ function Terms() {
             data or other essential information on the Other Websites.
           </p>
         </div>
-        <div className='term-container'>
+        <div className="term-container">
           <p>14. Acknowledgement</p>
           <p>
             BY USING SERVICE OR OTHER SERVICES PROVIDED BY US, YOU ACKNOWLEDGE
@@ -484,7 +484,7 @@ function Terms() {
             THEM.
           </p>
         </div>
-        <div className='term-container'>
+        <div className="term-container">
           <p>15. Contact Us</p>
           <p>
             Any time you wish to contact the Company, please send email at:

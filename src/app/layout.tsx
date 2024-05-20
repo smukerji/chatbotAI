@@ -1,13 +1,29 @@
-import './globals.css';
-import './layout.scss';
-import LayoutWrapper from './_components/LayoutWrapper';
-import { Metadata } from 'next';
+import "./globals.css";
+import "./layout.scss";
+import LayoutWrapper from "./_components/LayoutWrapper";
+import { Metadata } from "next";
+import { Josefin_Sans, Quicksand, Poppins } from "next/font/google";
 
+const josefinSans = Josefin_Sans({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-josefin-sans",
+});
+const quickSand = Quicksand({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-quick-sand",
+});
+const poppins = Poppins({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-poppins",
+});
 export const metadata: Metadata = {
-  metadataBase: new URL('http://localhost:3000'),
-  title: { default: 'TORRI.AI', template: `%s | TORRI.AI` },
+  metadataBase: new URL("http://localhost:3000"),
+  title: { default: "TORRI.AI", template: `%s | TORRI.AI` },
   description:
-    'Torri is the personalized custom chatbot solution. You can create your personal chatbot with specific respective data and interact with it to minimize time and effort',
+    "Torri is the personalized custom chatbot solution. You can create your personal chatbot with specific respective data and interact with it to minimize time and effort",
 };
 
 export default function RootLayout({
@@ -16,7 +32,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang='en'>
+    <html lang="en">
       <head>
         {/* Google Tag Manager  */}
         <script
@@ -30,36 +46,35 @@ export default function RootLayout({
         />
 
         {/* End Google Tag Manager  */}
-
-        <link rel='preconnect' href='https://fonts.googleapis.com' />
-        <link rel='preconnect' href='https://fonts.gstatic.com' />
-        <link
-          href='https://fonts.googleapis.com/css2?family=Josefin+Sans&family=Poppins&family=Quicksand&display=swap'
-          rel='stylesheet'
-        />
-        <link rel='icon' href='/favicon.ico' sizes='any' />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
 
       <body>
         {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe
-            src='https://www.googletagmanager.com/ns.html?id=GTM-P7SNSPF3'
-            height='0'
-            width='0'
-            style={{ display: 'none', visibility: 'hidden' }}
+            src="https://www.googletagmanager.com/ns.html?id=GTM-P7SNSPF3"
+            height="0"
+            width="0"
+            style={{ display: "none", visibility: "hidden" }}
           ></iframe>
         </noscript>
         {/* End Google Tag Manager (noscript)  */}
-        <LayoutWrapper>{children}</LayoutWrapper>
+        <LayoutWrapper>
+          <main
+            className={`${josefinSans.variable} ${quickSand.variable} ${poppins.variable}`}
+          >
+            {children}
+          </main>
+        </LayoutWrapper>
         <script
           dangerouslySetInnerHTML={{
             __html: `window.$zoho=window.$zoho || {};$zoho.salesiq=$zoho.salesiq||{ready:function(){}}`,
           }}
         />
         <script
-          id='zsiqscript'
-          src='https://salesiq.zohopublic.in/widget?wc=siq992fbe92f9ef9a36617ac4c9babe51c3d7778f44133f1fe66ec7795c68a6c396'
+          id="zsiqscript"
+          src="https://salesiq.zohopublic.in/widget?wc=siq992fbe92f9ef9a36617ac4c9babe51c3d7778f44133f1fe66ec7795c68a6c396"
           defer
         ></script>
       </body>
