@@ -2,6 +2,7 @@ import React from "react";
 import "./customer-question.scss";
 import Img1 from "../../../../../public/sections-images/customer-questions/image 57.png";
 import Image from "next/image";
+import Link from "next/link";
 
 function CustomerQuestions() {
   return (
@@ -16,15 +17,15 @@ function CustomerQuestions() {
           and more. Train the chatbot with your own data.
         </p>
 
-        <a
+        <Link
           style={{ color: "white", textDecoration: "none" }}
           href="/account/register"
         >
           <button className="sign-up-btn">Join Beta!</button>
-        </a>
+        </Link>
       </div>
       <div className="right">
-        <Image src={Img1} alt="image" />
+        <Image src={Img1} alt="image" loading="lazy" />
       </div>
     </div>
   );

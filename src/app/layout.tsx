@@ -1,9 +1,9 @@
-import "./globals.css";
-import "./layout.scss";
+import "./global.scss";
 import LayoutWrapper from "./_components/LayoutWrapper";
 import { Metadata } from "next";
 import { Josefin_Sans, Quicksand, Poppins } from "next/font/google";
-
+import Head from "next/head";
+import Script from "next/script";
 const josefinSans = Josefin_Sans({
   weight: ["400", "700"],
   subsets: ["latin"],
@@ -35,7 +35,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         {/* Google Tag Manager  */}
-        <script
+        <Script
           dangerouslySetInnerHTML={{
             __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
             new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -43,6 +43,7 @@ export default function RootLayout({
             'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
             })(window,document,'script','dataLayer','GTM-P7SNSPF3');`,
           }}
+          id="google-tag-manager"
         />
 
         {/* End Google Tag Manager  */}
@@ -67,16 +68,17 @@ export default function RootLayout({
             {children}
           </main>
         </LayoutWrapper>
-        <script
+        <Script
+          id="zsiqscript"
           dangerouslySetInnerHTML={{
             __html: `window.$zoho=window.$zoho || {};$zoho.salesiq=$zoho.salesiq||{ready:function(){}}`,
           }}
         />
-        <script
+        <Script
           id="zsiqscript"
           src="https://salesiq.zohopublic.in/widget?wc=siq992fbe92f9ef9a36617ac4c9babe51c3d7778f44133f1fe66ec7795c68a6c396"
           defer
-        ></script>
+        ></Script>
       </body>
     </html>
   );

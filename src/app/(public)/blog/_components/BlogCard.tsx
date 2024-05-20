@@ -7,7 +7,7 @@ const BlogCard = () => {
   return (
     <div className="blog-card-wrapper">
       {data.map((blog) => (
-        <div className="blog-card">
+        <div className="blog-card" key={blog.title}>
           <Link href={`/blog/${blog.title?.split(" ").join("-")}`}>
             <div className="card-header">
               <Image

@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useContext, useEffect, useRef, useState } from "react";
 import LuciferLogo from "../../../../public/svgs/lucifer-ai-logo.svg";
 import profileIcon from "../../../../public/svgs/profile-circle.svg";

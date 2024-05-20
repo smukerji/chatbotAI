@@ -430,3 +430,52 @@ Header a {
   width: 35px;
   margin-right: 5px;
 }
+/* layout.scss */
+.ant-modal-root {
+  .ant-modal-mask {
+    backdrop-filter: blur(4px);
+    background: none;
+    margin-top: 70px;
+  }
+  .ant-modal-wrap {
+    height: calc(100% - 70px);
+    margin-top: 70px;
+  }
+  .subscription-expire-popup {
+    .ant-modal-content {
+      box-shadow: none;
+      background: transparent !important;
+      text-align: center;
+      .ant-modal-body {
+        font-family: "General Sans";
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 28px;
+      }
+
+      .ant-modal-header {
+        background: transparent !important;
+        text-align: center;
+        .ant-modal-title {
+          font-family: "General Sans";
+          font-size: 30px;
+          font-weight: 600;
+          line-height: 40px;
+          font-style: normal;
+          color: #141416;
+        }
+      }
+      .ant-modal-footer {
+        display: flex;
+        justify-content: center;
+        margin-top: 40px;
+        .ant-btn {
+          border-radius: 12px;
+          background: #2e58ea;
+          color: #fff;
+        }
+      }
+    }
+  }
+}

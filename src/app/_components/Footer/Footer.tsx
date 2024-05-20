@@ -13,11 +13,13 @@ import Facebookimg from "../../../../public/svgs/facebook-icon-white.svg";
 import "./footer.scss";
 import SupportModal from "../../(secure)/chatbot/dashboard/_components/Modal/SupportModal";
 import Link from "next/link";
-import { company, quickLink, legal } from "../../api/footer.json";
+import data from "../../_helpers/data/footer.json";
 import Widget from "./Widget";
+
 function Footer() {
   /// state for opening support modal
   const [openSupport, setOpenSupport] = useState(false);
+  const { company, legal, quickLink } = data?.data || {};
   return (
     <div className="footer-section">
       <SupportModal
