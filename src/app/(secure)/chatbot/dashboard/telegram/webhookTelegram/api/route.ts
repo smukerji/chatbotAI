@@ -5,7 +5,7 @@ import clientPromise from '../../../../../../../db';
 import { ObjectId } from 'mongodb';
 import { encodeChat, encode, decode, isWithinTokenLimit } from 'gpt-tokenizer';
 import moment from 'moment';
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 interface WhatsAppChatHistoryType {
   _id?: ObjectId;

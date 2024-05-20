@@ -18,7 +18,7 @@
 
   // Get the script element
   const scriptElement = document.querySelector(
-    'script[src="https://chatbot-ai-silk.vercel.app/embed-bot.js"]'
+    'script[src="https://torri.ai/embed-bot.js"]'
     // 'script[src="http://192.168.1.76:3000/embed-bot.js"]'
   );
 

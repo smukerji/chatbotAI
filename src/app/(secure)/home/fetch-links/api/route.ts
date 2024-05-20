@@ -209,7 +209,7 @@ module.exports = apiHandler({
   POST: fetchLinks,
 });
 
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 const imageLinkRegex =
   /^https?:\/\/(?:[\w\-]+\.)+[a-zA-Z]{2,20}(?:\/[^\s?]+)*(?:\.(?:jpg|jpeg|png|gif|bmp|svg|webp|tiff))(?:\?.*)?$/i;
