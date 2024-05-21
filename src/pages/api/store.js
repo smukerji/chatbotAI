@@ -434,7 +434,7 @@ export default async function handler(req, res) {
                         question: qa.question,
                         answer:
                           `${qa.answer}` +
-                          `image: https://drive.google.com/uc?export=view&id=${qa.image}`,
+                          `image: ${qa.image}`,
                         // filename: qa.image,
                       })
                     : JSON.stringify({
