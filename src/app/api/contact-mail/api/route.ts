@@ -46,7 +46,9 @@ export async function POST(req: NextRequest) {
             Content: contactUsBase64,
           },
         ],
+
       });
+
 
       //---------------------- Insert values into the database with timestamp
       const timestamp = new Date(); // Generate timestamp
