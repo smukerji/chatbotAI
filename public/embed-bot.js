@@ -1,4 +1,4 @@
-(async function EmbedBot() {
+( function EmbedBot() {
   const cssStyles = `
   <style>
    
@@ -53,14 +53,16 @@
   
   // Api call for   bot setting
   try {
-    const res =await fetch(
+    fetch(
       `https://chatbot-ai-silk.vercel.app/chatbot/popup/details/api?chatbotId=${param1}`,{mode:"no-cors",method:"GET"}
-    )
-    const data = await res.json();
-    response = data;
-    // console.log('dataaaaaaaa', data);
-    bubbleIconUrl = data?.chatbotSettings[0]?.bubbleIconUrl
-    chatbubbleColor = data?.chatbotSettings[0]?.chatbotIconColor;
+    ).then((res)=>{
+
+      const data = res.json();
+      response = data;
+      // console.log('dataaaaaaaa', data);
+      bubbleIconUrl = data?.chatbotSettings[0]?.bubbleIconUrl
+      chatbubbleColor = data?.chatbotSettings[0]?.chatbotIconColor;
+    })
   } catch (error) {
     console.error('Error', error);
   }

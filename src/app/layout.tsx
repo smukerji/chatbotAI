@@ -70,7 +70,7 @@ export default function RootLayout({
           chatbotid="9bfb16c7-142e-4946-9ce2-61282e64b38b"
         ></script> */}
         <script
-          src="http://localhost:3000/embed-bot.js"
+          src="https://chatbot-ai-silk.vercel.app/embed-bot.js"
           // @ts-ignore
           chatbotID="f629716b-48f8-4a7f-a767-68c3f61dd189"
     ></script>
