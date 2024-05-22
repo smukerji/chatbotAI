@@ -2,8 +2,8 @@ import "./global.scss";
 import LayoutWrapper from "./_components/LayoutWrapper";
 import { Metadata } from "next";
 import { Josefin_Sans, Quicksand, Poppins } from "next/font/google";
-import Head from "next/head";
 import Script from "next/script";
+
 const josefinSans = Josefin_Sans({
   weight: ["400", "700"],
   subsets: ["latin"],
@@ -20,8 +20,8 @@ const poppins = Poppins({
   variable: "--font-poppins",
 });
 export const metadata: Metadata = {
-  metadataBase: new URL("http://localhost:3000"),
-  title: { default: "TORRI.AI", template: `%s | TORRI.AI` },
+  metadataBase: new URL("https://torri.ai"),
+  title: { default: "TORRI.AI", template: `%s` },
   description:
     "Torri is the personalized custom chatbot solution. You can create your personal chatbot with specific respective data and interact with it to minimize time and effort",
 };

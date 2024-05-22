@@ -5,7 +5,9 @@ import Footer from "../../_components/Footer/Footer";
 import { generateMetadata } from "@/app/_helpers/pageSeo";
 
 export const metadata = generateMetadata({
-  title: "Privacy Policy",
+  title: "Torri.AI Privacy Policy | Data Use & Protection",
+  description:
+    "Understand how Torri.AI collects, uses, and protects your data. Learn about our Privacy Policy for the Service. Contact us for inquiries.",
   canonical: "/privacy",
 });
 

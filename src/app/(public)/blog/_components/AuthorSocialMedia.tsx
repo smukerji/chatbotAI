@@ -5,13 +5,27 @@ import facebook from "../../../../assets/socialIcons/facebook.webp";
 import twitter from "../../../../assets/socialIcons/twitter.webp";
 import linkedin from "../../../../assets/socialIcons/linkedin.webp";
 import instagram from "../../../../assets/socialIcons/instagram.webp";
-const AuthorSocialMedia = () => {
+
+const AuthorSocialMedia = ({
+  socialLinks,
+}: {
+  socialLinks: {
+    facebook?: string;
+    instagram?: string;
+    twitter?: string;
+    linkedin?: string;
+  };
+}) => {
   return (
     <div className="author-social-link-container">
       <div className="author-spacer-line"></div>
       <div className="social-media-div">
         <div className="social-links">
-          <Link href="#" className="author-social-profile-wrapper">
+          <Link
+            href={socialLinks.facebook || "#"}
+            className="author-social-profile-wrapper"
+            target="_blank"
+          >
             <Image
               src={facebook}
               loading="lazy"
@@ -20,7 +34,7 @@ const AuthorSocialMedia = () => {
             />
           </Link>
           <Link
-            href="#"
+            href={socialLinks.twitter || "#"}
             target="_blank"
             className="author-social-profile-wrapper"
           >
@@ -32,7 +46,7 @@ const AuthorSocialMedia = () => {
             />
           </Link>
           <Link
-            href="#"
+            href={socialLinks.linkedin || "#"}
             target="_blank"
             className="author-social-profile-wrapper"
           >
@@ -43,7 +57,11 @@ const AuthorSocialMedia = () => {
               className="social-media-icon"
             />
           </Link>
-          <Link href="#" className="author-social-profile-wrapper ">
+          <Link
+            href={socialLinks.instagram || "#"}
+            className="author-social-profile-wrapper"
+            target="_blank"
+          >
             <Image
               src={instagram}
               loading="lazy"

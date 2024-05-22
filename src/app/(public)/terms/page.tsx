@@ -5,7 +5,9 @@ import Footer from "../../_components/Footer/Footer";
 import { generateMetadata } from "@/app/_helpers/pageSeo";
 
 export const metadata = generateMetadata({
-  title: "Terms & Conditions",
+  title: "Torri.AI Terms & Conditions | Legal Agreement",
+  description:
+    "Explore Torri.AI's Terms & Conditions. Understand the rules governing our AI chatbot service. Read and agree to the legal relationship.",
   canonical: "/terms",
 });
 

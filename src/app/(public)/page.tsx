@@ -17,7 +17,12 @@ import FeaturesSection from "../_components/Features-Section/FeaturesSection";
 import { generateMetadata } from "../_helpers/pageSeo";
 import ReactGoogleReCaptcha from "../_components/ReactGoogleRecaptcha";
 
-export const metadata = generateMetadata({ canonical: "/" });
+export const metadata = generateMetadata({
+  title: "Custom AI Chatbots | Elevate Customer Support with Torri.AI",
+  description:
+    "Elevate customer support with Torri.AI's AI chatbot. Precise, multilingual, and no-code. Join our beta for seamless interactions",
+  canonical: "/",
+});
 function Home() {
   return (
     <>

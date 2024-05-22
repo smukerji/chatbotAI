@@ -3,6 +3,12 @@ import SecondaryHeader from "@/app/_components/Secondary-Header/SecondaryHeader"
 import React from "react";
 import "./blog.scss";
 import BlogCard from "./_components/BlogCard";
+import { generateMetadata } from "@/app/_helpers/pageSeo";
+export const metadata = generateMetadata({
+  title: "Blog",
+  canonical: "/blog",
+});
+
 const Blog = () => {
   return (
     <>

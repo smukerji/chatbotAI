@@ -8,13 +8,14 @@ const BlogCard = () => {
     <div className="blog-card-wrapper">
       {data.map((blog) => (
         <div className="blog-card" key={blog.title}>
-          <Link href={`/blog/${blog.title?.split(" ").join("-")}`}>
+          <Link href={`/blog/${blog.slug}`}>
             <div className="card-header">
               <Image
                 src={blog.thumbnailUrl}
                 alt={`Image of ${"title"}`}
                 width={400}
                 height={300}
+                loading="lazy"
               />
             </div>
             <div className="card-footer">

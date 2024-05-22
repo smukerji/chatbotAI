@@ -6,6 +6,7 @@ import LuciferLogo from "../../../../public/svgs/lucifer-ai-logo.svg";
 import dynamic from "next/dynamic";
 import "./secondary-header.scss";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const AuthBtn = dynamic(() => import("../../_components/AuthBtn"), {
   ssr: false,
@@ -63,20 +64,20 @@ function SecondaryHeader() {
         <div className={`navbar `}>
           <ul>
             <li onClick={toggleMenu}>
-              <a href="/#features">Features</a>
+              <Link href="/#features">Features</Link>
             </li>
 
             <li onClick={toggleMenu}>
-              <a href="/home/pricing">Pricing</a>
+              <Link href="/home/pricing">Pricing</Link>
             </li>
 
             <li onClick={toggleMenu}>
-              <a href="/#service-offerings">Service Offerings</a>
+              <Link href="/#service-offerings">Service Offerings</Link>
             </li>
 
-            <li onClick={toggleMenu}>
+            {/* <li onClick={toggleMenu}>
               <a href="/blog">Blog</a>
-            </li>
+            </li> */}
           </ul>
         </div>
 
