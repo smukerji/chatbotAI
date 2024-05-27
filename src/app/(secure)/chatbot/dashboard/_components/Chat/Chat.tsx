@@ -60,18 +60,20 @@ function Chat({
   userLeadDetails,
   isPlanNotification,
   setIsPlanNotification,
+  userMessageColor
 }: any) {
+  
   let tempRef: any = useRef<HTMLDivElement>();
   const router = useRouter();
-
+  
   /// get the bot context
   const botContext: any = useContext(CreateBotContext);
   const botDetails = botContext?.createBotInfo;
-
+  
   /// get userDetails context
   const userDetailContext: any = useContext(UserDetailsContext);
   const userDetails = userDetailContext?.userDetails;
-
+  
   /// get the bot settings context
   const botSettingContext: any = useContext(ChatbotSettingContext);
   const botSettings = botSettingContext?.chatbotSettings;
@@ -768,7 +770,7 @@ function Chat({
                   <div
                     className="user-message"
                     key={index}
-                    style={{ backgroundColor: botSettings?.userMessageColor }}
+                    style={{ backgroundColor: botSettings?.userMessageColor ?  botSettings?.userMessageColor : userMessageColor  }}
                   >
                     {message.content}
                   </div>
@@ -1025,7 +1027,7 @@ function Chat({
           <button
             className="icon"
             onClick={() => getReply("click")}
-            style={{ backgroundColor: botSettings?.userMessageColor }}
+            style={{ backgroundColor: botSettings?.userMessageColor ?  botSettings?.userMessageColor : userMessageColor }}
             disabled={loading ? true : false}
           >
             <Image src={sendChatIcon} alt="send-chat-icon" />
