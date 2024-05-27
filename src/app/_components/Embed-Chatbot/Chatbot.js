@@ -135,7 +135,7 @@ function Chatbot() {
 
   return (
     <>
-      {state && (
+      {/* {state && ( */}
         <div className="embed-chatbot-container">
           <Chat
             chatbot={chatbot}
@@ -161,7 +161,7 @@ function Chatbot() {
             setIsPlanNotification={setIsPlanNotification}
           />
         </div>
-      )}
+      {/* )} */}
 
       {/* <div className="chatbot-icon" onClick={toggleChatbot}> */}
       {/* {state ? (
@@ -169,7 +169,7 @@ function Chatbot() {
         ) : (
           <MessageOutlined className="chat-icon" />
         )} */}
-      <div
+      {/* <div
         className="chatbot-icon"
         style={
           {
@@ -193,8 +193,7 @@ function Chatbot() {
             style={{ borderRadius: "50%" }}
           />
         </div>
-        {/* <Image src={ChatBubbleButton} alt="chat-bubble" /> */}
-      </div>
+      </div> */}
       {/* </div> */}
     </>
   );

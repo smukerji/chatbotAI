@@ -15,37 +15,26 @@ const BlogShareSocialMedia = ({ slug }: { slug: string }) => {
       <FacebookShareButton
         hashtag="Torri.AI"
         url={`https://torri.ai/blog/${slug}`}
-        children={
-          <div>
-            <Image
-              src={facebook}
-              alt="Facebook logo"
-              className="social-share"
-            />
-          </div>
-        }
-      />
+      >
+        <div>
+          <Image src={facebook} alt="Facebook logo" className="social-share" />
+        </div>
+      </FacebookShareButton>
+
       <TwitterShareButton
         hashtags={[`Torri.AI`]}
         url={`https://torri.ai/blog/${slug}`}
-        children={
-          <div>
-            <Image src={twitter} alt="Twitter logo" className="social-share" />
-          </div>
-        }
-      />
-      <LinkedinShareButton
-        url={`https://torri.ai/blog/${slug}`}
-        children={
-          <div>
-            <Image
-              src={linkedin}
-              alt="Linkedin logo"
-              className="social-share"
-            />
-          </div>
-        }
-      />
+      >
+        <div>
+          <Image src={twitter} alt="Twitter logo" className="social-share" />
+        </div>
+      </TwitterShareButton>
+
+      <LinkedinShareButton url={`https://torri.ai/blog/${slug}`}>
+        <div>
+          <Image src={linkedin} alt="Linkedin logo" className="social-share" />
+        </div>
+      </LinkedinShareButton>
     </div>
   );
 };

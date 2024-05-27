@@ -430,6 +430,19 @@ Header a {
   width: 35px;
   margin-right: 5px;
 }
+
+.grecaptcha-badge{
+  left: 0px;
+  right: -186px;
+  bottom: 0;
+}
+
+.grecaptcha-badge iframe{
+  right: 0px !important;
+  left: 0 !important;
+  height: 61px !important;
+  bottom: 14px !important;
+}
 /* layout.scss */
 .ant-modal-root {
   .ant-modal-mask {

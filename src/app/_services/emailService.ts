@@ -11,9 +11,11 @@ function emailService(): IEmailService {
       templateName: string,
       attachments: Array<any>,
       sendTo: string,
-      templateModel: {}
+      templateModel: {},
     ) => {
       try {
+
+
         await client.sendEmailWithTemplate({
           From: process.env.SENDERS_EMAIL!,
           To: sendTo,
@@ -22,6 +24,8 @@ function emailService(): IEmailService {
           MessageStream: "outbound",
           TemplateModel: templateModel,
         });
+
+        
       } catch (error) {
         console.log("Error sending Email", error);
       }
