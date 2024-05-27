@@ -45,7 +45,7 @@ function LimitReachedModal({ setOpenLimitModel }: any) {
           </div>
         </div>
         <p className="upgrade-desc">
-          Please upgrade plans to install more chatbot
+          Please upgrade plans to create more chatbots
         </p>
       </div>
       <button onClick={upgradeHandler}>

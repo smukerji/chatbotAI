@@ -62,7 +62,7 @@ function Security() {
           <p className="rating-title">Rate Limiting</p>
           <p className="rating-desc">
             Limit the number of messages sent from one device on the Torri and
-            chat bubble (this limit will not be applied to you on Torri,
+            chat bubble (this limit will not be applied to you on torri.ai,
             only on your website for your users to prevent abuse).
           </p>
           <div className="rating-bottom">
