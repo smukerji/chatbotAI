@@ -7,9 +7,9 @@ import "./compatibility-section.scss";
 
 function CompatibilitySection() {
   return (
-    <div className='compatibility-section-container'>
+    <div className="compatibility-section-container">
       {/* --------------------------left section------------------------------ */}
-      <div className='left'>
+      <div className="left">
         <h1>Compatibility with WhatsApp and any platforms</h1>
         <p className="description">
           We are offering an accessible interface to website or other platforms.
