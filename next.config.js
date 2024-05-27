@@ -1,7 +1,10 @@
 /** @type {import('next').NextConfig} */
+
 const nextConfig = {
   images: {
     remotePatterns: [
+      { hostname: "via.placeholder.com" },
+      { hostname: "res.cloudinary.com" },
       {
         protocol: "https",
         hostname: "lh3.googleusercontent.com",
@@ -20,6 +23,12 @@ const nextConfig = {
         port: "",
         pathname: "/**",
       },
+      { hostname: "miro.medium.com" },
+      // {
+      //   protocol: "https",
+      //   hostname: "**",
+      //   pathname: "**",
+      // },
     ],
   },
   async headers() {

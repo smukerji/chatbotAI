@@ -62,6 +62,7 @@
     "react-dom": "18.2.0",
     "react-google-recaptcha-v3": "^1.10.1",
     "react-phone-input-2": "^2.15.1",
+    "react-share": "^5.1.0",
     "react-to-print": "^2.15.1",
     "saslprep": "^1.0.3",
     "stripe": "^14.16.0",

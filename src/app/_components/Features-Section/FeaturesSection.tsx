@@ -78,11 +78,11 @@ function FeaturesSection() {
           </div>
           <div className="right">
             {activeKey == "1" ? (
-              <Image src={img1} alt="image" />
+              <Image src={img1} alt="image" loading="lazy" />
             ) : activeKey == "2" ? (
-              <Image src={img2} alt="image" />
+              <Image src={img2} alt="image" loading="lazy" />
             ) : activeKey == "3" ? (
-              <Image src={img3} alt="image" />
+              <Image src={img3} alt="image" loading="lazy" />
             ) : (
               ""
             )}

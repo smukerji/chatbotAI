@@ -1,15 +1,20 @@
 import React from "react";
 import "./hero-section.scss";
 import Image from "next/image";
-import HeaderImage from "../../../../public/sections-images/header-background/Group1.png";
-import freeTrialIcon from "../../../../public/sections-images/header-background/discount-shape.svg";
-import creditCardIcon from "../../../../public/sections-images/header-background/card-pos.svg";
-import cancelIcon from "../../../../public/sections-images/header-background/clipboard-close.svg";
+// import LineImage from "../../../../public/sections-images/header-background/Lines.png";
+import HeaderImage from "../../../../public/sections-images/header-background/Group1.webp";
+import freeTrialIcon from "../../../../public/sections-images/header-background/discount-shape.webp";
+import creditCardIcon from "../../../../public/sections-images/header-background/card-pos.webp";
+import cancelIcon from "../../../../public/sections-images/header-background/clipboard-close.webp";
+import Link from "next/link";
 
 function HeroSection() {
   return (
     <>
-      <div className="hero-section-container">
+      <div
+        className="hero-section-container"
+        // style={{ backgroundImage: `url(${LineImage.src})` }}
+      >
         <h1 className="title">
           Seamless Support Starts Here: AI-Powered Solutions for Every Customer
           Query
@@ -27,30 +32,48 @@ function HeroSection() {
           {/* <div className="email-input">
             <input type="text" placeholder="Enter your email" />
           </div> */}
-          <a
+          <Link
             style={{ color: "white", textDecoration: "none" }}
             href="/account/register"
           >
             <button className="request-demo-btn">Join Beta!</button>
-          </a>
+          </Link>
         </div>
         <div className="schemes-list">
           <ul>
             <li>
               <span>
-                <Image src={freeTrialIcon} alt="free-trial-icon" />
+                <Image
+                  src={freeTrialIcon}
+                  alt="free-trial-icon"
+                  loading="lazy"
+                  width={23}
+                  height={23}
+                />
               </span>
               <span>Free 7-day trial</span>
             </li>
             <li>
               <span>
-                <Image src={creditCardIcon} alt="credit-card-icon" />
+                <Image
+                  src={creditCardIcon}
+                  alt="credit-card-icon"
+                  loading="lazy"
+                  width={23}
+                  height={23}
+                />
               </span>
               <span>No credit card required</span>
             </li>
             <li>
               <span>
-                <Image src={cancelIcon} alt="cancel-icon" />
+                <Image
+                  src={cancelIcon}
+                  alt="cancel-icon"
+                  loading="lazy"
+                  width={23}
+                  height={23}
+                />
               </span>
               <span>Cancel anytime</span>
             </li>
@@ -58,7 +81,12 @@ function HeroSection() {
         </div>
 
         <div className="grp-img">
-          <Image src={HeaderImage} alt="image" />
+          <Image
+            src={HeaderImage}
+            alt="image"
+            loading="lazy"
+            objectFit="contain"
+          />
         </div>
       </div>
     </>
