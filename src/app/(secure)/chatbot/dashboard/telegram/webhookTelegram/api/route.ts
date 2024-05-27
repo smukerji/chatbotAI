@@ -1,10 +1,10 @@
-import { headers } from 'next/headers';
-import { NextRequest, NextResponse } from 'next/server';
-import { apiHandler } from '../../../../../../_helpers/server/api/api-handler';
-import clientPromise from '../../../../../../../db';
-import { ObjectId } from 'mongodb';
-import { encodeChat, encode, decode, isWithinTokenLimit } from 'gpt-tokenizer';
-import moment from 'moment';
+import { headers } from "next/headers";
+import { NextRequest, NextResponse } from "next/server";
+import { apiHandler } from "../../../../../../_helpers/server/api/api-handler";
+import clientPromise from "../../../../../../../db";
+import { ObjectId } from "mongodb";
+import { encodeChat, encode, decode, isWithinTokenLimit } from "gpt-tokenizer";
+import moment from "moment";
 export const maxDuration = 300;
 
 interface WhatsAppChatHistoryType {
@@ -28,7 +28,7 @@ interface WhatsAppChatHistoryType {
 
 async function getChatbotId(telegramToken: any) {
   const db = (await clientPromise!).db();
-  const collection = db?.collection('telegram-bot');
+  const collection = db?.collection("telegram-bot");
   const result = await collection?.findOne({
     telegramToken,
   });
@@ -55,16 +55,16 @@ async function sendMessageToTelegram(
 
   try {
     const response = await fetch(url, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(body),
     });
 
     const responseData = await response.json();
   } catch (error) {
-    console.log('Error sending message to Telegram:', error);
+    console.log("Error sending message to Telegram:", error);
   }
 }
 
@@ -72,11 +72,11 @@ async function sendMessageToTelegram(
 export async function POST(request: NextRequest) {
   const tokenLimit = [
     {
-      model: 'gpt-3.5-turbo',
+      model: "gpt-3.5-turbo",
       tokens: 15385,
     },
     {
-      model: 'gpt-4',
+      model: "gpt-4",
       tokens: 8000,
     },
   ];
@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
   try {
     let req = await request.json();
     const chatId = req?.message?.chat?.id;
-    const telegramToken = request?.nextUrl?.searchParams.get('token');
+    const telegramToken = request?.nextUrl?.searchParams.get("token");
     let queryFromTelegramUser: string = req?.message?.text;
 
     // This code is for getting chatbotId from telegram token
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
     //check if object is empty - if yes return
     // ---------------------------------------------------- If user might have deleted bot but still messaging
     if (!chatBotResult) {
-      return new Response('received', { status: 200 });
+      return new Response("received", { status: 200 });
     }
 
     const { chatbotId, userId, isEnabled } = chatBotResult;
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
     const db = (await clientPromise!).db();
     // -----------------------------------------------------This function will if the subscription is active or not of user
 
-    const collection = db?.collection('users');
+    const collection = db?.collection("users");
     const data = await collection.findOne({ _id: new ObjectId(userId) });
     const endDate = data?.endDate;
     // const isTelegram = data?.isWhatsapp;
@@ -116,15 +116,15 @@ export async function POST(request: NextRequest) {
       await sendMessageToTelegram(
         telegramToken,
         chatId,
-        'Your subscription has ended'
+        "Your subscription has ended"
       );
-      return new Response('received', { status: 200 });
+      return new Response("received", { status: 200 });
     } else {
-      console.log('continue..');
+      console.log("continue..");
     }
 
     //get the user's chatbot setting
-    let userChatBotSetting = db.collection('chatbot-settings');
+    let userChatBotSetting = db.collection("chatbot-settings");
 
     //find the user's chatbot model
     let userChatBotModel = await userChatBotSetting.findOne({
@@ -136,34 +136,34 @@ export async function POST(request: NextRequest) {
     step = 4;
     if (isEnabled === false) {
       // return { message: "Chatbot with WhatsApp is disabled" };
-      console.log('Chatbot with Telegram is disabled ');
+      console.log("Chatbot with Telegram is disabled ");
       // return NextResponse.json({ message: "received" });
-      return new Response('received', { status: 200 });
+      return new Response("received", { status: 200 });
     }
 
     step = 5;
     //---------------------------------------------------------- if user types /start
-    if (req?.message?.text === '/start') {
+    if (req?.message?.text === "/start") {
       await sendMessageToTelegram(
         telegramToken,
         chatId,
-        'Welcome how can we help you?'
+        "Welcome how can we help you?"
       );
-      return new Response('received', { status: 200 });
+      return new Response("received", { status: 200 });
     }
     //----------------------------------------------------------- check whether message limit is reached or not
 
     step = 6;
     // const db = (await clientPromise!).db();
-    const collections = db?.collection('user-details');
+    const collections = db?.collection("user-details");
     const result = await collections.findOne({ userId });
     if (result.totalMessageCount >= result.messageLimit) {
       await sendMessageToTelegram(
         telegramToken,
         chatId,
-        'Your limit reached please upgrade your plan'
+        "Your limit reached please upgrade your plan"
       );
-      return new Response('received', { status: 200 });
+      return new Response("received", { status: 200 });
     }
 
     step = 7;
@@ -173,7 +173,7 @@ export async function POST(request: NextRequest) {
       const response: any = await fetch(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/pinecone`,
         {
-          method: 'POST',
+          method: "POST",
           body: JSON.stringify({
             userQuery: req?.message?.text,
             chatbotId: chatbotId,
@@ -184,15 +184,15 @@ export async function POST(request: NextRequest) {
 
       /// parse the response and extract the similarity results
       const respText = await response.text();
-      const similaritySearchResults = JSON.parse(respText).join('\n');
+      const similaritySearchResults = JSON.parse(respText).join("\n");
 
       step = 8;
       //get the user's chatbot history
-      let userChatHistoryCollection = db.collection('telegram-chat-history');
+      let userChatHistoryCollection = db.collection("telegram-chat-history");
       let userChatHistory: WhatsAppChatHistoryType =
         await userChatHistoryCollection.findOne({
           userId: userId,
-          date: moment().utc().format('YYYY-MM-DD'),
+          date: moment().utc().format("YYYY-MM-DD"),
         });
 
       //find the user's chatbot model
@@ -204,11 +204,11 @@ export async function POST(request: NextRequest) {
       //if user chat history is not available, create a new chat history
       if (!userChatHistory) {
         const responseOpenAI: any = await fetch(
-          'https://api.openai.com/v1/chat/completions',
+          "https://api.openai.com/v1/chat/completions",
           {
-            method: 'POST',
+            method: "POST",
             headers: {
-              'Content-Type': 'application/json',
+              "Content-Type": "application/json",
               Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENAI_KEY}`,
             },
             body: JSON.stringify({
@@ -217,7 +217,7 @@ export async function POST(request: NextRequest) {
               top_p: 1,
               messages: [
                 {
-                  role: 'system',
+                  role: "system",
                   content: `Use the following pieces of context to answer the users question.
                             If you don't know the answer, just say that you don't know, don't try to make up an answer.
                             ----------------
@@ -228,7 +228,7 @@ export async function POST(request: NextRequest) {
                 },
                 // ...messages,
                 {
-                  role: 'user',
+                  role: "user",
                   content: `Answer user query and include images in response if available in the given context 
                           
                                       query: ${req?.message?.text} `,
@@ -240,7 +240,7 @@ export async function POST(request: NextRequest) {
 
         const openaiBody = JSON.parse(await responseOpenAI.text());
 
-        const collections = db?.collection('user-details');
+        const collections = db?.collection("user-details");
 
         step = 10;
         const result = await collections.findOne({ userId });
@@ -267,11 +267,11 @@ export async function POST(request: NextRequest) {
               [`${chatId}`]: {
                 messages: [
                   {
-                    role: 'user',
+                    role: "user",
                     content: `${queryFromTelegramUser}`,
                   },
                   {
-                    role: 'assistant',
+                    role: "assistant",
                     content: openaiBody.choices[0].message.content,
                   },
                 ],
@@ -284,7 +284,7 @@ export async function POST(request: NextRequest) {
                 },
               },
             },
-            date: moment().utc().format('YYYY-MM-DD'),
+            date: moment().utc().format("YYYY-MM-DD"),
           });
         }
 
@@ -296,7 +296,7 @@ export async function POST(request: NextRequest) {
             chatId,
             openaiBody.choices[0].message.content
           );
-          return new Response('received', { status: 200 });
+          return new Response("received", { status: 200 });
         }
       } else {
         //when user chat history is available
@@ -322,7 +322,7 @@ export async function POST(request: NextRequest) {
 
           step = 14;
           if (
-            tokenLimit[0]['model'] == userChatBotModel.model &&
+            tokenLimit[0]["model"] == userChatBotModel.model &&
             totalCountedToken >= tokenLimit[0].tokens
           ) {
             let tokensToRemove = totalCountedToken - tokenLimit[0].tokens;
@@ -340,7 +340,7 @@ export async function POST(request: NextRequest) {
 
             conversationMessages.splice(0, index);
           } else if (
-            tokenLimit[1]['model'] == userChatBotModel.model &&
+            tokenLimit[1]["model"] == userChatBotModel.model &&
             totalCountedToken >= tokenLimit[1].tokens
           ) {
             let tokensToRemove = totalCountedToken - tokenLimit[1].tokens;
@@ -363,11 +363,11 @@ export async function POST(request: NextRequest) {
         step = 15;
 
         const responseOpenAI: any = await fetch(
-          'https://api.openai.com/v1/chat/completions',
+          "https://api.openai.com/v1/chat/completions",
           {
-            method: 'POST',
+            method: "POST",
             headers: {
-              'Content-Type': 'application/json',
+              "Content-Type": "application/json",
               Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENAI_KEY}`,
             },
             body: JSON.stringify({
@@ -376,7 +376,7 @@ export async function POST(request: NextRequest) {
               top_p: 1,
               messages: [
                 {
-                  role: 'system',
+                  role: "system",
                   content: `Use the following pieces of context to answer the users question.
                             If you don't know the answer, just say that you don't know, don't try to make up an answer.
                             ----------------
@@ -387,7 +387,7 @@ export async function POST(request: NextRequest) {
                 },
                 ...conversationMessages,
                 {
-                  role: 'user',
+                  role: "user",
                   content: `Answer user query and include images in response if available in the given context 
                           
                 query: ${queryFromTelegramUser} `,
@@ -401,7 +401,7 @@ export async function POST(request: NextRequest) {
         //--------update message count if we have response from openai
         //update message count and check message limit
         step = 16;
-        const collections = db?.collection('user-details');
+        const collections = db?.collection("user-details");
         const result = await collections.findOne({ userId: userId });
         if (
           result?.totalMessageCount !== undefined &&
@@ -429,11 +429,11 @@ export async function POST(request: NextRequest) {
             userChatHistory.chats[`${chatId}`] = {
               messages: [
                 {
-                  role: 'user',
+                  role: "user",
                   content: `${queryFromTelegramUser}`,
                 },
                 {
-                  role: 'assistant',
+                  role: "assistant",
                   content: openaiBody.choices[0].message.content,
                 },
               ],
@@ -447,7 +447,7 @@ export async function POST(request: NextRequest) {
             };
             //update the chat history
             await userChatHistoryCollection.updateOne(
-              { userId: userId, date: moment().utc().format('YYYY-MM-DD') },
+              { userId: userId, date: moment().utc().format("YYYY-MM-DD") },
               {
                 $set: {
                   chats: userChatHistory.chats,
@@ -459,11 +459,11 @@ export async function POST(request: NextRequest) {
             //update the chat history
             userChatHistory.chats[`${chatId}`].messages.push(
               {
-                role: 'user',
+                role: "user",
                 content: `${queryFromTelegramUser}`,
               },
               {
-                role: 'assistant',
+                role: "assistant",
                 content: openaiBody.choices[0].message.content,
               }
             );
@@ -490,7 +490,7 @@ export async function POST(request: NextRequest) {
             step = 20;
             //update the chat history
             await userChatHistoryCollection.updateOne(
-              { userId: userId, date: moment().utc().format('YYYY-MM-DD') },
+              { userId: userId, date: moment().utc().format("YYYY-MM-DD") },
               {
                 $set: {
                   chats: userChatHistory.chats,
@@ -498,15 +498,15 @@ export async function POST(request: NextRequest) {
               }
             );
           }
-          return new Response('received', { status: 200 });
+          return new Response("received", { status: 200 });
         }
       }
     }
 
-    return new Response('received', { status: 200 });
+    return new Response("received", { status: 200 });
   } catch (error: any) {
-    console.log('error at step', step);
-    console.log('error', error);
+    console.log("error at step", step);
+    console.log("error", error);
   }
 }
 

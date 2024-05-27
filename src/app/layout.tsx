@@ -1,8 +1,24 @@
-import "./globals.css";
-import "./layout.scss";
+import "./global.scss";
 import LayoutWrapper from "./_components/LayoutWrapper";
 import { Metadata } from "next";
+import { Josefin_Sans, Quicksand, Poppins } from "next/font/google";
+import Script from "next/script";
 
+const josefinSans = Josefin_Sans({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-josefin-sans",
+});
+const quickSand = Quicksand({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-quick-sand",
+});
+const poppins = Poppins({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-poppins",
+});
 export const metadata: Metadata = {
   metadataBase: new URL("https://torri.ai"),
   title: { default: "TORRI.AI", template: `%s` },
@@ -19,7 +35,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         {/* Google Tag Manager  */}
-        <script
+        <Script
           dangerouslySetInnerHTML={{
             __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
             new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -27,16 +43,10 @@ export default function RootLayout({
             'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
             })(window,document,'script','dataLayer','GTM-P7SNSPF3');`,
           }}
+          id="google-tag-manager"
         />
 
         {/* End Google Tag Manager  */}
-
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Josefin+Sans&family=Poppins&family=Quicksand&display=swap"
-          rel="stylesheet"
-        />
         <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
 
@@ -51,17 +61,24 @@ export default function RootLayout({
           ></iframe>
         </noscript>
         {/* End Google Tag Manager (noscript)  */}
-        <LayoutWrapper>{children}</LayoutWrapper>
-        <script
+        <LayoutWrapper>
+          <main
+            className={`${josefinSans.variable} ${quickSand.variable} ${poppins.variable}`}
+          >
+            {children}
+          </main>
+        </LayoutWrapper>
+        <Script
+          id="zsiqscript"
           dangerouslySetInnerHTML={{
             __html: `window.$zoho=window.$zoho || {};$zoho.salesiq=$zoho.salesiq||{ready:function(){}}`,
           }}
         />
-        <script
+        <Script
           id="zsiqscript"
           src="https://salesiq.zohopublic.in/widget?wc=siq992fbe92f9ef9a36617ac4c9babe51c3d7778f44133f1fe66ec7795c68a6c396"
           defer
-        ></script>
+        ></Script>
         {/* <script
           src="https://torri.ai/embed-bot.js"
           // @ts-ignore
