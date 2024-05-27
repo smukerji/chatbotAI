@@ -20,7 +20,7 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      border-radius: 9999px;
+      border-radius: 50%;
       color: white;
       cursor: pointer;
       border-style: none;
@@ -30,12 +30,13 @@
       z-index: 999;
       height: 64px;
       width: 64px;
+      padding-inline: 0;
     }
   </style>
   `;
 
   // Get the script element
-  const scriptElement = document.querySelector('script[src="http://localhost:3000/embed-bot.js"]');
+  const scriptElement = document.querySelector('script[src="https://chatbot-ai-silk.vercel.app/embed-bot.js"]');
 
   // Access the data attributes
   const param1 = scriptElement.getAttribute("chatbotID");
@@ -43,12 +44,12 @@
 
   // Fetch bot settings
   try {
-    const response = await fetch(`http://localhost:3000/chatbot/popup/details/api?chatbotId=${param1}`);
+    const response = await fetch(`https://chatbot-ai-silk.vercel.app/chatbot/popup/details/api?chatbotId=${param1}`);
     if (!response.ok) throw new Error('Network response was not ok');
 
     const data = await response.json();
     console.log(data?.chatbotSettings[0]?.bubbleIconUrl);
-    bubbleIconUrl = "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/message-2-cbgyJSCUz2djFE1PMXYozzVSV8Uwfp.svg";
+    bubbleIconUrl = data?.chatbotSettings[0]?.bubbleIconUrl == "" ? "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/message-2-cbgyJSCUz2djFE1PMXYozzVSV8Uwfp.svg" : data?.chatbotSettings[0]?.bubbleIconUrl;
     chatbubbleColor = data?.chatbotSettings[0]?.chatbotIconColor;
     console.log("Bulle url",bubbleIconUrl);
   } catch (error) {
@@ -65,13 +66,14 @@
       alt="icon"
       height="${bubbleIconUrl == "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/message-2-cbgyJSCUz2djFE1PMXYozzVSV8Uwfp.svg" ? '32' : '64'}"
       width="${bubbleIconUrl == "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/message-2-cbgyJSCUz2djFE1PMXYozzVSV8Uwfp.svg" ? '32' : '64'}"
+      style="border-radius: 50%;"
     />
   `;
 
   chatWidget.innerHTML = `
     <iframe
       id="chat-frame-widget"
-      src="http://localhost:3000/embed-bot?chatbotID=${param1}"
+      src="https://chatbot-ai-silk.vercel.app/embed-bot?chatbotID=${param1}"
       frameborder="0"
       style="display: none; position: fixed; inset: auto 15px 0px auto; width: 400px; height: 750px; opacity: 1; color-scheme: none; margin: 0px; max-height: 100vh; max-width: 100vw; transform: translateY(0px); transition: none 0s ease 0s !important; visibility: visible; border: none"
     ></iframe>

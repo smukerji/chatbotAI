@@ -38,8 +38,6 @@ export default function RootLayout({
           rel="stylesheet"
         />
         <link rel="icon" href="/favicon.ico" sizes="any" />
-
-
       </head>
 
       <body>
@@ -64,19 +62,17 @@ export default function RootLayout({
           src="https://salesiq.zohopublic.in/widget?wc=siq992fbe92f9ef9a36617ac4c9babe51c3d7778f44133f1fe66ec7795c68a6c396"
           defer
         ></script>
-       {/* <script
+        {/* <script
           src="https://torri.ai/embed-bot.js"
           // @ts-ignore
           chatbotid="9bfb16c7-142e-4946-9ce2-61282e64b38b"
         ></script> */}
-        {/* <script
+        <script
           src="https://chatbot-ai-silk.vercel.app/embed-bot.js"
           // @ts-ignore
           chatbotID="f629716b-48f8-4a7f-a767-68c3f61dd189"
-    ></script> */}
+        ></script>
       </body>
-      
-
     </html>
   );
 }
