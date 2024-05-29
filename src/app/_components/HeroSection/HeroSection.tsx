@@ -16,7 +16,7 @@ function HeroSection() {
         // style={{ backgroundImage: `url(${LineImage.src})` }}
       >
         <h1 className="title">
-          Seamless Support Starts Here: AI-Powered Solutions for Every Customer
+          Seamless Support Starts Here: AI Chatbot Solutions for Every Customer
           Query
         </h1>
 
