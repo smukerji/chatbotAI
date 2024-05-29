@@ -85,7 +85,8 @@ function HeroSection() {
             src={HeaderImage}
             alt="image"
             loading="lazy"
-            objectFit="contain"
+            width={600}
+            height={460}
           />
         </div>
       </div>

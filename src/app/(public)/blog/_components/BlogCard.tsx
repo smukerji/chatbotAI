@@ -1,17 +1,36 @@
+"use client";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
-import { data } from "../blogData.json";
+import React, { useState } from "react";
+import { Pagination } from "antd";
 
-const BlogCard = () => {
+const BlogCard = ({
+  blogs,
+  initialPage,
+  pageCount,
+}: {
+  blogs: any;
+  initialPage: number;
+  pageCount: number;
+}) => {
+  const [currentPage, setCurrentPage] = useState(initialPage || 0);
+
+  const handlePageChange = (data: any) => {
+    setCurrentPage(data.selected);
+  };
+
+  const postsPerPage = 10;
+  const indexOfLastPost = currentPage * postsPerPage;
+  const indexOfFirstPost = indexOfLastPost - postsPerPage;
+  // const currentPosts = blogs.slice(indexOfFirstPost, indexOfLastPost);
   return (
     <div className="blog-card-wrapper">
-      {data.map((blog) => (
+      {blogs?.map((blog: any) => (
         <div className="blog-card" key={blog.title}>
           <Link href={`/blog/${blog.slug}`}>
             <div className="card-header">
               <Image
-                src={blog.thumbnailUrl}
+                src={blog.thumbnail}
                 alt={`Image of ${"title"}`}
                 width={400}
                 height={300}
@@ -20,14 +39,23 @@ const BlogCard = () => {
             </div>
             <div className="card-footer">
               <div className="card-about">
-                <button className="category-button">{blog.category}</button>
-                <p className="read">{blog.read} MIN READ</p>
+                <p className="author">{blog.author}</p>
+                <p className="empty"></p>
+                <p className="date">{blog.date}</p>
               </div>
-              <h3 className="card-title">{blog.title}</h3>
+              <h3 className="card-title">
+                {blog.title} {blog.id}
+              </h3>
+              <p className="description">{blog.description}</p>
             </div>
           </Link>
         </div>
       ))}
+      <Pagination
+        pageSize={pageCount}
+        current={currentPage}
+        onChange={handlePageChange}
+      />
     </div>
   );
 };

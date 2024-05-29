@@ -75,9 +75,10 @@ export default function RootLayout({
           }}
         />
         <Script
+          strategy="lazyOnload"
           id="zsiqscript"
           src="https://salesiq.zohopublic.in/widget?wc=siq992fbe92f9ef9a36617ac4c9babe51c3d7778f44133f1fe66ec7795c68a6c396"
-          defer
+          defer={true}
         ></Script>
         {/* <script
           src="https://torri.ai/embed-bot.js"
