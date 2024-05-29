@@ -36,7 +36,7 @@
   `;
 
   // Get the script element
-  const scriptElement = document.querySelector('script[src="https://chatbot-ai-silk.vercel.app//embed-bot.js"]');
+  const scriptElement = document.querySelector('script[src="https://chatbot-ai-silk.vercel.app/embed-bot.js"]');
 
   // Access the data attributes
   const param1 = scriptElement.getAttribute("chatbotID");
@@ -44,7 +44,7 @@
 
   // Fetch bot settings
   try {
-    const response = await fetch(`https://chatbot-ai-silk.vercel.app//chatbot/popup/details/api?chatbotId=${param1}`);
+    const response = await fetch(`https://chatbot-ai-silk.vercel.app/chatbot/popup/details/api?chatbotId=${param1}`);
     if (!response.ok) throw new Error('Network response was not ok');
 
     const data = await response.json();
@@ -72,7 +72,7 @@
   chatWidget.innerHTML = `
     <iframe
       id="chat-frame-widget"
-      src="https://chatbot-ai-silk.vercel.app//embed-bot?chatbotID=${param1}"
+      src="https://chatbot-ai-silk.vercel.app/embed-bot?chatbotID=${param1}"
       frameborder="0"
       style="display: none; position: fixed; inset: auto 15px 0px auto; width: 400px; height: 750px; opacity: 1; color-scheme: none; margin: 0px; max-height: 100vh; max-width: 100vw; transform: translateY(0px); transition: none 0s ease 0s !important; visibility: visible; border: none"
     ></iframe>
