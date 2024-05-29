@@ -1,11 +1,17 @@
 (async function EmbedBot() {
   const cssStyles = `
   <style>
-    @media (max-width: 768px) {
-      iframe {
-        width: 90%;
-      }
+  @media only screen and (max-width: 768px) {
+    iframe {
+      width: 90% !important;
     }
+  }
+
+  @media only screen and (max-width: 450px) {
+    iframe {
+      width: 330px !important;
+    }
+  }
 
     #chat-widget {
       position: fixed;
@@ -74,7 +80,7 @@
       id="chat-frame-widget"
       src="https://chatbot-ai-silk.vercel.app/embed-bot?chatbotID=${param1}"
       frameborder="0"
-      style="display: none; position: fixed; inset: auto 15px 0px auto; width: 400px; height: 750px; opacity: 1; color-scheme: none; margin: 0px; max-height: 100vh; max-width: 100vw; transform: translateY(0px); transition: none 0s ease 0s !important; visibility: visible; border: none"
+      style="display: none; position: fixed; inset: auto 15px 0px auto; width: 400px; height: 750px; opacity: 1; color-scheme: none; margin: 0px; max-height: 100vh; max-width: 100vw; transform: translateY(0px); transition: none 0s ease 0s !important; visibility: visible; border: none; bottom: 15px;"
     ></iframe>
     <button id="btn-trigger-chat">${icon_img}</button>
   `;

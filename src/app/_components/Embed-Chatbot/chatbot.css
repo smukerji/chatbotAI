@@ -27,9 +27,9 @@
 }
 
 .embed-chatbot-container {
-  position: fixed;
+  /* position: fixed;
   bottom: 80px;
-  right: 0;
+  right: 0; */
   /* background-color: white; */
 }
 
