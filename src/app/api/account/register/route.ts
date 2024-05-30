@@ -98,7 +98,7 @@ async function register(request: any) {
   //send the registration verification  email
   const jwtToken = generateJWTToken(email);
   const link = `${process.env.NEXT_PUBLIC_WEBSITE_URL}/account/email-verified?jwt=${jwtToken}`;
-  await temailService.send("verify-email-register-template", [], email, {
+  await temailService.send("verify-email-register-template", [logo], email, {
     link: link,
   });
 

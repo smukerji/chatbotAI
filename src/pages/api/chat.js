@@ -2,13 +2,26 @@ import OpenAI from "openai";
 import { OpenAIStream, StreamingTextResponse } from "ai";
 import { isWithinTokenLimit } from "gpt-tokenizer/model/gpt-3.5-turbo";
 import { models } from "../../app/_helpers/openaiModelContants";
+import { RateLimiterMemory } from "rate-limiter-flexible";
+
 // Set the runtime to edge for best performance
 export const config = {
   runtime: "edge",
 };
 
+// Create a rate limiter that allows 60 requests per 60 seconds
+const rateLimiter = new RateLimiterMemory({
+  points: 2, // 60 points
+  duration: 60, // per 60 seconds
+});
+
 export default async function handler(req, res) {
   if (req.method === "POST") {
+
+    try {
+      // Consume 1 point for each request
+      await rateLimiter.consume(req.ip);
+    
     /// parse the request object
     const { similaritySearchResults, messages, userQuery, chatbotId, userId } =
       await req.json();
@@ -29,6 +42,8 @@ export default async function handler(req, res) {
     );
     const data = await chatbotSettingsResponse.json();
     const chatbotSetting = data?.chatbotSetting;
+
+    console.log('hellllllllllo', chatbotSetting.rateLimit);
 
     const systemContent = `Use the following pieces of context to answer the users question.
     If you don't know the answer, simply give me the output in html format that you don't know the answer, don't try to make up an answer. and also, don't give me question back in response. Also focus on the instruction given to answer the question.
@@ -117,5 +132,12 @@ export default async function handler(req, res) {
       console.log("errr", error);
       return res.send(400).send(error);
     }
+  } catch (rateLimiterRes) {
+    // Handle rate limit error
+    return new Response('Too Many Requests', { status: 429 });
+  }
+  }
+  else {
+    return new Response('Method Not Allowed', { status: 405 });
   }
 }

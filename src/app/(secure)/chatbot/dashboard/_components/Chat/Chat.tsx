@@ -319,6 +319,20 @@ function Chat({
               next: { revalidate: 0 },
             }
           );
+
+          if (responseFromBackend.status === 429) {
+            // Handle the "Too Many Requests" error
+            message.error("Too many requests. Please try again later.");
+            return; // Exit early
+          }
+          
+          if (!responseFromBackend.ok) {
+            // Handle other possible errors
+            console.error("An error occurred:", responseFromBackend.statusText);
+            alert("An error occurred. Please try again.");
+            return; // Exit early
+          }
+
           let resptext = "";
           const reader = responseFromBackend.body
             .pipeThrough(new TextDecoderStream())

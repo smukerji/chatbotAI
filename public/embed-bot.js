@@ -1,9 +1,21 @@
 (async function EmbedBot() {
   const cssStyles = `
   <style>
-    @media (max-width: 768px) {
+    @media only screen and (max-width: 768px) {
       iframe {
-        width: 90%;
+        width: 90% !important;
+      }
+    }
+
+    @media only screen and (max-width: 450px) {
+      iframe {
+        width: 330px !important;
+      }
+    }
+
+    @media only screen and (max-height: 750px) {
+      iframe {
+        height: 600px !important;
       }
     }
 
@@ -11,6 +23,7 @@
       position: fixed;
       bottom: 20px;
       display: grid;
+      z-index: 1;
     }
 
     #btn-trigger-chat {
@@ -36,7 +49,7 @@
   `;
 
   // Get the script element
-  const scriptElement = document.querySelector('script[src="http://localhost:3000/embed-bot.js"]');
+  const scriptElement = document.querySelector('script[src="https://chatbot-ai-silk.vercel.app/embed-bot.js"]');
 
   // Access the data attributes
   const param1 = scriptElement.getAttribute("chatbotID");
@@ -44,7 +57,7 @@
 
   // Fetch bot settings
   try {
-    const response = await fetch(`http://localhost:3000/chatbot/popup/details/api?chatbotId=${param1}`);
+    const response = await fetch(`https://chatbot-ai-silk.vercel.app/chatbot/popup/details/api?chatbotId=${param1}`);
     if (!response.ok) throw new Error('Network response was not ok');
 
     const data = await response.json();
@@ -72,9 +85,9 @@
   chatWidget.innerHTML = `
     <iframe
       id="chat-frame-widget"
-      src="http://localhost:3000/embed-bot?chatbotID=${param1}"
+      src="https://chatbot-ai-silk.vercel.app/embed-bot?chatbotID=${param1}"
       frameborder="0"
-      style="display: none; position: fixed; inset: auto 15px 0px auto; width: 400px; height: 750px; opacity: 1; color-scheme: none; margin: 0px; max-height: 100vh; max-width: 100vw; transform: translateY(0px); transition: none 0s ease 0s !important; visibility: visible; border: none"
+      style="display: none; position: fixed; inset: auto 15px 0px auto; width: 400px; height: 750px; opacity: 1; color-scheme: none; margin: 0px; max-height: 100vh; max-width: 100vw; transform: translateY(0px); transition: none 0s ease 0s !important; visibility: visible; border: none; bottom: 15px;"
     ></iframe>
     <button id="btn-trigger-chat">${icon_img}</button>
   `;

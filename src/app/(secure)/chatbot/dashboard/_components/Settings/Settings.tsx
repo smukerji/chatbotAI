@@ -127,7 +127,7 @@ function Settings({
           {chabotSettings === "chatInterface" && (
             <ChatInterface chatbotId={chatbotId} />
           )}
-          {chabotSettings === "security" && <Security />}
+          {chabotSettings === "security" && <Security chatbotId={chatbotId}/>}
           {chabotSettings === "lead" && <Lead chatbotId={chatbotId} />}
           {chabotSettings === "notifications" && <h1>notifications</h1>}
         </div>

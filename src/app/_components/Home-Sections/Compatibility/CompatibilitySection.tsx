@@ -97,7 +97,12 @@ function CompatibilitySection() {
 
       {/* --------------------------right section------------------------------ */}
       <div className="right">
-        <Image src={Compatibility} alt="img-backgorund" />
+        <Image
+          src={Compatibility}
+          alt="img-backgorund"
+          width={400}
+          height={400}
+        />
       </div>
     </div>
   );
