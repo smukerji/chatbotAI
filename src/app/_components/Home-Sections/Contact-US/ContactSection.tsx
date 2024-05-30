@@ -40,12 +40,13 @@ function ContactSection() {
 
         {/* ---------------------for input container (test) */}
         <div className="input-container">
+          {" "}
           <ZohoForm />
         </div>
       </div>
       {/* --------------------------right section------------------------------ */}
       <div className="right">
-        <Image src={contact} alt="contact-us-img" />
+        <Image src={contact} alt="contact-us-img" loading="lazy" />
       </div>
     </div>
   );

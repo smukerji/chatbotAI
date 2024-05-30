@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./zohoForm.scss";
 import Head from "next/head";
 
@@ -8,7 +8,7 @@ const ZohoForm = () => {
     mobile: "",
     email: "",
   });
-
+  const imgRef = useRef(null);
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://zc1.maillist-manage.in/js/optin.min.js";
@@ -63,6 +63,7 @@ const ZohoForm = () => {
         const form = document.getElementById("zcampaignOptinForm");
         form.submit();
         form.reset();
+        window.location.reload();
       }
     };
 
@@ -70,7 +71,7 @@ const ZohoForm = () => {
     if (submitButton) {
       submitButton.addEventListener("click", validateForm);
       if (valid && window.recaptcha) {
-        window.recaptcha.reset();
+        window?.recaptcha?.reset();
       }
     }
 
@@ -82,6 +83,13 @@ const ZohoForm = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (imgRef.current) {
+      imgRef.current.onload = function () {
+        referenceSetter(this);
+      };
+    }
+  }, []);
   return (
     <>
       <Head>
@@ -103,7 +111,7 @@ const ZohoForm = () => {
           <input type="hidden" id="signupFormType" value="LargeForm_Vertical" />
           <input type="hidden" id="recapModeTheme" value="" />
           <input type="hidden" id="signupFormMode" value="copyCode" />
-          <div name="SIGNUP_PAGE" class="large_form_1_css" id="SIGNUP_PAGE">
+          <div name="SIGNUP_PAGE" className="large_form_1_css" id="SIGNUP_PAGE">
             <div name="" changeid="" changename="">
               <div id="imgBlock" name="LOGO_DIV" logo="true"></div>
             </div>
@@ -133,15 +141,15 @@ const ZohoForm = () => {
                   >
                     <table
                       width="100%"
-                      cellpadding="0"
-                      cellspacing="0"
+                      cellPadding="0"
+                      cellSpacing="0"
                       border="0"
                     >
                       <tbody>
                         <tr>
                           <td width="10%">
                             <img
-                              class="successicon"
+                              className="successicon"
                               src="https://zc1.maillist-manage.in/images/challangeiconenable.jpg"
                               align="absmiddle"
                             />
@@ -174,14 +182,14 @@ const ZohoForm = () => {
                     <div id="SIGNUP_BODY" name="SIGNUP_BODY">
                       <div>
                         <div className="contact-form">
-                          <div name="fieldsdivSf" class="zcsffieldsdiv">
+                          <div name="fieldsdivSf" className="zcsffieldsdiv">
                             <div>
                               <div>
-                                <div class="zcinputbox">
+                                <div className="zcinputbox">
                                   <input
                                     name="LASTNAME"
                                     changeitem="SIGNUP_FORM_FIELD"
-                                    maxlength="100"
+                                    maxLength="100"
                                     type="text"
                                     placeholder="Name"
                                   />
@@ -203,11 +211,11 @@ const ZohoForm = () => {
                             </div>
                             <div>
                               <div>
-                                <div class="zcinputbox">
+                                <div className="zcinputbox">
                                   <input
                                     name="MOBILE"
                                     changeitem="SIGNUP_FORM_FIELD"
-                                    maxlength="100"
+                                    maxLength="100"
                                     type="text"
                                     placeholder="Mobile"
                                   />
@@ -228,11 +236,11 @@ const ZohoForm = () => {
                             </div>
                             <div>
                               <div>
-                                <div class="zcinputbox">
+                                <div className="zcinputbox">
                                   <input
                                     name="CONTACT_EMAIL"
                                     changeitem="SIGNUP_FORM_FIELD"
-                                    maxlength="100"
+                                    maxLength="100"
                                     type="email"
                                     placeholder="Email"
                                   />
@@ -253,14 +261,14 @@ const ZohoForm = () => {
                             </div>
                             <div>
                               <div>
-                                <div class="zcinputbox">
+                                <div className="zcinputbox">
                                   <textarea
                                     name="CONTACT_CF1"
                                     changeitem="SIGNUP_FORM_FIELD"
                                     zc_display_name="Message Field"
-                                    maxlenght="2000"
+                                    // maxLenght="2000"
                                     placeholder="Message"
-                                  ></textarea>
+                                  />
                                   <span
                                     style={{ display: "none" }}
                                     id="dt_CONTACT_CF1"
@@ -274,7 +282,7 @@ const ZohoForm = () => {
                             </div>
                           </div>
                           <div
-                            class="recapDivlight recaptcha"
+                            className="recapDivlight recaptcha"
                             id="recapDiv"
                             onChange={() => console.log("dasd")}
                           ></div>
@@ -299,13 +307,18 @@ const ZohoForm = () => {
                         </div>
                       </div>
                     </div>
-                    <input type="hidden" id="fieldBorder" value="" onload="" />
+                    <input
+                      type="hidden"
+                      id="fieldBorder"
+                      value=""
+                      onLoad={() => ""}
+                    />
                     <input
                       type="hidden"
                       name="zc_trackCode"
                       id="zc_trackCode"
                       value="ZCFORMVIEW"
-                      onload=""
+                      onLoad={() => ""}
                     />
                     <input
                       type="hidden"
@@ -394,16 +407,17 @@ const ZohoForm = () => {
           <input type="hidden" id="isCaptchaNeeded" value="true" />
           <input type="hidden" id="superAdminCap" value="0" />
           <img
+            ref={imgRef}
             src="https://zc1.maillist-manage.in/images/spacer.gif"
             id="refImage"
-            onload="referenceSetter(this)"
+            // onload="referenceSetter(this)"
             style={{ display: "none" }}
           />
         </div>
       </div>
       <div
         id="zcOptinOverLay"
-        oncontextmenu="return false"
+        onContextMenu={() => false}
         style={{
           display: "none",
           textAlign: "center",
