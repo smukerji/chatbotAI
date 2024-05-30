@@ -3,7 +3,7 @@ id: 2
 title: Bill Walsh leadership lessons
 slug: bill-walsh-leadership-lessons-bot
 author: Alec Whitten
-date: 1 Jan 2023
+date: 02-05-2024
 description: Like to know the secrets of transforming a 2-14 team into a 3x Super Bowl winning Dynasty?
 thumbnail: https://s3-alpha-sig.figma.com/img/b93e/48b0/09579259b2afea3ee86bdcc95619e362?Expires=1717977600&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=iRNJJ-4ha-61gowJGOBLxbMlruZQCC7FTxgiXxibQstIvxYDEsDO~VPRuaMASoqjdnv34JM2vmbqZJ1APQqsDLBUwTFUurFgJE4gGZV3HpbCGotJj7A19coIvzT7~oE1-Fy5QRin401CiUe4EUiaUlCyrAAixlZhf~JapWyl~1~LL9HGS9L2IwRPQnrMOldEGySqEOlTB~UQGR6nfa8U0prkRovJpbjkD-kjpe-UUgwqMJXPF6sfeAiYlqtndsNEhLNJUWq0g~Ke3JcrE7jGcSmQNF1W1OKrUtB8fVVEiIAqoQLGzRqqasUXdLJ5IeE6bGrRDtD9s4Nd5E-NSWGPgA__
 hero: https://s3-alpha-sig.figma.com/img/b93e/48b0/09579259b2afea3ee86bdcc95619e362?Expires=1717977600&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=iRNJJ-4ha-61gowJGOBLxbMlruZQCC7FTxgiXxibQstIvxYDEsDO~VPRuaMASoqjdnv34JM2vmbqZJ1APQqsDLBUwTFUurFgJE4gGZV3HpbCGotJj7A19coIvzT7~oE1-Fy5QRin401CiUe4EUiaUlCyrAAixlZhf~JapWyl~1~LL9HGS9L2IwRPQnrMOldEGySqEOlTB~UQGR6nfa8U0prkRovJpbjkD-kjpe-UUgwqMJXPF6sfeAiYlqtndsNEhLNJUWq0g~Ke3JcrE7jGcSmQNF1W1OKrUtB8fVVEiIAqoQLGzRqqasUXdLJ5IeE6bGrRDtD9s4Nd5E-NSWGPgA__

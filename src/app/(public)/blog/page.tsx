@@ -8,9 +8,12 @@ import { getAllBlogs } from "@/app/_helpers/blogContent";
 import Image from "next/image";
 export const getBlogList = async () => {
   const blogs = await getAllBlogs();
+
   const pageCount = Math.ceil(blogs.length / 2); // Assuming 10 posts per page
 
+  const totalPage = blogs.length;
   return {
+    totalPage,
     blogs,
     pageCount,
     initialPage: 0,
@@ -23,7 +26,7 @@ export const metadata = generateMetadata({
 });
 
 const Blog = async () => {
-  const { blogs, initialPage, pageCount } = await getBlogList();
+  const { blogs, initialPage, pageCount, totalPage } = await getBlogList();
 
   return (
     <>
@@ -43,6 +46,7 @@ const Blog = async () => {
           </div>
           {/** blog card component */}
           <BlogCard
+            total={totalPage}
             blogs={blogs}
             initialPage={initialPage}
             pageCount={pageCount}
