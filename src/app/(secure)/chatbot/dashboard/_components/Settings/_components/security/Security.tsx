@@ -3,7 +3,12 @@ import "./security.scss";
 import { Switch, message } from "antd";
 import { useCookies } from "react-cookie";
 import { ChatbotSettingContext } from "@/app/_helpers/client/Context/ChatbotSettingContext";
-import { defaultBotVisibility, defaultRateLimit, defaultRateLimitMessage, defaultRateLimitTime } from "@/app/_helpers/constant";
+import {
+  defaultBotVisibility,
+  defaultRateLimit,
+  defaultRateLimitMessage,
+  defaultRateLimitTime,
+} from "@/app/_helpers/constant";
 
 function Security({ chatbotId }: any) {
   const [cookies, setCookies] = useCookies(["userId"]);
@@ -12,13 +17,12 @@ function Security({ chatbotId }: any) {
   const botSettingContext: any = useContext(ChatbotSettingContext);
   const botSettings = botSettingContext?.chatbotSettings;
 
-
   const onChange = (checked: boolean) => {
     console.log(`switch to ${checked}`);
-    botSettingContext?.handleChange("allowIframe")(checked)
+    botSettingContext?.handleChange("allowIframe")(checked);
   };
 
-  const handleSave = async() => {
+  const handleSave = async () => {
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/api/setting/api`,
@@ -38,10 +42,10 @@ function Security({ chatbotId }: any) {
               : defaultRateLimit,
             rateLimitTime: botSettings?.rateLimitTime
               ? botSettings?.rateLimitTime
-              : defaultRateLimitTime, 
-              rateLimitMessage: botSettings?.rateLimitMessage
+              : defaultRateLimitTime,
+            rateLimitMessage: botSettings?.rateLimitMessage
               ? botSettings?.rateLimitMessage
-              : defaultRateLimitMessage, 
+              : defaultRateLimitMessage,
           }),
           next: { revalidate: 0 },
         }
@@ -56,16 +60,23 @@ function Security({ chatbotId }: any) {
     } catch (error: any) {
       message.error(error?.message);
     }
-  }
+  };
   return (
     <div className="security-container">
       <div className="security-top-section">
         <div className="visibility-container">
           <p className="visiblity-container-heading">Visibilty</p>
-          <select className="visibility-container-input-box" value={botSettings?.botVisibility
-              ? botSettings?.botVisibility
-              : defaultBotVisibility} onChange={(e)=>{
-            botSettingContext?.handleChange("botVisibility")(e.target.value)}}>
+          <select
+            className="visibility-container-input-box"
+            value={
+              botSettings?.botVisibility
+                ? botSettings?.botVisibility
+                : defaultBotVisibility
+            }
+            onChange={(e) => {
+              botSettingContext?.handleChange("botVisibility")(e.target.value);
+            }}
+          >
             <option value="Public">Public</option>
             <option value="Private">Private</option>
           </select>
@@ -98,9 +109,12 @@ function Security({ chatbotId }: any) {
             Only allow the iframe and widget on specific domains
           </p>
           <div className="switch">
-            <Switch onChange={onChange} value={botSettings?.allowIframe
-              ? botSettings?.allowIframe
-              : false}/>
+            <Switch
+              onChange={onChange}
+              value={
+                botSettings?.allowIframe ? botSettings?.allowIframe : false
+              }
+            />
           </div>
         </div>
         <div className="horizontal-line">
@@ -118,18 +132,28 @@ function Security({ chatbotId }: any) {
           <p className="rating-title">Rate Limiting</p>
           <p className="rating-desc">
             Limit the number of messages sent from one device on the Torri and
-            chat bubble (this limit will not be applied to you on torri.ai,
-            only on your website for your users to prevent abuse).
+            chat bubble (this limit will not be applied to you on torri.ai, only
+            on your website for your users to prevent abuse).
           </p>
           <div className="rating-bottom">
             <p className="rating-limit">Limit to only</p>
-            <input type="number" value={botSettings?.rateLimit
-              ? botSettings?.rateLimit
-              : defaultRateLimit} onChange={(e)=>botSettingContext?.handleChange("rateLimit")(e.target.value)} defaultValue={20} />
+            <input
+              type="number"
+              value={botSettings?.rateLimit}
+              onChange={(e) =>
+                botSettingContext?.handleChange("rateLimit")(e.target.value)
+              }
+              defaultValue={defaultRateLimit}
+            />
             <p className="rating-msg">Message every</p>
-            <input type="number" value={botSettings?.rateLimitTime
-              ? botSettings?.rateLimitTime
-              : defaultRateLimitTime} onChange={(e)=>botSettingContext?.handleChange("rateLimitTime")(e.target.value)} defaultValue={240} />
+            <input
+              type="number"
+              value={botSettings?.rateLimitTime}
+              onChange={(e) =>
+                botSettingContext?.handleChange("rateLimitTime")(e.target.value)
+              }
+              defaultValue={defaultRateLimitTime}
+            />
             <p className="rating-seconds">Seconds.</p>
           </div>
         </div>
@@ -148,9 +172,16 @@ function Security({ chatbotId }: any) {
           <p className="limit-title">
             Show this message to show when limit is hit
           </p>
-          <input type="text" value={botSettings?.rateLimitMessage
-              ? botSettings?.rateLimitMessage
-              : defaultRateLimitMessage} defaultValue="Too many messages in a row" onChange={(e)=>botSettingContext?.handleChange("rateLimitMessage")(e.target.value)}/>
+          <input
+            type="text"
+            value={botSettings?.rateLimitMessage}
+            defaultValue={defaultRateLimitMessage}
+            onChange={(e) =>
+              botSettingContext?.handleChange("rateLimitMessage")(
+                e.target.value
+              )
+            }
+          />
         </div>
       </div>
       <button className="btn" onClick={handleSave}>

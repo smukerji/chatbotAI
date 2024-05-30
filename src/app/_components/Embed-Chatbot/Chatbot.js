@@ -43,6 +43,7 @@ function Chatbot() {
 
   /// chabot apperance
   const [userMessageColor,setUserMessageColor] = useState()
+  const [messagePlaceholder,setMessagePlaceholder] = useState()
 
   /// state to keep the chatbot open or close
   const [state, setState] = useState(false);
@@ -104,6 +105,7 @@ function Chatbot() {
       setLeadTitle(botDetails?.chatbotSettings[0]?.leadTitle);
       setUserDetails(botDetails?.chatbotSettings[0]?.userDetails);
       setUserMessageColor(botDetails?.chatbotSettings[0]?.userMessageColor)
+      setMessagePlaceholder(botDetails?.chatbotSettings[0]?.messagePlaceholder)
       botDetails?.chatbotSettings[0]?.initialMessage?.map((message, index) => {
         // setMessages((prev): any => {
         //   [
@@ -164,6 +166,7 @@ function Chatbot() {
             isPlanNotification={isPlanNotification}
             setIsPlanNotification={setIsPlanNotification}
             userMessageColor={userMessageColor}
+            messagePlaceholder={messagePlaceholder}
           />
         </div>
       {/* )} */}
