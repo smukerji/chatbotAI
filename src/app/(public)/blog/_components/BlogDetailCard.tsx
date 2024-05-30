@@ -27,8 +27,8 @@ const BlogDetailCard = ({
       <h1 className="title">{title}</h1>
       {introduction && (
         <div className="introduction">
-          {introduction.map((para: string) => {
-            return <p>{para}</p>;
+          {introduction.map((para: string, index: number) => {
+            return <p key={index}>{para}</p>;
           })}
         </div>
       )}
