@@ -77,12 +77,12 @@ const BlogCard = ({
           </Link>
         </div>
       ))}
-      <Pagination
+      {/* <Pagination
         pageSize={10}
         current={currentPage}
         total={total}
         onChange={handlePageChange}
-      />
+      /> */}
     </div>
   );
 };
