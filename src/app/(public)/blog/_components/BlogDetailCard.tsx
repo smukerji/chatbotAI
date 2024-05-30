@@ -3,7 +3,7 @@ import AuthorSocialMedia from "./AuthorSocialMedia";
 import BlogShareSocialMedia from "./BlogShareSocialMedia";
 import { data } from "../blogData.json";
 import AuthorProfile from "./AuthorProfile";
-
+import Markdown from "markdown-to-jsx";
 const BlogDetailCard = ({
   content,
   title,
@@ -25,11 +25,12 @@ const BlogDetailCard = ({
       <h1 className="title">{title}</h1>
 
       <div className="blog-content">
-        <div
+        {/* <div
           dangerouslySetInnerHTML={{
             __html: content || `<div>blog</div>`,
           }}
-        />
+        /> */}
+        <Markdown>{content}</Markdown>
       </div>
     </div>
   );

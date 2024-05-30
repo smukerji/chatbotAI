@@ -17,7 +17,7 @@ This is where Torri AI comes into the picture. Torri AI is a platform that empow
 
 Torri AI seamlessly transforms your data into AI chatbots fueled by advanced LLM (GPT) technology. Engage with your data in a new way where communication meets comprehension.
 
-[![YouTube video player](https://res.cloudinary.com/marcomontalbano/image/upload/v1716902726/video_to_markdown/images/youtube--Q0lo0H1FvI4-c05b58ac6eb4c4700831b2b3070cd403.jpg)](https://www.youtube.com/embed/Q0lo0H1FvI4?si=U_5xYARLbzPQTQsJ "YouTube video player")
+<iframe width='560' height='315' src='https://www.youtube.com/embed/Q0lo0H1FvI4?si=U_5xYARLbzPQTQsJ' title='YouTube video player' frameborder='0' allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share' referrerpolicy='strict-origin-when-cross-origin' allowfullscreen></iframe>
 
 - **Effortless Interaction:** Bid adieu to data complexity. Torri AI paves the way for smooth, intuitive communication.
 - **Intand Insights:** Extract quick answers and insights fromyour own PDFs, Docs, and data, eradicating the need for manual data searches. Companies and startups can use it to create LLM and AI applications trained on their specific data/use-cases to meet their specific needs.

@@ -39,7 +39,6 @@ const BlogCard = ({
 
   useEffect(() => {
     const currentPageNo = search?.get("page") ?? 1;
-    console.log(currentPageNo);
     setCurrentPage(Number(currentPageNo));
     router.push(`/blog?page=${currentPageNo || 1}`);
     const postsPerPage = 3;
@@ -48,7 +47,6 @@ const BlogCard = ({
     const currentPosts = blogs.slice(indexOfFirstPost, indexOfLastPost);
     setCurrentBlog(currentPosts);
   }, []);
-  console.log(currentPage);
   return (
     <div className="blog-card-wrapper">
       {currentBlog?.map((blog: any) => (
@@ -82,6 +80,15 @@ const BlogCard = ({
         current={currentPage}
         total={total}
         onChange={handlePageChange}
+        itemRender={(page, type, originalElement) => {
+          if (type === "prev") {
+            return <Link href={`/blog?page=${page}`}>Previous</Link>;
+          }
+          if (type === "next") {
+            return <Link href={`/blog?page=${page}`}>Next</Link>;
+          }
+          return <Link href={`/blog?page=${page}`}>{page}</Link>;
+        }}
       />
     </div>
   );
