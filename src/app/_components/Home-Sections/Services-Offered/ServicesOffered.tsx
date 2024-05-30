@@ -20,9 +20,9 @@ function ServicesOffered() {
         <div className="sub-parent">
           <div className="left-part">
             <p>
-              Torri.Ai is the AI chatbot that takes your digital presence to the
+              Torri AI is the AI chatbot that takes your digital presence to the
               next level. Join us on this extraordinary journey, where
-              conversation meets innovation. Experience Torri.Ai today, and
+              conversation meets innovation. Experience Torri AI today, and
               never look back.
             </p>
           </div>
@@ -74,7 +74,7 @@ function ServicesOffered() {
             />
             <h3>No Code</h3>
             <p>
-              1-click deployment of your chatbot, train, customize and
+              1-click deployment of your AI chatbot, train, customize and
               personalize.
             </p>
           </div>
@@ -89,7 +89,7 @@ function ServicesOffered() {
             />
             <h3>Multi-Channel</h3>
             <p>
-              Torri.AI is present on your website, WhatsApp, and other social
+              Torri AI is present on your website, WhatsApp, and other social
               channels.
             </p>
           </div>

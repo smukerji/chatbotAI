@@ -60,23 +60,27 @@ function Chat({
   userLeadDetails,
   isPlanNotification,
   setIsPlanNotification,
-  userMessageColor
+  userMessageColor,
+  messagePlaceholder,
 }: any) {
-  
   let tempRef: any = useRef<HTMLDivElement>();
   const router = useRouter();
-  
+
   /// get the bot context
   const botContext: any = useContext(CreateBotContext);
   const botDetails = botContext?.createBotInfo;
-  
+
   /// get userDetails context
   const userDetailContext: any = useContext(UserDetailsContext);
   const userDetails = userDetailContext?.userDetails;
-  
+
   /// get the bot settings context
   const botSettingContext: any = useContext(ChatbotSettingContext);
   const botSettings = botSettingContext?.chatbotSettings;
+
+  leadFields = botSettingContext?.chatbotSettings?.leadFields
+    ? botSettingContext?.chatbotSettings?.leadFields
+    : leadFields;
 
   const [cookies, setCookies] = useCookies(["userId"]);
 
@@ -322,10 +326,11 @@ function Chat({
 
           if (responseFromBackend.status === 429) {
             // Handle the "Too Many Requests" error
-            message.error("Too many requests. Please try again later.");
+            const error = await responseFromBackend.text();
+            message.error(error);
             return; // Exit early
           }
-          
+
           if (!responseFromBackend.ok) {
             // Handle other possible errors
             console.error("An error occurred:", responseFromBackend.statusText);
@@ -784,7 +789,11 @@ function Chat({
                   <div
                     className="user-message"
                     key={index}
-                    style={{ backgroundColor: botSettings?.userMessageColor ?  botSettings?.userMessageColor : userMessageColor  }}
+                    style={{
+                      backgroundColor: botSettings?.userMessageColor
+                        ? botSettings?.userMessageColor
+                        : userMessageColor,
+                    }}
                   >
                     {message.content}
                   </div>
@@ -792,14 +801,14 @@ function Chat({
                 </div>
               );
           })}
-
           {loading == false &&
-            isPopUp &&
+            // isPopUp &&
             !isLeadFormSubmitted &&
             !skipLeadForm &&
             messages.length > 1 &&
             messages.length % 2 == 1 &&
-            userLeadDetails !== "do-not-collect" && (
+            userLeadDetails !== "do-not-collect" &&
+            botSettings?.userDetails !== "do-not-collect" && (
               <div className="lead-generation-container">
                 <h2>
                   {leadTitle ? leadTitle : "Let us know how to contact you"}
@@ -951,7 +960,6 @@ function Chat({
                 </div>
               </div>
             )}
-
           {loading && response.length == 0 && (
             <div className="assistant-message-container">
               <div
@@ -1031,9 +1039,15 @@ function Chat({
               setUserQuery(event.target.value);
             }}
             placeholder={
-              isPopUp
-                ? `Message ${chatbotName}`
-                : botSettings?.messagePlaceholder
+              // isPopUp
+              //   ? `Message ${chatbotName}`
+              //   : botSettings?.messagePlaceholder
+              // isPopUp
+              //   ? `Message ${chatbotName}`
+              //   : botSettings?.messagePlaceholder
+              botSettings?.messagePlaceholder
+                ? botSettings?.messagePlaceholder
+                : messagePlaceholder
             }
             value={userQuery}
             disabled={loading ? true : false}
@@ -1041,7 +1055,11 @@ function Chat({
           <button
             className="icon"
             onClick={() => getReply("click")}
-            style={{ backgroundColor: botSettings?.userMessageColor ?  botSettings?.userMessageColor : userMessageColor }}
+            style={{
+              backgroundColor: botSettings?.userMessageColor
+                ? botSettings?.userMessageColor
+                : userMessageColor,
+            }}
             disabled={loading ? true : false}
           >
             <Image src={sendChatIcon} alt="send-chat-icon" />

@@ -26,7 +26,8 @@ const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
           path !== "/account/login" &&
           path !== "/account/register" &&
           path !== "/terms" &&
-          path !== "/privacy" && <AuthHeader />}
+          path !== "/privacy" &&
+          !path.match(/^\/blog/) && <AuthHeader />}
         {children}
       </UserDetailsDataProvider>
     </SessionProvider>

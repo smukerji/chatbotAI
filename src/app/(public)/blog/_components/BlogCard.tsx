@@ -3,12 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { Pagination } from "antd";
-import {
-  useParams,
-  usePathname,
-  useRouter,
-  useSearchParams,
-} from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const BlogCard = ({
   blogs,
@@ -30,7 +25,7 @@ const BlogCard = ({
     router.push(`/blog?page=${page}`);
   };
   useEffect(() => {
-    const postsPerPage = 3;
+    const postsPerPage = 10;
     const indexOfLastPost = currentPage * postsPerPage;
     const indexOfFirstPost = indexOfLastPost - postsPerPage;
     const currentPosts = blogs.slice(indexOfFirstPost, indexOfLastPost);
@@ -41,7 +36,7 @@ const BlogCard = ({
     const currentPageNo = search?.get("page") ?? 1;
     setCurrentPage(Number(currentPageNo));
     router.push(`/blog?page=${currentPageNo || 1}`);
-    const postsPerPage = 3;
+    const postsPerPage = 10;
     const indexOfLastPost = Number(currentPageNo) * postsPerPage;
     const indexOfFirstPost = indexOfLastPost - postsPerPage;
     const currentPosts = blogs.slice(indexOfFirstPost, indexOfLastPost);
@@ -76,7 +71,7 @@ const BlogCard = ({
         </div>
       ))}
       <Pagination
-        pageSize={3}
+        pageSize={10}
         current={currentPage}
         total={total}
         onChange={handlePageChange}

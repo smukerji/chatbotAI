@@ -51,6 +51,7 @@ const BlogDetail = async ({
               title={blog.title}
               author={blog.author}
               date={blog.date}
+              introduction={blog.introduction}
             />
           </div>
         )}

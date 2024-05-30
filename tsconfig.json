@@ -24,6 +24,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/pages/api/utils/storedChatHistory.js","src/utils/apiDocs/*.yaml", "src/app/_components/Home-Sections/Contact-US/zohoForm/ZohoForm.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/pages/api/utils/storedChatHistory.js","src/utils/apiDocs/*.yaml", "src/app/_components/Home-Sections/Contact-US/zohoForm/ZohoForm.js", "src/app/_helpers/middleware/ratelimiter.js"],
   "exclude": ["node_modules"]
 }

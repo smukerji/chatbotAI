@@ -9,11 +9,13 @@ const BlogDetailCard = ({
   title,
   author,
   date,
+  introduction,
 }: {
   content: any;
   title: string;
   author: string;
   date: string;
+  introduction: any;
 }) => {
   return (
     <div className="detail-card-wrapper">
@@ -23,13 +25,15 @@ const BlogDetailCard = ({
         <p className="date">{date}</p>
       </div>
       <h1 className="title">{title}</h1>
+      {introduction && (
+        <div className="introduction">
+          {introduction.map((para: string, index: number) => {
+            return <p key={index}>{para}</p>;
+          })}
+        </div>
+      )}
 
       <div className="blog-content">
-        {/* <div
-          dangerouslySetInnerHTML={{
-            __html: content || `<div>blog</div>`,
-          }}
-        /> */}
         <Markdown>{content}</Markdown>
       </div>
     </div>
