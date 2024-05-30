@@ -6,7 +6,7 @@ import BlogCard from "./_components/BlogCard";
 import { generateMetadata } from "@/app/_helpers/pageSeo";
 import { getAllBlogs } from "@/app/_helpers/blogContent";
 import Image from "next/image";
-export const getBlogList = async () => {
+const getBlogList = async () => {
   const blogs = await getAllBlogs();
 
   const pageCount = Math.ceil(blogs.length / 2); // Assuming 10 posts per page

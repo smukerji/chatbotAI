@@ -12,8 +12,7 @@ export async function generateMetadata({
 }: {
   params: { slug: string };
 }): Promise<Metadata> {
-  const blogDetail = data.filter((blog) => blog.slug === params.slug)?.[0];
-
+  const blogDetail: any = await getBlogBySlug(params.slug);
   return {
     title: `Blog | ${blogDetail?.title}`,
     alternates: {
@@ -22,10 +21,11 @@ export async function generateMetadata({
   };
 }
 
-export const getBlogDetail = async ({ slug }: { slug: string }) => {
+const getBlogDetail = async ({ slug }: { slug: string }) => {
   const blog = await getBlogBySlug(slug);
   return { blog };
 };
+
 const BlogDetail = async ({
   params: { slug },
 }: {
