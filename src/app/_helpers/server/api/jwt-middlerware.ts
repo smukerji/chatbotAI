@@ -10,7 +10,7 @@ async function jwtMiddleware(req: NextRequest) {
   req.headers.set("userId", id);
 }
 
-export function isPublicPath(req: NextRequest) {
+export function isPublicPath(req: NextRequest) {  
   // public routes that don't require authentication
   const publicPaths = [
     "POST:/api/account/login",
@@ -19,6 +19,7 @@ export function isPublicPath(req: NextRequest) {
     "POST:/api/account/reset-password",
     "POST:/chatbot/api/lead",
     "GET:/api/account/user/details",
+    "GET:/chatbot/dashboard/api"
   ];
 
   return publicPaths.includes(`${req.method}:${req.nextUrl.pathname}`);

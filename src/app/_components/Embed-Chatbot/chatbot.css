@@ -27,10 +27,10 @@
 }
 
 .embed-chatbot-container {
-  position: fixed;
+  /* position: fixed;
   bottom: 80px;
-  right: 0;
-  background-color: white;
+  right: 0; */
+  /* background-color: white; */
 }
 
 .embed-chatbot-container .chat-container {
@@ -43,11 +43,6 @@
 
 .embed-chatbot-container .chat-container .messages-section {
   width: 600px;
-}
-@media only screen and (max-width: 767px) {
-  .embed-chatbot-container .chat-container .messages-section {
-    width: 100%;
-  }
 }
 
 .embed-chatbot-container .chat-container .conversation-container {
@@ -110,4 +105,26 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+@media only screen and (max-width: 767px) {
+  .embed-chatbot-container .chat-container .messages-section {
+    width: 100%;
+  }
+}
+
+
+@media only screen and (max-height: 600px) {
+
+  .embed-chatbot-container .chat-container .messages-section {
+    height: 500px  !important;
+  }
+}
+@media screen and (max-width: 330px) {
+
+
+.chat-container .messages-section .suggested-messages .message {
+padding: 8px 12px !important;
+font-size: 12px !important;
+}
 }

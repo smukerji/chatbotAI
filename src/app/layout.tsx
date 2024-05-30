@@ -86,9 +86,9 @@ export default function RootLayout({
           chatbotid="9bfb16c7-142e-4946-9ce2-61282e64b38b"
         ></script> */}
         <Script
-          src="https://chatbot-ai-silk.vercel.app/embed-bot.js"
+          src="https://ichefpos.vercel.app/embed-bot.js"
           // @ts-ignore
-          chatbotID="f629716b-48f8-4a7f-a767-68c3f61dd189"
+          chatbotID="482163e1-f1d5-4a61-9805-82185e2cf47a"
         ></Script>
       </body>
     </html>
