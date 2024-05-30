@@ -63,10 +63,12 @@
       .card-about {
         display: flex;
         color: #002090;
-        font-size: 600;
-        font-weight: 14px;
+        font-size: 14px;
+        font-weight: 600;
         align-items: center;
         padding-bottom: 12px;
+        font-family: sans-serif;
+
         .empty {
           padding: 3px;
           margin: 0 3px;
@@ -80,6 +82,7 @@
         color: #141416;
         text-transform: capitalize;
         padding-bottom: 12px;
+        font-family: sans-serif;
 
         @media screen and (max-width: 767px) {
           font-size: 22px;
@@ -88,6 +91,7 @@
       .description {
         color: #777e90;
         line-height: 24px;
+        font-family: sans-serif;
       }
     }
     a {
@@ -99,7 +103,7 @@
     text-align: center;
     margin: 80px 0;
     @media screen and (max-width: 767px) {
-    margin: 40px 0;
+      margin: 40px 0;
     }
   }
 }

@@ -30,7 +30,7 @@ const BlogCard = ({
     router.push(`/blog?page=${page}`);
   };
   useEffect(() => {
-    const postsPerPage = 3;
+    const postsPerPage = 10;
     const indexOfLastPost = currentPage * postsPerPage;
     const indexOfFirstPost = indexOfLastPost - postsPerPage;
     const currentPosts = blogs.slice(indexOfFirstPost, indexOfLastPost);
@@ -42,7 +42,7 @@ const BlogCard = ({
     console.log(currentPageNo);
     setCurrentPage(Number(currentPageNo));
     router.push(`/blog?page=${currentPageNo || 1}`);
-    const postsPerPage = 3;
+    const postsPerPage = 10;
     const indexOfLastPost = Number(currentPageNo) * postsPerPage;
     const indexOfFirstPost = indexOfLastPost - postsPerPage;
     const currentPosts = blogs.slice(indexOfFirstPost, indexOfLastPost);
@@ -78,7 +78,7 @@ const BlogCard = ({
         </div>
       ))}
       <Pagination
-        pageSize={3}
+        pageSize={10}
         current={currentPage}
         total={total}
         onChange={handlePageChange}

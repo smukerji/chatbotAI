@@ -10,7 +10,7 @@ function CompatibilitySection() {
     <div className="compatibility-section-container">
       {/* --------------------------left section------------------------------ */}
       <div className="left">
-        <h1>Compatibility with WhatsApp and any platforms</h1>
+        <h1>Compatibility with WhatsApp and Any Platforms</h1>
         <p className="description">
           We are offering an accessible interface to website or other platforms.
         </p>

@@ -4,6 +4,7 @@
   width: 100%;
   padding: 15px;
   margin: 0 auto;
+  font-family: sans-serif;
   * {
     font-family: --font-josefin-sans;
   }
@@ -35,6 +36,9 @@
       color: #353945;
       align-items: center;
       padding: 20px 0;
+      font-size: 16px;
+      font-weight: 500;
+      font-family: sans-serif;
       .empty {
         padding: 4px;
         margin: 0 14px;
@@ -48,6 +52,7 @@
       font-size: 60px;
       font-weight: 600;
       line-height: 72px;
+      font-family: sans-serif;
       @media screen and (max-width: 991px) {
         font-size: 50px;
         line-height: 52px;
@@ -57,13 +62,31 @@
         line-height: 42px;
       }
     }
+
+    .introduction {
+      margin: 20px 0px;
+      p {
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 28px; /* 140% */
+        color: #353945;
+        font-family: sans-serif;
+        margin-bottom: 15px;
+
+        @media screen and (max-width: 767px) {
+          font-size: 18px;
+          line-height: 24px;
+        }
+      }
+    }
   }
-  
 
   /** blog content css start*/
   .blog-content {
     margin: 48px 0 200px;
     line-height: 32px;
+
     @media screen and (max-width: 991px) {
       margin: 40px 0 120px;
     }
@@ -76,10 +99,11 @@
     h5,
     h6 {
       text-transform: capitalize;
-      color: #121212; 
+      color: #121212;
       margin-bottom: 20px;
       font-size: 30px;
       font-weight: 600;
+      font-family: sans-serif;
       @media screen and (max-width: 767px) {
         font-size: 26px;
         line-height: 36px;
@@ -89,30 +113,35 @@
       margin-bottom: 20px;
       font-size: 20px;
       font-weight: 500;
+      font-family: sans-serif;
       @media screen and (max-width: 767px) {
-        font-size:18px;
+        font-size: 18px;
         line-height: 24px;
       }
     }
-    ul, ol {
+    ul,
+    ol {
       margin-bottom: 20px;
       font-size: 20px;
       list-style-type: none;
       @media screen and (max-width: 767px) {
         font-size: 18px;
         margin-bottom: 14px;
+        font-family: sans-serif;
       }
-      li{
+      li {
         margin-bottom: 15px;
         position: relative;
         padding-left: 30px;
+        font-family: sans-serif;
+
         @media screen and (max-width: 767px) {
           margin-bottom: 10px;
           line-height: 24px;
           padding-left: 24px;
         }
-        &::before{
-          content: '🔷';
+        &::before {
+          content: "🔷";
           position: absolute;
           left: 0;
           top: 1px;
