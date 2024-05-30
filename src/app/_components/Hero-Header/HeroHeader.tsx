@@ -39,6 +39,9 @@ function HeroHeader() {
               <li>
                 <a href="#service-offerings">Service Offerings</a>
               </li>
+              <li>
+                <a href="/blog">Blog</a>
+              </li>
             </ul>
           </div>
 

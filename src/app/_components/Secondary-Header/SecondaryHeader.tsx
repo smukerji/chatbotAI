@@ -75,9 +75,9 @@ function SecondaryHeader() {
               <Link href="/#service-offerings">Service Offerings</Link>
             </li>
 
-            {/* <li onClick={toggleMenu}>
+            <li onClick={toggleMenu}>
               <a href="/blog">Blog</a>
-            </li> */}
+            </li>
           </ul>
         </div>
 
