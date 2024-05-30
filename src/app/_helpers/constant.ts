@@ -20,3 +20,7 @@ export const defaultUserMessageColor = "#fe632f";
 export const defaultChatBubbleIconColor = "#9b00fb";
 export const defaultLeadTitle = "Let us know how to contact you";
 export const defaultLeadUserDetails = "do-not-collect";
+export const defaultBotVisibility = "Public";
+export const defaultRateLimit = 20;
+export const defaultRateLimitTime = 240;
+export const defaultRateLimitMessage = "Too many messages in a row";
