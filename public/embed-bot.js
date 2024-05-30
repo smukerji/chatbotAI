@@ -1,22 +1,29 @@
 (async function EmbedBot() {
   const cssStyles = `
   <style>
-  @media only screen and (max-width: 768px) {
-    iframe {
-      width: 90% !important;
+    @media only screen and (max-width: 768px) {
+      iframe {
+        width: 90% !important;
+      }
     }
-  }
 
-  @media only screen and (max-width: 450px) {
-    iframe {
-      width: 330px !important;
+    @media only screen and (max-width: 450px) {
+      iframe {
+        width: 330px !important;
+      }
     }
-  }
+
+    @media only screen and (max-height: 750px) {
+      iframe {
+        height: 600px !important;
+      }
+    }
 
     #chat-widget {
       position: fixed;
       bottom: 20px;
       display: grid;
+      z-index: 1;
     }
 
     #btn-trigger-chat {

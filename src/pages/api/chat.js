@@ -43,6 +43,8 @@ export default async function handler(req, res) {
     const data = await chatbotSettingsResponse.json();
     const chatbotSetting = data?.chatbotSetting;
 
+    console.log('hellllllllllo', chatbotSetting.rateLimit);
+
     const systemContent = `Use the following pieces of context to answer the users question.
     If you don't know the answer, simply give me the output in html format that you don't know the answer, don't try to make up an answer. and also, don't give me question back in response. Also focus on the instruction given to answer the question.
     ----------------
