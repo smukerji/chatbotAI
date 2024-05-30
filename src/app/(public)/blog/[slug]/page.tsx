@@ -6,35 +6,54 @@ import { data } from "../blogData.json";
 import Image from "next/image";
 import BlogDetailCard from "../_components/BlogDetailCard";
 import { Metadata } from "next";
+import { getBlogBySlug } from "@/app/_helpers/blogContent";
 export async function generateMetadata({
   params,
 }: {
   params: { slug: string };
 }): Promise<Metadata> {
-  const blogDetail = data.filter((blog) => blog.slug === params.slug)?.[0];
-
+  const blogDetail: any = await getBlogBySlug(params.slug);
   return {
-    title: `Blog | ${blogDetail.title}`,
+    title: `Blog | ${blogDetail?.title}`,
     alternates: {
-      canonical: `https://torri.ai/blog/${blogDetail.slug}`,
+      canonical: `https://torri.ai/blog/${blogDetail?.slug}`,
     },
   };
 }
-const BlogDetail = ({ params }: { params: { slug: string } }) => {
-  const blogDetail = data.filter((blog) => blog.slug === params.slug)?.[0];
+
+const getBlogDetail = async ({ slug }: { slug: string }) => {
+  const blog = await getBlogBySlug(slug);
+  return { blog };
+};
+
+const BlogDetail = async ({
+  params: { slug },
+}: {
+  params: { slug: string };
+}) => {
+  const { blog }: { blog: any } = await getBlogDetail({ slug });
+
   return (
     <>
       <SecondaryHeader />
       <div className="blog-detail-container">
-        <Image
-          src={blogDetail.url}
-          width={1200}
-          height={500}
-          objectFit="contain"
-          className="banner-image"
-          alt={`${blogDetail.title} banner image`}
-        />
-        <BlogDetailCard slug={params.slug} />
+        {blog && (
+          <div className="blog-detail">
+            <Image
+              src={blog.hero || ""}
+              width={1200}
+              height={500}
+              className="banner-image"
+              alt={`${blog?.title} banner image`}
+            />
+            <BlogDetailCard
+              content={blog.content}
+              title={blog.title}
+              author={blog.author}
+              date={blog.date}
+            />
+          </div>
+        )}
       </div>
       <Footer />
     </>

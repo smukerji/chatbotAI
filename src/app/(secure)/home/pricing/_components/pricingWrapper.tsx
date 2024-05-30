@@ -1,22 +1,22 @@
 "use client";
 
-import React, { useState, useEffect, useDebugValue } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../../pricing/stripe.scss";
 import Image from "next/image";
 import PlanOne from "./plan-box-1";
 import PlanTwo from "./plan-box-2";
-import zoho from "../../../../../../public/zoho.svg";
-import whatsapp from "../../../../../../public/whatsapp.svg";
-import telegram from "../../../../../../public/telegram.svg";
-import hubspot from "../../../../../../public/hubspot.svg";
+import zoho from "../../../../../../public/zoho.webp";
+import whatsapp from "../../../../../../public/whatsapp.webp";
+import telegram from "../../../../../../public/telegram.webp";
+import hubspot from "../../../../../../public/hubspot.webp";
 import { useCookies } from "react-cookie";
 import { Modal, message, Collapse } from "antd";
 import Loader from "./Loader";
 import Coll from "./Collapse";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import slack from "../../../../../../public/slack.svg";
+import slack from "../../../../../../public/slack.webp";
 import { NOTVALIDPLAN } from "../../../../_helpers/errorConstants";
 import SecondaryHeader from "@/app/_components/Secondary-Header/SecondaryHeader";
 import PriceOffer from "./PriceOffer";

@@ -1,17 +1,62 @@
+"use client";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
-import { data } from "../blogData.json";
+import React, { useEffect, useState } from "react";
+import { Pagination } from "antd";
+import {
+  useParams,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
 
-const BlogCard = () => {
+const BlogCard = ({
+  blogs,
+  initialPage,
+  pageCount,
+  total,
+}: {
+  blogs: any;
+  initialPage: number;
+  pageCount: number;
+  total: number;
+}) => {
+  const router = useRouter();
+  const search = useSearchParams();
+  const [currentPage, setCurrentPage] = useState(initialPage || 1);
+  const [currentBlog, setCurrentBlog] = useState([]);
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    router.push(`/blog?page=${page}`);
+  };
+  useEffect(() => {
+    const postsPerPage = 3;
+    const indexOfLastPost = currentPage * postsPerPage;
+    const indexOfFirstPost = indexOfLastPost - postsPerPage;
+    const currentPosts = blogs.slice(indexOfFirstPost, indexOfLastPost);
+    setCurrentBlog(currentPosts);
+  }, [currentPage]);
+
+  useEffect(() => {
+    const currentPageNo = search?.get("page") ?? 1;
+    console.log(currentPageNo);
+    setCurrentPage(Number(currentPageNo));
+    router.push(`/blog?page=${currentPageNo || 1}`);
+    const postsPerPage = 3;
+    const indexOfLastPost = Number(currentPageNo) * postsPerPage;
+    const indexOfFirstPost = indexOfLastPost - postsPerPage;
+    const currentPosts = blogs.slice(indexOfFirstPost, indexOfLastPost);
+    setCurrentBlog(currentPosts);
+  }, []);
+  console.log(currentPage);
   return (
     <div className="blog-card-wrapper">
-      {data.map((blog) => (
+      {currentBlog?.map((blog: any) => (
         <div className="blog-card" key={blog.title}>
           <Link href={`/blog/${blog.slug}`}>
             <div className="card-header">
               <Image
-                src={blog.thumbnailUrl}
+                src={blog.thumbnail}
                 alt={`Image of ${"title"}`}
                 width={400}
                 height={300}
@@ -20,14 +65,24 @@ const BlogCard = () => {
             </div>
             <div className="card-footer">
               <div className="card-about">
-                <button className="category-button">{blog.category}</button>
-                <p className="read">{blog.read} MIN READ</p>
+                <p className="author">{blog.author}</p>
+                <p className="empty"></p>
+                <p className="date">{blog.date}</p>
               </div>
-              <h3 className="card-title">{blog.title}</h3>
+              <h3 className="card-title">
+                {blog.title} {blog.id}
+              </h3>
+              <p className="description">{blog.description}</p>
             </div>
           </Link>
         </div>
       ))}
+      <Pagination
+        pageSize={3}
+        current={currentPage}
+        total={total}
+        onChange={handlePageChange}
+      />
     </div>
   );
 };
