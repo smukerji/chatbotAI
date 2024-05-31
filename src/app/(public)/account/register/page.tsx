@@ -1,12 +1,14 @@
-import React from 'react';
-import RegisterPage from './_components/RegisterPage';
-import ReactGoogleReCaptcha from '@/app/_components/ReactGoogleRecaptcha';
+import React, { Suspense } from "react";
+import RegisterPage from "./_components/RegisterPage";
+import ReactGoogleReCaptcha from "@/app/_components/ReactGoogleRecaptcha";
 
 const Register = () => {
   return (
-    <ReactGoogleReCaptcha>
-      <RegisterPage />
-    </ReactGoogleReCaptcha>
+    <Suspense fallback={<div>login</div>}>
+      <ReactGoogleReCaptcha>
+        <RegisterPage />
+      </ReactGoogleReCaptcha>
+    </Suspense>
   );
 };
 
