@@ -11,6 +11,8 @@ import {encodeChat,
 
 import moment from 'moment';
 
+export const maxDuration = 300;
+
 interface WhatsAppChatHistoryType {
   _id?: ObjectId;
   userId: string;
@@ -276,6 +278,9 @@ async function whatsAppOperation(res: any) {
       userId: userID,
     });
 
+    console.log(userChatBotModel);
+    
+
     step = 9;
     //if user chat history is not available, create a new chat history
     if (!userChatHistory) {
@@ -290,24 +295,24 @@ async function whatsAppOperation(res: any) {
           },
           body: JSON.stringify({
             model: userChatBotModel.model,
-            temperature: 0.5,
+            temperature: userChatBotModel?.temperature ?? 0,
             top_p: 1,
             messages: [
               {
                 role: "system",
-                content: `Use the following pieces of context to answer the users question.
-                  If you don't know the answer, just say that you don't know, don't try to make up an answer.
+                content: `You are a whatsapp service agent. Use the following pieces of context to answer the users question.
+                If you don't know the answer, just say that you don't know, don't try to make up an answer.
                   ----------------
                   context:
                   ${similaritySearchResults}
-                  
-                  Answer user query and include images write respect to each line if available`,
+
+                  instruction:
+                  ${userChatBotModel?.instruction}`,
               },
               // ...conversationMessages,
               {
                 role: "user",
-                content: `Answer user query and include images in response if available in the given context 
-                
+                content: `
                   query: ${questionFromWhatsapp} `,
               },
             ],
@@ -447,24 +452,24 @@ async function whatsAppOperation(res: any) {
           body: JSON.stringify({
             model: userChatBotModel.model,
             // model:"gpt-4",
-            temperature: 0.5,
+            temperature: userChatBotModel?.temperature ?? 0,
             top_p: 1,
             messages: [
               {
                 role: "system",
-                content: `Use the following pieces of context to answer the users question.
+                content: `You are a whatsapp service agent. Use the following pieces of context to answer the users question.
                   If you don't know the answer, just say that you don't know, don't try to make up an answer.
                   ----------------
                   context:
                   ${similaritySearchResults}
-                  
-                  Answer user query and include images write respect to each line if available`,
+
+                  instruction:
+                  ${userChatBotModel?.instruction}`,
               },
               ...conversationMessages,
               {
                 role: "user",
-                content: `Answer user query and include images in response if available in the given context 
-                
+                content: `
                   query: ${questionFromWhatsapp} `,
               },
             ],
