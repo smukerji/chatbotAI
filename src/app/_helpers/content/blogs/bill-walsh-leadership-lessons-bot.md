@@ -20,13 +20,12 @@ Torri AI seamlessly transforms your data into AI chatbots fueled by advanced LLM
 
 <iframe width='560' height='315' src='https://www.youtube.com/embed/Q0lo0H1FvI4?si=U_5xYARLbzPQTQsJ' title='YouTube video player' frameborder='0' allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share' referrerpolicy='strict-origin-when-cross-origin' allowfullscreen></iframe>
 
-
 - **Effortless Interaction:** Bid adieu to data complexity. Torri AI paves the way for smooth, intuitive communication.
 - **Intand Insights:** Extract quick answers and insights fromyour own PDFs, Docs, and data, eradicating the need for manual data searches. Companies and startups can use it to create LLM and AI applications trained on their specific data/use-cases to meet their specific needs.
 - **Enhanced Productivity:** Redirect your efforts from searchingto decision-making, amplifying overall efficiency.
 - **Tailored Understanding:** Tailor chatbots to comprehenddomain-specific language, multiple languages and use cases
 - **Customise and make it aligned to your brand:** Tailorchatbots with your own logo, and tone of voice aligned to your brand. Fullycustomisable with brand, colour, logo, description and tone of voice.
 
-<!-- ### Getting Started: Crafting Your Own Torri AI Chatbot
+### Getting Started: Crafting Your Own Torri AI Chatbot
 
-![](https://miro.medium.com/v2/resize:fit:700/1*PNSo80wBCZn8HmZnNUKolw.png) -->
+![](https://miro.medium.com/v2/resize:fit:700/1*PNSo80wBCZn8HmZnNUKolw.png)

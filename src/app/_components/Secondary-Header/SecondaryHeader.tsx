@@ -63,7 +63,11 @@ function SecondaryHeader() {
       <div ref={menuRef} className={`hamburger-menu ${menuOpen ? "open" : ""}`}>
         <div className={`navbar `}>
           <ul>
-            <li onClick={toggleMenu}>
+            <li
+              onClick={() => {
+                toggleMenu();
+              }}
+            >
               <Link href="/#features">Features</Link>
             </li>
 
@@ -71,7 +75,11 @@ function SecondaryHeader() {
               <Link href="/home/pricing">Pricing</Link>
             </li>
 
-            <li onClick={toggleMenu}>
+            <li
+              onClick={() => {
+                toggleMenu();
+              }}
+            >
               <Link href="/#service-offerings">Service Offerings</Link>
             </li>
 

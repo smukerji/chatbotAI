@@ -83,6 +83,11 @@
       // left: 5%;
       flex: 1;
       margin-top: -3%;
+
+      @media only screen and (min-width: 1497px) {
+        margin-top: -12% !important;
+      }
+
       .empty-box {
         // display: flex;
         // flex: 1;
@@ -178,6 +183,14 @@
         margin-top: 0% !important;
       }
 
+      @media only screen and (min-width: 1497px) {
+        margin-top: -43% !important;
+      }
+
+      @media only screen and (min-width: 2097px) {
+        margin-top: -30% !important;
+      }
+
       .empty-box {
         display: flex;
         // width: 22vw;
@@ -270,7 +283,7 @@
     height: 100%;
   }
 
-  @media only screen and (max-width: 800px) {
+  @media only screen and (max-width: 1045px) {
     display: flex;
     flex-direction: column;
     height: auto;

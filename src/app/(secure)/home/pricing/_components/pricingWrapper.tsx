@@ -122,8 +122,8 @@ export default function PricingWrapper() {
       );
       setHubspotDisable(checkPlan.data.hubspotIntegration);
       setSlackDisable(checkPlan.data.slackIntegration);
-      console.log("Diable whatsappp",checkPlan.data.whatsAppIntegration);
-      
+      console.log("Diable whatsappp", checkPlan.data.whatsAppIntegration);
+
       setWhatsappDisable(checkPlan.data.whatsAppIntegration);
       setTelegramDisable(checkPlan.data.telegramIntegration);
       if (checkPlan.data.msg == 1) {
@@ -158,6 +158,10 @@ export default function PricingWrapper() {
   const handlePlanType = () => {
     setIsYearlyPlan(!isYearlyPlan);
   };
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <>

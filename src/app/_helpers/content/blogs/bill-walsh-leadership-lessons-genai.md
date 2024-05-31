@@ -26,6 +26,6 @@ Torri AI seamlessly transforms your data into AI chatbots fueled by advanced LLM
 - **Tailored Understanding:** Tailor chatbots to comprehenddomain-specific language, multiple languages and use cases
 - **Customise and make it aligned to your brand:** Tailorchatbots with your own logo, and tone of voice aligned to your brand. Fullycustomisable with brand, colour, logo, description and tone of voice.
 
-<!-- ### Getting Started: Crafting Your Own Torri AI Chatbot
+### Getting Started: Crafting Your Own Torri AI Chatbot
 
-![](https://miro.medium.com/v2/resize:fit:700/1*PNSo80wBCZn8HmZnNUKolw.png) -->
+![](https://miro.medium.com/v2/resize:fit:700/1*PNSo80wBCZn8HmZnNUKolw.png)

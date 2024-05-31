@@ -25,7 +25,7 @@ const BlogCard = ({
     router.push(`/blog?page=${page}`);
   };
   useEffect(() => {
-    const postsPerPage = 10;
+    const postsPerPage = 12;
     const indexOfLastPost = currentPage * postsPerPage;
     const indexOfFirstPost = indexOfLastPost - postsPerPage;
     const currentPosts = blogs.slice(indexOfFirstPost, indexOfLastPost);
@@ -36,11 +36,15 @@ const BlogCard = ({
     const currentPageNo = search?.get("page") ?? 1;
     setCurrentPage(Number(currentPageNo));
     router.push(`/blog?page=${currentPageNo || 1}`);
-    const postsPerPage = 10;
+    const postsPerPage = 12;
     const indexOfLastPost = Number(currentPageNo) * postsPerPage;
     const indexOfFirstPost = indexOfLastPost - postsPerPage;
     const currentPosts = blogs.slice(indexOfFirstPost, indexOfLastPost);
     setCurrentBlog(currentPosts);
+  }, []);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
   }, []);
   return (
     <div className="blog-card-wrapper">
@@ -71,7 +75,7 @@ const BlogCard = ({
         </div>
       ))}
       <Pagination
-        pageSize={10}
+        pageSize={12}
         current={currentPage}
         total={total}
         onChange={handlePageChange}

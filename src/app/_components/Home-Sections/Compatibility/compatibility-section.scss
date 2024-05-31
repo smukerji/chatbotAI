@@ -1,6 +1,6 @@
 .compatibility-section-container {
   display: flex;
-  padding: 5.2vw 12.2vw;
+  padding: 5.2vw 12.2vw 0;
   gap: 40px;
 
   /* --------------------------left section------------------------------ */
@@ -155,7 +155,7 @@
     }
   }
   @media only screen and (max-width: 550px) {
-    .right {  
+    .right {
       img {
         width: 80%;
       }
