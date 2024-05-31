@@ -101,8 +101,8 @@
     position: relative;
     img {
       width: 100%;
-      height: auto;
-      position: absolute;
+      height: auto !important;
+      // position: absolute;
       max-height: 700px;
       // bottom: 0;
     }
@@ -212,8 +212,8 @@
       margin-top: 20px;
       // width: 120%;
       width:100%;
-      height: auto;
-      position: unset;
+      height: auto !important;
+      position: relative !important;
     }
   }
 

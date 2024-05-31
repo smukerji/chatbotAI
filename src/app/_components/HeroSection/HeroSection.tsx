@@ -81,13 +81,7 @@ function HeroSection() {
         </div>
 
         <div className="grp-img">
-          <Image
-            src={HeaderImage}
-            alt="image"
-            loading="lazy"
-            width={600}
-            height={460}
-          />
+          <Image src={HeaderImage} alt="image" fill />
         </div>
       </div>
     </>
