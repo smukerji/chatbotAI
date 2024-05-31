@@ -43,9 +43,9 @@ const BlogCard = ({
     setCurrentBlog(currentPosts);
   }, []);
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+  // useEffect(() => {
+  //   window.scrollTo(0, 0);
+  // }, []);
   return (
     <div className="blog-card-wrapper">
       {currentBlog?.map((blog: any) => (
