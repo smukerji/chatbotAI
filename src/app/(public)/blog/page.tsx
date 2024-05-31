@@ -3,9 +3,10 @@ import SecondaryHeader from "@/app/_components/Secondary-Header/SecondaryHeader"
 import React from "react";
 import "./blog.scss";
 import BlogCard from "./_components/BlogCard";
-import { generateMetadata } from "@/app/_helpers/pageSeo";
+// import { generateMetadata } from "@/app/_helpers/pageSeo";
 import { getAllBlogs } from "@/app/_helpers/blogContent";
 import Image from "next/image";
+import { Metadata } from "next";
 const getBlogList = async () => {
   const blogs = await getAllBlogs();
 
@@ -19,11 +20,14 @@ const getBlogList = async () => {
     initialPage: 0,
   };
 };
-
-export const metadata = generateMetadata({
-  title: "Blog",
-  canonical: "/blog",
-});
+export async function generateMetadata(context: any): Promise<Metadata> {
+  return {
+    title: `Blog`,
+    alternates: {
+      canonical: `https://torri.ai/blog?page=${context.searchParams.page}`,
+    },
+  };
+}
 
 const Blog = async () => {
   const { blogs, initialPage, pageCount, totalPage } = await getBlogList();

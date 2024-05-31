@@ -1,7 +1,5 @@
 import matter from "gray-matter";
 import fs from "fs";
-import { remark } from "remark";
-import html from "remark-html";
 
 const contentDir = process.cwd() + "/src/app/_helpers/content/blogs";
 export async function getAllBlogs() {
@@ -25,11 +23,7 @@ export async function getBlogBySlug(slug: string) {
   try {
     const content = await fs.promises.readFile(filename, "utf8");
     const { data, content: markdownContent } = matter(content);
-    const processedContent = await remark()
-      .use(html)
-      .processSync(markdownContent)
-      .toString();
-    return { ...data, content: processedContent };
+    return { ...data, content: content };
   } catch (error) {
     return null;
   }

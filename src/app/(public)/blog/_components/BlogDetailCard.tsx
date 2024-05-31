@@ -1,9 +1,10 @@
-import React from "react";
+"use client";
+import React, { useEffect } from "react";
 import AuthorSocialMedia from "./AuthorSocialMedia";
 import BlogShareSocialMedia from "./BlogShareSocialMedia";
 import { data } from "../blogData.json";
 import AuthorProfile from "./AuthorProfile";
-
+import Markdown from "markdown-to-jsx";
 const BlogDetailCard = ({
   content,
   title,
@@ -17,8 +18,12 @@ const BlogDetailCard = ({
   date: string;
   introduction: any;
 }) => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
-    <div className="detail-card-wrapper">
+    <div className="detail-card-wrapper" id="blog-detail-wrapper">
       <div className="card-about">
         <p className="category">{author}</p>
         <p className="empty"></p>
@@ -34,11 +39,7 @@ const BlogDetailCard = ({
       )}
 
       <div className="blog-content">
-        <div
-          dangerouslySetInnerHTML={{
-            __html: content || `<div>blog</div>`,
-          }}
-        />
+        <Markdown>{content}</Markdown>
       </div>
     </div>
   );

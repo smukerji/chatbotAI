@@ -1,14 +1,28 @@
 import Link from "next/link";
 import React from "react";
 
-const Widget = ({ title, list }: { title: string; list: any }) => {
+const Widget = ({
+  title,
+  list,
+  setOpenSupport,
+}: {
+  title: string;
+  list: any;
+  setOpenSupport: any;
+}) => {
   return (
     <div className="links-container">
       <h2>{title}</h2>
       <ul className="info">
         {list.map((lt: any) => (
           <li key={lt.title}>
-            <Link href={lt.url || "#"}>{lt.title}</Link>
+            {lt.title == "Support" ? (
+              <Link href={""} onClick={() => setOpenSupport(true)}>
+                {lt.title}
+              </Link>
+            ) : (
+              <Link href={lt.url || "#"}>{lt.title}</Link>
+            )}
           </li>
         ))}
       </ul>

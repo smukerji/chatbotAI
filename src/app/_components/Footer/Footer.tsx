@@ -45,7 +45,13 @@ function Footer() {
             </li>
             <li>
               <Image src={blueEnvelopImg} alt="blue-envelop-img" />
-              <Link href="">info@sapahk.ai</Link>
+              <Link
+                href="https://mail.google.com/mail/?view=cm&fs=1&to=info@sapahk.ai"
+                target="_blank"
+                className="mail"
+              >
+                info@sapahk.ai
+              </Link>
             </li>
           </ul>
 
@@ -76,13 +82,25 @@ function Footer() {
         {/* </div> */}
 
         {/*------------------------------------------company links container----------------------------------------------*/}
-        <Widget title={company.title} list={company.list} />
+        <Widget
+          title={company.title}
+          list={company.list}
+          setOpenSupport={setOpenSupport}
+        />
 
         {/*------------------------------------------quick links container----------------------------------------------*/}
-        <Widget title={quickLink.title} list={quickLink.list} />
+        <Widget
+          title={quickLink.title}
+          list={quickLink.list}
+          setOpenSupport={setOpenSupport}
+        />
 
         {/*------------------------------------------legal links container----------------------------------------------*/}
-        <Widget title={legal.title} list={legal.list} />
+        <Widget
+          title={legal.title}
+          list={legal.list}
+          setOpenSupport={setOpenSupport}
+        />
 
         <div className="links-container">
           <select name="" id="" className="temp">

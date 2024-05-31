@@ -23,9 +23,6 @@ const ZohoForm = () => {
           "3"
         );
       }
-      if (window.recaptcha) {
-        window.recaptcha.render("recaptcha-element-id");
-      }
     };
     document.body.appendChild(script);
     let valid = true;
@@ -70,9 +67,6 @@ const ZohoForm = () => {
     const submitButton = document.getElementById("zcWebOptin");
     if (submitButton) {
       submitButton.addEventListener("click", validateForm);
-      if (valid && window.recaptcha) {
-        window?.recaptcha?.reset();
-      }
     }
 
     return () => {
@@ -90,6 +84,7 @@ const ZohoForm = () => {
       };
     }
   }, []);
+
   return (
     <>
       <Head>

@@ -3,12 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { Pagination } from "antd";
-import {
-  useParams,
-  usePathname,
-  useRouter,
-  useSearchParams,
-} from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const BlogCard = ({
   blogs,
@@ -30,7 +25,7 @@ const BlogCard = ({
     router.push(`/blog?page=${page}`);
   };
   useEffect(() => {
-    const postsPerPage = 10;
+    const postsPerPage = 12;
     const indexOfLastPost = currentPage * postsPerPage;
     const indexOfFirstPost = indexOfLastPost - postsPerPage;
     const currentPosts = blogs.slice(indexOfFirstPost, indexOfLastPost);
@@ -39,16 +34,18 @@ const BlogCard = ({
 
   useEffect(() => {
     const currentPageNo = search?.get("page") ?? 1;
-    console.log(currentPageNo);
     setCurrentPage(Number(currentPageNo));
     router.push(`/blog?page=${currentPageNo || 1}`);
-    const postsPerPage = 10;
+    const postsPerPage = 12;
     const indexOfLastPost = Number(currentPageNo) * postsPerPage;
     const indexOfFirstPost = indexOfLastPost - postsPerPage;
     const currentPosts = blogs.slice(indexOfFirstPost, indexOfLastPost);
     setCurrentBlog(currentPosts);
   }, []);
-  console.log(currentPage);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div className="blog-card-wrapper">
       {currentBlog?.map((blog: any) => (
@@ -77,12 +74,21 @@ const BlogCard = ({
           </Link>
         </div>
       ))}
-      {/* <Pagination
-        pageSize={10}
+      <Pagination
+        pageSize={12}
         current={currentPage}
         total={total}
         onChange={handlePageChange}
-      /> */}
+        itemRender={(page, type, originalElement) => {
+          if (type === "prev") {
+            return <Link href={`/blog?page=${page}`}>Previous</Link>;
+          }
+          if (type === "next") {
+            return <Link href={`/blog?page=${page}`}>Next</Link>;
+          }
+          return <Link href={`/blog?page=${page}`}>{page}</Link>;
+        }}
+      />
     </div>
   );
 };

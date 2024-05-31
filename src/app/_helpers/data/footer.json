@@ -4,7 +4,7 @@
       "title": "Company",
       "list": [
         { "title": "Features", "url": "/#features" },
-        { "title": "Service Offerings", "url": "/#service-offering" },
+        { "title": "Service Offerings", "url": "/#service-offerings" },
         { "title": "Book a Demo", "url": "/#contact-us" }
       ]
     },
