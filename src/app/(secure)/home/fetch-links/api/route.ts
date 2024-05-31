@@ -384,7 +384,6 @@ async function fetchLinks(request: NextRequest) {
 }
 
 async function extractUrls(page: any, baseUrl: any) {
-  console.log(baseUrl);
 
   // console.log('user input', baseUrl);
   const hrefs = await page.$$eval(
