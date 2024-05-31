@@ -39,9 +39,7 @@ const formidable = require("formidable");
 
 import * as postmark from "postmark";
 import e from "express";
-const client = new postmark.ServerClient(
-  process.env.POST_MARK_TOKEN
-);
+const client = new postmark.ServerClient(process.env.POST_MARK_TOKEN);
 
 export const maxDuration = 300;
 
@@ -439,9 +437,7 @@ export default async function handler(req, res) {
                   qa.image
                     ? JSON.stringify({
                         question: qa.question,
-                        answer:
-                          `${qa.answer}` +
-                          `image: ${qa.image}`,
+                        answer: `${qa.answer}` + `image: ${qa.image}`,
                         // filename: qa.image,
                       })
                     : JSON.stringify({
@@ -630,8 +626,6 @@ export default async function handler(req, res) {
             //   To: email,
             //   MessageStream: "outbound",
             // })
-
-           
           } catch (error) {
             return res.status(400).send(error);
           }
