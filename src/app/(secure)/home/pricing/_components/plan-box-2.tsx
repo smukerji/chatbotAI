@@ -18,6 +18,7 @@ export default function PlanTwo({
   prePrice,
   enableTwo,
   text,
+  messages,
 }: any) {
   const { status } = useSession();
   const [cookies, setCookie] = useCookies(["userId"]);
@@ -53,9 +54,9 @@ export default function PlanTwo({
     <div className="plan-box">
       <div className="plan-plan">
         <div className="plan-name-price">
-          <span className="plan-name">Agency Plan (Monthly)</span>
+          <span className="plan-name">Agency Plan</span>
           <span className="plan-placeholder">
-            Have a go and test your superpowers
+            For small and medium businesses
           </span>
         </div>
         <div className="plan-price-container">
@@ -67,7 +68,7 @@ export default function PlanTwo({
       </div>
       <div className="plan-container-list">
         <button className="pay-btn" disabled={true}>
-          <span className="btn-text">Coming Soon...</span>
+          <span className="btn-text">Coming Soon</span>
         </button>
         <div className="plan-details">
           <div className="plan-item">
@@ -76,20 +77,38 @@ export default function PlanTwo({
           </div>
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
-            <span className="plan-text">5k Messages / Month</span>
+            <span className="plan-text">{messages}</span>
           </div>
           <div className="plan-item">
-            <Image src={tickCircle} alt="no-svg" />
-            <span className="plan-text">Unlimited links to train</span>
-          </div>
-          <div className="plan-item horizontal-line-2">
             <Image src={tickCircle} alt="no-svg" />
             <span className="plan-text">
-              Limit to 1000k characters to train /chatbot
+              Unlimited website links allowed for training
             </span>
           </div>
-
           <div className="plan-item">
+            <Image src={tickCircle} alt="no-svg" />
+            <span className="plan-text">
+              1,000,000 characters allowed for training
+            </span>
+          </div>
+          <div className="plan-item">
+            <Image src={tickCircle} alt="no-svg" />
+            <span className="plan-text">Choose GPT 3.5/4/4o</span>
+          </div>
+          <div className="plan-item">
+            <Image src={tickCircle} alt="no-svg" />
+            <span className="plan-text">Embed on website</span>
+          </div>
+          <div className="plan-item">
+            <Image src={tickCircle} alt="no-svg" />
+            <span className="plan-text">Lead form</span>
+          </div>
+          <div className="plan-item">
+            <Image src={tickCircle} alt="no-svg" />
+            <span className="plan-text">Unlimited conversation history</span>
+          </div>
+
+          {/* <div className="plan-item">
             <span className="plan-text-head ">Allowed Training Data</span>
           </div>
           <div className="plan-item">
@@ -116,10 +135,6 @@ export default function PlanTwo({
             <Image src={tickCircle} alt="no-svg" />
             <span className="plan-text">Excel & CSV</span>
           </div>
-
-          {/* <div className="plan-item">
-            <span className="plan-text-head">Integration </span>
-          </div> */}
           <div className="plan-item">
             <Image src={tickCircle} alt="no-svg" />
             <span className="plan-text">Embed on unlimited websites</span>
@@ -192,11 +207,7 @@ export default function PlanTwo({
             </div>
             <div className="coming-soon">Coming soon</div>
           </div>
-          {/* <div className="plan-item">
-            <Image src={tickCircle} alt="no-svg" />
-            <span className="plan-text">Affliliation/API Access</span>
-          </div>
-         */}
+
           <div className="plan-item-container">
             <div className="plan-item">
               <Image src={tickCircle} alt="no-svg" />
@@ -240,7 +251,7 @@ export default function PlanTwo({
               <span className="plan-text">Chrome Extension</span>
             </div>
             <div className="coming-soon">Coming soon</div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

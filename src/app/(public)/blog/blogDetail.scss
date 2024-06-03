@@ -6,11 +6,11 @@
   margin: 0 auto;
   font-family: sans-serif;
   * {
-    font-family: --font-josefin-sans;
+    font-family: sans-serif;
   }
   .banner-image {
     width: 100%;
-    height: 600px;
+    height: auto;
     object-fit: cover;
     border-radius: 20px;
     margin-top: 48px;
@@ -65,7 +65,7 @@
 
     .introduction {
       margin: 20px 0px;
-      p {
+      span {
         font-size: 20px;
         font-style: normal;
         font-weight: 500;
@@ -85,7 +85,7 @@
   /** blog content css start*/
   .blog-content {
     margin: 48px 0 200px;
-    line-height: 32px;
+    line-height: 28px;
 
     @media screen and (max-width: 991px) {
       margin: 40px 0 120px;
@@ -119,8 +119,7 @@
         line-height: 24px;
       }
     }
-    ul,
-    ol {
+    ul {
       margin-bottom: 20px;
       font-size: 20px;
       list-style-type: none;
@@ -142,6 +141,40 @@
         }
         &::before {
           content: "🔷";
+          position: absolute;
+          left: 0;
+          top: 1px;
+          font-size: 15px;
+          @media screen and (max-width: 767px) {
+            font-size: 12px;
+          }
+        }
+      }
+    }
+
+    ol {
+      margin-bottom: 20px;
+      font-size: 20px;
+      // list-style-type: none;
+      padding-left: 22px;
+      @media screen and (max-width: 767px) {
+        font-size: 18px;
+        margin-bottom: 14px;
+        font-family: sans-serif;
+      }
+      li {
+        margin-bottom: 15px;
+        position: relative;
+        // padding-left: 30px;
+        font-family: sans-serif;
+
+        @media screen and (max-width: 767px) {
+          margin-bottom: 10px;
+          line-height: 24px;
+          // padding-left: 24px;
+        }
+        &::before {
+          content: "";
           position: absolute;
           left: 0;
           top: 1px;

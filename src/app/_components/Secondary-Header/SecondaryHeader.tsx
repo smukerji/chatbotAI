@@ -72,7 +72,7 @@ function SecondaryHeader() {
             </li>
 
             <li onClick={toggleMenu}>
-              <Link href="/home/pricing">Pricing</Link>
+              <a href="/home/pricing">Pricing</a>
             </li>
 
             <li

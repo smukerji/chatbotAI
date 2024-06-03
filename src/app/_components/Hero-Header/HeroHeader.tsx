@@ -33,7 +33,7 @@ function HeroHeader() {
               </li>
 
               <li>
-                <a href="/home/pricing">Pricing</a>
+                <a href="/home/pricing">Pricingggg</a>
               </li>
 
               <li>
