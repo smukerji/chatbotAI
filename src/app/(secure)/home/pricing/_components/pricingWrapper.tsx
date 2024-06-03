@@ -31,9 +31,7 @@ export default function PricingWrapper() {
   const [loading, setLoading] = useState(true);
   const [cookies, setCookie] = useCookies(["userId"]);
   const [prePrice, setPrePrice] = useState(0);
-  const [textOne, setText] = useState(
-    "Get 7 Day Free Trial on First registration"
-  );
+  const [textOne, setText] = useState("Select Plan");
   const [textTwo, setTextTwo] = useState("Get Plan");
   const router = useRouter();
   const [whatsappDisable, setWhatsappDisable] = useState(false);
@@ -194,6 +192,7 @@ export default function PricingWrapper() {
             price={isYearlyPlan ? 144 : 15}
             enableOne={enableOne}
             text={textOne}
+            messages={isYearlyPlan ? "2000 messages/month" : "2000 messages"}
           />
           <PlanTwo
             setPlan={setPlan}
@@ -202,6 +201,8 @@ export default function PricingWrapper() {
             enableTwo={enableTwo}
             prePrice={prePrice}
             text={textTwo}
+            messages={isYearlyPlan ? "5000 messages/month" : "5000 messages"}
+
             // disableMonth={isYearlyPlan ? false : disableMonth}
           />
         </div>
@@ -315,7 +316,7 @@ export default function PricingWrapper() {
           </div>
           <div className="add-ons-right">
             <div className="add-ons-integration">
-              <p className="integration-head">Messaging per chatbot</p>
+              <p className="integration-head">Messaging Per Chatbot</p>
               <div className="integration-list">
                 <div className="app-integration">
                   <div className="integration-name-container">
@@ -391,12 +392,12 @@ export default function PricingWrapper() {
         <div className="price-footer-container">
           <div className="footer-left">
             <div className="left-head">
-              <p className="left-head-text">Pricing FAQs</p>
+              <p className="left-head-text">FAQ</p>
             </div>
-            <p className="left-text">
+            {/* <p className="left-text">
               We are offering an accessible interface to website or other
               platforms.
-            </p>
+            </p> */}
           </div>
           <div className="footer-right">
             <Coll />

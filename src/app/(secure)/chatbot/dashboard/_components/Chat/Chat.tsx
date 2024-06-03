@@ -825,7 +825,7 @@ function Chat({
                       <input
                         type="text"
                         className="title-input"
-                        placeholder="Enter your name..."
+                        placeholder="Enter your name"
                         onChange={(e: any) => {
                           setLeadDetails({
                             ...leadDetails,
@@ -861,7 +861,7 @@ function Chat({
                       <input
                         type="email"
                         className="title-input"
-                        placeholder="Enter your email address..."
+                        placeholder="Enter your email address"
                         onChange={(e) => {
                           setLeadDetails({
                             ...leadDetails,
@@ -922,7 +922,7 @@ function Chat({
                       <PhoneInput
                         country={"us"}
                         value={leadDetails?.number}
-                        placeholder="Enter your phone number..."
+                        placeholder="Enter your phone number"
                         onChange={(phone) => {
                           setLeadDetails({
                             ...leadDetails,

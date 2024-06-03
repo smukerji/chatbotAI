@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, { useEffect } from "react";
 import AuthorSocialMedia from "./AuthorSocialMedia";
 import BlogShareSocialMedia from "./BlogShareSocialMedia";
 import { data } from "../blogData.json";
@@ -17,9 +18,9 @@ const BlogDetailCard = ({
   date: string;
   introduction: any;
 }) => {
-  // useEffect(() => {
-  //   window.scrollTo(0, 0);
-  // }, []);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div className="detail-card-wrapper" id="blog-detail-wrapper">
@@ -32,7 +33,7 @@ const BlogDetailCard = ({
       {introduction && (
         <div className="introduction">
           {introduction.map((para: string, index: number) => {
-            return <p key={index}>{para}</p>;
+            return <Markdown>{para}</Markdown>;
           })}
         </div>
       )}
