@@ -20,11 +20,11 @@ const getBlogList = async () => {
     initialPage: 0,
   };
 };
-export async function generateMetadata(context: any): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   return {
     title: `Blog`,
     alternates: {
-      canonical: `https://torri.ai/blog?page=${context.searchParams.page}`,
+      canonical: `https://torri.ai/blog`,
     },
   };
 }

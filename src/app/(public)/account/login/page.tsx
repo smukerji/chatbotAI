@@ -4,11 +4,11 @@ import ReactGoogleReCaptcha from "@/app/_components/ReactGoogleRecaptcha";
 
 const Login = () => {
   return (
-    <Suspense fallback={<div>login</div>}>
-      <ReactGoogleReCaptcha>
-        <LoginPage />
-      </ReactGoogleReCaptcha>
-    </Suspense>
+    // <Suspense fallback={<div>login</div>}>
+    <ReactGoogleReCaptcha>
+      <LoginPage />
+    </ReactGoogleReCaptcha>
+    // </Suspense>
   );
 };
 

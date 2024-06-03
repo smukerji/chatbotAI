@@ -21,7 +21,7 @@ export async function getAllBlogs() {
 export async function getBlogBySlug(slug: string) {
   const filename = `${contentDir}/${slug}.md`;
   try {
-    const content = await fs.promises.readFile(process.cwd() + filename, "utf8");
+    const content = await fs.promises.readFile(filename, "utf8");
     const { data, content: markdownContent } = matter(content);
     return { ...data, content: content };
   } catch (error) {
