@@ -33,7 +33,7 @@ const BlogDetailCard = ({
       {introduction && (
         <div className="introduction">
           {introduction.map((para: string, index: number) => {
-            return <Markdown>{para}</Markdown>;
+            return <Markdown key={index}>{para}</Markdown>;
           })}
         </div>
       )}
