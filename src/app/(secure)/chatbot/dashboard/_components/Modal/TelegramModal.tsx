@@ -14,7 +14,7 @@ function TelegramModal({
   setIsTelegramModalOpen,
   isTelegramEdit,
   setIsTelegramEdit,
-  setIsTelegramConnected
+  setIsTelegramConnected,
 }: any) {
   /// fetch the params
   const params: any = useSearchParams();
@@ -86,9 +86,9 @@ function TelegramModal({
   const deleteHandler = async () => {
     try {
       //First remove the webhook from telegram
-      const telegramRemoveWebhookUrl=`https://api.telegram.org/bot${telegramToken}/deleteWebhook`
-      const response1 = await fetch(telegramRemoveWebhookUrl,{
-          headers: {
+      const telegramRemoveWebhookUrl = `https://api.telegram.org/bot${telegramToken}/deleteWebhook`;
+      const response1 = await fetch(telegramRemoveWebhookUrl, {
+        headers: {
           cache: "no-store",
         },
         method: "POST",
@@ -96,8 +96,7 @@ function TelegramModal({
       });
       const resp1 = await response1.json();
 
-      if(resp1?.result){
-
+      if (resp1?.result) {
         const url = `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard/telegram/telegramData/api?chatbotId=${chatbot.id}`;
         const response2 = await fetch(url, {
           headers: {
@@ -108,26 +107,18 @@ function TelegramModal({
         });
         const resp2 = await response2.json();
         if (resp2.status === 200) {
-          setIsTelegramEdit(false)
+          setIsTelegramEdit(false);
           setStatus(false);
-          setIsTelegramModalOpen(false); 
+          setIsTelegramModalOpen(false);
           message.success(resp2?.message);
         } else {
           message.error(resp2?.message);
         }
+      } else {
+        message.error("error deleting");
       }
-      else{
-        message.error('error deleting')
-      }
-
-
-
-
-
-
-
     } catch (error) {
-      console.log("error deleting ",error)
+      console.log("error deleting ", error);
     }
   };
 
@@ -231,7 +222,7 @@ function TelegramModal({
         getBotName("");
         message.success(resp?.message);
         //This is for when telegram is connnected
-        setIsTelegramConnected(true)
+        setIsTelegramConnected(true);
       } else {
         message.error(resp?.message);
       }
@@ -355,14 +346,15 @@ function TelegramModal({
                     </div>
                   ) : (
                     <div className="telegram-botname-edit">
-                    
-                        <Image
+                      <Image
                         src={BotUserIcon}
                         alt="bot-user-icon"
                         className="bot-user-img"
-                        />
-                     
-                      <div className="telegram-bot-name">{botName ? botName : 'loading...'}</div>
+                      />
+
+                      <div className="telegram-bot-name">
+                        {botName ? botName : "loading..."}
+                      </div>
                       <Image
                         src={EditIcon}
                         alt="edit-icon"
