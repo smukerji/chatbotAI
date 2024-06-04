@@ -1,0 +1,494 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: sans-serif;
+  scroll-behavior: smooth;
+  /* color: #000; */
+}
+
+
+.scroll-container,
+.scroll-area {
+  height: 100vh;
+}
+
+.scroll-container {
+  overflow: auto;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+}
+
+.scroll-area {
+  scroll-snap-align: start;
+}
+
+/* Header {
+  background-color: white !important;
+  display: flex;
+  justify-content: space-between;
+}
+
+Header .logo a {
+  font-size: 30px;
+  font-weight: lighter;
+  font-family: 'Times New Roman', Times, serif;
+}
+
+Header a {
+  font-size: 20px;
+  font-weight: bolder;
+  color: black;
+} */
+
+/* .ant-btn-primary {
+  background-color: black;
+}
+
+.ant-btn-primary:hover {
+  background-color: rgba(10, 10, 10, 0.856) !important;
+} */
+
+.CardField {
+  display: flex;
+  flex-direction: column;
+}
+
+.whatsapp-step-container {
+  display: flex;
+  flex-direction: column;
+  /* justify-content: center; */
+  /* align-items: center; */
+
+
+}
+
+.whatsapp-steps {
+  width: 60%;
+  margin: auto;
+}
+
+.whatsapp-integration-title {
+  color: #141416;
+  text-align: center;
+  /* Subtitle/Large */
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 28px;
+  /* 140% */
+  margin-bottom: 5px;
+}
+
+.whatsapp-top-title {
+  color: #353945 !important;
+
+  /* Body/Medium */
+  font-size: 16px !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  line-height: 24px !important;
+  /* 150% */
+}
+
+.whatsapp-input-copy-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.whatsapp-error-message {
+  color: red !important;
+  margin: 0px !important;
+  font-size: 14px !important;
+}
+
+.whatsapp-input {
+  width: 90%;
+  display: flex;
+  padding: 12px 16px;
+  align-items: center;
+  gap: 10px;
+  align-self: stretch;
+  border-radius: 12px;
+  border: 1px solid #E6E8EC !important;
+  background: #FFF;
+
+
+  /* style */
+  color: #141416;
+  /* Body/Medium */
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px;
+
+}
+
+.whatsapp-input:focus {
+  outline: none;
+}
+
+.whatsapp-btn {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 15px !important;
+}
+
+.whatsapp-verify {
+  display: flex;
+  padding: 12px 24px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border-radius: 12px;
+  background: #2E58EA;
+  border: none;
+}
+
+.whatsapp-verify:hover {
+  cursor: pointer !important;
+}
+
+.whatsapp-verify-text {
+  color: #FCFCFD !important;
+  text-align: center;
+  font-size: 16px !important;
+  font-style: normal !important;
+  font-weight: 600 !important;
+  line-height: 24px !important;
+  /* 150% */
+  margin-top: 0px !important;
+}
+
+.whatsapp-verify-text:hover {
+  cursor: pointer;
+}
+
+.whatsapp-modal .ant-modal-footer {
+  display: none !important;
+}
+
+.whatsapp-status-container {
+  display: flex;
+  justify-content: space-between;
+  border: 1px solid #E6E8EC;
+  border-radius: 12px;
+  margin: 30px;
+  padding: 10px;
+}
+
+.whatsapp-status-container-mobile-section {
+  width: 50%;
+}
+
+.whatsapp-status-container-switch-section {
+  width: 50%;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+
+}
+
+.whatsapp-copy-icon {
+  height: 22px;
+  width: 22px;
+}
+
+.whatsapp-copy-icon:hover {
+  cursor: pointer !important;
+}
+
+.whatsapp-delete {
+  cursor: pointer !important;
+}
+
+.whatsapp-spin-token {
+  margin: 2px auto;
+}
+
+.whatsapp-edit-icon {
+  color: #2e58ea;
+  height: 20px;
+  width: 20px;
+}
+
+.whatsapp-edit-icon:hover {
+  cursor: pointer !important;
+}
+
+.whatsapp-edit-icon-s {
+  height: 18px;
+  width: 18px;
+  margin-left: -12px;
+}
+
+.whatsapp-edit-icon-s:hover {
+  cursor: pointer !important;
+
+}
+
+.telegram-token-container {
+  height: 114px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-top: 10px;
+  gap: 2px;
+}
+
+.telegram-heading {
+  color: #141416;
+
+  /* Subtitle/Large */
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 28px;
+  /* 140% */
+}
+
+.telegram-input {
+  display: flex;
+  padding: 12px 16px;
+  align-items: center;
+  gap: 10px;
+  align-self: stretch;
+  border-radius: 12px;
+  border: 1px solid #E6E8EC;
+  background: #FFF;
+  color: #23262F;
+
+  /* Body/Medium */
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px;
+  /* 150% */
+}
+
+.telegram-input:focus-visible {
+  outline: none !important;
+  border: 1px solid #E6E8EC !important;
+
+}
+
+.telegram-label {
+  color: #353945;
+  text-align: center;
+
+  /* Body/Medium */
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px;
+  /* 150% */
+}
+
+.telegram-error {
+  color: red !important;
+  margin: 0px !important;
+  font-size: 14px !important;
+}
+
+.telegram-button {
+  margin-left: auto;
+  display: flex;
+  padding: 12px 16px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border-radius: 12px;
+  background: #2E58EA;
+  color: #FCFCFD;
+  text-align: center;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 28px;
+  /* 175% */
+  border: 0px;
+}
+
+.telegram-button-save {
+  padding: 4px 14px;
+  border-radius: 12px;
+  background: #2E58EA;
+  color: #FCFCFD;
+  text-align: center;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 28px;
+  /* 175% */
+  border: 0px;
+
+}
+
+.telegram-button-save:hover {
+  cursor: pointer !important;
+}
+
+.telegram-button:hover {
+  cursor: pointer !important;
+}
+
+.telegram-modal .ant-modal-footer {
+  display: none !important;
+}
+
+.telegram-switch-delete-container {
+  margin-top: 15px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* margin-top: 30px; */
+}
+
+.telegram-switch-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.telegram-delete:hover {
+  cursor: pointer;
+}
+
+.telegram-bot-name {
+  margin-right: 6px;
+
+  color: #353945;
+
+  /* Body/Medium */
+  font-size: 17px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px;
+  /* 150% */
+}
+
+.telegram-bot-name-input {
+  padding: 8px !important;
+  font-size: 16px;
+  line-height: 24px;
+  gap: 10px;
+  border-radius: 12px;
+  border: 1px solid #E6E8EC !important;
+  margin-right: 7px;
+}
+
+.telegram-bot-name-input:focus-visible {
+  outline: none !important;
+}
+
+.telegram-switch-delete {
+  display: flex;
+  justify-content: space-between;
+  width: 30%;
+}
+
+.telegram-input-save {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.telegram-botname-edit {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+}
+
+.telegram-active-inactive {
+  width: 38%;
+}
+
+.telegram-edit-icon-s {
+  height: 18px;
+  width: 18px;
+  margin-left: -12px;
+}
+
+.telegram-edit-icon-s:hover {
+  cursor: pointer;
+}
+
+.telegram-edit-icon {
+  height: 19px;
+  width: 19px;
+}
+
+.telegram-edit-icon:hover {
+  cursor: pointer;
+}
+
+.bot-user-img {
+  height: 35px;
+  width: 35px;
+  margin-right: 5px;
+}
+
+.grecaptcha-badge{
+  left: 0px;
+  right: -186px;
+  bottom: 0;
+}
+
+.grecaptcha-badge iframe{
+  right: 0px !important;
+  left: 0 !important;
+  height: 61px !important;
+  bottom: 14px !important;
+}
+/* layout.scss */
+.ant-modal-root {
+  .ant-modal-mask {
+    backdrop-filter: blur(4px);
+    background: none;
+    margin-top: 70px;
+  }
+  .ant-modal-wrap {
+    height: calc(100% - 70px);
+    margin-top: 70px;
+  }
+  .subscription-expire-popup {
+    .ant-modal-content {
+      box-shadow: none;
+      background: transparent !important;
+      text-align: center;
+      .ant-modal-body {
+        font-family: "General Sans";
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 28px;
+      }
+
+      .ant-modal-header {
+        background: transparent !important;
+        text-align: center;
+        .ant-modal-title {
+          font-family: "General Sans";
+          font-size: 30px;
+          font-weight: 600;
+          line-height: 40px;
+          font-style: normal;
+          color: #141416;
+        }
+      }
+      .ant-modal-footer {
+        display: flex;
+        justify-content: center;
+        margin-top: 40px;
+        .ant-btn {
+          border-radius: 12px;
+          background: #2e58ea;
+          color: #fff;
+        }
+      }
+    }
+  }
+}

@@ -40,7 +40,8 @@ function Dashboard() {
   /// fetch the params
   const params: any = useSearchParams();
   const chatbot = JSON.parse(decodeURIComponent(params.get("chatbot")));
-  const editChatbotSource = params.get("editChatbotSource");
+
+  const editChatbotSource = params.get("editChatbotSource") ?? "chatbot";
 
   const [cookies, setCookies] = useCookies(["userId"]);
 
@@ -217,6 +218,7 @@ function Dashboard() {
   }, []);
 
   const [loading, setLoading] = useState(false);
+
   if (status === "authenticated" || cookies?.userId) {
     return (
       <div className="edit-chatbot-container">

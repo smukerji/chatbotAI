@@ -1,17 +1,11 @@
 "use client";
-"use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import "./hero-header.scss";
-import { Button, Input, Space } from "antd";
 import Image from "next/image";
 import LuciferLogo from "../../../../public/svgs/lucifer-ai-logo.svg";
-import smsIcon from "../../../../public/svgs/sms.svg";
-import { useRouter } from "next/navigation";
-import { useCookies } from "react-cookie";
-import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
-import Link from "next/link";
+
 const AuthBtn = dynamic(() => import("../AuthBtn"), { ssr: false });
 
 function HeroHeader() {
@@ -39,11 +33,14 @@ function HeroHeader() {
               </li>
 
               <li>
-                <a href="/home/pricing">Pricing</a>
+                <a href="/home/pricing">Pricingggg</a>
               </li>
 
               <li>
                 <a href="#service-offerings">Service Offerings</a>
+              </li>
+              <li>
+                <a href="/blog">Blog</a>
               </li>
             </ul>
           </div>

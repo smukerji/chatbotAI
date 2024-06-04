@@ -138,7 +138,13 @@ async function updateChatbotSettings(request: NextRequest) {
       leadTitle,
       userDetails,
       leadFields,
+      botVisibility,
+      rateLimit,
+      rateLimitMessage,
+      rateLimitTime,
+      allowIframe,
     } = body;
+    
 
     /// extract only the field that need to be updated
     const updateFields = {
@@ -175,6 +181,12 @@ async function updateChatbotSettings(request: NextRequest) {
       ...(leadTitle !== undefined && { leadTitle }),
       ...(userDetails !== undefined && { userDetails }),
       ...(leadFields !== undefined && { leadFields }),
+      ...(botVisibility !== undefined && { botVisibility }),
+      ...(rateLimit !== undefined && { rateLimit }),
+      ...(rateLimitMessage !== undefined && { rateLimitMessage }),
+      ...(rateLimitTime !== undefined && { rateLimitTime }),
+      ...(allowIframe !== undefined && { allowIframe }),
+
     };
     const collection = db.collection("chatbot-settings");
 
@@ -225,4 +237,9 @@ updateChatbotSettings.schema = joi.object({
   leadTitle: joi.string().optional(),
   userDetails: joi.string().optional(),
   leadFields: joi.object().optional(),
+  botVisibility: joi.string().optional(),
+  rateLimit: joi.number().optional(),
+  rateLimitMessage:joi.string().optional(),
+  rateLimitTime: joi.number().optional(),
+  allowIframe: joi.boolean().optional(),
 });

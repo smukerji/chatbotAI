@@ -10,6 +10,7 @@ import { put } from "@vercel/blob";
 import fs from "fs";
 import { emailService } from "../../app/_services/emailService";
 import {
+  contactUsBase64,
   createNewChatbotMail,
   logo,
 } from "../../app/_helpers/emailImagesBase64Constants";
@@ -35,6 +36,10 @@ import {
 } from "../../app/_helpers/server/pinecone";
 import { ObjectId } from "mongodb";
 const formidable = require("formidable");
+
+import * as postmark from "postmark";
+import e from "express";
+const client = new postmark.ServerClient(process.env.POST_MARK_TOKEN);
 
 export const maxDuration = 300;
 
@@ -432,9 +437,7 @@ export default async function handler(req, res) {
                   qa.image
                     ? JSON.stringify({
                         question: qa.question,
-                        answer:
-                          `${qa.answer}` +
-                          `image: https://drive.google.com/uc?export=view&id=${qa.image}`,
+                        answer: `${qa.answer}` + `image: ${qa.image}`,
                         // filename: qa.image,
                       })
                     : JSON.stringify({
@@ -617,6 +620,12 @@ export default async function handler(req, res) {
                 name: result?.username,
               }
             );
+
+            // await client.sendEmail({
+            //   From: process.env.SENDERS_EMAIL,
+            //   To: email,
+            //   MessageStream: "outbound",
+            // })
           } catch (error) {
             return res.status(400).send(error);
           }

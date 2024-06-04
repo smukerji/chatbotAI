@@ -2,8 +2,12 @@
 import { createContext, useState } from "react";
 import {
   chatbotBubbleAlignment,
+  defaultBotVisibility,
   defaultLeadTitle,
   defaultLeadUserDetails,
+  defaultRateLimit,
+  defaultRateLimitMessage,
+  defaultRateLimitTime,
   models,
   theme,
   visibility,
@@ -39,6 +43,11 @@ export const ChatbotSettingDataProvider = ({ children }: any) => {
     },
     leadTitle: defaultLeadTitle,
     userDetails: defaultLeadUserDetails,
+    botVisibility: defaultBotVisibility,
+    allowIframe: false, 
+    rateLimit: defaultRateLimit,
+    rateLimitTime: defaultRateLimitTime,
+    rateLimitMessage: defaultRateLimitMessage,
   };
   const [chatbotSettings, setChatbotSettings] = useState(
     initialChatbotSettings

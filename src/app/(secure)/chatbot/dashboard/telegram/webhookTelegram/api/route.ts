@@ -3,34 +3,28 @@ import { NextRequest, NextResponse } from "next/server";
 import { apiHandler } from "../../../../../../_helpers/server/api/api-handler";
 import clientPromise from "../../../../../../../db";
 import { ObjectId } from "mongodb";
-import {encodeChat,
-  encode,
-  decode,
-  isWithinTokenLimit,
-} from 'gpt-tokenizer'
+import { encodeChat, encode, decode, isWithinTokenLimit } from "gpt-tokenizer";
 import moment from "moment";
 export const maxDuration = 300;
-
 
 interface WhatsAppChatHistoryType {
   _id?: ObjectId;
   userId: string;
   chatbotId: string;
   chats: {
-    [key:string]: {
+    [key: string]: {
       messages: {
         role: string;
         content: string;
-      }[],
-      usage:{
+      }[];
+      usage: {
         completion_tokens: number;
-        prompt_tokens:number;
-        total_tokens:number;
-      }
-    }
-  }
+        prompt_tokens: number;
+        total_tokens: number;
+      };
+    };
+  };
 }
-
 
 async function getChatbotId(telegramToken: any) {
   const db = (await clientPromise!).db();
@@ -38,9 +32,9 @@ async function getChatbotId(telegramToken: any) {
   const result = await collection?.findOne({
     telegramToken,
   });
-  if(result){
+  if (result) {
     const { chatbotId, userId, isEnabled } = result;
-    return {chatbotId, userId, isEnabled}
+    return { chatbotId, userId, isEnabled };
   }
   return null;
 }
@@ -89,9 +83,7 @@ export async function POST(request: NextRequest) {
 
   let step = 1;
 
-  try{
-
-
+  try {
     let req = await request.json();
     const chatId = req?.message?.chat?.id;
     const telegramToken = request?.nextUrl?.searchParams.get("token");
@@ -130,7 +122,6 @@ export async function POST(request: NextRequest) {
     } else {
       console.log("continue..");
     }
-
 
     //get the user's chatbot setting
     let userChatBotSetting = db.collection("chatbot-settings");
@@ -175,7 +166,6 @@ export async function POST(request: NextRequest) {
       return new Response("received", { status: 200 });
     }
 
-
     step = 7;
     if (userId) {
       // write pinecone and open ai code
@@ -204,13 +194,13 @@ export async function POST(request: NextRequest) {
           userId: userId,
           date: moment().utc().format("YYYY-MM-DD"),
         });
-      
+
       //find the user's chatbot model
       let userChatBotModel = await userChatBotSetting.findOne({
         userId: userId,
       });
 
-        step = 9;
+      step = 9;
       //if user chat history is not available, create a new chat history
       if (!userChatHistory) {
         const responseOpenAI: any = await fetch(
@@ -308,8 +298,7 @@ export async function POST(request: NextRequest) {
           );
           return new Response("received", { status: 200 });
         }
-      } 
-      else {
+      } else {
         //when user chat history is available
 
         step = 13;
@@ -332,28 +321,37 @@ export async function POST(request: NextRequest) {
           conversationMessages = userChatHistory.chats[`${chatId}`].messages;
 
           step = 14;
-          if (tokenLimit[0]["model"] == userChatBotModel.model && totalCountedToken >= tokenLimit[0].tokens) {
+          if (
+            tokenLimit[0]["model"] == userChatBotModel.model &&
+            totalCountedToken >= tokenLimit[0].tokens
+          ) {
             let tokensToRemove = totalCountedToken - tokenLimit[0].tokens;
             let index = 0;
             let tokens = 0;
 
             // Find the index where the sum of tokens reaches the limit
-            while (tokens < tokensToRemove && index < conversationMessages.length) {
+            while (
+              tokens < tokensToRemove &&
+              index < conversationMessages.length
+            ) {
               tokens += calculateTokens(conversationMessages[index]);
               index++;
             }
 
             conversationMessages.splice(0, index);
-
-          }
-
-          else if (tokenLimit[1]["model"] == userChatBotModel.model && totalCountedToken >= tokenLimit[1].tokens) {
+          } else if (
+            tokenLimit[1]["model"] == userChatBotModel.model &&
+            totalCountedToken >= tokenLimit[1].tokens
+          ) {
             let tokensToRemove = totalCountedToken - tokenLimit[1].tokens;
             let index = 0;
             let tokens = 0;
 
             // Find the index where the sum of tokens reaches the limit
-            while (tokens < tokensToRemove && index < conversationMessages.length) {
+            while (
+              tokens < tokensToRemove &&
+              index < conversationMessages.length
+            ) {
               tokens += calculateTokens(conversationMessages[index]);
               index++;
             }
@@ -361,8 +359,6 @@ export async function POST(request: NextRequest) {
             // Remove the messages from the start of the array up to the found index
             conversationMessages.splice(0, index);
           }
-
-
         }
         step = 15;
 
@@ -407,7 +403,10 @@ export async function POST(request: NextRequest) {
         step = 16;
         const collections = db?.collection("user-details");
         const result = await collections.findOne({ userId: userId });
-        if (result?.totalMessageCount !== undefined && openaiBody.choices[0].message.content) {
+        if (
+          result?.totalMessageCount !== undefined &&
+          openaiBody.choices[0].message.content
+        ) {
           // If totalMessageCount exists, update it by adding 1
           await collections.updateOne(
             { userId: userId },
@@ -424,9 +423,9 @@ export async function POST(request: NextRequest) {
             openaiBody.choices[0].message.content
           );
 
-
           step = 18;
-          if (!userChatHistory.chats[`${chatId}`]) { //if userPhoneNumber's chat history is not available, add that to the chat history
+          if (!userChatHistory.chats[`${chatId}`]) {
+            //if userPhoneNumber's chat history is not available, add that to the chat history
             userChatHistory.chats[`${chatId}`] = {
               messages: [
                 {
@@ -440,54 +439,58 @@ export async function POST(request: NextRequest) {
               ],
               usage: {
                 completion_tokens: openaiBody.usage.completion_tokens,
-                prompt_tokens: openaiBody.usage.prompt_tokens - similarSearchToken,
-                total_tokens: openaiBody.usage.total_tokens - similarSearchToken
-              }
-            }
+                prompt_tokens:
+                  openaiBody.usage.prompt_tokens - similarSearchToken,
+                total_tokens:
+                  openaiBody.usage.total_tokens - similarSearchToken,
+              },
+            };
             //update the chat history
             await userChatHistoryCollection.updateOne(
-              { userId: userId, date: moment().utc().format('YYYY-MM-DD') },
+              { userId: userId, date: moment().utc().format("YYYY-MM-DD") },
               {
                 $set: {
                   chats: userChatHistory.chats,
                 },
               }
             );
-
-          }
-          else {
+          } else {
             step = 19;
             //update the chat history
-            userChatHistory.chats[`${chatId}`].messages.push({
-              role: "user",
-              content: `${queryFromTelegramUser}`,
-            }, {
-              role: "assistant",
-              content: openaiBody.choices[0].message.content,
-            });
+            userChatHistory.chats[`${chatId}`].messages.push(
+              {
+                role: "user",
+                content: `${queryFromTelegramUser}`,
+              },
+              {
+                role: "assistant",
+                content: openaiBody.choices[0].message.content,
+              }
+            );
 
             //total tokens addition
-            let oldTotalTokens = userChatHistory.chats[`${chatId}`].usage.total_tokens;
+            let oldTotalTokens =
+              userChatHistory.chats[`${chatId}`].usage.total_tokens;
             let userEnterToken = currentQuestionsTotalTokens;
             let openAICompletionToken = openaiBody.usage.completion_tokens;
-            oldTotalTokens += (userEnterToken + openAICompletionToken);
-
+            oldTotalTokens += userEnterToken + openAICompletionToken;
 
             //prompt tokens addition
-            let oldPromptTokens = userChatHistory.chats[`${chatId}`].usage.prompt_tokens;
+            let oldPromptTokens =
+              userChatHistory.chats[`${chatId}`].usage.prompt_tokens;
             oldPromptTokens += currentQuestionsTotalTokens;
 
             //add the new to previoius tokens
             userChatHistory.chats[`${chatId}`].usage = {
               completion_tokens: openaiBody.usage.completion_tokens,
               prompt_tokens: oldPromptTokens,
-              total_tokens: oldTotalTokens
-            }
+              total_tokens: oldTotalTokens,
+            };
 
             step = 20;
             //update the chat history
             await userChatHistoryCollection.updateOne(
-              { userId: userId, date: moment().utc().format('YYYY-MM-DD') },
+              { userId: userId, date: moment().utc().format("YYYY-MM-DD") },
               {
                 $set: {
                   chats: userChatHistory.chats,
@@ -501,16 +504,16 @@ export async function POST(request: NextRequest) {
     }
 
     return new Response("received", { status: 200 });
-
-  }
-  catch (error: any) {
+  } catch (error: any) {
     console.log("error at step", step);
     console.log("error", error);
   }
-
 }
 
-function calculateTokens(conversationMessages: { role: string, content: string }) {
+function calculateTokens(conversationMessages: {
+  role: string;
+  content: string;
+}) {
   const token = encode(conversationMessages.content).length;
   return token;
 }

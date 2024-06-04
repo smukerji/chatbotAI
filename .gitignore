@@ -39,3 +39,4 @@ next-env.d.ts
 /public/qa-images/*.png
 /public/qa-images/*.jpg
 /public/qa-images/*.jpeg
+.prettierrc

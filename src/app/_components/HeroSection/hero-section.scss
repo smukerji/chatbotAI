@@ -3,7 +3,7 @@
   background: var(--Primary-6, #335df3);
   margin: 60px 12.2vw;
   padding: 84px 63px;
-  background-image: url("../../../../public//sections-images//header-background/Lines.png");
+  background-image: url("../../../../public//sections-images//header-background/Lines.webp");
   background-repeat: no-repeat;
   height: 970px;
   background-position: center bottom;
@@ -101,9 +101,9 @@
     position: relative;
     img {
       width: 100%;
-      height: auto;
-      position: absolute;
-      max-height: 700px;
+      height: auto !important;
+      // position: absolute;
+      // max-height: 700px;
       // bottom: 0;
     }
   }
@@ -142,11 +142,11 @@
         gap: 16px;
         li {
           gap: 2px;
-          span {
-            img {
-              width: 80%;
-            }
-          }
+          // span {
+          //   // img {
+          //   //   width: 80%;
+          //   // }
+          // }
         }
       }
     }
@@ -200,5 +200,24 @@
         }
       }
     }
+  }
+}
+
+@media only screen and (max-width: 452px) {
+  .hero-section-container .grp-img {
+    position: unset;
+    display: flex;
+    justify-content: center;
+    img {
+      margin-top: 20px;
+      // width: 120%;
+      width: 100%;
+      height: auto !important;
+      position: relative !important;
+    }
+  }
+
+  .hero-section-container .schemes-list ul li {
+    justify-content: flex-start;
   }
 }

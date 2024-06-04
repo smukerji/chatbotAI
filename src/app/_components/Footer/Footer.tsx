@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState } from "react";
 import Image from "next/image";
 import logoWhite from "../../../../public/svgs/lucifer-ai-logo-white.svg";
@@ -11,10 +12,14 @@ import Instagramimg from "../../../../public/svgs/instagram-icon-white.svg";
 import Facebookimg from "../../../../public/svgs/facebook-icon-white.svg";
 import "./footer.scss";
 import SupportModal from "../../(secure)/chatbot/dashboard/_components/Modal/SupportModal";
+import Link from "next/link";
+import data from "../../_helpers/data/footer.json";
+import Widget from "./Widget";
 
 function Footer() {
   /// state for opening support modal
   const [openSupport, setOpenSupport] = useState(false);
+  const { company, legal, quickLink } = data?.data || {};
   return (
     <div className="footer-section">
       <SupportModal
@@ -25,22 +30,28 @@ function Footer() {
       <div className="footer-container">
         {/*------------------------------------------company address container----------------------------------------------*/}
         <div className="company-details-container">
-          <Image src={logoWhite} alt="logo-white" />
+          <Image src={logoWhite} alt="logo-white" loading="lazy" />
           <ul className="info">
             <li>
-              <Image src={bluePin} alt="blue-pin-img" />
-              <a href="">
+              <Image src={bluePin} alt="blue-pin-img" loading="lazy" />
+              <Link href="#">
                 Unit F, 18/F Wordtech centre. 95 How Ming Street, Kwun Tong,
                 Hong Kong
-              </a>
+              </Link>
             </li>
             <li>
               <Image src={bluePhone} alt="blue-phone-img" />
-              <a href="">+852 55 445532</a>
+              <Link href="">+852 55 445532</Link>
             </li>
             <li>
               <Image src={blueEnvelopImg} alt="blue-envelop-img" />
-              <a href="">info@sapahk.ai</a>
+              <Link
+                href="https://mail.google.com/mail/?view=cm&fs=1&to=info@sapahk.ai"
+                target="_blank"
+                className="mail"
+              >
+                info@sapahk.ai
+              </Link>
             </li>
           </ul>
 
@@ -71,64 +82,25 @@ function Footer() {
         {/* </div> */}
 
         {/*------------------------------------------company links container----------------------------------------------*/}
-        <div className="links-container">
-          <h2>Company</h2>
-          <ul>
-            <li>
-              <a href="/#features">Features</a>
-            </li>
-            <li>
-              <a href="/#service-offerings">Service Offerings</a>
-            </li>
-            {/* <li>
-              <a href="">News</a>
-            </li> */}
-            {/* <li>
-              <a href="">Terms & Conditions</a>
-            </li> */}
-            <li>
-              <a href="/#contact-us">Book a Demo</a>
-            </li>
-          </ul>
-        </div>
+        <Widget
+          title={company.title}
+          list={company.list}
+          setOpenSupport={setOpenSupport}
+        />
 
         {/*------------------------------------------quick links container----------------------------------------------*/}
-        <div className="links-container">
-          <h2>Quick Links</h2>
-          <ul>
-            {/* <li>
-              <a href="/#how-it-works">How It Works</a>
-            </li> */}
-            {/* <li>
-              <a href="">API</a>
-            </li> */}
-            <li>
-              <a href="/home/pricing">Pricing</a>
-            </li>
-            <li onClick={() => setOpenSupport(true)}>
-              <a>Support</a>
-            </li>
-          </ul>
-        </div>
+        <Widget
+          title={quickLink.title}
+          list={quickLink.list}
+          setOpenSupport={setOpenSupport}
+        />
 
         {/*------------------------------------------legal links container----------------------------------------------*/}
-        <div className="links-container">
-          <h2>Legal</h2>
-          <ul>
-            <li>
-              <a href="/terms">Terms & Conditions</a>
-            </li>
-            <li>
-              <a href="/privacy">Privacy Policy</a>
-            </li>
-            {/* <li>
-              <a href="">License</a>
-            </li>
-            <li>
-              <a href="">Security</a>
-            </li> */}
-          </ul>
-        </div>
+        <Widget
+          title={legal.title}
+          list={legal.list}
+          setOpenSupport={setOpenSupport}
+        />
 
         <div className="links-container">
           <select name="" id="" className="temp">
@@ -138,7 +110,9 @@ function Footer() {
         </div>
       </div>
 
-      <div className="copyright-section">Copyright © 2023 SAP Alliance & Creole Studios</div>
+      <div className="copyright-section">
+        Copyright © 2023 SAP Alliance & Creole Studios
+      </div>
     </div>
   );
 }

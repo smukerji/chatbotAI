@@ -14,6 +14,14 @@ import CustomerQuestions from "../_components/Home-Sections/customer-question/Cu
 import HeroSection from "../_components/HeroSection/HeroSection";
 import SecondaryHeader from "../_components/Secondary-Header/SecondaryHeader";
 import FeaturesSection from "../_components/Features-Section/FeaturesSection";
+import { generateMetadata } from "../_helpers/pageSeo";
+
+export const metadata = generateMetadata({
+  title: "Custom AI Chatbots | Elevate Customer Support with Torri.AI",
+  description:
+    "Elevate customer support with Torri.AI's AI chatbot. Precise, multilingual, and no-code. Join our beta for seamless interactions",
+  canonical: "/",
+});
 
 function Home() {
   return (

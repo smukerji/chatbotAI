@@ -40,7 +40,7 @@ function FeaturesSection() {
               </h2>
               <p className="description">
                 Engage your website visitors, customers, and clients with
-                natural, intuitive conversations. Torri ensures every
+                natural, intuitive conversations. Torri AI ensures every
                 interaction is personalised, relevant, and memorable.
               </p>
             </div>
@@ -55,7 +55,7 @@ function FeaturesSection() {
                 </span>
               </h2>
               <p className="description">
-                Seamlessly integrate Torri with your website, WhatsApp, or
+                Seamlessly integrate Torri AI with your website, WhatsApp, or
                 preferred tools for a unified experience.
               </p>
             </div>
@@ -70,19 +70,19 @@ function FeaturesSection() {
                 </span>
               </h2>
               <p className="description">
-                Torri is revolutionising how companies interact with their data
-                through an advanced AI chatbot that learns directly from your
-                organisation&apos;s knowledge base.
+                Torri AI is revolutionising how companies interact with their
+                data through an advanced AI chatbot that learns directly from
+                your organisation&apos;s knowledge base.
               </p>
             </div>
           </div>
           <div className="right">
             {activeKey == "1" ? (
-              <Image src={img1} alt="image" />
+              <Image src={img1} alt="image" loading="lazy" />
             ) : activeKey == "2" ? (
-              <Image src={img2} alt="image" />
+              <Image src={img2} alt="image" loading="lazy" />
             ) : activeKey == "3" ? (
-              <Image src={img3} alt="image" />
+              <Image src={img3} alt="image" loading="lazy" />
             ) : (
               ""
             )}

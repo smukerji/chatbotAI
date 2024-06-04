@@ -28,11 +28,16 @@
           list-style: none;
           a {
             color: #fcfcfd;
+            cursor: default;
             font-size: 16px;
             font-style: normal;
             font-weight: 500;
             line-height: 24px; /* 150% */
             text-decoration: none;
+          }
+
+          .mail {
+            cursor: pointer;
           }
         }
       }
@@ -80,7 +85,8 @@
         gap: 11px;
         border-radius: 12px;
         appearance: none;
-        background: #23262f url(../../../../public/svgs/arrow-down.svg) no-repeat;
+        background: #23262f url(../../../../public/svgs/arrow-down.svg)
+          no-repeat;
         background-position: center right 10px;
         padding-right: 35px;
 

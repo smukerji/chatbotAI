@@ -1,40 +1,41 @@
-'use client';
-import Link from 'next/link';
-import './globals.css';
-import { Layout, Modal, Button } from 'antd';
-import { SessionProvider } from 'next-auth/react';
-import axios from 'axios';
-import { useCookies } from 'react-cookie';
-// import AuthBtn from "./_components/AuthBtn";
-import dynamic from 'next/dynamic';
-import { useEffect, useState } from 'react';
-import Header from './_components/Header/Header';
-import { UserDetailsDataProvider } from './_helpers/client/Context/UserDetailsContext';
-import './layout.scss';
+import "./global.scss";
+import LayoutWrapper from "./_components/LayoutWrapper";
+import { Metadata } from "next";
+import { Josefin_Sans, Quicksand, Poppins } from "next/font/google";
+import Script from "next/script";
 
-// const AuthBtn = dynamic(() => import("./_components/AuthBtn"), { ssr: false });
-const AuthHeader = dynamic(() => import('./_components/AuthHeader'), {
-  ssr: false,
+const josefinSans = Josefin_Sans({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-josefin-sans",
 });
+const quickSand = Quicksand({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-quick-sand",
+});
+const poppins = Poppins({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-poppins",
+});
+export const metadata: Metadata = {
+  metadataBase: new URL("https://torri.ai"),
+  title: { default: "TORRI.AI", template: `%s` },
+  description:
+    "Torri is the personalized custom chatbot solution. You can create your personal chatbot with specific respective data and interact with it to minimize time and effort",
+};
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // const { Header } = Layout;
-  const [path, setPath] = useState('');
-  const [cookies, setCookie] = useCookies(['userId']);
-
-  useEffect(() => {
-    setPath(window.location.pathname);
-  }, []);
-
   return (
-    <html lang='en'>
+    <html lang="en">
       <head>
         {/* Google Tag Manager  */}
-        <script
+        <Script
           dangerouslySetInnerHTML={{
             __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
             new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -42,15 +43,10 @@ export default function RootLayout({
             'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
             })(window,document,'script','dataLayer','GTM-P7SNSPF3');`,
           }}
+          id="google-tag-manager"
         />
-        {/* End Google Tag Manager  */}
 
-        <link rel='preconnect' href='https://fonts.googleapis.com' />
-        <link rel='preconnect' href='https://fonts.gstatic.com' />
-        <link
-          href='https://fonts.googleapis.com/css2?family=Josefin+Sans&family=Poppins&family=Quicksand&display=swap'
-          rel='stylesheet'
-        />
+        {/* End Google Tag Manager  */}
         <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
 
@@ -58,50 +54,42 @@ export default function RootLayout({
         {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe
-            src='https://www.googletagmanager.com/ns.html?id=GTM-P7SNSPF3'
-            height='0'
-            width='0'
-            style={{ display: 'none', visibility: 'hidden' }}
+            src="https://www.googletagmanager.com/ns.html?id=GTM-P7SNSPF3"
+            height="0"
+            width="0"
+            style={{ display: "none", visibility: "hidden" }}
           ></iframe>
         </noscript>
         {/* End Google Tag Manager (noscript)  */}
-        <SessionProvider>
-          <UserDetailsDataProvider>
-            {path !== '/' &&
-              path !== '/account/login' &&
-              path !== '/account/register' &&
-              path !== '/terms' &&
-              path !== '/privacy' && <AuthHeader />}
+        <LayoutWrapper>
+          <main
+            className={`${josefinSans.variable} ${quickSand.variable} ${poppins.variable}`}
+          >
             {children}
-
-            {/* <Modal
-              title='Upgrade Now to create new Chatbots!'
-              open={isPlanNotification}
-              onCancel={() => {}}
-              footer={[
-                <Button key='submit' type='primary' onClick={handleUpgradePlan}>
-                  Upgrade Now
-                </Button>,
-              ]}
-              closable={false}
-              centered
-              className='subscription-expire-popup'
-              width={800}
-            >
-              <p>Upgrade now to access your chatbots!</p>
-            </Modal> */}
-          </UserDetailsDataProvider>
-        </SessionProvider>
-        <script
+          </main>
+        </LayoutWrapper>
+        <Script
+          id="zsiqscript"
           dangerouslySetInnerHTML={{
             __html: `window.$zoho=window.$zoho || {};$zoho.salesiq=$zoho.salesiq||{ready:function(){}}`,
           }}
         />
-        <script
-          id='zsiqscript'
-          src='https://salesiq.zohopublic.in/widget?wc=siq992fbe92f9ef9a36617ac4c9babe51c3d7778f44133f1fe66ec7795c68a6c396'
-          defer
-        ></script>
+        <Script
+          strategy="lazyOnload"
+          id="zsiqscript"
+          src="https://salesiq.zohopublic.in/widget?wc=siq992fbe92f9ef9a36617ac4c9babe51c3d7778f44133f1fe66ec7795c68a6c396"
+          defer={true}
+        ></Script>
+        {/* <script
+          src="https://torri.ai/embed-bot.js"
+          // @ts-ignore
+          chatbotid="9bfb16c7-142e-4946-9ce2-61282e64b38b"
+        ></script> */}
+        <Script
+          src="https://ichefpos.vercel.app/embed-bot.js"
+          // @ts-ignore
+          chatbotID="482163e1-f1d5-4a61-9805-82185e2cf47a"
+        ></Script>
       </body>
     </html>
   );

@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     res?.values?.name.trim() === "" ||
     res?.values?.email.trim() === "" ||
     res?.values?.mobile.trim() === "" ||
-    res?.values?.message.trim() === ""
+    res?.values?.user_message.trim() === ""
   ) {
     return NextResponse.json({
       message: "One or more required fields are empty",

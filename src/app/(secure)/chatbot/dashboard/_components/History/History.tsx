@@ -230,7 +230,7 @@ function History({ chatbotId }: any) {
         {currentChatHistory.length != 0 && (
           <>
             <div className="header">
-              <span>Powered by iCHEF POS</span>
+              <span>Powered by Torri.AI</span>
               <div className="action-btns">
                 <ReactToPrint
                   trigger={() => {

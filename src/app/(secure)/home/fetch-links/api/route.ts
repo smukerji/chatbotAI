@@ -196,14 +196,14 @@
 //   return filteredUrls;
 // }
 
-import { NextRequest, NextResponse } from "next/server";
-import { apiHandler } from "../../../../_helpers/server/api/api-handler";
+import { NextRequest, NextResponse } from 'next/server';
+import { apiHandler } from '../../../../_helpers/server/api/api-handler';
 // import { chromium } from "playwright";
-import * as puppeteer from "puppeteer";
-import { parse } from "node-html-parser";
-import chromium from "@sparticuz/chromium-min";
-import clientPromise from "../../../../../db";
-import { ObjectId } from "mongodb";
+import * as puppeteer from 'puppeteer';
+import { parse } from 'node-html-parser';
+import chromium from '@sparticuz/chromium-min';
+import clientPromise from '../../../../../db';
+import { ObjectId } from 'mongodb';
 
 module.exports = apiHandler({
   POST: fetchLinks,
@@ -216,29 +216,29 @@ const imageLinkRegex =
 
 function extractTextAndImageSrc(element: any) {
   if (
-    element.tagName === "SCRIPT" ||
-    element.tagName === "SVG" ||
-    element.tagName === "STYLE"
+    element.tagName === 'SCRIPT' ||
+    element.tagName === 'SVG' ||
+    element.tagName === 'STYLE'
   ) {
-    return "";
-  } else if (element.tagName === "IMG") {
+    return '';
+  } else if (element.tagName === 'IMG') {
     // If the element is an image, extract its src attribute
-    const imgSrc = element.getAttribute("src");
+    const imgSrc = element.getAttribute('src');
 
     if (imageLinkRegex.test(imgSrc))
       return `      image: ${decodeURI(imgSrc)}          `;
-    return "";
+    return '';
   } else if (element.childNodes.length === 0) {
     // If the element has no child nodes, return its text
     if (element.text === undefined) console.log(element.tagName);
     return element.text;
   } else {
     // If the element has child nodes, recursively extract text and image src links from them
-    let text = "";
+    let text = '';
     element.childNodes.forEach((child: any) => {
       text += extractTextAndImageSrc(child);
     });
-    return text.replace(/(\r\n|\n|\r|\t|)/gm, "").trim();
+    return text.replace(/(\r\n|\n|\r|\t|)/gm, '').trim();
   }
 }
 
@@ -259,14 +259,14 @@ async function fetchLinks(request: NextRequest) {
 
     /// get the user plan and allow only crawling of the amount of links left
     const userDetails = await db
-      .collection("user-details")
+      .collection('user-details')
       .findOne({ userId: userId });
 
     /// find how many link are previously fetched  by this user for this bot
-    const chatBotDataCollection = db.collection("chatbots-data");
+    const chatBotDataCollection = db.collection('chatbots-data');
     const previousFetches = await chatBotDataCollection.findOne({
       chatbotId: chatbotId!,
-      source: "crawling",
+      source: 'crawling',
     });
 
     let limit = 0;
@@ -281,13 +281,13 @@ async function fetchLinks(request: NextRequest) {
     if (limit === 0) {
       return {
         error:
-          "Oops! You have reached the crawling limit of your plan. Please upgrade to crawl more websites.",
+          'Oops! You have reached the crawling limit of your plan. Please upgrade to crawl more websites.',
       };
     }
 
     const browser = await puppeteer.launch({
       /// this code only run for vercel dvelopment
-      args: [...chromium.args, "--hide-scrollbars", "--disable-web-security"],
+      args: [...chromium.args, '--hide-scrollbars', '--disable-web-security'],
       defaultViewport: chromium.defaultViewport,
       executablePath: await chromium.executablePath(
         // `https://github.com/Sparticuz/chromium/releases/download/v119.0.2/chromium-v119.0.2-pack.tar`
@@ -304,10 +304,10 @@ async function fetchLinks(request: NextRequest) {
     // });
     // const context = await browser.newContext();
 
-    console.log("browser launched !")
+    console.log('browser launched !');
 
     const page = await browser.newPage();
-    console.log(" page created !")
+    console.log(' page created !');
 
     const visitedUrls = new Map();
     const pendingUrls = [sourceUrl];
@@ -322,18 +322,18 @@ async function fetchLinks(request: NextRequest) {
       try {
         await page.goto(url, {
           // waitUntil: "networkidle",
-          waitUntil: "networkidle2",
+          waitUntil: 'networkidle2',
           timeout: 180000,
         });
 
         /// if it is image skip that link
         if (imageLinkRegex.test(url)) continue;
 
-        const html = await page.$eval("body", (body) => {
+        const html = await page.$eval('body', (body) => {
           return body.innerHTML;
         });
         const root = parse(html);
-        const text = extractTextAndImageSrc(root).replace(/<img[^>]*>/g, "");
+        const text = extractTextAndImageSrc(root).replace(/<img[^>]*>/g, '');
         let chunks: any = [];
         await new Promise((resolve) => {
           let start = 0;
@@ -379,30 +379,29 @@ async function fetchLinks(request: NextRequest) {
       fetchedLinks: crawledData,
     };
   } else {
-    return { error: "Please enter a valid url" };
+    return { error: 'Please enter a valid url' };
   }
 }
 
 async function extractUrls(page: any, baseUrl: any) {
-  console.log(baseUrl);
 
   // console.log('user input', baseUrl);
   const hrefs = await page.$$eval(
-    "a",
+    'a',
     (links: any, baseUrl: any) => {
       // Function to add or remove 'www' subdomain based on baseUrl
       const adjustWwwSubdomain = (url: any, baseUrl: any) => {
         const urlObj = new URL(url);
         const baseObj = new URL(baseUrl);
 
-        if (baseObj.hostname.startsWith("www.")) {
+        if (baseObj.hostname.startsWith('www.')) {
           // If baseUrl has 'www' subdomain, ensure 'www' in extracted URLs
-          if (!urlObj.hostname.startsWith("www.")) {
-            urlObj.hostname = "www." + urlObj.hostname;
+          if (!urlObj.hostname.startsWith('www.')) {
+            urlObj.hostname = 'www.' + urlObj.hostname;
           }
         } else {
           // If baseUrl doesn't have 'www' subdomain, remove 'www' in extracted URLs
-          urlObj.hostname = urlObj.hostname.replace(/^www\./, "");
+          urlObj.hostname = urlObj.hostname.replace(/^www\./, '');
         }
 
         return urlObj.href;
@@ -413,34 +412,34 @@ async function extractUrls(page: any, baseUrl: any) {
           let href = link.href;
 
           // Ignore empty hrefs or hash-only hrefs
-          if (!href || href === "#" || href.startsWith("javascript:")) {
+          if (!href || href === '#' || href.startsWith('javascript:')) {
             return null;
           }
 
           // Convert relative URLs to absolute URLs
-          if (href.startsWith("/")) {
-            const protocol = baseUrl.startsWith("https://")
-              ? "https://"
-              : "http://";
+          if (href.startsWith('/')) {
+            const protocol = baseUrl.startsWith('https://')
+              ? 'https://'
+              : 'http://';
             href = protocol + new URL(href, baseUrl).hostname + href;
           }
 
           // Handle protocol-relative URLs
-          if (href.startsWith("//")) {
-            const protocol = baseUrl.startsWith("https://")
-              ? "https:"
-              : "http:";
+          if (href.startsWith('//')) {
+            const protocol = baseUrl.startsWith('https://')
+              ? 'https:'
+              : 'http:';
             href = protocol + href;
           }
 
-          const fragment = href.split("/").pop().startsWith("#");
+          const fragment = href.split('/').pop().startsWith('#');
           if (fragment) {
-            const arr = href.split("#");
+            const arr = href.split('#');
             href = arr[0];
           }
           const includesHash =
-            !href.split("/").pop().startsWith("#") &&
-            href.split("/").pop().includes("#");
+            !href.split('/').pop().startsWith('#') &&
+            href.split('/').pop().includes('#');
           if (includesHash) {
             return null;
           }
