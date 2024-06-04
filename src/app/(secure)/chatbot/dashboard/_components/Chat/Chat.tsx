@@ -948,15 +948,16 @@ function Chat({
                     Submit
                   </Button>
 
-                  {userLeadDetails !== "mandatory" && (
-                    <Button
-                      type="text"
-                      className="skip-btn"
-                      onClick={skipLeadDetail}
-                    >
-                      Skip
-                    </Button>
-                  )}
+                  {userLeadDetails !== "mandatory" &&
+                    botSettings?.userDetails !== "mandatory" && (
+                      <Button
+                        type="text"
+                        className="skip-btn"
+                        onClick={skipLeadDetail}
+                      >
+                        Skip
+                      </Button>
+                    )}
                 </div>
               </div>
             )}
