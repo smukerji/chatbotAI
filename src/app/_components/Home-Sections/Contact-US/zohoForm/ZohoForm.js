@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./zohoForm.scss";
 import Head from "next/head";
+import { message } from "antd";
 
 const ZohoForm = () => {
   const [errors, setErrors] = useState({
@@ -27,12 +28,15 @@ const ZohoForm = () => {
     document.body.appendChild(script);
     let valid = true;
     // form validation function
-    const validateForm = (event) => {
+    const validateForm = async (event) => {
       event.preventDefault();
       let error = { name: "", mobile: "", email: "" };
       const name = document.querySelector("input[name='LASTNAME']");
       const mobile = document.querySelector("input[name='MOBILE']");
       const email = document.querySelector("input[name='CONTACT_EMAIL']");
+      const userMessage = document.querySelector(
+        "textarea[name='CONTACT_CF1']"
+      );
 
       if (!name.value.trim()) {
         error.name = "Name is required.";
@@ -57,8 +61,38 @@ const ZohoForm = () => {
       setErrors(error);
 
       if (valid) {
+        const formData = {
+          values: {
+            name: name.value,
+            mobile: mobile.value,
+            email: email.value,
+            user_message: userMessage.value,
+          },
+        };
+
+        try {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/contact-mail/api`,
+            {
+              method: "POST",
+              body: JSON.stringify(formData),
+            }
+          );
+
+          if (response.ok) {
+            message.success("Response saved successfully");
+            // Handle successful form submission
+          } else {
+            message.error("Error submitting response");
+            // Handle error in form submission
+          }
+        } catch (error) {
+          message.error("Error:", error);
+        }
+
         const form = document.getElementById("zcampaignOptinForm");
         form.submit();
+
         form.reset();
         window.location.reload();
       }
