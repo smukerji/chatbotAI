@@ -70,6 +70,11 @@ const ZohoForm = () => {
           },
         };
 
+        const form = document.getElementById("zcampaignOptinForm");
+        form.submit();
+
+        form.reset();
+        window.location.reload();
         try {
           const response = await fetch(
             `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/contact-mail/api`,
@@ -87,14 +92,8 @@ const ZohoForm = () => {
             // Handle error in form submission
           }
         } catch (error) {
-          message.error("Error:", error);
+          message.error("Error:", error.message);
         }
-
-        const form = document.getElementById("zcampaignOptinForm");
-        form.submit();
-
-        form.reset();
-        window.location.reload();
       }
     };
 
@@ -111,13 +110,13 @@ const ZohoForm = () => {
     };
   }, []);
 
-  useEffect(() => {
-    if (imgRef.current) {
-      imgRef.current.onload = function () {
-        referenceSetter(this);
-      };
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (imgRef.current) {
+  //     imgRef.current.onload = function () {
+  //       referenceSetter(this);
+  //     };
+  //   }
+  // }, []);
 
   return (
     <>
