@@ -49,7 +49,9 @@
   `;
 
   // Get the script element
-  const scriptElement = document.querySelector('script[src="https://torri.ai/embed-bot.js"]');
+  const scriptElement = document.querySelector(
+    'script[src="https://torri.ai/embed-bot.js"]'
+  );
 
   // Access the data attributes
   const param1 = scriptElement.getAttribute("chatbotID");
@@ -57,12 +59,17 @@
 
   // Fetch bot settings
   try {
-    const response = await fetch(`https://torri.ai/chatbot/popup/details/api?chatbotId=${param1}`);
-    if (!response.ok) throw new Error('Network response was not ok');
+    const response = await fetch(
+      `https://torri.ai/chatbot/popup/details/api?chatbotId=${param1}`
+    );
+    if (!response.ok) throw new Error("Network response was not ok");
 
     const data = await response.json();
     console.log(data?.chatbotSettings[0]?.bubbleIconUrl);
-    bubbleIconUrl = data?.chatbotSettings[0]?.bubbleIconUrl == "" ? "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/message-2-cbgyJSCUz2djFE1PMXYozzVSV8Uwfp.svg" : data?.chatbotSettings[0]?.bubbleIconUrl;
+    bubbleIconUrl =
+      data?.chatbotSettings[0]?.bubbleIconUrl == ""
+        ? "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/message-2-cbgyJSCUz2djFE1PMXYozzVSV8Uwfp.svg"
+        : data?.chatbotSettings[0]?.bubbleIconUrl;
     chatbubbleColor = data?.chatbotSettings[0]?.chatbotIconColor;
   } catch (error) {
     console.error("Error fetching bot settings:", error);
@@ -74,10 +81,20 @@
 
   const icon_img = `
     <img
-      src="${bubbleIconUrl ? bubbleIconUrl : ''}"
+      src="${bubbleIconUrl ? bubbleIconUrl : ""}"
       alt="icon"
-      height="${bubbleIconUrl == "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/message-2-cbgyJSCUz2djFE1PMXYozzVSV8Uwfp.svg" ? '32' : '64'}"
-      width="${bubbleIconUrl == "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/message-2-cbgyJSCUz2djFE1PMXYozzVSV8Uwfp.svg" ? '32' : '64'}"
+      height="${
+        bubbleIconUrl ==
+        "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/message-2-cbgyJSCUz2djFE1PMXYozzVSV8Uwfp.svg"
+          ? "32"
+          : "64"
+      }"
+      width="${
+        bubbleIconUrl ==
+        "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/message-2-cbgyJSCUz2djFE1PMXYozzVSV8Uwfp.svg"
+          ? "32"
+          : "64"
+      }"
       style="border-radius: 50%;"
     />
   `;
