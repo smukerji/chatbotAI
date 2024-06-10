@@ -421,6 +421,11 @@ const ZohoForm = () => {
                       name="zc_formIx"
                       value="3z3445ada2863b1460c0440ca9b6d50444b0539e5dae5bf84e62e5cfe38ad15acb"
                     />
+                    {/* <input
+                      type="hidden"
+                      name="SERVER_URL"
+                      value={window.location.origin}
+                    /> */}
                   </div>
                 </form>
               </div>

@@ -1,12 +1,12 @@
 ---
 id:
-title: Improving Healthcare Accessibility - AI Chatbots Bridging the Gap in Underserved Areas
-slug: improving-healthcare-accessibility
+title: AI in Education - AI Chatbots Bridging the Gap in Underserved Areas
+slug: ai-in-education
 author: SAP
-date: 03-06-2024
+date: 07-06-2024
 description: Explore how AI chatbots in healthcare revolutionize accessibility, addressing barriers for better outcomes. Join the movement today!
-thumbnail: https://xyhog03g93hzc0am.public.blob.vercel-storage.com/improving_health_thumb-IpqauXdfagXHIetNAL2C3n2sBW0Pgr
-hero: https://xyhog03g93hzc0am.public.blob.vercel-storage.com/healthcare_accessibility-BghzSFT0k70z4C6G3SnSSVTGdbLiZh
+thumbnail: https://xyhog03g93hzc0am.public.blob.vercel-storage.com/ai-in-education-2-EAFJDcSuKZyiGqf0W41rBjNIaY5a7f.png
+hero: https://xyhog03g93hzc0am.public.blob.vercel-storage.com/ai-in-education-VlGU1dgWsGC5z9Wra9myd8YDGlLCwr.png
 introduction:
   [
     "In today's rapidly evolving world, the transformative power of artificial intelligence (AI) is reshaping numerous sectors, including healthcare. One of the most promising applications of AI is in the form of chatbots, which are revolutionizing healthcare accessibility, especially in underserved areas. Through platforms like **Torri.ai**, anyone can now create their own AI chatbot using personalized data, providing tailored solutions to meet specific healthcare needs. This blog post explores how AI chatbots are addressing the accessibility gap in healthcare and enhancing the overall healthcare experience.",

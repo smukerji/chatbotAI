@@ -1,10 +1,10 @@
 ---
-id: 5
+id:
 title: Introducing Torri.AI - Create Your Own AI Chatbot Using Your Data
 slug: intro-to-torri-ai
 author: SAP
 date: 03-06-2024
-description: Like to know the secrets of transforming a 2-14 team into a 3x Super Bowl winning Dynasty?
+description: Torri.AI represents the next step in the evolution of customer service, offering businesses an efficient, reliable, and customizable AI-powered chatbot solution.
 thumbnail: https://xyhog03g93hzc0am.public.blob.vercel-storage.com/intro-torri-thumb-EeL2FhiYywdJ9jY7PYxcHvnXUnOYT7
 hero: https://xyhog03g93hzc0am.public.blob.vercel-storage.com/intrototorri-EEhfvj4Ulat4x8J8gAgW7BnjX31Rz9
 introduction:
