@@ -218,20 +218,15 @@ export async function POST(request: NextRequest) {
               messages: [
                 {
                   role: "system",
-                  content: `Use the following pieces of context to answer the users question.
-                            If you don't know the answer, just say that you don't know, don't try to make up an answer.
-                            ----------------
-                            context:
-                            ${similaritySearchResults}
-                            
-                            Answer user query and include images write respect to each line if available`,
+                  content: `${userChatBotModel?.instruction}
+
+                  context:
+               ${similaritySearchResults}`,
                 },
                 // ...messages,
                 {
                   role: "user",
-                  content: `Answer user query and include images in response if available in the given context 
-                          
-                                      query: ${req?.message?.text} `,
+                  content: `query: ${req?.message?.text} `,
                 },
               ],
             }),
@@ -377,19 +372,15 @@ export async function POST(request: NextRequest) {
               messages: [
                 {
                   role: "system",
-                  content: `Use the following pieces of context to answer the users question.
-                            If you don't know the answer, just say that you don't know, don't try to make up an answer.
-                            ----------------
-                            context:
-                            ${similaritySearchResults}
-                            
-                            Answer user query and include images write respect to each line if available`,
+                  content: `${userChatBotModel?.instruction}
+
+                  context:
+               ${similaritySearchResults}`,
                 },
                 ...conversationMessages,
                 {
                   role: "user",
-                  content: `Answer user query and include images in response if available in the given context 
-                          
+                  content: `
                 query: ${queryFromTelegramUser} `,
                 },
               ],
