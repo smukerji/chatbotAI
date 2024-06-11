@@ -17,9 +17,7 @@ const Widget = ({
         {list.map((lt: any) => (
           <li key={lt.title}>
             {lt.title == "Support" ? (
-              <a href={""} onClick={() => setOpenSupport(true)}>
-                {lt.title}
-              </a>
+              <a onClick={() => setOpenSupport(true)}>{lt.title}</a>
             ) : (
               <a href={lt.url || "#"}>{lt.title}</a>
             )}

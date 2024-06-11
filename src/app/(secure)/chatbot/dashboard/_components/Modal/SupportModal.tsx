@@ -21,7 +21,7 @@ function SupportModal({ openSupport, setOpenSupport, centered = true }: any) {
         ]}
       >
         <p>
-          In case of enquiry, please email us at <a href="">info@sapahk.ai</a>
+          In case of enquiry, please email us at <a href="">info@torri.ai</a>
         </p>
       </Modal>
     </>

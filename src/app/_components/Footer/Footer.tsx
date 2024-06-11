@@ -46,11 +46,11 @@ function Footer() {
             <li>
               <Image src={blueEnvelopImg} alt="blue-envelop-img" />
               <Link
-                href="https://mail.google.com/mail/?view=cm&fs=1&to=info@sapahk.ai"
+                href="https://mail.google.com/mail/?view=cm&fs=1&to=info@torri.ai"
                 target="_blank"
                 className="mail"
               >
-                info@sapahk.ai
+                info@torri.ai
               </Link>
             </li>
           </ul>

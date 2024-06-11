@@ -10,7 +10,48 @@ const ZohoForm = () => {
     email: "",
   });
   const imgRef = useRef(null);
+
+  async function sendEmail() {
+    const name = document.querySelector("input[name='LASTNAME']");
+    const mobile = document.querySelector("input[name='MOBILE']");
+    const email = document.querySelector("input[name='CONTACT_EMAIL']");
+    // const userMessage = document.querySelector("textarea[name='CONTACT_CF1']");
+
+    const formData = {
+      values: {
+        name: name.value,
+        mobile: mobile.value,
+        email: email.value,
+        // user_message: userMessage.value,
+      },
+    };
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/contact-mail/api`,
+        {
+          method: "POST",
+          body: JSON.stringify(formData),
+        }
+      );
+
+      if (response.ok) {
+        message.success("Response saved successfully");
+        // Handle successful form submission
+      } else {
+        message.error("Error submitting response");
+        // Handle error in form submission
+      }
+    } catch (error) {
+      message.error("Error:", error.message);
+    }
+  }
   useEffect(() => {
+    // load the script to save domain in hidden field
+    // const url = window.location.href;
+    // const contactCf2Input = document.querySelector("input[name='CONTACT_CF2']");
+    // contactCf2Input.value = url;
+
     const script = document.createElement("script");
     script.src = "https://zc1.maillist-manage.in/js/optin.min.js";
     script.onload = () => {
@@ -26,7 +67,6 @@ const ZohoForm = () => {
       }
     };
     document.body.appendChild(script);
-    let valid = true;
     // form validation function
     const validateForm = async (event) => {
       event.preventDefault();
@@ -34,9 +74,10 @@ const ZohoForm = () => {
       const name = document.querySelector("input[name='LASTNAME']");
       const mobile = document.querySelector("input[name='MOBILE']");
       const email = document.querySelector("input[name='CONTACT_EMAIL']");
-      const userMessage = document.querySelector(
-        "textarea[name='CONTACT_CF1']"
-      );
+
+      let valid = true;
+
+      // console.log(userMessage);
 
       if (!name.value.trim()) {
         error.name = "Name is required.";
@@ -61,39 +102,11 @@ const ZohoForm = () => {
       setErrors(error);
 
       if (valid) {
-        const formData = {
-          values: {
-            name: name.value,
-            mobile: mobile.value,
-            email: email.value,
-            user_message: userMessage.value,
-          },
-        };
-
         const form = document.getElementById("zcampaignOptinForm");
         form.submit();
-
-        form.reset();
-        window.location.reload();
-        try {
-          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/contact-mail/api`,
-            {
-              method: "POST",
-              body: JSON.stringify(formData),
-            }
-          );
-
-          if (response.ok) {
-            message.success("Response saved successfully");
-            // Handle successful form submission
-          } else {
-            message.error("Error submitting response");
-            // Handle error in form submission
-          }
-        } catch (error) {
-          message.error("Error:", error.message);
-        }
+        sendEmail();
+        // form.reset();
+        // window.location.reload();
       }
     };
 
@@ -287,6 +300,23 @@ const ZohoForm = () => {
                               </div>
                               <div></div>
                             </div>
+                            {/* <div>
+                              <div>
+                                <div className="zcinputbox">
+                                  <input
+                                    name="CONTACT_CF2"
+                                    changeitem="SIGNUP_FORM_FIELD"
+                                    style={{ display: "none" }}
+                                  />
+                                  <span
+                                    style={{ display: "none" }}
+                                    id="dt_CONTACT_CF2"
+                                  >
+                                    1,true,9,Page URL,2
+                                  </span>
+                                </div>
+                              </div>
+                            </div> */}
                             <div>
                               <div>
                                 <div className="zcinputbox">
@@ -421,11 +451,6 @@ const ZohoForm = () => {
                       name="zc_formIx"
                       value="3z3445ada2863b1460c0440ca9b6d50444b0539e5dae5bf84e62e5cfe38ad15acb"
                     />
-                    {/* <input
-                      type="hidden"
-                      name="SERVER_URL"
-                      value={window.location.origin}
-                    /> */}
                   </div>
                 </form>
               </div>
