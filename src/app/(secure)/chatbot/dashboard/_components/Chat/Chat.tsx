@@ -398,6 +398,12 @@ function Chat({
   const refreshChat = () => {
     setMessages([]);
     setMessagesTime([]);
+    userDetailContext?.handleChange("isLeadFormSubmitted")(false);
+    setLeadDetails({
+      name: "",
+      email: "",
+      number: "",
+    });
 
     /// check if chat window is opened from popup
     if (isPopUp) {
@@ -518,6 +524,7 @@ function Chat({
             chatbotId: chatbot.id,
             userId: cookies.userId ? cookies.userId : userId,
             leadDetails: leadDetails,
+            sessionId: sessionID,
           }),
           next: { revalidate: 0 },
         }
@@ -530,7 +537,12 @@ function Chat({
       const data = await res.json();
 
       // message.success(data?.message);
-      setIsLeadFormSubmitted(true);
+      if (isPopUp) {
+        setIsLeadFormSubmitted(true);
+      }
+      {
+        userDetailContext?.handleChange("isLeadFormSubmitted")(true);
+      }
     } catch (error) {}
   };
 
@@ -804,6 +816,7 @@ function Chat({
           {loading == false &&
             // isPopUp &&
             !isLeadFormSubmitted &&
+            !userDetails?.isLeadFormSubmitted &&
             !skipLeadForm &&
             messages.length > 1 &&
             messages.length % 2 == 1 &&
