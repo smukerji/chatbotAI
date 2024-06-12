@@ -50,7 +50,7 @@ function DeleteModal({
           });
       } else {
         messageApi.open({
-          type: "error",
+          type: "success",
           content: data.text,
         });
         setChangeFlag(!changeFlag);

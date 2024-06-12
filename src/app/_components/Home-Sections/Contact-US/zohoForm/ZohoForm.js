@@ -10,6 +10,7 @@ const ZohoForm = () => {
     email: "",
   });
   const imgRef = useRef(null);
+  const formRef = useRef(null);
 
   async function sendEmail() {
     const name = document.querySelector("input[name='LASTNAME']");
@@ -48,9 +49,6 @@ const ZohoForm = () => {
   }
   useEffect(() => {
     // load the script to save domain in hidden field
-    // const url = window.location.href;
-    // const contactCf2Input = document.querySelector("input[name='CONTACT_CF2']");
-    // contactCf2Input.value = url;
 
     const script = document.createElement("script");
     script.src = "https://zc1.maillist-manage.in/js/optin.min.js";
@@ -65,11 +63,22 @@ const ZohoForm = () => {
           "3"
         );
       }
+      if (window.recaptcha) {
+        window.recaptcha.render("recaptcha-element-id");
+      }
     };
     document.body.appendChild(script);
+
+    const url = window.location.href;
+    const contactCf2Input = document.querySelector("input[name='CONTACT_CF2']");
+    if (contactCf2Input) {
+      contactCf2Input.value = url;
+    }
+
     // form validation function
     const validateForm = async (event) => {
       event.preventDefault();
+
       let error = { name: "", mobile: "", email: "" };
       const name = document.querySelector("input[name='LASTNAME']");
       const mobile = document.querySelector("input[name='MOBILE']");
@@ -102,11 +111,26 @@ const ZohoForm = () => {
       setErrors(error);
 
       if (valid) {
-        const form = document.getElementById("zcampaignOptinForm");
-        form.submit();
-        sendEmail();
-        // form.reset();
-        // window.location.reload();
+        // // await sendEmail();
+        // const form = document.getElementById("zcampaignOptinForm");
+        // form.submit();
+
+        // // Reset the form and reload after submission
+        // setTimeout(() => {
+        //   document.getElementById("zcampaignOptinForm").reset();
+        //   window.location.reload();
+        // }, 5000); // Delay to ensure form submission completes
+        // // form.reset();
+        // // window.location.reload();
+
+        const emailSent = await sendEmail();
+        if (emailSent) {
+          formRef.current.submit();
+          // setTimeout(() => {
+          formRef.current.reset();
+          window.location.reload();
+          // }, 1000); // Delay to ensure form submission completes
+        }
       }
     };
 
@@ -218,6 +242,7 @@ const ZohoForm = () => {
                   id="zcampaignOptinForm"
                   action="https://zc1.maillist-manage.in/weboptin.zc"
                   target="_zcSignup"
+                  ref={formRef}
                 >
                   <div id="SIGNUP_BODY_ALL" name="SIGNUP_BODY_ALL">
                     <div id="SIGNUP_BODY" name="SIGNUP_BODY">
@@ -303,11 +328,6 @@ const ZohoForm = () => {
                             {/* <div>
                               <div>
                                 <div className="zcinputbox">
-                                  <input
-                                    name="CONTACT_CF2"
-                                    changeitem="SIGNUP_FORM_FIELD"
-                                    style={{ display: "none" }}
-                                  />
                                   <span
                                     style={{ display: "none" }}
                                     id="dt_CONTACT_CF2"
@@ -316,6 +336,7 @@ const ZohoForm = () => {
                                   </span>
                                 </div>
                               </div>
+                              <div></div>
                             </div> */}
                             <div>
                               <div>
@@ -377,6 +398,12 @@ const ZohoForm = () => {
                       id="zc_trackCode"
                       value="ZCFORMVIEW"
                       onLoad={() => ""}
+                    />
+                    <input
+                      name="CONTACT_CF2"
+                      changeitem="SIGNUP_FORM_FIELD"
+                      type="hidden"
+                      value=""
                     />
                     <input
                       type="hidden"

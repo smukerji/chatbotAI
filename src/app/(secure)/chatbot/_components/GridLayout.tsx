@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
-import chatbotBg from '../../../../../public/sections-images/common/chatbot-bg-img.svg';
-import chatbotOpenIcon from '../../../../../public/sections-images/common/chatbot-open-icon.svg';
-import chatbotMenuIcon from '../../../../../public/sections-images/common/chatbot-menu-icon.svg';
-import shareIcon from '../../../../../public/sections-images/common/share.svg';
-import duplicateIcon from '../../../../../public/sections-images/common/document-copy.svg';
-import renameIcon from '../../../../../public/sections-images/common/edit.svg';
-import deleteIcon from '../../../../../public/sections-images/common/trash.svg';
+import React, { useEffect, useState } from "react";
+import Image from "next/image";
+import chatbotBg from "../../../../../public/sections-images/common/chatbot-bg-img.svg";
+import chatbotOpenIcon from "../../../../../public/sections-images/common/chatbot-open-icon.svg";
+import chatbotMenuIcon from "../../../../../public/sections-images/common/chatbot-menu-icon.svg";
+import shareIcon from "../../../../../public/sections-images/common/share.svg";
+import duplicateIcon from "../../../../../public/sections-images/common/document-copy.svg";
+import renameIcon from "../../../../../public/sections-images/common/edit.svg";
+import deleteIcon from "../../../../../public/sections-images/common/trash.svg";
 
 function GridLayout({
   chatbotData,
@@ -27,7 +27,7 @@ function GridLayout({
     // Handle chatbot click event
     const handleChatbotClick = (event: any) => {
       // Check if the event target is the chatbot or any of its children
-      if (event.target.closest('.chatbot')) {
+      if (event.target.closest(".chatbot")) {
         /// Open the chatbot menu
         changeMenu(null);
       }
@@ -36,7 +36,7 @@ function GridLayout({
     // Handle menu-icon click event
     const handleChatbotMenuClick = (event: any) => {
       // Check if the event target is the chatbot or any of its children
-      const menuClick = event.target.closest('.chatbot-actions');
+      const menuClick = event.target.closest(".chatbot-actions");
 
       if (menuClick?.value == 0) {
         /// if share is clicked
@@ -54,15 +54,15 @@ function GridLayout({
     };
 
     // Attach the event listeners to the document body
-    document.body.addEventListener('click', handleChatbotClick);
-    document.body.addEventListener('click', handleChatbotMenuClick);
+    document.body.addEventListener("click", handleChatbotClick);
+    document.body.addEventListener("click", handleChatbotMenuClick);
 
     // document.body.addEventListener("click", handleMenuIconClick);
 
     // Clean up the event listeners when the component is unmounted
     return () => {
-      document.body.removeEventListener('click', handleChatbotClick);
-      document.body.removeEventListener('click', handleChatbotMenuClick);
+      document.body.removeEventListener("click", handleChatbotClick);
+      document.body.removeEventListener("click", handleChatbotMenuClick);
 
       //   document.body.removeEventListener("click", handleMenuIconClick);
     };
@@ -72,7 +72,7 @@ function GridLayout({
     return (
       <div
         className="chatbot-grid"
-        style={{ pointerEvents: disabled ? 'none' : 'all' }}
+        style={{ pointerEvents: disabled ? "none" : "all" }}
       >
         {chatbotData?.map((data: any, index: number) => {
           return (
@@ -90,15 +90,15 @@ function GridLayout({
                 style={{
                   background: `${
                     data.id === currentChatbotId
-                      ? '#ecf0fe'
+                      ? "#ecf0fe"
                       : openMenu?.[index]
-                      ? 'ecf0fe'
-                      : ''
+                      ? "ecf0fe"
+                      : ""
                   }`,
                 }}
                 //   onClick={() => openMenu && setOpenMenu(null)}
               >
-                <Image src={chatbotBg} alt={'chatbot-img'} />
+                <Image src={chatbotBg} alt={"chatbot-img"} />
                 <div className="name">
                   {data.name}
                   {/* <Image
@@ -113,15 +113,15 @@ function GridLayout({
                   style={{
                     visibility: `${
                       data.id === currentChatbotId
-                        ? 'visible'
+                        ? "visible"
                         : openMenu?.[index]
-                        ? 'visible'
-                        : 'hidden'
+                        ? "visible"
+                        : "hidden"
                     }`,
                   }}
                   className="menu-icon"
                   src={chatbotMenuIcon}
-                  alt={'chatbot-menu-icon'}
+                  alt={"chatbot-menu-icon"}
                   onClick={(event) => {
                     event.stopPropagation();
                     changeMenu({ [index]: !openMenu?.[index] });
@@ -131,21 +131,21 @@ function GridLayout({
 
                 {/* opening the menu for chatbot actions */}
                 {openMenu?.[index] ? (
-                  <div className={`menu ${openMenu?.[index] && 'active'}`}>
+                  <div className={`menu ${openMenu?.[index] && "active"}`}>
                     <ul>
                       <li className="chatbot-actions" value={0}>
-                        <Image src={shareIcon} alt={'share-icon'} /> Share
+                        <Image src={shareIcon} alt={"share-icon"} /> Share
                       </li>
-                      <li className="chatbot-actions" value={1}>
+                      {/* <li className="chatbot-actions" value={1}>
                         <Image src={duplicateIcon} alt={'duplicate-icon'} />
                         Duplicate
-                      </li>
+                      </li> */}
 
                       <li className="chatbot-actions" value={2}>
-                        <Image src={renameIcon} alt={'rename-icon'} /> Rename
+                        <Image src={renameIcon} alt={"rename-icon"} /> Rename
                       </li>
                       <li className="chatbot-actions" value={3}>
-                        <Image src={deleteIcon} alt={'delete-icon'} />
+                        <Image src={deleteIcon} alt={"delete-icon"} />
                         Delete
                       </li>
                     </ul>
