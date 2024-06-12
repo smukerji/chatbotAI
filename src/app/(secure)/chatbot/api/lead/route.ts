@@ -31,29 +31,58 @@ async function submitLeadDetail(request: NextRequest) {
 
 /// function to get leads
 async function getLeads(request: NextRequest) {
-  const page = parseInt(request.nextUrl.searchParams.get("page")!) || 1;
-  const pageSize =
-    parseInt(request.nextUrl.searchParams.get("pageSize")!) || 100;
-  const chatbotId = request.nextUrl.searchParams.get("chatbotId");
+  const count = request.nextUrl.searchParams.get("count")! || 0;
 
+  /// check if the api is used to count the leads or to get the leads
   const db = (await clientPromise!).db();
   const leadsCollection = db.collection("leads");
+  const chatbotId = request.nextUrl.searchParams.get("chatbotId");
 
-  console.log(new Date("2024-06-11").toISOString());
+  /// function to retrive leads
+  async function retriveLeads() {
+    const page = parseInt(request.nextUrl.searchParams.get("page")!) || 1;
+    const pageSize =
+      parseInt(request.nextUrl.searchParams.get("pageSize")!) || 10;
 
-  const leadsCursor = await leadsCollection
-    .find({
+    // const timestamp = {
+    //   $gte: new Date("2024-06-10"), // Start date
+    //   $lte: new Date("2024-06-11T23:59:59"), // End date
+    // };
+
+    const leadsCursor = await leadsCollection
+      .find({
+        chatbotId: chatbotId,
+      })
+      .project({
+        chatbotId: 0,
+        userId: 0,
+      })
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
+      .toArray();
+
+    // Flatten leadDetails
+    const flattenedLeads = leadsCursor.map((lead: any) => ({
+      _id: lead._id,
+      name: lead.leadDetails.name !== "" ? lead.leadDetails.name : "N/A",
+      email: lead.leadDetails.email !== "" ? lead.leadDetails.email : "N/A",
+      number: lead.leadDetails.number !== "" ? lead.leadDetails.number : "N/A",
+      date: new Date(lead.timestamp).toLocaleDateString("en-GB"),
+      sessionId: lead.sessionId ? lead.sessionId : "N/A",
+    }));
+
+    return flattenedLeads;
+  }
+
+  if (count === "true") {
+    const leadsCount = await leadsCollection.countDocuments({
       chatbotId: chatbotId,
-      timestamp: {
-        $gte: new Date("2024-06-10"), // Start date
-        $lte: new Date("2024-06-11T23:59:59"), // End date
-      },
-    })
-    .skip((page - 1) * pageSize)
-    .limit(pageSize)
-    .toArray();
+    });
 
-  return { leads: leadsCursor };
+    return { leadsCount, leads: await retriveLeads() };
+  } else {
+    return { leads: await retriveLeads() };
+  }
 }
 
 submitLeadDetail.schema = joi.object({

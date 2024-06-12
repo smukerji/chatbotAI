@@ -1,0 +1,38 @@
+.leads-container {
+  margin: 24px 45px 0 45px;
+
+  .action-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 13px;
+
+    .export-btn {
+      display: flex;
+      max-width: 150px;
+      padding: 12px 16px;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      border-radius: 12px;
+      background: #2e58ea;
+      outline: none;
+      border: 0px;
+      cursor: pointer;
+
+      color: #fcfcfd;
+      text-align: center;
+
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 600;
+
+      svg {
+        path {
+          stroke-width: 0.4px;
+          stroke: #fff;
+          fill: #fff;
+        }
+      }
+    }
+  }
+}

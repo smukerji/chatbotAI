@@ -22,6 +22,7 @@ import Integration from "./_components/Integration/Integration";
 import { ChatbotSettingContext } from "../../../_helpers/client/Context/ChatbotSettingContext";
 import { JWT_EXPIRED } from "../../../_helpers/errorConstants";
 import axios from "axios";
+import Leads from "./_components/Leads/Leads";
 
 function Dashboard() {
   const { status } = useSession();
@@ -299,6 +300,14 @@ function Dashboard() {
               >
                 <h3 className="option">Conversation History</h3>
               </li>
+
+              <li
+                className={`${editChatbot === "leads" ? "active" : ""}`}
+                value={"leads"}
+                onClick={() => botContext?.handleChange("editChatbot")("leads")}
+              >
+                <h3 className="option">Leads</h3>
+              </li>
             </ul>
 
             <hr />
@@ -376,6 +385,9 @@ function Dashboard() {
 
           {/*------------------------------------------history-component----------------------------------------------*/}
           {editChatbot == "history" && <History chatbotId={chatbot.id} />}
+
+          {/*------------------------------------------leads-component----------------------------------------------*/}
+          {editChatbot == "leads" && <Leads chatbotId={chatbot.id} />}
         </div>
       </div>
 
