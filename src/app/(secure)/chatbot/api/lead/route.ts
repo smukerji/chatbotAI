@@ -5,7 +5,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 async function submitLeadDetail(request: NextRequest) {
   // Extract necessary data from request body
-  const { chatbotId, userId, leadDetails }: any = await request.json();
+  const body = await request.json();
+
+  const { chatbotId, userId, leadDetails, sessionId }: any = body;
 
   try {
     const db = (await clientPromise!).db();
@@ -17,6 +19,7 @@ async function submitLeadDetail(request: NextRequest) {
       userId,
       leadDetails,
       timestamp: new Date(),
+      sessionId,
     });
 
     return { message: "Lead details saved successfully." };
@@ -26,12 +29,70 @@ async function submitLeadDetail(request: NextRequest) {
   }
 }
 
+/// function to get leads
+async function getLeads(request: NextRequest) {
+  const count = request.nextUrl.searchParams.get("count")! || 0;
+
+  /// check if the api is used to count the leads or to get the leads
+  const db = (await clientPromise!).db();
+  const leadsCollection = db.collection("leads");
+  const chatbotId = request.nextUrl.searchParams.get("chatbotId");
+
+  /// function to retrive leads
+  async function retriveLeads() {
+    const page = parseInt(request.nextUrl.searchParams.get("page")!) || 1;
+    const pageSize =
+      parseInt(request.nextUrl.searchParams.get("pageSize")!) || 10;
+
+    // const timestamp = {
+    //   $gte: new Date("2024-06-10"), // Start date
+    //   $lte: new Date("2024-06-11T23:59:59"), // End date
+    // };
+
+    const leadsCursor = await leadsCollection
+      .find({
+        chatbotId: chatbotId,
+      })
+      .project({
+        chatbotId: 0,
+        userId: 0,
+      })
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
+      .toArray();
+
+    // Flatten leadDetails
+    const flattenedLeads = leadsCursor.map((lead: any) => ({
+      _id: lead._id,
+      name: lead.leadDetails.name !== "" ? lead.leadDetails.name : "N/A",
+      email: lead.leadDetails.email !== "" ? lead.leadDetails.email : "N/A",
+      number: lead.leadDetails.number !== "" ? lead.leadDetails.number : "N/A",
+      date: new Date(lead.timestamp).toLocaleDateString("en-GB"),
+      sessionId: lead.sessionId ? lead.sessionId : "N/A",
+    }));
+
+    return flattenedLeads;
+  }
+
+  if (count === "true") {
+    const leadsCount = await leadsCollection.countDocuments({
+      chatbotId: chatbotId,
+    });
+
+    return { leadsCount, leads: await retriveLeads() };
+  } else {
+    return { leads: await retriveLeads() };
+  }
+}
+
 submitLeadDetail.schema = joi.object({
   chatbotId: joi.string().required(),
   userId: joi.string().optional(), // userId is optional since you handle it in the function
-  leadDetails: joi.object().required(), // Adjust the schema according to your leadDetails structure
+  leadDetails: joi.object().required(),
+  sessionId: joi.string().required(), // Adjust the schema according to your leadDetails structure
 });
 
 module.exports = apiHandler({
   POST: submitLeadDetail,
+  GET: getLeads,
 });

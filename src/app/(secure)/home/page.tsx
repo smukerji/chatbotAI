@@ -1,29 +1,29 @@
-'use client';
-import React, { useContext, useEffect, useState } from 'react';
-import Image from 'next/image';
-import Icon from '../../_components/Icon/Icon';
-import DocumentIcon from '../../../assets/svg/DocumentIcon';
-import arrowIcon from '../../../../public/svgs/Feather Icon.svg';
-import './app.scss';
-import TextIcon from '../../../assets/svg/TextIcon';
-import QAIcon from '../../../assets/svg/QAIcon';
-import WebsiteIcon from '../../../assets/svg/WebsiteIcon';
-import SpreadSheetIcon from '../../../assets/svg/SpreadSheetIcon';
-import { CreateBotContext } from '../../_helpers/client/Context/CreateBotContext';
-import SourceUpload from '../../_components/Source-Upload/SourceUpload';
-import Text from '../../_components/Text/Text';
-import QA from '../../_components/QA/QA';
-import Website from '../../_components/Website/Website';
-import { useSession } from 'next-auth/react';
-import { Spin, message } from 'antd';
-import { LoadingOutlined } from '@ant-design/icons';
-import { useCookies } from 'react-cookie';
-import { redirect, useRouter } from 'next/navigation';
-import { UserDetailsContext } from '../../_helpers/client/Context/UserDetailsContext';
-import { formatNumber } from '../../_helpers/client/formatNumber';
-import LoaderModal from '../chatbot/dashboard/_components/Modal/LoaderModal';
-import CustomModal from '../chatbot/dashboard/_components/CustomModal/CustomModal';
-const crypto = require('crypto');
+"use client";
+import React, { useContext, useEffect, useState } from "react";
+import Image from "next/image";
+import Icon from "../../_components/Icon/Icon";
+import DocumentIcon from "../../../assets/svg/DocumentIcon";
+import arrowIcon from "../../../../public/svgs/Feather Icon.svg";
+import "./app.scss";
+import TextIcon from "../../../assets/svg/TextIcon";
+import QAIcon from "../../../assets/svg/QAIcon";
+import WebsiteIcon from "../../../assets/svg/WebsiteIcon";
+import SpreadSheetIcon from "../../../assets/svg/SpreadSheetIcon";
+import { CreateBotContext } from "../../_helpers/client/Context/CreateBotContext";
+import SourceUpload from "../../_components/Source-Upload/SourceUpload";
+import Text from "../../_components/Text/Text";
+import QA from "../../_components/QA/QA";
+import Website from "../../_components/Website/Website";
+import { useSession } from "next-auth/react";
+import { Spin, message } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
+import { useCookies } from "react-cookie";
+import { redirect, useRouter } from "next/navigation";
+import { UserDetailsContext } from "../../_helpers/client/Context/UserDetailsContext";
+import { formatNumber } from "../../_helpers/client/formatNumber";
+import LoaderModal from "../chatbot/dashboard/_components/Modal/LoaderModal";
+import CustomModal from "../chatbot/dashboard/_components/CustomModal/CustomModal";
+const crypto = require("crypto");
 
 function Home({
   updateChatbot = false,
@@ -44,10 +44,10 @@ function Home({
 
   /// loading icon
   const antIcon = (
-    <LoadingOutlined style={{ fontSize: 24, color: 'black' }} spin />
+    <LoadingOutlined style={{ fontSize: 24, color: "black" }} spin />
   );
 
-  const [cookies, setCookie] = useCookies(['userId']);
+  const [cookies, setCookie] = useCookies(["userId"]);
   const [messageApi, contextHolder] = message.useMessage();
   const [isResponseOk, setIsResponseOk] = useState(false);
 
@@ -87,25 +87,25 @@ function Home({
   const crawledList = botDetails?.crawledList;
 
   /// creating the hash of initial text to compare it later with current text hash
-  const initialTextData = textData?.text ? textData.text : '';
+  const initialTextData = textData?.text ? textData.text : "";
 
   const initialTextHash = crypto
-    .createHash('sha1')
+    .createHash("sha1")
     .update(initialTextData)
-    .digest('hex');
+    .digest("hex");
 
   /// creating the hash of initial Q&A to compare it later with current Q&A hash
   const initialQAData = qaData?.qaList ? qaData.qaList : [];
   const initialQAHash = crypto
-    .createHash('sha1')
+    .createHash("sha1")
     .update(JSON.stringify(initialQAData))
-    .digest('hex');
+    .digest("hex");
 
   /// creating the hash of latest QA
   const currentQAHash = crypto
-    .createHash('sha1')
+    .createHash("sha1")
     .update(JSON.stringify(botDetails?.qaList))
-    .digest('hex');
+    .digest("hex");
 
   /// creating the hash of initial website data to compare it later with current website hash
 
@@ -125,7 +125,7 @@ function Home({
 
   /// creating the hash of latest text
   const text = botDetails?.text;
-  const currentTextHash = crypto.createHash('sha1').update(text).digest('hex');
+  const currentTextHash = crypto.createHash("sha1").update(text).digest("hex");
 
   // useEffect(() => {
   //   const fetchData = async () => {
@@ -148,16 +148,16 @@ function Home({
     /// set chatbot name
     // Accessing search parameters using window.location.search to get chatbotname
     const searchParams = new URLSearchParams(window.location.search);
-    const paramValue = searchParams.get('chatbotName');
+    const paramValue = searchParams.get("chatbotName");
 
     /// return the use to chatbot screen if chatbot name is empty
-    if ((paramValue == '' || !paramValue) && !chatbotName) {
-      router.push('/chatbot');
+    if ((paramValue == "" || !paramValue) && !chatbotName) {
+      router.push("/chatbot");
       return;
     }
 
-    if (botDetails?.chatbotName == '')
-      botContext.handleChange('chatbotName')(paramValue);
+    if (botDetails?.chatbotName == "")
+      botContext.handleChange("chatbotName")(paramValue);
 
     // /// total characters count
     // botContext.handleChange("totalCharCount")(
@@ -168,28 +168,28 @@ function Home({
     // );
 
     /// text cahracter count and text
-    botContext.handleChange('textCharCount')(tempTextCharCount);
-    botContext.handleChange('text')(initialTextData);
+    botContext.handleChange("textCharCount")(tempTextCharCount);
+    botContext.handleChange("text")(initialTextData);
 
     /// file sources
-    botContext.handleChange('defaultFileList')(
+    botContext.handleChange("defaultFileList")(
       fileData ? fileData.defaultFileList : []
     );
     /// file cahracter count
-    botContext.handleChange('filesCharCount')(tempFileTextCount);
+    botContext.handleChange("filesCharCount")(tempFileTextCount);
 
     /// set the isUpdatechatbot to true if chatbot is getting retrained
-    botContext.handleChange('isUpdateChatbot')(updateChatbot);
+    botContext.handleChange("isUpdateChatbot")(updateChatbot);
 
     /// QA cahracter count
-    botContext.handleChange('qaCount')(qaData ? qaData.qaCount : 0);
-    botContext.handleChange('qaCharCount')(tempQaCharCount);
+    botContext.handleChange("qaCount")(qaData ? qaData.qaCount : 0);
+    botContext.handleChange("qaCharCount")(tempQaCharCount);
     /// QA state array
-    botContext.handleChange('qaList')(initialQAData);
+    botContext.handleChange("qaList")(initialQAData);
 
     /// crawledLinks count
-    botContext.handleChange('crawledList')(initialCrawlData);
-    botContext.handleChange('websiteCharCount')(tempCrawlDataCount);
+    botContext.handleChange("crawledList")(initialCrawlData);
+    botContext.handleChange("websiteCharCount")(tempCrawlDataCount);
   }, [
     updateChatbot,
     qaData,
@@ -211,7 +211,7 @@ function Home({
       message.error(
         `Sorry you cannot create the chatbot. Please upgrade your plan.`
       );
-      botContext?.handleChange('isLoading')(false);
+      botContext?.handleChange("isLoading")(false);
       return;
     }
 
@@ -220,16 +220,16 @@ function Home({
       message.warning(
         `Oops! You have reached the crawling limit of your plan. Please delete few links or upgrade the plan.`
       );
-      botContext?.handleChange('isLoading')(false);
+      botContext?.handleChange("isLoading")(false);
       return;
     }
 
     /// if the training data limit is exceeded  then show error message
     if (totalCharCount > userDetails?.plan?.trainingDataLimit) {
       message.warning(
-        'Oops! You have reached the data limit of your plan. Please upgrade to train more data.'
+        "Oops! You have reached the data limit of your plan. Please upgrade to train more data."
       );
-      botContext?.handleChange('isLoading')(false);
+      botContext?.handleChange("isLoading")(false);
       return;
     }
 
@@ -239,14 +239,14 @@ function Home({
       defaultFileList.length === 0 &&
       crawledList.length === 0
     ) {
-      message.warning('Please add some content to create the bot').then(() => {
-        botContext?.handleChange('isLoading')(false);
+      message.warning("Please add some content to create the bot").then(() => {
+        botContext?.handleChange("isLoading")(false);
       });
       return;
     }
     if (totalCharCount < 100) {
-      message.warning('Not enough content to create the bot').then(() => {
-        botContext?.handleChange('isLoading')(false);
+      message.warning("Not enough content to create the bot").then(() => {
+        botContext?.handleChange("isLoading")(false);
       });
       return;
     }
@@ -254,10 +254,10 @@ function Home({
       if (item.question.length < 10 || item.answer.length < 20) {
         message
           .warning(
-            'Question/Answer length too short in Q&A section. Min length : q = 10, a = 20'
+            "Question/Answer length too short in Q&A section. Min length : q = 10, a = 20"
           )
           .then(() => {
-            botContext?.handleChange('isLoading')(false);
+            botContext?.handleChange("isLoading")(false);
           });
         return;
       }
@@ -274,30 +274,30 @@ function Home({
       for (const [index, qa] of botDetails?.qaList.entries()) {
         // formData.append(`qaList[${index}].question`, qa.question);
         // formData.append(`qaList[${index}].answer`, qa.answer);
-        if (qa.image && typeof qa.image != 'string') {
+        if (qa.image && typeof qa.image != "string") {
           formData.append(`qaList[${index}].image`, qa.image);
         }
       }
 
       // Append other data to the formData object
-      formData.append('updateChatbot', updateChatbot);
+      formData.append("updateChatbot", updateChatbot);
       formData.append(
-        'isTextUpdated',
-        initialTextHash === currentTextHash ? 'false' : 'true'
+        "isTextUpdated",
+        initialTextHash === currentTextHash ? "false" : "true"
       );
-      formData.append('chatbotId', chatbotId);
-      formData.append('defaultFileList', JSON.stringify(defaultFileList));
-      formData.append('deleteFileList', JSON.stringify(deleteFileList));
-      formData.append('deleteQAList', JSON.stringify(botDetails?.deleteQaList));
-      formData.append('crawledList', JSON.stringify(crawledList));
-      formData.append('numberOfCharacterTrained', totalCharCount);
+      formData.append("chatbotId", chatbotId);
+      formData.append("defaultFileList", JSON.stringify(defaultFileList));
+      formData.append("deleteFileList", JSON.stringify(deleteFileList));
+      formData.append("deleteQAList", JSON.stringify(botDetails?.deleteQaList));
+      formData.append("crawledList", JSON.stringify(crawledList));
+      formData.append("numberOfCharacterTrained", totalCharCount);
       formData.append(
-        'deleteCrawlList',
+        "deleteCrawlList",
         JSON.stringify(botDetails?.deleteCrawlList)
       );
       //// default chatbot set
       formData.append(
-        'userId',
+        "userId",
         // chatbotId === "123d148a-be02-4749-a612-65be9d96266c"
         //   ? "651d111b8158397ebd0e65fb"
         //   : chatbotId === "34cceb84-07b9-4b3e-ad6f-567a1c8f3557"
@@ -308,10 +308,10 @@ function Home({
         //   ? "6523fee523c290d75609a1fa"
         cookies.userId
       );
-      formData.append('qaList', JSON.stringify(botDetails?.qaList));
-      formData.append('text', text);
+      formData.append("qaList", JSON.stringify(botDetails?.qaList));
+      formData.append("text", text);
       formData.append(
-        'chatbotText',
+        "chatbotText",
         chatbotName ? chatbotName : botDetails?.chatbotName
       );
 
@@ -322,9 +322,9 @@ function Home({
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/store`,
         {
           headers: {
-            cache: 'no-store',
+            cache: "no-store",
           },
-          method: 'POST',
+          method: "POST",
           body: formData,
           next: { revalidate: 0 },
         }
@@ -334,12 +334,12 @@ function Home({
         const errorMessage = await response?.text();
         messageApi
           .open({
-            type: 'warning',
+            type: "warning",
             // content:
             // "Something went wrong while creating custom bot. Please refresh the page and try again!",
             // content: errorMessage,
             content:
-              'Something went wrong. Please refresh the page and try again! ',
+              "Something went wrong. Please refresh the page and try again! ",
           })
           .then(() => {
             // botContext?.handleChange("isLoading")(false);
@@ -358,7 +358,7 @@ function Home({
           window.location.href = `${
             process.env.NEXT_PUBLIC_WEBSITE_URL
           }chatbot/dashboard?${encodeURIComponent(
-            'chatbot'
+            "chatbot"
           )}=${encodeURIComponent(
             JSON.stringify({
               id: chatbotId,
@@ -371,7 +371,7 @@ function Home({
           window.location.href = `${
             process.env.NEXT_PUBLIC_WEBSITE_URL
           }chatbot/dashboard?${encodeURIComponent(
-            'chatbot'
+            "chatbot"
           )}=${encodeURIComponent(
             JSON.stringify({
               id: chatbotId,
@@ -388,24 +388,24 @@ function Home({
     }
   }
 
-  if (status === 'loading') {
+  if (status === "loading") {
     return (
       <center>
         <Spin indicator={antIcon} />
       </center>
     );
-  } else if (status === 'authenticated' || cookies?.userId) {
+  } else if (status === "authenticated" || cookies?.userId) {
     return (
-      <div className='create-chatbot-container'>
+      <div className="create-chatbot-container">
         <CustomModal
           open={isPlanNotification}
           setOpen={setIsPlanNotification}
-          header={'Upgrade Now to create new Chatbots!'}
-          content={'Upgrade now to access your chatbots!'}
+          header={"Upgrade Now to create new Chatbots!"}
+          content={"Upgrade now to access your chatbots!"}
           footer={
             <button
               onClick={() => {
-                router.push('/home/pricing');
+                router.push("/home/pricing");
               }}
             >
               Upgrade Now
@@ -420,14 +420,14 @@ function Home({
         )}
         {contextHolder}
         {/*------------------------------------------top-section----------------------------------------------*/}
-        <div className='top'>
+        <div className="top">
           {/*------------------------------------------header----------------------------------------------*/}
-          <div className='sources-header'>
-            <div className='title'>
+          <div className="sources-header">
+            <div className="title">
               <Image
                 src={arrowIcon}
-                alt='arrow-icon'
-                style={{ transform: 'rotate(180deg)', cursor: 'pointer' }}
+                alt="arrow-icon"
+                style={{ transform: "rotate(180deg)", cursor: "pointer" }}
                 onClick={() => {
                   window.history.back();
                 }}
@@ -438,63 +438,63 @@ function Home({
             <p>Add your data sources to train your chatbot</p>
 
             {/*------------------------------------------options-container----------------------------------------------*/}
-            <ul className='options-container'>
+            <ul className="options-container">
               <li
-                className={`${activeSource === 'document' ? 'active' : ''}`}
-                value={'document'}
+                className={`${activeSource === "document" ? "active" : ""}`}
+                value={"document"}
                 onClick={() => {
                   if (
-                    botDetails?.activeSource === 'website' &&
+                    botDetails?.activeSource === "website" &&
                     botDetails?.isLoading
                   ) {
-                    alert('Crawling in progress. Cannot interrupt');
+                    alert("Crawling in progress. Cannot interrupt");
                     return;
                   }
-                  botContext?.handleChange('activeSource')('document');
+                  botContext?.handleChange("activeSource")("document");
                 }}
               >
                 <Icon Icon={DocumentIcon} />
                 <h3>Document</h3>
               </li>
               <li
-                className={`${activeSource === 'text' ? 'active' : ''}`}
-                value={'text'}
+                className={`${activeSource === "text" ? "active" : ""}`}
+                value={"text"}
                 onClick={() => {
                   if (
-                    botDetails?.activeSource === 'website' &&
+                    botDetails?.activeSource === "website" &&
                     botDetails?.isLoading
                   ) {
-                    alert('Crawling in progress. Cannot interrupt');
+                    alert("Crawling in progress. Cannot interrupt");
                     return;
                   }
-                  botContext?.handleChange('activeSource')('text');
+                  botContext?.handleChange("activeSource")("text");
                 }}
               >
                 <Icon Icon={TextIcon} />
                 <h3>Text</h3>
               </li>
               <li
-                className={`${activeSource === 'qa' ? 'active' : ''}`}
-                value={'qa'}
+                className={`${activeSource === "qa" ? "active" : ""}`}
+                value={"qa"}
                 onClick={() => {
                   if (
-                    botDetails?.activeSource === 'website' &&
+                    botDetails?.activeSource === "website" &&
                     botDetails?.isLoading
                   ) {
-                    alert('Crawling in progress. Cannot interrupt');
+                    alert("Crawling in progress. Cannot interrupt");
                     return;
                   }
-                  botContext?.handleChange('activeSource')('qa');
+                  botContext?.handleChange("activeSource")("qa");
                 }}
               >
                 <Icon Icon={QAIcon} />
                 <h3>Q&A</h3>
               </li>
               <li
-                className={`${activeSource === 'website' ? 'active' : ''}`}
-                value={'website'}
+                className={`${activeSource === "website" ? "active" : ""}`}
+                value={"website"}
                 onClick={() =>
-                  botContext?.handleChange('activeSource')('website')
+                  botContext?.handleChange("activeSource")("website")
                 }
               >
                 <Icon Icon={WebsiteIcon} />
@@ -505,29 +505,29 @@ function Home({
         </div>
 
         {/*------------------------------------------bottom-section----------------------------------------------*/}
-        <div className='bottom'>
-          <div className='left'>
-            {activeSource === 'document' && (
+        <div className="bottom">
+          <div className="left">
+            {activeSource === "document" && (
               <SourceUpload
                 totalCharCount={totalCharCount}
                 filesCharCount={filesCharCount}
                 isPlanNotification={isPlanNotification}
               />
             )}
-            {activeSource === 'text' && (
+            {activeSource === "text" && (
               <Text
                 totalCharCount={totalCharCount}
                 textCharCount={textCharCount}
               />
             )}
-            {activeSource === 'qa' && (
+            {activeSource === "qa" && (
               <QA
                 isUpdateChatbot={isUpdateChatbot}
                 totalCharCount={totalCharCount}
                 qaCharCount={qaCharCount}
               />
             )}
-            {activeSource === 'website' && (
+            {activeSource === "website" && (
               <Website
                 websiteCharCount={websiteCharCount}
                 totalCharCount={totalCharCount}
@@ -537,14 +537,14 @@ function Home({
               />
             )}
           </div>
-          <div className='right' style={{ marginTop: '20px' }}>
-            <div className='character-count-container'>
+          <div className="right" style={{ marginTop: "20px" }}>
+            <div className="character-count-container">
               {/*------------------------------------------items-character-count----------------------------------------------*/}
-              <div className='items-character-count-container'>
+              <div className="items-character-count-container">
                 {defaultFileList?.length > 0 && (
                   <p>
-                    {defaultFileList.length}{' '}
-                    {defaultFileList.length > 1 ? 'Files' : 'File'} (
+                    {defaultFileList.length}{" "}
+                    {defaultFileList.length > 1 ? "Files" : "File"} (
                     {filesCharCount} detected chars)
                   </p>
                 )}
@@ -589,8 +589,8 @@ function Home({
 
                 {crawledList?.length > 0 && (
                   <p>
-                    {crawledList.length}{' '}
-                    {crawledList.length > 1 ? 'Links' : 'Link'} (
+                    {crawledList.length}{" "}
+                    {crawledList.length > 1 ? "Links" : "Link"} (
                     {websiteCharCount} detected chars)
                   </p>
                 )}
@@ -598,7 +598,7 @@ function Home({
 
               <hr />
 
-              <div className='total-count-container'>
+              <div className="total-count-container">
                 <p>Total detected characters</p>
 
                 <span>
@@ -610,7 +610,7 @@ function Home({
                     /
                     {userDetails?.plan?.trainingDataLimit
                       ? formatNumber(userDetails?.plan?.trainingDataLimit)
-                      : 0}{' '}
+                      : 0}{" "}
                     limit
                   </span>
                 </span>
@@ -627,7 +627,7 @@ function Home({
               disabled={
                 isLoading == true
                   ? true
-                  : isUpdateChatbot == 'true' &&
+                  : isUpdateChatbot == "true" &&
                     currentTextHash === initialTextHash
                   ? deleteFileList.length + newFileList.length
                     ? false
@@ -642,14 +642,14 @@ function Home({
               }
               onClick={createCustomBot}
             >
-              {(!updateChatbot && 'Create') || 'Retrain Bot'}
+              {(!updateChatbot && "Create") || "Retrain Bot"}
             </button>
           </div>
         </div>
       </div>
     );
-  } else if (status === 'unauthenticated') {
-    redirect('/account/login');
+  } else if (status === "unauthenticated") {
+    redirect("/account/login");
   } else {
     return <></>;
   }

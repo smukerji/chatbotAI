@@ -1,4 +1,4 @@
-import { createContext, useState } from 'react';
+import { createContext, useState } from "react";
 
 export const UserDetailsContext = createContext({});
 
@@ -9,10 +9,11 @@ export const UserDetailsDataProvider = ({ children }: any) => {
     plan: {},
     percent: 0,
     planExpiry: null,
-    firstName: '',
-    lastName: '',
-    fullName: '',
-    email: '',
+    firstName: "",
+    lastName: "",
+    fullName: "",
+    email: "",
+    isLeadFormSubmitted: false,
   };
 
   const [userDetails, setUserDetails] = useState(initialUserDetails);
