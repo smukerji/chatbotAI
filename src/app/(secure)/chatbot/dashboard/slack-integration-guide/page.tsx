@@ -6,7 +6,7 @@ import Image from "next/image";
 import "../whatsapp-integration-guide/whatsappintegration.scss";
 import step2_1 from "../../../../../../public/whataspp-guide-images/step2_1.png";
 
-function page() {
+function Page() {
   const [cookies, setCookies] = useCookies(["userId"]);
   const [selectedStep, setSelectedStep] = useState(1);
 
@@ -87,7 +87,7 @@ function page() {
           <p className="intro-para">
             Slack integration has become an essential part of modern workflows,
             allowing seamless communication and collaboration within teams.
-            Leveraging Slack's API Events and Web API opens up a myriad of
+            Leveraging Slack&apos;s API Events and Web API opens up a myriad of
             possibilities for customizing and automating interactions. This
             comprehensive guide will walk you through the process of integrating
             Slack into your applications, harnessing the power of API Events and
@@ -264,4 +264,4 @@ function page() {
   );
 }
 
-export default page;
+export default Page;

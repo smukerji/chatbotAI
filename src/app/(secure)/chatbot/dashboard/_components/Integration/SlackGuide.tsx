@@ -101,7 +101,7 @@ function SlackGuide() {
           <p className="intro-para">
             Slack integration has become an essential part of modern workflows,
             allowing seamless communication and collaboration within teams.
-            Leveraging Slack's API Events and Web API opens up a myriad of
+            Leveraging Slack&apos;s API Events and Web API opens up a myriad of
             possibilities for customizing and automating interactions. This
             comprehensive guide will walk you through the process of integrating
             Slack into your applications, harnessing the power of API Events and

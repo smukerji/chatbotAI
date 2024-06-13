@@ -111,26 +111,11 @@ const ZohoForm = () => {
       setErrors(error);
 
       if (valid) {
-        // // await sendEmail();
-        // const form = document.getElementById("zcampaignOptinForm");
-        // form.submit();
-
-        // // Reset the form and reload after submission
-        // setTimeout(() => {
-        //   document.getElementById("zcampaignOptinForm").reset();
-        //   window.location.reload();
-        // }, 5000); // Delay to ensure form submission completes
-        // // form.reset();
-        // // window.location.reload();
-
-        const emailSent = await sendEmail();
-        if (emailSent) {
-          formRef.current.submit();
-          // setTimeout(() => {
-          formRef.current.reset();
-          window.location.reload();
-          // }, 1000); // Delay to ensure form submission completes
-        }
+        await sendEmail();
+        const form = document.getElementById("zcampaignOptinForm");
+        form.submit();
+        form.reset();
+        window.location.reload();
       }
     };
 
@@ -242,7 +227,6 @@ const ZohoForm = () => {
                   id="zcampaignOptinForm"
                   action="https://zc1.maillist-manage.in/weboptin.zc"
                   target="_zcSignup"
-                  ref={formRef}
                 >
                   <div id="SIGNUP_BODY_ALL" name="SIGNUP_BODY_ALL">
                     <div id="SIGNUP_BODY" name="SIGNUP_BODY">
