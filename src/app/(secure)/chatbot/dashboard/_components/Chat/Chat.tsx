@@ -690,7 +690,7 @@ function Chat({
               height={40}
               style={{ borderRadius: "50%" }}
             />
-            <h1>
+            <h1 className={`${isPopUp ? "popup-heading" : ""}`}>
               {isPopUp
                 ? `${chatbotDisplayName}`
                 : botSettings?.chatbotDisplayName}

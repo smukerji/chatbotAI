@@ -15,7 +15,7 @@ export async function generateMetadata({
   const blogDetail: any = await getBlogBySlug(params.slug);
 
   return {
-    title: `Blog | ${blogDetail?.metaTitle}`,
+    title: `Blog ${blogDetail?.metaTitle ? ` | ${blogDetail?.metaTitle}` : ""}`,
     description: `${blogDetail?.metaDescription}`,
     alternates: {
       canonical: `https://torri.ai/blog/${blogDetail?.slug}`,
