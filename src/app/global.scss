@@ -7,7 +7,6 @@
   /* color: #000; */
 }
 
-
 .scroll-container,
 .scroll-area {
   height: 100vh;
@@ -59,8 +58,6 @@ Header a {
   flex-direction: column;
   /* justify-content: center; */
   /* align-items: center; */
-
-
 }
 
 .whatsapp-steps {
@@ -111,9 +108,8 @@ Header a {
   gap: 10px;
   align-self: stretch;
   border-radius: 12px;
-  border: 1px solid #E6E8EC !important;
-  background: #FFF;
-
+  border: 1px solid #e6e8ec !important;
+  background: #fff;
 
   /* style */
   color: #141416;
@@ -122,7 +118,6 @@ Header a {
   font-style: normal;
   font-weight: 500;
   line-height: 24px;
-
 }
 
 .whatsapp-input:focus {
@@ -142,7 +137,7 @@ Header a {
   align-items: center;
   gap: 10px;
   border-radius: 12px;
-  background: #2E58EA;
+  background: #2e58ea;
   border: none;
 }
 
@@ -151,7 +146,7 @@ Header a {
 }
 
 .whatsapp-verify-text {
-  color: #FCFCFD !important;
+  color: #fcfcfd !important;
   text-align: center;
   font-size: 16px !important;
   font-style: normal !important;
@@ -172,7 +167,7 @@ Header a {
 .whatsapp-status-container {
   display: flex;
   justify-content: space-between;
-  border: 1px solid #E6E8EC;
+  border: 1px solid #e6e8ec;
   border-radius: 12px;
   margin: 30px;
   padding: 10px;
@@ -187,7 +182,6 @@ Header a {
   display: flex;
   justify-content: space-evenly;
   align-items: center;
-
 }
 
 .whatsapp-copy-icon {
@@ -225,7 +219,6 @@ Header a {
 
 .whatsapp-edit-icon-s:hover {
   cursor: pointer !important;
-
 }
 
 .telegram-token-container {
@@ -255,9 +248,9 @@ Header a {
   gap: 10px;
   align-self: stretch;
   border-radius: 12px;
-  border: 1px solid #E6E8EC;
-  background: #FFF;
-  color: #23262F;
+  border: 1px solid #e6e8ec;
+  background: #fff;
+  color: #23262f;
 
   /* Body/Medium */
   font-size: 16px;
@@ -269,8 +262,7 @@ Header a {
 
 .telegram-input:focus-visible {
   outline: none !important;
-  border: 1px solid #E6E8EC !important;
-
+  border: 1px solid #e6e8ec !important;
 }
 
 .telegram-label {
@@ -299,8 +291,8 @@ Header a {
   align-items: center;
   gap: 10px;
   border-radius: 12px;
-  background: #2E58EA;
-  color: #FCFCFD;
+  background: #2e58ea;
+  color: #fcfcfd;
   text-align: center;
   font-size: 16px;
   font-style: normal;
@@ -313,8 +305,8 @@ Header a {
 .telegram-button-save {
   padding: 4px 14px;
   border-radius: 12px;
-  background: #2E58EA;
-  color: #FCFCFD;
+  background: #2e58ea;
+  color: #fcfcfd;
   text-align: center;
   font-size: 15px;
   font-style: normal;
@@ -322,7 +314,6 @@ Header a {
   line-height: 28px;
   /* 175% */
   border: 0px;
-
 }
 
 .telegram-button-save:hover {
@@ -375,7 +366,7 @@ Header a {
   line-height: 24px;
   gap: 10px;
   border-radius: 12px;
-  border: 1px solid #E6E8EC !important;
+  border: 1px solid #e6e8ec !important;
   margin-right: 7px;
 }
 
@@ -399,7 +390,6 @@ Header a {
   display: flex;
   justify-content: space-between;
   align-items: center;
-
 }
 
 .telegram-active-inactive {
@@ -431,13 +421,13 @@ Header a {
   margin-right: 5px;
 }
 
-.grecaptcha-badge{
+.grecaptcha-badge {
   left: 0px;
   right: -186px;
   bottom: 0;
 }
 
-.grecaptcha-badge iframe{
+.grecaptcha-badge iframe {
   right: 0px !important;
   left: 0 !important;
   height: 61px !important;
@@ -487,6 +477,112 @@ Header a {
           border-radius: 12px;
           background: #2e58ea;
           color: #fff;
+        }
+      }
+    }
+  }
+}
+
+// ranger picker for leads css
+.ant-picker-dropdown .ant-picker-footer-extra {
+  display: flex;
+  padding: 16px;
+  .action-btns {
+    display: flex;
+    gap: 8px;
+    justify-content: space-between;
+    .cancel-date-btn,
+    .set-date-btn {
+      display: flex;
+      max-width: 150px;
+      padding: 12px 16px;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      border-radius: 12px;
+      outline: none;
+      border: 0px;
+      cursor: pointer;
+      text-align: center;
+
+      font-size: 16px;
+      font-style: normal;
+    }
+
+    .set-date-btn {
+      background: #4d72f5;
+      color: #fff;
+    }
+
+    .cancel-date-btn {
+      background: #ecf0fe;
+    }
+  }
+}
+
+// ant-picker-range-wrapper
+.ant-picker-dropdown {
+  @media screen and (max-width: 767px) {
+    position: fixed;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100%;
+    padding: 0 !important;
+    height: 100vh;
+    overflow: auto;
+  }
+  .ant-picker-range-wrapper {
+    @media screen and (max-width: 767px) {
+      height: 100%;
+    }
+    .ant-picker-range-arrow {
+      @media screen and (max-width: 767px) {
+        display: none;
+      }
+    }
+    .ant-picker-panel-container {
+      @media screen and (max-width: 767px) {
+        width: 100%;
+      }
+      .ant-picker-panels {
+        @media screen and (max-width: 767px) {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+        }
+        .ant-picker-panel {
+          @media screen and (max-width: 767px) {
+            width: 100%;
+          }
+          .ant-picker-date-panel {
+            @media screen and (max-width: 767px) {
+              width: 100%;
+            }
+          }
+          .ant-picker-content {
+            tr {
+              td {
+                @media screen and (max-width: 767px) {
+                  padding: 5px 0;
+                }
+              }
+            }
+          }
+        }
+      }
+      .ant-picker-footer {
+        .ant-picker-footer-extra {
+          @media screen and (max-width: 767px) {
+            padding: 10px !important;
+          }
+          .action-btns {
+            @media screen and (max-width: 767px) {
+              width: 100%;
+              button {
+                flex: 1;
+              }
+            }
+          }
         }
       }
     }
