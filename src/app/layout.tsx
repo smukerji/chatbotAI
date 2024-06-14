@@ -85,17 +85,11 @@ export default function RootLayout({
           // @ts-ignore
           chatbotid="9bfb16c7-142e-4946-9ce2-61282e64b38b"
         ></script> */}
-        {/* <Script
+        <Script
           src="https://ichefpos.vercel.app/embed-bot.js"
           // @ts-ignore
           chatbotID="482163e1-f1d5-4a61-9805-82185e2cf47a"
-        ></Script> */}
-
-        <script
-          src="http://localhost:3000/embed-bot.js"
-          // @ts-ignore
-          chatbotID="9b58cffd-98b1-4b20-a4b9-f3aee4f08fcf"
-        ></script>
+        ></Script>
       </body>
     </html>
   );
