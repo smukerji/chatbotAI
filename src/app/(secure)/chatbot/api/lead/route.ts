@@ -2,6 +2,7 @@ import { apiHandler } from "@/app/_helpers/server/api/api-handler";
 import clientPromise from "@/db";
 import joi from "joi";
 import { NextRequest, NextResponse } from "next/server";
+import { start } from "repl";
 
 async function submitLeadDetail(request: NextRequest) {
   // Extract necessary data from request body
@@ -37,6 +38,18 @@ async function getLeads(request: NextRequest) {
   const db = (await clientPromise!).db();
   const leadsCollection = db.collection("leads");
   const chatbotId = request.nextUrl.searchParams.get("chatbotId");
+  const startDate = request.nextUrl.searchParams.get("startDate");
+  const endDate = request.nextUrl.searchParams.get("endDate");
+  let timestamp: any = null;
+  let leadsCursor = null;
+  let leadsCount = null;
+
+  if (startDate != "null" && endDate != "null") {
+    timestamp = {
+      $gte: new Date(startDate!), // Start date
+      $lte: new Date(endDate + "T23:59:59"), // End date
+    };
+  }
 
   /// function to retrive leads
   async function retriveLeads() {
@@ -44,22 +57,33 @@ async function getLeads(request: NextRequest) {
     const pageSize =
       parseInt(request.nextUrl.searchParams.get("pageSize")!) || 10;
 
-    // const timestamp = {
-    //   $gte: new Date("2024-06-10"), // Start date
-    //   $lte: new Date("2024-06-11T23:59:59"), // End date
-    // };
-
-    const leadsCursor = await leadsCollection
-      .find({
-        chatbotId: chatbotId,
-      })
-      .project({
-        chatbotId: 0,
-        userId: 0,
-      })
-      .skip((page - 1) * pageSize)
-      .limit(pageSize)
-      .toArray();
+    /// timestamp is used to get the leads between the start and end date
+    if (timestamp) {
+      leadsCursor = await leadsCollection
+        .find({
+          chatbotId: chatbotId,
+          timestamp,
+        })
+        .project({
+          chatbotId: 0,
+          userId: 0,
+        })
+        .skip((page - 1) * pageSize)
+        .limit(pageSize)
+        .toArray();
+    } else {
+      leadsCursor = await leadsCollection
+        .find({
+          chatbotId: chatbotId,
+        })
+        .project({
+          chatbotId: 0,
+          userId: 0,
+        })
+        .skip((page - 1) * pageSize)
+        .limit(pageSize)
+        .toArray();
+    }
 
     // Flatten leadDetails
     const flattenedLeads = leadsCursor.map((lead: any) => ({
@@ -75,9 +99,16 @@ async function getLeads(request: NextRequest) {
   }
 
   if (count === "true") {
-    const leadsCount = await leadsCollection.countDocuments({
-      chatbotId: chatbotId,
-    });
+    if (timestamp) {
+      leadsCount = await leadsCollection.countDocuments({
+        chatbotId: chatbotId,
+        timestamp,
+      });
+    } else {
+      leadsCount = await leadsCollection.countDocuments({
+        chatbotId: chatbotId,
+      });
+    }
 
     return { leadsCount, leads: await retriveLeads() };
   } else {
