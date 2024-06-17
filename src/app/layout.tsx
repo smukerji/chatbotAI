@@ -80,11 +80,12 @@ export default function RootLayout({
           src="https://salesiq.zohopublic.in/widget?wc=siq992fbe92f9ef9a36617ac4c9babe51c3d7778f44133f1fe66ec7795c68a6c396"
           defer={true}
         ></Script>{" "}
-        <Script
+        {/* Old torri bot (Broken)*/}
+        {/* <Script
           src="https://torri.ai/embed-bot.js"
           // @ts-ignore
           chatbotid="9bfb16c7-142e-4946-9ce2-61282e64b38b"
-        ></Script>
+        ></Script> */}
         {/*         <Script
           src="https://ichefpos.vercel.app/embed-bot.js"
           // @ts-ignore
