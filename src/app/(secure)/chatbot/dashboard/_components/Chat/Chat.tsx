@@ -241,7 +241,7 @@ function Chat({
         { role: "user", content: userQuery, messageTime: tempUserMessageTime },
       ]);
 
-      const filterUserId = cookies?.userId ? cookies?.userId : userId;
+      const filterUserId = !isPopUp ? cookies?.userId : userId;
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/account/user/details?userId=${filterUserId}`,
         {
