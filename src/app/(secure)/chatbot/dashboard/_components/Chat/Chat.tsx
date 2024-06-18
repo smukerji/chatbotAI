@@ -199,7 +199,7 @@ function Chat({
         body: JSON.stringify({
           chatbotId: chatbot.id,
           messages: [...messagesTime, userLatestQuery, gptLatestResponse],
-          userId: cookies.userId ? cookies.userId : userId,
+          userId: !isPopUp ? cookies.userId : userId,
           sessionID,
           sessionStartDate,
           sessionEndDate: getDate(),
@@ -288,7 +288,7 @@ function Chat({
                   //   ? "651d111b8158397ebd0e65fb"
                   //   : chatbot?.id === "f8095ef4-6cd0-4373-a45e-8fe15cb6dd0f"
                   //   ? "6523fee523c290d75609a1fa"
-                  cookies.userId ? cookies.userId : userId,
+                  !isPopUp ? cookies.userId : userId,
               }),
             }
           );
@@ -318,7 +318,7 @@ function Chat({
                   //   ? "651d111b8158397ebd0e65fb"
                   //   : chatbot?.id === "f8095ef4-6cd0-4373-a45e-8fe15cb6dd0f"
                   //   ? "6523fee523c290d75609a1fa"
-                  cookies.userId ? cookies.userId : userId,
+                  !isPopUp ? cookies.userId : userId,
               }),
               next: { revalidate: 0 },
             }
@@ -522,7 +522,7 @@ function Chat({
           method: "POST",
           body: JSON.stringify({
             chatbotId: chatbot.id,
-            userId: cookies.userId ? cookies.userId : userId,
+            userId: !isPopUp ? cookies.userId : userId,
             leadDetails: leadDetails,
             sessionId: sessionID,
           }),
