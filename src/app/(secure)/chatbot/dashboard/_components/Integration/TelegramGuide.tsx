@@ -28,9 +28,10 @@ function TelegramGuide() {
       const rect = stepElement.getBoundingClientRect();
 
       if (
-        rect.top <= 375 &&
-        (index === stepElements.length - 1 ||
-          stepElements[index + 1].getBoundingClientRect().top > 375)
+        (rect.top <= 90 &&
+          (index === stepElements.length - 1 ||
+            stepElements[index + 1].getBoundingClientRect().top > 90)) ||
+        (index === stepElements.length - 1 && rect.bottom <= window.innerHeight)
       ) {
         // If the top of the stepElement is above the window top and the next stepElement is below the window top (or there's no next stepElement)
         currentStep = index + 1; // Update currentStep directly based on index

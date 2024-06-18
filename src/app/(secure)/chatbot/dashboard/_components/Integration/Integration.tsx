@@ -228,7 +228,10 @@ function Integration({ isPlanNotification, setIsPlanNotification }: any) {
         <div
           // style={{ position: isPlanNotification ? "unset" : "relative" }}
           className="telegram-i-btn"
-          onClick={() => router.push(`dashboard/whatsapp-integration-guide`)}
+          // onClick={() => router.push(`dashboard/whatsapp-integration-guide`)}
+          onClick={() =>
+            router.push(`dashboard/integration-guide?guide=whatsapp`)
+          }
         >
           <InfoCircleOutlined />
         </div>
@@ -296,7 +299,10 @@ function Integration({ isPlanNotification, setIsPlanNotification }: any) {
         <div
           // style={{ position: isPlanNotification ? "unset" : "relative" }}
           className="telegram-i-btn"
-          onClick={() => router.push(`dashboard/telegram-guide`)}
+          // onClick={() => router.push(`dashboard/telegram-guide`)}
+          onClick={() =>
+            router.push(`dashboard/integration-guide?guide=telegram`)
+          }
         >
           <InfoCircleOutlined />
         </div>
@@ -332,7 +338,9 @@ function Integration({ isPlanNotification, setIsPlanNotification }: any) {
         <div
           // style={{ position: isPlanNotification ? "unset" : "relative" }}
           className="telegram-i-btn"
-          onClick={() => router.push(`dashboard/slack-integration-guide`)}
+          // onClick={() => router.push(`dashboard/slack-integration-guide`)}
+
+          onClick={() => router.push(`dashboard/integration-guide?guide=slack`)}
         >
           <InfoCircleOutlined />
         </div>

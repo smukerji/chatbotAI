@@ -8,6 +8,7 @@ import NoDataSvg from "../../../../../../../public/svgs/no-data-image.svg";
 import { alt } from "joi";
 import moment from "moment";
 import e from "express";
+import { json2csv } from "json-2-csv";
 
 interface Item {
   key: string;
@@ -117,6 +118,37 @@ const Leads = ({ chatbotId }: any) => {
       setTotalPages(content?.leadsCount);
     }
   };
+
+  // Function for exporting all the leads
+
+  async function exportLeads() {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/api/leadexport?chatbotId=${chatbotId}`
+      );
+      const content = await response.json();
+
+      const csvString = await json2csv(content);
+
+      downloadCsv(csvString, "leads.csv");
+    } catch (error) {
+      console.error("Error exporting leads:", error);
+    }
+  }
+
+  // function to download the csv
+
+  function downloadCsv(csvString: any, filename: string) {
+    const blob = new Blob([csvString], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const csvFile = document.createElement("a");
+    csvFile.setAttribute("hidden", "");
+    csvFile.setAttribute("href", url);
+    csvFile.setAttribute("download", filename);
+    document.body.appendChild(csvFile);
+    csvFile.click();
+    document.body.removeChild(csvFile);
+  }
 
   useEffect(() => {
     /// set the pages and leads initial data
@@ -281,7 +313,7 @@ const Leads = ({ chatbotId }: any) => {
             </ConfigProvider>
           </div>
         </div>
-        <button className="export-btn">
+        <button className="export-btn" onClick={exportLeads}>
           <ExportBtn /> Export
         </button>
       </div>

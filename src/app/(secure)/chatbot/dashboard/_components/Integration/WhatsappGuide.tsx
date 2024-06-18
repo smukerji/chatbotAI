@@ -53,12 +53,16 @@ function WhatsappGuide() {
   const handleClick = (stepNumber: any) => {
     const stepElement = rightRef?.current.querySelector(`.step-${stepNumber}`);
     if (stepElement) {
-      stepElement.scrollIntoView({ behavior: "smooth" });
+      stepElement.scrollIntoView({
+        behavior: "smooth",
+      });
       setSelectedStep(stepNumber);
     }
   };
 
   const handleScroll = () => {
+    console.log("goes uinder handle scroll");
+
     const rightDiv = rightRef.current;
     const stepElements = rightDiv.querySelectorAll('[class^="step-"]');
     let currentStep = 1;
@@ -67,9 +71,10 @@ function WhatsappGuide() {
       const rect = stepElement.getBoundingClientRect();
 
       if (
-        rect.top <= 375 &&
-        (index === stepElements.length - 1 ||
-          stepElements[index + 1].getBoundingClientRect().top > 375)
+        (rect.top <= 90 &&
+          (index === stepElements.length - 1 ||
+            stepElements[index + 1].getBoundingClientRect().top > 90)) ||
+        (index === stepElements.length - 1 && rect.bottom <= window.innerHeight)
       ) {
         // If the top of the stepElement is above the window top and the next stepElement is below the window top (or there's no next stepElement)
         currentStep = index + 1; // Update currentStep directly based on index
@@ -81,12 +86,15 @@ function WhatsappGuide() {
   };
 
   useEffect(() => {
+    console.log("use effect triggered");
+
     const sectionRight = document.querySelector(".right");
     sectionRight?.addEventListener("scroll", handleScroll);
     return () => {
       sectionRight?.removeEventListener("scroll", handleScroll);
     };
   });
+
   return (
     <>
       <div className="whatsapp-container">

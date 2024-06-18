@@ -41,6 +41,7 @@
     "i": "^0.3.7",
     "joi": "^17.10.1",
     "js-yaml": "^4.1.0",
+    "json-2-csv": "^5.5.1",
     "jsonwebtoken": "^9.0.2",
     "mammoth": "^1.6.0",
     "markdown-to-jsx": "^7.4.7",

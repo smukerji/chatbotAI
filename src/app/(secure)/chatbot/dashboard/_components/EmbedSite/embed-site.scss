@@ -1,6 +1,6 @@
 .emebed-site-container {
   display: flex;
-  flex-direction: column;
+  // flex-direction: column;
   align-items: flex-start;
   gap: 20px;
   border-radius: 8px;
@@ -9,6 +9,10 @@
   margin: 24px 45px 0 45px;
   padding: 24px;
   position: relative;
+
+  @media only screen and (max-width: 767px) {
+    flex-direction: column;
+  }
 
   .script {
     width: 50%;

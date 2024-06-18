@@ -120,6 +120,9 @@ function Chat({
     number: "",
   });
 
+  /// to check if iframe is loaded or not
+  const [iframeLoaded, setiFrameLoaded] = useState(false);
+
   /// handling the chatbot ok action
   const handleOk = async () => {
     if (feedbackText.length < 10) {
@@ -552,6 +555,20 @@ function Chat({
     setSkipLeadForm(true);
   };
 
+  // For checking whether iframe is loaded or not
+  useEffect(() => {
+    // Create a URLSearchParams object from the current URL's search string
+    const params = new URLSearchParams(window.location.search);
+
+    // Get the value of the 'guide' query parameter
+    const guideValue = params.get("source");
+
+    const iframeLoaded = guideValue == "web" ? true : false;
+    setiFrameLoaded(iframeLoaded);
+
+    console.log("iframe loadedd", guideValue, iframeLoaded);
+  }, []);
+
   return (
     <div className="chat-container">
       {!isPopUp && (
@@ -668,7 +685,7 @@ function Chat({
       )}
       {/*------------------------------------------right-section----------------------------------------------*/}
       <div
-        className="messages-section"
+        className={`messages-section ${iframeLoaded ? "iframe" : ""}`}
         style={{
           backgroundColor: botSettings?.theme === "dark" ? "black" : "",
         }}

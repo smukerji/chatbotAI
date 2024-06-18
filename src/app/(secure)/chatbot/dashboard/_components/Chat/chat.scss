@@ -482,6 +482,15 @@
       }
     }
   }
+
+  .iframe {
+    width: 100% !important;
+    height: 100% !important;
+
+    .conversation-container {
+      height: calc(100vh - 260px) !important;
+    }
+  }
 }
 
 @keyframes bounce {

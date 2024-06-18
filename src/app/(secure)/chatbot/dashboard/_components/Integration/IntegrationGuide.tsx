@@ -1,19 +1,54 @@
 "use client";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import whatsAppIcon from "../../../../../../../public/whatsapp.png";
 import telegramIcon from "../../../../../../../public/telegram.svg";
 import slackIcon from "../../../../../../../public/slackwhite.png";
 import WhatsappGuide from "./WhatsappGuide";
 import SlackGuide from "./SlackGuide";
 import TelegramGuide from "./TelegramGuide";
+import { useRouter } from "next/navigation";
 
 function IntegrationGuide() {
   const [activeStep, setActiveStep] = useState(1);
+  const router = useRouter();
 
   function handleStep(step: number) {
     setActiveStep(step);
+
+    // Update the 'guide' query parameter
+    const newGuide =
+      step == 1
+        ? "whatsapp"
+        : step == 2
+        ? "slack"
+        : step == 3
+        ? "telegram"
+        : "";
+
+    // Push the new URL to the history
+    router.push(`/chatbot/dashboard/integration-guide?guide=${newGuide}`);
   }
+
+  useEffect(() => {
+    // Create a URLSearchParams object from the current URL's search string
+    const params = new URLSearchParams(window.location.search);
+
+    // Get the value of the 'guide' query parameter
+    const guideValue = params.get("guide");
+
+    // Set the guide value in the state
+    const activeGuide =
+      guideValue == "whatsapp"
+        ? 1
+        : guideValue == "slack"
+        ? 2
+        : guideValue == "telegram"
+        ? 3
+        : 1;
+    setActiveStep(activeGuide);
+  }, []);
+
   return (
     <>
       <div className="integration-wrapper">

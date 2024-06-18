@@ -114,8 +114,8 @@ const ZohoForm = () => {
         await sendEmail();
         const form = document.getElementById("zcampaignOptinForm");
         form.submit();
-        form.reset();
-        window.location.reload();
+        // form.reset();
+        // window.location.reload();
       }
     };
 
