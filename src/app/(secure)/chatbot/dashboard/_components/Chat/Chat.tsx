@@ -199,7 +199,7 @@ function Chat({
         body: JSON.stringify({
           chatbotId: chatbot.id,
           messages: [...messagesTime, userLatestQuery, gptLatestResponse],
-          userId: cookies.userId ? cookies.userId : userId,
+          userId: !isPopUp ? cookies.userId : userId,
           sessionID,
           sessionStartDate,
           sessionEndDate: getDate(),
