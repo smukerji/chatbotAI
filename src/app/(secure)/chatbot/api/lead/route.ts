@@ -1,6 +1,7 @@
 import { apiHandler } from "@/app/_helpers/server/api/api-handler";
 import clientPromise from "@/db";
 import joi from "joi";
+import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { start } from "repl";
 
@@ -9,19 +10,52 @@ async function submitLeadDetail(request: NextRequest) {
   const body = await request.json();
 
   const { chatbotId, userId, leadDetails, sessionId }: any = body;
+  // Check if the cookie is already set
+  const existingCookie = cookies().get(`leadDetails-${chatbotId}`);
+  console.log("Cookie found ", existingCookie);
 
   try {
     const db = (await clientPromise!).db();
     const leadsCollection = db.collection("leads");
 
+    /// check if the lead details is already saved
+    try {
+      const filter = {
+        chatbotId,
+        userId,
+        email: leadDetails.email,
+      };
+
+      const update = {
+        $addToSet: {
+          sessions: sessionId,
+        },
+        $setOnInsert: {
+          timestamp: new Date(),
+          chatbotId,
+          userId,
+          email: leadDetails.email,
+          leadDetails,
+        },
+      };
+
+      // Using upsert: true to handle both insert and update operations
+      const result = await leadsCollection.updateOne(filter, update, {
+        upsert: true,
+      });
+
+      if (result.upsertedCount > 0) {
+        // Document was inserted
+        console.log("New lead inserted.");
+      } else {
+        // Document was updated
+        console.log("Lead updated.");
+      }
+    } catch (error) {
+      console.error("Error while updating lead:", error);
+    }
+
     // Insert lead details into the leads collection
-    await leadsCollection.insertOne({
-      chatbotId,
-      userId,
-      leadDetails,
-      timestamp: new Date(),
-      sessionId,
-    });
 
     return { message: "Lead details saved successfully." };
   } catch (error) {
@@ -92,7 +126,7 @@ async function getLeads(request: NextRequest) {
       email: lead.leadDetails.email !== "" ? lead.leadDetails.email : "N/A",
       number: lead.leadDetails.number !== "" ? lead.leadDetails.number : "N/A",
       date: new Date(lead.timestamp).toLocaleDateString("en-GB"),
-      sessionId: lead.sessionId ? lead.sessionId : "N/A",
+      sessions: lead.sessions ? lead.sessions : "N/A",
     }));
 
     return flattenedLeads;

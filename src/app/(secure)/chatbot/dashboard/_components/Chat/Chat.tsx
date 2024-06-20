@@ -82,7 +82,10 @@ function Chat({
     ? botSettingContext?.chatbotSettings?.leadFields
     : leadFields;
 
-  const [cookies, setCookies] = useCookies(["userId"]);
+  const [cookies, setCookies] = useCookies([
+    "userId",
+    `leadDetails-${chatbot.id}`,
+  ]);
 
   /// storing the input value
   const [userQuery, setUserQuery] = useState("");
@@ -207,9 +210,37 @@ function Chat({
           sessionStartDate,
           sessionEndDate: getDate(),
           initialMessageLength: botSettings?.initialMessage?.length,
+          email: cookies?.[`leadDetails-${chatbot.id}`]
+            ? cookies?.[`leadDetails-${chatbot.id}`]
+            : "Anonymous",
         }),
       }
     );
+
+    /// store the lead if new session
+    if (cookies?.[`leadDetails-${chatbot.id}`]) {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/api/lead`,
+          {
+            method: "POST",
+            body: JSON.stringify({
+              chatbotId: chatbot.id,
+              userId: !isPopUp ? cookies.userId : userId,
+              leadDetails: { email: cookies?.[`leadDetails-${chatbot.id}`] },
+              sessionId: sessionID,
+            }),
+            next: { revalidate: 0 },
+          }
+        );
+        if (res.ok) {
+          const data = await res.json();
+          console.log("Lead details stored", data);
+        }
+      } catch (error) {
+        console.log("Error while storing lead details", error);
+      }
+    }
   }
 
   const onChange = (newValue: number) => {
@@ -282,16 +313,7 @@ function Chat({
                 chatbotId: chatbot?.id,
                 // userId: cookies.userId,
                 //// default chatbot set
-                userId:
-                  // chatbot?.id === "123d148a-be02-4749-a612-65be9d96266c"
-                  //   ? "651d111b8158397ebd0e65fb"
-                  //   : chatbot?.id === "34cceb84-07b9-4b3e-ad6f-567a1c8f3557"
-                  //   ? "65795294269d08529b8cd743"
-                  //   : chatbot?.id === "f0893732-3302-46b2-922a-95e79ef3524c"
-                  //   ? "651d111b8158397ebd0e65fb"
-                  //   : chatbot?.id === "f8095ef4-6cd0-4373-a45e-8fe15cb6dd0f"
-                  //   ? "6523fee523c290d75609a1fa"
-                  !isPopUp ? cookies.userId : userId,
+                userId: !isPopUp ? cookies.userId : userId,
               }),
             }
           );
@@ -312,16 +334,7 @@ function Chat({
                 userQuery,
                 chatbotId: chatbot?.id,
                 //// default chatbot set
-                userId:
-                  // chatbot?.id === "123d148a-be02-4749-a612-65be9d96266c"
-                  //   ? "651d111b8158397ebd0e65fb"
-                  //   : chatbot?.id === "34cceb84-07b9-4b3e-ad6f-567a1c8f3557"
-                  //   ? "65795294269d08529b8cd743"
-                  //   : chatbot?.id === "f0893732-3302-46b2-922a-95e79ef3524c"
-                  //   ? "651d111b8158397ebd0e65fb"
-                  //   : chatbot?.id === "f8095ef4-6cd0-4373-a45e-8fe15cb6dd0f"
-                  //   ? "6523fee523c290d75609a1fa"
-                  !isPopUp ? cookies.userId : userId,
+                userId: !isPopUp ? cookies.userId : userId,
               }),
               next: { revalidate: 0 },
             }
@@ -536,8 +549,16 @@ function Chat({
       if (!res.ok) {
         throw await res.json();
       }
-      /// displaying status
-      const data = await res.json();
+      /// Store the cookie
+
+      setCookies(
+        `leadDetails-${chatbot.id}`,
+        leadDetails.email ? leadDetails.email : "N/A",
+        {
+          expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 60), // 60 days
+          path: "/",
+        }
+      );
 
       // message.success(data?.message);
       if (isPopUp) {
@@ -835,6 +856,7 @@ function Chat({
             !isLeadFormSubmitted &&
             !userDetails?.isLeadFormSubmitted &&
             !skipLeadForm &&
+            !cookies?.[`leadDetails-${chatbot.id}`] &&
             messages.length > 1 &&
             messages.length % 2 == 1 &&
             userLeadDetails !== "do-not-collect" &&

@@ -37,6 +37,8 @@ export const CreateBotDataProvider = ({ children }: any) => {
 
     // plan: {},
 
+    referedFrom: "",
+
     chatbotName: "",
   };
   const [createBotInfo, setCreateBotInfo] = useState(initialCreateBotInfo);

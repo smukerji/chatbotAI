@@ -12,6 +12,7 @@ export default async function handler(req, res) {
     const sessionEndDate = body?.sessionEndDate;
     const initialMessageLength = body?.initialMessageLength;
     const historyCollectionName = body?.historyCollectionName;
+    const email = body?.email;
 
     /// for storing the history date wise
     const startDate = sessionStartDate.split(" ")[0];
@@ -93,6 +94,7 @@ export default async function handler(req, res) {
                     sessionStartDate,
                     sessionEndDate,
                     initialMessageLength: initialMessageLength,
+                    email: email,
                   },
           },
           date: startDate,
@@ -119,6 +121,7 @@ export default async function handler(req, res) {
                         sessionStartDate,
                         sessionEndDate,
                         initialMessageLength: initialMessageLength,
+                        email: email,
                       },
                     },
             },
