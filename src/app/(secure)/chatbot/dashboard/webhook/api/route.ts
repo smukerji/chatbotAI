@@ -288,8 +288,6 @@ async function whatsAppOperation(res: any) {
       userId: userID,
     });
 
-    console.log(userChatBotModel);
-
     step = 9;
     //if user chat history is not available, create a new chat history
     if (!userChatHistory) {

@@ -16,6 +16,7 @@ interface Item {
   name: string;
   age: number;
   address: string;
+  email: string;
 }
 
 const { RangePicker } = DatePicker;
@@ -69,8 +70,13 @@ const Leads = ({ chatbotId }: any) => {
           <Typography.Link
             // disabled={editingKey !== ""}
             onClick={() => {
-              botContext?.handleChange("editChatbot")("history");
-              botContext?.handleChange("referedFrom")("leads");
+              if (record?.email == "N/A") {
+                message.error("Email not found to retrive leads");
+              } else {
+                botContext?.handleChange("leadSessionsEmail")(record?.email);
+                botContext?.handleChange("editChatbot")("history");
+                botContext?.handleChange("referedFrom")("leads");
+              }
             }}
           >
             Detail &nbsp;&nbsp;&gt;
@@ -161,6 +167,8 @@ const Leads = ({ chatbotId }: any) => {
   useEffect(() => {
     /// set the pages and leads initial data
     fetchLeadsCount(true);
+    botContext?.handleChange("leadSessionsEmail")("");
+    botContext?.handleChange("referedFrom")("");
   }, []);
 
   /// when no customers are found display this component

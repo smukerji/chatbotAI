@@ -35,22 +35,41 @@ function History({ chatbotId }: any) {
   const botSettingContext: any = useContext(ChatbotSettingContext);
   const botSettings = botSettingContext?.chatbotSettings;
 
+  const [displayEmail, setDisplayEmail] = useState("");
+
   useEffect(() => {
     /// retrive the chatbot data
     const retriveData = async () => {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/api/history?chatbotId=${chatbotId}&userId=${cookies.userId}&startDate=null&endDate=null&page=1&pageSize=10`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          // body: JSON.stringify({
+      let response;
+      if (botDetails?.leadSessionsEmail == "") {
+        response = await fetch(
+          `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/api/history?chatbotId=${chatbotId}&userId=${cookies.userId}&startDate=null&endDate=null&page=1&pageSize=10&filterSource=history`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            // body: JSON.stringify({
 
-          // }),
-          // next: { revalidate: 0 },
-        }
-      );
+            // }),
+            // next: { revalidate: 0 },
+          }
+        );
+      } else {
+        response = await fetch(
+          `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/api/history?chatbotId=${chatbotId}&userId=${cookies.userId}&startDate=null&endDate=null&page=1&pageSize=10&filterSource=lead-history&email=${botDetails?.leadSessionsEmail}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            // body: JSON.stringify({
+
+            // }),
+            // next: { revalidate: 0 },
+          }
+        );
+      }
       const content = await response.json();
 
       if (content?.message === JWT_EXPIRED) {
@@ -63,7 +82,7 @@ function History({ chatbotId }: any) {
     };
 
     retriveData();
-  }, []);
+  }, [botDetails?.leadSessionsEmail]);
 
   /// chatbot messages feedback pop up state
   const [open, setOpen] = useState(false);
@@ -120,7 +139,11 @@ function History({ chatbotId }: any) {
       <div className="chatbot-history-details">
         {/*------------------------------------------chat-list-section----------------------------------------------*/}
         <div className="detail">
-          {botDetails?.referedFrom == "leads"}
+          {botDetails?.referedFrom == "leads" && (
+            <>
+              <p className="first-message"> {botDetails?.leadSessionsEmail}</p>
+            </>
+          )}
           {chatHistoryList?.chats && (
             <>
               {Object.entries(chatHistoryList?.chats)
@@ -133,9 +156,22 @@ function History({ chatbotId }: any) {
                           ? "active"
                           : ""
                       }`}
+                      style={{
+                        display:
+                          botDetails?.referedFrom == "leads" ? "flex" : "",
+                        justifyContent:
+                          botDetails?.referedFrom == "leads"
+                            ? "space-between"
+                            : "",
+                        flexDirection:
+                          botDetails?.referedFrom == "leads"
+                            ? "row-reverse"
+                            : "column",
+                      }}
                       key={index}
                       onClick={() => {
                         setCurrentChatHistory(data[1]?.messages);
+                        setDisplayEmail(data[1]?.email);
                         setActiveCurrentChatHistory("today" + index);
                       }}
                     >
@@ -149,10 +185,17 @@ function History({ chatbotId }: any) {
                           justifyContent: "space-between",
                         }}
                       >
-                        <div>
+                        <div
+                          style={{
+                            display:
+                              botDetails?.referedFrom == "leads"
+                                ? "none"
+                                : "block",
+                          }}
+                        >
                           {data[1]?.email ? data[1]?.email : "Anonymous"}
                         </div>
-                        <div>{getTimeAgo(data[1].sessionStartDate)}</div>
+                        <div>{getTimeAgo(data[1].sessionEndDate)}</div>
                       </div>
 
                       <div>
@@ -262,27 +305,31 @@ function History({ chatbotId }: any) {
 
       {/*------------------------------------------right-section----------------------------------------------*/}
       <div className="messages-section">
-        {currentChatHistory.length != 0 && (
-          <>
-            <div className="header">
-              <span>Powered by Torri.AI</span>
-              <div className="action-btns">
-                <ReactToPrint
-                  trigger={() => {
-                    return (
-                      <button style={{ border: "none", background: "none" }}>
-                        <Image src={exportBtn} alt="export-btn" />
-                      </button>
-                    );
-                  }}
-                  content={() => tempRef.current}
-                />
-              </div>
-            </div>
-
-            <hr />
-          </>
-        )}
+        <div
+          className="header"
+          style={{
+            visibility: currentChatHistory?.length != 0 ? "visible" : "hidden",
+          }}
+        >
+          <p style={{ color: "#777e90" }}>{displayEmail}</p>
+          <div className="action-btns">
+            <ReactToPrint
+              trigger={() => {
+                return (
+                  <button style={{ border: "none", background: "none" }}>
+                    <Image src={exportBtn} alt="export-btn" />
+                  </button>
+                );
+              }}
+              content={() => tempRef.current}
+            />
+          </div>
+        </div>
+        <hr
+          style={{
+            visibility: currentChatHistory?.length != 0 ? "visible" : "hidden",
+          }}
+        />
 
         <div className="history-conversation-container">
           {currentChatHistory.map((message: any, index: any) => {
@@ -363,6 +410,15 @@ function History({ chatbotId }: any) {
                 </div>
               );
           })}
+        </div>
+
+        <div
+          className="footer"
+          style={{
+            visibility: currentChatHistory?.length != 0 ? "visible" : "hidden",
+          }}
+        >
+          <p>Powered by Torri.AI</p>
         </div>
       </div>
     </div>

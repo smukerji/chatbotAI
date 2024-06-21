@@ -79,7 +79,7 @@ export default async function handler(req, res) {
     try {
       if (!user) {
         /// if it return null store the history
-        await collection.insertOne({
+        const insertedData = await collection.insertOne({
           userId,
           chatbotId,
           chats: {
@@ -98,6 +98,11 @@ export default async function handler(req, res) {
                   },
           },
           date: startDate,
+        });
+
+        return res.status(200).send({
+          message: "new history created",
+          id: insertedData.insertedId,
         });
       } else {
         /// update the session
@@ -127,8 +132,10 @@ export default async function handler(req, res) {
             },
           }
         );
+        return res
+          .status(200)
+          .send({ message: "updated history", id: user._id });
       }
-      return res.status(200).send("saved history");
     } catch (err) {
       console.log("Error while updating chat history", err);
     }

@@ -93,6 +93,9 @@ function Chat({
   /// chat base response
   const [response, setResponse] = useState("");
 
+  /// state to store the chat history id
+  const chatHistoryId = useRef("");
+
   /// loading state
   const [loading, setLoading] = useState(false);
 
@@ -217,6 +220,9 @@ function Chat({
       }
     );
 
+    const data = await store.json();
+    chatHistoryId.current = data?.id;
+
     /// store the lead if new session
     if (cookies?.[`leadDetails-${chatbot.id}`]) {
       try {
@@ -229,6 +235,7 @@ function Chat({
               userId: !isPopUp ? cookies.userId : userId,
               leadDetails: { email: cookies?.[`leadDetails-${chatbot.id}`] },
               sessionId: sessionID,
+              id: data?.id,
             }),
             next: { revalidate: 0 },
           }
@@ -541,6 +548,7 @@ function Chat({
             userId: !isPopUp ? cookies.userId : userId,
             leadDetails: leadDetails,
             sessionId: sessionID,
+            id: chatHistoryId.current,
           }),
           next: { revalidate: 0 },
         }
