@@ -1,0 +1,117 @@
+.integration-wrapper {
+  max-width: 1206px;
+  width: 100%;
+  margin: 0 auto;
+
+  .header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: url("../../../../../../public/guide.png") no-repeat center
+      center;
+    background-size: cover;
+    height: 248px;
+    padding: 32px 48px;
+    justify-content: space-between;
+
+    .intro {
+      color: var(--Neutral-1, #fcfcfd);
+
+      /* Heading/H2 */
+      font-family: "General Sans";
+      font-size: 48px;
+      font-style: normal;
+      font-weight: 600;
+      line-height: 68px; /* 141.667% */
+    }
+
+    .guide-btns {
+      display: flex;
+
+      .btn {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 20px 12px 12px;
+        background-color: #2e58ea;
+        border: none;
+        border-radius: 1000px;
+        margin-right: 20px;
+        color: var(--Neutral-1, #fcfcfd);
+        font-size: 24px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 32px; /* 133.333% */
+        cursor: pointer;
+
+        span {
+          //   margin-right: 12px;
+          height: 35px;
+        }
+
+        &.active {
+          background-color: #fcfcfd;
+          color: #141416;
+        }
+      }
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+
+  @media only screen and (max-width: 1240px) {
+    .header {
+      margin: 0 20px;
+      border-radius: 20px;
+
+      .intro {
+        font-size: 40px;
+        line-height: 60px; /* 141.667% */
+      }
+
+      .guide-btns {
+        .btn {
+          gap: 12px;
+          padding: 12px 20px 12px 12px;
+          margin-right: 20px;
+          font-size: 18px;
+          line-height: 26px; /* 133.333% */
+        }
+      }
+    }
+  }
+
+  @media only screen and (max-width: 991px) {
+    .header {
+      margin: 0 20px;
+      border-radius: 20px;
+    }
+  }
+
+  @media only screen and (max-width: 660px) {
+    .header {
+      padding: 8px 16px; /* Further adjust padding for mobile devices */
+      height: auto; /* Adjust height if needed */
+      margin: 0 20px;
+
+      .intro {
+        font-size: 26px;
+        line-height: 48px; /* 141.667% */
+      }
+
+      .guide-btns {
+        flex-direction: column;
+        .btn {
+          margin-bottom: 12px;
+          gap: 6px;
+          padding: 6px 12px 6px 6px;
+          margin-right: 10px;
+          font-size: 16px;
+          line-height: 24px; /* 133.333% */
+        }
+      }
+    }
+  }
+}

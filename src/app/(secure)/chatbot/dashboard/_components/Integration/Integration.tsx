@@ -228,7 +228,10 @@ function Integration({ isPlanNotification, setIsPlanNotification }: any) {
         <div
           // style={{ position: isPlanNotification ? "unset" : "relative" }}
           className="telegram-i-btn"
-          onClick={() => router.push(`dashboard/whatsapp-integration-guide`)}
+          // onClick={() => router.push(`dashboard/whatsapp-integration-guide`)}
+          onClick={() =>
+            router.push(`dashboard/integration-guide?guide=whatsapp`)
+          }
         >
           <InfoCircleOutlined />
         </div>
@@ -296,13 +299,16 @@ function Integration({ isPlanNotification, setIsPlanNotification }: any) {
         <div
           // style={{ position: isPlanNotification ? "unset" : "relative" }}
           className="telegram-i-btn"
-          onClick={() => router.push(`dashboard/telegram-guide`)}
+          // onClick={() => router.push(`dashboard/telegram-guide`)}
+          onClick={() =>
+            router.push(`dashboard/integration-guide?guide=telegram`)
+          }
         >
           <InfoCircleOutlined />
         </div>
       </div>
       {/* -----------------------------------------Slack-integration------------------------------------------------------------- */}
-      <div className="integration">
+      <div className="integration i-btn">
         <div className="name">
           <Image src={slackIcon} alt="slack-icon" height={35} width={35} />
           <span>Add to Slack</span>
@@ -328,13 +334,24 @@ function Integration({ isPlanNotification, setIsPlanNotification }: any) {
             </>
           )}
         </>
+
+        <div
+          // style={{ position: isPlanNotification ? "unset" : "relative" }}
+          className="telegram-i-btn"
+          // onClick={() => router.push(`dashboard/slack-integration-guide`)}
+
+          onClick={() => router.push(`dashboard/integration-guide?guide=slack`)}
+        >
+          <InfoCircleOutlined />
+        </div>
       </div>
+
       {/* </div> */}
 
       <div className="how-to-integrate">
         <p
           className="integrate-text"
-          onClick={() => router.push(`dashboard/whatsapp-integration-guide`)}
+          onClick={() => router.push(`dashboard/integration-guide`)}
         >
           How to integrate my Chatbot?
         </p>

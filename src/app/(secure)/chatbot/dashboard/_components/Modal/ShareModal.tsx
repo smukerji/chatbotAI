@@ -49,10 +49,10 @@ function ShareModal({ open, setOpen, chatbotId }: any) {
             <Image src={copyIcon} alt="copy-icon" />
             Copy
           </button>
-          <button>
+          {/* <button>
             <Image src={redirectIcon} alt="redirect-icon" />
             Visit
-          </button>
+          </button> */}
         </div>
       }
     >

@@ -2,6 +2,11 @@
   display: flex;
   padding: 15px 25px;
   justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: rgb(255, 255, 255);
+
   .logo {
     cursor: pointer;
     height: auto;

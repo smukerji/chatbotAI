@@ -1,0 +1,103 @@
+.leads-container {
+  margin: 24px 45px 0 45px;
+
+  .action-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 13px;
+
+    .date-picker-container {
+      // display: flex;
+      // gap: 16px;
+      .interval-btns {
+        display: flex;
+        gap: 16px;
+        .interval-btn {
+          border-radius: 1000px;
+          background: #f4f5f6;
+          padding: 16px;
+          border: none;
+          outline: none;
+          cursor: pointer;
+
+          &.active {
+            background: #f4f5f6;
+            color: #2e58ea;
+            border: 1px solid #2e58ea;
+          }
+        }
+
+        @media only screen and (max-width: 991px) {
+          flex-wrap: wrap;
+        }
+      }
+    }
+
+    .ant-picker {
+      height: 46px;
+      border-radius: 1000px;
+      background: #f4f5f6 !important;
+      width: 218px !important;
+
+      .ant-picker-input {
+        input::placeholder {
+          color: #000 !important;
+          text-align: center !important;
+        }
+      }
+
+      .anticon svg {
+        path {
+          fill: #000;
+        }
+      }
+
+      &.active {
+        background: #f4f5f6;
+        color: #2e58ea;
+        border: 1px solid #2e58ea;
+      }
+    }
+
+    .export-btn {
+      display: flex;
+      max-width: 150px;
+      padding: 12px 16px;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      border-radius: 12px;
+      background: #2e58ea;
+      outline: none;
+      border: 0px;
+      height: fit-content;
+      cursor: pointer;
+
+      color: #fcfcfd;
+      text-align: center;
+
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 600;
+
+      svg {
+        path {
+          stroke-width: 0.4px;
+          stroke: #fff;
+          fill: #fff;
+        }
+      }
+    }
+
+    @media only screen and (max-width: 530px) {
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+  }
+
+  @media only screen and (max-width: 767px) {
+    margin-left: 5px;
+    margin-right: 5px;
+    flex-direction: column;
+  }
+}

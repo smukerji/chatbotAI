@@ -17,8 +17,8 @@ export async function POST(req: NextRequest) {
   if (
     res?.values?.name.trim() === "" ||
     res?.values?.email.trim() === "" ||
-    res?.values?.mobile.trim() === "" ||
-    res?.values?.user_message.trim() === ""
+    res?.values?.mobile.trim() === ""
+    // || res?.values?.user_message.trim() === ""
   ) {
     return NextResponse.json({
       message: "One or more required fields are empty",
@@ -51,15 +51,15 @@ export async function POST(req: NextRequest) {
       //---------------------- Insert values into the database with timestamp
       const timestamp = new Date(); // Generate timestamp
 
-      const db = (await clientPromise!).db();
-      const collection = db.collection("contact-details");
-      const result = await collection.insertOne({
-        name: res?.values?.name,
-        email: res?.values?.email,
-        mobile: res?.values?.mobile,
-        message: res?.values?.message,
-        contactedAt: timestamp, // Insert timestamp
-      });
+      // const db = (await clientPromise!).db();
+      // const collection = db.collection("contact-details");
+      // const result = await collection.insertOne({
+      //   name: res?.values?.name,
+      //   email: res?.values?.email,
+      //   mobile: res?.values?.mobile,
+      //   message: res?.values?.message,
+      //   contactedAt: timestamp, // Insert timestamp
+      // });
 
       return NextResponse.json({
         message: "Thank you for contacting us.",

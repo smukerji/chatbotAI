@@ -51,7 +51,7 @@ async function handler(req, res) {
       `;
 
     const userContent = `
-      Strictly write all the response in html format with only raw text and image link inside img tag. give answer only if it is available in context.
+    Answer only if it is available in context. Strictly write all the response in html format without html and body tag. Also add image link inside img tag if available in the context. 
       query: ${userQuery}`;
 
     //// count the token before sending to openai

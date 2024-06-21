@@ -12,6 +12,7 @@ export default async function handler(req, res) {
     const sessionEndDate = body?.sessionEndDate;
     const initialMessageLength = body?.initialMessageLength;
     const historyCollectionName = body?.historyCollectionName;
+    const email = body?.email;
 
     /// for storing the history date wise
     const startDate = sessionStartDate.split(" ")[0];
@@ -78,7 +79,7 @@ export default async function handler(req, res) {
     try {
       if (!user) {
         /// if it return null store the history
-        await collection.insertOne({
+        const insertedData = await collection.insertOne({
           userId,
           chatbotId,
           chats: {
@@ -93,9 +94,15 @@ export default async function handler(req, res) {
                     sessionStartDate,
                     sessionEndDate,
                     initialMessageLength: initialMessageLength,
+                    email: email,
                   },
           },
           date: startDate,
+        });
+
+        return res.status(200).send({
+          message: "new history created",
+          id: insertedData.insertedId,
         });
       } else {
         /// update the session
@@ -119,13 +126,16 @@ export default async function handler(req, res) {
                         sessionStartDate,
                         sessionEndDate,
                         initialMessageLength: initialMessageLength,
+                        email: email,
                       },
                     },
             },
           }
         );
+        return res
+          .status(200)
+          .send({ message: "updated history", id: user._id });
       }
-      return res.status(200).send("saved history");
     } catch (err) {
       console.log("Error while updating chat history", err);
     }

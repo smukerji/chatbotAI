@@ -1,10 +1,12 @@
 ---
-id: 5
+id:
 title: Introducing Torri.AI - Create Your Own AI Chatbot Using Your Data
+metaTitle: Introducing Torri.AI - Create Your Own AI Chatbot Using Your Data
+metaDescription: Torri.AI represents the next step in the evolution of customer service, offering businesses an efficient, reliable, and customizable AI-powered chatbot solution.
 slug: intro-to-torri-ai
 author: SAP
 date: 03-06-2024
-description: Like to know the secrets of transforming a 2-14 team into a 3x Super Bowl winning Dynasty?
+description: Torri.AI represents the next step in the evolution of customer service, offering businesses an efficient, reliable, and customizable AI-powered chatbot solution.
 thumbnail: https://xyhog03g93hzc0am.public.blob.vercel-storage.com/intro-torri-thumb-EeL2FhiYywdJ9jY7PYxcHvnXUnOYT7
 hero: https://xyhog03g93hzc0am.public.blob.vercel-storage.com/intrototorri-EEhfvj4Ulat4x8J8gAgW7BnjX31Rz9
 introduction:
@@ -144,7 +146,7 @@ Use these insights to make informed adjustments to your bot’s training and cus
 
 By following these steps, you can effectively set up and maintain your Torri.AI chatbot, ensuring it provides exceptional customer support and enhances user engagement across your digital platforms.
 
-## Conclusion
+### Conclusion
 
 Torri.AI represents the next step in the evolution of customer service, offering businesses an efficient, reliable, and customizable AI-powered chatbot solution. By leveraging your own data, Torri.AI provides precise and accurate answers, ensuring every customer interaction is seamless and satisfying. Whether you operate in healthcare, hospitality, education, or any other sector, Torri.AI can transform your digital presence and elevate your customer support to new heights.
 

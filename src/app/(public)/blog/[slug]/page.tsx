@@ -13,8 +13,10 @@ export async function generateMetadata({
   params: { slug: string };
 }): Promise<Metadata> {
   const blogDetail: any = await getBlogBySlug(params.slug);
+
   return {
-    title: `Blog | ${blogDetail?.title}`,
+    title: `Blog ${blogDetail?.metaTitle ? ` | ${blogDetail?.metaTitle}` : ""}`,
+    description: `${blogDetail?.metaDescription}`,
     alternates: {
       canonical: `https://torri.ai/blog/${blogDetail?.slug}`,
     },
