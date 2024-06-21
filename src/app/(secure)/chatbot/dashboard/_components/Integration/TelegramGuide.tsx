@@ -4,7 +4,7 @@ import arrowIcon from "../../../../../../../public/svgs/Feather Icon.svg";
 import { useCookies } from "react-cookie";
 import Image from "next/image";
 import "../../whatsapp-integration-guide/whatsappintegration.scss";
-import step2_1 from "../../../../../../../public/whataspp-guide-images/step2_1.png";
+import step2_1 from "../../../../../../../public/telegram-guide-images/step1_1.png";
 
 function TelegramGuide() {
   const [selectedStep, setSelectedStep] = useState(1);
