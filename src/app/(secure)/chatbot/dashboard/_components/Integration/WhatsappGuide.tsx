@@ -30,6 +30,7 @@ import step4_13 from "../../../../../../../public/whataspp-guide-images/step4_13
 import step4_14 from "../../../../../../../public/whataspp-guide-images/step4_14.png";
 import step4_15 from "../../../../../../../public/whataspp-guide-images/step4_15.png";
 import step4_16 from "../../../../../../../public/whataspp-guide-images/step4_16.png";
+import step4_17 from "../../../../../../../public/whataspp-guide-images/step4_17.png";
 import step5_1 from "../../../../../../../public/whataspp-guide-images/step5_1.png";
 import step5_2 from "../../../../../../../public/whataspp-guide-images/step5_2.png";
 import step5_3 from "../../../../../../../public/whataspp-guide-images/step5_3.png";
@@ -40,6 +41,7 @@ import step6_1 from "../../../../../../../public/whataspp-guide-images/step6_1.p
 import step6_2 from "../../../../../../../public/whataspp-guide-images/step6_2.png";
 import step6_3 from "../../../../../../../public/whataspp-guide-images/step6_3.png";
 import step6_4 from "../../../../../../../public/whataspp-guide-images/step6_4.png";
+import step6_5 from "../../../../../../../public/whataspp-guide-images/step6_5.png";
 import step7_1 from "../../../../../../../public/whataspp-guide-images/step7_1.png";
 import Image from "next/image";
 import arrowIcon from "../../../../../../../public/svgs/Feather Icon.svg";
@@ -114,7 +116,7 @@ function WhatsappGuide() {
             <span>back</span>
           </div> */}
           <ul className="step-list">
-            {[1, 2, 3, 4, 5, 6, 7].map((step) => (
+            {[1, 2, 3, 4, 5, 6].map((step) => (
               <li
                 key={step}
                 onClick={() => handleClick(step)}
@@ -131,53 +133,29 @@ function WhatsappGuide() {
 
           <div className="step-1">
             <h2 className="guide-step-title">
-              Step 1: Getting Started with WhatsApp Integration
+              Step 1: Setting Up Meta (Facebook) Business Suite and Meta for
+              Developers account
             </h2>
 
             <ol className="ordered-points">
-              <li>Sign in to Torri.AI and Create Your Bot:</li>
+              <li>Create a Meta (Facebook) Business Suite account:</li>
               <ul className="unordered-sub-points">
                 <li>
-                  Make sure you have access to your Torri.Ai account. If you
-                  don&apos;t have one, create an account.
+                  Visit{" "}
+                  <a
+                    href="https://business.facebook.com/"
+                    target="_blank"
+                    className="grey-link-with-underline"
+                  >
+                    Meta Business Suite.
+                  </a>
                 </li>
-                <li>
-                  Set up your bot by uploading files, text, websites, or Q&As.
-                </li>
-              </ul>
-              <li>Find the WhatsApp Integration Option:</li>
-              <ul className="unordered-sub-points">
-                <li>Navigate to your chatbot menu.</li>
-                <li>Click on the &apos;Integrations&apos; tab.</li>
-                <li>
-                  Select &apos;Add to WhatsApp&apos; to initiate the integration
-                  process.
-                </li>
-                <li>
-                  Follow the displayed steps to connect your WhatsApp business
-                  account to Torri.
-                </li>
-              </ul>
-            </ol>
-          </div>
+                <li>Create an account.</li>
 
-          <div className="step-2">
-            <h2 className="guide-step-title">
-              Step 2: Setting Up Meta (Facebook) Business Account and App
-            </h2>
-
-            <ol className="ordered-points">
-              <li>Create a Meta (Facebook) Business Account:</li>
-              <ul className="unordered-sub-points">
-                <li>Visit here.</li>
                 <li>
-                  Enter your business name, your name, and work email address.
-                  Click &apos;Next&apos;.
+                  Enter your business name, your name, and business email
+                  address. Click &apos;Next&apos;.
                 </li>
-                <li>
-                  Provide your business details and click &apos;Submit&apos;.
-                </li>
-                <li>Enter your business details and click Submit.</li>
 
                 <div className="steps-img">
                   <Image src={step2_1} alt="step2_1" />
@@ -185,18 +163,28 @@ function WhatsappGuide() {
               </ul>
 
               <li>
-                Create a new Meta (Facebook) App at{" "}
-                <a
-                  href="https://developers.facebook.com/."
-                  target="_blank"
-                  className="grey-link-with-underline"
-                >
-                  https://developers.facebook.com/.
-                </a>
+                Create a new Meta (Facebook) Developer account:
                 <ul className="unordered-sub-points">
                   <li>
-                    &apos;Log in&apos; to your Meta (Facebook) Developer
-                    Account.
+                    Visit{" "}
+                    <a
+                      href="https://developers.facebook.com/"
+                      target="_blank"
+                      className="grey-link-with-underline"
+                    >
+                      Meta for Developers.
+                    </a>
+                  </li>
+
+                  <li>
+                    <a
+                      href="https://business.facebook.com/business/loginpage/?next=https%3A%2F%2Fdevelopers.facebook.com%2F&app=436761779744620&login_options%5B0%5D=FB&login_options%5B1%5D=SSO&is_work_accounts=1"
+                      target="_blank"
+                      className="grey-link-with-underline"
+                    >
+                      Log in
+                    </a>
+                    &nbsp;to your Meta for Developers Account.
                   </li>
 
                   <div className="steps-img">
@@ -210,7 +198,7 @@ function WhatsappGuide() {
                       target="_blank"
                       className="grey-link-with-underline"
                     >
-                      &apos;My Apps&apos;.
+                      My Apps.
                     </a>
                   </li>
 
@@ -225,7 +213,7 @@ function WhatsappGuide() {
                       target="_blank"
                       className="grey-link-with-underline"
                     >
-                      &apos;Create App&apos;
+                      Create App
                     </a>
                   </li>
 
@@ -257,8 +245,14 @@ function WhatsappGuide() {
                   </div>
 
                   <li>
-                    Provide app details: App Name, App Contact Email, Business
-                    Account (Optional), and click &apos;Create app&apos;.
+                    Provide app details:{" "}
+                    <span style={{ fontWeight: "bold" }}>
+                      App Name, App Contact Email, Business Account (Optional),
+                    </span>{" "}
+                    and click &apos;
+                    <span style={{ fontWeight: "bold" }}>
+                      Create app&apos;.
+                    </span>
                   </li>
 
                   <div className="steps-img">
@@ -269,33 +263,22 @@ function WhatsappGuide() {
             </ol>
           </div>
 
-          <div className="step-3">
+          <div className="step-2">
             <h2 className="guide-step-title">
-              Step 3: Setting Up Meta (Facebook) App for WhatsApp Integration
+              Step 2: Setting Up WhatsApp Integration on Meta for Developers
+              account
             </h2>
 
             <ol className="ordered-points">
-              <li>Add WhatsApp to your Meta (Facebook) App.</li>
+              <li>Add WhatsApp to your Meta for Developers account.</li>
 
               <ul className="unordered-sub-points">
                 <li>
-                  In the{" "}
-                  <a
-                    href="https://developers.facebook.com/apps"
-                    target="_blank"
-                    className="grey-link-with-underline"
-                  >
-                    &apos;Developers Dashboard&apos;
-                  </a>
-                  , choose your app.
-                </li>
-
-                <li>
-                  Locate{" "}
+                  Under the Dashboard tab, locate &apos;
                   <span style={{ fontWeight: "bold" }}>
-                    &apos;Add products to your app&apos;
-                  </span>{" "}
-                  in your app&apos;s dashboard tab.
+                    Add products to your app
+                  </span>
+                  &apos;
                 </li>
 
                 <div className="steps-img">
@@ -303,7 +286,7 @@ function WhatsappGuide() {
                 </div>
 
                 <li>
-                  Choose{" "}
+                  Scroll down and choose{" "}
                   <span className="point-bold-text">&apos;WhatsApp&apos;</span>{" "}
                   for setup.
                 </li>
@@ -314,7 +297,7 @@ function WhatsappGuide() {
 
                 <li>
                   Select your Meta (Facebook) Business Account (if not selected
-                  in step 2).
+                  in step 1.2).
                 </li>
                 <li>
                   Navigate to{" "}
@@ -336,14 +319,14 @@ function WhatsappGuide() {
                     className="grey-link-with-underline"
                   >
                     {`${process.env.NEXT_PUBLIC_WEBSITE_URL}privacy`}
-                  </a>
+                  </a>{" "}
+                  and click Save changes.
                 </li>
 
                 <div className="steps-img">
                   <Image src={step3_4} alt="step3_4" />
                 </div>
 
-                <li>Save changes.</li>
                 <li>
                   Set App Mode to <span className="point-bold-text">Live.</span>
                 </li>
@@ -355,9 +338,9 @@ function WhatsappGuide() {
             </ol>
           </div>
 
-          <div className="step-4">
+          <div className="step-3">
             <h2 className="guide-step-title">
-              Step 4: Generate WhatsApp Token
+              Step 3: Generate WhatsApp Token
             </h2>
             <p className="ordered-points">
               To obtain a permanent WhatsApp Access Token, follow 1 to 3 steps:
@@ -380,10 +363,7 @@ function WhatsappGuide() {
                   click its{" "}
                   <span className="point-bold-text">Settings (gear)</span> icon.
                 </li>
-                <li>
-                  Click <span className="point-bold-text">Business</span>{" "}
-                  Settings.
-                </li>
+
                 <div className="steps-img">
                   <Image src={step4_1} alt="step4_1" />
                 </div>
@@ -433,6 +413,9 @@ function WhatsappGuide() {
                 <li>
                   Select your app and grant full control to manage the app.
                 </li>
+                <li>
+                  Click <span style={{ fontWeight: "bold" }}>Save.</span>
+                </li>
                 <div className="steps-img">
                   <Image src={step4_5} alt="step4_5" />
                 </div>
@@ -448,10 +431,12 @@ function WhatsappGuide() {
                   <Image src={step4_6} alt="step4_6" />
                 </div>
 
-                <p className="ordered-points">
-                  Choose the app that will use the token and set the token
-                  expiration to <span className="point-bold-text">never.</span>
-                </p>
+                <li>Choose the app that will use the token.</li>
+
+                <li>
+                  Set the token expiration to{" "}
+                  <span style={{ fontWeight: "bold" }}>Never.</span>
+                </li>
 
                 <div className="steps-img">
                   <Image src={step4_7} alt="step4_7" />
@@ -460,21 +445,30 @@ function WhatsappGuide() {
                 <li>
                   Select{" "}
                   <span className="point-bold-text">
-                    &apos;whatsapp_business_messaging&apos;
+                    &apos;whatsapp_business_management&apos;
                   </span>{" "}
                   and{" "}
                   <span className="point-bold-text">
-                    &apos;whatsapp_business_management&apos;
+                    &apos;whatsapp_business_messaging&apos;
                   </span>{" "}
                   permissions.
+                </li>
+
+                <li>
+                  Click Generate <span className="point-bold-text">token.</span>
                 </li>
 
                 <div className="steps-img">
                   <Image src={step4_8} alt="step4_8" />
                 </div>
 
-                <li>Generate the token.</li>
-                <li>Copy the access token and store it securely.</li>
+                <li>
+                  Copy the access token that has been generated and store it
+                  securely.{" "}
+                </li>
+                <li>
+                  Click <span className="point-bold-text">OK.</span>
+                </li>
 
                 <div className="steps-img">
                   <Image src={step4_9} alt="step4_9" />
@@ -494,7 +488,7 @@ function WhatsappGuide() {
                     target="_blank"
                     className="grey-link-with-underline"
                   >
-                    WhatsApp Developer Dashboard
+                    Meta for Developers
                   </a>
                   , navigate to WhatsApp &gt; API Setup from the sidebar.
                 </li>
@@ -563,32 +557,39 @@ function WhatsappGuide() {
                 </div>
 
                 <li>
-                  You&apos;ll be directed to your WhatsApp account settings.
-                  Click{" "}
-                  <span className="point-bold-text">
-                    &apos;Payment Methods&apos; &gt; &apos;Add business payment
-                    method&apos;
-                  </span>{" "}
-                  and follow the prompts to add your card info.
+                  You will be directed to your Business settings on Meta
+                  Business Suite. Click{" "}
+                  <span className="point-bold-text">Billing and payments.</span>{" "}
                 </li>
 
                 <div className="steps-img">
                   <Image src={step4_15} alt="step4_15" />
+                </div>
+
+                <li>
+                  Click on{" "}
+                  <span className="point-bold-text">
+                    Payment Methods &gt; Add business payment method
+                  </span>{" "}
+                  and follow the prompts to add your card details.
+                </li>
+                <div className="steps-img">
+                  <Image src={step4_16} alt="step4_15" />
                 </div>
               </ul>
 
               <li>Test your new Business Number for WhatsApp</li>
               <ul className="unordered-sub-points">
                 <li>
-                  Return to WhatsApp Developer Dashboard, navigate to{" "}
+                  Return to Meta for Developers Dashboard, navigate to{" "}
                   <span className="point-bold-text">
                     API Setup &gt; Step 1.
                   </span>
                 </li>
                 <li>
-                  Enter a testing{" "}
-                  <span className="point-bold-text">&apos;To&apos;</span>{" "}
-                  number.
+                  Enter a{" "}
+                  <span className="point-bold-text">&apos;To&apos;</span> number
+                  to test message delivery.
                 </li>
                 <li>
                   Click{" "}
@@ -598,15 +599,15 @@ function WhatsappGuide() {
                   to verify successful message delivery.
                 </li>
                 <div className="steps-img">
-                  <Image src={step4_16} alt="step4_16" />
+                  <Image src={step4_17} alt="step4_16" />
                 </div>
               </ul>
             </ol>
           </div>
 
-          <div className="step-5">
+          <div className="step-4">
             <h2 className="guide-step-title">
-              Step 5: Configure WhatsApp API Webhook settings
+              Step 4: Configure WhatsApp API Webhook settings
             </h2>
 
             <ol className="ordered-points">
@@ -614,8 +615,10 @@ function WhatsappGuide() {
 
               <ul className="unordered-sub-points">
                 <li>
-                  In WhatsApp Developer Dashboard, navigate to{" "}
-                  <span className="point-bold-text">Configuration.</span>
+                  n Meta for Developers Dashboard, navigate to{" "}
+                  <span className="point-bold-text">
+                    WhatsApp &gt; Configuration.
+                  </span>
                 </li>
                 <li>
                   Under <span className="point-bold-text">Webhook</span>, click
@@ -630,20 +633,20 @@ function WhatsappGuide() {
                   Copy the <span className="point-bold-text">Callback URL</span>{" "}
                   and{" "}
                   <span className="point-bold-text">Verification Token</span>{" "}
-                  from Torri.ai WhatsApp Integration modal to your WhatsApp
-                  Developer Dashboard.
+                  from Torri.AI WhatsApp Integration modal to your Meta for
+                  Developers Dashboard.
                 </li>
 
                 <div className="steps-img">
                   <Image src={step5_2} alt="step5_2" />
                 </div>
+                <li>
+                  Click{" "}
+                  <span className="point-bold-text">Verify and save.</span>
+                </li>
                 <div className="steps-img">
                   <Image src={step5_3} alt="step5_3" />
                 </div>
-
-                <li>
-                  Click <span className="point-bold-text">Verify and save</span>
-                </li>
               </ul>
 
               <li>Configure Webhook Subscription Field</li>
@@ -670,7 +673,7 @@ function WhatsappGuide() {
                 </div>
 
                 <li>
-                  Return to Torri.ai and click{" "}
+                  Return to Torri and click{" "}
                   <span className="point-bold-text">Verify.</span>
                 </li>
 
@@ -681,9 +684,9 @@ function WhatsappGuide() {
             </ol>
           </div>
 
-          <div className="step-6">
+          <div className="step-5">
             <h2 className="guide-step-title">
-              Step 6: Add WhatsApp Account to your Torri Chatbot
+              Step 5: Add WhatsApp Account to your Torri Chatbot
             </h2>
 
             <ol className="ordered-points">
@@ -691,13 +694,14 @@ function WhatsappGuide() {
 
               <ul className="unordered-sub-points">
                 <li>
-                  In WhatsApp Developer Dashboard, navigate to{" "}
+                  In Meta for Developers Dashboard, navigate to{" "}
                   <span className="point-bold-text">
                     App Settings &gt; Basic
                   </span>
                 </li>
                 <li>
-                  Copy App secret and paste it in Torri integration modal in{" "}
+                  Copy <span className="point-bold-text">App secret</span> and
+                  paste it in Torri integration modal in{" "}
                   <span className="point-bold-text">Facebook App Secret</span>
                 </li>
 
@@ -706,15 +710,29 @@ function WhatsappGuide() {
                 </div>
 
                 <li>
-                  Paste the permanent access token generated from{" "}
-                  <span className="point-bold-text">Step 4.3</span> in torri
-                  integration modal in{" "}
+                  Copy the the{" "}
+                  <span className="point-bold-text">
+                    Temporary access token
+                  </span>{" "}
+                  from{" "}
+                  <span className="point-bold-text">
+                    Whatsapp &gt; API Setup
+                  </span>{" "}
+                  into Torri integration modal under{" "}
                   <span className="point-bold-text">
                     WhatsApp Access Token.
                   </span>
                 </li>
                 <div className="steps-img">
                   <Image src={step6_2} alt="step6_2" />
+                </div>
+
+                <li>
+                  Click <span className="point-bold-text">Add Account.</span>
+                </li>
+
+                <div className="steps-img">
+                  <Image src={step6_3} alt="step6_3" />
                 </div>
 
                 <li>
@@ -730,24 +748,24 @@ function WhatsappGuide() {
                 </li>
 
                 <div className="steps-img">
-                  <Image src={step6_3} alt="step6_3" />
+                  <Image src={step6_4} alt="step6_4" />
                 </div>
 
                 <li>
-                  Click <span className="point-bold-text">Add Number</span> to
+                  Click <span className="point-bold-text">Save</span> to
                   complete integration.
                 </li>
 
                 <div className="steps-img">
-                  <Image src={step6_4} alt="step6_4" />
+                  <Image src={step6_5} alt="step6_5" />
                 </div>
               </ul>
             </ol>
           </div>
 
-          <div className="step-7">
+          <div className="step-6">
             <h2 className="guide-step-title">
-              Step 7: Confirm Integration Completion
+              Step 6: Confirm Integration Completion
             </h2>
 
             <p className="ordered-points">
