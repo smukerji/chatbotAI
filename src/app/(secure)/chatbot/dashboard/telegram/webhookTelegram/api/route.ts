@@ -79,6 +79,10 @@ export async function POST(request: NextRequest) {
       model: "gpt-4",
       tokens: 8000,
     },
+    {
+      model: "gpt-4o",
+      tokens: 16000,
+    },
   ];
 
   let step = 1;
@@ -339,6 +343,25 @@ export async function POST(request: NextRequest) {
             totalCountedToken >= tokenLimit[1].tokens
           ) {
             let tokensToRemove = totalCountedToken - tokenLimit[1].tokens;
+            let index = 0;
+            let tokens = 0;
+
+            // Find the index where the sum of tokens reaches the limit
+            while (
+              tokens < tokensToRemove &&
+              index < conversationMessages.length
+            ) {
+              tokens += calculateTokens(conversationMessages[index]);
+              index++;
+            }
+
+            // Remove the messages from the start of the array up to the found index
+            conversationMessages.splice(0, index);
+          } else if (
+            tokenLimit[2]["model"] == userChatBotModel.model &&
+            totalCountedToken >= tokenLimit[2].tokens
+          ) {
+            let tokensToRemove = totalCountedToken - tokenLimit[2].tokens;
             let index = 0;
             let tokens = 0;
 

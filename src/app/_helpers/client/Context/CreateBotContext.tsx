@@ -37,6 +37,10 @@ export const CreateBotDataProvider = ({ children }: any) => {
 
     // plan: {},
 
+    /// lead session data
+    referedFrom: "",
+    leadSessionsEmail: "",
+
     chatbotName: "",
   };
   const [createBotInfo, setCreateBotInfo] = useState(initialCreateBotInfo);

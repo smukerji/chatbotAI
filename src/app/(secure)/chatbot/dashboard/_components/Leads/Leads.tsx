@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { TableProps, DatePicker, ConfigProvider, message } from "antd";
 import { Table, Typography } from "antd";
 import "./leads.scss";
@@ -9,12 +9,14 @@ import { alt } from "joi";
 import moment from "moment";
 import e from "express";
 import { json2csv } from "json-2-csv";
+import { CreateBotContext } from "@/app/_helpers/client/Context/CreateBotContext";
 
 interface Item {
   key: string;
   name: string;
   age: number;
   address: string;
+  email: string;
 }
 
 const { RangePicker } = DatePicker;
@@ -29,6 +31,10 @@ const Leads = ({ chatbotId }: any) => {
   const [leadsFilter, setLeadsFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [displayDate, setDisplayDate] = useState(null);
+
+  /// get the bot context
+  const botContext: any = useContext(CreateBotContext);
+  const botDetails = botContext?.createBotInfo;
 
   const columns = [
     {
@@ -56,41 +62,49 @@ const Leads = ({ chatbotId }: any) => {
     //   dataIndex: "address",
     //   width: "20%",
     // },
-    // {
-    //   title: "",
-    //   dataIndex: "sessionId",
-    //   render: (_: any, record: Item) => {
-    //     return (
-    //       <Typography.Link
-    //         // disabled={editingKey !== ""}
-    //         onClick={() => alert(JSON.stringify(record))}
-    //       >
-    //         Detail &nbsp;&nbsp;&gt;
-    //       </Typography.Link>
-    //     );
-    //     // const editable = isEditing(record);
-    //     // return editable ? (
-    //     //   <span>
-    //     //     <Typography.Link
-    //     //       onClick={() => save(record.key)}
-    //     //       style={{ marginRight: 8 }}
-    //     //     >
-    //     //       Save
-    //     //     </Typography.Link>
-    //     //     <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
-    //     //       <a>Cancel</a>
-    //     //     </Popconfirm>
-    //     //   </span>
-    //     // ) : (
-    //     //   <Typography.Link
-    //     //     disabled={editingKey !== ""}
-    //     //     onClick={() => edit(record)}
-    //     //   >
-    //     //     Edit
-    //     //   </Typography.Link>
-    //     // );
-    //   },
-    // },
+    {
+      title: "Messages Log",
+      dataIndex: "sessions",
+      render: (_: any, record: Item) => {
+        return (
+          <Typography.Link
+            // disabled={editingKey !== ""}
+            onClick={() => {
+              if (record?.email == "N/A") {
+                message.error("Email not found to retrive leads");
+              } else {
+                botContext?.handleChange("leadSessionsEmail")(record?.email);
+                botContext?.handleChange("editChatbot")("history");
+                botContext?.handleChange("referedFrom")("leads");
+              }
+            }}
+          >
+            Detail &nbsp;&nbsp;&gt;
+          </Typography.Link>
+        );
+        // const editable = isEditing(record);
+        // return editable ? (
+        //   <span>
+        //     <Typography.Link
+        //       onClick={() => save(record.key)}
+        //       style={{ marginRight: 8 }}
+        //     >
+        //       Save
+        //     </Typography.Link>
+        //     <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
+        //       <a>Cancel</a>
+        //     </Popconfirm>
+        //   </span>
+        // ) : (
+        //   <Typography.Link
+        //     disabled={editingKey !== ""}
+        //     onClick={() => edit(record)}
+        //   >
+        //     Edit
+        //   </Typography.Link>
+        // );
+      },
+    },
   ];
 
   const mergedColumns: TableProps["columns"] = columns.map((col) => {
@@ -124,7 +138,7 @@ const Leads = ({ chatbotId }: any) => {
   async function exportLeads() {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/api/leadexport?chatbotId=${chatbotId}`
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/api/lead/export?chatbotId=${chatbotId}`
       );
       const content = await response.json();
 
@@ -153,6 +167,8 @@ const Leads = ({ chatbotId }: any) => {
   useEffect(() => {
     /// set the pages and leads initial data
     fetchLeadsCount(true);
+    botContext?.handleChange("leadSessionsEmail")("");
+    botContext?.handleChange("referedFrom")("");
   }, []);
 
   /// when no customers are found display this component

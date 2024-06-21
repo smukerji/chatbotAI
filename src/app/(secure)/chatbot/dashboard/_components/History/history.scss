@@ -18,7 +18,7 @@
     border: 1px solid #e6e8ec;
     background: #fcfcfd;
     overflow-y: auto;
-    height: 585px;
+    height: 608px;
 
     .detail {
       display: flex;
@@ -75,19 +75,22 @@
       justify-content: space-between;
       align-items: center;
 
-      span {
+      .action-btns {
+        display: flex;
+        gap: 24px;
+      }
+    }
+
+    .footer {
+      width: 100%;
+      p {
         color: #777e90;
-        text-align: center;
+        text-align: end;
         font-size: 12px;
         font-style: normal;
         font-weight: 500;
         line-height: 24px;
         /* 200% */
-      }
-
-      .action-btns {
-        display: flex;
-        gap: 24px;
       }
     }
 
