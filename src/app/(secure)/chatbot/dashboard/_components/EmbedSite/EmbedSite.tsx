@@ -50,8 +50,8 @@ function EmbedSite({
       />
       <div className="script">
         <p className="share-note">
-          To add the chatbot any where on your website, add this iframe to your
-          html code
+          To display the chatbot in full-screen mode on your website or mobile
+          app, insert this iframe into your HTML code
         </p>
         <p className="script-container">{iframe}</p>
         <button onClick={() => handleOk(iframe)}>
