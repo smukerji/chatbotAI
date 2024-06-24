@@ -142,6 +142,10 @@ const Leads = ({ chatbotId }: any) => {
       );
       const content = await response.json();
 
+      if (content.length === 0) {
+        message.error("No leads to export");
+        return;
+      }
       const csvString = await json2csv(content);
 
       downloadCsv(csvString, "leads.csv");
