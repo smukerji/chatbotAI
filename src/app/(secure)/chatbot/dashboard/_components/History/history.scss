@@ -9,7 +9,7 @@
   .chatbot-history-details {
     display: flex;
     flex: 1;
-    padding: 16px;
+    // padding: 16px;
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
@@ -17,14 +17,19 @@
     border-radius: 16px;
     border: 1px solid #e6e8ec;
     background: #fcfcfd;
-    overflow-y: auto;
+    // overflow-y: auto;
+    position: relative;
     height: 608px;
+    padding-bottom: 36px;
 
     .detail {
       display: flex;
       flex-direction: column;
       gap: 4px;
       width: 100%;
+      height: 100%;
+      overflow-y: auto;
+      padding: 5px;
 
       .time {
         color: #777e90;
@@ -42,11 +47,12 @@
         font-style: normal;
         font-weight: 500;
         line-height: 24px;
+
         /* 150% */
         cursor: pointer;
         border-radius: 8px;
         text-transform: capitalize;
-        padding: 4px 8px;
+        padding: 5px 16px;
 
         &:hover {
           background: #e6e8ec;
@@ -55,6 +61,18 @@
         &.active {
           background: #e6e8ec;
         }
+      }
+      .history-link {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        color: #2e58ea;
+        text-align: center;
+        width: 100%;
+        background-color: #fcfcfd;
+        padding: 8px;
+        cursor: pointer;
+        border-radius: 16px;
       }
     }
   }

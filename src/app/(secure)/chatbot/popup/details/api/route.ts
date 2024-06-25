@@ -36,7 +36,8 @@ export async function GET(request: NextRequest) {
               leadTitle: 1,
               userDetails: 1,
               userMessageColor: 1,
-              messagePlaceholder:1
+              messagePlaceholder: 1,
+              chatbotBubbleAlignment: 1,
             },
           },
         ],
