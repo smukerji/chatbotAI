@@ -239,6 +239,10 @@
             width: 100%;
           }
 
+          iframe {
+            width: 100%;
+          }
+
           .typing-indicator {
             display: flex;
             justify-content: space-between;
@@ -530,6 +534,10 @@
       }
 
       img {
+        width: 100%;
+      }
+
+      iframe {
         width: 100%;
       }
     }
