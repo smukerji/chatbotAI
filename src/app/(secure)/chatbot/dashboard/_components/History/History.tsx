@@ -212,6 +212,21 @@ function History({ chatbotId }: any) {
                 })}
             </>
           )}
+
+          {botDetails?.referedFrom == "leads" && (
+            <>
+              <p
+                className="history-link"
+                onClick={() => {
+                  /// reset to the conversation history
+                  botContext?.handleChange("leadSessionsEmail")("");
+                  botContext?.handleChange("referedFrom")("");
+                }}
+              >
+                See all converstion history
+              </p>
+            </>
+          )}
         </div>
 
         {/*------------------------------------------yesterday's-chat----------------------------------------------*/}

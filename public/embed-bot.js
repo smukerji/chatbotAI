@@ -1,5 +1,5 @@
 (async function EmbedBot() {
-  const cssStyles = `
+  let cssStyles = `
   <style>
     @media only screen and (max-width: 768px) {
       iframe {
@@ -47,7 +47,6 @@
     }
   </style>
   `;
-
   // Get the script element
   const scriptElement = document.querySelector(
     'script[src="https://torri.ai/embed-bot.js"]'
@@ -55,7 +54,9 @@
 
   // Access the data attributes
   const param1 = scriptElement.getAttribute("chatbotID");
-  let bubbleIconUrl, chatbubbleColor;
+  let bubbleIconUrl, chatbubbleColor, chatbotBubbleAlignment;
+
+  let iframe;
 
   // Fetch bot settings
   try {
@@ -65,7 +66,13 @@
     if (!response.ok) throw new Error("Network response was not ok");
 
     const data = await response.json();
-    console.log(data?.chatbotSettings[0]?.bubbleIconUrl);
+
+    /// change the bubble alignment
+
+    if (data?.chatbotSettings[0]?.chatbotBubbleAlignment == "left") {
+      chatbotBubbleAlignment = data?.chatbotSettings[0]?.chatbotBubbleAlignment;
+    }
+
     bubbleIconUrl =
       data?.chatbotSettings[0]?.bubbleIconUrl == ""
         ? "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/message-2-cbgyJSCUz2djFE1PMXYozzVSV8Uwfp.svg"
@@ -99,15 +106,20 @@
     />
   `;
 
-  chatWidget.innerHTML = `
-    <iframe
-      id="chat-frame-widget"
-      src="https://torri.ai/embed-bot?chatbotID=${param1}"
-      frameborder="0"
-      style="display: none; position: fixed; inset: auto 15px 0px auto; width: 400px; height: 750px; opacity: 1; color-scheme: none; margin: 0px; max-height: 100vh; max-width: 100vw; transform: translateY(0px); transition: none 0s ease 0s !important; visibility: visible; border: none; bottom: 15px;"
-    ></iframe>
-    <button id="btn-trigger-chat">${icon_img}</button>
-  `;
+  iframe = `<iframe
+    id="chat-frame-widget"
+    src="https://chatbot-ai-silk.vercel.app/embed-bot?chatbotID=${param1}"
+    frameborder="0"
+    style="display: none; position: fixed; inset: auto 15px 0px auto; width: 400px; height: 750px; opacity: 1; color-scheme: none; margin: 0px; max-height: 100vh; max-width: 100vw; transform: translateY(0px); transition: none 0s ease 0s !important; visibility: visible; border: none; bottom: 15px;"
+  ></iframe>
+  <button id="btn-trigger-chat">${icon_img}</button>
+`;
+  if (chatbotBubbleAlignment === "left") {
+    cssStyles = cssStyles.replace("right: 20px", "left: 20px");
+    iframe = iframe.replace("position: fixed;", "position: unset;");
+  }
+
+  chatWidget.innerHTML = iframe;
 
   document.head.insertAdjacentHTML("beforeend", cssStyles);
   document.body.appendChild(chatWidget);
