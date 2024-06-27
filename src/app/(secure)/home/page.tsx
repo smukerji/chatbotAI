@@ -245,9 +245,11 @@ function Home({
       return;
     }
     if (totalCharCount < 100) {
-      message.warning("Not enough content to create the bot").then(() => {
-        botContext?.handleChange("isLoading")(false);
-      });
+      message
+        .warning("Minimum of 100 characters required to create the bot")
+        .then(() => {
+          botContext?.handleChange("isLoading")(false);
+        });
       return;
     }
     for await (const item of botDetails?.qaList) {

@@ -24,6 +24,7 @@
     "@vercel/kv": "^1.0.1",
     "ai": "^2.2.20",
     "antd": "^5.10.1",
+    "awesome-phonenumber": "^6.9.0",
     "axios": "^1.4.0",
     "bcrypt": "^5.1.1",
     "bullmq": "^5.4.3",

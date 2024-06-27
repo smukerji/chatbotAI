@@ -308,7 +308,10 @@ function Integration({ isPlanNotification, setIsPlanNotification }: any) {
         </div>
       </div>
       {/* -----------------------------------------Slack-integration------------------------------------------------------------- */}
-      <div className="integration i-btn">
+      <div
+        className="integration i-btn"
+        style={{ zIndex: isPlanNotification ? -1 : 0 }}
+      >
         <div className="name">
           <Image src={slackIcon} alt="slack-icon" height={35} width={35} />
           <span>Add to Slack</span>

@@ -63,7 +63,7 @@ const Leads = ({ chatbotId }: any) => {
     //   width: "20%",
     // },
     {
-      title: "Messages Log",
+      title: "Message Log",
       dataIndex: "sessions",
       render: (_: any, record: Item) => {
         return (
