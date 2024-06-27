@@ -8,6 +8,7 @@ export const CreateBotDataProvider = ({ children }: any) => {
     activeSource: "document",
     editChatbot: "chatbot",
     chabotSettings: "general",
+    userCountry: "",
 
     isLoading: false,
     totalCharCount: 0,

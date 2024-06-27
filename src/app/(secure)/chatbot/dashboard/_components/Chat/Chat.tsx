@@ -63,6 +63,7 @@ function Chat({
   setIsPlanNotification,
   userMessageColor,
   messagePlaceholder,
+  userLocation,
 }: any) {
   let tempRef: any = useRef<HTMLDivElement>();
   const router = useRouter();
@@ -78,6 +79,7 @@ function Chat({
   /// get the bot settings context
   const botSettingContext: any = useContext(ChatbotSettingContext);
   const botSettings = botSettingContext?.chatbotSettings;
+  console.log("bot settings", botSettingContext);
 
   leadFields = botSettingContext?.chatbotSettings?.leadFields
     ? botSettingContext?.chatbotSettings?.leadFields
@@ -87,9 +89,6 @@ function Chat({
     "userId",
     `leadDetails-${chatbot.id}`,
   ]);
-
-  // set the country according to user ip
-  const [userCountry, setUserCountry] = useState("us");
 
   /// storing the input value
   const [userQuery, setUserQuery] = useState("");
@@ -632,25 +631,25 @@ function Chat({
     console.log("iframe loadedd", guideValue, iframeLoaded);
   }, []);
 
-  // Get the ip and location of user
+  // // Get the ip and location of user
 
-  useEffect(() => {
-    const getUserIP = async () => {
-      const response = await fetch("https://api.ipify.org?format=json");
-      const data = await response.json();
-      const userIp = await data.ip;
+  // useEffect(() => {
+  //   const getUserIP = async () => {
+  //     const response = await fetch("https://api.ipify.org?format=json");
+  //     const data = await response.json();
+  //     const userIp = await data.ip;
 
-      const location = await fetch(
-        `https://ipinfo.io/${userIp}/json?token=${process.env.NEXT_PUBLIC_LOCATION_TOKEN}`
-      );
-      const data2 = await location.json();
-      const country = await data2?.country?.toLowerCase();
-      setUserCountry(country);
-      console.log("dataaaaaaaa", data2, process.env.NEXT_PUBLIC_LOCATION_TOKEN);
-      // return data.ip;
-    };
-    getUserIP();
-  }, []);
+  //     const location = await fetch(
+  //       `https://ipinfo.io/${userIp}/json?token=${process.env.NEXT_PUBLIC_LOCATION_TOKEN}`
+  //     );
+  //     const data2 = await location.json();
+  //     const country = await data2?.country?.toLowerCase();
+  //     setUserCountry(country);
+  //     console.log("dataaaaaaaa", data2, process.env.NEXT_PUBLIC_LOCATION_TOKEN);
+  //     // return data.ip;
+  //   };
+  //   getUserIP();
+  // }, []);
 
   return (
     <div className="chat-container">
@@ -1034,7 +1033,11 @@ function Chat({
                       /> */}
 
                       <PhoneInput
-                        country={userCountry}
+                        country={
+                          botDetails?.userCountry !== ""
+                            ? botDetails?.userCountry
+                            : userLocation
+                        }
                         value={mobileNumber}
                         placeholder="Enter your phone number"
                         onChange={(phone, country: any) => {

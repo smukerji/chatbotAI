@@ -139,6 +139,11 @@ function Dashboard() {
           window.location.href = "/account/login";
         }
 
+        /// set user country
+        botContext.handleChange("userCountry")(
+          content?.country ? content?.country : "us"
+        );
+
         /// set all the chatbot setting
         chatbotSettingContext?.loadData(content?.chatbotSetting);
         content?.chatbotSetting?.initialMessage?.map(
