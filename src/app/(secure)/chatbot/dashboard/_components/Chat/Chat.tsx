@@ -88,6 +88,9 @@ function Chat({
     `leadDetails-${chatbot.id}`,
   ]);
 
+  // set the country according to user ip
+  const [userCountry, setUserCountry] = useState("us");
+
   /// storing the input value
   const [userQuery, setUserQuery] = useState("");
 
@@ -514,31 +517,14 @@ function Chat({
     }
   };
 
-  // For checking the length of phone number for each country
-
-  const calculateMaxLength = (format: any) => {
-    // Count the number of dots in the format string to determine the number of digits
-    const digitCount = (format.match(/\./g) || []).length;
-    console.log("digit counttttttttt", digitCount);
-
-    return digitCount;
-  };
-
   // To check if phone number is valid or not
-  const isValidPhoneNumber = (value: any, country: any) => {
-    console.log(value, country);
-
-    const format = country.format || "";
-    const maxLength = calculateMaxLength(format);
-    const numericPhone = value.replace(/\D/g, "");
-    setIsNumberValid(numericPhone.length == maxLength);
-    return numericPhone.length == maxLength;
-  };
 
   function getPhoneNumberLength(value: any, country: any) {
     const pn = parsePhoneNumber(value, {
       regionCode: country.iso2,
     });
+
+    console.log(pn);
 
     // const numberInfo = pn.toJSON();
     setIsNumberValid(pn.valid);
@@ -646,7 +632,25 @@ function Chat({
     console.log("iframe loadedd", guideValue, iframeLoaded);
   }, []);
 
-  console.log("formattedd numberrrr", mobileNumber);
+  // Get the ip and location of user
+
+  useEffect(() => {
+    const getUserIP = async () => {
+      const response = await fetch("https://api.ipify.org?format=json");
+      const data = await response.json();
+      const userIp = await data.ip;
+
+      const location = await fetch(
+        `https://ipinfo.io/${userIp}/json?token=${process.env.NEXT_PUBLIC_LOCATION_TOKEN}`
+      );
+      const data2 = await location.json();
+      const country = await data2?.country?.toLowerCase();
+      setUserCountry(country);
+      console.log("dataaaaaaaa", data2, process.env.NEXT_PUBLIC_LOCATION_TOKEN);
+      // return data.ip;
+    };
+    getUserIP();
+  }, []);
 
   return (
     <div className="chat-container">
@@ -1030,7 +1034,7 @@ function Chat({
                       /> */}
 
                       <PhoneInput
-                        country={"us"}
+                        country={userCountry}
                         value={mobileNumber}
                         placeholder="Enter your phone number"
                         onChange={(phone, country: any) => {

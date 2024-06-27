@@ -68,8 +68,8 @@ async function getConversationHistory(request: NextRequest) {
             chatbotId: 0,
             userId: 0,
           })
-          .skip((page - 1) * pageSize)
-          .limit(pageSize)
+          // .skip((page - 1) * pageSize)
+          // .limit(pageSize)
           .toArray();
       }
 

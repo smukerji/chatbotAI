@@ -11,6 +11,11 @@ module.exports = apiHandler({
 });
 
 async function dataSources(request: any) {
+  const ip =
+    request.headers.get("x-forwarded-for") || request.connection?.remoteAddress;
+
+  console.log("ip", ip, request.headers);
+
   /// get the session and then access the id
   const session: any = await getServerSession(authOptions);
   const userId = request?.headers.get("userId")
