@@ -61,6 +61,7 @@
   // Fetch bot settings
   try {
     const response = await fetch(
+      // `https://chatbot-ai-silk.vercel.app/chatbot/popup/details/api?chatbotId=${param1}`
       `https://chatbot-ai-silk.vercel.app/chatbot/popup/details/api?chatbotId=${param1}`
     );
     if (!response.ok) throw new Error("Network response was not ok");

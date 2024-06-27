@@ -42,14 +42,17 @@ function Chatbot() {
   const [userDetails, setUserDetails] = useState();
 
   /// chabot apperance
-  const [userMessageColor,setUserMessageColor] = useState()
-  const [messagePlaceholder,setMessagePlaceholder] = useState()
+  const [userMessageColor, setUserMessageColor] = useState();
+  const [messagePlaceholder, setMessagePlaceholder] = useState();
 
   /// state to keep the chatbot open or close
   const [state, setState] = useState(false);
   function toggleChatbot() {
     setState(!state);
   }
+
+  /// set user location
+  const [userLocation, setUserLocation] = useState("");
 
   /// used to fetch the bot details
   const [isBotDetailsFetched, setIsBotDetailsFetched] = useState(false);
@@ -99,13 +102,14 @@ function Chatbot() {
       getUser(botDetails?.userId);
 
       setUserId(botDetails?.userId);
+      setUserLocation(botDetails?.country);
       setSuggestedMessages(botDetails?.chatbotSettings[0]?.suggestedMessages);
       setInitialMessage(botDetails?.chatbotSettings[0]?.initialMessage);
       setLeadFields(botDetails?.chatbotSettings[0]?.leadFields);
       setLeadTitle(botDetails?.chatbotSettings[0]?.leadTitle);
       setUserDetails(botDetails?.chatbotSettings[0]?.userDetails);
-      setUserMessageColor(botDetails?.chatbotSettings[0]?.userMessageColor)
-      setMessagePlaceholder(botDetails?.chatbotSettings[0]?.messagePlaceholder)
+      setUserMessageColor(botDetails?.chatbotSettings[0]?.userMessageColor);
+      setMessagePlaceholder(botDetails?.chatbotSettings[0]?.messagePlaceholder);
       botDetails?.chatbotSettings[0]?.initialMessage?.map((message, index) => {
         // setMessages((prev): any => {
         //   [
@@ -142,33 +146,34 @@ function Chatbot() {
   return (
     <>
       {/* {state && ( */}
-        <div className="embed-chatbot-container">
-          <Chat
-            chatbot={chatbot}
-            messages={messages}
-            setMessages={setMessages}
-            messagesTime={messagesTime}
-            setMessagesTime={setMessagesTime}
-            sessionID={sessionID}
-            sessionStartDate={sessionStartDate}
-            setSessionID={setSessionID}
-            setSessionStartDate={setSessionStartDate}
-            isPopUp={true}
-            userId={userId}
-            chatbotName={chatbotName}
-            chatbotDisplayName={displayName}
-            suggestedMessages={suggestedMessages}
-            initialMessage={initialMessage}
-            profilePictureUrl={profilePictureUrl}
-            leadFields={leadFields}
-            leadTitle={leadTitle}
-            userLeadDetails={userDetails}
-            isPlanNotification={isPlanNotification}
-            setIsPlanNotification={setIsPlanNotification}
-            userMessageColor={userMessageColor}
-            messagePlaceholder={messagePlaceholder}
-          />
-        </div>
+      <div className="embed-chatbot-container">
+        <Chat
+          chatbot={chatbot}
+          messages={messages}
+          setMessages={setMessages}
+          messagesTime={messagesTime}
+          setMessagesTime={setMessagesTime}
+          sessionID={sessionID}
+          sessionStartDate={sessionStartDate}
+          setSessionID={setSessionID}
+          setSessionStartDate={setSessionStartDate}
+          isPopUp={true}
+          userId={userId}
+          chatbotName={chatbotName}
+          chatbotDisplayName={displayName}
+          suggestedMessages={suggestedMessages}
+          initialMessage={initialMessage}
+          profilePictureUrl={profilePictureUrl}
+          leadFields={leadFields}
+          leadTitle={leadTitle}
+          userLeadDetails={userDetails}
+          isPlanNotification={isPlanNotification}
+          setIsPlanNotification={setIsPlanNotification}
+          userMessageColor={userMessageColor}
+          messagePlaceholder={messagePlaceholder}
+          userLocation={userLocation}
+        />
+      </div>
       {/* )} */}
 
       {/* <div className="chatbot-icon" onClick={toggleChatbot}> */}
