@@ -62,49 +62,49 @@ const Leads = ({ chatbotId }: any) => {
     //   dataIndex: "address",
     //   width: "20%",
     // },
-    // {
-    //   title: "Messages Log",
-    //   dataIndex: "sessions",
-    //   render: (_: any, record: Item) => {
-    //     return (
-    //       <Typography.Link
-    //         // disabled={editingKey !== ""}
-    //         onClick={() => {
-    //           if (record?.email == "N/A") {
-    //             message.error("Email not found to retrive leads");
-    //           } else {
-    //             botContext?.handleChange("leadSessionsEmail")(record?.email);
-    //             botContext?.handleChange("editChatbot")("history");
-    //             botContext?.handleChange("referedFrom")("leads");
-    //           }
-    //         }}
-    //       >
-    //         Detail &nbsp;&nbsp;&gt;
-    //       </Typography.Link>
-    //     );
-    //     // const editable = isEditing(record);
-    //     // return editable ? (
-    //     //   <span>
-    //     //     <Typography.Link
-    //     //       onClick={() => save(record.key)}
-    //     //       style={{ marginRight: 8 }}
-    //     //     >
-    //     //       Save
-    //     //     </Typography.Link>
-    //     //     <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
-    //     //       <a>Cancel</a>
-    //     //     </Popconfirm>
-    //     //   </span>
-    //     // ) : (
-    //     //   <Typography.Link
-    //     //     disabled={editingKey !== ""}
-    //     //     onClick={() => edit(record)}
-    //     //   >
-    //     //     Edit
-    //     //   </Typography.Link>
-    //     // );
-    //   },
-    // },
+    {
+      title: "Message Log",
+      dataIndex: "sessions",
+      render: (_: any, record: Item) => {
+        return (
+          <Typography.Link
+            // disabled={editingKey !== ""}
+            onClick={() => {
+              if (record?.email == "N/A") {
+                message.error("Email not found to retrive leads");
+              } else {
+                botContext?.handleChange("leadSessionsEmail")(record?.email);
+                botContext?.handleChange("editChatbot")("history");
+                botContext?.handleChange("referedFrom")("leads");
+              }
+            }}
+          >
+            Detail &nbsp;&nbsp;&gt;
+          </Typography.Link>
+        );
+        // const editable = isEditing(record);
+        // return editable ? (
+        //   <span>
+        //     <Typography.Link
+        //       onClick={() => save(record.key)}
+        //       style={{ marginRight: 8 }}
+        //     >
+        //       Save
+        //     </Typography.Link>
+        //     <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
+        //       <a>Cancel</a>
+        //     </Popconfirm>
+        //   </span>
+        // ) : (
+        //   <Typography.Link
+        //     disabled={editingKey !== ""}
+        //     onClick={() => edit(record)}
+        //   >
+        //     Edit
+        //   </Typography.Link>
+        // );
+      },
+    },
   ];
 
   const mergedColumns: TableProps["columns"] = columns.map((col) => {

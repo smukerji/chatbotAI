@@ -37,6 +37,7 @@ import {
 } from "../../../../../_helpers/errorConstants";
 import { useRouter } from "next/navigation";
 import CustomModal from "../CustomModal/CustomModal";
+import { parsePhoneNumber } from "awesome-phonenumber";
 
 function Chat({
   chatbot,
@@ -118,6 +119,7 @@ function Chat({
   const [emailError, setEmailError] = useState("");
   const [numberError, setNumberError] = useState("");
   const [nameError, setNameError] = useState("");
+  const [validNumberError, setValidNumberError] = useState("");
 
   /// chatbot lead section state
   const [leadDetails, setLeadDetails] = useState({
@@ -128,6 +130,10 @@ function Chat({
 
   /// to check if iframe is loaded or not
   const [iframeLoaded, setiFrameLoaded] = useState(false);
+
+  /// state for max phone number limit
+  const [mobileNumber, setMobileNumber] = useState("");
+  const [isNumberValid, setIsNumberValid] = useState(false);
 
   /// handling the chatbot ok action
   const handleOk = async () => {
@@ -508,6 +514,37 @@ function Chat({
     }
   };
 
+  // For checking the length of phone number for each country
+
+  const calculateMaxLength = (format: any) => {
+    // Count the number of dots in the format string to determine the number of digits
+    const digitCount = (format.match(/\./g) || []).length;
+    console.log("digit counttttttttt", digitCount);
+
+    return digitCount;
+  };
+
+  // To check if phone number is valid or not
+  const isValidPhoneNumber = (value: any, country: any) => {
+    console.log(value, country);
+
+    const format = country.format || "";
+    const maxLength = calculateMaxLength(format);
+    const numericPhone = value.replace(/\D/g, "");
+    setIsNumberValid(numericPhone.length == maxLength);
+    return numericPhone.length == maxLength;
+  };
+
+  function getPhoneNumberLength(value: any, country: any) {
+    const pn = parsePhoneNumber(value, {
+      regionCode: country.iso2,
+    });
+
+    // const numberInfo = pn.toJSON();
+    setIsNumberValid(pn.valid);
+    return pn.valid;
+  }
+
   /// function for submitting lead
   const submitLeadDetail = async () => {
     setLeadError("");
@@ -523,7 +560,18 @@ function Chat({
         return;
       }
 
-      if (nameError !== "" || emailError !== "" || numberError !== "") return;
+      // if (leadFields?.number.isChecked == true && !isNumberValid) {
+      //   setLeadError("Please, enter valid number.");
+      //   return;
+      // }
+
+      if (
+        nameError !== "" ||
+        emailError !== "" ||
+        numberError !== "" ||
+        validNumberError !== ""
+      )
+        return;
       // if (leadFields?.name.isChecked == true && leadDetails.name === "") {
       //   setNameError("Please enter your name");
       //   return;
@@ -597,6 +645,8 @@ function Chat({
 
     console.log("iframe loadedd", guideValue, iframeLoaded);
   }, []);
+
+  console.log("formattedd numberrrr", mobileNumber);
 
   return (
     <div className="chat-container">
@@ -981,15 +1031,47 @@ function Chat({
 
                       <PhoneInput
                         country={"us"}
-                        value={leadDetails?.number}
+                        value={mobileNumber}
                         placeholder="Enter your phone number"
-                        onChange={(phone) => {
+                        onChange={(phone, country: any) => {
+                          // Process to format the phone number
+                          const phoneWithoutCode = phone.startsWith(
+                            `${country?.dialCode}`
+                          )
+                            ? phone.slice(`${country?.dialCode}`.length)
+                            : phone;
+                          const formattedPhone: any = `+${country?.dialCode}-${phoneWithoutCode}`;
+
+                          setMobileNumber(phone);
+
                           setLeadDetails({
                             ...leadDetails,
-                            number: phone,
+                            number: formattedPhone,
                           });
+                          setLeadError("");
+                          setValidNumberError("");
+                        }}
+                        // onChange={(phone, country) =>
+                        //   handlePhoneChange(phone, country)
+                        // }
+                        enableLongNumbers={true}
+                        isValid={(value: any, country: any) =>
+                          // isValidPhoneNumber(value, country)
+                          getPhoneNumberLength(value, country)
+                        }
+                        onBlur={() => {
+                          if (
+                            leadFields?.number.isChecked == true &&
+                            !isNumberValid
+                          ) {
+                            setValidNumberError("Please enter valid number");
+                            return;
+                          }
                         }}
                       />
+                      <div className="lead-error">
+                        <p>{validNumberError}</p>
+                      </div>
                     </div>
                   )}
                   {leadError && (

@@ -380,6 +380,15 @@
           width: 100%;
         }
 
+        .react-tel-input .form-control.invalid-number {
+          background-color: #fff;
+        }
+
+        // .react-tel-input .selected-flag:hover,
+        // .react-tel-input .selected-flag:focus {
+        //   background-color: unset;
+        // }
+
         .react-tel-input .flag-dropdown {
           border: none;
           border-radius: 10px 0 0 10px;

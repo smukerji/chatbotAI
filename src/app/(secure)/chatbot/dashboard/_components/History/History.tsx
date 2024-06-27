@@ -193,7 +193,20 @@ function History({ chatbotId }: any) {
                                 : "block",
                           }}
                         >
-                          {data[1]?.email ? data[1]?.email : "Anonymous"}
+                          {data[1]?.email ? (
+                            <span
+                              style={{
+                                textTransform:
+                                  data[1].email == "Anonymous"
+                                    ? "capitalize"
+                                    : "lowercase",
+                              }}
+                            >
+                              {data[1]?.email}
+                            </span>
+                          ) : (
+                            "Anonymous"
+                          )}
                         </div>
                         <div>{getTimeAgo(data[1].sessionEndDate)}</div>
                       </div>

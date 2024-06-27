@@ -439,6 +439,7 @@ Header a {
     backdrop-filter: blur(4px);
     background: none;
     margin-top: 70px;
+    z-index: 0;
   }
   .ant-modal-wrap {
     height: calc(100% - 70px);
