@@ -81,11 +81,11 @@ export default function RootLayout({
           defer={true}
         ></Script>{" "}
         {/* Old torri bot (Broken)*/}
-        {/* <Script
+        <Script
           src="https://torri.ai/embed-bot.js"
           // @ts-ignore
-          chatbotid="9bfb16c7-142e-4946-9ce2-61282e64b38b"
-        ></Script> */}
+          chatbotid="5049369b-bbd0-49a5-84dc-c9c62b60f87e"
+        ></Script>
         {/*         <Script
           src="https://ichefpos.vercel.app/embed-bot.js"
           // @ts-ignore
