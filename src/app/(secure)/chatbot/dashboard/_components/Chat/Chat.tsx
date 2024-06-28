@@ -1034,7 +1034,7 @@ function Chat({
 
                       <PhoneInput
                         country={
-                          botDetails?.userCountry !== ""
+                          botDetails?.userCountry
                             ? botDetails?.userCountry
                             : userLocation
                         }
