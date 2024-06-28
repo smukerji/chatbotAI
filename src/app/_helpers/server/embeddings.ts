@@ -55,6 +55,63 @@ export async function generateChunksNEmbeddForLinks(
   }
 }
 
+export async function generateChunksNEmbeddExcel(
+  content: any[],
+  source: string,
+  chatbotId: string,
+  userId: string,
+  filename: string = "none"
+) {
+  // /// split the content in 1000 characters
+  // let start = 0;
+  // let end = content.length;
+  let contentLength = 0;
+
+  /// storing the chunks
+  const chunks: any = content.map((item) => {
+    const text = JSON.stringify(item);
+    contentLength += text.length;
+    return text;
+  });
+
+  /// creating chunks with batch size 2000
+  const batchSize = 250;
+  let data: any = [];
+  let dataIDs: any = [];
+  /// creating embeddings
+  for (let i = 0; i < chunks.length; i += batchSize) {
+    let tempData: any = [];
+    const batch = chunks.slice(i, i + batchSize);
+    const batchEmbedding: any = await openaiObj().embeddings.create({
+      model: "text-embedding-ada-002",
+      input: batch,
+    });
+    batchEmbedding.data.map((embeddingData: any, index: number) => {
+      const id = uuidv4();
+      dataIDs.push(id);
+      /// storing in response data
+      data.push({
+        metadata: { content: chunks[index], source, filename, chatbotId },
+        values: embeddingData.embedding,
+        id: id,
+      });
+
+      tempData.push({
+        metadata: { content: chunks[index], source, filename, chatbotId },
+        values: embeddingData.embedding,
+        id: id,
+      });
+    });
+
+    /// currently being used to upsert on files data
+    if (userId != "") {
+      await upsert(tempData, userId);
+    }
+  }
+
+  return { data, dataIDs, contentLength };
+}
+
 export async function generateChunksNEmbedd(
   content: string,
   source: string,

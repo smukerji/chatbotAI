@@ -32,12 +32,25 @@ export default async function handler(req, res) {
             destinationPath,
             files.file[0].mimetype
           );
-          res.status(200).send({
-            charLength: pdfText.length,
-            filepath: destinationPath,
-            fileType: files.file[0].mimetype,
-            fileText: pdfText,
-          });
+          if (
+            files.file[0].mimetype ===
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+            files.file[0].mimetype === "text/csv"
+          ) {
+            res.status(200).send({
+              charLength: JSON.stringify(pdfText).length,
+              filepath: destinationPath,
+              fileType: files.file[0].mimetype,
+              fileText: pdfText,
+            });
+          } else {
+            res.status(200).send({
+              charLength: pdfText.length,
+              filepath: destinationPath,
+              fileType: files.file[0].mimetype,
+              fileText: pdfText,
+            });
+          }
         } catch (error) {
           console.error(error);
           res.status(500).send("Error reading file content");
