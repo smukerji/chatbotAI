@@ -37,10 +37,10 @@ export async function readContent(filePath, fileType) {
     });
 
     // Convert the CSV data to text
-    const csvText = csvData
-      .map((row) => Object.values(row).join(","))
-      .join("\n");
-    return csvText;
+    // const csvText = csvData
+    //   .map((row) => Object.values(row).join(","))
+    //   .join("\n");
+    return csvData;
   } else if (
     fileType ===
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -51,9 +51,26 @@ export async function readContent(filePath, fileType) {
     const sheet = workbook.Sheets[sheetName];
     const xlsxData = xlsx.utils.sheet_to_json(sheet, { header: 1 });
 
+    /// assuming the first row will be the key pairs
+    const keys = xlsxData.shift();
+    // console.log("keys", keys);
+    // console.log("XLSX data", xlsxData);
+
+    const jsonData = [];
+    let objectCount = 0;
+    for (const data of xlsxData) {
+      data.forEach((value, index) => {
+        if (!jsonData[objectCount]) {
+          jsonData[objectCount] = {};
+        }
+        jsonData[objectCount][keys[index]] = value;
+      });
+      objectCount++;
+    }
+
     // Convert the XLSX data to text
-    const xlsxText = xlsxData.map((row) => row.join(",")).join("\n");
-    return xlsxText;
+    // const xlsxText = xlsxData.map((row) => row.join(",")).join("\n");
+    return jsonData;
   }
 
   // Handle unsupported file types

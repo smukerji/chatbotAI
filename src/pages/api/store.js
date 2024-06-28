@@ -1,6 +1,7 @@
 import { readContent } from "../../app/_helpers/server/ReadContent";
 import {
   generateChunksNEmbedd,
+  generateChunksNEmbeddExcel,
   generateChunksNEmbeddForLinks,
 } from "../../app/_helpers/server/embeddings";
 import clientPromise from "../../db";
@@ -266,15 +267,32 @@ export default async function handler(req, res) {
                 // const content = await readContent(file.filepath, file.fileType);
                 // console.log("FileData >>>>>>>>>>", file);
                 const content = file.fileText;
-                /// generating chunks and embedding
-                const chunks = await generateChunksNEmbedd(
-                  content,
-                  "file",
-                  chatbotId,
-                  userId,
-                  file.name
-                );
-                resolve(chunks);
+                /// process the excel data differently
+                if (
+                  file.fileType ===
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+                  file.fileType === "text/csv"
+                ) {
+                  /// generating chunks and embedding
+                  const chunks = await generateChunksNEmbeddExcel(
+                    content,
+                    "file",
+                    chatbotId,
+                    userId,
+                    file.name
+                  );
+                  resolve(chunks);
+                } else {
+                  /// generating chunks and embedding
+                  const chunks = await generateChunksNEmbedd(
+                    content,
+                    "file",
+                    chatbotId,
+                    userId,
+                    file.name
+                  );
+                  resolve(chunks);
+                }
               } else {
                 reject();
               }
