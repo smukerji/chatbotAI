@@ -181,9 +181,14 @@ function Header() {
             {/*------------------------------------------feedback-btn----------------------------------------------*/}
             <button
               className="feedback-btn"
-              onClick={() => setOpenSupport(true)}
+              // onClick={() => setOpenSupport(true)}
             >
-              Support
+              <a
+                href="https://torri-ai.canny.io/torri-agent-feedback"
+                target="_blank"
+              >
+                Support
+              </a>
             </button>
           </>
         )}
