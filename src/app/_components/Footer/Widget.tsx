@@ -17,7 +17,12 @@ const Widget = ({
         {list.map((lt: any) => (
           <li key={lt.title}>
             {lt.title == "Support" ? (
-              <a onClick={() => setOpenSupport(true)}>{lt.title}</a>
+              <a
+                href="https://torri-ai.canny.io/torri-agent-feedback"
+                target="_blank"
+              >
+                {lt.title}
+              </a>
             ) : (
               <a href={lt.url || "#"}>{lt.title}</a>
             )}

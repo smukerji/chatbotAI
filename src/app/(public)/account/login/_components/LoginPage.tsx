@@ -27,7 +27,8 @@ function LoginPage() {
   const [email, setEmail]: any = useState(null);
   const [password, setPassword]: any = useState(null);
 
-  const { status } = useSession();
+  const { data: session, status } = useSession();
+
   const [loading, setLoading] = useState(false);
   const antIcon = (
     <LoadingOutlined
@@ -35,16 +36,35 @@ function LoginPage() {
       spin
     />
   );
-  if (status === "authenticated") {
-    const searchParams = new URLSearchParams(window.location.search);
-    const key = searchParams.get("key");
+  // if (status === "authenticated") {
+  //   const searchParams = new URLSearchParams(window.location.search);
+  //   const key = searchParams.get("key");
+  //   message.success(`Welcome Back ${session.user?.name}`).then(() => {
+  //     if (!key) {
+  //       console.log("redirected from here.....");
 
-    if (!key) {
-      window.location.href = "/chatbot";
-    } else {
-      window.location.href = String(key);
+  //       window.location.href = "/chatbot";
+  //     } else {
+  //       window.location.href = String(key);
+  //     }
+  //   });
+  // }
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      const searchParams = new URLSearchParams(window.location.search);
+      const key = searchParams.get("key");
+      message.success(`Welcome Back ${session.user?.name}`).then(() => {
+        if (!key) {
+          console.log("redirected from here.....");
+
+          window.location.href = "/chatbot";
+        } else {
+          window.location.href = String(key);
+        }
+      });
     }
-  }
+  }, [status]);
 
   const userService = useUserService();
   /// when the form is submitted
@@ -130,7 +150,7 @@ function LoginPage() {
     try {
       await signIn(provider);
       // After successful sign-in, replace the current history entry
-      window.history.replaceState(null, "", window.location.href);
+      // window.history.replaceState(null, "", window.location.href);
     } catch (error) {
       console.error("Sign-in error:", error);
     }

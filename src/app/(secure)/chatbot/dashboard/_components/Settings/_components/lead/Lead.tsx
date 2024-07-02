@@ -79,6 +79,12 @@ function Lead({ chatbotId }: any) {
     }
   };
 
+  console.log(
+    "hellllll0",
+    botSettings?.leadFields.email.isChecked,
+    botSettings
+  );
+
   return (
     <>
       <div className="lead-container">
@@ -243,7 +249,9 @@ function Lead({ chatbotId }: any) {
             )}
 
             <div className="detail-field">
-              <p>Email Address</p>
+              <p>
+                Email Address <span style={{ color: "red" }}>*</span>
+              </p>
               <Switch
                 checked={botSettings?.leadFields?.email?.isChecked}
                 onChange={(checked) => {
@@ -256,6 +264,7 @@ function Lead({ chatbotId }: any) {
                   updatedFields.email.isChecked = checked;
                   botSettingContext?.handleChange("leadFields")(updatedFields);
                 }}
+                disabled
               />
             </div>
 

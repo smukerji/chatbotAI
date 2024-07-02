@@ -5,6 +5,7 @@ import "./loadermodal.scss";
 import ChatbotReady from "../../../../../../../public/svgs/chatbot_ready.svg";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import gif from "../../../../../../../public/create-chatbot-svgs/create-bot-animation.gif";
 
 function LoaderModal({ isResponseOk, setIsResponseOk }: any) {
   const router = useRouter();
@@ -55,6 +56,7 @@ function LoaderModal({ isResponseOk, setIsResponseOk }: any) {
           className="chatbot-trained-loader"
         >
           <Spin indicator={<LoadingOutlined spin />} />
+          {/* <Image src={gif} alt="gif" /> */}
           <p className="please-wait-text">
             Please wait while your Chatbot is getting trained!
           </p>
