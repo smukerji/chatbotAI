@@ -79,7 +79,6 @@ function Chat({
   /// get the bot settings context
   const botSettingContext: any = useContext(ChatbotSettingContext);
   const botSettings = botSettingContext?.chatbotSettings;
-  console.log("bot settings", botSettingContext, botDetails, userLocation);
 
   leadFields = botSettingContext?.chatbotSettings?.leadFields
     ? botSettingContext?.chatbotSettings?.leadFields

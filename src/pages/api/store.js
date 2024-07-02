@@ -652,7 +652,7 @@ export default async function handler(req, res) {
             noOfMessagesSent: 0,
             leadFields: {
               name: { isChecked: false, value: "name" },
-              email: { isChecked: false, value: "email" },
+              email: { isChecked: true, value: "email" },
               number: { isChecked: false, value: "number" },
             },
             leadTitle: defaultLeadTitle,
