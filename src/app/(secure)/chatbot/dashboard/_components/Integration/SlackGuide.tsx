@@ -207,8 +207,10 @@ function SlackGuide() {
 
                 <li>
                   Now inside the Event Subscription, add the following URL
-                  inside Request URL
-                  “https://b19c-125-20-216-178.ngrok-free.app/chatbot/dashboard/slack-botintegration/webhook”
+                  inside Request URL{" "}
+                  <span>
+                    {`${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard/slack-bot-integration/webhook`}
+                  </span>
                 </li>
 
                 <div className="steps-img">

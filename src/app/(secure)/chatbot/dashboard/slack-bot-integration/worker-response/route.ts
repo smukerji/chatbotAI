@@ -1,4 +1,6 @@
 import clientPromise from "@/db";
+import moment from "moment";
+import { ObjectId } from "mongodb";
 import { NextRequest, NextResponse } from "next/server";
 const { WebClient, LogLevel } = require("@slack/web-api");
 
@@ -7,6 +9,25 @@ interface SlackAppData {
   userId: string;
   authOToken: string;
   chatBotId: string;
+}
+
+interface SlackChatHistoryType {
+  _id?: ObjectId;
+  userId: string;
+  chatbotId: string;
+  chats: {
+    [key: string]: {
+      messages: {
+        role: string;
+        content: string;
+      }[];
+      usage: {
+        completion_tokens: number;
+        prompt_tokens: number;
+        total_tokens: number;
+      };
+    };
+  };
 }
 
 export async function POST(req: NextRequest) {
@@ -44,6 +65,7 @@ export async function POST(req: NextRequest) {
       const chatBotId = appDetails.chatBotId;
       const message = data.event.text.replace(/<@.*?>\s*\n?/, "");
       const userID = appDetails.userId;
+      console.log("insideee app detailsss");
 
       step = 3;
       const client = new WebClient(authOToken, {
@@ -153,6 +175,8 @@ export async function POST(req: NextRequest) {
           const openaiBody = JSON.parse(await responseOpenAI.text());
 
           step = 7;
+          console.log("this is step 77777777");
+
           // after getting response from open ai send the response to slack
           if (openaiBody.choices[0].message.content) {
             await client.chat.postMessage({
@@ -160,6 +184,84 @@ export async function POST(req: NextRequest) {
               text: openaiBody.choices[0].message.content,
               thread_ts: data.event.ts,
             });
+
+            // after sending the message store history in database
+            let userChatHistoryCollection = db.collection("slack-chat-history");
+
+            let userChatHistory: SlackChatHistoryType =
+              await userChatHistoryCollection.findOne({
+                userId: userID,
+                date: moment().utc().format("YYYY-MM-DD"),
+              });
+
+            const newChatEntry = {
+              role: "user",
+              content: `${message}`,
+            };
+
+            const assistantResponse = {
+              role: "assistant",
+              content: openaiBody.choices[0].message.content,
+            };
+
+            const newChatData = {
+              messages: [newChatEntry, assistantResponse],
+              // usage: {
+              //   completion_tokens: openaiBody.usage.completion_tokens,
+              //   prompt_tokens: openaiBody.usage.prompt_tokens - similaritySearchResults,
+              //   total_tokens: openaiBody.usage.total_tokens - similaritySearchResults,
+              // },
+            };
+
+            //find the user's chatbot model
+            // let userChatBotModel = await userChatBotSetting.findOne({
+            //   userId: userId,
+            // });
+
+            //stores chat history
+            if (userChatHistory) {
+              // If chat history for today exists, update it
+              if (!userChatHistory.chats[appId]) {
+                console.log("goes in iffffffffffffffff");
+
+                userChatHistory.chats[appId] = {
+                  messages: [],
+                  usage: {
+                    completion_tokens: 0,
+                    prompt_tokens: 0,
+                    total_tokens: 0,
+                  },
+                };
+              }
+
+              userChatHistory.chats[appId].messages.push(
+                newChatEntry,
+                assistantResponse
+              );
+              // userChatHistory.chats[appId].usage.completion_tokens +=
+              //   openaiBody.usage.completion_tokens;
+              // userChatHistory.chats[appId].usage.prompt_tokens +=
+              //   openaiBody.usage.prompt_tokens - similaritySearchResults;
+              // userChatHistory.chats[appId].usage.total_tokens +=
+              //   openaiBody.usage.total_tokens - similaritySearchResults;
+
+              await userChatHistoryCollection.updateOne(
+                { userId: userID, date: moment().utc().format("YYYY-MM-DD") },
+                { $set: { chats: userChatHistory.chats } }
+              );
+            } else {
+              // If no chat history for today exists, create a new entry
+              console.log("goes in elseeeeeeeee");
+
+              await userChatHistoryCollection.insertOne({
+                userId: userID,
+                chatbotId: chatBotId,
+                chats: {
+                  [`${appId}`]: newChatData,
+                },
+                date: moment().utc().format("YYYY-MM-DD"),
+              });
+            }
           } else {
             step = 8;
             //if update result is true and open ai didn't respond then decrement the message count
