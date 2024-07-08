@@ -257,6 +257,9 @@ export async function POST(request: NextRequest) {
         step = 11;
         if (openaiBody.choices[0].message.content) {
           let similarSearchToken = encode(similaritySearchResults).length;
+          let instructionTokenLength = encode(
+            userChatBotModel?.instruction
+          ).length;
           step = 10;
           //stores chat history
           await userChatHistoryCollection.insertOne({
@@ -277,9 +280,13 @@ export async function POST(request: NextRequest) {
                 usage: {
                   completion_tokens: openaiBody.usage.completion_tokens,
                   prompt_tokens:
-                    openaiBody.usage.prompt_tokens - similarSearchToken,
+                    openaiBody.usage.prompt_tokens -
+                    instructionTokenLength -
+                    similarSearchToken,
                   total_tokens:
-                    openaiBody.usage.total_tokens - similarSearchToken,
+                    openaiBody.usage.total_tokens -
+                    instructionTokenLength -
+                    similarSearchToken,
                 },
               },
             },
@@ -304,6 +311,9 @@ export async function POST(request: NextRequest) {
         //calculate the total tokens based on user message
         let previousTotalTokens = 0;
         let similarSearchToken = encode(similaritySearchResults).length;
+        let instructionTokenLength = encode(
+          userChatBotModel?.instruction
+        ).length;
         let conversationMessages: any = [];
         let currentQuestionsTotalTokens: any = encode(
           queryFromTelegramUser
@@ -454,9 +464,13 @@ export async function POST(request: NextRequest) {
               usage: {
                 completion_tokens: openaiBody.usage.completion_tokens,
                 prompt_tokens:
-                  openaiBody.usage.prompt_tokens - similarSearchToken,
+                  openaiBody.usage.prompt_tokens -
+                  instructionTokenLength -
+                  similarSearchToken,
                 total_tokens:
-                  openaiBody.usage.total_tokens - similarSearchToken,
+                  openaiBody.usage.total_tokens -
+                  instructionTokenLength -
+                  similarSearchToken,
               },
             };
             //update the chat history

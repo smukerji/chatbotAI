@@ -55,8 +55,9 @@ function LoaderModal({ isResponseOk, setIsResponseOk }: any) {
           footer=""
           className="chatbot-trained-loader"
         >
-          <Spin indicator={<LoadingOutlined spin />} />
-          {/* <Image src={gif} alt="gif" /> */}
+          {/* <Spin indicator={<LoadingOutlined spin />} /> */}
+          <Image src={gif} alt="gif" />
+          <p className="training-chatbot">Training your Chatbot</p>
           <p className="please-wait-text">
             Please wait while your Chatbot is getting trained!
           </p>

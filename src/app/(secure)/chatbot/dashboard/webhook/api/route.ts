@@ -127,7 +127,7 @@ export async function GET(req: NextRequest) {
     console.log("verified successfully");
     return new Response(hubChallenge);
   }
-
+  console.log("->>>>>>>>>>>>>>>>>>");
   return new Response("Invalid Credentials", { status: 400 });
 }
 
@@ -355,6 +355,9 @@ async function whatsAppOperation(res: any) {
         );
 
         let similarSearchToken = encode(similaritySearchResults).length;
+        let instructionTokenLength = encode(
+          userChatBotModel?.instruction
+        ).length;
         step = 10;
         //stores chat history
         await userChatHistoryCollection.insertOne({
@@ -375,9 +378,13 @@ async function whatsAppOperation(res: any) {
               usage: {
                 completion_tokens: openaiBody.usage.completion_tokens,
                 prompt_tokens:
-                  openaiBody.usage.prompt_tokens - similarSearchToken,
+                  openaiBody.usage.prompt_tokens -
+                  instructionTokenLength -
+                  similarSearchToken,
                 total_tokens:
-                  openaiBody.usage.total_tokens - similarSearchToken,
+                  openaiBody.usage.total_tokens -
+                  instructionTokenLength -
+                  similarSearchToken,
               },
             },
           },
@@ -394,6 +401,7 @@ async function whatsAppOperation(res: any) {
       //calculate the total tokens based on user message
       let previousTotalTokens = 0;
       let similarSearchToken = encode(similaritySearchResults).length;
+      let instructionTokenLength = encode(userChatBotModel?.instruction).length;
       let conversationMessages: any = [];
       let currentQuestionsTotalTokens: any =
         encode(questionFromWhatsapp).length;
@@ -570,8 +578,13 @@ async function whatsAppOperation(res: any) {
             usage: {
               completion_tokens: openaiBody.usage.completion_tokens,
               prompt_tokens:
-                openaiBody.usage.prompt_tokens - similarSearchToken,
-              total_tokens: openaiBody.usage.total_tokens - similarSearchToken,
+                openaiBody.usage.prompt_tokens -
+                instructionTokenLength -
+                similarSearchToken,
+              total_tokens:
+                openaiBody.usage.total_tokens -
+                instructionTokenLength -
+                similarSearchToken,
             },
           };
 
