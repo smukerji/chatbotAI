@@ -97,7 +97,7 @@ function History({ chatbotId }: any) {
       );
       const content = await response.json();
       // setChatHistoryList(content?.chatHistory);
-      setChatHistoryList(Object.entries(content?.chatHistory?.chats));
+      setChatHistoryList(Object.entries(content?.chatHistory?.chats).reverse());
     }
 
     /// used only to get the total number of pages when page loads
@@ -148,7 +148,7 @@ function History({ chatbotId }: any) {
         return;
       }
       // setChatHistoryList(content?.chatHistory);
-      setChatHistoryList(Object.entries(content?.chatHistory?.chats));
+      setChatHistoryList(Object.entries(content?.chatHistory?.chats).reverse());
     };
 
     retriveData();
@@ -258,6 +258,7 @@ function History({ chatbotId }: any) {
                 lastMonth.setDate(1);
                 let refinedFormatLastMonth =
                   lastMonth.toLocaleDateString("en-CA");
+                setCurrentPage(1);
                 fetchHistoryCount(
                   true,
                   1,
@@ -265,7 +266,6 @@ function History({ chatbotId }: any) {
                   refinedFormatLastMonth,
                   refinedFormatLastMonthEndDate
                 );
-                setCurrentPage(1);
                 setLeadsFilter("last-month");
                 setOpenDatePicker(false);
                 setDisplayDate(null);
@@ -386,7 +386,7 @@ function History({ chatbotId }: any) {
             {chatHistoryList?.length > 0 && (
               <>
                 {chatHistoryList
-                  ?.reverse()
+                  // ?.reverse()
                   ?.slice((currentPage - 1) * 25, currentPage * 25)
                   ?.map((data: any, index: any) => {
                     return (
@@ -506,10 +506,11 @@ function History({ chatbotId }: any) {
             )}
           </div>
 
-          {chatHistoryList?.chats && (
+          {chatHistoryList?.length > 0 && (
             <Pagination
               defaultCurrent={1}
-              total={Object.entries(chatHistoryList?.chats)?.length}
+              current={currentPage}
+              total={chatHistoryList.length}
               onChange={(page) => {
                 handlePageChange(page);
               }}
