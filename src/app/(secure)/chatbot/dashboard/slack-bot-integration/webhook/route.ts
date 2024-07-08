@@ -237,14 +237,16 @@ async function writeInDataBase(data: any) {
             previousTotalTokens +
             currentQuestionsTotalTokens +
             similarSearchToken;
-          conversationMessages = userChatHistory?.chats[`${appId}`]?.messages;
+          conversationMessages = [
+            ...userChatHistory?.chats[`${appId}`]?.messages,
+          ];
 
-          console.log(
-            "{{{{{{{{{{{{{{{{{{{[",
-            tokenLimit[1]["model"],
-            userChatBotModel.model,
-            conversationMessages
-          );
+          // console.log(
+          //   "{{{{{{{{{{{{{{{{{{{[",
+          //   tokenLimit[1]["model"],
+          //   userChatBotModel.model,
+          //   conversationMessages
+          // );
 
           if (
             tokenLimit[0]["model"] == userChatBotModel.model &&
@@ -354,6 +356,9 @@ async function writeInDataBase(data: any) {
           if (openaiBody.choices[0].message.content) {
             const tokenUsage = openaiBody.usage;
             let similarSearchToken = encode(similaritySearchResults).length;
+            let instructionTokenLength = encode(
+              userChatBotModel?.instruction
+            ).length;
             await client.chat.postMessage({
               channel: channelId,
               text: openaiBody.choices[0].message.content,
@@ -376,8 +381,14 @@ async function writeInDataBase(data: any) {
               messages: [newChatEntry, assistantResponse],
               usage: {
                 completion_tokens: tokenUsage.completion_tokens,
-                prompt_tokens: tokenUsage.prompt_tokens - similarSearchToken,
-                total_tokens: tokenUsage.total_tokens - similarSearchToken,
+                prompt_tokens:
+                  tokenUsage.prompt_tokens -
+                  instructionTokenLength -
+                  similarSearchToken,
+                total_tokens:
+                  tokenUsage.total_tokens -
+                  instructionTokenLength -
+                  similarSearchToken,
               },
             };
 
@@ -391,9 +402,13 @@ async function writeInDataBase(data: any) {
               userChatHistory.chats[appId].usage.completion_tokens +=
                 openaiBody.usage.completion_tokens;
               userChatHistory.chats[appId].usage.prompt_tokens +=
-                openaiBody.usage.prompt_tokens - similarSearchToken;
+                openaiBody.usage.prompt_tokens -
+                instructionTokenLength -
+                similarSearchToken;
               userChatHistory.chats[appId].usage.total_tokens +=
-                openaiBody.usage.total_tokens - similarSearchToken;
+                openaiBody.usage.total_tokens -
+                instructionTokenLength -
+                similarSearchToken;
 
               await userChatHistoryCollection.updateOne(
                 { userId: userID, date: moment().utc().format("YYYY-MM-DD") },
