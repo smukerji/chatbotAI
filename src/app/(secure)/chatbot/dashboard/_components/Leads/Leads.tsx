@@ -8,7 +8,8 @@ import NoDataSvg from "../../../../../../../public/svgs/no-data-image.svg";
 import { alt } from "joi";
 import moment from "moment";
 import e from "express";
-import { json2csv } from "json-2-csv";
+// import { json2csv } from "json-2-csv";
+import json2csv, { Parser } from "json2csv";
 import { CreateBotContext } from "@/app/_helpers/client/Context/CreateBotContext";
 
 interface Item {
@@ -136,17 +137,55 @@ const Leads = ({ chatbotId }: any) => {
   // Function for exporting all the leads
 
   async function exportLeads() {
+    const today: any = new Date().toLocaleDateString("en-CA");
+    const last7Days: any = new Date();
+    last7Days.setDate(last7Days.getDate() - 7);
+    let refinedFormatLast7Days = last7Days.toLocaleDateString("en-CA");
+
+    const lastMonth: any = new Date();
+    lastMonth.setMonth(lastMonth.getMonth() - 1);
+    let refinedFormatLastMonth = lastMonth.toLocaleDateString("en-CA");
+
+    const startDate =
+      leadsFilter === "today"
+        ? today
+        : leadsFilter === "last-7-day"
+        ? refinedFormatLast7Days
+        : leadsFilter === "last-month"
+        ? refinedFormatLastMonth
+        : leadsFilter === "custom-date"
+        ? selectedDate.current[0]
+        : null;
+
+    const endDate =
+      leadsFilter === "custom-date"
+        ? selectedDate.current[1]
+        : leadsFilter === "today" ||
+          leadsFilter === "last-7-day" ||
+          leadsFilter === "last-month"
+        ? today
+        : null;
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/api/lead/export?chatbotId=${chatbotId}`
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/api/lead/export?chatbotId=${chatbotId}&startDate=${startDate}&endDate=${endDate}`
       );
       const content = await response.json();
+      console.log("contentttt", content);
 
       if (content.length === 0) {
         message.error("No leads to export");
         return;
       }
-      const csvString = await json2csv(content);
+
+      // Ensure numbers are treated as text in CSV
+      const modifiedContent = content.map((entry: any) => ({
+        ...entry,
+        Number: `'${entry.Number}`, // Wrap the number in double quotes
+      }));
+      const json2csvParser = new Parser();
+      const csvString = await json2csvParser.parse(modifiedContent);
+
+      console.log("csv stringg", csvString);
 
       downloadCsv(csvString, "leads.csv");
     } catch (error) {
@@ -190,6 +229,8 @@ const Leads = ({ chatbotId }: any) => {
     selectedDate.current = null;
     setOpenDatePicker(false);
   };
+
+  console.log("leads filterre", leadsFilter);
 
   return (
     <div className="leads-container">
