@@ -16,19 +16,24 @@ async function getConversationHistory(request: NextRequest) {
   /// check if the api is used to count the leads or to get the leads
   const db = (await clientPromise!).db();
   const chatbotId = request.nextUrl.searchParams.get("chatbotId");
-  const startDate = request.nextUrl.searchParams.get("startDate");
+
+  const startDate = request.nextUrl.searchParams
+    .get("startDate")
+    ?.replaceAll("-", "/");
   const userId = request?.headers.get("userId")
     ? request?.headers.get("userId")
     : session?.user?.id;
-  const endDate = request.nextUrl.searchParams.get("endDate");
+  const endDate = request.nextUrl.searchParams
+    .get("endDate")
+    ?.replaceAll("-", "/");
   const filterSource = request.nextUrl.searchParams.get("filterSource");
-  let timestamp: any = null;
+  let date: any = null;
   let historyCursor = null;
 
   if (startDate != "null" && endDate != "null") {
-    timestamp = {
-      $gte: new Date(startDate!), // Start date
-      $lte: new Date(endDate + "T23:59:59"), // End date
+    date = {
+      $gte: startDate!, // Start date
+      $lte: endDate!, // End date
     };
   }
 
@@ -44,19 +49,19 @@ async function getConversationHistory(request: NextRequest) {
       let historyResults: any = {};
 
       /// timestamp is used to get the history between the start and end date
-      if (timestamp) {
+      if (date) {
         historyCursor = await chatHistory
           .find({
             chatbotId: chatbotId,
             userId: userId,
-            timestamp,
+            date,
           })
           .project({
             chatbotId: 0,
             userId: 0,
           })
-          .skip((page - 1) * pageSize)
-          .limit(pageSize)
+          // .skip((page - 1) * pageSize)
+          // .limit(pageSize)
           .toArray();
       } else {
         historyCursor = await chatHistory
