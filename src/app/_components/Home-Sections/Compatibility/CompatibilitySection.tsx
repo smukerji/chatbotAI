@@ -10,11 +10,14 @@ function CompatibilitySection() {
     <div className="compatibility-section-container">
       {/* --------------------------left section------------------------------ */}
       <div className="left">
-        <h1>Compatibility with WhatsApp and Any Platforms</h1>
+        <h1>Engage with your customers in their comfort zone</h1>
         <p className="description">
-          We are offering an accessible interface to website or other platforms.
+          It&apos;s not just about reaching your users; it's about reaching them
+          in their comfort zone. Integrate with platforms like Whatsapp,
+          Telegram and Slack and enable 24/7 instant communication with
+          AI-driven answers. Never let a customer request go unanswered again.
         </p>
-        <div className="points-container">
+        {/* <div className="points-container">
           <div className="point">
             <Image
               src={arrowIcon}
@@ -92,7 +95,7 @@ function CompatibilitySection() {
               Define ways of checking and correcting inaccessible content.
             </p>
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* --------------------------right section------------------------------ */}

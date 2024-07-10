@@ -229,6 +229,10 @@
           word-break: break-word;
           white-space: pre-line;
 
+          > div:first-of-type {
+            display: contents;
+          }
+
           /// if there are any bullte points in the response
           ul,
           ol {
@@ -236,6 +240,7 @@
           }
 
           ul {
+            display: contents;
             padding: 0;
             li {
               display: flex;
@@ -556,12 +561,17 @@
       word-break: break-word;
       white-space: pre-line;
 
+      > div:first-of-type {
+        display: contents;
+      }
+
       ul,
       ol {
         padding-left: 16px;
       }
 
       ul {
+        display: contents;
         padding: 0;
         li {
           display: flex;
