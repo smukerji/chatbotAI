@@ -317,7 +317,7 @@ function Integration({ isPlanNotification, setIsPlanNotification }: any) {
           <span>Add to Slack</span>
           {isSlackConnected && (
             <Image
-              src={viewIcon}
+              src={editIcon}
               alt="edit"
               className="slack-edit-icon"
               onClick={() => setIsSlackModalOpen(true)}
@@ -351,14 +351,14 @@ function Integration({ isPlanNotification, setIsPlanNotification }: any) {
 
       {/* </div> */}
 
-      <div className="how-to-integrate">
+      {/* <div className="how-to-integrate">
         <p
           className="integrate-text"
           onClick={() => router.push(`dashboard/integration-guide`)}
         >
           How to integrate my Chatbot?
         </p>
-      </div>
+      </div> */}
 
       {/* Whatsapp Modal */}
       <WhatsappModal

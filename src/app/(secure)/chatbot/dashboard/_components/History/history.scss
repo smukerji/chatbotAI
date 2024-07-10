@@ -214,12 +214,17 @@
             word-break: break-word;
             white-space: pre-line;
 
+            > div:first-of-type {
+              display: contents;
+            }
+
             ul,
             ol {
               padding-left: 16px;
             }
 
             ul {
+              display: contents;
               padding: 0;
               li {
                 display: flex;
