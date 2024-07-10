@@ -225,9 +225,14 @@
           max-width: 80%;
           border-radius: 16px;
           background: #e6e8ec;
-          text-align: justify;
+          text-align: left;
           word-break: break-word;
           white-space: pre-line;
+
+          img {
+            width: fit-content;
+            max-width: 100%;
+          }
 
           > div:first-of-type {
             display: contents;
