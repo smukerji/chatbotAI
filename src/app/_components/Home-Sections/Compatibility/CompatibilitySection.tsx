@@ -12,8 +12,8 @@ function CompatibilitySection() {
       <div className="left">
         <h1>Engage with your customers in their comfort zone</h1>
         <p className="description">
-          It&apos;s not just about reaching your users; it's about reaching them
-          in their comfort zone. Integrate with platforms like Whatsapp,
+          It&apos;s not just about reaching your users; it&apos;s about reaching
+          them in their comfort zone. Integrate with platforms like Whatsapp,
           Telegram and Slack and enable 24/7 instant communication with
           AI-driven answers. Never let a customer request go unanswered again.
         </p>
