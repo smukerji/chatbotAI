@@ -45,6 +45,7 @@
     "json-2-csv": "^5.5.1",
     "json2csv": "^6.0.0-alpha.2",
     "jsonwebtoken": "^9.0.2",
+    "lottie-react": "^2.4.0",
     "mammoth": "^1.6.0",
     "markdown-to-jsx": "^7.4.7",
     "moment": "^2.30.1",

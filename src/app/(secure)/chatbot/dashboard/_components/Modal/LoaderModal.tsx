@@ -1,13 +1,16 @@
 import { LoadingOutlined } from "@ant-design/icons";
 import { Button, Modal, Spin } from "antd";
-import React from "react";
+import React, { useState } from "react";
 import "./loadermodal.scss";
 import ChatbotReady from "../../../../../../../public/svgs/chatbot_ready.svg";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import gif from "../../../../../../../public/create-chatbot-svgs/create-bot-animation.gif";
+import Lottie from "lottie-react";
+import loadertik from "../../../../../../../public/loadertik.json";
 
 function LoaderModal({ isResponseOk, setIsResponseOk }: any) {
+  const [isPlaying, setIsPlaying] = useState(true);
   const router = useRouter();
   const gotoHome = () => {
     setIsResponseOk(false);
@@ -19,9 +22,14 @@ function LoaderModal({ isResponseOk, setIsResponseOk }: any) {
     router.push("/chatbot");
   };
 
+  const handleAnimationComplete = () => {
+    console.log("Animation completed");
+    setIsPlaying(false);
+  };
+
   return (
     <>
-      {isResponseOk == true ? (
+      {isResponseOk == true && isPlaying == false ? (
         <Modal
           title=""
           open={true}
@@ -55,13 +63,18 @@ function LoaderModal({ isResponseOk, setIsResponseOk }: any) {
           footer=""
           className="chatbot-trained-loader"
         >
-          {/* <Spin indicator={<LoadingOutlined spin />} /> */}
-          <Image src={gif} alt="gif" />
+          <Lottie
+            animationData={loadertik}
+            aria-aria-labelledby="use lottie animation"
+            loop={false}
+            onComplete={handleAnimationComplete}
+          />
           <p className="training-chatbot">Training your Chatbot</p>
           <p className="please-wait-text">
             Please wait while your Chatbot is getting trained!
           </p>
         </Modal>
+        // <></>
       )}
     </>
   );
