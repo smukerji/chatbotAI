@@ -1,5 +1,11 @@
 .edit-chatbot-container {
   padding: 2.4vw 5.2vw;
+  @media screen and (max-width: 1440px) {
+    padding: 2vw 2vw;
+  }
+  @media screen and (max-width: 1199px) {
+    padding: 0 1vw 1vw;
+  }
   /*------------------------------------------top-section----------------------------------------------*/
   .top {
     /*------------------------------------------header----------------------------------------------*/
@@ -24,11 +30,28 @@
         list-style: none;
         display: flex;
         gap: 12px;
+        @media screen and (max-width: 1440px) {
+          margin-top: 10px;
+          gap: 10px;
+          padding-left: 20px;
+        }
+
+        @media screen and (max-width: 1199px) {
+          padding-left: 10px;
+          gap: 5px;
+        }
         li {
           display: flex;
           padding: 8px 16px;
           align-items: center;
           gap: 12px;
+          @media screen and (max-width: 1440px) {
+            gap: 10px;
+            padding: 8px 12px;
+          }
+          @media screen and (max-width: 1199px) {
+            gap: 5px;
+          }
           .option {
             font-size: 16px;
             font-style: normal;
@@ -45,7 +68,7 @@
               color: #2e58ea;
               position: relative;
               &::before {
-                content: '';
+                content: "";
                 position: absolute;
                 width: 100%;
                 top: 32px;
@@ -68,6 +91,14 @@
       background: #e6e8ec;
       margin-left: 45px;
       margin-right: 45px;
+      @media screen and (max-width: 1440px) {
+        margin-left: 20px;
+        margin-right: 20px;
+      }
+      @media screen and (max-width: 1199px) {
+        margin-left: 10px;
+        margin-right: 10px;
+      }
     }
   }
 

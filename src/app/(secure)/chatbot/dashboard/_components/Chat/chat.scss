@@ -6,6 +6,19 @@
   margin-top: 28px;
   position: relative;
 
+  @media screen and (max-width: 1440px) {
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-top: 20px;
+    gap: 20px;
+  }
+  @media screen and (max-width: 1199px) {
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 20px;
+    gap: 10px;
+  }
+
   /*------------------------------------------left-section----------------------------------------------*/
   .chatbot-details {
     display: flex;
