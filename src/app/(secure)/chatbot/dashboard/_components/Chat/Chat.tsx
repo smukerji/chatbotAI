@@ -650,6 +650,7 @@ function Chat({
   //   getUserIP();
   // }, []);
 
+  
   return (
     <div className="chat-container">
       {!isPopUp && (
