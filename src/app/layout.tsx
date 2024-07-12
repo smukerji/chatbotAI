@@ -79,17 +79,18 @@ export default function RootLayout({
           id="zsiqscript"
           src="https://salesiq.zohopublic.in/widget?wc=siq992fbe92f9ef9a36617ac4c9babe51c3d7778f44133f1fe66ec7795c68a6c396"
           defer={true}
-        ></Script> <Script
+        ></Script>{" "}
+        <Script
           src="https://torri.ai/embed-bot.js"
           // @ts-ignore
           chatbotid="9bfb16c7-142e-4946-9ce2-61282e64b38b"
         ></Script>
-{/*         <Script
+        {/*         <Script
           src="https://ichefpos.vercel.app/embed-bot.js"
           // @ts-ignore
           chatbotID="482163e1-f1d5-4a61-9805-82185e2cf47a"
-        ></Script>
-      </body> */}
+        ></Script> */}
+      </body>
     </html>
   );
 }
