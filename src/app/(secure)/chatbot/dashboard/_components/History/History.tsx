@@ -16,6 +16,7 @@ import {
 } from "../../../../../_helpers/errorConstants";
 import { getTimeAgo } from "@/app/_helpers/client/getTime";
 import { CreateBotContext } from "@/app/_helpers/client/Context/CreateBotContext";
+import closeImage from "../../../../../../../public/svgs/close-icon.svg";
 
 const { RangePicker } = DatePicker;
 
@@ -36,6 +37,8 @@ function History({ chatbotId }: any) {
   const [currentPage, setCurrentPage] = useState(1);
   const [displayDate, setDisplayDate] = useState(null);
   const selectedDate: any = useRef(null);
+
+  const [chatClicked, setIsChatClicked] = useState<boolean>(false);
 
   const handleCancel = () => {
     selectedDate.current = null;
@@ -202,7 +205,7 @@ function History({ chatbotId }: any) {
     const body = await response.json();
     message.info(body?.message);
   };
-
+  console.log("->>>>>>>>>>>>>>>>", chatClicked);
   return (
     <div className="history-chat-container">
       <div className="action-container">
@@ -410,6 +413,7 @@ function History({ chatbotId }: any) {
                         }}
                         key={index}
                         onClick={() => {
+                          setIsChatClicked(true);
                           setCurrentChatHistory(data[1]?.messages);
                           setDisplayEmail(data[1]?.email);
                           setActiveCurrentChatHistory("today" + index);
@@ -606,78 +610,94 @@ function History({ chatbotId }: any) {
           // messagesTime={messagesTime}
         />
         {/*------------------------------------------right-section----------------------------------------------*/}
-        <div className="messages-section">
-          <div
-            className="header"
-            style={{
-              visibility:
-                currentChatHistory?.length != 0 ? "visible" : "hidden",
-            }}
-          >
-            <p style={{ color: "#777e90" }}>{displayEmail}</p>
-            <div className="action-btns">
-              <ReactToPrint
-                trigger={() => {
-                  return (
-                    <button style={{ border: "none", background: "none" }}>
-                      <Image src={exportBtn} alt="export-btn" />
-                    </button>
-                  );
-                }}
-                content={() => tempRef.current}
-              />
+
+        <div
+          className="message-section-wrapper"
+          style={{
+            display: window.innerWidth > 767 || chatClicked ? "block" : "none",
+          }}
+        >
+          <div className="messages-section">
+            <div
+              className="header"
+              style={{
+                visibility:
+                  currentChatHistory?.length != 0 ? "visible" : "hidden",
+              }}
+            >
+              <p style={{ color: "#777e90" }}>{displayEmail}</p>
+              <div className="action-btns">
+                <ReactToPrint
+                  trigger={() => {
+                    return (
+                      <button style={{ border: "none", background: "none" }}>
+                        <Image src={exportBtn} alt="export-btn" />
+                      </button>
+                    );
+                  }}
+                  content={() => tempRef.current}
+                />
+                {window.innerWidth < 768 && (
+                  <Image
+                    src={closeImage}
+                    alt="close-icon"
+                    onClick={() => setIsChatClicked(false)}
+                  />
+                )}
+              </div>
             </div>
-          </div>
-          <hr
-            style={{
-              visibility:
-                currentChatHistory?.length != 0 ? "visible" : "hidden",
-            }}
-          />
+            <hr
+              style={{
+                visibility:
+                  currentChatHistory?.length != 0 ? "visible" : "hidden",
+              }}
+            />
 
-          <div className="history-conversation-container">
-            {currentChatHistory.map((message: any, index: any) => {
-              if (message.role == "assistant")
-                return (
-                  <React.Fragment key={index}>
-                    <div
-                      className="assistant-message-container"
-                      style={{
-                        marginTop:
-                          `${message.messageType}` === "initial" ? "10px" : "0",
-                      }}
-                    >
+            <div className="history-conversation-container">
+              {currentChatHistory.map((message: any, index: any) => {
+                if (message.role == "assistant")
+                  return (
+                    <React.Fragment key={index}>
                       <div
-                        className="assistant-message"
+                        className="assistant-message-container"
                         style={{
-                          display: "flex",
-                          flexDirection: "column",
+                          marginTop:
+                            `${message.messageType}` === "initial"
+                              ? "10px"
+                              : "0",
                         }}
-                        dangerouslySetInnerHTML={{
-                          __html: message.content,
-                        }}
-                      ></div>
-                      {/* <div className="time">{message?.messageTime}</div> */}
-                      {message.messageType !== "initial" && (
-                        <div className="time">{message?.messageTime}</div>
-                      )}
+                      >
+                        <div
+                          className="assistant-message"
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                          }}
+                          dangerouslySetInnerHTML={{
+                            __html: message.content,
+                          }}
+                        ></div>
+                        {/* <div className="time">{message?.messageTime}</div> */}
+                        {message.messageType !== "initial" && (
+                          <div className="time">{message?.messageTime}</div>
+                        )}
 
-                      {(currentChatHistory[index + 1] === undefined ||
-                        currentChatHistory[index + 1].role == "user") && (
-                        <div className="like-dislike-container">
-                          <Image
-                            src={likeIcon}
-                            alt="like-icon"
-                            onClick={() => openChatbotModal(index, "like")}
-                          />
-                          <Image
-                            src={dislikeIcon}
-                            alt="dislike-icon"
-                            onClick={() => openChatbotModal(index, "dislike")}
-                          />
-                        </div>
-                      )}
-                      {/* <div className="like-dislike-container">
+                        {(currentChatHistory[index + 1] === undefined ||
+                          currentChatHistory[index + 1].role == "user") && (
+                          <div className="like-dislike-container">
+                            <Image
+                              src={likeIcon}
+                              alt="like-icon"
+                              onClick={() => openChatbotModal(index, "like")}
+                            />
+                            <Image
+                              src={dislikeIcon}
+                              alt="dislike-icon"
+                              onClick={() => openChatbotModal(index, "dislike")}
+                            />
+                          </div>
+                        )}
+                        {/* <div className="like-dislike-container">
                       <Image
                         src={likeIcon}
                         alt="like-icon"
@@ -689,41 +709,44 @@ function History({ chatbotId }: any) {
                         onClick={() => openChatbotModal(index, "dislike")}
                       />
                     </div> */}
+                      </div>
+                      <ChatbotNameModal
+                        open={open}
+                        setOpen={setOpen}
+                        chatbotText={feedbackText}
+                        setChatbotText={setfeedbackText}
+                        handleOk={handleOk}
+                        forWhat="feedback"
+                      />
+                    </React.Fragment>
+                  );
+                else
+                  return (
+                    <div className="user-message-container">
+                      <div
+                        className="user-message"
+                        key={index}
+                        style={{
+                          backgroundColor: botSettings?.userMessageColor,
+                        }}
+                      >
+                        {message.content}
+                      </div>
+                      <div className="time">{message?.messageTime}</div>
                     </div>
-                    <ChatbotNameModal
-                      open={open}
-                      setOpen={setOpen}
-                      chatbotText={feedbackText}
-                      setChatbotText={setfeedbackText}
-                      handleOk={handleOk}
-                      forWhat="feedback"
-                    />
-                  </React.Fragment>
-                );
-              else
-                return (
-                  <div className="user-message-container">
-                    <div
-                      className="user-message"
-                      key={index}
-                      style={{ backgroundColor: botSettings?.userMessageColor }}
-                    >
-                      {message.content}
-                    </div>
-                    <div className="time">{message?.messageTime}</div>
-                  </div>
-                );
-            })}
-          </div>
+                  );
+              })}
+            </div>
 
-          <div
-            className="footer"
-            style={{
-              visibility:
-                currentChatHistory?.length != 0 ? "visible" : "hidden",
-            }}
-          >
-            <p>Powered by Torri.AI</p>
+            <div
+              className="footer"
+              style={{
+                visibility:
+                  currentChatHistory?.length != 0 ? "visible" : "hidden",
+              }}
+            >
+              <p>Powered by Torri.AI</p>
+            </div>
           </div>
         </div>
       </div>
