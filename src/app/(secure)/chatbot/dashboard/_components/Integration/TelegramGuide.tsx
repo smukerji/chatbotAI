@@ -68,13 +68,13 @@ function TelegramGuide() {
             <span>back</span>
           </div> */}
           <ul className="step-list">
-            {[1].map((step) => (
+            {[{ id: 1, title: "Telegram Integration Guide" }].map((step) => (
               <li
-                key={step}
-                onClick={() => handleClick(step)}
-                className={selectedStep === step ? "selected" : ""}
+                key={step.id}
+                onClick={() => handleClick(step.id)}
+                className={selectedStep === step.id ? "selected" : ""}
               >
-                Step {step}
+                {step.id}. {step.title}
               </li>
             ))}
           </ul>

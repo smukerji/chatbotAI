@@ -28,7 +28,7 @@
 
     .step-list {
       list-style: none;
-      background-color: #f4f5f6;
+      // background-color: #f4f5f6;
       padding: 24px;
       border-radius: 20px;
       position: sticky;
@@ -42,10 +42,13 @@
         font-weight: 500;
         line-height: 24px; /* 150% */
         padding-bottom: 5px;
+        padding: 6px;
+        border-radius: 5px;
         cursor: pointer;
         &.selected {
-          color: blue;
-          border-bottom: 1px solid #2e58ea;
+          color: #2e58ea;
+          // border-bottom: 1px solid #2e58ea;
+          background: #ecf0fe;
         }
       }
     }

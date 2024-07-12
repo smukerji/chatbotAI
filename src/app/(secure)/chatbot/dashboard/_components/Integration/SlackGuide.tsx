@@ -21,6 +21,7 @@ import step1_14 from "../../../../../../../public/slack-guide-images/step1_14.pn
 import step2_1 from "../../../../../../../public/slack-guide-images/step2_1.png";
 import step2_2 from "../../../../../../../public/slack-guide-images/step2_2.png";
 import step3_1 from "../../../../../../../public/slack-guide-images/step3_1.png";
+import { slackStepTitles } from "@/app/_helpers/constant";
 
 function SlackGuide() {
   const [selectedStep, setSelectedStep] = useState(1);
@@ -84,13 +85,13 @@ function SlackGuide() {
             <span>back</span>
           </div> */}
           <ul className="step-list">
-            {[1, 2, 3].map((step) => (
+            {slackStepTitles.map((step) => (
               <li
-                key={step}
-                onClick={() => handleClick(step)}
-                className={selectedStep === step ? "selected" : ""}
+                key={step.id}
+                onClick={() => handleClick(step.id)}
+                className={selectedStep === step.id ? "selected" : ""}
               >
-                Step {step}
+                {step.id}. {step.title}
               </li>
             ))}
           </ul>
