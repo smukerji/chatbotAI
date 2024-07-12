@@ -128,7 +128,7 @@
   const frameWidget = document.getElementById("chat-frame-widget");
 
   btn.style.backgroundColor = chatbubbleColor ? chatbubbleColor : "#9b00fb";
-  frameWidget.style.display = "block";
+  frameWidget.style.display = "none";
 
   btn.addEventListener("click", () => {
     if (frameWidget.style.display === "none") {
