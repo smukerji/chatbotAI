@@ -1,6 +1,6 @@
 import { LoadingOutlined } from "@ant-design/icons";
 import { Button, Modal, Spin } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./loadermodal.scss";
 import ChatbotReady from "../../../../../../../public/svgs/chatbot_ready.svg";
 import Image from "next/image";
@@ -11,6 +11,7 @@ import loadertik from "../../../../../../../public/loadertik.json";
 
 function LoaderModal({ isResponseOk, setIsResponseOk }: any) {
   const [isPlaying, setIsPlaying] = useState(true);
+  const animationRef = useRef<any>(null);
   const router = useRouter();
   const gotoHome = () => {
     setIsResponseOk(false);
@@ -26,6 +27,20 @@ function LoaderModal({ isResponseOk, setIsResponseOk }: any) {
     console.log("Animation completed");
     setIsPlaying(false);
   };
+  useEffect(() => {
+    if (animationRef.current) {
+      animationRef.current.goToAndStop(30, true); // Pause at frame 30
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isResponseOk && animationRef.current) {
+      animationRef.current.playSegments(
+        [30, animationRef.current.totalFrames],
+        true
+      );
+    }
+  }, [isResponseOk]);
 
   return (
     <>
@@ -64,6 +79,7 @@ function LoaderModal({ isResponseOk, setIsResponseOk }: any) {
           className="chatbot-trained-loader"
         >
           <Lottie
+            lottieRef={animationRef}
             animationData={loadertik}
             aria-aria-labelledby="use lottie animation"
             loop={false}

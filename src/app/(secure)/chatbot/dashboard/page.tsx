@@ -1,5 +1,12 @@
 "use client";
-import { Button, Modal, Radio, RadioChangeEvent } from "antd";
+import {
+  Button,
+  Dropdown,
+  MenuProps,
+  Modal,
+  Radio,
+  RadioChangeEvent,
+} from "antd";
 import { redirect, useSearchParams } from "next/navigation";
 import React, { useContext, useEffect, useState } from "react";
 import "./dashboard.scss";
@@ -13,7 +20,7 @@ import { v4 as uuid } from "uuid";
 import Settings from "./_components/Settings/Settings";
 import { getDate, getTime } from "../../../_helpers/client/getTime";
 import Image from "next/image";
-
+import tick from "../../../../../public/svgs/tick-circle-fill.svg";
 import arrowIcon from "../../../../../public/svgs/Feather Icon.svg";
 import { CreateBotContext } from "../../../_helpers/client/Context/CreateBotContext";
 import History from "./_components/History/History";
@@ -23,6 +30,11 @@ import { ChatbotSettingContext } from "../../../_helpers/client/Context/ChatbotS
 import { JWT_EXPIRED } from "../../../_helpers/errorConstants";
 import axios from "axios";
 import Leads from "./_components/Leads/Leads";
+import {
+  CaretDownOutlined,
+  CaretUpOutlined,
+  DownOutlined,
+} from "@ant-design/icons";
 
 function Dashboard() {
   const { status } = useSession();
@@ -72,6 +84,170 @@ function Dashboard() {
 
   const [isPlanNotification, setIsPlanNotification] = useState(false);
   const [user, setUser] = useState<any>(null);
+
+  // Dropdown item current value
+  const [selectedValue, setSelectedValue] = useState("chatbot");
+  // Dropdown open or not
+  const [isOpen, setIsOpen] = useState(false);
+
+  const onClick = (e: any) => {
+    const selectedItem = dropdownMenuItems.find((item) => item.key === e.key);
+    setIsOpen(false);
+    if (selectedItem) {
+      setSelectedValue(selectedItem.key);
+    }
+  };
+
+  const dropdownMenuItems = [
+    {
+      key: "chatbot",
+      label: (
+        <div
+          className="dropdown-item"
+          style={{
+            color: selectedValue === "chatbot" ? "#2e58ea" : undefined,
+            alignItems: "center",
+            justifyContent: "space-between",
+            display: "flex",
+            fontSize: "16px",
+          }}
+        >
+          chatbot
+          {selectedValue === "chatbot" ? (
+            <Image src={tick} alt="tick-icon" />
+          ) : null}
+        </div>
+      ),
+      onClick: () => botContext?.handleChange("editChatbot")("chatbot"),
+    },
+    {
+      key: "settings",
+      label: (
+        <div
+          className="dropdown-item"
+          style={{
+            color: selectedValue === "settings" ? "#2e58ea" : undefined,
+            alignItems: "center",
+            justifyContent: "space-between",
+            display: "flex",
+            fontSize: "16px",
+          }}
+        >
+          settings
+          {selectedValue === "settings" ? (
+            <Image src={tick} alt="tick-icon" />
+          ) : null}
+        </div>
+      ),
+      onClick: () => botContext?.handleChange("editChatbot")("settings"),
+    },
+    {
+      key: "data sources",
+      label: (
+        <div
+          className="dropdown-item"
+          style={{
+            color: selectedValue === "data sources" ? "#2e58ea" : undefined,
+            alignItems: "center",
+            justifyContent: "space-between",
+            display: "flex",
+            fontSize: "16px",
+          }}
+        >
+          data sources
+          {selectedValue === "data sources" ? (
+            <Image src={tick} alt="tick-icon" />
+          ) : null}
+        </div>
+      ),
+      onClick: () => botContext?.handleChange("editChatbot")("sources"),
+    },
+    {
+      key: "Integrations",
+      label: (
+        <div
+          className="dropdown-item"
+          style={{
+            color: selectedValue === "Integrations" ? "#2e58ea" : undefined,
+            alignItems: "center",
+            justifyContent: "space-between",
+            display: "flex",
+            fontSize: "16px",
+          }}
+        >
+          Integrations
+          {selectedValue === "Integrations" ? (
+            <Image src={tick} alt="tick-icon" />
+          ) : null}
+        </div>
+      ),
+      onClick: () => botContext?.handleChange("editChatbot")("integrations"),
+    },
+    {
+      key: "Embed on site",
+      label: (
+        <div
+          className="dropdown-item"
+          style={{
+            color: selectedValue === "Embed on site" ? "#2e58ea" : undefined,
+            alignItems: "center",
+            justifyContent: "space-between",
+            display: "flex",
+            fontSize: "16px",
+          }}
+        >
+          Embed on site
+          {selectedValue === "Embed on site" ? (
+            <Image src={tick} alt="tick-icon" />
+          ) : null}
+        </div>
+      ),
+      onClick: () => botContext?.handleChange("editChatbot")("embedSite"),
+    },
+    {
+      key: "Conversation History",
+      label: (
+        <div
+          className="dropdown-item"
+          style={{
+            color:
+              selectedValue === "Conversation History" ? "#2e58ea" : undefined,
+            alignItems: "center",
+            justifyContent: "space-between",
+            display: "flex",
+            fontSize: "16px",
+          }}
+        >
+          Conversation History
+          {selectedValue === "Conversation History" ? (
+            <Image src={tick} alt="tick-icon" />
+          ) : null}
+        </div>
+      ),
+      onClick: () => botContext?.handleChange("editChatbot")("history"),
+    },
+    {
+      key: "Leads",
+      label: (
+        <div
+          className="dropdown-item"
+          style={{
+            color: selectedValue === "Leads" ? "#2e58ea" : undefined,
+            alignItems: "center",
+            justifyContent: "space-between",
+            display: "flex",
+            fontSize: "16px",
+          }}
+        >
+          Leads
+          {selectedValue === "Leads" ? (
+            <Image src={tick} alt="tick-icon" />
+          ) : null}
+        </div>
+      ),
+      onClick: () => botContext?.handleChange("editChatbot")("leads"),
+    },
+  ];
 
   const getUser = async () => {
     const response = await axios.get(
@@ -248,74 +424,93 @@ function Dashboard() {
             </div>
 
             {/*------------------------------------------options-container----------------------------------------------*/}
-            <ul className="options-container">
-              <li
-                className={`${editChatbot === "chatbot" ? "active" : ""}`}
-                value={"chatbot"}
-                onClick={() =>
-                  botContext?.handleChange("editChatbot")("chatbot")
-                }
+            {window.innerWidth < 767 ? (
+              <Dropdown
+                menu={{ items: dropdownMenuItems, onClick }}
+                placement="bottom"
+                trigger={["click"]}
+                onVisibleChange={(visible) => setIsOpen(visible)}
               >
-                <h3 className="option">chatbot</h3>
-              </li>
-              <li
-                className={`${editChatbot === "settings" ? "active" : ""}`}
-                value={"settings"}
-                onClick={() =>
-                  botContext?.handleChange("editChatbot")("settings")
-                }
-              >
-                <h3 className="option">settings</h3>
-              </li>
-              <li
-                className={`${editChatbot === "sources" ? "active" : ""}`}
-                value={"sources"}
-                onClick={() => {
-                  // fetchData();
-                  botContext?.handleChange("editChatbot")("sources");
-                }}
-              >
-                <h3 className="option">data sources</h3>
-              </li>
-              <li
-                className={`${editChatbot === "integrations" ? "active" : ""}`}
-                value={"integrations"}
-                onClick={() =>
-                  botContext?.handleChange("editChatbot")("integrations")
-                }
-              >
-                <h3 className="option">Integrations</h3>
-              </li>
-              <li
-                className={`${editChatbot === "embedSite" ? "active" : ""}`}
-                value={"embedSite"}
-                onClick={() =>
-                  botContext?.handleChange("editChatbot")("embedSite")
-                }
-              >
-                <h3 className="option">Embed on site</h3>
-              </li>
+                <button className="options-container-dropdwon">
+                  {selectedValue}
+                  {isOpen ? <CaretUpOutlined /> : <CaretDownOutlined />}
+                </button>
+              </Dropdown>
+            ) : (
+              <>
+                <ul className="options-container">
+                  <li
+                    className={`${editChatbot === "chatbot" ? "active" : ""}`}
+                    value={"chatbot"}
+                    onClick={() =>
+                      botContext?.handleChange("editChatbot")("chatbot")
+                    }
+                  >
+                    <h3 className="option">chatbot</h3>
+                  </li>
+                  <li
+                    className={`${editChatbot === "settings" ? "active" : ""}`}
+                    value={"settings"}
+                    onClick={() =>
+                      botContext?.handleChange("editChatbot")("settings")
+                    }
+                  >
+                    <h3 className="option">settings</h3>
+                  </li>
+                  <li
+                    className={`${editChatbot === "sources" ? "active" : ""}`}
+                    value={"sources"}
+                    onClick={() => {
+                      // fetchData();
+                      botContext?.handleChange("editChatbot")("sources");
+                    }}
+                  >
+                    <h3 className="option">data sources</h3>
+                  </li>
+                  <li
+                    className={`${
+                      editChatbot === "integrations" ? "active" : ""
+                    }`}
+                    value={"integrations"}
+                    onClick={() =>
+                      botContext?.handleChange("editChatbot")("integrations")
+                    }
+                  >
+                    <h3 className="option">Integrations</h3>
+                  </li>
+                  <li
+                    className={`${editChatbot === "embedSite" ? "active" : ""}`}
+                    value={"embedSite"}
+                    onClick={() =>
+                      botContext?.handleChange("editChatbot")("embedSite")
+                    }
+                  >
+                    <h3 className="option">Embed on site</h3>
+                  </li>
 
-              <li
-                className={`${editChatbot === "history" ? "active" : ""}`}
-                value={"history"}
-                onClick={() =>
-                  botContext?.handleChange("editChatbot")("history")
-                }
-              >
-                <h3 className="option">Conversation History</h3>
-              </li>
+                  <li
+                    className={`${editChatbot === "history" ? "active" : ""}`}
+                    value={"history"}
+                    onClick={() =>
+                      botContext?.handleChange("editChatbot")("history")
+                    }
+                  >
+                    <h3 className="option">Conversation History</h3>
+                  </li>
 
-              <li
-                className={`${editChatbot === "leads" ? "active" : ""}`}
-                value={"leads"}
-                onClick={() => botContext?.handleChange("editChatbot")("leads")}
-              >
-                <h3 className="option">Leads</h3>
-              </li>
-            </ul>
-
-            <hr />
+                  <li
+                    className={`${editChatbot === "leads" ? "active" : ""}`}
+                    value={"leads"}
+                    onClick={() =>
+                      botContext?.handleChange("editChatbot")("leads")
+                    }
+                  >
+                    <h3 className="option">Leads</h3>
+                  </li>
+                </ul>
+                <hr />
+              </>
+            )}
           </div>
         </div>
 

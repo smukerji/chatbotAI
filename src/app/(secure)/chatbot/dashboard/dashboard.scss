@@ -154,6 +154,25 @@
   @media only screen and (max-width: 767px) {
     .top {
       .sources-header {
+        .options-container-dropdwon {
+          display: flex;
+          margin: 10px 0 5px 5px;
+          width: calc(100% - 10px);
+          display: flex;
+          padding: var(--2, 8px) var(--3, 12px);
+          justify-content: space-between;
+          align-items: center;
+          flex: 1 0 0;
+          border-radius: 1000px;
+          border: 1px solid var(--Primary-7, #2e58ea);
+          background: var(--Neutral-2, #f4f5f6);
+          color: var(--Neutral-6, #353945);
+          font-family: sans-serif;
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 24px;
+        }
         .options-container {
           flex-wrap: wrap;
           padding-left: 0;
