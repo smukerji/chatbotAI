@@ -5,8 +5,12 @@ import { useCookies } from "react-cookie";
 import Image from "next/image";
 import "../../whatsapp-integration-guide/whatsappintegration.scss";
 import step2_1 from "../../../../../../../public/telegram-guide-images/step1_1.png";
+import IntegrationGuideControls from "./IntegrationGuideControls";
+import { useWindowSize } from "react-use";
 
-function TelegramGuide() {
+function TelegramGuide({ activeStep, setActiveStep, handleStep }: any) {
+  const { width } = useWindowSize();
+
   const [selectedStep, setSelectedStep] = useState(1);
 
   const rightRef = useRef<any>(null);
@@ -81,6 +85,13 @@ function TelegramGuide() {
         </div>
 
         <div className="right" ref={rightRef}>
+          {width > 767 && (
+            <IntegrationGuideControls
+              activeStep={activeStep}
+              setActiveStep={setActiveStep}
+              handleStep={handleStep}
+            />
+          )}
           <h1 className="guide-heading">Telegram Integration Guide</h1>
 
           <div className="step-1">

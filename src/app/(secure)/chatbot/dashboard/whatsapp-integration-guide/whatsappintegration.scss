@@ -2,6 +2,9 @@
   display: flex;
   margin-top: 55px;
   // padding: 0 300px 0 0;
+  @media screen and (max-width: 767px) {
+    margin-top: 30px;
+  }
 
   .left {
     width: 30%;
@@ -34,6 +37,10 @@
       position: sticky;
       top: 125px;
 
+      @media screen and (max-width: 991px) {
+        padding: 20px 15px;
+      }
+
       li {
         margin-bottom: 16px;
         color: var(--Neutral-5, #777e90);
@@ -62,6 +69,16 @@
     padding-right: 100px;
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
+
+    @media screen and (max-width: 991px) {
+      padding-left: 20px;
+      padding-right: 20px !important;
+    }
+
+    @media screen and (max-width: 767px) {
+      height: auto;
+      overflow: unset;
+    }
 
     &::-webkit-scrollbar {
       display: none;
@@ -145,9 +162,39 @@
     flex-direction: column;
 
     .left {
-      // width: 100%;
-      // margin-top: 20px;
       display: none;
+    }
+    .step-list {
+      background: #fff;
+      display: flex;
+      margin: 0 20px 0;
+      padding: 10px 0;
+      list-style-type: none;
+      overflow: auto;
+      position: sticky;
+      top: 70px;
+      li {
+        padding: 8px 0;
+        margin: 0 10px;
+        color: #777e90;
+        text-transform: capitalize;
+        white-space: nowrap;
+        position: relative;
+        * {
+          white-space: nowrap;
+        }
+        &.selected {
+          &::before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: #2e58ea;
+            bottom: 0;
+            left: 0;
+          }
+        }
+      }
     }
 
     .right {

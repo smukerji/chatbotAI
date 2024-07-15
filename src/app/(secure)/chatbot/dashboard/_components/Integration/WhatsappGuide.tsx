@@ -46,8 +46,31 @@ import step7_1 from "../../../../../../../public/whataspp-guide-images/step7_1.p
 import Image from "next/image";
 import arrowIcon from "../../../../../../../public/svgs/Feather Icon.svg";
 import { whatsAppStepTitles } from "@/app/_helpers/constant";
+import IntegrationGuideControls from "./IntegrationGuideControls";
+import { useWindowSize } from "react-use";
+import { Tabs } from "antd";
 
-function WhatsappGuide() {
+const items = [
+  {
+    key: "1",
+    label: "Tab 1",
+    children: "Content of Tab Pane 1",
+  },
+  {
+    key: "2",
+    label: "Tab 2",
+    children: "Content of Tab Pane 2",
+  },
+  {
+    key: "3",
+    label: "Tab 3",
+    children: "Content of Tab Pane 3",
+  },
+];
+
+function WhatsappGuide({ activeStep, setActiveStep, handleStep }: any) {
+  const { width } = useWindowSize();
+
   const [cookies, setCookies] = useCookies(["userId"]);
   const [selectedStep, setSelectedStep] = useState(1);
 
@@ -128,8 +151,28 @@ function WhatsappGuide() {
             ))}
           </ul>
         </div>
+        {width < 768 && (
+          <ul className="step-list">
+            {whatsAppStepTitles.map((step) => (
+              <li
+                key={step.id}
+                onClick={() => handleClick(step.id)}
+                className={selectedStep === step.id ? "selected" : ""}
+              >
+                Step {step.id}
+              </li>
+            ))}
+          </ul>
+        )}
 
         <div className="right" ref={rightRef}>
+          {width > 767 && (
+            <IntegrationGuideControls
+              activeStep={activeStep}
+              setActiveStep={setActiveStep}
+              handleStep={handleStep}
+            />
+          )}
           <h1 className="guide-heading">WhatsApp Integration Guide</h1>
 
           <div className="step-1">

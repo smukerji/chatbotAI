@@ -22,8 +22,12 @@ import step2_1 from "../../../../../../../public/slack-guide-images/step2_1.png"
 import step2_2 from "../../../../../../../public/slack-guide-images/step2_2.png";
 import step3_1 from "../../../../../../../public/slack-guide-images/step3_1.png";
 import { slackStepTitles } from "@/app/_helpers/constant";
+import IntegrationGuideControls from "./IntegrationGuideControls";
+import { useWindowSize } from "react-use";
 
-function SlackGuide() {
+function SlackGuide({ activeStep, setActiveStep, handleStep }: any) {
+  const { width } = useWindowSize();
+
   const [selectedStep, setSelectedStep] = useState(1);
 
   const rightRef = useRef<any>(null);
@@ -98,6 +102,13 @@ function SlackGuide() {
         </div>
 
         <div className="right" ref={rightRef}>
+          {width > 767 && (
+            <IntegrationGuideControls
+              activeStep={activeStep}
+              setActiveStep={setActiveStep}
+              handleStep={handleStep}
+            />
+          )}
           <h1 className="guide-heading">Slack Integration Guide</h1>
 
           <p className="intro-para">

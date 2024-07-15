@@ -13,6 +13,11 @@
     height: 248px;
     padding: 32px 48px;
     justify-content: space-between;
+    border-radius: 20px;
+
+    @media screen and (max-width: 991px) {
+      margin: 15px 0;
+    }
 
     .intro {
       color: var(--Neutral-1, #fcfcfd);
