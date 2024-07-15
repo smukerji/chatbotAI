@@ -100,7 +100,19 @@ function SlackGuide({ activeStep, setActiveStep, handleStep }: any) {
             ))}
           </ul>
         </div>
-
+        {width < 768 && (
+          <ul className="step-list">
+            {slackStepTitles.map((step) => (
+              <li
+                key={step.id}
+                onClick={() => handleClick(step.id)}
+                className={selectedStep === step.id ? "selected" : ""}
+              >
+                Step {step.id}
+              </li>
+            ))}
+          </ul>
+        )}
         <div className="right" ref={rightRef}>
           {width > 767 && (
             <IntegrationGuideControls
@@ -109,9 +121,9 @@ function SlackGuide({ activeStep, setActiveStep, handleStep }: any) {
               handleStep={handleStep}
             />
           )}
-          <h1 className="guide-heading">Slack Integration Guide</h1>
+          {/* <h1 className="guide-heading">Slack Integration Guide</h1> */}
 
-          <p className="intro-para">
+          {/* <p className="intro-para">
             Slack integration has become an essential part of modern workflows,
             allowing seamless communication and collaboration within teams.
             Leveraging Slack&apos;s API Events and Web API opens up a myriad of
@@ -119,7 +131,7 @@ function SlackGuide({ activeStep, setActiveStep, handleStep }: any) {
             comprehensive guide will walk you through the process of integrating
             Slack into your applications, harnessing the power of API Events and
             Web API to enhance productivity and efficiency.
-          </p>
+          </p> */}
 
           <div className="step-1">
             <h2 className="guide-step-title">

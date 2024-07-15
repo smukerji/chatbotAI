@@ -63,7 +63,7 @@
 
   .right {
     width: 70%;
-    height: calc(100vh - 70px);
+    height: calc(100vh - 125px);
     overflow-y: auto;
     padding-left: 30px;
     padding-right: 100px;
@@ -123,6 +123,10 @@
       line-height: 28px; /* 140% */
       margin-bottom: 20px;
       margin-left: 30px;
+      margin-top: 20px;
+      span {
+        font-weight: bold;
+      }
 
       .unordered-sub-points {
         list-style-type: disc;
@@ -184,6 +188,7 @@
           white-space: nowrap;
         }
         &.selected {
+          color: #2e58ea;
           &::before {
             content: "";
             position: absolute;

@@ -71,7 +71,7 @@ function TelegramGuide({ activeStep, setActiveStep, handleStep }: any) {
             />
             <span>back</span>
           </div> */}
-          <ul className="step-list">
+          {/* <ul className="step-list">
             {[{ id: 1, title: "Telegram Integration Guide" }].map((step) => (
               <li
                 key={step.id}
@@ -81,8 +81,21 @@ function TelegramGuide({ activeStep, setActiveStep, handleStep }: any) {
                 {step.id}. {step.title}
               </li>
             ))}
-          </ul>
+          </ul> */}
         </div>
+        {/* {width < 768 && (
+          <ul className="step-list">
+            {[{ id: 1, title: "Telegram Integration Guide" }].map((step) => (
+              <li
+                key={step.id}
+                onClick={() => handleClick(step.id)}
+                className={selectedStep === step.id ? "selected" : ""}
+              >
+                Step {step.id}
+              </li>
+            ))}
+          </ul>
+        )} */}
 
         <div className="right" ref={rightRef}>
           {width > 767 && (
@@ -92,23 +105,33 @@ function TelegramGuide({ activeStep, setActiveStep, handleStep }: any) {
               handleStep={handleStep}
             />
           )}
-          <h1 className="guide-heading">Telegram Integration Guide</h1>
+          {/* <h1 className="guide-heading">Telegram Integration Guide</h1> */}
 
           <div className="step-1">
             {/* <h2 className="guide-step-title">
               Step 1: Log in to your slack account
             </h2> */}
 
-            <ol className="ordered-points">
-              <li>Search BotFather in your Telegram app</li>
+            <ul className="ordered-points" style={{ listStyleType: "none" }}>
               <li>
-                Type <span style={{ fontWeight: "bold" }}>/newbot</span>
+                <span>Step 1:</span> Search BotFather in your Telegram app
               </li>
-              <li>Choose name for your bot</li>
-              <li>Choose username for your bot</li>
-              <li>Now you will receive token</li>
               <li>
-                Copy token and paste in our torri.AI telegram modal and{" "}
+                <span>Step 2:</span> Type{" "}
+                <span style={{ fontWeight: "bold" }}>/newbot</span>
+              </li>
+              <li>
+                <span>Step 3:</span>Choose name for your bot
+              </li>
+              <li>
+                <span>Step 4:</span>Choose username for your bot
+              </li>
+              <li>
+                <span>Step 5:</span>Now you will receive token
+              </li>
+              <li>
+                <span>Step 6:</span> Copy token and paste in our torri.AI
+                telegram modal and{" "}
                 <span style={{ fontWeight: "bold" }}>click</span> connect
               </li>
 
@@ -117,7 +140,7 @@ function TelegramGuide({ activeStep, setActiveStep, handleStep }: any) {
                   <Image src={step2_1} alt="step1_1" />
                 </div>
               </ul>
-            </ol>
+            </ul>
           </div>
         </div>
       </div>

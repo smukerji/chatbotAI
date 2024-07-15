@@ -1,5 +1,4 @@
 "use client";
-
 import React from "react";
 import whatsAppIcon from "../../../../../../../public/whatsapp.png";
 import telegramIcon from "../../../../../../../public/telegram.svg";
