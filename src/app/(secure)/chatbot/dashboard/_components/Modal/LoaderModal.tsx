@@ -10,7 +10,8 @@ import Lottie from "lottie-react";
 import loadertik from "../../../../../../../public/loadertik.json";
 
 function LoaderModal({ isResponseOk, setIsResponseOk }: any) {
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(1);
+  const [annimation, setAnnimation] = useState(false);
   const animationRef = useRef<any>(null);
   const router = useRouter();
   const gotoHome = () => {
@@ -25,26 +26,29 @@ function LoaderModal({ isResponseOk, setIsResponseOk }: any) {
 
   const handleAnimationComplete = () => {
     console.log("Animation completed");
-    setIsPlaying(false);
+    if (annimation) {
+      setIsPlaying(isPlaying + 1);
+    }
   };
   useEffect(() => {
     if (animationRef.current) {
-      animationRef.current.goToAndStop(30, true); // Pause at frame 30
+      animationRef.current.setSpeed(0.1);
+      animationRef.current.playSegments([0, 30], true);
     }
   }, []);
 
   useEffect(() => {
-    if (isResponseOk && animationRef.current) {
-      animationRef.current.playSegments(
-        [30, animationRef.current.totalFrames],
-        true
-      );
+    console.log("isResponseOk", isResponseOk);
+    if (isResponseOk) {
+      animationRef.current.setSpeed(0.7);
+      animationRef.current.playSegments([30, 90], true);
+      setAnnimation(true);
     }
   }, [isResponseOk]);
 
   return (
     <>
-      {isResponseOk == true && isPlaying == false ? (
+      {isResponseOk == true && isPlaying == 2 ? (
         <Modal
           title=""
           open={true}

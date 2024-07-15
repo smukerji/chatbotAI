@@ -17,6 +17,7 @@ import {
 import { getTimeAgo } from "@/app/_helpers/client/getTime";
 import { CreateBotContext } from "@/app/_helpers/client/Context/CreateBotContext";
 import closeImage from "../../../../../../../public/svgs/close-icon.svg";
+import noHistory from "../../../../../../../public/svgs/empty-history.svg";
 
 const { RangePicker } = DatePicker;
 
@@ -365,165 +366,171 @@ function History({ chatbotId }: any) {
           </div>
         </div>
       </div>
-      <div className="chatbot-history-parts">
-        {/*------------------------------------------left-section----------------------------------------------*/}
-        <div className="chatbot-history-details">
-          {/*------------------------------------------chat-list-section----------------------------------------------*/}
-          <div
-            className="detail"
-            style={{
-              height: botDetails?.leadSessionsEmail == "" ? "100%" : "87%",
-            }}
-          >
-            {botDetails?.referedFrom == "leads" && (
-              <>
-                <p
-                  className="first-message"
-                  style={{ textTransform: "lowercase", pointerEvents: "none" }}
-                >
-                  {botDetails?.leadSessionsEmail.toLowerCase()}
-                </p>
-              </>
-            )}
+      {chatHistoryList?.length == 0 && (
+        <div className="chatbot-history-parts">
+          {/*------------------------------------------left-section----------------------------------------------*/}
+          <div className="chatbot-history-details">
+            {/*------------------------------------------chat-list-section----------------------------------------------*/}
+            <div
+              className="detail"
+              style={{
+                height: botDetails?.leadSessionsEmail == "" ? "100%" : "87%",
+              }}
+            >
+              {botDetails?.referedFrom == "leads" && (
+                <>
+                  <p
+                    className="first-message"
+                    style={{
+                      textTransform: "lowercase",
+                      pointerEvents: "none",
+                    }}
+                  >
+                    {botDetails?.leadSessionsEmail.toLowerCase()}
+                  </p>
+                </>
+              )}
+
+              {chatHistoryList?.length > 0 && (
+                <>
+                  {chatHistoryList
+                    // ?.reverse()
+                    ?.slice((currentPage - 1) * 25, currentPage * 25)
+                    ?.map((data: any, index: any) => {
+                      return (
+                        <div
+                          className={`first-message ${
+                            activeCurrentChatHistory === `today${index}`
+                              ? "active"
+                              : ""
+                          }`}
+                          style={{
+                            display:
+                              botDetails?.referedFrom == "leads" ? "flex" : "",
+                            justifyContent:
+                              botDetails?.referedFrom == "leads"
+                                ? "space-between"
+                                : "",
+                            flexDirection:
+                              botDetails?.referedFrom == "leads"
+                                ? "row-reverse"
+                                : "column",
+                          }}
+                          key={index}
+                          onClick={() => {
+                            setIsChatClicked(true);
+                            setCurrentChatHistory(data[1]?.messages);
+                            setDisplayEmail(data[1]?.email);
+                            setActiveCurrentChatHistory("today" + index);
+                          }}
+                        >
+                          <div
+                            className="time"
+                            style={{
+                              padding: 0,
+                              fontSize: "14px",
+                              display: "flex",
+                              flexDirection: "row",
+                              justifyContent: "space-between",
+                            }}
+                          >
+                            <div
+                              style={{
+                                display:
+                                  botDetails?.referedFrom == "leads"
+                                    ? "none"
+                                    : "block",
+                              }}
+                            >
+                              {data[1]?.email ? (
+                                <span
+                                  style={{
+                                    textTransform:
+                                      data[1].email == "Anonymous"
+                                        ? "capitalize"
+                                        : "lowercase",
+                                  }}
+                                >
+                                  {data[1]?.email}
+                                </span>
+                              ) : (
+                                "Anonymous"
+                              )}
+                            </div>
+
+                            <div
+                              // style={{
+                              //   textOverflow: "ellipsis",
+                              //   overflow: "hidden",
+                              //   width: "100%",
+                              //   textWrap: "nowrap",
+                              // }}
+                              style={{
+                                flex:
+                                  botDetails?.referedFrom == "leads"
+                                    ? 1
+                                    : "none",
+                                textAlign: "end",
+                                textWrap: "nowrap",
+                              }}
+                            >
+                              {getTimeAgo(data[1].sessionEndDate)}
+                            </div>
+                          </div>
+
+                          <div
+                            style={{
+                              textOverflow: "ellipsis",
+                              overflow: "hidden",
+                              width: "250px",
+                              textWrap: "nowrap",
+                              // flex: botDetails?.referedFrom == "leads" ? 1 : 0,
+                            }}
+                          >
+                            {
+                              data[1]?.messages[
+                                data[1]?.initialMessageLength
+                                  ? data[1]?.initialMessageLength
+                                  : 1
+                              ]?.content
+                            }
+                          </div>
+                        </div>
+                      );
+                    })}
+                </>
+              )}
+
+              {botDetails?.referedFrom == "leads" && (
+                <>
+                  <p
+                    className="history-link"
+                    onClick={() => {
+                      /// reset to the conversation history
+                      botContext?.handleChange("leadSessionsEmail")("");
+                      botContext?.handleChange("referedFrom")("");
+                    }}
+                  >
+                    See all converstion history
+                  </p>
+                </>
+              )}
+            </div>
 
             {chatHistoryList?.length > 0 && (
-              <>
-                {chatHistoryList
-                  // ?.reverse()
-                  ?.slice((currentPage - 1) * 25, currentPage * 25)
-                  ?.map((data: any, index: any) => {
-                    return (
-                      <div
-                        className={`first-message ${
-                          activeCurrentChatHistory === `today${index}`
-                            ? "active"
-                            : ""
-                        }`}
-                        style={{
-                          display:
-                            botDetails?.referedFrom == "leads" ? "flex" : "",
-                          justifyContent:
-                            botDetails?.referedFrom == "leads"
-                              ? "space-between"
-                              : "",
-                          flexDirection:
-                            botDetails?.referedFrom == "leads"
-                              ? "row-reverse"
-                              : "column",
-                        }}
-                        key={index}
-                        onClick={() => {
-                          setIsChatClicked(true);
-                          setCurrentChatHistory(data[1]?.messages);
-                          setDisplayEmail(data[1]?.email);
-                          setActiveCurrentChatHistory("today" + index);
-                        }}
-                      >
-                        <div
-                          className="time"
-                          style={{
-                            padding: 0,
-                            fontSize: "14px",
-                            display: "flex",
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                          }}
-                        >
-                          <div
-                            style={{
-                              display:
-                                botDetails?.referedFrom == "leads"
-                                  ? "none"
-                                  : "block",
-                            }}
-                          >
-                            {data[1]?.email ? (
-                              <span
-                                style={{
-                                  textTransform:
-                                    data[1].email == "Anonymous"
-                                      ? "capitalize"
-                                      : "lowercase",
-                                }}
-                              >
-                                {data[1]?.email}
-                              </span>
-                            ) : (
-                              "Anonymous"
-                            )}
-                          </div>
-
-                          <div
-                            // style={{
-                            //   textOverflow: "ellipsis",
-                            //   overflow: "hidden",
-                            //   width: "100%",
-                            //   textWrap: "nowrap",
-                            // }}
-                            style={{
-                              flex:
-                                botDetails?.referedFrom == "leads" ? 1 : "none",
-                              textAlign: "end",
-                              textWrap: "nowrap",
-                            }}
-                          >
-                            {getTimeAgo(data[1].sessionEndDate)}
-                          </div>
-                        </div>
-
-                        <div
-                          style={{
-                            textOverflow: "ellipsis",
-                            overflow: "hidden",
-                            width: "250px",
-                            textWrap: "nowrap",
-                            // flex: botDetails?.referedFrom == "leads" ? 1 : 0,
-                          }}
-                        >
-                          {
-                            data[1]?.messages[
-                              data[1]?.initialMessageLength
-                                ? data[1]?.initialMessageLength
-                                : 1
-                            ]?.content
-                          }
-                        </div>
-                      </div>
-                    );
-                  })}
-              </>
+              <Pagination
+                defaultCurrent={1}
+                current={currentPage}
+                total={chatHistoryList.length}
+                onChange={(page) => {
+                  handlePageChange(page);
+                }}
+                showSizeChanger={false}
+                pageSize={25}
+              />
             )}
-
-            {botDetails?.referedFrom == "leads" && (
-              <>
-                <p
-                  className="history-link"
-                  onClick={() => {
-                    /// reset to the conversation history
-                    botContext?.handleChange("leadSessionsEmail")("");
-                    botContext?.handleChange("referedFrom")("");
-                  }}
-                >
-                  See all converstion history
-                </p>
-              </>
-            )}
-          </div>
-
-          {chatHistoryList?.length > 0 && (
-            <Pagination
-              defaultCurrent={1}
-              current={currentPage}
-              total={chatHistoryList.length}
-              onChange={(page) => {
-                handlePageChange(page);
-              }}
-              showSizeChanger={false}
-              pageSize={25}
-            />
-          )}
-          {/*------------------------------------------yesterday's-chat----------------------------------------------*/}
-          {/* <div className="detail">
+            {/*------------------------------------------yesterday's-chat----------------------------------------------*/}
+            {/* <div className="detail">
           {chatHistoryList?.yesterday?.chats && (
             <>
               <div className="time">Yesterday</div>
@@ -568,8 +575,8 @@ function History({ chatbotId }: any) {
             </>
           )}
         </div> */}
-          {/*------------------------------------------last-7-days-chat----------------------------------------------*/}
-          {/* <div className="detail">
+            {/*------------------------------------------last-7-days-chat----------------------------------------------*/}
+            {/* <div className="detail">
           {chatHistoryList?.lastSevenDay?.chats && (
             <>
               <div className="time">Last 7 days</div>
@@ -602,102 +609,105 @@ function History({ chatbotId }: any) {
             </>
           )}
         </div> */}
-        </div>
-        {/* this is used for printing the chats initially it will be hidden but on print it will be visible*/}
-        <PrintingChats
-          ref={tempRef}
-          messages={currentChatHistory}
-          // messagesTime={messagesTime}
-        />
-        {/*------------------------------------------right-section----------------------------------------------*/}
+          </div>
+          {/* this is used for printing the chats initially it will be hidden but on print it will be visible*/}
+          <PrintingChats
+            ref={tempRef}
+            messages={currentChatHistory}
+            // messagesTime={messagesTime}
+          />
+          {/*------------------------------------------right-section----------------------------------------------*/}
 
-        <div
-          className="message-section-wrapper"
-          style={{
-            display: window.innerWidth > 767 || chatClicked ? "block" : "none",
-          }}
-        >
-          <div className="messages-section">
-            <div
-              className="header"
-              style={{
-                visibility:
-                  currentChatHistory?.length != 0 ? "visible" : "hidden",
-              }}
-            >
-              <p style={{ color: "#777e90" }}>{displayEmail}</p>
-              <div className="action-btns">
-                <ReactToPrint
-                  trigger={() => {
-                    return (
-                      <button style={{ border: "none", background: "none" }}>
-                        <Image src={exportBtn} alt="export-btn" />
-                      </button>
-                    );
-                  }}
-                  content={() => tempRef.current}
-                />
-                {window.innerWidth < 768 && (
-                  <Image
-                    src={closeImage}
-                    alt="close-icon"
-                    onClick={() => setIsChatClicked(false)}
+          <div
+            className="message-section-wrapper"
+            style={{
+              display:
+                window.innerWidth > 767 || chatClicked ? "block" : "none",
+            }}
+          >
+            <div className="messages-section">
+              <div
+                className="header"
+                style={{
+                  visibility:
+                    currentChatHistory?.length != 0 ? "visible" : "hidden",
+                }}
+              >
+                <p style={{ color: "#777e90" }}>{displayEmail}</p>
+                <div className="action-btns">
+                  <ReactToPrint
+                    trigger={() => {
+                      return (
+                        <button style={{ border: "none", background: "none" }}>
+                          <Image src={exportBtn} alt="export-btn" />
+                        </button>
+                      );
+                    }}
+                    content={() => tempRef.current}
                   />
-                )}
+                  {window.innerWidth < 768 && (
+                    <Image
+                      src={closeImage}
+                      alt="close-icon"
+                      onClick={() => setIsChatClicked(false)}
+                    />
+                  )}
+                </div>
               </div>
-            </div>
-            <hr
-              style={{
-                visibility:
-                  currentChatHistory?.length != 0 ? "visible" : "hidden",
-              }}
-            />
+              <hr
+                style={{
+                  visibility:
+                    currentChatHistory?.length != 0 ? "visible" : "hidden",
+                }}
+              />
 
-            <div className="history-conversation-container">
-              {currentChatHistory.map((message: any, index: any) => {
-                if (message.role == "assistant")
-                  return (
-                    <React.Fragment key={index}>
-                      <div
-                        className="assistant-message-container"
-                        style={{
-                          marginTop:
-                            `${message.messageType}` === "initial"
-                              ? "10px"
-                              : "0",
-                        }}
-                      >
+              <div className="history-conversation-container">
+                {currentChatHistory.map((message: any, index: any) => {
+                  if (message.role == "assistant")
+                    return (
+                      <React.Fragment key={index}>
                         <div
-                          className="assistant-message"
+                          className="assistant-message-container"
                           style={{
-                            display: "flex",
-                            flexDirection: "column",
+                            marginTop:
+                              `${message.messageType}` === "initial"
+                                ? "10px"
+                                : "0",
                           }}
-                          dangerouslySetInnerHTML={{
-                            __html: message.content,
-                          }}
-                        ></div>
-                        {/* <div className="time">{message?.messageTime}</div> */}
-                        {message.messageType !== "initial" && (
-                          <div className="time">{message?.messageTime}</div>
-                        )}
+                        >
+                          <div
+                            className="assistant-message"
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                            }}
+                            dangerouslySetInnerHTML={{
+                              __html: message.content,
+                            }}
+                          ></div>
+                          {/* <div className="time">{message?.messageTime}</div> */}
+                          {message.messageType !== "initial" && (
+                            <div className="time">{message?.messageTime}</div>
+                          )}
 
-                        {(currentChatHistory[index + 1] === undefined ||
-                          currentChatHistory[index + 1].role == "user") && (
-                          <div className="like-dislike-container">
-                            <Image
-                              src={likeIcon}
-                              alt="like-icon"
-                              onClick={() => openChatbotModal(index, "like")}
-                            />
-                            <Image
-                              src={dislikeIcon}
-                              alt="dislike-icon"
-                              onClick={() => openChatbotModal(index, "dislike")}
-                            />
-                          </div>
-                        )}
-                        {/* <div className="like-dislike-container">
+                          {(currentChatHistory[index + 1] === undefined ||
+                            currentChatHistory[index + 1].role == "user") && (
+                            <div className="like-dislike-container">
+                              <Image
+                                src={likeIcon}
+                                alt="like-icon"
+                                onClick={() => openChatbotModal(index, "like")}
+                              />
+                              <Image
+                                src={dislikeIcon}
+                                alt="dislike-icon"
+                                onClick={() =>
+                                  openChatbotModal(index, "dislike")
+                                }
+                              />
+                            </div>
+                          )}
+                          {/* <div className="like-dislike-container">
                       <Image
                         src={likeIcon}
                         alt="like-icon"
@@ -709,47 +719,54 @@ function History({ chatbotId }: any) {
                         onClick={() => openChatbotModal(index, "dislike")}
                       />
                     </div> */}
+                        </div>
+                        <ChatbotNameModal
+                          open={open}
+                          setOpen={setOpen}
+                          chatbotText={feedbackText}
+                          setChatbotText={setfeedbackText}
+                          handleOk={handleOk}
+                          forWhat="feedback"
+                        />
+                      </React.Fragment>
+                    );
+                  else
+                    return (
+                      <div className="user-message-container">
+                        <div
+                          className="user-message"
+                          key={index}
+                          style={{
+                            backgroundColor: botSettings?.userMessageColor,
+                          }}
+                        >
+                          {message.content}
+                        </div>
+                        <div className="time">{message?.messageTime}</div>
                       </div>
-                      <ChatbotNameModal
-                        open={open}
-                        setOpen={setOpen}
-                        chatbotText={feedbackText}
-                        setChatbotText={setfeedbackText}
-                        handleOk={handleOk}
-                        forWhat="feedback"
-                      />
-                    </React.Fragment>
-                  );
-                else
-                  return (
-                    <div className="user-message-container">
-                      <div
-                        className="user-message"
-                        key={index}
-                        style={{
-                          backgroundColor: botSettings?.userMessageColor,
-                        }}
-                      >
-                        {message.content}
-                      </div>
-                      <div className="time">{message?.messageTime}</div>
-                    </div>
-                  );
-              })}
-            </div>
+                    );
+                })}
+              </div>
 
-            <div
-              className="footer"
-              style={{
-                visibility:
-                  currentChatHistory?.length != 0 ? "visible" : "hidden",
-              }}
-            >
-              <p>Powered by Torri.AI</p>
+              <div
+                className="footer"
+                style={{
+                  visibility:
+                    currentChatHistory?.length != 0 ? "visible" : "hidden",
+                }}
+              >
+                <p>Powered by Torri.AI</p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
+      {chatHistoryList?.length !== 0 && (
+        <div className="empty-history">
+          <Image src={noHistory} alt="no-data"></Image>
+          <p style={{ textAlign: "center" }}>No chat history found</p>
+        </div>
+      )}
     </div>
   );
 }

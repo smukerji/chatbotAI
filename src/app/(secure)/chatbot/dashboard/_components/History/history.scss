@@ -4,6 +4,7 @@
   margin-right: 45px;
   margin-top: 28px;
   flex-direction: column;
+  height: 100%;
 
   @media screen and (max-width: 1440px) {
     margin-left: 20px;
@@ -24,6 +25,10 @@
       .interval-btns {
         display: flex;
         gap: 16px;
+        overflow: auto;
+        width: 100%;
+        white-space: nowrap;
+        flex-wrap: nowrap !important;
         .interval-btn {
           border-radius: 1000px;
           background: #f4f5f6;
@@ -31,6 +36,8 @@
           border: none;
           outline: none;
           cursor: pointer;
+          white-space: nowrap;
+          flex: 0 0 auto !important;
 
           &.active {
             background: #f4f5f6;
@@ -50,6 +57,7 @@
       border-radius: 1000px;
       background: #f4f5f6 !important;
       width: 218px !important;
+      flex: 0 0 auto;
 
       .ant-picker-input {
         input::placeholder {
@@ -401,5 +409,15 @@
     margin-left: 5px;
     margin-right: 5px;
     flex-direction: column;
+  }
+  .empty-history {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    font-size: 24px;
+    font-weight: 500;
+    color: #777e90;
   }
 }
