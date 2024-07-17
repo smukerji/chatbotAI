@@ -366,7 +366,7 @@ function History({ chatbotId }: any) {
           </div>
         </div>
       </div>
-      {chatHistoryList?.length == 0 && (
+      {chatHistoryList?.length !== 0 && (
         <div className="chatbot-history-parts">
           {/*------------------------------------------left-section----------------------------------------------*/}
           <div className="chatbot-history-details">
@@ -761,7 +761,7 @@ function History({ chatbotId }: any) {
           </div>
         </div>
       )}
-      {chatHistoryList?.length !== 0 && (
+      {chatHistoryList?.length == 0 && (
         <div className="empty-history">
           <Image src={noHistory} alt="no-data"></Image>
           <p style={{ textAlign: "center" }}>No chat history found</p>
