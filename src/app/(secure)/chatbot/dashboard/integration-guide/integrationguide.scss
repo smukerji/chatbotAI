@@ -94,12 +94,18 @@
       border-radius: 20px;
     }
   }
+  @media only screen and (max-width: 768px) {
+    .header {
+      margin: 0;
+      border-radius: 0;
+    }
+  }
 
   @media only screen and (max-width: 660px) {
     .header {
       padding: 8px 16px; /* Further adjust padding for mobile devices */
       height: auto; /* Adjust height if needed */
-      margin: 0 20px;
+      // margin: 0 20px;
 
       .intro {
         font-size: 26px;
