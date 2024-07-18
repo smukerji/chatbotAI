@@ -80,6 +80,7 @@ async function getConversationHistory(request: NextRequest) {
 
       // Flatten historyDetails
       let chatsCount = 0;
+      historyResults["chats"] = {};
       historyCursor.forEach((history: any) => {
         chatsCount += Object.entries(history.chats).length;
         historyResults["chats"] = {
@@ -116,6 +117,7 @@ async function getConversationHistory(request: NextRequest) {
           }
         );
 
+        historyResults["chats"] = {};
         for (const [chat0, chat1] of filterChats) {
           historyResults["chats"] = {
             ...historyResults["chats"],
