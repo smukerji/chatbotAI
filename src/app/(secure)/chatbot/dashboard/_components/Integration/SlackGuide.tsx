@@ -49,9 +49,9 @@ function SlackGuide({ activeStep, setActiveStep, handleStep }: any) {
       const rect = stepElement.getBoundingClientRect();
 
       if (
-        (rect.top <= 90 &&
+        (rect.top <= 130 &&
           (index === stepElements.length - 1 ||
-            stepElements[index + 1].getBoundingClientRect().top > 90)) ||
+            stepElements[index + 1].getBoundingClientRect().top > 130)) ||
         (index === stepElements.length - 1 && rect.bottom <= window.innerHeight)
       ) {
         // If the top of the stepElement is above the window top and the next stepElement is below the window top (or there's no next stepElement)

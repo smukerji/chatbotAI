@@ -13,7 +13,6 @@ function IntegrationGuideControls({
   return (
     <div className="header">
       <p className="intro">Integration Guide</p>
-
       <div className="guide-btns">
         <button
           className={`btn ${activeStep == 1 ? "active" : ""}`}
