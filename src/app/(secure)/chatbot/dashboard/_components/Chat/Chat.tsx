@@ -1138,7 +1138,9 @@ function Chat({
                     botSettings?.theme === "dark" ? "#353945" : "",
                   color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
                 }}
-                dangerouslySetInnerHTML={{ __html: response }}
+                dangerouslySetInnerHTML={{
+                  __html: response.concat("<b> |</b>"),
+                }}
               />
             </div>
           )}
