@@ -41,14 +41,15 @@ const BlogDetail = async ({
       <div className="blog-detail-container">
         {blog && (
           <div className="blog-detail">
-            <Image
+            {/* <Image
               src={blog.hero || ""}
               width={1200}
               height={500}
               className="banner-image"
               alt={`${blog?.title} banner image`}
-            />
+            /> */}
             <BlogDetailCard
+              heroImage={blog.hero}
               content={blog.content}
               title={blog.title}
               author={blog.author}
