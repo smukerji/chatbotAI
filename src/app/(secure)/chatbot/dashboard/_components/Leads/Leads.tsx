@@ -180,7 +180,7 @@ const Leads = ({ chatbotId }: any) => {
       // Ensure numbers are treated as text in CSV
       const modifiedContent = content.map((entry: any) => ({
         ...entry,
-        Number: `'${entry.Number}`, // Wrap the number in double quotes
+        Number: ` ${entry.Number}`,
       }));
       const json2csvParser = new Parser();
       const csvString = await json2csvParser.parse(modifiedContent);

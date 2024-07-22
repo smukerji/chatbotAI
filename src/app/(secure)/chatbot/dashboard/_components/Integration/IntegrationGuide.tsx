@@ -1,15 +1,15 @@
 "use client";
 import Image from "next/image";
+import { useWindowSize } from "react-use";
 import React, { useEffect, useState } from "react";
-import whatsAppIcon from "../../../../../../../public/whatsapp.png";
-import telegramIcon from "../../../../../../../public/telegram.svg";
-import slackIcon from "../../../../../../../public/slackwhite.png";
 import WhatsappGuide from "./WhatsappGuide";
 import SlackGuide from "./SlackGuide";
 import TelegramGuide from "./TelegramGuide";
 import { useRouter } from "next/navigation";
+import IntegrationGuideControls from "./IntegrationGuideControls";
 
 function IntegrationGuide() {
+  const { width } = useWindowSize();
   const [activeStep, setActiveStep] = useState(1);
   const router = useRouter();
 
@@ -52,7 +52,14 @@ function IntegrationGuide() {
   return (
     <>
       <div className="integration-wrapper">
-        <div className="header">
+        {width < 768 && (
+          <IntegrationGuideControls
+            activeStep={activeStep}
+            setActiveStep={setActiveStep}
+            handleStep={handleStep}
+          />
+        )}
+        {/* <div className="header">
           <p className="intro">Integration Guide</p>
 
           <div className="guide-btns">
@@ -99,12 +106,30 @@ function IntegrationGuide() {
               Telegram
             </button>
           </div>
-        </div>
+        </div> */}
 
         <div className="guides">
-          {activeStep == 1 && <WhatsappGuide />}
-          {activeStep == 2 && <SlackGuide />}
-          {activeStep == 3 && <TelegramGuide />}
+          {activeStep == 1 && (
+            <WhatsappGuide
+              activeStep={activeStep}
+              setActiveStep={setActiveStep}
+              handleStep={handleStep}
+            />
+          )}
+          {activeStep == 2 && (
+            <SlackGuide
+              activeStep={activeStep}
+              setActiveStep={setActiveStep}
+              handleStep={handleStep}
+            />
+          )}
+          {activeStep == 3 && (
+            <TelegramGuide
+              activeStep={activeStep}
+              setActiveStep={setActiveStep}
+              handleStep={handleStep}
+            />
+          )}
         </div>
       </div>
     </>

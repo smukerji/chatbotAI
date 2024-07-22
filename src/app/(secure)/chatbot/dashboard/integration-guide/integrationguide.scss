@@ -1,5 +1,5 @@
 .integration-wrapper {
-  max-width: 1206px;
+  max-width: 1800px;
   width: 100%;
   margin: 0 auto;
 
@@ -13,6 +13,11 @@
     height: 248px;
     padding: 32px 48px;
     justify-content: space-between;
+    border-radius: 20px;
+
+    @media screen and (max-width: 991px) {
+      margin: 15px 0;
+    }
 
     .intro {
       color: var(--Neutral-1, #fcfcfd);
@@ -89,26 +94,33 @@
       border-radius: 20px;
     }
   }
+  @media only screen and (max-width: 768px) {
+    .header {
+      margin: 0;
+      border-radius: 0;
+    }
+  }
 
   @media only screen and (max-width: 660px) {
     .header {
       padding: 8px 16px; /* Further adjust padding for mobile devices */
       height: auto; /* Adjust height if needed */
-      margin: 0 20px;
+      // margin: 0 20px;
 
       .intro {
         font-size: 26px;
         line-height: 48px; /* 141.667% */
+        margin-bottom: 13px;
       }
 
       .guide-btns {
-        flex-direction: column;
+        // flex-direction: column;
         .btn {
           margin-bottom: 12px;
-          gap: 6px;
-          padding: 6px 12px 6px 6px;
+          // gap: 6px;
+          padding: 2px 8px 2px 2px;
           margin-right: 10px;
-          font-size: 16px;
+          font-size: 14px;
           line-height: 24px; /* 133.333% */
         }
       }

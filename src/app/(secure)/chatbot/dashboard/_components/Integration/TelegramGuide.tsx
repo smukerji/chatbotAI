@@ -5,8 +5,12 @@ import { useCookies } from "react-cookie";
 import Image from "next/image";
 import "../../whatsapp-integration-guide/whatsappintegration.scss";
 import step2_1 from "../../../../../../../public/telegram-guide-images/step1_1.png";
+import IntegrationGuideControls from "./IntegrationGuideControls";
+import { useWindowSize } from "react-use";
 
-function TelegramGuide() {
+function TelegramGuide({ activeStep, setActiveStep, handleStep }: any) {
+  const { width } = useWindowSize();
+
   const [selectedStep, setSelectedStep] = useState(1);
 
   const rightRef = useRef<any>(null);
@@ -28,9 +32,9 @@ function TelegramGuide() {
       const rect = stepElement.getBoundingClientRect();
 
       if (
-        (rect.top <= 90 &&
+        (rect.top <= 130 &&
           (index === stepElements.length - 1 ||
-            stepElements[index + 1].getBoundingClientRect().top > 90)) ||
+            stepElements[index + 1].getBoundingClientRect().top > 130)) ||
         (index === stepElements.length - 1 && rect.bottom <= window.innerHeight)
       ) {
         // If the top of the stepElement is above the window top and the next stepElement is below the window top (or there's no next stepElement)
@@ -67,37 +71,67 @@ function TelegramGuide() {
             />
             <span>back</span>
           </div> */}
-          <ul className="step-list">
-            {[1].map((step) => (
+          {/* <ul className="step-list">
+            {[{ id: 1, title: "Telegram Integration Guide" }].map((step) => (
               <li
-                key={step}
-                onClick={() => handleClick(step)}
-                className={selectedStep === step ? "selected" : ""}
+                key={step.id}
+                onClick={() => handleClick(step.id)}
+                className={selectedStep === step.id ? "selected" : ""}
               >
-                Step {step}
+                {step.id}. {step.title}
+              </li>
+            ))}
+          </ul> */}
+        </div>
+        {/* {width < 768 && (
+          <ul className="step-list">
+            {[{ id: 1, title: "Telegram Integration Guide" }].map((step) => (
+              <li
+                key={step.id}
+                onClick={() => handleClick(step.id)}
+                className={selectedStep === step.id ? "selected" : ""}
+              >
+                Step {step.id}
               </li>
             ))}
           </ul>
-        </div>
+        )} */}
 
         <div className="right" ref={rightRef}>
-          <h1 className="guide-heading">Telegram Integration Guide</h1>
+          {width > 767 && (
+            <IntegrationGuideControls
+              activeStep={activeStep}
+              setActiveStep={setActiveStep}
+              handleStep={handleStep}
+            />
+          )}
+          {/* <h1 className="guide-heading">Telegram Integration Guide</h1> */}
 
           <div className="step-1">
             {/* <h2 className="guide-step-title">
               Step 1: Log in to your slack account
             </h2> */}
 
-            <ol className="ordered-points">
-              <li>Search BotFather in your Telegram app</li>
+            <ul className="ordered-points" style={{ listStyleType: "none" }}>
               <li>
-                Type <span style={{ fontWeight: "bold" }}>/newbot</span>
+                <span>Step 1:</span> Search BotFather in your Telegram app
               </li>
-              <li>Choose name for your bot</li>
-              <li>Choose username for your bot</li>
-              <li>Now you will receive token</li>
               <li>
-                Copy token and paste in our torri.AI telegram modal and{" "}
+                <span>Step 2:</span> Type{" "}
+                <span style={{ fontWeight: "bold" }}>/newbot</span>
+              </li>
+              <li>
+                <span>Step 3:</span>Choose name for your bot
+              </li>
+              <li>
+                <span>Step 4:</span>Choose username for your bot
+              </li>
+              <li>
+                <span>Step 5:</span>Now you will receive token
+              </li>
+              <li>
+                <span>Step 6:</span> Copy token and paste in our torri.AI
+                telegram modal and{" "}
                 <span style={{ fontWeight: "bold" }}>click</span> connect
               </li>
 
@@ -106,7 +140,7 @@ function TelegramGuide() {
                   <Image src={step2_1} alt="step1_1" />
                 </div>
               </ul>
-            </ol>
+            </ul>
           </div>
         </div>
       </div>

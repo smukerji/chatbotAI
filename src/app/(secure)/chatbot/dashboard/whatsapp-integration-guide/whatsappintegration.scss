@@ -2,6 +2,9 @@
   display: flex;
   margin-top: 55px;
   // padding: 0 300px 0 0;
+  @media screen and (max-width: 767px) {
+    margin-top: 30px;
+  }
 
   .left {
     width: 30%;
@@ -28,11 +31,15 @@
 
     .step-list {
       list-style: none;
-      background-color: #f4f5f6;
+      // background-color: #f4f5f6;
       padding: 24px;
       border-radius: 20px;
       position: sticky;
       top: 125px;
+
+      @media screen and (max-width: 991px) {
+        padding: 20px 15px;
+      }
 
       li {
         margin-bottom: 16px;
@@ -42,10 +49,13 @@
         font-weight: 500;
         line-height: 24px; /* 150% */
         padding-bottom: 5px;
+        padding: 6px;
+        border-radius: 5px;
         cursor: pointer;
         &.selected {
-          color: blue;
-          border-bottom: 1px solid #2e58ea;
+          color: #2e58ea;
+          // border-bottom: 1px solid #2e58ea;
+          background: #ecf0fe;
         }
       }
     }
@@ -53,12 +63,22 @@
 
   .right {
     width: 70%;
-    height: calc(100vh - 70px);
+    height: calc(100vh - 125px);
     overflow-y: auto;
     padding-left: 30px;
     padding-right: 100px;
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
+
+    @media screen and (max-width: 991px) {
+      padding-left: 20px;
+      padding-right: 20px !important;
+    }
+
+    @media screen and (max-width: 767px) {
+      height: auto;
+      overflow: unset;
+    }
 
     &::-webkit-scrollbar {
       display: none;
@@ -103,6 +123,10 @@
       line-height: 28px; /* 140% */
       margin-bottom: 20px;
       margin-left: 30px;
+      margin-top: 20px;
+      span {
+        font-weight: bold;
+      }
 
       .unordered-sub-points {
         list-style-type: disc;
@@ -142,9 +166,40 @@
     flex-direction: column;
 
     .left {
-      // width: 100%;
-      // margin-top: 20px;
       display: none;
+    }
+    .step-list {
+      background: #fff;
+      display: flex;
+      margin: 0 20px 0;
+      padding: 10px 0;
+      list-style-type: none;
+      overflow: auto;
+      position: sticky;
+      top: 70px;
+      li {
+        padding: 8px 0;
+        margin: 0 10px;
+        color: #777e90;
+        text-transform: capitalize;
+        white-space: nowrap;
+        position: relative;
+        * {
+          white-space: nowrap;
+        }
+        &.selected {
+          color: #2e58ea;
+          &::before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: #2e58ea;
+            bottom: 0;
+            left: 0;
+          }
+        }
+      }
     }
 
     .right {
