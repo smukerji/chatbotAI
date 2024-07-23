@@ -60,7 +60,6 @@
             line-height: 24px; /* 150% */
             text-transform: capitalize;
             color: #777e90;
-            text-transform: capitalize;
           }
           cursor: pointer;
 
@@ -157,6 +156,7 @@
     .top {
       .sources-header {
         .options-container-dropdwon {
+          text-transform: capitalize;
           display: flex;
           margin: 10px 0 5px 5px;
           width: calc(100% - 10px);
@@ -212,6 +212,7 @@
 
         .messages-section {
           width: 100%;
+          margin-bottom: 78px;
 
           .conversation-container {
             .user-message-container {
