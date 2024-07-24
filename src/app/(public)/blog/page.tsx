@@ -4,22 +4,23 @@ import React from "react";
 import "./blog.scss";
 import BlogCard from "./_components/BlogCard";
 // import { generateMetadata } from "@/app/_helpers/pageSeo";
-import { getAllBlogs } from "@/app/_helpers/blogContent";
+// import { getAllBlogs } from "@/app/_helpers/blogContent";
 import Image from "next/image";
 import { Metadata } from "next";
-const getBlogList = async () => {
-  const blogs = await getAllBlogs();
 
-  const pageCount = Math.ceil(blogs.length / 2); // Assuming 10 posts per page
+// const getBlogList = async () => {
+//   const blogs = await getAllBlogs();
 
-  const totalPage = blogs.length;
-  return {
-    totalPage,
-    blogs,
-    pageCount,
-    initialPage: 0,
-  };
-};
+//   const pageCount = Math.ceil(blogs.length / 2); // Assuming 10 posts per page
+
+//   const totalPage = blogs.length;
+//   return {
+//     totalPage,
+//     blogs,
+//     pageCount,
+//     initialPage: 0,
+//   };
+// };
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: `Blog`,
@@ -30,8 +31,6 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 const Blog = async () => {
-  const { blogs, initialPage, pageCount, totalPage } = await getBlogList();
-
   return (
     <>
       <SecondaryHeader />
@@ -49,12 +48,7 @@ const Blog = async () => {
             />
           </div>
           {/** blog card component */}
-          <BlogCard
-            total={totalPage}
-            blogs={blogs}
-            initialPage={initialPage}
-            pageCount={pageCount}
-          />
+          <BlogCard />
         </div>
       </div>
       <Footer />

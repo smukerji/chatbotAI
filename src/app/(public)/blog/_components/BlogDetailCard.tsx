@@ -63,8 +63,14 @@ const BlogDetailCard = ({ slug }: { slug: string }) => {
           <div className="detail-card-wrapper" id="blog-detail-wrapper">
             <div className="card-about">
               <p className="category">{blog?.author || ""}</p>
-              <p className="empty"></p>
-              <p className="date">{blog?.publishDate?.split("T")[0] || ""}</p>
+              {/* <p className="empty"></p> */}
+              <p className="date">
+                {blog?.publishDate
+                  ?.split("T")[0]
+                  .split("-")
+                  .reverse()
+                  .join("-") || ""}
+              </p>
             </div>
             <h1 className="title">{blog?.title || ""}</h1>
             <div className="introduction">

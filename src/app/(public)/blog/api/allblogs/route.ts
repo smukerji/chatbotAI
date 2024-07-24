@@ -6,18 +6,18 @@ import { NextRequest } from "next/server";
 // Function to get single blog from contentful api
 
 async function getBlogs(request: NextRequest) {
-  const limit = 9;
-  const { pageNumber }: any = request.nextUrl.searchParams;
-  const skip = (pageNumber - 1) * limit;
+  const limit: any = process.env.NEXT_PUBLIC_BLOG_POST_PER_PAGE;
+  const currentPage: number =
+    Number(request.nextUrl.searchParams.get("currentPage")) || 1;
+  const skip = (currentPage - 1) * limit;
 
-  console.log(pageNumber);
+  console.log("limit", limit, currentPage, skip);
 
   const query = `
   query {
     blogCollection(limit: ${limit}, skip: ${skip}, order: publishDate_DESC) {
     total
       items {
-        id
         thumbnail {
           url
         }
@@ -27,6 +27,7 @@ async function getBlogs(request: NextRequest) {
         publishDate
         tags
         category
+        slug
       }
     }
   }
@@ -40,17 +41,17 @@ async function getBlogs(request: NextRequest) {
 
   await axios
     .post(
-      `https://graphql.contentful.com/content/v1/spaces/${process.env.CONTENTFUL_SPACE_ID}`,
+      `https://graphql.contentful.com/content/v1/spaces/${process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID}`,
       body,
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.CONTENTFUL_ACCESS_TOKEN}`,
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_CONTENTFUL_ACCESS_TOKEN}`,
         },
       }
     )
     .then((res) => {
-      response = res?.data?.data?.blogCollection?.items || [];
+      response = res?.data?.data?.blogCollection || [];
     })
     .catch((error) => {
       console.error("Error fetching data:", error.message);
