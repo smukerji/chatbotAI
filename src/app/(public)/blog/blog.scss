@@ -40,9 +40,60 @@
     }
   }
 }
+.category-wrapper {
+  margin-top: 80px;
+  background: var(--Neutral-2, #f4f5f6);
+  display: flex;
+  justify-content: space-between;
+  padding: 40px 20px;
+  border-radius: 16px;
+  flex-wrap: wrap;
+  gap: 20px;
+
+  .category {
+    display: flex;
+    cursor: pointer;
+
+    .icon {
+      svg {
+        path {
+          fill: #292d32;
+        }
+      }
+    }
+
+    &.active {
+      .icon {
+        svg {
+          path {
+            fill: #2e58ea;
+          }
+        }
+      }
+      p {
+        color: #2e58ea;
+      }
+    }
+  }
+
+  @media only screen and (max-width: 767px) {
+    justify-content: flex-start;
+  }
+
+  p {
+    color: var(--Neutral-6, #353945);
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 28px; /* 140% */
+    display: flex;
+    align-items: center;
+    margin-left: 16px;
+  }
+}
 // blog card design
 .blog-card-wrapper {
-  margin: 80px -15px 0;
+  margin: 56px -15px 0;
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;

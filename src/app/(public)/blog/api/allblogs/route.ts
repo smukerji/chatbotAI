@@ -6,16 +6,21 @@ import { NextRequest } from "next/server";
 // Function to get single blog from contentful api
 
 async function getBlogs(request: NextRequest) {
+  const category: string = request.nextUrl.searchParams.get("category") || "";
+
   const limit: any = process.env.NEXT_PUBLIC_BLOG_POST_PER_PAGE;
   const currentPage: number =
     Number(request.nextUrl.searchParams.get("currentPage")) || 1;
   const skip = (currentPage - 1) * limit;
 
-  console.log("limit", limit, currentPage, skip);
+  let whereClause = "";
+  if (category !== "Allcategory") {
+    whereClause = `, where:{category_contains_all:"${category}"}`;
+  }
 
   const query = `
   query {
-    blogCollection(limit: ${limit}, skip: ${skip}, order: publishDate_DESC) {
+    blogCollection(limit: ${limit}, skip: ${skip}, order: publishDate_DESC${whereClause}) {
     total
       items {
         thumbnail {
