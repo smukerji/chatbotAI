@@ -65,7 +65,15 @@ const BlogCard = () => {
           setCurrentBlog([]);
         } else if (res?.data?.data) {
           // setBlog(res?.data?.data[0]);
-          setCurrentBlog(res?.data?.data?.items || []);
+          const blogPosts = res.data.data.items;
+
+          // skip first 4 blog as we already showing this in recent posts
+          if (currentPage === 1 && activeCategory === "Allcategory") {
+            setCurrentBlog(blogPosts.slice(4)); // skip first 4 blog posts
+          } else {
+            setCurrentBlog(blogPosts || []);
+          }
+
           setTotalPosts(res?.data?.data?.total);
           console.log(res.data.data);
         } else {
@@ -189,7 +197,7 @@ const BlogCard = () => {
                       {blog?.tags?.length > 0 &&
                         blog?.tags?.map((tag: any, index: number) => {
                           return (
-                            <p className="tags">
+                            <p className="tags" key={index}>
                               <span key={index}>{tag}</span>
                             </p>
                           );
