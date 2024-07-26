@@ -86,7 +86,11 @@ function Dashboard() {
       if (user) {
         const planEndDate = new Date(user?.endDate);
 
-        if (new Date() > planEndDate) {
+        // Get the current time in UTC
+        const nowUtc = new Date().toISOString();
+
+        // Compare the current time in UTC with the plan end date
+        if (new Date(nowUtc) > planEndDate) {
           setIsPlanNotification(true);
 
           // setSource("history");

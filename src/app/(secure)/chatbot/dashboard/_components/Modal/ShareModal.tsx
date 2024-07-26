@@ -8,10 +8,7 @@ import copyIcon from "../../../../../../../public/svgs/copy-icon.svg";
 import Image from "next/image";
 
 function ShareModal({ open, setOpen, chatbotId }: any) {
-  const script = `<script
-    src="${process.env.NEXT_PUBLIC_WEBSITE_URL}embed-bot.js"
-    chatbotID=${chatbotId}
-    ></script>`;
+  const script = `${process.env.NEXT_PUBLIC_WEBSITE_URL}embed-bot?chatbotID=${chatbotId}&source=web`;
 
   const handleOk = async () => {
     // await navigator.clipboard
@@ -57,8 +54,8 @@ function ShareModal({ open, setOpen, chatbotId }: any) {
       }
     >
       <p className="share-note">
-        To add the chatbot any where on your website, add this script to your
-        html code
+        Share the link to open the bot in full-screen mode on your website or
+        mobile
       </p>
       <p className="script-container">{script}</p>
     </Modal>
