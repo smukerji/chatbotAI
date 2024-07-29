@@ -68,8 +68,6 @@ function WhatsappGuide({ activeStep, setActiveStep, handleStep }: any) {
   };
 
   const handleScroll = () => {
-    console.log("goes uinder handle scroll");
-
     const rightDiv = rightRef.current;
     const stepElements = rightDiv.querySelectorAll('[class^="step-"]');
     let currentStep = 1;
@@ -93,8 +91,6 @@ function WhatsappGuide({ activeStep, setActiveStep, handleStep }: any) {
   };
 
   useEffect(() => {
-    console.log("use effect triggered");
-
     const sectionRight = document.querySelector(".right");
     sectionRight?.addEventListener("scroll", handleScroll);
     return () => {

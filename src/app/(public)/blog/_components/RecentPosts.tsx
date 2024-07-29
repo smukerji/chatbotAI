@@ -22,7 +22,6 @@ function RecentPosts() {
         } else if (res?.data?.data) {
           // setBlog(res?.data?.data[0]);
           setCurrentBlog(res?.data?.data?.items || []);
-          console.log("llllllllllllll", res.data.data);
         } else {
           message.error("Error fetching blogs. Please, try again.");
         }
@@ -99,14 +98,16 @@ function RecentPosts() {
                         </p>
                       );
                     })}
-                  {blog?.category?.length > 0 &&
-                    blog?.category?.map((tag: any, index: number) => {
-                      return (
-                        <p className="category">
-                          <span key={index}>{tag}</span>
-                        </p>
-                      );
-                    })}
+                  {
+                    blog?.category?.length > 0 && (
+                      // blog?.category?.map((tag: any, index: number) => {
+                      // return (
+                      <p className="category">
+                        <span>{blog?.category}</span>
+                      </p>
+                    )
+                    // );
+                  }
                 </div>
               </div>
               <hr className="hr-line" />

@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { message, Pagination, Spin } from "antd";
 import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
@@ -32,6 +32,8 @@ const BlogCard = () => {
   const [loading, setLoading] = useState(false);
   const [activeCategory, setActiveCategory] = useState("Allcategory");
 
+  const [categories, setCategories] = useState<string[]>([]);
+
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     router.push(`/blog?page=${page}&category=${activeCategory}`);
@@ -51,52 +53,83 @@ const BlogCard = () => {
     setActiveCategory(currentCategory);
     router.push(`/blog?page=${currentPageNo || 1}&category=${currentCategory}`);
     setLoading(false);
+  }, [search]);
+
+  useEffect(() => {
+    const savedCategories = sessionStorage.getItem("categories");
+    if (savedCategories) {
+      setCategories(JSON.parse(savedCategories));
+    }
   }, []);
 
   useEffect(() => {
-    setLoading(true);
-    axios
-      .get(
-        `${process.env.NEXT_PUBLIC_WEBSITE_URL}blog/api/allblogs?currentPage=${currentPage}&category=${activeCategory}`
-      )
-      .then((res) => {
-        if (res?.data?.data?.total === 0) {
-          message.error("No posts to show");
-          setCurrentBlog([]);
-        } else if (res?.data?.data) {
-          // setBlog(res?.data?.data[0]);
-          const blogPosts = res.data.data.items;
+    if (
+      activeCategory !== "Allcategory" ||
+      (activeCategory === "Allcategory" &&
+        search?.get("category") === "Allcategory")
+    ) {
+      setLoading(true);
 
-          // skip first 4 blog as we already showing this in recent posts
-          if (currentPage === 1 && activeCategory === "Allcategory") {
-            setCurrentBlog(blogPosts.slice(4)); // skip first 4 blog posts
+      axios
+        .get(
+          `${process.env.NEXT_PUBLIC_WEBSITE_URL}blog/api/allblogs?currentPage=${currentPage}&category=${activeCategory}`
+        )
+        .then((res) => {
+          if (res?.data?.data?.total === 0) {
+            message.error("No posts to show");
+            setCurrentBlog([]);
+          } else if (res?.data?.data) {
+            // setBlog(res?.data?.data[0]);
+            const blogPosts = res.data.data.items;
+
+            // Update categories only if the active category is "Allcategory"
+            if (activeCategory === "Allcategory" && categories.length === 0) {
+              const fetchedCategories = blogPosts.map(
+                (blog: any) => blog.category
+              );
+              const uniqueCategories: string[] = fetchedCategories
+                .filter(
+                  (category: string, index: number, self: any) =>
+                    self.indexOf(category) === index
+                )
+                .sort((a: any, b: any) => a.localeCompare(b));
+              setCategories(uniqueCategories);
+              sessionStorage.setItem(
+                "categories",
+                JSON.stringify(uniqueCategories)
+              );
+            }
+
+            // skip first 4 blog as we already showing this in recent posts
+            if (currentPage === 1 && activeCategory === "Allcategory") {
+              setCurrentBlog(blogPosts.slice(4)); // skip first 4 blog posts
+            } else {
+              setCurrentBlog(blogPosts || []);
+            }
+
+            setTotalPosts(res?.data?.data?.total);
           } else {
-            setCurrentBlog(blogPosts || []);
+            message.error("Error fetching blogs. Please, try again.");
           }
+        })
+        .catch((err) => {
+          console.log("Error", err);
 
-          setTotalPosts(res?.data?.data?.total);
-          console.log(res.data.data);
-        } else {
           message.error("Error fetching blogs. Please, try again.");
-        }
-      })
-      .catch((err) => {
-        console.log("Error", err);
-
-        message.error("Error fetching blogs. Please, try again.");
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [currentPage, activeCategory]);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  }, [search, activeCategory, currentPage]);
 
   // useEffect(() => {
   //   window.scrollTo(0, 0);
   // }, []);
+
   return (
     <>
-      {loading && <Spin indicator={antIcon} />}
-      {!loading && currentBlog && (
+      {!loading && currentBlog.length > 0 && (
         <>
           <div className="category-wrapper">
             <div
@@ -108,11 +141,25 @@ const BlogCard = () => {
                 handleChangeCategory("Allcategory")
               }
             >
-              <Icon Icon={AllCategoryIcon} />
+              {/* <Icon Icon={AllCategoryIcon} /> */}
               <p>All categories</p>
             </div>
 
-            <div
+            {categories.map((category: string, index: number) => {
+              return (
+                <div
+                  key={index}
+                  className={`category ${
+                    activeCategory === category ? "active" : ""
+                  }`}
+                  onClick={() => handleChangeCategory(`${category}`)}
+                >
+                  <p>{category}</p>
+                </div>
+              );
+            })}
+
+            {/* <div
               className={`category ${
                 activeCategory === "Casestudy" ? "active" : ""
               }`}
@@ -158,7 +205,7 @@ const BlogCard = () => {
             >
               <Icon Icon={StoriesIcon} />
               <p>Stories</p>
-            </div>
+            </div> */}
           </div>
 
           <div className="blog-card-wrapper">
@@ -202,16 +249,18 @@ const BlogCard = () => {
                             </p>
                           );
                         })}
-                      {blog?.category?.length > 0 &&
-                        blog?.category?.map((tag: any, index: number) => {
-                          return (
-                            <p className="category">
-                              <span key={index}>{tag}</span>
-                            </p>
-                          );
-                        })}
+                      {
+                        blog?.category?.length > 0 && (
+                          // blog?.category?.map((tag: any, index: number) => {
+                          //   return (
+                          <p className="category">
+                            <span>{blog?.category}</span>
+                          </p>
+                        )
+                        // );
+                      }
                     </div>
-                    <div className="likes-comment">
+                    {/* <div className="likes-comment">
                       <p className="likes">
                         <span className="icon">
                           <Image src={LikeIcon} alt="icon" />
@@ -224,13 +273,13 @@ const BlogCard = () => {
                         </span>{" "}
                         10
                       </p>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>
             ))}
 
-            {currentBlog.length > 0 && (
+            {!loading && currentBlog.length > 0 && (
               <Pagination
                 pageSize={postsPerPage}
                 current={currentPage}
@@ -250,6 +299,8 @@ const BlogCard = () => {
           </div>
         </>
       )}
+
+      {loading && <Spin indicator={antIcon} />}
     </>
   );
 };

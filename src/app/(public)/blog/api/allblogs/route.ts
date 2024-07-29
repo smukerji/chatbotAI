@@ -15,7 +15,7 @@ async function getBlogs(request: NextRequest) {
 
   let whereClause = "";
   if (category !== "Allcategory") {
-    whereClause = `, where:{category_contains_all:"${category}"}`;
+    whereClause = `, where:{category_contains:"${category}"}`;
   }
 
   const query = `

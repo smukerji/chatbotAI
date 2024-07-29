@@ -220,7 +220,7 @@
   background: var(--Neutral-2, #f4f5f6);
   display: flex;
   justify-content: space-between;
-  padding: 40px 20px;
+  padding: 40px 40px;
   border-radius: 16px;
   flex-wrap: wrap;
   gap: 20px;
@@ -263,7 +263,7 @@
     line-height: 28px; /* 140% */
     display: flex;
     align-items: center;
-    margin-left: 16px;
+    // margin-left: 16px;
   }
 }
 // blog card design
