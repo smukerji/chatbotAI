@@ -25,7 +25,6 @@ const nextConfig = {
         pathname: "/**",
       },
       { hostname: "miro.medium.com" },
-      { hostname: "images.ctfassets.net" },
       // {
       //   protocol: "https",
       //   hostname: "**",
