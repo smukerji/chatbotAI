@@ -23,40 +23,18 @@ export async function generateMetadata({
   };
 }
 
-const getBlogDetail = async ({ slug }: { slug: string }) => {
-  const blog = await getBlogBySlug(slug);
-  return { blog };
-};
-
 const BlogDetail = async ({
   params: { slug },
 }: {
   params: { slug: string };
 }) => {
-  const { blog }: { blog: any } = await getBlogDetail({ slug });
-
   return (
     <>
       <SecondaryHeader />
       <div className="blog-detail-container">
-        {blog && (
-          <div className="blog-detail">
-            <Image
-              src={blog.hero || ""}
-              width={1200}
-              height={500}
-              className="banner-image"
-              alt={`${blog?.title} banner image`}
-            />
-            <BlogDetailCard
-              content={blog.content}
-              title={blog.title}
-              author={blog.author}
-              date={blog.date}
-              introduction={blog.introduction}
-            />
-          </div>
-        )}
+        <div className="blog-detail">
+          <BlogDetailCard slug={slug} />
+        </div>
       </div>
       <Footer />
     </>
