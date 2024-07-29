@@ -7,21 +7,21 @@ import Image from "next/image";
 import BlogDetailCard from "../_components/BlogDetailCard";
 import { Metadata } from "next";
 import { getBlogBySlug } from "@/app/_helpers/blogContent";
-export async function generateMetadata({
-  params,
-}: {
-  params: { slug: string };
-}): Promise<Metadata> {
-  const blogDetail: any = await getBlogBySlug(params.slug);
+// export async function generateMetadata({
+//   params,
+// }: {
+//   params: { slug: string };
+// }): Promise<Metadata> {
+//   const blogDetail: any = await getBlogBySlug(params.slug);
 
-  return {
-    title: `Blog ${blogDetail?.metaTitle ? ` | ${blogDetail?.metaTitle}` : ""}`,
-    description: `${blogDetail?.metaDescription}`,
-    alternates: {
-      canonical: `https://torri.ai/blog/${blogDetail?.slug}`,
-    },
-  };
-}
+//   return {
+//     title: `Blog ${blogDetail?.metaTitle ? ` | ${blogDetail?.metaTitle}` : ""}`,
+//     description: `${blogDetail?.metaDescription}`,
+//     alternates: {
+//       canonical: `https://torri.ai/blog/${blogDetail?.slug}`,
+//     },
+//   };
+// }
 
 const BlogDetail = async ({
   params: { slug },

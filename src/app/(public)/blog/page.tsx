@@ -5,23 +5,9 @@ import "./blog.scss";
 import BlogCard from "./_components/BlogCard";
 // import { generateMetadata } from "@/app/_helpers/pageSeo";
 // import { getAllBlogs } from "@/app/_helpers/blogContent";
-import Image from "next/image";
 import { Metadata } from "next";
 import RecentPosts from "./_components/RecentPosts";
 
-// const getBlogList = async () => {
-//   const blogs = await getAllBlogs();
-
-//   const pageCount = Math.ceil(blogs.length / 2); // Assuming 10 posts per page
-
-//   const totalPage = blogs.length;
-//   return {
-//     totalPage,
-//     blogs,
-//     pageCount,
-//     initialPage: 0,
-//   };
-// };
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: `Blog`,

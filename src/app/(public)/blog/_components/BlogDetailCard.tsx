@@ -47,6 +47,28 @@ const BlogDetailCard = ({ slug }: { slug: string }) => {
     window.scrollTo(0, 0);
   }, []);
 
+  // Update metadata after fetching blog data
+  useEffect(() => {
+    if (blog) {
+      const metadata = {
+        title: `Blog ${blog?.title ? ` | ${blog?.title}` : ""}`,
+        description: `${blog?.description}`,
+        alternates: {
+          canonical: `https://torri.ai/blog/${slug}`,
+        },
+      };
+      // Update metadata
+      document.title = metadata.title;
+      // Example for setting meta description
+      const metaDescription = document.querySelector(
+        'meta[name="description"]'
+      );
+      if (metaDescription) {
+        metaDescription.setAttribute("content", metadata.description);
+      }
+    }
+  }, [blog]);
+
   return (
     <>
       {loading && <Spin indicator={antIcon} />}

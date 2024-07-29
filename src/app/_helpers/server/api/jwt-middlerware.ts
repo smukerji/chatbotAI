@@ -22,6 +22,7 @@ export function isPublicPath(req: NextRequest) {
     "GET:/chatbot/dashboard/api",
     "GET:/blog/api/singleblog",
     "GET:/blog/api/allblogs",
+    "GET:/blog/api/allslugs",
   ];
 
   return publicPaths.includes(`${req.method}:${req.nextUrl.pathname}`);

@@ -5,26 +5,13 @@ import { NextRequest } from "next/server";
 
 // Function to get single blog from contentful api
 
-async function getSingleBlog(request: NextRequest) {
-  console.log("coming in request");
-
-  const slug = request.nextUrl.searchParams.get("slug") || "";
-
+async function getSlugs(request: NextRequest) {
   const query = `
   query {
-    blogCollection(where: {slug: "${slug}"}) {
+    blogCollection {
+    total
       items {
-        id
-        heroImage {
-          url
-        }
-        title
-        author
-        introPara
-        content
-        publishDate
-        tags
-        description
+        slug
       }
     }
   }
@@ -48,7 +35,7 @@ async function getSingleBlog(request: NextRequest) {
       }
     )
     .then((res) => {
-      response = res?.data?.data?.blogCollection?.items || [];
+      response = res?.data?.data?.blogCollection || [];
     })
     .catch((error) => {
       console.error("Error fetching data:", error.message);
@@ -61,5 +48,5 @@ async function getSingleBlog(request: NextRequest) {
 }
 
 module.exports = apiHandler({
-  GET: getSingleBlog,
+  GET: getSlugs,
 });
