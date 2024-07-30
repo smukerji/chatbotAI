@@ -654,3 +654,9 @@ Header a {
     }
   }
 }
+
+.ant-dropdown {
+  .ant-dropdown-menu {
+    text-transform: capitalize;
+  }
+}
