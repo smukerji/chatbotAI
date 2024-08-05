@@ -325,6 +325,7 @@ function Chat({
               body: JSON.stringify({
                 userQuery,
                 chatbotId: chatbot?.id,
+                messages,
                 // userId: cookies.userId,
                 //// default chatbot set
                 userId: !isPopUp ? cookies.userId : userId,
@@ -335,7 +336,7 @@ function Chat({
           /// parse the response and extract the similarity results
           const respText = await response.text();
 
-          const similaritySearchResults = JSON.parse(respText).join("\n");
+          const similaritySearchResults = respText;
 
           /// get response from backend in streaming
           const responseFromBackend: any = await fetch(
