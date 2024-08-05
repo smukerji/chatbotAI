@@ -74,6 +74,7 @@ export default async function handler(req, res) {
       /// retrieve the similarity search results
       const llm = new OpenAI({
         apiKey: process.env.NEXT_PUBLIC_OPENAI_KEY,
+        model: "gpt-4o",
       });
       const retriever = MultiQueryRetriever.fromLLM({
         llm: llm,
@@ -84,6 +85,8 @@ export default async function handler(req, res) {
           By generating multiple perspectives on the user question,
           your goal is to help the user overcome some of the limitations
           of distance-based similarity search.
+
+          Replace any number or words like it, that, etc according to the user's flow.
 
           Provide these alternative questions separated by newlines between XML tags. For example:
 
@@ -102,7 +105,7 @@ export default async function handler(req, res) {
           filter: { chatbotId: chatbotId },
         }),
 
-        // verbose: true,
+        verbose: true,
       });
 
       /// getting the relveant similaritiy search
