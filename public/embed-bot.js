@@ -64,7 +64,7 @@
   `;
   // Get the script element
   const scriptElement = document.querySelector(
-    'script[src="http://localhost:3000/embed-bot.js"]'
+    'script[src="https://chatbot-ai-silk.vercel.app/embed-bot.js"]'
   );
 
   // Access the data attributes
@@ -74,8 +74,8 @@
   // Fetch bot settings
   try {
     const response = await fetch(
-      // `http://localhost:3000/chatbot/popup/details/api?chatbotId=${param1}`
-      `http://localhost:3000/chatbot/popup/details/api?chatbotId=${param1}`
+      // `https://chatbot-ai-silk.vercel.app/chatbot/popup/details/api?chatbotId=${param1}`
+      `https://chatbot-ai-silk.vercel.app/chatbot/popup/details/api?chatbotId=${param1}`
     );
     if (!response.ok) throw new Error("Network response was not ok");
 
@@ -122,7 +122,7 @@
 
   iframe = `<iframe
     id="chat-frame-widget"
-    src="http://localhost:3000/embed-bot?chatbotID=${param1}"
+    src="https://chatbot-ai-silk.vercel.app/embed-bot?chatbotID=${param1}"
     frameborder="0"
   ></iframe>
   <button id="btn-trigger-chat">${icon_img}</button>
@@ -157,7 +157,7 @@
 
   window.addEventListener("message", function (event) {
     // Validate the origin of the message
-    if (event.origin !== "http://localhost:3000") {
+    if (event.origin !== "https://chatbot-ai-silk.vercel.app") {
       return;
     }
 
