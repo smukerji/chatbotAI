@@ -1,9 +1,29 @@
 (async function EmbedBot() {
   let cssStyles = `
   <style>
+    #chat-frame-widget{
+      display: none; position: fixed; inset: auto 15px 0px auto; width: 400px; height: 750px; opacity: 1; color-scheme: none; margin: 0px; max-height: 100vh; max-width: 100vw; transform: translateY(0px); transition: none 0s ease 0s !important; visibility: visible; border: none; bottom: 15px;
+    }
+
     @media only screen and (max-width: 768px) {
       iframe {
         width: 90% !important;
+      }
+
+       #chat-widget {
+        width: 100%;
+        height: 100%;
+        bottom: 0;
+        display: unset;
+      }
+
+      #chat-frame-widget{
+        position: fixed !important;
+        inset: 0 !important; 
+        height: 100% !important;
+        width: 100% !important;
+        max-height: 100% !important;
+        max-width: 100% !important;
       }
     }
 
@@ -13,11 +33,6 @@
       }
     }
 
-    @media only screen and (max-height: 750px) {
-      iframe {
-        height: 600px !important;
-      }
-    }
 
     #chat-widget {
       position: fixed;
@@ -55,8 +70,6 @@
   // Access the data attributes
   const param1 = scriptElement.getAttribute("chatbotID");
   let bubbleIconUrl, chatbubbleColor, chatbotBubbleAlignment;
-
-  let iframe;
 
   // Fetch bot settings
   try {
@@ -134,8 +147,26 @@
   btn.addEventListener("click", () => {
     if (frameWidget.style.display === "none") {
       frameWidget.style.display = "block";
+      /// remove the button if the screen size is less than 768px
+      if (window.innerWidth < 768) {
+        btn.style.display = "none";
+      }
     } else {
       frameWidget.style.display = "none";
+    }
+  });
+
+  window.addEventListener("message", function (event) {
+    // Validate the origin of the message
+    if (event.origin !== "https://chatbot-ai-silk.vercel.app") {
+      return;
+    }
+
+    // Handle the message
+    if (event.data === "disable-iframe") {
+      frameWidget.style.display = "none";
+      /// add the button if the screen size is less than 768px
+      btn.style.display = "block";
     }
   });
 })();
