@@ -6,6 +6,12 @@
   margin-top: 28px;
   position: relative;
 
+  &.embed-chat-container {
+    height: 100vh;
+    margin: 0;
+    display: block;
+  }
+
   @media screen and (max-width: 1440px) {
     margin-left: 20px;
     margin-right: 20px;
@@ -125,6 +131,10 @@
     height: 650px;
     background: #fff;
 
+    &.embed-messages-section {
+      height: 100%;
+    }
+
     .header {
       display: flex;
       justify-content: space-between;
@@ -212,6 +222,10 @@
       height: 490px;
       margin-top: 17px;
       margin-bottom: 17px;
+
+      &.embed-conversation-container {
+        height: 100%;
+      }
 
       &::-webkit-scrollbar {
         width: 0.5em;
