@@ -124,7 +124,6 @@
     id="chat-frame-widget"
     src="https://chatbot-ai-silk.vercel.app/embed-bot?chatbotID=${param1}"
     frameborder="0"
-    style="display: none; position: fixed; inset: auto 15px 0px auto; width: 400px; height: 750px; opacity: 1; color-scheme: none; margin: 0px; max-height: 100vh; max-width: 100vw; transform: translateY(0px); transition: none 0s ease 0s !important; visibility: visible; border: none; bottom: 15px;"
   ></iframe>
   <button id="btn-trigger-chat">${icon_img}</button>
 `;
@@ -142,7 +141,7 @@
   const frameWidget = document.getElementById("chat-frame-widget");
 
   btn.style.backgroundColor = chatbubbleColor ? chatbubbleColor : "#9b00fb";
-  frameWidget.style.display = "block";
+  frameWidget.style.display = "none";
 
   btn.addEventListener("click", () => {
     if (frameWidget.style.display === "none") {
