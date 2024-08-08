@@ -17,7 +17,7 @@ const antIcon = (
   />
 );
 
-const BlogDetailCard = ({ slug }: { slug: string }) => {
+const PreviewBlog = ({ slug }: { slug: string }) => {
   const [blog, setBlog] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
@@ -26,11 +26,11 @@ const BlogDetailCard = ({ slug }: { slug: string }) => {
     setLoading(true);
     axios
       .get(
-        `${process.env.NEXT_PUBLIC_WEBSITE_URL}blog/api/singleblog?slug=${slug}`
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}blog/api/previewblog?slug=${slug}`
       )
       .then((res) => {
         if (res?.data?.data) {
-          setBlog(res?.data?.data[0]);
+          setBlog(res?.data?.data);
         } else {
           message.error("Error fetching blog. Please, try again.");
         }
@@ -46,28 +46,6 @@ const BlogDetailCard = ({ slug }: { slug: string }) => {
 
     window.scrollTo(0, 0);
   }, []);
-
-  // Update metadata after fetching blog data
-  useEffect(() => {
-    if (blog) {
-      const metadata = {
-        title: `Blog ${blog?.title ? ` | ${blog?.title}` : ""}`,
-        description: `${blog?.description}`,
-        alternates: {
-          canonical: `https://torri.ai/blog/${slug}`,
-        },
-      };
-      // Update metadata
-      document.title = metadata.title;
-      // Example for setting meta description
-      const metaDescription = document.querySelector(
-        'meta[name="description"]'
-      );
-      if (metaDescription) {
-        metaDescription.setAttribute("content", metadata.description);
-      }
-    }
-  }, [blog]);
 
   return (
     <>
@@ -122,4 +100,4 @@ const BlogDetailCard = ({ slug }: { slug: string }) => {
   );
 };
 
-export default BlogDetailCard;
+export default PreviewBlog;

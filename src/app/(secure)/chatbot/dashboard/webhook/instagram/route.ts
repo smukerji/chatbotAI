@@ -98,7 +98,7 @@ async function handleInstagramMessage(senderId: string, message: string) {
 // Function to send messages via the Instagram Graph API
 async function callSendAPI(senderId: string, response: any) {
   const PAGE_ACCESS_TOKEN =
-    "EAANR0Mh3zkMBO2wiMQAyasJcC18kClLIXA8bqF1XMo2yPEnnj7RT2G2D9kZATAvZBSiIz9Jinl4cZCeLn6LHyUhPpW2B4WZBpiFDkXMLiZAWbdyZBy2nLWNVPDskIV1IHZAcSe8cd1Ct4p1DTMTXYQI5ePUy3YGgEaN3XRxty0GZBzCoDJfE6rUxrk0IUzsOPNaQ5vbUqKPp";
+    "EAANR0Mh3zkMBOZBlvNh0LLCHcrdowj7zrIkUc27GYeIQnVMa6ZAokPBlYzmKoECminZBZAe3QQDF5lcn6kGQR2JZCyZBHBZBp91XIcS0MTeCZCo7ZCZCi2mZAryIqwMZAFOGuRobZATcZCQgmzX6ZAdJRtgZAXB6v7JRa8rRbqrZCnUteIig3Df1GEIisu5PUpLpaZBeMNuuPaTOir1kQG";
 
   const requestBody = {
     recipient: {

@@ -33,6 +33,11 @@ async function getBlogs(request: NextRequest) {
         tags
         category
         slug
+        contentfulMetadata{
+          tags{
+            name
+          }
+        }
       }
     }
   }

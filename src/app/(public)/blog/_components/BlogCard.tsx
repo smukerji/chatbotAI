@@ -241,14 +241,16 @@ const BlogCard = () => {
 
                   <div className="category-feedback">
                     <div className="category-tags">
-                      {blog?.tags?.length > 0 &&
-                        blog?.tags?.map((tag: any, index: number) => {
-                          return (
-                            <p className="tags" key={index}>
-                              <span key={index}>{tag}</span>
-                            </p>
-                          );
-                        })}
+                      {blog?.contentfulMetadata?.tags?.length > 0 &&
+                        blog?.contentfulMetadata?.tags?.map(
+                          (tag: any, index: number) => {
+                            return (
+                              <p className="tags" key={index}>
+                                <span key={index}>{tag.name}</span>
+                              </p>
+                            );
+                          }
+                        )}
                       {
                         blog?.category?.length > 0 && (
                           // blog?.category?.map((tag: any, index: number) => {

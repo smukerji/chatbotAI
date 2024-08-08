@@ -90,7 +90,7 @@ async function handleMessage(senderPsid: number, receivedMessage: any) {
 // Function to send messages via the Facebook Graph API
 async function callSendAPI(senderPsid: number, response: any) {
   const PAGE_ACCESS_TOKEN =
-    "EAANR0Mh3zkMBO3hwwnDVhu6lZCSzTlkH6cngDpovapnFFEoyQORgjr3phdl7VZC3uptzsYY0QDl1xD8VCY6gRd03SLpUMwnuDevKJEe9UTYhR1cNinCd1dFZANoqdApO28U1ca4T54rCtxcVZAZBFrbT6YqoC1ej91PlVWjw8v2HrksCchSTXVaZCTzTCZBmn5Mw0jRrzAZB";
+    "EAANR0Mh3zkMBO3l6KZCc3RSWpuz7LEyhMuVCBZACaxA5byfWvZBtcL0DXVFboufDz7u2KA4PmHTylGdZBLwZBCJ8UeJAUqAC90vnQZAEZCgVY9tkcTtiJR30Y57bvSkF3rbZBZC3h6YBuwSHYqZBXGd4u90C7R8awJh7K58rp7VdkFMPq87xoX9tgvtPEX9bc03u4t2gpy4tZAk";
 
   const requestBody = {
     recipient: {
