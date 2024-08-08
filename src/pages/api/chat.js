@@ -10,6 +10,8 @@ export const config = {
   runtime: "edge",
 };
 
+export const preferredRegion = ["iad1", "hnd1"];
+
 async function handler(req, res) {
   if (req.method === "POST") {
     /// parse the request object
