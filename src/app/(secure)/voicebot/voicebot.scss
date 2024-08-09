@@ -1,0 +1,84 @@
+:root {
+  --black: #fff;
+}
+
+.parents-voicebot {
+  padding: 20px 15px;
+  border: 2px solid black;
+  background: #F4F5F6;
+  display: flex;
+
+  .stepper {
+    margin-right: 60px;
+    display: flex;
+    width: 363px;
+    height: 884px;
+    padding: 32px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 40px;
+    flex-shrink: 0;
+    border-radius: 16px;
+    background: #FCFCFD;
+
+    .voicebot-avatar {
+      display: flex;
+      padding: 20px 12px;
+      flex-direction: column;
+      align-items: center;
+      gap: 27px;
+      align-self: stretch;
+      border-radius: 12px;
+      background: #F4F5F6;
+
+      .voicebot-avatar-img {
+        display: flex;
+        width: 120px;
+        height: 120px;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        border-radius: 1000px;
+        background: #E6E8EC;
+      }
+
+      .voicebot-avatar-img__info {
+        display: flex;
+        align-items: center;
+
+        .voicebot-avatar-img__botname {
+          display: inline-block;
+          margin-right: 16px;
+        }
+
+        .voicebot-avatar-img__botimg {
+          display: inline-block;
+        }
+      }
+
+    }
+  }
+
+  .main-voicebot {
+    flex: 1;
+    background: violet;
+
+    .main-voiceboot__title {
+      font-family: "General Sans";
+      font-size: 36px;
+      font-style: normal;
+      font-weight: 600;
+      line-height: 44px;
+    }
+
+    .main-voiceboot__subtitle {
+      color: #777E90;
+      font-family: "General Sans";
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 24px;
+
+    }
+  }
+}
