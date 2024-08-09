@@ -6,13 +6,9 @@ import { NextRequest } from "next/server";
 // Function to get single blog from contentful api
 
 async function getpreviewBlog(request: NextRequest) {
-  console.log("coming in request");
-
   const entryId = request.nextUrl.searchParams.get("slug") || "";
 
   let response;
-
-  console.log(">>>", entryId);
 
   await axios
     .get(
@@ -26,7 +22,30 @@ async function getpreviewBlog(request: NextRequest) {
       }
     )
     .then((res) => {
-      console.log("res", res.data.fields);
+      response = res?.data?.fields || [];
+    })
+    .catch((error) => {
+      console.error("Error fetching data:", error.message);
+      response = error.message;
+    });
+
+  return {
+    data: response,
+  };
+}
+
+async function getassetsUrl(request: NextRequest) {
+  const body = await request.json();
+
+  const { assetId } = body;
+
+  let response;
+
+  await axios
+    .get(
+      `https://preview.contentful.com/spaces/${process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID}/environments/master/assets/${assetId}?access_token=${process.env.NEXT_PUBLIC_CONTENTFUL_PREVIEW_ACCESS_TOKEN}`
+    )
+    .then((res) => {
       response = res?.data?.fields || [];
     })
     .catch((error) => {
@@ -41,4 +60,5 @@ async function getpreviewBlog(request: NextRequest) {
 
 module.exports = apiHandler({
   GET: getpreviewBlog,
+  POST: getassetsUrl,
 });

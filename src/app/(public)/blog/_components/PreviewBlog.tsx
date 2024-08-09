@@ -20,6 +20,7 @@ const antIcon = (
 const PreviewBlog = ({ slug }: { slug: string }) => {
   const [blog, setBlog] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [imageUrl, setImageUrl] = useState("");
 
   // fetch blog using specific slug
   useEffect(() => {
@@ -47,13 +48,45 @@ const PreviewBlog = ({ slug }: { slug: string }) => {
     window.scrollTo(0, 0);
   }, []);
 
+  useEffect(() => {
+    if (blog) {
+      const body = {
+        assetId: blog?.heroImage?.sys?.id || "",
+      };
+      setLoading(true);
+      axios
+        .post(
+          `${process.env.NEXT_PUBLIC_WEBSITE_URL}blog/api/previewblog`,
+          body
+        )
+        .then((res) => {
+          if (res?.data?.data) {
+            setImageUrl(`https:${res?.data?.data?.file?.url}`);
+            // setBlog(res?.data?.data);
+          } else {
+            message.error("Error fetching blog. Please, try again.");
+          }
+        })
+        .catch((err) => {
+          console.log("Error", err);
+
+          message.error("Error fetching blog. Please, try again.");
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+
+    window.scrollTo(0, 0);
+  }, [blog]);
+
   return (
     <>
       {loading && <Spin indicator={antIcon} />}
       {!loading && blog && (
         <>
           <Image
-            src={blog?.heroImage?.url || ""}
+            src={imageUrl}
             width={1200}
             height={500}
             className="banner-image"
