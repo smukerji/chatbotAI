@@ -5,6 +5,7 @@ import editIcon from "../../../../public/svgs/edit-2.svg";
 import Image from "next/image";
 
 import img from "../../../../public/voiceBot/Image (4).png";
+import infoImage from "../../../../public/voiceBot/SVG/info-circle.svg"
 
 export default function VoiceBot() {
 
@@ -66,6 +67,17 @@ export default function VoiceBot() {
           <div className="assistant-card">
             <div className="card-image">
               <Image src={img} alt="" height={100} width={100}></Image>
+            </div>
+            <div>
+              <h2>
+                Sales Agent
+              </h2>
+              <h3>
+                AI Chatbot Agent 
+              </h3>
+            </div>
+            <div>
+              <Image src={infoImage} alt="" height={100} width={100}></Image>
             </div>
           </div>
 
