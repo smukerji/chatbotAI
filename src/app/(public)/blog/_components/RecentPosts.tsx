@@ -55,7 +55,7 @@ function RecentPosts() {
             }}
           >
             {heroPost?.contentfulMetadata?.tags?.length > 0 &&
-              heroPost?.contentfulMetadata?.tags.map(
+              heroPost?.contentfulMetadata?.tags?.map(
                 (tag: any, index: number) => {
                   return (
                     <p className="tags" key={index}>
