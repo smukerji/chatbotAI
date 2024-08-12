@@ -99,10 +99,12 @@ const PreviewBlog = ({ slug }: { slug: string }) => {
               {/* <p className="empty"></p> */}
               <p className="date">
                 {blog?.publishDate
-                  ?.split("T")[0]
-                  .split("-")
-                  .reverse()
-                  .join("-") || ""}
+                  ? new Date(blog.publishDate).toLocaleDateString("en-GB", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                    })
+                  : ""}
               </p>
             </div>
 

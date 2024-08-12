@@ -54,14 +54,16 @@ function RecentPosts() {
               backgroundSize: "100% 100%",
             }}
           >
-            {heroPost?.tags?.length > 0 &&
-              heroPost?.tags?.map((tag: any, index: number) => {
-                return (
-                  <p className="tags" key={index}>
-                    <span key={index}>{tag}</span>
-                  </p>
-                );
-              })}
+            {heroPost?.contentfulMetadata?.tags?.length > 0 &&
+              heroPost?.contentfulMetadata?.tags.map(
+                (tag: any, index: number) => {
+                  return (
+                    <p className="tags" key={index}>
+                      <span key={index}>{tag.name}</span>
+                    </p>
+                  );
+                }
+              )}
             <Link href={`/blog/${heroPost?.slug}`} className="link">
               <h3 className="card-title">{heroPost?.title}</h3>
               <p className="description">{heroPost?.description}</p>
@@ -76,10 +78,12 @@ function RecentPosts() {
                 {/* <p className="empty"></p> */}
                 <p className="date">
                   {blog?.publishDate
-                    ?.split("T")[0]
-                    .split("-")
-                    .reverse()
-                    .join("-") || ""}
+                    ? new Date(blog.publishDate).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })
+                    : ""}
                 </p>
               </div>
 
