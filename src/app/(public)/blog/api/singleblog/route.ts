@@ -23,8 +23,12 @@ async function getSingleBlog(request: NextRequest) {
         introPara
         content
         publishDate
-        tags
         description
+        contentfulMetadata{
+          tags{
+            name
+          }
+        }
       }
     }
   }
