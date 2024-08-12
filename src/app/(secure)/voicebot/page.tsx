@@ -6,6 +6,8 @@ import Image from "next/image";
 
 import img from "../../../../public/voiceBot/Image (4).png";
 import infoImage from "../../../../public/voiceBot/SVG/info-circle.svg"
+import customTemplate from "../../../../public/voiceBot/SVG/profile-circle.svg"
+import galaryImg from "../../../../public/voiceBot/SVG/gallery-add.svg";
 
 export default function VoiceBot() {
 
@@ -20,7 +22,7 @@ export default function VoiceBot() {
       <div className="stepper">
         <div className="voicebot-avatar">
           <div className="voicebot-avatar-img">
-              <img src="" alt="" />
+            <Image alt="" src={galaryImg} className="galary_image"></Image>
           </div>
           <div className="voicebot-avatar-img__info">
             <h4 className="voicebot-avatar-img__botname">Your Bot Name</h4>
@@ -29,14 +31,26 @@ export default function VoiceBot() {
         </div>
         <h2>Create your voicebot</h2>
         <h3>Let's create your own bot</h3>
-        <Steps
+        <Steps className="stepper-steps"
           direction="vertical"
           size="small"
           current={1}
           items={[
             {
-              title: 'Choose your assistant',
-              description: <div> gggg</div> },
+              title: <div className="selected-assistant">
+                <div className="mini-selected-assistant-image">
+                  <Image alt="" src={img} width={100} height={100}></Image>
+                </div>
+                <div className="selected-assistant-header">
+                  <h3 className="heading_title">
+                    Your assistant
+                  </h3>
+                  <h4 className="heading_description">
+                    Customer Service Representative
+                  </h4>
+                </div>
+              </div>,
+              description: "" /*<div> gggg</div> */},
             {
               title: 'Choose your AI expert',
               description:"Description information! ",
@@ -48,7 +62,7 @@ export default function VoiceBot() {
           ]}
         />
 
-        <Button type="primary">primary</Button>
+        <Button type="primary">Continue</Button>
 
       </div>
       {/*------------------------------------------stepper-end----------------------------------------------*/}
@@ -63,21 +77,61 @@ export default function VoiceBot() {
         </h4>
 
         <div className="assistant-wrapper">
+          {
+            Array(4).fill("").map((x: any) => {
+              return <>
+                <div className="assistant-card">
+                  <div className="card-image">
+                    <Image src={img} alt="" height={100} width={100}></Image>
+                  </div>
+                  <div className="header-information">
+                    <div className="header_container">
+                      <h2 className="card_header">
+                        Sales Agent
+                      </h2>
+                      <div className="image-info">
+                        <Image src={infoImage} alt="" height={100} width={100}></Image>
+                      </div>
+                    </div>
 
-          <div className="assistant-card">
+                    <h3 className="card_sub-header">
+                      AI Chatbot Agent
+                    </h3>
+                  </div>
+
+                </div>
+              </>
+            })
+          }
+          {/* <div className="assistant-card">
             <div className="card-image">
               <Image src={img} alt="" height={100} width={100}></Image>
             </div>
-            <div>
-              <h2>
-                Sales Agent
-              </h2>
-              <h3>
-                AI Chatbot Agent 
+            <div className="header-information">
+              <div className="header_container">
+                <h2 className="card_header">
+                  Sales Agent
+                </h2>
+                <div className="image-info">
+                  <Image src={infoImage} alt="" height={100} width={100}></Image>
+                </div>
+              </div>
+
+              <h3 className="card_sub-header">
+                AI Chatbot Agent
               </h3>
             </div>
-            <div>
-              <Image src={infoImage} alt="" height={100} width={100}></Image>
+
+          </div> */}
+
+          <div className="custom_assistant-card">
+            <div className="blank-template">
+              <div className="image-card">
+                <Image src={customTemplate} alt="" height={100} width={100}></Image>
+              </div>
+              <h3 className="card_sub-header">
+                Blank Template
+              </h3>
             </div>
           </div>
 
