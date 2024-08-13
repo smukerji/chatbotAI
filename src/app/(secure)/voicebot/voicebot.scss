@@ -121,6 +121,21 @@
       }
 
     }
+
+    .navigation-button{
+         
+      margin-top: auto;
+          display: flex;
+            gap: 80px;
+            .previous-button{
+               padding-left: 10px;
+              .arrow-left{
+                width: 24px;
+                  height: 24px;
+              }
+            }
+    }
+
   }
 
   .main-voicebot {

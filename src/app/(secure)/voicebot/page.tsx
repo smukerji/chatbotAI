@@ -8,6 +8,7 @@ import img from "../../../../public/voiceBot/Image (4).png";
 import infoImage from "../../../../public/voiceBot/SVG/info-circle.svg"
 import customTemplate from "../../../../public/voiceBot/SVG/profile-circle.svg"
 import galaryImg from "../../../../public/voiceBot/SVG/gallery-add.svg";
+import leftArrow from "../../../../public/voiceBot/SVG/arrow-left.svg"
 
 export default function VoiceBot() {
 
@@ -62,7 +63,19 @@ export default function VoiceBot() {
           ]}
         />
 
-        <Button type="primary">Continue</Button>
+        <div className="navigation-button">
+          <Button className="previous-button">
+            <Image className="arrow-left" alt="left arrow" src={leftArrow} width={100} height={100}>
+
+            </Image>
+            <span>
+              Previous
+            </span>
+          </Button>
+
+          <Button type="primary">Continue</Button>
+        </div>
+      
 
       </div>
       {/*------------------------------------------stepper-end----------------------------------------------*/}
