@@ -38,7 +38,7 @@
       position: fixed;
       bottom: 20px;
       display: grid;
-      z-index: 1;
+      z-index: 999;
     }
 
     #btn-trigger-chat {

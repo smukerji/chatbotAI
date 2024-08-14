@@ -80,6 +80,12 @@ export default function RootLayout({
           src="https://salesiq.zohopublic.in/widget?wc=siq992fbe92f9ef9a36617ac4c9babe51c3d7778f44133f1fe66ec7795c68a6c396"
           defer={true}
         ></Script>
+
+        <script
+          src="http://localhost:3000/embed-bot.js"
+          // @ts-ignore
+          chatbotID="bb8b8731-4b94-41f8-bb92-ac74e6bc55b9"
+        ></script>
         {/* <script
           src="https://torri.ai/embed-bot.js"
           // @ts-ignore
