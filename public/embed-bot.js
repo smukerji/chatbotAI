@@ -121,7 +121,7 @@
 
   iframe = `<iframe
     id="chat-frame-widget"
-    src="https://chatbot-ai-silk.vercel.app/embed-bot?chatbotID=${param1}"
+    src="https://torri.ai/embed-bot?chatbotID=${param1}"
     frameborder="0"
   ></iframe>
   <button id="btn-trigger-chat">${icon_img}</button>
@@ -156,7 +156,7 @@
 
   window.addEventListener("message", function (event) {
     // Validate the origin of the message
-    if (event.origin !== "https://chatbot-ai-silk.vercel.app") {
+    if (event.origin !== "https://torri.ai") {
       return;
     }
 

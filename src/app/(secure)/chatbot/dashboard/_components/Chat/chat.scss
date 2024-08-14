@@ -291,30 +291,6 @@
             }
           }
 
-          ul {
-            display: contents;
-            padding: 0;
-            li {
-              display: flex;
-              padding-left: 15px;
-              position: relative;
-              &::before {
-                content: "";
-                position: absolute;
-                left: 0;
-                top: 6px;
-                width: 5px;
-                height: 5px;
-                border-radius: 50%;
-                background: #000;
-              }
-            }
-          }
-
-          iframe {
-            width: 100%;
-          }
-
           iframe {
             width: 100%;
           }
@@ -645,30 +621,6 @@
             background: #000;
           }
         }
-      }
-
-      ul {
-        display: contents;
-        padding: 0;
-        li {
-          display: flex;
-          padding-left: 15px;
-          position: relative;
-          &::before {
-            content: "";
-            position: absolute;
-            left: 0;
-            top: 6px;
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background: #000;
-          }
-        }
-      }
-
-      iframe {
-        width: 100%;
       }
 
       iframe {
