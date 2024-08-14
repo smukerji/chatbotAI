@@ -371,9 +371,9 @@ const Leads = ({ chatbotId }: any) => {
             </ConfigProvider>
           </div>
         </div>
-        {/* <button className="export-btn" onClick={exportLeads}>
+        <button className="export-btn" onClick={exportLeads}>
           <ExportBtn /> Export
-        </button> */}
+        </button>
       </div>
       <Table
         scroll={{ x: 767 }}
