@@ -6,6 +6,25 @@
   margin-top: 28px;
   position: relative;
 
+  &.embed-chat-container {
+    height: 100vh;
+    margin: 0;
+    display: block;
+  }
+
+  @media screen and (max-width: 1440px) {
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-top: 20px;
+    gap: 20px;
+  }
+  @media screen and (max-width: 1199px) {
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 20px;
+    gap: 10px;
+  }
+
   /*------------------------------------------left-section----------------------------------------------*/
   .chatbot-details {
     display: flex;
@@ -112,6 +131,10 @@
     height: 650px;
     background: #fff;
 
+    &.embed-messages-section {
+      height: 100%;
+    }
+
     .header {
       display: flex;
       justify-content: space-between;
@@ -200,6 +223,10 @@
       margin-top: 17px;
       margin-bottom: 17px;
 
+      &.embed-conversation-container {
+        height: 100%;
+      }
+
       &::-webkit-scrollbar {
         width: 0.5em;
       }
@@ -264,7 +291,27 @@
             }
           }
 
-          img {
+          ul {
+            display: contents;
+            padding: 0;
+            li {
+              display: flex;
+              padding-left: 15px;
+              position: relative;
+              &::before {
+                content: "";
+                position: absolute;
+                left: 0;
+                top: 6px;
+                width: 5px;
+                height: 5px;
+                border-radius: 50%;
+                background: #000;
+              }
+            }
+          }
+
+          iframe {
             width: 100%;
           }
 
@@ -600,7 +647,27 @@
         }
       }
 
-      img {
+      ul {
+        display: contents;
+        padding: 0;
+        li {
+          display: flex;
+          padding-left: 15px;
+          position: relative;
+          &::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 6px;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #000;
+          }
+        }
+      }
+
+      iframe {
         width: 100%;
       }
 

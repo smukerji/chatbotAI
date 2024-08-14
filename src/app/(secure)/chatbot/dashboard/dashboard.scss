@@ -1,5 +1,12 @@
 .edit-chatbot-container {
+  height: calc(100%);
   padding: 2.4vw 5.2vw;
+  @media screen and (max-width: 1440px) {
+    padding: 2vw 2vw;
+  }
+  @media screen and (max-width: 1199px) {
+    padding: 0 1vw 1vw;
+  }
   /*------------------------------------------top-section----------------------------------------------*/
   .top {
     /*------------------------------------------header----------------------------------------------*/
@@ -24,11 +31,28 @@
         list-style: none;
         display: flex;
         gap: 12px;
+        @media screen and (max-width: 1440px) {
+          margin-top: 10px;
+          gap: 10px;
+          padding-left: 20px;
+        }
+
+        @media screen and (max-width: 1199px) {
+          padding-left: 10px;
+          gap: 5px;
+        }
         li {
           display: flex;
           padding: 8px 16px;
           align-items: center;
           gap: 12px;
+          @media screen and (max-width: 1440px) {
+            gap: 10px;
+            padding: 8px 12px;
+          }
+          @media screen and (max-width: 1199px) {
+            gap: 5px;
+          }
           .option {
             font-size: 16px;
             font-style: normal;
@@ -36,7 +60,6 @@
             line-height: 24px; /* 150% */
             text-transform: capitalize;
             color: #777e90;
-            text-transform: capitalize;
           }
           cursor: pointer;
 
@@ -45,7 +68,7 @@
               color: #2e58ea;
               position: relative;
               &::before {
-                content: '';
+                content: "";
                 position: absolute;
                 width: 100%;
                 top: 32px;
@@ -68,11 +91,20 @@
       background: #e6e8ec;
       margin-left: 45px;
       margin-right: 45px;
+      @media screen and (max-width: 1440px) {
+        margin-left: 20px;
+        margin-right: 20px;
+      }
+      @media screen and (max-width: 1199px) {
+        margin-left: 10px;
+        margin-right: 10px;
+      }
     }
   }
 
   /*------------------------------------------bottom-section----------------------------------------------*/
   .bottom {
+    height: calc(100% - 92px - 1vh);
     margin-left: 0px;
     .create-chatbot-container {
       padding: 0px;
@@ -123,6 +155,26 @@
   @media only screen and (max-width: 767px) {
     .top {
       .sources-header {
+        .options-container-dropdwon {
+          text-transform: capitalize;
+          display: flex;
+          margin: 10px 0 5px 5px;
+          width: calc(100% - 10px);
+          display: flex;
+          padding: var(--2, 8px) var(--3, 12px);
+          justify-content: space-between;
+          align-items: center;
+          flex: 1 0 0;
+          border-radius: 1000px;
+          border: 1px solid var(--Primary-7, #2e58ea);
+          background: var(--Neutral-2, #f4f5f6);
+          color: var(--Neutral-6, #353945);
+          font-family: sans-serif;
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 24px;
+        }
         .options-container {
           flex-wrap: wrap;
           padding-left: 0;
@@ -160,6 +212,7 @@
 
         .messages-section {
           width: 100%;
+          margin-bottom: 78px;
 
           .conversation-container {
             .user-message-container {

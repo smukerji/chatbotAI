@@ -38,6 +38,7 @@ import {
 import { useRouter } from "next/navigation";
 import CustomModal from "../CustomModal/CustomModal";
 import { parsePhoneNumber } from "awesome-phonenumber";
+import CloseEmbedBotIcon from "@/assets/svg/CloseEmbedBotIcon";
 
 function Chat({
   chatbot,
@@ -109,6 +110,9 @@ function Chat({
   const [leadError, setLeadError] = useState("");
 
   const chatWindowRef: any = useRef(null);
+
+  /// for apply css for embed bot on mobile screens
+  const [innerWidth, setInnerWidth] = useState(false);
 
   /// chatbot messages feedback pop up state
   const [open, setOpen] = useState(false);
@@ -325,6 +329,7 @@ function Chat({
               body: JSON.stringify({
                 userQuery,
                 chatbotId: chatbot?.id,
+                messages,
                 // userId: cookies.userId,
                 //// default chatbot set
                 userId: !isPopUp ? cookies.userId : userId,
@@ -335,7 +340,7 @@ function Chat({
           /// parse the response and extract the similarity results
           const respText = await response.text();
 
-          const similaritySearchResults = JSON.parse(respText).join("\n");
+          const similaritySearchResults = respText;
 
           /// get response from backend in streaming
           const responseFromBackend: any = await fetch(
@@ -626,8 +631,21 @@ function Chat({
 
     const iframeLoaded = guideValue == "web" ? true : false;
     setiFrameLoaded(iframeLoaded);
+  }, []);
 
-    console.log("iframe loadedd", guideValue, iframeLoaded);
+  useEffect(() => {
+    const handleResize = () => {
+      setInnerWidth(
+        isPopUp && window.innerWidth < 767 && window.innerWidth != 400
+      );
+    };
+
+    handleResize(); // Set initial window width
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
 
   // // Get the ip and location of user
@@ -650,9 +668,8 @@ function Chat({
   //   getUserIP();
   // }, []);
 
-  
   return (
-    <div className="chat-container">
+    <div className={`chat-container ${innerWidth && "embed-chat-container"}`}>
       {!isPopUp && (
         <CustomModal
           open={isPlanNotification}
@@ -767,7 +784,9 @@ function Chat({
       )}
       {/*------------------------------------------right-section----------------------------------------------*/}
       <div
-        className={`messages-section ${iframeLoaded ? "iframe" : ""}`}
+        className={`messages-section ${iframeLoaded ? "iframe" : ""} ${
+          innerWidth && "embed-messages-section"
+        }`}
         style={{
           backgroundColor: botSettings?.theme === "dark" ? "black" : "",
         }}
@@ -812,26 +831,47 @@ function Chat({
               messagesTime={messagesTime}
             />
 
-            <ReactToPrint
-              trigger={() => {
-                return (
-                  <button style={{ border: "none", background: "none" }}>
-                    <Icon
-                      Icon={ExportBtn}
-                      className={
-                        botSettings?.theme === "dark" ? "color-white" : ""
-                      }
-                    />
-                  </button>
-                );
-              }}
-              content={() => tempRef.current}
-            />
+            {/* If chatbot is opened from popup then add the close embed bot button */}
+            {isPopUp && (
+              <Icon
+                Icon={CloseEmbedBotIcon}
+                click={() => {
+                  const btn = document.getElementById("chat-frame-widget");
+                  // Send a message to the parent
+                  window.parent.postMessage("disable-iframe", "*");
+                }}
+                className={botSettings?.theme === "dark" ? "color-white" : ""}
+              />
+            )}
+
+            {/* If the chatbot is embeded remove the print chat button */}
+            {!isPopUp && (
+              <ReactToPrint
+                trigger={() => {
+                  return (
+                    <button style={{ border: "none", background: "none" }}>
+                      <Icon
+                        Icon={ExportBtn}
+                        className={
+                          botSettings?.theme === "dark" ? "color-white" : ""
+                        }
+                      />
+                    </button>
+                  );
+                }}
+                content={() => tempRef.current}
+              />
+            )}
           </div>
         </div>
 
         <hr />
-        <div className="conversation-container" ref={chatWindowRef}>
+        <div
+          className={`conversation-container ${
+            innerWidth && "embed-conversation-container"
+          }`}
+          ref={chatWindowRef}
+        >
           {messages.map((message: any, index: any) => {
             if (message.role == "assistant")
               return (
@@ -1139,7 +1179,9 @@ function Chat({
                     botSettings?.theme === "dark" ? "#353945" : "",
                   color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
                 }}
-                dangerouslySetInnerHTML={{ __html: response }}
+                dangerouslySetInnerHTML={{
+                  __html: response.concat("<b> |</b>"),
+                }}
               />
             </div>
           )}

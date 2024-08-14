@@ -170,7 +170,6 @@ const Leads = ({ chatbotId }: any) => {
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/api/lead/export?chatbotId=${chatbotId}&startDate=${startDate}&endDate=${endDate}`
       );
       const content = await response.json();
-      console.log("contentttt", content);
 
       if (content.length === 0) {
         message.error("No leads to export");
@@ -180,12 +179,10 @@ const Leads = ({ chatbotId }: any) => {
       // Ensure numbers are treated as text in CSV
       const modifiedContent = content.map((entry: any) => ({
         ...entry,
-        Number: `'${entry.Number}`, // Wrap the number in double quotes
+        Number: ` ${entry.Number}`,
       }));
       const json2csvParser = new Parser();
       const csvString = await json2csvParser.parse(modifiedContent);
-
-      console.log("csv stringg", csvString);
 
       downloadCsv(csvString, "leads.csv");
     } catch (error) {

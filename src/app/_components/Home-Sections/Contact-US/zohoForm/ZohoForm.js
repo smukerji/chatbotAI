@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import "./zohoForm.scss";
 import Head from "next/head";
 import { message } from "antd";
+import Thankyoumodal from "./Thankyoumodal";
 
 const ZohoForm = () => {
   const [errors, setErrors] = useState({
@@ -9,8 +10,18 @@ const ZohoForm = () => {
     mobile: "",
     email: "",
   });
+
   const imgRef = useRef(null);
   const formRef = useRef(null);
+  const [openModal, setOpenModal] = useState(false);
+
+  const handleOk = () => {
+    setOpenModal(false);
+  };
+
+  const handleCancel = () => {
+    setOpenModal(false);
+  };
 
   async function sendEmail() {
     const name = document.querySelector("input[name='LASTNAME']");
@@ -37,7 +48,8 @@ const ZohoForm = () => {
       );
 
       if (response.ok) {
-        message.success("Response saved successfully");
+        // message.success("Response saved successfully");
+        setOpenModal(true);
         // Handle successful form submission
       } else {
         message.error("Error submitting response");
@@ -532,6 +544,12 @@ const ZohoForm = () => {
         </span>
         <div id="zcOptinSuccessPanel"></div>
       </div>
+      <Thankyoumodal
+        openModal={openModal}
+        setOpenModal={setOpenModal}
+        handleOk={handleOk}
+        handleCancel={handleCancel}
+      />
     </>
   );
 };
