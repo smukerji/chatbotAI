@@ -50,9 +50,39 @@
         width: 912px;
 
         .tool-list {
+          margin-bottom: 25px;
           display: flex;
           list-style: none;
           gap: 32px;
+
+          li:hover {
+            cursor: pointer;
+          }
+
+          .active {
+            color: #2e58ea;
+            position: relative;
+
+            &::before {
+              content: "";
+              position: absolute;
+              width: 100%;
+              top: 43.6px;
+              // bottom: -9px;
+              left: 0;
+              border: 1px solid #2e58ea;
+
+              // @media only screen and (max-width: 767px) {
+              //   bottom: -3px;
+              // }
+            }
+          }
+
+        }
+
+        hr {
+          border-color: transparent;
+          background: #e6e8ec;
         }
       }
 
@@ -100,5 +130,8 @@
         }
       }
     }
+  }
+  .bottom{
+    margin-top: 30px;
   }
 }
