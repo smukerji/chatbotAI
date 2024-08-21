@@ -1,4 +1,4 @@
-.model-container{
+.model-container {
   display: flex;
   // flex-direction: column;
   padding: 24px;
@@ -7,11 +7,21 @@
   border-radius: 8px;
   border: 1px solid #E6E8EC;
   background: #FCFCFD;
-  .left-column{
 
+  .left-column {
+    width: 50%;
+    .input-header{
+      font-size: 1rem;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 1.5rem;
+      color: #353945;
+    }
+    // height: 50vh;
   }
 
-  .right-columnJ{
-
+  .right-column {
+    width: 50%;
+    // height: 50vh;
   }
 }

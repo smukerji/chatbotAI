@@ -63,6 +63,8 @@ function Dashboard() {
         </div>
       </div>
       <div className="bottom">
+        
+
         {
           "model" == "model" && (
             <>
@@ -70,7 +72,9 @@ function Dashboard() {
             </>
           )
         }
+
       </div>
+
 
     </div>
 
