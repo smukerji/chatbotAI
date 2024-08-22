@@ -21,7 +21,14 @@ import Image from "next/image";
 import Transcriber from "./transcriber/Transcriber";
 function Dashboard() {
 
+  let [tab, setTab] = useState<string>("model");;
+
   let tabValue = "model";
+
+  const changeHandler = (value: string) => {
+    console.log("working , clicking")
+    setTab(value);
+  }
 
 
   return (
@@ -43,8 +50,8 @@ function Dashboard() {
         <div className="middle-container">
           <div className="list-container">
             <ul className="tool-list">
-              <li className="active">Model</li>
-              <li className="active">Transcriber</li>
+              <li className={tab == "model" ? "active" : ""} onClick={()=> changeHandler("model")}>Model</li>
+              <li className={tab == "transcriber" ? "active" : ""} onClick={() => changeHandler("transcriber")}>Transcriber</li>
               <li>Voice</li>
               <li>Tool</li>
               <li>Advance</li>
@@ -68,7 +75,7 @@ function Dashboard() {
         
 
         {
-          tabValue == "model" && (
+          tab == "model" && (
             <>
               <Model />
             </>
@@ -76,7 +83,7 @@ function Dashboard() {
         }
 
         {
-          tabValue == "transcriber" && (
+          tab == "transcriber" && (
             <>
               <Transcriber />
             </>
