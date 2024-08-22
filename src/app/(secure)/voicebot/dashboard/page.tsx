@@ -18,8 +18,10 @@ import callOutgoing from "../../../../../public/voiceBot/SVG/call-outgoing.svg"
 
 import arrowIcon from "../../../../../public/svgs/Feather Icon.svg";
 import Image from "next/image";
+import Transcriber from "./transcriber/Transcriber";
 function Dashboard() {
 
+  let tabValue = "model";
 
 
   return (
@@ -66,9 +68,17 @@ function Dashboard() {
         
 
         {
-          "model" == "model" && (
+          tabValue == "model" && (
             <>
               <Model />
+            </>
+          )
+        }
+
+        {
+          tabValue == "transcriber" && (
+            <>
+              <Transcriber />
             </>
           )
         }

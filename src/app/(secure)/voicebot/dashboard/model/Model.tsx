@@ -14,7 +14,7 @@ function Model() {
 
   return (
     <div className="model-container">
-    
+
       <div className="left-column">
         <h4 className="input-header">First Message</h4>
         <p className="input-description">The first message that the assistant will say.</p>
@@ -102,7 +102,7 @@ function Model() {
 
           <span className="temprature_value">0.5</span>
         </div>
-        
+
         <Slider className="slider" min={2} max={10} value={stepsCount} onChange={setStepsCount} />
 
         <h4 className="man-token">Max Token</h4>
@@ -111,7 +111,7 @@ function Model() {
 
         <div className="temprature emotional-detect">
           <h4 className="emotional-header">Emotion Detects</h4>
-          <Switch className="emotional-switch" defaultChecked  />
+          <Switch className="emotional-switch" defaultChecked />
         </div>
 
       </div>
