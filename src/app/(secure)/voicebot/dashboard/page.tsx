@@ -19,6 +19,7 @@ import callOutgoing from "../../../../../public/voiceBot/SVG/call-outgoing.svg"
 import arrowIcon from "../../../../../public/svgs/Feather Icon.svg";
 import Image from "next/image";
 import Transcriber from "./transcriber/Transcriber";
+import Voice from "./voice/Voice";
 function Dashboard() {
 
   let [tab, setTab] = useState<string>("model");;
@@ -52,10 +53,10 @@ function Dashboard() {
             <ul className="tool-list">
               <li className={tab == "model" ? "active" : ""} onClick={()=> changeHandler("model")}>Model</li>
               <li className={tab == "transcriber" ? "active" : ""} onClick={() => changeHandler("transcriber")}>Transcriber</li>
-              <li>Voice</li>
-              <li>Tool</li>
-              <li>Advance</li>
-              <li>Analysis</li>
+              <li className={tab == "voice" ? "active" : ""} onClick={() => changeHandler("voice")}>Voice</li>
+              <li className={tab == "tool" ? "active" : ""} onClick={() => changeHandler("tool")}>Tool</li>
+              <li className={tab == "advance" ? "active" : ""} onClick={() => changeHandler("advance")}>Advance</li>
+              <li className={tab == "analysis" ? "active" : ""} onClick={() => changeHandler("analysis")}>Analysis</li>
 
             </ul>
             <hr />
@@ -86,6 +87,14 @@ function Dashboard() {
           tab == "transcriber" && (
             <>
               <Transcriber />
+            </>
+          )
+        }
+
+        {
+          tab == "voice" && (
+            <>
+              <Voice/>
             </>
           )
         }
