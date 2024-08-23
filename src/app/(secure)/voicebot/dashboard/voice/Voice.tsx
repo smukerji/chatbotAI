@@ -12,8 +12,7 @@ function Voice() {
         <p className="voice-configuration-description">Choose from the list of voices, or sync your voice library if you aren't able to find your voice in the dropdown. If you are still facing any error, you can enable custom voice and add a voice ID manually.</p>
         <div className="provider-container">
           <h4 className="provider">Provider</h4>
-          <Select
-            className="select-field"
+          <Select className="select-field"
 
             placeholder="Select the provider"
 

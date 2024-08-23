@@ -20,6 +20,7 @@ import arrowIcon from "../../../../../public/svgs/Feather Icon.svg";
 import Image from "next/image";
 import Transcriber from "./transcriber/Transcriber";
 import Voice from "./voice/Voice";
+import Functions from "./functions/Functions";
 function Dashboard() {
 
   let [tab, setTab] = useState<string>("model");;
@@ -95,6 +96,14 @@ function Dashboard() {
           tab == "voice" && (
             <>
               <Voice/>
+            </>
+          )
+        }
+
+        {
+          tab == "tool" && (
+            <>
+              <Functions/>
             </>
           )
         }
