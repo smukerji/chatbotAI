@@ -8,7 +8,7 @@ import {
 } from "@stripe/react-stripe-js";
 import { message } from "antd";
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 function DummyPaymentMethod({
   price,
@@ -29,6 +29,10 @@ function DummyPaymentMethod({
   const [isChecked, setIsChecked] = useState(false);
   const [isCheckedSlack, setIsCheckedSlack] = useState(false);
   const [newPriceId, setNewPriceId] = useState([priceId]);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [productPrices, setProductPrices] = useState<{ [key: string]: number }>(
+    {}
+  );
 
   console.log("customerid", customerId);
 
@@ -96,29 +100,63 @@ function DummyPaymentMethod({
 
   const handleWhatsappChange = (e: any) => {
     setIsChecked(e.target.checked);
+    fetchProductDetail("price_1PqpudHhVvYsUDoGJA8m5Biz");
 
     if (e.target.checked) {
       setNewPriceId([...newPriceId, "price_1PqpudHhVvYsUDoGJA8m5Biz"]); // add whatsapp price id to the array
+      setTotalPrice(
+        (prev) => prev + productPrices["price_1PqpudHhVvYsUDoGJA8m5Biz"]
+      ); // add whatsapp price id to the array
     } else {
       setNewPriceId(
         newPriceId.filter((id) => id !== "price_1PqpudHhVvYsUDoGJA8m5Biz")
       ); // remove whatsapp price id from the array
+      setTotalPrice(
+        (prev) => prev + productPrices["price_1PqpudHhVvYsUDoGJA8m5Biz"]
+      ); // add whatsapp price id to the array
     }
   };
 
   const handleSlackChange = (e: any) => {
     setIsCheckedSlack(e.target.checked);
+    fetchProductDetail("price_1PqpuqHhVvYsUDoGdxU77hzP");
 
     if (e.target.checked) {
-      setNewPriceId([...newPriceId, "price_1PqpuqHhVvYsUDoGdxU77hzP"]); // add whatsapp price id to the array
+      setNewPriceId([...newPriceId, "price_1PqpuqHhVvYsUDoGdxU77hzP"]);
+      setTotalPrice(
+        (prev) => prev + productPrices["price_1PqpuqHhVvYsUDoGdxU77hzP"]
+      ); // add whatsapp price id to the array
     } else {
       setNewPriceId(
         newPriceId.filter((id) => id !== "price_1PqpuqHhVvYsUDoGdxU77hzP")
       ); // remove whatsapp price id from the array
+      setTotalPrice(
+        (prev) => prev - productPrices["price_1PqpuqHhVvYsUDoGdxU77hzP"]
+      );
     }
   };
 
-  console.log("new price id", newPriceId);
+  const fetchProductDetail = async (id: string) => {
+    try {
+      const productDetail = await axios.get(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/retrieve-product?priceId=${id}`
+      );
+      console.log("productDetail", productDetail.data.data);
+      // setTotalPrice((prev) => prev + productDetail.data.data.unit_amount / 100);
+      setProductPrices((prev) => ({
+        ...prev,
+        [id]: productDetail.data.data.unit_amount / 100,
+      }));
+    } catch (error) {
+      console.log("rrrrrrrrrr", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchProductDetail(priceId);
+  }, []);
+
+  console.log("new price id", totalPrice);
 
   return (
     <>
@@ -177,7 +215,7 @@ function DummyPaymentMethod({
             {/* )} */}
             <div className="bottom-left">
               <div className="total">Total</div>
-              <div className="total-price">$10</div>
+              <div className="total-price">${Number(totalPrice)}</div>
             </div>
           </div>
           <div className="right">
