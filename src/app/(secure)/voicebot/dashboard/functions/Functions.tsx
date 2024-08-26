@@ -4,7 +4,72 @@ import { Input, Slider, Switch } from 'antd';
 import { Select, ConfigProvider } from 'antd';
 import Image from "next/image";
 import keyboardimg from "../../../../../../public/voiceBot/SVG/keyboard.svg";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
+const { Option } = Select;
 function Functions() {
+
+  const countryFlag: any = 
+    [
+      {
+        value: '1',
+        label: 'US',
+      },
+      {
+        value: '2',
+        label: 'UK',
+      },
+      {
+        value: '3',
+        label: 'IN',
+      },
+      {
+        value: '4',
+        label: 'AU',
+      },
+      {
+        value: '5',
+        label: 'CA',
+      }
+  ];
+
+  const prefixSelector:any = (
+    
+
+
+    <Select
+      style={{ width: 100 }}
+      options={[
+        {
+          value: '1',
+          label: '+21',
+        },
+        {
+          value: '2',
+          label: '+90',
+        },
+        {
+          value: '3',
+          label: '+91',
+        },
+        {
+          value: '4',
+          label: '+93',
+        },
+        {
+          value: '5',
+          label: '+44',
+        },
+        {
+          value: '6',
+          label: '+444',
+        },
+      ]}
+    />
+ 
+  );
+
+
   return (
     <div className="function-container">
       <div className="left-column">
@@ -113,6 +178,22 @@ function Functions() {
             <h4 className="emotional-header">Forwarding Phone Number</h4>
             <Switch className="emotional-switch" defaultChecked />
           </div>
+
+          {/* <Input addonBefore={prefixSelector} style={{ width: '100%' }} />
+           */}
+          
+          <div className="phone-input-with-flag">
+            <PhoneInput 
+            country={'us'}
+              // value={this.state.phone}
+              // onChange={phone => this.setState({ phone })}
+            />
+          </div>
+
+          <h4 className="call-end-phrase">End Call Phrases</h4>
+
+          <Input className="max-token-input" placeholder="Goodbye" />
+         
 
         </div>
       </div>

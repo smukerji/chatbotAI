@@ -6,6 +6,7 @@
     width: 50%;
 
     .title {
+      margin-top: 1.3rem;
       color: #23262F;
       /* Subtitle/Large */
       // font-family: "General Sans";
@@ -26,6 +27,7 @@
     }
 
     .wrapper {
+      margin-top: 1rem;
       display: flex;
       padding: 24px;
       flex-direction: column;
@@ -84,6 +86,7 @@
           line-height: 24px;
         }
       }
+
     }
   }
 
@@ -112,6 +115,7 @@
 
 
     .wrapper {
+      margin-top: 15px;
       display: flex;
       padding: 24px;
       flex-direction: column;
@@ -206,18 +210,69 @@
 
         .toggle {
           width: 100%;
+
           .split {
             margin-top: 0;
           }
-          .info{
+
+          .info {
             margin-top: 8px;
           }
-          .read-more{
+
+          .read-more {
             text-decoration: none;
             display: flex;
             margin-top: 8px;
           }
         }
+      }
+
+      .phone-input-with-flag {
+        margin-top: 8px;
+
+        input {
+          height: 49px;
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 24px;
+          border-radius: 12px;
+          border: 1px solid #E6E8EC;
+          background: #FFF;
+          width: 80%;
+        }
+
+        .flag-dropdown {
+          border-radius: 12px;
+          border: 1px solid #E6E8EC;
+          background: #FFF;
+        }
+
+
+      }
+
+      .call-end-phrase{
+        margin-top: 32px;
+        color:  #353945;
+          /* Body/Medium */
+          // font-family: "General Sans";
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 24px;
+      }
+
+      .max-token-input{
+          font-size: 16px;
+          margin-top: 8px;
+            font-style: normal;
+            font-family: "General Sans";
+            font-weight: 500;
+            line-height: 24px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid #E6E8EC;
+            background: #FFF;
       }
 
     }
