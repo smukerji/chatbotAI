@@ -6,9 +6,10 @@ import {
   useElements,
   useStripe,
 } from "@stripe/react-stripe-js";
-import { message } from "antd";
+import { Button, message } from "antd";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import Loader from "./Loader";
 
 function DummyPaymentMethod({
   price,
@@ -25,14 +26,11 @@ function DummyPaymentMethod({
   const [error, setError] = useState("");
   const stripe = useStripe();
   const elements = useElements();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const [isCheckedSlack, setIsCheckedSlack] = useState(false);
   const [newPriceId, setNewPriceId] = useState([priceId]);
   const [totalPrice, setTotalPrice] = useState(0);
-  const [productPrices, setProductPrices] = useState<{ [key: string]: number }>(
-    {}
-  );
 
   console.log("customerid", customerId);
 
@@ -98,41 +96,29 @@ function DummyPaymentMethod({
     }
   }
 
-  const handleWhatsappChange = (e: any) => {
+  const handleWhatsappChange = async (e: any) => {
     setIsChecked(e.target.checked);
-    fetchProductDetail("price_1PqpudHhVvYsUDoGJA8m5Biz");
+    const price: any = await fetchProductDetail(
+      "price_1PqpudHhVvYsUDoGJA8m5Biz"
+    );
 
     if (e.target.checked) {
-      setNewPriceId([...newPriceId, "price_1PqpudHhVvYsUDoGJA8m5Biz"]); // add whatsapp price id to the array
-      setTotalPrice(
-        (prev) => prev + productPrices["price_1PqpudHhVvYsUDoGJA8m5Biz"]
-      ); // add whatsapp price id to the array
+      setTotalPrice((prev) => prev + price);
     } else {
-      setNewPriceId(
-        newPriceId.filter((id) => id !== "price_1PqpudHhVvYsUDoGJA8m5Biz")
-      ); // remove whatsapp price id from the array
-      setTotalPrice(
-        (prev) => prev + productPrices["price_1PqpudHhVvYsUDoGJA8m5Biz"]
-      ); // add whatsapp price id to the array
+      setTotalPrice((prev) => prev - price);
     }
   };
 
-  const handleSlackChange = (e: any) => {
+  const handleSlackChange = async (e: any) => {
     setIsCheckedSlack(e.target.checked);
-    fetchProductDetail("price_1PqpuqHhVvYsUDoGdxU77hzP");
+    const price: any = await fetchProductDetail(
+      "price_1PqpuqHhVvYsUDoGdxU77hzP"
+    );
 
     if (e.target.checked) {
-      setNewPriceId([...newPriceId, "price_1PqpuqHhVvYsUDoGdxU77hzP"]);
-      setTotalPrice(
-        (prev) => prev + productPrices["price_1PqpuqHhVvYsUDoGdxU77hzP"]
-      ); // add whatsapp price id to the array
+      setTotalPrice((prev) => prev + price);
     } else {
-      setNewPriceId(
-        newPriceId.filter((id) => id !== "price_1PqpuqHhVvYsUDoGdxU77hzP")
-      ); // remove whatsapp price id from the array
-      setTotalPrice(
-        (prev) => prev - productPrices["price_1PqpuqHhVvYsUDoGdxU77hzP"]
-      );
+      setTotalPrice((prev) => prev - price);
     }
   };
 
@@ -141,25 +127,26 @@ function DummyPaymentMethod({
       const productDetail = await axios.get(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/retrieve-product?priceId=${id}`
       );
-      console.log("productDetail", productDetail.data.data);
       // setTotalPrice((prev) => prev + productDetail.data.data.unit_amount / 100);
-      setProductPrices((prev) => ({
-        ...prev,
-        [id]: productDetail.data.data.unit_amount / 100,
-      }));
+      return productDetail.data.data.unit_amount / 100;
     } catch (error) {
       console.log("rrrrrrrrrr", error);
     }
   };
 
   useEffect(() => {
-    fetchProductDetail(priceId);
+    fetchProductDetail(priceId).then((price: any) => {
+      setTotalPrice(price);
+    });
   }, []);
 
   console.log("new price id", totalPrice);
 
   return (
     <>
+      {/* {loading ? (
+        <Loader />
+      ) : ( */}
       <div className="card-main">
         <div className="card-head">Billing Info</div>
         <form className="cardElementForm" onSubmit={handleSubmit}>
@@ -238,16 +225,20 @@ function DummyPaymentMethod({
               <CardElement onChange={handleCardInputChange} />
             </form> */}
             {error && <div>{error}</div>}
-            <button
+            <Button
               className="btn-card-submit"
-              type="submit"
+              // type="submit"
               disabled={!stripe && disabled}
+              onClick={handleSubmit}
+              loading={loading}
+              style={{ display: "flex" }}
             >
               Pay
-            </button>
+            </Button>
           </div>
         </form>
       </div>
+      {/* )} */}
     </>
   );
 }

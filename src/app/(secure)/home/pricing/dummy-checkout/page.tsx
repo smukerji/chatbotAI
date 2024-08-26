@@ -15,6 +15,7 @@ import { useCookies } from "react-cookie";
 import { message } from "antd";
 import axios from "axios";
 import DummyPaymentMethod from "../_components/DummyPaymentMethod";
+import CryptoJS from "crypto-js";
 
 const stripePromise = loadStripe(
   String(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY)
@@ -22,15 +23,28 @@ const stripePromise = loadStripe(
 
 function page() {
   const searchParams = useSearchParams();
-  const priceId: any = searchParams ? searchParams.get("priceId") : null;
+  const a: any = searchParams ? searchParams.get("priceId") : null;
+  const encryptedPriceId = decodeURIComponent(a);
   const [loader, setLoader] = useState(true);
   const [subscriptionDetail, setSubscriptionDetail]: any = useState();
   const [customerId, setCustomerId] = useState("");
+  const cryptoSecret: any = process.env.NEXT_PUBLIC_CRYPTO_SECRET;
 
   const [cookies, setCookie] = useCookies(["userId"]);
   const u_id: any = cookies.userId;
   //   const stripe = useStripe();
   let response: any;
+
+  function decryptPriceId(encryptedPriceId: string) {
+    const bytes = CryptoJS.AES.decrypt(encryptedPriceId, cryptoSecret);
+    console.log(" bytesss", bytes);
+
+    return bytes.toString(CryptoJS.enc.Utf8);
+  }
+
+  const priceId: any = encryptedPriceId
+    ? decryptPriceId(encryptedPriceId)
+    : null;
 
   const getCustomer = async () => {
     setLoader(true);
@@ -68,7 +82,8 @@ function page() {
     getCustomer();
   }, []);
 
-  console.log("subscriptoooo", subscriptionDetail);
+  // console.log("subscriptoooo", subscriptionDetail);
+  console.log("pricingggg", priceId, encryptedPriceId);
 
   return (
     <>
