@@ -21,6 +21,7 @@ import Image from "next/image";
 import Transcriber from "./transcriber/Transcriber";
 import Voice from "./voice/Voice";
 import Functions from "./functions/Functions";
+import Advance from "./advance/Advance";
 function Dashboard() {
 
   let [tab, setTab] = useState<string>("model");;
@@ -104,6 +105,14 @@ function Dashboard() {
           tab == "tool" && (
             <>
               <Functions/>
+            </>
+          )
+        }
+
+        {
+          tab == "advance" && (
+            <>
+              <Advance />
             </>
           )
         }
