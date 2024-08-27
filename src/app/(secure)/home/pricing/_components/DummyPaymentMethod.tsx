@@ -104,8 +104,12 @@ function DummyPaymentMethod({
 
     if (e.target.checked) {
       setTotalPrice((prev) => prev + price);
+      setNewPriceId([...newPriceId, "price_1PqpudHhVvYsUDoGJA8m5Biz"]); // add whatsapp price id to the array
     } else {
       setTotalPrice((prev) => prev - price);
+      setNewPriceId(
+        newPriceId.filter((id) => id !== "price_1PqpudHhVvYsUDoGJA8m5Biz")
+      ); // remove whatsapp price id from the array
     }
   };
 
@@ -117,7 +121,11 @@ function DummyPaymentMethod({
 
     if (e.target.checked) {
       setTotalPrice((prev) => prev + price);
+      setNewPriceId([...newPriceId, "price_1PqpuqHhVvYsUDoGdxU77hzP"]);
     } else {
+      setNewPriceId(
+        newPriceId.filter((id) => id !== "price_1PqpuqHhVvYsUDoGdxU77hzP")
+      );
       setTotalPrice((prev) => prev - price);
     }
   };
@@ -140,7 +148,7 @@ function DummyPaymentMethod({
     });
   }, []);
 
-  console.log("new price id", totalPrice);
+  console.log("new price id", totalPrice, newPriceId);
 
   return (
     <>

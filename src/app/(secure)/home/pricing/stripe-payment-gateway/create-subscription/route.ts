@@ -9,7 +9,7 @@ const createSubscription = async (req: any, res: NextApiResponse) => {
 
     const { customerId, priceId } = req.json();
 
-    console.log("customer id ", customerId);
+    // console.log("customer id ", customerId);
 
     const pricePlans = priceId.map((price: string) => {
       return {

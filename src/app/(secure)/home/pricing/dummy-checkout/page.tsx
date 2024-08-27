@@ -83,7 +83,7 @@ function page() {
   }, []);
 
   // console.log("subscriptoooo", subscriptionDetail);
-  console.log("pricingggg", priceId, encryptedPriceId);
+  // console.log("pricingggg", priceId, encryptedPriceId);
 
   return (
     <>
