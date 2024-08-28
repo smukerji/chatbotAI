@@ -22,6 +22,7 @@ import Transcriber from "./transcriber/Transcriber";
 import Voice from "./voice/Voice";
 import Functions from "./functions/Functions";
 import Advance from "./advance/Advance";
+import Analysis from "./analysis/Analysis";
 function Dashboard() {
 
   let [tab, setTab] = useState<string>("model");;
@@ -113,6 +114,14 @@ function Dashboard() {
           tab == "advance" && (
             <>
               <Advance />
+            </>
+          )
+        }
+
+        {
+          tab == "analysis" && (
+            <>
+              <Analysis />
             </>
           )
         }
