@@ -29,10 +29,14 @@ function DummyPaymentMethod({
   const [loading, setLoading] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const [isCheckedSlack, setIsCheckedSlack] = useState(false);
+  const [isCheckedTelegram, setIsCheckedTelegram] = useState(false);
   const [newPriceId, setNewPriceId] = useState([priceId]);
   const [totalPrice, setTotalPrice] = useState(0);
+  const [planPrice, setPlanPrice] = useState(0);
 
-  console.log("customerid", customerId);
+  const whatsappPriceId: any = process.env.NEXT_PUBLIC_WHATSAPP_PLAN_ID;
+  const slackPriceId: any = process.env.NEXT_PUBLIC_SLACK_PLAN_ID;
+  const telegramPriceId: any = process.env.NEXT_PUBLIC_TELEGRAM_PLAN_ID;
 
   function handleCardInputChange(event: any) {
     // Listen for changes in card input
@@ -48,7 +52,6 @@ function DummyPaymentMethod({
     setLoading(true); // Start loader
 
     if (!stripe || !elements) {
-      // Stripe.js has not loaded yet.
       // Stripe.js has not loaded yet.
       setLoading(false);
       return;
@@ -66,14 +69,6 @@ function DummyPaymentMethod({
     const subscription = await axios.post(
       `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/create-subscription`,
       { priceId: newPriceId, customerId: customerId }
-    );
-
-    console.log(
-      "subscriptionnn",
-
-      ">>>>",
-      subscription.data,
-      subscription.data.clientSecret
     );
     const stripePayload = await stripe.confirmCardPayment(
       subscription.data.clientSecret, // returned by subscribe endpoint
@@ -98,57 +93,65 @@ function DummyPaymentMethod({
 
   const handleWhatsappChange = async (e: any) => {
     setIsChecked(e.target.checked);
-    const price: any = await fetchProductDetail(
-      "price_1PqpudHhVvYsUDoGJA8m5Biz"
-    );
+    const price: any = await fetchProductDetail(whatsappPriceId);
 
     if (e.target.checked) {
       setTotalPrice((prev) => prev + price);
-      setNewPriceId([...newPriceId, "price_1PqpudHhVvYsUDoGJA8m5Biz"]); // add whatsapp price id to the array
+      setNewPriceId([...newPriceId, whatsappPriceId]); // add whatsapp price id to the array
     } else {
       setTotalPrice((prev) => prev - price);
-      setNewPriceId(
-        newPriceId.filter((id) => id !== "price_1PqpudHhVvYsUDoGJA8m5Biz")
-      ); // remove whatsapp price id from the array
+      setNewPriceId(newPriceId.filter((id) => id !== whatsappPriceId)); // remove whatsapp price id from the array
     }
   };
 
   const handleSlackChange = async (e: any) => {
     setIsCheckedSlack(e.target.checked);
-    const price: any = await fetchProductDetail(
-      "price_1PqpuqHhVvYsUDoGdxU77hzP"
-    );
+    const price: any = await fetchProductDetail(slackPriceId);
 
     if (e.target.checked) {
       setTotalPrice((prev) => prev + price);
-      setNewPriceId([...newPriceId, "price_1PqpuqHhVvYsUDoGdxU77hzP"]);
+      setNewPriceId([...newPriceId, slackPriceId]);
     } else {
-      setNewPriceId(
-        newPriceId.filter((id) => id !== "price_1PqpuqHhVvYsUDoGdxU77hzP")
-      );
+      setNewPriceId(newPriceId.filter((id) => id !== slackPriceId));
+      setTotalPrice((prev) => prev - price);
+    }
+  };
+
+  const handleTelegramChange = async (e: any) => {
+    setIsCheckedTelegram(e.target.checked);
+    const price: any = await fetchProductDetail(telegramPriceId);
+
+    if (e.target.checked) {
+      setTotalPrice((prev) => prev + price);
+      setNewPriceId([...newPriceId, telegramPriceId]);
+    } else {
+      setNewPriceId(newPriceId.filter((id) => id !== telegramPriceId));
       setTotalPrice((prev) => prev - price);
     }
   };
 
   const fetchProductDetail = async (id: string) => {
     try {
+      setLoading(true);
       const productDetail = await axios.get(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/retrieve-product?priceId=${id}`
       );
       // setTotalPrice((prev) => prev + productDetail.data.data.unit_amount / 100);
+      // console.log("product detail", productDetail);
+
       return productDetail.data.data.unit_amount / 100;
     } catch (error) {
-      console.log("rrrrrrrrrr", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchProductDetail(priceId).then((price: any) => {
       setTotalPrice(price);
+      setPlanPrice(price);
     });
   }, []);
-
-  console.log("new price id", totalPrice, newPriceId);
 
   return (
     <>
@@ -158,12 +161,12 @@ function DummyPaymentMethod({
       <div className="card-main">
         <div className="card-head">Billing Info</div>
         <form className="cardElementForm" onSubmit={handleSubmit}>
-          <div className="left">
+          <div className="left white-left">
             <div className="top-left">
               <div className="plan-name">Individual Plan</div>
               <div className="price">
                 {/* <span>${Number(price) / 100}</span> */}
-                <span>$10</span>
+                <span>${planPrice}</span>
                 <span className="price-duration">Per Month</span>
               </div>
             </div>
@@ -205,6 +208,25 @@ function DummyPaymentMethod({
                 className="checkbox-label"
               >
                 Add Slack Integration
+              </label>
+            </div>
+
+            <div className="checkbox">
+              <input
+                type="checkbox"
+                // defaultChecked={defaultChecked}
+                checked={isCheckedTelegram}
+                id="telegramIntegrationCheckbox"
+                className="price-checkbox"
+                onChange={(e) => {
+                  handleTelegramChange(e);
+                }}
+              />
+              <label
+                htmlFor="telegramIntegrationCheckbox"
+                className="checkbox-label"
+              >
+                Add Telegram Integration
               </label>
             </div>
             {/* )} */}

@@ -37,7 +37,6 @@ function page() {
 
   function decryptPriceId(encryptedPriceId: string) {
     const bytes = CryptoJS.AES.decrypt(encryptedPriceId, cryptoSecret);
-    console.log(" bytesss", bytes);
 
     return bytes.toString(CryptoJS.enc.Utf8);
   }

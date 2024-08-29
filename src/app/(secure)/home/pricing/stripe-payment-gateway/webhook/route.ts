@@ -3,62 +3,69 @@ import clientPromise from "@/db";
 import Stripe from "stripe";
 import { ObjectId } from "mongodb";
 const stripe = new Stripe(String(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY));
-import express from "express";
-const app = express();
 
 export async function POST(req: any, res: any) {
-  if (req.method === "POST") {
-    const db = (await clientPromise!).db();
-    const collection = db.collection("users");
-    const collectionDetails = db.collection("user-details");
-    const collectionPlan = db.collection("plans");
-    const collectionPayment = db.collection("payment-history");
+  if (req.method !== "POST") {
+    res.setHeader("Allow", ["POST"]);
+    return `Method ${req.method} Not Allowed`;
+  }
 
-    const sig = req.headers.get("stripe-signature");
-    const endpointSecret: any = process.env.NEXT_PUBLIC_STRIPE_WEBHOOK_PUBLIC;
+  const db = (await clientPromise!).db();
+  const collection = db.collection("users");
+  const collectionDetails = db.collection("user-details");
+  const collectionPlan = db.collection("plans");
+  const collectionPayment = db.collection("payment-history");
 
-    let event: any;
-    const body = await req.text();
+  const sig = req.headers.get("stripe-signature");
+  const endpointSecret: any = process.env.NEXT_PUBLIC_STRIPE_WEBHOOK_PUBLIC;
 
-    // console.log("bodyyyyy", endpointSecret);
+  let event: any;
+  const body = await req.text();
 
-    try {
-      event = stripe.webhooks.constructEvent(body, sig, endpointSecret);
-    } catch (err) {
-      console.error("Webhook signature verification failed.", err);
-      return res.status(400).end();
-    }
+  try {
+    event = stripe.webhooks.constructEvent(body, sig, endpointSecret);
+  } catch (err) {
+    console.error("Webhook signature verification failed.", err);
+    return res.status(400).end();
+  }
 
-    // console.log("eventttttttttttt", event.data.object.items.data, event.type);
+  const planIds =
+    event?.data?.object?.items?.data.map((item: any) => item?.plan?.id) || [];
+  console.log("Plan IDs:", planIds);
 
-    let planIds = event.data.object.items.data.map((data: any) => {
-      return data.plan.id;
-    });
+  let date;
+  let userData;
+  let Details;
 
-    // Handle the event
-    let planData;
-    let date;
-    let userData: any;
-    let Details;
-    let status;
+  try {
     switch (event.type) {
       case "customer.subscription.created":
-        console.log("coming inside customer subscription created");
+        console.log("Processing customer.subscription.created");
 
         date = new Date(event.data.object.current_period_end * 1000);
         userData = await collection.findOne({
           customerId: event.data.object.customer,
         });
+
+        if (!userData) {
+          console.error(
+            `User not found for customerId: ${event.data.object.customer}`
+          );
+          break;
+        }
+
         Details = await collectionDetails.findOne({
           userId: String(userData._id),
         });
 
-        for (let planId of planIds) {
-          console.log(
-            planId === process.env.NEXT_PUBLIC_WHATSAPP_PLAN_ID,
-            "lllllllllllllllllllllllllll",
-            "going inside "
-          );
+        if (!Details) {
+          console.error(`Details not found for userId: ${userData._id}`);
+          break;
+        }
+
+        for (const planId of planIds) {
+          console.log(`Processing planId: ${planId}`);
+
           if (planId === process.env.NEXT_PUBLIC_WHATSAPP_PLAN_ID) {
             await collection.updateOne(
               { customerId: event.data.object.customer },
@@ -119,58 +126,63 @@ export async function POST(req: any, res: any) {
               }
             );
           } else {
-            // Update plan details
-            planData = await collectionPlan.findOne({
-              priceId: { $in: planIds },
-            });
-            if (planData) {
-              console.log("customer rrrr idddd", event.data.object.customer);
+            const planData = await collectionPlan.findOne({ priceId: planId });
 
-              await collection.updateOne(
-                { customerId: event.data.object.customer },
-                {
-                  $set: {
-                    subId: event.data.object.id,
-                    stripePlanId: event.data.object.plan.id,
-                    endDate: date,
-                    plan: planData.name,
-                    planId: planData._id,
-                    status: "active",
-                  },
-                }
-              );
-              await collectionDetails.updateMany(
-                { userId: String(userData._id) },
-                {
-                  $set: {
-                    trainingDataLimit: planData.trainingDataLimit,
-                    totalMessageCount: 0,
-                    messageLimit: planData.messageLimit,
-                    chatbotLimit: planData.numberOfChatbot,
-                  },
-                }
-              );
+            console.log("plandataaaaa", planData);
+
+            if (!planData) {
+              console.error(`Plan data not found for priceId: ${planId}`);
+              continue;
             }
+
+            await collection.updateOne(
+              { customerId: event.data.object.customer },
+              {
+                $set: {
+                  subId: event.data.object.id ?? null,
+                  endDate: date,
+                  plan: planData.name ?? "",
+                  planId: planData._id ?? null,
+                  status: "active",
+                },
+              }
+            );
+
+            await collectionDetails.updateMany(
+              { userId: String(userData?._id) },
+              {
+                $set: {
+                  trainingDataLimit: planData.trainingDataLimit ?? 1000000,
+                  totalMessageCount: 0,
+                  messageLimit: planData.messageLimit ?? 2000,
+                  chatbotLimit: planData.numberOfChatbot ?? 1,
+                  websiteCrawlingLimit: planData.websiteCrawlingLimit ?? 10,
+                },
+              }
+            );
           }
         }
-
-        // console.log(">>>>>>>>>>>>>", event.data.object.plan);
-
         break;
-      case "customer.subscription.updated":
-        console.log("Checkout session completed:");
 
+      case "customer.subscription.created":
         break;
       case "invoice.paid":
-        console.log("invoice paid webhook");
+        console.log("Processing invoice.paid");
 
         date = new Date(event.data.object.lines.data[0].period.end * 1000);
-        planData = await collection.findOne({
+        userData = await collection.findOne({
           customerId: event.data.object.customer,
         });
 
-        status = event.data.object.status === "paid" ? "success" : "failed";
+        if (!userData) {
+          console.error(
+            `User not found for customerId: ${event.data.object.customer}`
+          );
+          break;
+        }
 
+        const paymentStatus =
+          event.data.object.status === "paid" ? "success" : "failed";
         const currentDate = new Date();
         const formattedDate = currentDate.toLocaleString("en-US", {
           month: "short",
@@ -179,11 +191,11 @@ export async function POST(req: any, res: any) {
         });
 
         await collectionPayment.insertOne({
-          userId: String(planData._id),
-          status,
+          userId: String(userData._id),
+          status: paymentStatus,
           date: formattedDate,
-          price: "$" + event.data.object.amount_paid / 100,
-          paymentId: event.data.object.id,
+          price: `$${event.data.object.amount_paid / 100}`,
+          paymentId: event.data.object.id ?? null,
         });
 
         // Optionally update subscription end date if it's a renewal
@@ -191,11 +203,21 @@ export async function POST(req: any, res: any) {
           { customerId: event.data.object.customer },
           { $set: { endDate: date } }
         );
-
         break;
 
       case "customer.subscription.deleted":
-        console.log("subscription_schedule.canceled", event.data.object);
+        console.log("Processing customer.subscription.deleted");
+
+        userData = await collection.findOne({
+          customerId: event.data.object.customer,
+        });
+
+        if (!userData) {
+          console.error(
+            `User not found for customerId: ${event.data.object.customer}`
+          );
+          break;
+        }
 
         await collection.updateOne(
           { customerId: event.data.object.customer },
@@ -208,7 +230,7 @@ export async function POST(req: any, res: any) {
         );
 
         await collectionDetails.updateMany(
-          { userId: String(userData?._id) },
+          { userId: String(userData._id) },
           {
             $set: {
               isWhatsapp: false,
@@ -225,11 +247,9 @@ export async function POST(req: any, res: any) {
         console.warn("Unhandled event type:", event.type);
     }
 
-    // Return a response to acknowledge receipt of the event
     return NextResponse.json({ received: true });
+  } catch (err) {
+    console.error("Error processing webhook:", err);
+    return res.status(500).end();
   }
-
-  // Respond to other HTTP methods
-  res.setHeader("Allow", ["POST"]);
-  return `Method ${req.method} Not Allowed`;
 }
