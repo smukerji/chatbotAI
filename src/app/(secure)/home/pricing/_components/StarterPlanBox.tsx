@@ -24,9 +24,21 @@ function findStarterPlanPrice(prices: any) {
   return { monthlyPrice, yearlyPrice };
 }
 
-function StarterPlanBox({ handleClick, prices, isYearlyPlan }: any) {
+function StarterPlanBox({
+  handleClick,
+  prices,
+  isYearlyPlan,
+  activePlan,
+}: any) {
   // Get the filtered prices
   const { monthlyPrice, yearlyPrice } = findStarterPlanPrice(prices);
+
+  const isPlanActive =
+    (activePlan?.id === monthlyStarterPlanId ||
+      activePlan?.id === yearlyStarterPlanId) &&
+    activePlan?.active;
+
+  console.log("active plannnn", activePlan, isPlanActive);
 
   return (
     <>
@@ -121,8 +133,8 @@ function StarterPlanBox({ handleClick, prices, isYearlyPlan }: any) {
                 isYearlyPlan ? yearlyStarterPlanId : monthlyStarterPlanId
               )
             }
-            // disabled={enableOne}
-            // title={enableOne ? "Already have plan" : undefined}
+            disabled={isPlanActive}
+            title={isPlanActive ? "Active Plan" : undefined}
           >
             <span className="btn-text">Get Started</span>
           </button>

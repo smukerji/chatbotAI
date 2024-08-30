@@ -23,8 +23,18 @@ function findStarterPlanPrice(prices: any) {
   return { monthlyPrice, yearlyPrice };
 }
 
-function IndividualPlanBox({ handleClick, prices, isYearlyPlan }: any) {
+function IndividualPlanBox({
+  handleClick,
+  prices,
+  isYearlyPlan,
+  activePlan,
+}: any) {
   const { monthlyPrice, yearlyPrice } = findStarterPlanPrice(prices);
+
+  const isPlanActive =
+    (activePlan?.id === monthlyStarterPlanId ||
+      activePlan?.id === yearlyStarterPlanId) &&
+    activePlan?.active;
 
   return (
     <>
@@ -111,6 +121,8 @@ function IndividualPlanBox({ handleClick, prices, isYearlyPlan }: any) {
                 isYearlyPlan ? yearlyStarterPlanId : monthlyStarterPlanId
               )
             }
+            disabled={isPlanActive}
+            title={isPlanActive ? "Active Plan" : undefined}
           >
             <span className="btn-text">Get Started</span>
           </button>

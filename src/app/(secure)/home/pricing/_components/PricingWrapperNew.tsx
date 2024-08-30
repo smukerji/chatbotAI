@@ -17,6 +17,7 @@ function PricingWrapperNew() {
   const [isYearlyPlan, setIsYearlyPlan] = useState(false);
   const [prices, setPrices] = useState([]);
   const router = useRouter();
+  const [activePlan, setActivePlan] = useState();
   const cryptoSecret = process.env.NEXT_PUBLIC_CRYPTO_SECRET;
 
   const { status } = useSession();
@@ -52,6 +53,7 @@ function PricingWrapperNew() {
         }
       );
 
+      setActivePlan(checkPlan?.data?.price);
       console.log("check plan", checkPlan.data);
     } catch (error) {
       console.log("error", error);
@@ -130,16 +132,19 @@ function PricingWrapperNew() {
             handleClick={(priceId: string) => handleClick(priceId)}
             prices={prices}
             isYearlyPlan={isYearlyPlan}
+            activePlan={activePlan}
           />
           <IndividualPlanBox
             handleClick={(priceId: string) => handleClick(priceId)}
             prices={prices}
             isYearlyPlan={isYearlyPlan}
+            activePlan={activePlan}
           />
           <BusinessplanBox
             handleClick={(priceId: string) => handleClick(priceId)}
             prices={prices}
             isYearlyPlan={isYearlyPlan}
+            activePlan={activePlan}
           />
         </div>
       </div>

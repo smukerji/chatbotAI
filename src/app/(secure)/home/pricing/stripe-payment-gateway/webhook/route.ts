@@ -144,6 +144,7 @@ export async function POST(req: any, res: any) {
                   plan: planData.name ?? "",
                   planId: planData._id ?? null,
                   status: "active",
+                  stripePlanId: planData.priceId ?? null,
                 },
               }
             );
