@@ -12,6 +12,45 @@ function Model() {
 
   const [stepsCount, setStepsCount] = useState<number>(5);
 
+  const providersOption: {value: string; label: string; }[] = [
+      {
+        value: '1',
+        label: 'openai',
+      },
+      {
+        value: '2',
+        label: 'together.ai',
+      },
+      {
+        value: '3',
+        label: 'anyscale',
+      },
+      {
+        value: '4',
+        label: 'openrouter',
+      },
+      {
+        value: '5',
+        label: 'perplexity-ai',
+      },
+      {
+        value: '6',
+        label: 'deepinfra',
+      },
+      {
+        value: '7',
+        label: 'groq',
+      },
+      {
+        value: '8',
+        label: 'anthropic',
+      },
+      {
+        value: '9',
+        label: 'custom-llm',
+      },
+    ]
+
   return (
     <div className="model-container">
 
@@ -33,21 +72,7 @@ function Model() {
 
           placeholder="Select the provider"
 
-
-          options={[
-            {
-              value: '1',
-              label: 'deepgram',
-            },
-            {
-              value: '2',
-              label: 'talkscriber',
-            },
-            {
-              value: '3',
-              label: 'gladia',
-            }
-          ]}
+          options={providersOption}
         />
 
         <h4 className="provider model">Model</h4>
