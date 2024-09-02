@@ -1,9 +1,11 @@
 .voice-container {
   display: flex;
-  gap: 24px;
+  gap: 2.5rem;
+  flex-direction: column;
 
   .left-column {
-    width: 50%;
+
+    // width: 50%;
     .voice-configuration-title {
       color: #23262F;
       /* Subtitle/Large */
@@ -92,7 +94,8 @@
   }
 
   .right-column {
-    width: 50%;
+
+    // width: 50%;
     .title {
       color: #23262F;
       /* Subtitle/Large */
@@ -126,8 +129,11 @@
       .wrapper {
         display: flex;
         gap: 24px;
+        width: 100%;
 
         .wrapper-content {
+          width: 50%;
+
           h4 {
             color: #353945;
             /* Body/Medium */
@@ -237,25 +243,52 @@
         }
       }
 
-            .emotional-detect {
-              display: flex;
-              justify-content: space-between;
-              width: 100%;
-              margin-top: 2rem;
-      
-              .emotional-header {
-      
-                text-align: center;
-                /* Body/Medium */
-                // font-family: "General Sans";
-                font-size: 16px;
-                font-style: normal;
-                font-weight: 500;
-                line-height: 24px;
-              }
-            }
+      .emotional-detect {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        margin-top: 2rem;
 
-    
+        .emotional-header {
+
+          text-align: center;
+          /* Body/Medium */
+          // font-family: "General Sans";
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 24px;
+        }
+      }
+
+      .emotional-detect-description {
+        color: #777E90;
+        /* Body/Small */
+        // font-family: "General Sans";
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 24px;
+      }
+
+      .slider-container {
+        display: flex;
+        width: 100%;
+        .left-column{
+          width: 40%;
+        }
+        .right-column{
+          width: 60%;
+          .top{
+                display: flex;
+                  align-items: center;
+          }
+         
+        
+        }
+      }
+
+
     }
   }
 }

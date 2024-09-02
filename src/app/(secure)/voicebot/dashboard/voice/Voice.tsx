@@ -2,7 +2,9 @@ import dynamic from "next/dynamic";
 import "./design.scss";
 import { Input, Slider, Switch } from 'antd';
 import { Select, ConfigProvider } from 'antd';
+import { useState } from "react";
 function Voice() {
+  const [stepsCount, setStepsCount] = useState<number>(5);
   return (
     <div className="voice-container">
 
@@ -139,20 +141,47 @@ function Voice() {
           />
 
           <div className="emotional-detect">
-            <h4 className="emotional-header">Detect Emotion</h4>
+            <h4 className="emotional-header">Filler Injection Enabled</h4>
             <Switch className="emotional-switch" defaultChecked />
           </div>
+          <p className="emotional-detect-description">This determines whether fillers are injected into the Model output before inputting it into the Voice provider.</p>
 
           <div className="emotional-detect">
             <h4 className="emotional-header">Backchanneling Enabled</h4>
             <Switch className="emotional-switch" defaultChecked />
           </div>
+          <p className="emotional-detect-description">Make the bot say words like 'mhmm', 'ya' etc. while listening to make the conversation sounds natural. Default disabled</p>
 
           <div className="emotional-detect">
             <h4 className="emotional-header">Background Denoising Enabled</h4>
             <Switch className="emotional-switch" defaultChecked />
           </div>
+          <p className="emotional-detect-description">Filter background noise while the user is talking.</p>
 
+          <div className="emotional-detect">
+            <h4 className="emotional-header">Use Speaker Boost</h4>
+            <Switch className="emotional-switch" defaultChecked />
+          </div>
+          <p className="emotional-detect-description">Boost the similarity of the synthesized speech and the voice at the cost of some generation speed.</p>
+
+          <hr />
+          <div className="slider-container">
+            {/* <div className="slider-wrapper-container"> */}
+            <div className="left-column">
+              <h4 className="emotional-header">Stability</h4>
+            </div>
+            <div className="right-column">
+              <div className="top">
+                <Slider className="slider" min={2} max={10} value={stepsCount} onChange={setStepsCount} />
+                <h4>0.6</h4>
+              </div>
+              <div className="bottom">
+                <span>More Variable</span>
+                <span>More Stable</span>
+              </div>
+            </div>
+            {/* </div> */}
+          </div>
 
         </div>
       </div>
