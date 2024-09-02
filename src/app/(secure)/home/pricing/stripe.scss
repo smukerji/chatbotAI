@@ -713,6 +713,12 @@
           line-height: 32px;
         }
 
+        .integration-title {
+          font-size: 20px;
+          line-height: 28px;
+          font-weight: 500;
+        }
+
         .btn-add-ons {
           cursor: pointer;
           margin-top: 80px;
@@ -843,6 +849,12 @@
           line-height: 32px;
         }
 
+        .integration-title {
+          font-size: 20px;
+          line-height: 28px;
+          font-weight: 500;
+        }
+
         .btn-add-ons {
           cursor: pointer;
           display: flex;
@@ -935,6 +947,82 @@
               cursor: not-allowed;
             }
           }
+        }
+      }
+    }
+  }
+
+  .add-ons-new-container {
+    background-color: #f4f5f6;
+    .add-ons-left {
+      width: 50%;
+
+      .add-ons-integration {
+        .integration-list {
+          gap: 24px;
+          .app-integration {
+            .integration-name-container {
+              .integration {
+                gap: 4px;
+                display: flex;
+                flex-direction: column;
+              }
+              .integration-name {
+                color: #23262f;
+              }
+
+              .price {
+                color: var(--Neutral-8, #141416);
+                font-size: 16px;
+                font-style: normal;
+                font-weight: 600;
+                line-height: 24px; /* 150% */
+
+                span {
+                  color: var(--Neutral-5, #777e90);
+                  font-size: 16px;
+                  font-style: normal;
+                  font-weight: 500;
+                  line-height: 24px; /* 150% */
+                }
+              }
+            }
+
+            .app-integration-price-btn {
+              // border-radius: var(--rounded-xl, 12px);
+              background: var(--Primary-2, #ecf0fe);
+              border: #ecf0fe;
+
+              .app-integration-price-btn-text {
+                color: var(--Primary-7, #2e58ea);
+                text-align: center;
+
+                font-size: 14px;
+                font-style: normal;
+                font-weight: 500;
+                line-height: 24px; /* 171.429% */
+              }
+            }
+
+            .app-integration-price.coming-soon {
+              color: var(--secondary-8, #fe632f);
+
+              font-size: 14px;
+              font-style: normal;
+              font-weight: 500;
+              line-height: 24px; /* 171.429% */
+            }
+          }
+        }
+      }
+    }
+
+    .add-ons-right {
+      width: 50%;
+
+      .add-ons-integration {
+        .integration-list {
+          gap: 24px;
         }
       }
     }
@@ -1351,7 +1439,32 @@
       align-items: flex-start;
       gap: 22px;
       flex-shrink: 0;
-      height: 650px;
+      height: auto;
+
+      .social-integration {
+        width: 100%;
+        gap: 16px;
+        display: flex;
+        flex-direction: column;
+        // align-items: center;
+      }
+
+      .drop-down-icon {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        color: var(--Neutral-6, #353945);
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 24px; /* 171.429% */
+        gap: 15px;
+
+        span {
+          display: flex;
+          align-items: center;
+        }
+      }
 
       .top-left {
         display: flex;
@@ -1363,13 +1476,13 @@
         padding-bottom: 20px;
 
         .plan-name {
-          color: var(--Neutral-1, #777e90);
+          color: var(--Neutral-5, #777e90);
           text-align: center;
-          font-family: sans-serif;
-          font-size: 24px;
+
+          font-size: 20px;
           font-style: normal;
-          font-weight: 600;
-          line-height: 32px;
+          font-weight: 500;
+          line-height: 28px; /* 140% */
         }
 
         .price {
@@ -1378,7 +1491,7 @@
           gap: 12px;
 
           span {
-            color: var(--Neutral-1, #777e90);
+            color: var(--Neutral-1, #23262f);
             text-align: center;
             font-family: sans-serif;
             font-size: 48px;
@@ -1391,7 +1504,7 @@
             color: var(--Primary-4, #777e90);
             text-align: center;
             font-family: sans-serif;
-            font-size: 20px;
+            font-size: 16px;
             font-style: normal;
             font-weight: 500;
             line-height: 28px;
@@ -1400,9 +1513,23 @@
       }
 
       .checkbox {
-        justify-content: center !important;
+        justify-content: space-between !important;
         display: flex;
         align-items: center;
+        width: 100%;
+
+        .check-label {
+          display: flex;
+          align-items: center;
+        }
+
+        .pricing {
+          color: var(--Neutral-6, #777e90);
+        }
+
+        .coming-soon {
+          color: var(--secondary-8, #fe632f);
+        }
 
         .price-checkbox {
           height: 20px;
@@ -1414,10 +1541,32 @@
           color: var(--Neutral-1, #777e90);
           text-align: center;
           font-family: sans-serif;
-          font-size: 15px;
+          font-size: 16px;
           font-style: normal;
-          font-weight: 600;
+          font-weight: 500;
           line-height: 32px;
+        }
+      }
+
+      .active-label {
+        .checkbox-label {
+          color: var(--Neutral-6, #353945);
+          text-align: center;
+          font-family: sans-serif;
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 32px;
+        }
+
+        .pricing {
+          color: var(--Neutral-6, #353945);
+        }
+      }
+
+      .hidden {
+        .price-checkbox {
+          visibility: hidden;
         }
       }
 
@@ -1426,6 +1575,8 @@
         justify-content: space-between;
         align-items: baseline;
         align-self: stretch;
+        border-top: 1px solid #b1b5c3;
+        padding-top: 15px;
 
         .total {
           color: var(--Primary-3, #777e90);
@@ -1594,6 +1745,7 @@
         border: none;
         border-radius: 16px;
         background: var(--Primary-6, #335df3);
+        height: 48px;
       }
 
       .btn-card-submit:hover {
@@ -1644,6 +1796,14 @@
     .cardElementForm {
       width: 60%;
     }
+  }
+}
+
+.new-card {
+  background-color: #f4f5f6;
+
+  .card-head {
+    width: 60%;
   }
 }
 

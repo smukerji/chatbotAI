@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { Avatar, Badge, Button } from "antd";
 import CryptoJS from "crypto-js";
 import axios from "axios";
+import PricingAddons from "./PricingAddons";
 
 function PricingWrapperNew() {
   const [loading, setLoading] = useState(false);
@@ -147,6 +148,8 @@ function PricingWrapperNew() {
             activePlan={activePlan}
           />
         </div>
+
+        <PricingAddons />
       </div>
     </>
   );
