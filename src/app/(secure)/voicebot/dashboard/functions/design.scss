@@ -87,7 +87,25 @@
         }
       }
 
+            .create-tool{
+                border: none;
+                display: flex;
+                align-items: center;
+                width: 38%;
+                padding: 0;
+                gap: 5px;
+                margin-top: 20px;
+            }
+
     }
+    .backdrope-container{
+      display: block;
+      background: rgba(31, 31, 31, 0.50);
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+    }
+
   }
 
   .right-column {

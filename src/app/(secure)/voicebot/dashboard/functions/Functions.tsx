@@ -1,13 +1,19 @@
 import dynamic from "next/dynamic";
 import "./design.scss";
-import { Input, Slider, Switch } from 'antd';
+import { Input, Slider, Switch, Button } from 'antd';
 import { Select, ConfigProvider } from 'antd';
 import Image from "next/image";
 import keyboardimg from "../../../../../../public/voiceBot/SVG/keyboard.svg";
+import addImg from "../../../../../../public/voiceBot/SVG/add.svg";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
+import { useState } from "react";
+import CustomModel from "../../_components/CustomModel/CustomModel";
+import Schema from "./schema/Schema";
 const { Option } = Select;
 function Functions() {
+
+  const [openModel, setOpenModel] = useState<boolean>(true);
 
   const countryFlag: any = 
     [
@@ -69,9 +75,21 @@ function Functions() {
  
   );
 
+  const openHandleModel = () => {
+    setOpenModel(true);
+
+  }
+  console.log("first value ",openModel);
+
 
   return (
+
     <div className="function-container">
+
+  
+      {/* <div className="creating-tool-container">
+
+      </div> */}
       <div className="left-column">
         <h3 className="title">Tools</h3>
         <p className="description">Tools are a way you can enable your voicebots to perform certain actions and tasks during the call. Add your tools From the Tools Library page to your voicebots to connect with Make.com or GHL workflows. You can also have custom tools with your own backend.</p>
@@ -97,33 +115,14 @@ function Functions() {
               }
             ]}
           />
+          <Button className="create-tool" onClick={() => openHandleModel()}>
+            <Image alt="add" src={addImg}></Image>
+            <span>Create New Tools</span>
+          </Button>
         </div>
 
-        <h3 className="title">Custom functions</h3>
-        <p className="description">Define your custom functions here to enhance your assistant's capabilities. You can use your own code or tools like Pipedream or Make for the setup.</p>
-        <div className="wrapper">
-          <h4 className="provider">Provider</h4>
-          <Select className="select-field"
 
-            placeholder="Select the provider"
-
-
-            options={[
-              {
-                value: '1',
-                label: 'deepgram',
-              },
-              {
-                value: '2',
-                label: 'talkscriber',
-              },
-              {
-                value: '3',
-                label: 'gladia',
-              }
-            ]}
-          />
-        </div>
+      
       </div>
       <div className="right-column">
         <h3 className="title">Predefined Functions</h3>
@@ -197,6 +196,14 @@ function Functions() {
 
         </div>
       </div>
+
+      {
+        openModel && 
+        <CustomModel
+          setOpen={setOpenModel}
+          title={"Create a Tool"}
+          content={<Schema/>} />
+     }
 
     </div>
   )
