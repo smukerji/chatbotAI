@@ -164,7 +164,7 @@ function Voice() {
           </div>
           <p className="emotional-detect-description">Boost the similarity of the synthesized speech and the voice at the cost of some generation speed.</p>
 
-          <hr />
+          <hr className="splitter" />
           <div className="slider-container">
             {/* <div className="slider-wrapper-container"> */}
             <div className="left-column">
@@ -178,6 +178,63 @@ function Voice() {
               <div className="bottom">
                 <span>More Variable</span>
                 <span>More Stable</span>
+              </div>
+            </div>
+            {/* </div> */}
+          </div>
+          <hr className="splitter" />
+
+          <div className="slider-container">
+            {/* <div className="slider-wrapper-container"> */}
+            <div className="left-column">
+              <h4 className="emotional-header">Clarity + Similarity</h4>
+            </div>
+            <div className="right-column">
+              <div className="top">
+                <Slider className="slider" min={2} max={10} value={stepsCount} onChange={setStepsCount} />
+                <h4>0.6</h4>
+              </div>
+              <div className="bottom">
+                <span>Low</span>
+                <span>High</span>
+              </div>
+            </div>
+            {/* </div> */}
+          </div>
+          <hr className="splitter" />
+
+          <div className="slider-container">
+            {/* <div className="slider-wrapper-container"> */}
+            <div className="left-column">
+              <h4 className="emotional-header">Style Exaggeration</h4>
+            </div>
+            <div className="right-column">
+              <div className="top">
+                <Slider className="slider" min={2} max={10} value={stepsCount} onChange={setStepsCount} />
+                <h4>0.6</h4>
+              </div>
+              <div className="bottom">
+                <span>None (Fastest)</span>
+                <span>Exaggerated</span>
+              </div>
+            </div>
+            {/* </div> */}
+          </div>
+          <hr className="splitter" />
+
+          <div className="slider-container">
+            {/* <div className="slider-wrapper-container"> */}
+            <div className="left-column">
+              <h4 className="emotional-header">Optimize Streaming Latency</h4>
+            </div>
+            <div className="right-column">
+              <div className="top">
+                <Slider className="slider" min={2} max={10} value={stepsCount} onChange={setStepsCount} />
+                <h4>3</h4>
+              </div>
+              <div className="bottom">
+                <span>More Latency</span>
+                <span>Less Latency</span>
               </div>
             </div>
             {/* </div> */}

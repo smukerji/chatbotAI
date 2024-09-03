@@ -270,25 +270,53 @@
         font-weight: 500;
         line-height: 24px;
       }
+             .splitter {
+               margin: 2rem 0;
+               width: 100%;
+             }
+
 
       .slider-container {
         display: flex;
         width: 100%;
         .left-column{
           width: 40%;
+          .emotional-header{
+            color:  #23262F;
+              /* Body/Medium */
+              // font-family: "General Sans";
+              font-size: 16px;
+              font-style: normal;
+              font-weight: 500;
+              line-height: 24px;
+          }
         }
         .right-column{
           width: 60%;
           .top{
                 display: flex;
                   align-items: center;
+                  .slider{
+                    flex: 1;
+                    margin-right: 10px;
+                  }
+                
+          }        
+          .bottom{
+            margin: 0;
+            display: flex;
+            justify-content: space-between;
+            span{
+              color:  #777E90;
+              font-size: 16px;
+              font-style: normal;
+              font-weight: 500;
+              line-height: 24px;
+            }
+          
           }
-         
-        
         }
       }
-
-
     }
   }
 }
