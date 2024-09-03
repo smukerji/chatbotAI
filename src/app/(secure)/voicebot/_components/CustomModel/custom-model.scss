@@ -56,6 +56,22 @@
           margin-bottom: 12px;
           
         }
+        .model-title{
+          color: #23262F;
+            /* Body/Bold */
+            font-size: 16px;
+            font-style: normal;
+            font-weight: 600;
+            line-height: 24px;
+        }
+        .model-description{
+          color:  #777E90;
+            /* Body/Small */
+            font-size: 14px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 24px;
+        }
     }
     .content{
       flex: 1;

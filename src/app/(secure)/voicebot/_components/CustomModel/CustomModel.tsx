@@ -16,6 +16,8 @@ function CustomModel({ setOpen,title,content }: any) {
             <Image alt="current-status" src={inActiveImg}></Image>
             <Image alt="current-status" src={inActiveImg}></Image>
           </div>
+          <h3 className="model-title">model-title</h3>
+          <p className="model-description">model-description</p>
         </div>
        
         <div className="content">{content}</div>
