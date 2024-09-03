@@ -124,7 +124,7 @@
     // justify-content: center;
     background: #e6e8ec;
     width: fit-content;
-    margin: 20px auto;
+    margin: 40px auto 20px auto;
     border-radius: 32px;
     padding: 8px;
     gap: 16px;
@@ -221,6 +221,7 @@
     justify-content: center;
     align-items: flex-start;
     gap: 16px;
+    margin: 0 10px;
 
     .plan-entity {
       width: 50%;
@@ -682,91 +683,263 @@
     width: 66%;
   }
 
-  .add-ons-container {
-    display: flex;
-    max-width: 100%;
-    justify-content: center;
-    align-items: flex-start;
-    gap: 16px;
+  .add-ons-title {
+    width: auto;
+    // margin: 0 10px;
+    margin-left: 20px;
+    margin-right: 20px;
+    cursor: pointer;
+    // background-color: #fff;
+  }
 
-    .add-ons-left {
-      width: 33%;
+  .add-ons {
+    background-color: #fcfcfd;
+    border-radius: 16px;
+    padding: 24px;
+    margin: 0;
 
-      .add-ons-integration {
-        // height: 338px;
-        margin-bottom: 20px auto 16px auto;
-        display: flex;
-        padding: 24px;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 16px;
-        border-radius: 16px;
-        background: var(--Neutral-2, #f4f5f6);
+    .integration-head {
+      .integration-title {
+        color: var(--Neutral-6, #353945);
+        text-align: center;
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 28px; /* 140% */
+      }
+    }
 
-        .integration-head {
-          color: var(--Neutral-6, #353945);
-          text-align: center;
-          font-family: sans-serif;
-          font-size: 24px;
-          font-style: normal;
-          font-weight: 600;
-          line-height: 32px;
-        }
+    .add-ons-container {
+      display: flex;
+      max-width: 100%;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 16px;
 
-        .integration-title {
-          font-size: 20px;
-          line-height: 28px;
-          font-weight: 500;
-        }
+      .add-ons-left {
+        width: 33%;
 
-        .btn-add-ons {
-          cursor: pointer;
-          margin-top: 80px;
+        .add-ons-integration {
+          // height: 338px;
+          margin-bottom: 20px auto 16px auto;
           display: flex;
-          padding: 16px;
-          justify-content: center;
-          align-items: center;
-          gap: 10px;
-          align-self: stretch;
-          border-radius: 12px;
-          border: 1px solid var(--Primary-7, #2e58ea);
-          background: var(--Primary-7, #2e58ea);
-
-          .btn-text {
-            color: var(--Neutral-1, #fcfcfd);
-            text-align: center;
-            font-family: sans-serif;
-            font-size: 20px;
-            font-style: normal;
-            font-weight: 600;
-            line-height: 28px;
-            /* 140% */
-          }
-        }
-        .btn-add-ons:disabled {
-          cursor: not-allowed;
-        }
-
-        .integration-list {
-          display: flex;
+          padding: 24px;
           flex-direction: column;
           align-items: flex-start;
-          gap: 12px;
-          align-self: stretch;
+          gap: 16px;
+          border-radius: 16px;
+          background: var(--Neutral-2, #f4f5f6);
 
-          .app-integration {
+          .integration-head {
+            color: var(--Neutral-6, #353945);
+            text-align: center;
+            font-family: sans-serif;
+            font-size: 24px;
+            font-style: normal;
+            font-weight: 600;
+            line-height: 32px;
+          }
+
+          .integration-title {
+            font-size: 20px;
+            line-height: 28px;
+            font-weight: 500;
+          }
+
+          .btn-add-ons {
+            cursor: pointer;
+            margin-top: 80px;
             display: flex;
-            justify-content: space-between;
+            padding: 16px;
+            justify-content: center;
             align-items: center;
+            gap: 10px;
+            align-self: stretch;
+            border-radius: 12px;
+            border: 1px solid var(--Primary-7, #2e58ea);
+            background: var(--Primary-7, #2e58ea);
+
+            .btn-text {
+              color: var(--Neutral-1, #fcfcfd);
+              text-align: center;
+              font-family: sans-serif;
+              font-size: 20px;
+              font-style: normal;
+              font-weight: 600;
+              line-height: 28px;
+              /* 140% */
+            }
+          }
+          .btn-add-ons:disabled {
+            cursor: not-allowed;
+          }
+
+          .integration-list {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
             align-self: stretch;
 
-            .integration-name-container {
+            .app-integration {
               display: flex;
-              width: 268.5px;
+              justify-content: space-between;
               align-items: center;
-              gap: 12px;
+              align-self: stretch;
 
-              .integration-name {
+              .integration-name-container {
+                display: flex;
+                width: 268.5px;
+                align-items: center;
+                gap: 12px;
+
+                .integration-name {
+                  color: var(--Neutral-8, #141416);
+                  font-family: sans-serif;
+                  font-size: 16px;
+                  font-style: normal;
+                  font-weight: 500;
+                  line-height: 24px;
+                }
+              }
+
+              .app-integration-price-btn {
+                cursor: pointer;
+                display: flex;
+                padding: 8px 16px;
+                justify-content: center;
+                align-items: center;
+                gap: 10px;
+                border-radius: 12px;
+                border: 1px solid var(--Primary-7, #2e58ea);
+                background: var(--Primary-7, #2e58ea);
+
+                .app-integration-price-btn-text {
+                  color: var(--Neutral-1, #fcfcfd);
+                  text-align: center;
+                  font-family: sans-serif;
+                  font-size: 16px;
+                  font-style: normal;
+                  font-weight: 600;
+                  line-height: 24px;
+                }
+              }
+
+              .app-integration-price-btn:disabled {
+                cursor: not-allowed;
+              }
+
+              .app-integration-price {
+                color: var(--Neutral-8, #141416);
+                font-family: sans-serif;
+                font-size: 16px;
+                font-style: normal;
+                font-weight: 500;
+                line-height: 24px;
+
+                &.coming-soon {
+                  color: var(--Neutral-5, #777e90);
+                  font-family: sans-serif;
+                  font-size: 16px;
+                  font-style: normal;
+                  font-weight: 500;
+                  line-height: 24px;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .add-ons-right {
+        width: 33%;
+        display: flex;
+        gap: 16px;
+        flex-direction: column;
+
+        .add-ons-integration {
+          display: flex;
+          padding: 24px;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 16px;
+          border-radius: 16px;
+          background: var(--Neutral-2, #f4f5f6);
+
+          .integration-head {
+            color: var(--Neutral-6, #353945);
+            text-align: center;
+            font-family: sans-serif;
+            font-size: 24px;
+            font-style: normal;
+            font-weight: 600;
+            line-height: 32px;
+          }
+
+          .integration-title {
+            font-size: 20px;
+            line-height: 28px;
+            font-weight: 500;
+          }
+
+          .btn-add-ons {
+            cursor: pointer;
+            display: flex;
+            padding: 16px;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            align-self: stretch;
+            border-radius: 12px;
+            border: 1px solid var(--Primary-7, #2e58ea);
+            background: var(--Primary-7, #2e58ea);
+
+            .btn-text {
+              color: var(--Neutral-1, #fcfcfd);
+              text-align: center;
+              font-family: sans-serif;
+              font-size: 20px;
+              font-style: normal;
+              font-weight: 600;
+              line-height: 28px;
+              /* 140% */
+            }
+          }
+
+          .btn-add-ons:disabled {
+            cursor: not-allowed;
+          }
+
+          .integration-list {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+            align-self: stretch;
+
+            .app-integration {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              align-self: stretch;
+
+              .integration-name-container {
+                display: flex;
+                width: 268.5px;
+                align-items: center;
+                gap: 12px;
+
+                .integration-name {
+                  color: var(--Neutral-8, #141416);
+                  font-family: sans-serif;
+                  font-size: 16px;
+                  font-style: normal;
+                  font-weight: 500;
+                  line-height: 24px;
+                }
+              }
+
+              .app-integration-price {
                 color: var(--Neutral-8, #141416);
                 font-family: sans-serif;
                 font-size: 16px;
@@ -774,49 +947,31 @@
                 font-weight: 500;
                 line-height: 24px;
               }
-            }
 
-            .app-integration-price-btn {
-              cursor: pointer;
-              display: flex;
-              padding: 8px 16px;
-              justify-content: center;
-              align-items: center;
-              gap: 10px;
-              border-radius: 12px;
-              border: 1px solid var(--Primary-7, #2e58ea);
-              background: var(--Primary-7, #2e58ea);
+              .app-integration-price-btn {
+                cursor: pointer;
+                display: flex;
+                padding: 8px 16px;
+                justify-content: center;
+                align-items: center;
+                gap: 10px;
+                border-radius: 12px;
+                border: 1px solid var(--Primary-7, #2e58ea);
+                background: var(--Primary-7, #2e58ea);
 
-              .app-integration-price-btn-text {
-                color: var(--Neutral-1, #fcfcfd);
-                text-align: center;
-                font-family: sans-serif;
-                font-size: 16px;
-                font-style: normal;
-                font-weight: 600;
-                line-height: 24px;
+                .app-integration-price-btn-text {
+                  color: var(--Neutral-1, #fcfcfd);
+                  text-align: center;
+                  font-family: sans-serif;
+                  font-size: 16px;
+                  font-style: normal;
+                  font-weight: 600;
+                  line-height: 24px;
+                }
               }
-            }
 
-            .app-integration-price-btn:disabled {
-              cursor: not-allowed;
-            }
-
-            .app-integration-price {
-              color: var(--Neutral-8, #141416);
-              font-family: sans-serif;
-              font-size: 16px;
-              font-style: normal;
-              font-weight: 500;
-              line-height: 24px;
-
-              &.coming-soon {
-                color: var(--Neutral-5, #777e90);
-                font-family: sans-serif;
-                font-size: 16px;
-                font-style: normal;
-                font-weight: 500;
-                line-height: 24px;
+              .app-integration-price-btn:disabled {
+                cursor: not-allowed;
               }
             }
           }
@@ -824,127 +979,93 @@
       }
     }
 
-    .add-ons-right {
-      width: 33%;
-      display: flex;
-      gap: 16px;
-      flex-direction: column;
+    .add-ons-new-container {
+      gap: 0;
+      .add-ons-left {
+        width: 50%;
+        border-right: 1px solid #e6e8ec;
 
-      .add-ons-integration {
-        display: flex;
-        padding: 24px;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 16px;
-        border-radius: 16px;
-        background: var(--Neutral-2, #f4f5f6);
+        .add-ons-integration {
+          background: #fcfcfd;
+          padding: 24px 80px 24px 0;
 
-        .integration-head {
-          color: var(--Neutral-6, #353945);
-          text-align: center;
-          font-family: sans-serif;
-          font-size: 24px;
-          font-style: normal;
-          font-weight: 600;
-          line-height: 32px;
-        }
+          .integration-list {
+            gap: 24px;
+            .app-integration {
+              .integration-name-container {
+                .integration {
+                  gap: 4px;
+                  display: flex;
+                  flex-direction: column;
+                }
+                .integration-name {
+                  color: #23262f;
+                }
 
-        .integration-title {
-          font-size: 20px;
-          line-height: 28px;
-          font-weight: 500;
-        }
+                .price {
+                  color: var(--Neutral-8, #141416);
+                  font-size: 16px;
+                  font-style: normal;
+                  font-weight: 600;
+                  line-height: 24px; /* 150% */
 
-        .btn-add-ons {
-          cursor: pointer;
-          display: flex;
-          padding: 16px;
-          justify-content: center;
-          align-items: center;
-          gap: 10px;
-          align-self: stretch;
-          border-radius: 12px;
-          border: 1px solid var(--Primary-7, #2e58ea);
-          background: var(--Primary-7, #2e58ea);
+                  span {
+                    color: var(--Neutral-5, #777e90);
+                    font-size: 16px;
+                    font-style: normal;
+                    font-weight: 500;
+                    line-height: 24px; /* 150% */
+                  }
+                }
+              }
 
-          .btn-text {
-            color: var(--Neutral-1, #fcfcfd);
-            text-align: center;
-            font-family: sans-serif;
-            font-size: 20px;
-            font-style: normal;
-            font-weight: 600;
-            line-height: 28px;
-            /* 140% */
-          }
-        }
+              .app-integration-price-btn {
+                // border-radius: var(--rounded-xl, 12px);
+                background: var(--Primary-2, #ecf0fe);
+                border: #ecf0fe;
 
-        .btn-add-ons:disabled {
-          cursor: not-allowed;
-        }
+                .app-integration-price-btn-text {
+                  color: var(--Primary-7, #2e58ea);
+                  text-align: center;
 
-        .integration-list {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 12px;
-          align-self: stretch;
+                  font-size: 14px;
+                  font-style: normal;
+                  font-weight: 500;
+                  line-height: 24px; /* 171.429% */
+                }
+              }
 
-          .app-integration {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            align-self: stretch;
-
-            .integration-name-container {
-              display: flex;
-              width: 268.5px;
-              align-items: center;
-              gap: 12px;
-
-              .integration-name {
-                color: var(--Neutral-8, #141416);
-                font-family: sans-serif;
-                font-size: 16px;
+              .app-integration-price.coming-soon {
+                color: var(--secondary-8, #fe632f);
+                padding: 8px;
+                font-size: 14px;
                 font-style: normal;
                 font-weight: 500;
-                line-height: 24px;
+                line-height: 24px; /* 171.429% */
               }
             }
+          }
+        }
+      }
 
-            .app-integration-price {
-              color: var(--Neutral-8, #141416);
-              font-family: sans-serif;
-              font-size: 16px;
-              font-style: normal;
-              font-weight: 500;
-              line-height: 24px;
-            }
+      .add-ons-right {
+        width: 50%;
 
-            .app-integration-price-btn {
-              cursor: pointer;
-              display: flex;
-              padding: 8px 16px;
-              justify-content: center;
-              align-items: center;
-              gap: 10px;
-              border-radius: 12px;
-              border: 1px solid var(--Primary-7, #2e58ea);
-              background: var(--Primary-7, #2e58ea);
+        .add-ons-integration {
+          background: #fcfcfd;
+          padding: 24px 0 24px 80px;
+          .integration-list {
+            gap: 24px;
 
-              .app-integration-price-btn-text {
-                color: var(--Neutral-1, #fcfcfd);
+            .app-integration {
+              .coming-soon {
+                color: var(--secondary-8, #fe632f);
                 text-align: center;
-                font-family: sans-serif;
-                font-size: 16px;
+                font-size: 14px;
                 font-style: normal;
-                font-weight: 600;
-                line-height: 24px;
+                font-weight: 500;
+                line-height: 24px; /* 171.429% */
               }
-            }
-
-            .app-integration-price-btn:disabled {
-              cursor: not-allowed;
             }
           }
         }
@@ -952,78 +1073,87 @@
     }
   }
 
-  .add-ons-new-container {
+  .pricing-grid {
+    display: flex;
+    flex-wrap: wrap;
+    // gap: 20px;
+    // padding: 20px 0;
+    margin: 0;
     background-color: #f4f5f6;
-    .add-ons-left {
-      width: 50%;
+  }
 
-      .add-ons-integration {
-        .integration-list {
-          gap: 24px;
-          .app-integration {
-            .integration-name-container {
-              .integration {
-                gap: 4px;
-                display: flex;
-                flex-direction: column;
-              }
-              .integration-name {
-                color: #23262f;
-              }
+  .pricing-card {
+    // flex: 0 1 calc(50% - 20px); /* 50% width minus the gap between cards */
+    width: calc(50% - 10px);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    // flex-direction: column;
+    justify-content: space-between;
+    background-color: #ffffff;
+    align-items: center;
+    margin-top: 20px;
 
-              .price {
-                color: var(--Neutral-8, #141416);
-                font-size: 16px;
-                font-style: normal;
-                font-weight: 600;
-                line-height: 24px; /* 150% */
+    &:nth-of-type(odd) {
+      margin-right: 20px; /* Add right margin to odd cards */
+    }
 
-                span {
-                  color: var(--Neutral-5, #777e90);
-                  font-size: 16px;
-                  font-style: normal;
-                  font-weight: 500;
-                  line-height: 24px; /* 150% */
-                }
-              }
-            }
+    &.coming-soon {
+      display: flex;
+      align-items: center;
 
-            .app-integration-price-btn {
-              // border-radius: var(--rounded-xl, 12px);
-              background: var(--Primary-2, #ecf0fe);
-              border: #ecf0fe;
+      .pricing-info {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
 
-              .app-integration-price-btn-text {
-                color: var(--Primary-7, #2e58ea);
-                text-align: center;
-
-                font-size: 14px;
-                font-style: normal;
-                font-weight: 500;
-                line-height: 24px; /* 171.429% */
-              }
-            }
-
-            .app-integration-price.coming-soon {
-              color: var(--secondary-8, #fe632f);
-
-              font-size: 14px;
-              font-style: normal;
-              font-weight: 500;
-              line-height: 24px; /* 171.429% */
-            }
-          }
+        .pricing-period {
+          color: #fe632f;
         }
       }
     }
 
-    .add-ons-right {
-      width: 50%;
+    .pricing-info {
+      // margin-bottom: 20px;
 
-      .add-ons-integration {
-        .integration-list {
-          gap: 24px;
-        }
+      .pricing-title {
+        color: var(--Neutral-7, #23262f);
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 24px; /* 150% */
+      }
+
+      .pricing-amount {
+        color: var(--Neutral-8, #141416);
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 24px; /* 150% */
+      }
+
+      .pricing-period {
+        color: var(--Neutral-5, #777e90);
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 24px; /* 150% */
+      }
+    }
+
+    .pricing-button {
+      background: var(--Primary-2, #ecf0fe);
+      border: #ecf0fe;
+      color: var(--Primary-7, #2e58ea);
+      text-align: center;
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 24px;
+
+      &:hover {
+        background: var(--Primary-7, #ecf0fe);
+        color: var(--Primary-7, #2e58ea);
       }
     }
   }
@@ -1292,8 +1422,56 @@
 }
 
 .new-main {
-  max-width: 1080px !important;
+  // max-width: 1080px !important;
   margin: 0 auto;
+  width: 100%;
+  background-color: #f4f5f6;
+  position: relative;
+  padding-top: 50px;
+  padding-bottom: 30px;
+  padding-left: 15%;
+  padding-right: 15%;
+
+  .img1 {
+    position: absolute;
+    right: 380px;
+    top: 165px;
+  }
+
+  .img2 {
+    position: absolute;
+    left: 400px;
+    top: 40px;
+  }
+
+  .img3 {
+    position: absolute;
+    right: 350px;
+    top: 40px;
+  }
+
+  .img4 {
+    position: absolute;
+    left: 450px;
+    top: 165px;
+  }
+
+  .choose-plan {
+    width: 100%;
+    text-align: center;
+  }
+
+  .price-description {
+    text-align: center;
+    margin: 20px 0;
+  }
+
+  .plan-container {
+    margin: 0;
+    .plan-box {
+      background-color: #fff;
+    }
+  }
 }
 
 .success {
@@ -1757,7 +1935,7 @@
   }
 
   .broad-card {
-    width: 56%;
+    width: 50%;
   }
 
   @media only screen and (max-width: 767px) {
@@ -1801,9 +1979,11 @@
 
 .new-card {
   background-color: #f4f5f6;
+  padding-top: 50px;
+  padding-bottom: 50px;
 
   .card-head {
-    width: 60%;
+    width: 50%;
   }
 }
 

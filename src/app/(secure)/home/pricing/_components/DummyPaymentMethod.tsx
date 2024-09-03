@@ -12,14 +12,28 @@ import React, { useEffect, useState } from "react";
 import Loader from "./Loader";
 import ArrowDown from "../../../../../../public/svgs/arrow-down-bold.svg";
 import Image from "next/image";
+import { useCookies } from "react-cookie";
 
 const whatsappPriceId: any = process.env.NEXT_PUBLIC_WHATSAPP_PLAN_ID;
 const slackPriceId: any = process.env.NEXT_PUBLIC_SLACK_PLAN_ID;
 const telegramPriceId: any = process.env.NEXT_PUBLIC_TELEGRAM_PLAN_ID;
+const trainingData: any = process.env.NEXT_PUBLIC_TRAINING_DATA_MONTHLY;
+const conversationHistory: any =
+  process.env.NEXT_PUBLIC_CONVERSATION_HISTORY_MONTHLY;
+const leads: any = process.env.NEXT_PUBLIC_LEADS_MONTHLY;
+const onBoarding: any = process.env.NEXT_PUBLIC_ONBOARDING_FEES;
+const msgSmall: any = process.env.NEXT_PUBLIC_MESSAGESMALL_PLAN_ID;
+const msgLarge: any = process.env.NEXT_PUBLIC_MESSAGELARGE_PLAN_ID;
+
+function findPrice(prices: any, envPriceId: string) {
+  const priceObj = prices.find(
+    (price: any) => price.priceId === envPriceId
+    // && price.interval === interval
+  );
+  return priceObj ? priceObj.unit_amount / 100 : null;
+}
 
 function DummyPaymentMethod({
-  price,
-  interval,
   customerId,
   priceId,
 }: {
@@ -33,15 +47,27 @@ function DummyPaymentMethod({
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState(false);
-  const [isChecked, setIsChecked] = useState(false);
-  const [isCheckedSlack, setIsCheckedSlack] = useState(false);
-  const [isCheckedTelegram, setIsCheckedTelegram] = useState(false);
+  const [cookies, setCookie] = useCookies(["userId"]);
   const [newPriceId, setNewPriceId] = useState([priceId]);
   const [totalPrice, setTotalPrice] = useState(0);
   const [planPrice, setPlanPrice] = useState(0);
   const [isSocialDropdownOpen, setIsSocialDropdownOpen] = useState(true);
   const [isOtherDropdownOpen, setIsOtherDropdownOpen] = useState(false);
   const [paymentLoading, setPaymentLoading] = useState(false);
+  const [prices, setPrices] = useState([]);
+  const [addonPrices, setAddonPrices] = useState<any>({
+    msgSmallPrice: null,
+    msgLargePrice: null,
+    onBoardingPrice: null,
+    trainingDataPrice: null,
+    conversationHistoryPrice: null,
+    leadsPrice: null,
+    whatsappPlanPrice: null,
+    slackPlanPrice: null,
+    telegramPlanPrice: null,
+  });
+
+  const u_id: any = cookies.userId;
 
   const [checkedIntegrations, setCheckedIntegrations] = useState<{
     [key: string]: boolean;
@@ -116,45 +142,6 @@ function DummyPaymentMethod({
     }
   }
 
-  const handleWhatsappChange = async (e: any) => {
-    setIsChecked(e.target.checked);
-    const price: any = await fetchProductDetail(whatsappPriceId);
-
-    if (e.target.checked) {
-      setTotalPrice((prev) => prev + price);
-      setNewPriceId([...newPriceId, whatsappPriceId]); // add whatsapp price id to the array
-    } else {
-      setTotalPrice((prev) => prev - price);
-      setNewPriceId(newPriceId.filter((id) => id !== whatsappPriceId)); // remove whatsapp price id from the array
-    }
-  };
-
-  const handleSlackChange = async (e: any) => {
-    setIsCheckedSlack(e.target.checked);
-    const price: any = await fetchProductDetail(slackPriceId);
-
-    if (e.target.checked) {
-      setTotalPrice((prev) => prev + price);
-      setNewPriceId([...newPriceId, slackPriceId]);
-    } else {
-      setNewPriceId(newPriceId.filter((id) => id !== slackPriceId));
-      setTotalPrice((prev) => prev - price);
-    }
-  };
-
-  const handleTelegramChange = async (e: any) => {
-    setIsCheckedTelegram(e.target.checked);
-    const price: any = await fetchProductDetail(telegramPriceId);
-
-    if (e.target.checked) {
-      setTotalPrice((prev) => prev + price);
-      setNewPriceId([...newPriceId, telegramPriceId]);
-    } else {
-      setNewPriceId(newPriceId.filter((id) => id !== telegramPriceId));
-      setTotalPrice((prev) => prev - price);
-    }
-  };
-
   const handleChange = async (e: any, integrationId: string) => {
     const isChecked = e.target.checked;
     const price: any = await fetchProductDetail(integrationId);
@@ -189,11 +176,56 @@ function DummyPaymentMethod({
     }
   };
 
+  const fetchPrices = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/get-plan-prices`,
+        {
+          u_id: u_id,
+        }
+      );
+      setPrices(response.data.prices);
+    } catch (error) {
+      console.log("error", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (prices?.length > 0) {
+      const msgSmallPrice = findPrice(prices, msgSmall);
+      const msgLargePrice = findPrice(prices, msgLarge);
+      const onBoardingPrice = findPrice(prices, onBoarding);
+      const trainingDataPrice = findPrice(prices, trainingData);
+      const conversationHistoryPrice = findPrice(prices, conversationHistory);
+      const leadsPrice = findPrice(prices, leads);
+      const whatsappPlanPrice = findPrice(prices, whatsappPriceId);
+      const slackPlanPrice = findPrice(prices, slackPriceId);
+      const telegramPlanPrice = findPrice(prices, telegramPriceId);
+
+      // Set these prices in your state or directly in your JSX where needed
+      setAddonPrices({
+        msgSmallPrice,
+        msgLargePrice,
+        onBoardingPrice,
+        trainingDataPrice,
+        conversationHistoryPrice,
+        leadsPrice,
+        whatsappPlanPrice,
+        slackPlanPrice,
+        telegramPlanPrice,
+      });
+    }
+  }, [prices]);
+
   useEffect(() => {
     fetchProductDetail(priceId).then((price: any) => {
       setTotalPrice(price);
       setPlanPrice(price);
     });
+    fetchPrices();
   }, []);
 
   return (
@@ -262,7 +294,7 @@ function DummyPaymentMethod({
                     </div>
 
                     <div className="pricing">
-                      <p>$8</p>
+                      <p>${addonPrices.whatsappPlanPrice ?? 0}</p>
                     </div>
                   </div>
                   <div
@@ -289,7 +321,7 @@ function DummyPaymentMethod({
                       </label>
                     </div>
                     <div className="pricing">
-                      <p>$8</p>
+                      <p>${addonPrices.slackPlanPrice ?? 0}</p>
                     </div>
                   </div>
 
@@ -318,7 +350,7 @@ function DummyPaymentMethod({
                     </div>
 
                     <div className="pricing">
-                      <p>$8</p>
+                      <p>${addonPrices.telegramPlanPrice ?? 0}</p>
                     </div>
                   </div>
 
@@ -524,7 +556,7 @@ function DummyPaymentMethod({
                     </div>
 
                     <div className="pricing">
-                      <p>$499</p>
+                      <p>${addonPrices.onBoardingPrice ?? 0}</p>
                     </div>
                   </div>
                   <div className="checkbox">
@@ -548,7 +580,7 @@ function DummyPaymentMethod({
                     </div>
 
                     <div className="pricing">
-                      <p>$5</p>
+                      <p>${addonPrices.msgSmallPrice ?? 0}</p>
                     </div>
                   </div>
                   <div className="checkbox">
@@ -571,7 +603,7 @@ function DummyPaymentMethod({
                       </label>
                     </div>
                     <div className="pricing">
-                      <p>$8</p>
+                      <p>${addonPrices.msgLargePrice ?? 0}</p>
                     </div>
                   </div>
                   <div className="checkbox">
@@ -595,7 +627,7 @@ function DummyPaymentMethod({
                     </div>
 
                     <div className="pricing">
-                      <p>$8</p>
+                      <p>${addonPrices.trainingDataPrice ?? 0}</p>
                     </div>
                   </div>
                   <div className="checkbox">
@@ -618,7 +650,7 @@ function DummyPaymentMethod({
                       </label>
                     </div>
                     <div className="pricing">
-                      <p>$15</p>
+                      <p>${addonPrices.conversationHistoryPrice ?? 0}</p>
                     </div>
                   </div>
                   <div className="checkbox">
@@ -641,7 +673,7 @@ function DummyPaymentMethod({
                       </label>
                     </div>
                     <div className="pricing">
-                      <p>$9</p>
+                      <p>${addonPrices.leadsPrice ?? 0}</p>
                     </div>
                   </div>
                   <div className="checkbox hidden">

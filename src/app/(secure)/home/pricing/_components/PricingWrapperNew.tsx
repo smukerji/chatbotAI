@@ -11,6 +11,11 @@ import { Avatar, Badge, Button } from "antd";
 import CryptoJS from "crypto-js";
 import axios from "axios";
 import PricingAddons from "./PricingAddons";
+import img1 from "../../../../../../public/pricingImages/image 47.svg";
+import img2 from "../../../../../../public/pricingImages/image 52.svg";
+import img3 from "../../../../../../public/pricingImages/messages-3.svg";
+import img4 from "../../../../../../public/pricingImages/voice-cricle.svg";
+import Image from "next/image";
 
 function PricingWrapperNew() {
   const [loading, setLoading] = useState(false);
@@ -86,10 +91,16 @@ function PricingWrapperNew() {
     window.scrollTo(0, 0);
   }, []);
 
+  console.log("prices", prices);
+
   return (
     <>
       {loading && <Loader />}
       <div className="main new-main">
+        <Image className="img1" src={img1} alt="img1" />
+        <Image className="img2" src={img2} alt="img2" />
+        <Image className="img3" src={img3} alt="img3" />
+        <Image className="img4" src={img4} alt="img4" />
         <h2 className="choose-plan">Choose your plan</h2>
         <p className="price-description">
           Please choose your plan to continue using your AI chatagent
@@ -149,7 +160,7 @@ function PricingWrapperNew() {
           />
         </div>
 
-        <PricingAddons />
+        <PricingAddons pricing={prices} />
       </div>
     </>
   );
