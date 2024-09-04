@@ -2,7 +2,10 @@
 
 function ToolFor() {
   return (
-    <div>ToolFor</div>
+    <div className="tool-for-container">
+      <div className="input-container"></div>
+      <div className="text-area-container"></div>
+    </div>
   )
 }
 

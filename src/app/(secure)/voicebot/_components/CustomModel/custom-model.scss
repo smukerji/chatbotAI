@@ -8,7 +8,7 @@
   align-items: center;
   justify-content: center;
 
-  z-index: 9999;
+  z-index: 999;
 
   .backdrop {
     cursor: pointer;
@@ -75,6 +75,7 @@
     }
     .content{
       flex: 1;
+      margin-top:  1.5rem;
     }
     .footer{
       // position: sticky;

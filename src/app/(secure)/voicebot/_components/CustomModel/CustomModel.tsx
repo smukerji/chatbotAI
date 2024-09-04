@@ -2,7 +2,7 @@ import "./custom-model.scss";
 import Image from "next/image";
 import activeImg from "../../../../../../public/voiceBot/SVG/Ellipse 64.svg"
 import inActiveImg from "../../../../../../public/voiceBot/SVG/Ellipse 65.svg"
-import { Input, Slider, Switch, Button } from 'antd';
+import { Input, Slider, Switch, Button, Select } from 'antd';
 function CustomModel({ setOpen,title,content }: any) {
   
   return (
@@ -19,6 +19,15 @@ function CustomModel({ setOpen,title,content }: any) {
           <h3 className="model-title">model-title</h3>
           <p className="model-description">model-description</p>
         </div>
+        {/* <Select
+          placeholder="Select a person"
+          
+          options={[
+            { value: '1', label: 'Jack' },
+            { value: '2', label: 'Lucy' },
+            { value: '3', label: 'Tom' },
+          ]}
+        /> */}
        
         <div className="content">{content}</div>
         <div className="footer">

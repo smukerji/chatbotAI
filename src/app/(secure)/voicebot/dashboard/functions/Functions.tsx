@@ -203,8 +203,9 @@ function Functions() {
         <CustomModel
           setOpen={setOpenModel}
           title={"Create a Tool"}
-          content={<Make />} />
-     }
+          content={<Schema />} />
+      }
+    
 
     </div>
   )
