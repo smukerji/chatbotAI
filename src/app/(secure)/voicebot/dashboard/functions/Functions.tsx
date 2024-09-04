@@ -11,6 +11,7 @@ import { useState } from "react";
 import CustomModel from "../../_components/CustomModel/CustomModel";
 import Schema from "./schema/Schema";
 import Make from "./make/Make";
+import ToolFor from "./tool-for/ToolFor";
 const { Option } = Select;
 function Functions() {
 
@@ -203,7 +204,7 @@ function Functions() {
         <CustomModel
           setOpen={setOpenModel}
           title={"Create a Tool"}
-          content={<Schema />} />
+          content={<ToolFor />} />
       }
     
 
