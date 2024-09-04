@@ -40,8 +40,6 @@ export async function POST(req: any, res: any) {
   try {
     switch (event.type) {
       case "customer.subscription.created":
-        console.log("Processing customer.subscription.created");
-
         date = new Date(event.data.object.current_period_end * 1000);
         userData = await collection.findOne({
           customerId: event.data.object.customer,
@@ -66,7 +64,14 @@ export async function POST(req: any, res: any) {
         for (const planId of planIds) {
           console.log(`Processing planId: ${planId}`);
 
-          if (planId === process.env.NEXT_PUBLIC_WHATSAPP_PLAN_ID) {
+          const planData = await collectionPlan.findOne({ priceId: planId });
+
+          if (!planData) {
+            console.error(`Plan data not found for priceId: ${planId}`);
+            continue;
+          }
+
+          if (planId === process.env.NEXT_PUBLIC_WHATSAPP_PLAN_ID_MONTHLY) {
             await collection.updateOne(
               { customerId: event.data.object.customer },
               {
@@ -77,7 +82,7 @@ export async function POST(req: any, res: any) {
                 },
               }
             );
-          } else if (planId === process.env.NEXT_PUBLIC_SLACK_PLAN_ID) {
+          } else if (planId === process.env.NEXT_PUBLIC_SLACK_PLAN_ID_MONTHLY) {
             await collectionDetails.updateMany(
               { userId: String(userData._id) },
               {
@@ -87,7 +92,9 @@ export async function POST(req: any, res: any) {
                 },
               }
             );
-          } else if (planId === process.env.NEXT_PUBLIC_TELEGRAM_PLAN_ID) {
+          } else if (
+            planId === process.env.NEXT_PUBLIC_TELEGRAM_PLAN_ID_MONTHLY
+          ) {
             await collectionDetails.updateMany(
               { userId: String(userData._id) },
               {
@@ -102,26 +109,73 @@ export async function POST(req: any, res: any) {
               { userId: String(userData._id) },
               {
                 $set: {
-                  messageLimit: Number(Details?.messageLimit) + 5000,
+                  messageLimit:
+                    Number(Details?.messageLimit) +
+                    (planData.messageLimit ?? 0),
                 },
               }
             );
           } else if (planId === process.env.NEXT_PUBLIC_MESSAGELARGE_PLAN_ID) {
+            console.log(
+              "updated messege large",
+              planData.messageLimit,
+              Details.messageLimit
+            );
             await collectionDetails.updateMany(
               { userId: String(userData._id) },
               {
                 $set: {
-                  messageLimit: Number(Details?.messageLimit) + 10000,
+                  messageLimit:
+                    Number(Details?.messageLimit) +
+                    Number(planData.messageLimit ?? 0),
                 },
               }
             );
-          } else if (planId === process.env.NEXT_PUBLIC_CHARACTER_PLAN_ID) {
+          } else if (planId === process.env.NEXT_PUBLIC_TRAINING_DATA_MONTHLY) {
+            console.log(
+              "updated traommomg data limit",
+              planData.trainingDataLimit,
+              planId
+            );
             await collectionDetails.updateMany(
               { userId: String(userData._id) },
               {
                 $set: {
                   trainingDataLimit:
-                    Number(Details?.trainingDataLimit) + 1000000,
+                    Number(Details?.trainingDataLimit) +
+                    Number(planData.trainingDataLimit ?? 0),
+                },
+              }
+            );
+          } else if (planId === process.env.NEXT_PUBLIC_LEADS_MONTHLY) {
+            console.log("updated leads", planData.leads, planId);
+            await collectionDetails.updateMany(
+              { userId: String(userData._id) },
+              {
+                $set: {
+                  leads:
+                    planData.leads == "unlimited"
+                      ? "unlimited"
+                      : Number(Details?.leads) + Number(planData.leads ?? 0),
+                },
+              }
+            );
+          } else if (
+            planId === process.env.NEXT_PUBLIC_CONVERSATION_HISTORY_MONTHLY
+          ) {
+            console.log(
+              "updated conversation history",
+              planData.conversationHistory,
+              planId
+            );
+
+            await collectionDetails.updateMany(
+              { userId: String(userData._id) },
+              {
+                $set: {
+                  conversationHistory:
+                    Number(Details?.conversationHistory) +
+                    Number(planData.conversationHistory ?? 0),
                 },
               }
             );
@@ -145,6 +199,9 @@ export async function POST(req: any, res: any) {
                   planId: planData._id ?? null,
                   status: "active",
                   stripePlanId: planData.priceId ?? null,
+                  isWhatsapp: planData.isWhatsapp ?? false,
+                  subIdWhatsapp: event.data.object.id ?? null,
+                  nextIsWhatsapp: planData.isWhatsapp ?? false,
                 },
               }
             );
@@ -158,6 +215,12 @@ export async function POST(req: any, res: any) {
                   messageLimit: planData.messageLimit ?? 2000,
                   chatbotLimit: planData.numberOfChatbot ?? 1,
                   websiteCrawlingLimit: planData.websiteCrawlingLimit ?? 10,
+                  conversationHistory: planData.conversationHistory ?? "2",
+                  leads: planData.leads ?? "10",
+                  models: planData.models ?? "3.5&4o",
+                  // isWhatsapp: planData.isWhatsapp ?? false,
+                  isTelegram: planData.isTelegram ?? false,
+                  subIdTelegram: event.data.object.id ?? null,
                 },
               }
             );

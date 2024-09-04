@@ -14,12 +14,22 @@ import ArrowDown from "../../../../../../public/svgs/arrow-down-bold.svg";
 import Image from "next/image";
 import { useCookies } from "react-cookie";
 
-const whatsappPriceId: any = process.env.NEXT_PUBLIC_WHATSAPP_PLAN_ID;
-const slackPriceId: any = process.env.NEXT_PUBLIC_SLACK_PLAN_ID;
-const telegramPriceId: any = process.env.NEXT_PUBLIC_TELEGRAM_PLAN_ID;
-const trainingData: any = process.env.NEXT_PUBLIC_TRAINING_DATA_MONTHLY;
-const conversationHistory: any =
+const whatsappPriceIdMonthly: any =
+  process.env.NEXT_PUBLIC_WHATSAPP_PLAN_ID_MONTHLY;
+const whatsappPriceIdYearly: any =
+  process.env.NEXT_PUBLIC_WHATSAPP_PLAN_ID_YEARLY;
+const slackPriceIdMonthly: any = process.env.NEXT_PUBLIC_SLACK_PLAN_ID_MONTHLY;
+const slackPriceIdYearly: any = process.env.NEXT_PUBLIC_SLACK_PLAN_ID_YEARLY;
+const telegramPriceIdMonthly: any =
+  process.env.NEXT_PUBLIC_TELEGRAM_PLAN_ID_MONTHLY;
+const telegramPriceIdYearly: any =
+  process.env.NEXT_PUBLIC_TELEGRAM_PLAN_ID_YEARLY;
+const trainingDataMonthly: any = process.env.NEXT_PUBLIC_TRAINING_DATA_MONTHLY;
+const trainingDataYearly: any = process.env.NEXT_PUBLIC_TRAINING_DATA_YEARLY;
+const conversationHistoryMonthly: any =
   process.env.NEXT_PUBLIC_CONVERSATION_HISTORY_MONTHLY;
+const conversationHistoryYearly: any =
+  process.env.NEXT_PUBLIC_CONVERSATION_HISTORY_YEARLY;
 const leads: any = process.env.NEXT_PUBLIC_LEADS_MONTHLY;
 const onBoarding: any = process.env.NEXT_PUBLIC_ONBOARDING_FEES;
 const msgSmall: any = process.env.NEXT_PUBLIC_MESSAGESMALL_PLAN_ID;
@@ -55,6 +65,7 @@ function DummyPaymentMethod({
   const [isOtherDropdownOpen, setIsOtherDropdownOpen] = useState(false);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [prices, setPrices] = useState([]);
+  const [interval, setInterval] = useState("");
   const [addonPrices, setAddonPrices] = useState<any>({
     msgSmallPrice: null,
     msgLargePrice: null,
@@ -72,9 +83,21 @@ function DummyPaymentMethod({
   const [checkedIntegrations, setCheckedIntegrations] = useState<{
     [key: string]: boolean;
   }>({
-    [whatsappPriceId]: false,
-    [slackPriceId]: false,
-    [telegramPriceId]: false,
+    [whatsappPriceIdMonthly]: false,
+    [whatsappPriceIdYearly]: false,
+    [slackPriceIdMonthly]: false,
+    [slackPriceIdYearly]: false,
+    [telegramPriceIdMonthly]: false,
+    [telegramPriceIdYearly]: false,
+    [trainingDataMonthly]: false,
+    [trainingDataYearly]: false,
+    [conversationHistoryMonthly]: false,
+    [conversationHistoryYearly]: false,
+    [leads]: false,
+    [onBoarding]: false,
+    [msgSmall]: false,
+    [msgLarge]: false,
+
     // Add other integrations here
   });
 
@@ -96,49 +119,55 @@ function DummyPaymentMethod({
   };
 
   async function handleSubmit(event: any) {
-    event.preventDefault();
-    setLoading(true); // Start loader
-    setPaymentLoading(true);
+    try {
+      event.preventDefault();
+      setLoading(true); // Start loader
+      setPaymentLoading(true);
 
-    if (!stripe || !elements) {
-      // Stripe.js has not loaded yet.
-      setLoading(false);
-      return;
-    }
-
-    const cardElement = elements.getElement(CardNumberElement);
-    if (!cardElement) {
-      setLoading(false);
-      setError("Card element not found");
-      return;
-    }
-
-    // Call the subscribe endpoint and create a Stripe subscription
-    // object. Returns the subscription ID and client secret
-    const subscription = await axios.post(
-      `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/create-subscription`,
-      { priceId: newPriceId, customerId: customerId }
-    );
-    const stripePayload = await stripe.confirmCardPayment(
-      subscription.data.clientSecret, // returned by subscribe endpoint
-      {
-        payment_method: {
-          card: cardElement,
-        },
+      if (!stripe || !elements) {
+        // Stripe.js has not loaded yet.
+        setLoading(false);
+        return;
       }
-    );
 
-    if (stripePayload.error) {
-      setError(
-        stripePayload.error.message ?? "Payment failed. Please try again."
+      const cardElement = elements.getElement(CardNumberElement);
+      if (!cardElement) {
+        setLoading(false);
+        setError("Card element not found");
+        return;
+      }
+
+      // Call the subscribe endpoint and create a Stripe subscription
+      // object. Returns the subscription ID and client secret
+      const subscription = await axios.post(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/create-subscription`,
+        { priceId: newPriceId, customerId: customerId }
       );
+      const stripePayload = await stripe.confirmCardPayment(
+        subscription.data.clientSecret, // returned by subscribe endpoint
+        {
+          payment_method: {
+            card: cardElement,
+          },
+        }
+      );
+
+      if (stripePayload.error) {
+        setError(
+          stripePayload.error.message ?? "Payment failed. Please try again."
+        );
+        setLoading(false);
+        setPaymentLoading(false);
+      } else {
+        // setSuccess("Payment succeeded! Thank you for your purchase.");
+        message.success("Payment succeeded! Thank you for your purchase.");
+        setLoading(false);
+        setPaymentLoading(false);
+      }
+    } catch (error) {
       setLoading(false);
       setPaymentLoading(false);
-    } else {
-      // setSuccess("Payment succeeded! Thank you for your purchase.");
-      message.success("Payment succeeded! Thank you for your purchase.");
-      setLoading(false);
-      setPaymentLoading(false);
+      console.log("error", error);
     }
   }
 
@@ -146,16 +175,18 @@ function DummyPaymentMethod({
     const isChecked = e.target.checked;
     const price: any = await fetchProductDetail(integrationId);
 
+    console.log("intergration id", integrationId);
+
     setCheckedIntegrations((prev) => ({
       ...prev,
       [integrationId]: isChecked,
     }));
 
     if (isChecked) {
-      setTotalPrice((prev) => prev + price);
+      setTotalPrice((prev) => prev + price.amount);
       setNewPriceId((prev) => [...prev, integrationId]); // Add the integrationId to the array
     } else {
-      setTotalPrice((prev) => prev - price);
+      setTotalPrice((prev) => prev - price.amount);
       setNewPriceId((prev) => prev.filter((id) => id !== integrationId)); // Remove the integrationId from the array
     }
   };
@@ -167,9 +198,12 @@ function DummyPaymentMethod({
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/retrieve-product?priceId=${id}`
       );
       // setTotalPrice((prev) => prev + productDetail.data.data.unit_amount / 100);
-      // console.log("product detail", productDetail);
+      console.log("product detail", productDetail.data.data.recurring.interval);
 
-      return productDetail.data.data.unit_amount / 100;
+      return {
+        amount: productDetail.data.data.unit_amount / 100,
+        interval: productDetail.data.data.recurring.interval ?? "month",
+      };
     } catch (error) {
     } finally {
       setLoading(false);
@@ -198,12 +232,29 @@ function DummyPaymentMethod({
       const msgSmallPrice = findPrice(prices, msgSmall);
       const msgLargePrice = findPrice(prices, msgLarge);
       const onBoardingPrice = findPrice(prices, onBoarding);
-      const trainingDataPrice = findPrice(prices, trainingData);
-      const conversationHistoryPrice = findPrice(prices, conversationHistory);
+      const trainingDataPrice = findPrice(
+        prices,
+        interval === "year" ? trainingDataYearly : trainingDataMonthly
+      );
+      const conversationHistoryPrice = findPrice(
+        prices,
+        interval === "year"
+          ? conversationHistoryYearly
+          : conversationHistoryMonthly
+      );
       const leadsPrice = findPrice(prices, leads);
-      const whatsappPlanPrice = findPrice(prices, whatsappPriceId);
-      const slackPlanPrice = findPrice(prices, slackPriceId);
-      const telegramPlanPrice = findPrice(prices, telegramPriceId);
+      const whatsappPlanPrice = findPrice(
+        prices,
+        interval === "year" ? whatsappPriceIdYearly : whatsappPriceIdMonthly
+      );
+      const slackPlanPrice = findPrice(
+        prices,
+        interval === "year" ? slackPriceIdYearly : slackPriceIdMonthly
+      );
+      const telegramPlanPrice = findPrice(
+        prices,
+        interval === "year" ? telegramPriceIdYearly : telegramPriceIdMonthly
+      );
 
       // Set these prices in your state or directly in your JSX where needed
       setAddonPrices({
@@ -222,8 +273,9 @@ function DummyPaymentMethod({
 
   useEffect(() => {
     fetchProductDetail(priceId).then((price: any) => {
-      setTotalPrice(price);
-      setPlanPrice(price);
+      setTotalPrice(price.amount);
+      setPlanPrice(price.amount);
+      setInterval(price.interval);
     });
     fetchPrices();
   }, []);
@@ -242,7 +294,9 @@ function DummyPaymentMethod({
               <div className="price">
                 {/* <span>${Number(price) / 100}</span> */}
                 <span>${planPrice}</span>
-                <span className="price-duration">Per Month</span>
+                <span className="price-duration">
+                  Per {interval === "year" ? "Year" : "Month"}
+                </span>
               </div>
             </div>
             {/* <Image src={line} alt={"no image"} /> */}
@@ -271,18 +325,35 @@ function DummyPaymentMethod({
 
                   <div
                     className={`checkbox ${
-                      checkedIntegrations[whatsappPriceId] ? "active-label" : ""
+                      checkedIntegrations[
+                        interval === "year"
+                          ? whatsappPriceIdYearly
+                          : whatsappPriceIdMonthly
+                      ]
+                        ? "active-label"
+                        : ""
                     }`}
                   >
                     <div className={`check-label`}>
                       <input
                         type="checkbox"
                         // defaultChecked={defaultChecked}
-                        checked={checkedIntegrations[whatsappPriceId] || false}
+                        checked={
+                          checkedIntegrations[
+                            interval === "year"
+                              ? whatsappPriceIdYearly
+                              : whatsappPriceIdMonthly
+                          ] || false
+                        }
                         className="price-checkbox"
                         id="whatsappIntegrationCheckbox"
                         onChange={(e) => {
-                          handleChange(e, whatsappPriceId);
+                          handleChange(
+                            e,
+                            interval === "year"
+                              ? whatsappPriceIdYearly
+                              : whatsappPriceIdMonthly
+                          );
                         }}
                       />
                       <label
@@ -299,18 +370,35 @@ function DummyPaymentMethod({
                   </div>
                   <div
                     className={`checkbox ${
-                      checkedIntegrations[slackPriceId] ? "active-label" : ""
+                      checkedIntegrations[
+                        interval === "year"
+                          ? slackPriceIdYearly
+                          : slackPriceIdMonthly
+                      ]
+                        ? "active-label"
+                        : ""
                     }`}
                   >
                     <div className="check-label">
                       <input
                         type="checkbox"
                         // defaultChecked={defaultChecked}
-                        checked={checkedIntegrations[slackPriceId] || false}
+                        checked={
+                          checkedIntegrations[
+                            interval === "year"
+                              ? slackPriceIdYearly
+                              : slackPriceIdMonthly
+                          ] || false
+                        }
                         id="slackIntegrationCheckbox"
                         className="price-checkbox"
                         onChange={(e) => {
-                          handleChange(e, slackPriceId);
+                          handleChange(
+                            e,
+                            interval === "year"
+                              ? slackPriceIdYearly
+                              : slackPriceIdMonthly
+                          );
                         }}
                       />
                       <label
@@ -327,18 +415,35 @@ function DummyPaymentMethod({
 
                   <div
                     className={`checkbox ${
-                      checkedIntegrations[telegramPriceId] ? "active-label" : ""
+                      checkedIntegrations[
+                        interval === "year"
+                          ? telegramPriceIdYearly
+                          : telegramPriceIdMonthly
+                      ]
+                        ? "active-label"
+                        : ""
                     }`}
                   >
                     <div className="check-label">
                       <input
                         type="checkbox"
                         // defaultChecked={defaultChecked}
-                        checked={checkedIntegrations[telegramPriceId] || false}
+                        checked={
+                          checkedIntegrations[
+                            interval === "year"
+                              ? telegramPriceIdYearly
+                              : telegramPriceIdMonthly
+                          ] || false
+                        }
                         id="telegramIntegrationCheckbox"
                         className="price-checkbox"
                         onChange={(e) => {
-                          handleChange(e, telegramPriceId);
+                          handleChange(
+                            e,
+                            interval === "year"
+                              ? telegramPriceIdYearly
+                              : telegramPriceIdMonthly
+                          );
                         }}
                       />
                       <label
@@ -360,7 +465,13 @@ function DummyPaymentMethod({
                       <input
                         type="checkbox"
                         // defaultChecked={defaultChecked}
-                        checked={checkedIntegrations[telegramPriceId] || false}
+                        checked={
+                          checkedIntegrations[
+                            interval === "year"
+                              ? telegramPriceIdYearly
+                              : telegramPriceIdMonthly
+                          ] || false
+                        }
                         id="instagramIntegrationCheckbox"
                         className="price-checkbox"
                         // onChange={(e) => {
@@ -386,7 +497,13 @@ function DummyPaymentMethod({
                       <input
                         type="checkbox"
                         // defaultChecked={defaultChecked}
-                        checked={checkedIntegrations[telegramPriceId] || false}
+                        checked={
+                          checkedIntegrations[
+                            interval === "year"
+                              ? telegramPriceIdYearly
+                              : telegramPriceIdMonthly
+                          ] || false
+                        }
                         id="messengerIntegrationCheckbox"
                         className="price-checkbox"
                         // onChange={(e) => {
@@ -411,7 +528,13 @@ function DummyPaymentMethod({
                       <input
                         type="checkbox"
                         // defaultChecked={defaultChecked}
-                        checked={checkedIntegrations[telegramPriceId] || false}
+                        checked={
+                          checkedIntegrations[
+                            interval === "year"
+                              ? telegramPriceIdYearly
+                              : telegramPriceIdMonthly
+                          ] || false
+                        }
                         id="sevenroomsIntegrationCheckbox"
                         className="price-checkbox"
                         // onChange={(e) => {
@@ -437,7 +560,13 @@ function DummyPaymentMethod({
                       <input
                         type="checkbox"
                         // defaultChecked={defaultChecked}
-                        checked={checkedIntegrations[telegramPriceId] || false}
+                        checked={
+                          checkedIntegrations[
+                            interval === "year"
+                              ? telegramPriceIdYearly
+                              : telegramPriceIdMonthly
+                          ] || false
+                        }
                         id="mindbodyIntegrationCheckbox"
                         className="price-checkbox"
                         // onChange={(e) => {
@@ -462,7 +591,13 @@ function DummyPaymentMethod({
                       <input
                         type="checkbox"
                         // defaultChecked={defaultChecked}
-                        checked={checkedIntegrations[telegramPriceId] || false}
+                        checked={
+                          checkedIntegrations[
+                            interval === "year"
+                              ? telegramPriceIdYearly
+                              : telegramPriceIdMonthly
+                          ] || false
+                        }
                         id="hubspotIntegrationCheckbox"
                         className="price-checkbox"
                         // onChange={(e) => {
@@ -488,7 +623,13 @@ function DummyPaymentMethod({
                       <input
                         type="checkbox"
                         // defaultChecked={defaultChecked}
-                        checked={checkedIntegrations[telegramPriceId] || false}
+                        checked={
+                          checkedIntegrations[
+                            interval === "year"
+                              ? telegramPriceIdYearly
+                              : telegramPriceIdMonthly
+                          ] || false
+                        }
                         id="zohocrmIntegrationCheckbox"
                         className="price-checkbox"
                         // onChange={(e) => {
@@ -540,11 +681,11 @@ function DummyPaymentMethod({
                       <input
                         type="checkbox"
                         // defaultChecked={defaultChecked}
-                        checked={checkedIntegrations[telegramPriceId] || false}
+                        checked={checkedIntegrations[onBoarding] || false}
                         id="onboardingIntegrationCheckbox"
                         className="price-checkbox"
                         onChange={(e) => {
-                          handleChange(e, telegramPriceId);
+                          handleChange(e, onBoarding);
                         }}
                       />
                       <label
@@ -564,11 +705,11 @@ function DummyPaymentMethod({
                       <input
                         type="checkbox"
                         // defaultChecked={defaultChecked}
-                        checked={checkedIntegrations[telegramPriceId] || false}
+                        checked={checkedIntegrations[msgSmall] || false}
                         id="5kmessagesIntegrationCheckbox"
                         className="price-checkbox"
                         onChange={(e) => {
-                          handleChange(e, telegramPriceId);
+                          handleChange(e, msgSmall);
                         }}
                       />
                       <label
@@ -588,11 +729,11 @@ function DummyPaymentMethod({
                       <input
                         type="checkbox"
                         // defaultChecked={defaultChecked}
-                        checked={checkedIntegrations[telegramPriceId] || false}
+                        checked={checkedIntegrations[msgLarge] || false}
                         id="10kIntegrationCheckbox"
                         className="price-checkbox"
                         onChange={(e) => {
-                          handleChange(e, telegramPriceId);
+                          handleChange(e, msgLarge);
                         }}
                       />
                       <label
@@ -611,11 +752,22 @@ function DummyPaymentMethod({
                       <input
                         type="checkbox"
                         // defaultChecked={defaultChecked}
-                        checked={checkedIntegrations[telegramPriceId] || false}
+                        checked={
+                          checkedIntegrations[
+                            interval === "year"
+                              ? trainingDataYearly
+                              : trainingDataMonthly
+                          ] || false
+                        }
                         id="trainingIntegrationCheckbox"
                         className="price-checkbox"
                         onChange={(e) => {
-                          handleChange(e, telegramPriceId);
+                          handleChange(
+                            e,
+                            interval === "year"
+                              ? trainingDataYearly
+                              : trainingDataMonthly
+                          );
                         }}
                       />
                       <label
@@ -635,11 +787,22 @@ function DummyPaymentMethod({
                       <input
                         type="checkbox"
                         // defaultChecked={defaultChecked}
-                        checked={checkedIntegrations[telegramPriceId] || false}
+                        checked={
+                          checkedIntegrations[
+                            interval === "year"
+                              ? conversationHistoryYearly
+                              : conversationHistoryMonthly
+                          ] || false
+                        }
                         id="conversationhistoryIntegrationCheckbox"
                         className="price-checkbox"
                         onChange={(e) => {
-                          handleChange(e, telegramPriceId);
+                          handleChange(
+                            e,
+                            interval === "year"
+                              ? conversationHistoryYearly
+                              : conversationHistoryMonthly
+                          );
                         }}
                       />
                       <label
@@ -658,11 +821,11 @@ function DummyPaymentMethod({
                       <input
                         type="checkbox"
                         // defaultChecked={defaultChecked}
-                        checked={checkedIntegrations[telegramPriceId] || false}
+                        checked={checkedIntegrations[leads] || false}
                         id="leadIntegrationCheckbox"
                         className="price-checkbox"
                         onChange={(e) => {
-                          handleChange(e, telegramPriceId);
+                          handleChange(e, leads);
                         }}
                       />
                       <label
@@ -681,12 +844,12 @@ function DummyPaymentMethod({
                       <input
                         type="checkbox"
                         // defaultChecked={defaultChecked}
-                        checked={checkedIntegrations[telegramPriceId] || false}
+                        // checked={checkedIntegrations[telegramPriceId] || false}
                         id="sentimetIntegrationCheckbox"
                         className="price-checkbox"
-                        onChange={(e) => {
-                          handleChange(e, telegramPriceId);
-                        }}
+                        // onChange={(e) => {
+                        //   handleChange(e, telegramPriceId);
+                        // }}
                       />
                       <label
                         htmlFor="sentimetIntegrationCheckbox"

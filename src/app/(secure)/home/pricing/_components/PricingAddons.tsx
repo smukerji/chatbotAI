@@ -17,9 +17,9 @@ const conversationHistory: any =
   process.env.NEXT_PUBLIC_CONVERSATION_HISTORY_MONTHLY;
 const leads: any = process.env.NEXT_PUBLIC_LEADS_MONTHLY;
 const onBoarding: any = process.env.NEXT_PUBLIC_ONBOARDING_FEES;
-const whatsappId: any = process.env.NEXT_PUBLIC_WHATSAPP_PLAN_ID;
-const slackId: any = process.env.NEXT_PUBLIC_SLACK_PLAN_ID;
-const telegramId: any = process.env.NEXT_PUBLIC_TELEGRAM_PLAN_ID;
+const whatsappId: any = process.env.NEXT_PUBLIC_WHATSAPP_PLAN_ID_MONTHLY;
+const slackId: any = process.env.NEXT_PUBLIC_SLACK_PLAN_ID_MONTHLY;
+const telegramId: any = process.env.NEXT_PUBLIC_TELEGRAM_PLAN_ID_MONTHLY;
 const msgSmall: any = process.env.NEXT_PUBLIC_MESSAGESMALL_PLAN_ID;
 const msgLarge: any = process.env.NEXT_PUBLIC_MESSAGELARGE_PLAN_ID;
 
