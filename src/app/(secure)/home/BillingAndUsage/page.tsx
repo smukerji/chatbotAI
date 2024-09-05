@@ -8,12 +8,18 @@ import { useCookies } from "react-cookie";
 import { useSession } from "next-auth/react";
 // import { redirect } from "next/navigation";
 import { getDate } from "@/app/_helpers/client/getTime";
-import { Table, Modal, message } from "antd";
+import { Table, Modal, message, TableProps } from "antd";
 import { redirect, useRouter } from "next/navigation";
 import { UserDetailsContext } from "../../../_helpers/client/Context/UserDetailsContext";
 import { formatNumber } from "../../../_helpers/client/formatNumber";
 import dynamic from "next/dynamic";
 import circle from "../../../../../public/svgs/Ellipse 58.svg";
+import downArrow from "../../../../../public/svgs/arrow-down-bold-gray.svg";
+import ArrowDownBlack from "../../../../../public/svgs/arrow-down-bold.svg";
+import AddOnsDetail from "./_components/AddOnsDetail";
+import { TableRowSelection } from "antd/es/table/interface";
+import { transformDataSource } from "./utils/transformedDataSource";
+import PaymentTable from "./_components/PaymentTable";
 
 function BillingAndUsage() {
   const [cookies, setCookie] = useCookies(["userId"]);
@@ -23,7 +29,6 @@ function BillingAndUsage() {
   const [chat, setChat] = useState(0);
   const [date, setDate] = useState<any>();
   const [duration, setDuration] = useState("");
-  const [dataSource, setDataSource] = useState([]);
   const [disable, setDisable] = useState(false);
   const [buttonDisable, setButtonDisable] = useState(false);
   const router = useRouter();
@@ -33,14 +38,6 @@ function BillingAndUsage() {
   const userDetailContext: any = useContext(UserDetailsContext);
   const userDetails = userDetailContext?.userDetails;
   // const [columns, setColumns] = useState([])
-
-  const showModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const cancelWhatsapp = () => {
-    setIsWhatsappModalOpen(true);
-  };
 
   //ANCHOR - API CALL TO CANCEL WHATSAPP INTEGRATION FOR NEXT BILLING CYCLE
   const handleWhatsappOk = async () => {
@@ -65,7 +62,7 @@ function BillingAndUsage() {
   //ANCHOR - API CALL TO CANCEL PLAN FOR NEXT BILLING CYCLE
   const handleOk = async () => {
     const response = await axios.put(
-      `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/BillingAndUsage/api`,
+      `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/BillingAndUsage/api/cancel-plan`,
       {
         u_id: cookies.userId,
         x: 2,
@@ -89,30 +86,6 @@ function BillingAndUsage() {
     setIsModalOpen(false);
   };
 
-  //ANCHOR - COLUMNS OF TABLE IN PAYMENT HISTORY
-  const columns = [
-    {
-      title: "PaymentId",
-      dataIndex: "paymentId",
-      key: "paymentId",
-    },
-    {
-      title: "Amount",
-      dataIndex: "price",
-      key: "price",
-    },
-    {
-      title: "Date",
-      dataIndex: "date",
-      key: "date",
-    },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-    },
-  ];
-
   const explorePlan = async () => {
     router.push(`${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing`);
   };
@@ -126,6 +99,7 @@ function BillingAndUsage() {
           u_id: cookies.userId,
         }
       );
+
       setChat(response?.data?.chatbot);
       setMsg(response?.data?.message);
       setPlan(response?.data?.plan);
@@ -134,7 +108,7 @@ function BillingAndUsage() {
       const options: any = { year: "numeric", month: "short", day: "2-digit" };
       const formattedDate: any = newDate.toLocaleDateString("en-US", options);
       setDate(formattedDate);
-      setDataSource(response?.data?.paymentDetails);
+      // setDataSource(response?.data?.paymentDetails);
       if (response?.data?.status == "cancel") {
         setDisable(true);
         setButtonDisable(true);
@@ -155,6 +129,7 @@ function BillingAndUsage() {
       console.log(error);
     }
   };
+
   useEffect(() => {
     myFunction();
   }, []);
@@ -200,25 +175,11 @@ function BillingAndUsage() {
                 <span className="plan-name">{userDetails?.plan?.name}</span>
                 {duration != "" && (
                   <div className="plan-duration">
-                    <span className="plan-duration-text">{duration}</span>
+                    <span className="plan-duration-text">Billed Monthly</span>
                   </div>
                 )}
               </div>
               <div className="plan-feature">
-                <div className="plan-message">
-                  {" "}
-                  {formatNumber(
-                    userDetails?.plan?.messageLimit
-                      ? userDetails?.plan?.messageLimit
-                      : 0
-                  )}{" "}
-                  Messages
-                </div>
-                <Image className="dot-image" src={circle} alt="no image" />
-                <div className="plan-chatbot">
-                  {userDetails?.plan?.numberOfChatbot} Chatbots
-                </div>
-                <Image className="dot-image" src={circle} alt="no image" />
                 <div className="next-renewal-date">
                   <div className="next-renewal-date-text">
                     Auto Renewal due on
@@ -226,45 +187,46 @@ function BillingAndUsage() {
                   <div className="next-renewal-date-date">{date}</div>
                 </div>
               </div>
+              <div className="plan-feature">
+                {/* <div className="plan-message">
+                  {" "}
+                  {formatNumber(
+                    userDetails?.plan?.messageLimit
+                      ? userDetails?.plan?.messageLimit
+                      : 0
+                  )}{" "}
+                  Messages
+                </div> */}
+                {/* <Image className="dot-image" src={circle} alt="no image" /> */}
+                {/* <div className="plan-chatbot">
+                  {userDetails?.plan?.numberOfChatbot} Chatbots
+                </div>
+                <Image className="dot-image" src={circle} alt="no image" /> */}
+
+                <div className="more-details">
+                  <p className="more-details-text">
+                    More Details{" "}
+                    <span>
+                      <Image src={downArrow} alt="down-arrow" />
+                    </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="cancel-upgrade-btns">
+              <p className="cancel-plan">Cancel My Plan</p>
+              <button className="btn-upgrade" onClick={explorePlan}>
+                <span className="btn-text">Upgrade Plan</span>
+              </button>
             </div>
           </div>
-          <div className="btn-class">
-            <button className="btn-upgrade" onClick={explorePlan}>
-              <span className="btn-text">Explore Plans</span>
-            </button>
-            {buttonDisable && (
-              <button
-                className="btn-cancel-plan"
-                onClick={showModal}
-                disabled={disable}
-              >
-                <span className="btn-text-cancel-plan">
-                  {disable ? "Plan Cancelled" : "Cancel My Plan"}
-                </span>
-              </button>
-            )}
-            <button
-              className="btn-cancel-plan btn-cancel-plan-whatsapp"
-              onClick={whatsapp ? cancelWhatsapp : explorePlan}
-            >
-              <span className="btn-text-cancel-plan">
-                {whatsapp
-                  ? "Cancel Whatsapp integration for next cycle"
-                  : "Explore Whatsapp Integration Plan"}
-              </span>
-            </button>
-          </div>
+
+          <AddOnsDetail />
           <div className="manage-plan">Payment history</div>
         </div>
-        <Table
-          className="payment-table"
-          dataSource={dataSource}
-          columns={columns}
-          scroll={{
-            x: 600,
-          }}
-        />
-        ;
+
+        <PaymentTable />
       </>
     );
   } else if (status === "unauthenticated") {

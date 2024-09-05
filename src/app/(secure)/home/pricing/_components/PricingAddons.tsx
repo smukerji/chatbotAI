@@ -48,8 +48,6 @@ function PricingAddons({ pricing }: any) {
   const slackPrice = findPrice(pricing, slackId);
   const telegramPrice = findPrice(pricing, telegramId);
 
-  console.log("priing", pricing);
-
   return (
     <>
       <div>

@@ -36,6 +36,8 @@ function IndividualPlanBox({
       activePlan?.id === yearlyStarterPlanId) &&
     activePlan?.active;
 
+  console.log("active plan", activePlan);
+
   return (
     <>
       <div className="plan-box">

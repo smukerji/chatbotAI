@@ -31,7 +31,6 @@ export async function POST(req: any, res: any) {
 
   const planIds =
     event?.data?.object?.items?.data.map((item: any) => item?.plan?.id) || [];
-  console.log("Plan IDs:", planIds);
 
   let date;
   let userData;
@@ -116,11 +115,6 @@ export async function POST(req: any, res: any) {
               }
             );
           } else if (planId === process.env.NEXT_PUBLIC_MESSAGELARGE_PLAN_ID) {
-            console.log(
-              "updated messege large",
-              planData.messageLimit,
-              Details.messageLimit
-            );
             await collectionDetails.updateMany(
               { userId: String(userData._id) },
               {
@@ -132,11 +126,6 @@ export async function POST(req: any, res: any) {
               }
             );
           } else if (planId === process.env.NEXT_PUBLIC_TRAINING_DATA_MONTHLY) {
-            console.log(
-              "updated traommomg data limit",
-              planData.trainingDataLimit,
-              planId
-            );
             await collectionDetails.updateMany(
               { userId: String(userData._id) },
               {
@@ -148,7 +137,6 @@ export async function POST(req: any, res: any) {
               }
             );
           } else if (planId === process.env.NEXT_PUBLIC_LEADS_MONTHLY) {
-            console.log("updated leads", planData.leads, planId);
             await collectionDetails.updateMany(
               { userId: String(userData._id) },
               {
@@ -163,12 +151,6 @@ export async function POST(req: any, res: any) {
           } else if (
             planId === process.env.NEXT_PUBLIC_CONVERSATION_HISTORY_MONTHLY
           ) {
-            console.log(
-              "updated conversation history",
-              planData.conversationHistory,
-              planId
-            );
-
             await collectionDetails.updateMany(
               { userId: String(userData._id) },
               {
@@ -198,6 +180,7 @@ export async function POST(req: any, res: any) {
                   plan: planData.name ?? "",
                   planId: planData._id ?? null,
                   status: "active",
+                  duration: event.data.object.items.data[0].plan.interval,
                   stripePlanId: planData.priceId ?? null,
                   isWhatsapp: planData.isWhatsapp ?? false,
                   subIdWhatsapp: event.data.object.id ?? null,
@@ -228,8 +211,6 @@ export async function POST(req: any, res: any) {
         }
         break;
 
-      case "customer.subscription.created":
-        break;
       case "invoice.paid":
         console.log("Processing invoice.paid");
 
@@ -302,6 +283,20 @@ export async function POST(req: any, res: any) {
               isTelegram: false,
               messageLimit: 0,
               trainingDataLimit: 0,
+              websiteCrawlingLimit: "0",
+              conversationHistory: "0",
+              leads: "0",
+            },
+          }
+        );
+
+        await collection.updateMany(
+          { userId: String(userData._id) },
+          {
+            $set: {
+              status: "cancel",
+              nextIsWhatsapp: false,
+              isWhatsapp: false,
             },
           }
         );
