@@ -9,8 +9,13 @@ import infoImage from "../../../../public/voiceBot/SVG/info-circle.svg"
 import customTemplate from "../../../../public/voiceBot/SVG/profile-circle.svg"
 import galaryImg from "../../../../public/voiceBot/SVG/gallery-add.svg";
 import leftArrow from "../../../../public/voiceBot/SVG/arrow-left.svg"
+import { useRouter } from "next/navigation";
+
+
 
 export default function VoiceBot() {
+
+  const router = useRouter();
 
   let cardDetails = [{
     image: "",
@@ -73,7 +78,9 @@ export default function VoiceBot() {
             </span>
           </Button>
 
-          <Button type="primary">Continue</Button>
+          <Button type="primary" onClick={() => {
+            router.push("/voicebot/dashboard");
+          }}>Continue</Button>
         </div>
       
 
