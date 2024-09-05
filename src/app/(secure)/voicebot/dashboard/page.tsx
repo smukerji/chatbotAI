@@ -23,6 +23,7 @@ import Voice from "./voice/Voice";
 import Functions from "./functions/Functions";
 import Advance from "./advance/Advance";
 import Analysis from "./analysis/Analysis";
+import PhoneNumber from "./phone-number/PhoneNumber";
 function Dashboard() {
 
   let [tab, setTab] = useState<string>("model");;
@@ -60,6 +61,7 @@ function Dashboard() {
               <li className={tab == "tool" ? "active" : ""} onClick={() => changeHandler("tool")}>Tool</li>
               <li className={tab == "advance" ? "active" : ""} onClick={() => changeHandler("advance")}>Advance</li>
               <li className={tab == "analysis" ? "active" : ""} onClick={() => changeHandler("analysis")}>Analysis</li>
+              <li className={tab == "phone-number" ? "active" : ""} onClick={() => changeHandler("phone-number")}>Phone Number</li>
 
             </ul>
             <hr />
@@ -122,6 +124,14 @@ function Dashboard() {
           tab == "analysis" && (
             <>
               <Analysis />
+            </>
+          )
+        }
+
+        {
+          tab == "phone-number" && (
+            <>
+              <PhoneNumber />
             </>
           )
         }
