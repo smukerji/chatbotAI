@@ -186,8 +186,7 @@ function Functions() {
           <div className="phone-input-with-flag">
             <PhoneInput 
             country={'us'}
-              // value={this.state.phone}
-              // onChange={phone => this.setState({ phone })}
+              
             />
           </div>
 

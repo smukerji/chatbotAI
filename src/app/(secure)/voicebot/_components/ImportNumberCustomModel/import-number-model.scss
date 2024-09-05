@@ -1,0 +1,171 @@
+.phone-model-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 999;
+
+  .backdrop {
+    cursor: pointer;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: rgba($color: #000000, $alpha: .5);
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+
+  .model-content {
+    padding: 1.5rem;
+    max-width: 500px;
+    width: 100%;
+    min-height: 600px;
+    max-height: 90%;
+    margin: auto;
+    background: white;
+    z-index: 2;
+    position: relative;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+
+    .header {
+      .title {
+        color: #141416;
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 28px;
+      }
+    }
+
+    .middle {
+      .select-wrapper {
+
+        width: 100%;
+
+        .lable {
+          color: #353945;
+          /* Body/Medium */
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 24px;
+        }
+
+        .description {
+          margin-top: 0.5rem;
+          color: #777E90;
+          font-size: 14px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 24px;
+          /* 171.429% */
+        }
+
+        .phone-input-with-flag {
+          margin-top: 8px;
+
+          input {
+            width: 100%;
+            height: 41.45px;
+            font-size: 16px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 24px;
+            border-radius: 12px;
+            border: 1px solid #E6E8EC;
+            background: #FFF;
+
+          }
+
+          .flag-dropdown {
+            border-radius: 12px;
+            border: 1px solid #E6E8EC;
+            background: #FFF;
+          }
+
+
+        }
+      }
+
+      .input-wrapper {
+        width: 100%;
+        margin-top: 20px;
+
+        .lable {
+          color: #353945;
+          /* Body/Medium */
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 24px;
+        }
+
+        .number-input {
+          width: 100%;
+          font-size: 16px;
+          margin-top: 8px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 24px;
+          padding: 8px 16px 8px 8px;
+          border-radius: 12px;
+          border: 1px solid #E6E8EC;
+          background: #FFF;
+        }
+      }
+    }
+
+    .bottom {
+      width: 100%;
+      display: flex;
+      gap: 12px;
+
+      .cancel {
+        border: none;
+        padding: 12px 24px;
+        border-radius: 12px;
+        background: #E6E8EC;
+        height: auto;
+        width: 100%;
+
+        span {
+          color: #141416;
+          text-align: center;
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 600;
+          line-height: 28px;
+        }
+      }
+
+      .import {
+        border: none;
+        padding: 12px 24px;
+        border-radius: 12px;
+        background: #2E58EA;
+        height: auto;
+        width: 100%;
+
+        span {
+          color: #FCFCFD;
+          text-align: center;
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 600;
+          line-height: 28px;
+        }
+      }
+
+    }
+
+  }
+}
