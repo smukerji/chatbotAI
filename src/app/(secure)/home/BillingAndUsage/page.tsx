@@ -20,6 +20,7 @@ import AddOnsDetail from "./_components/AddOnsDetail";
 import { TableRowSelection } from "antd/es/table/interface";
 import { transformDataSource } from "./utils/transformedDataSource";
 import PaymentTable from "./_components/PaymentTable";
+import CancelPlanModal from "./_components/CancelPlanModal";
 
 function BillingAndUsage() {
   const [cookies, setCookie] = useCookies(["userId"]);
@@ -31,6 +32,7 @@ function BillingAndUsage() {
   const [duration, setDuration] = useState("");
   const [disable, setDisable] = useState(false);
   const [buttonDisable, setButtonDisable] = useState(false);
+  const [planDetail, setPlanDetail] = useState();
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isWhatsappModalOpen, setIsWhatsappModalOpen] = useState(false);
@@ -104,6 +106,7 @@ function BillingAndUsage() {
       setMsg(response?.data?.message);
       setPlan(response?.data?.plan);
       setWhatsapp(response?.data?.whatsappIntegration);
+      setPlanDetail(response?.data?.planDetail);
       const newDate = new Date(response?.data?.nextRenewal);
       const options: any = { year: "numeric", month: "short", day: "2-digit" };
       const formattedDate: any = newDate.toLocaleDateString("en-US", options);
@@ -138,17 +141,18 @@ function BillingAndUsage() {
     return (
       <>
         <Modal
-          title="Cancel My Plan"
+          title="Are you sure to cancel the plan?"
           open={isModalOpen}
           onOk={handleOk}
           onCancel={handleCancel}
           cancelText="Keep"
           okText="Cancel"
           closeIcon={null}
-          className="model"
+          className="model cancel-modal"
           centered
         >
-          <p>Are you sure to cancel your plan?</p>
+          {/* <p>Are you sure to cancel your plan?</p> */}
+          <CancelPlanModal planDetail={planDetail} date={date} />
         </Modal>
         <Modal
           title="Cancel My Plan"
@@ -215,7 +219,9 @@ function BillingAndUsage() {
             </div>
 
             <div className="cancel-upgrade-btns">
-              <p className="cancel-plan">Cancel My Plan</p>
+              <p className="cancel-plan" onClick={() => setIsModalOpen(true)}>
+                Cancel My Plan
+              </p>
               <button className="btn-upgrade" onClick={explorePlan}>
                 <span className="btn-text">Upgrade Plan</span>
               </button>

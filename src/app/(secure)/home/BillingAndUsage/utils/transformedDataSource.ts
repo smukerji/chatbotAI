@@ -10,8 +10,6 @@ function formatDate(timestamp: number) {
 
 // Function to transform the data source
 export function transformDataSource(subscriptions: any[]) {
-  console.log("subscriptions", subscriptions);
-
   return subscriptions?.map((subscription) => {
     const totalAmount = subscription.data.reduce(
       (total: number, item: any) => total + item.amount,

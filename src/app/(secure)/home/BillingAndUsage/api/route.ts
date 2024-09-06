@@ -17,6 +17,7 @@ async function getUserDetails(req: any, res: NextResponse) {
     const collectionUser = db.collection("users");
     const collectionPlan = db.collection("plans");
     const data = await collectionUser.findOne({ _id: new ObjectId(u_id) });
+
     const planId = data.planId;
     const data_plan = await collectionPlan.findOne({ _id: planId });
 
@@ -28,6 +29,7 @@ async function getUserDetails(req: any, res: NextResponse) {
       duration: data.duration,
       status: data.status,
       whatsappIntegration: data.nextIsWhatsapp,
+      planDetail: data_plan,
     };
   } catch (error) {}
 }
