@@ -1,0 +1,114 @@
+<div className="call-log-wrapper">
+  <div className="left">
+    {callLogIds.map((data, index: number) => (
+      <div
+        key={data.id}
+        className={`time-card ${activeLog === index && 'active'} ${data.startTime == undefined && 'error'
+          }`}
+      // onClick={getCallDetails.bind(null, data.id, index)}
+      >
+        <p>
+          {data.startTime != undefined
+            ? new Date(data.startTime).toLocaleString()
+            : "Call doesn't start"}
+        </p>
+        {/* <p>{data.startTime +" "+ data.endTime}</p> */}
+        <span>{data.endedReason.split('-').join(' ')}</span>
+        <span>{data.duration}</span>
+      </div>
+    ))}
+  </div>
+
+  <div className="right">
+    {!loading ? (
+      <>
+        <div className="button-wrapper">
+          <button
+            className="resume-call-btn"
+            onClick={() => {
+              message.success('Will add soon!');
+            }}
+          >
+            <Image
+              src={resumeCall}
+              alt="resumeCall"
+              width={20}
+              height={20}
+            />
+            <span>Call Sentiments</span>
+          </button>
+          {/* <button className="download-btn">
+                <Image src={callListData?.recordingUrl as string} alt="download" width={20} height={20} />
+                <span>Download Record</span>
+              </button> */}
+          <button
+            className="download-btn"
+          // onClick={() =>
+          //   window.open(callListData?.recordingUrl, '_blank')
+          // }
+          >
+            <Image src={download} alt="download" width={20} height={20} />
+            <span>Download Record</span>
+          </button>
+        </div>
+        <div className="summary-wrapper">
+          <span>Summary</span>
+          <p>
+            {callListData?.summary
+              ? callListData?.summary
+              : 'No summary available'}
+          </p>
+        </div>
+        <div className="recording-wrapper">
+          <span>Recording</span>
+
+          <div ref={containerRef}></div>
+          {isReady && (
+            <div className="voice-controller">
+              <button
+                // onClick={onPlayPause}
+                style={{
+                  border: 'none',
+                  outline: 'none',
+                  cursor: 'pointer',
+                }}
+                title={isPlaying ? 'Pause' : 'Play'}
+              >
+                <Image
+                  src={isPlaying ? pause : play}
+                  alt="recording"
+                  width={20}
+                  height={20}
+                />
+              </button>
+
+              <span>{formatTime(currentTime)}</span>
+            </div>
+          )}
+        </div>
+        <div className="transcript-wrapper">
+          <span>Transcript</span>
+          <div>
+            <ul>
+              {callListData?.transcript ? (
+                callListData?.transcript
+                  .split('\n')
+                  .map((entry: string, index: number) => (
+                    <li key={index}>{entry}</li>
+                  ))
+              ) : (
+                <li>No transcript available</li>
+              )}
+            </ul>
+          </div>
+        </div>
+      </>
+    ) : (
+      <Flex align="center" gap="middle" className="loader">
+        <Spin size="large" />
+      </Flex>
+    )}
+  </div>
+
+
+</div>

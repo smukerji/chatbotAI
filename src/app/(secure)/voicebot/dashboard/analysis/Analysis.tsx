@@ -12,7 +12,7 @@ function Analysis() {
     <div className="analysis-container">
       <div className="summary-container">
         <h3 className="title">Summary</h3>
-        <p className="description">This is the prompt that's used to summarize the call. The output is stored in call.analysis.summary. You can also find the summary in the Call Logs Page.</p>
+        <p className="description">This is the prompt that&lsquo;s used to summarize the call. The output is stored in call.analysis.summary. You can also find the summary in the Call Logs Page.</p>
         <div className="content-wrapper">
           <h4 className="text-area-title">Prompt</h4>
           <TextArea className="text-area" rows={4} placeholder="Write your system prompts here..." />
@@ -25,7 +25,7 @@ function Analysis() {
         <p className="description">Evaluate if your call was successful. You can use Rubric standalone or in combination with Success Evaluation Prompt. If both are provided, they are concatenated into appropriate instructions.</p>
         <div className="content-wrapper">
           <h4 className="text-area-title">Prompt</h4>
-          <p className="text-area-description">This is the prompt that's used to evaluate if the call was successful.</p>
+          <p className="text-area-description">This is the prompt that&lsquo;s used to evaluate if the call was successful.</p>
           <TextArea className="text-area" rows={4} placeholder="Write your system prompts here..." />
 
           <h4 className="text-area-title spacer">Success Evaluation Rubric</h4>
@@ -59,7 +59,7 @@ function Analysis() {
         <p className="description">Evaluate if your call was successful. You can use Rubric standalone or in combination with Success Evaluation Prompt. If both are provided, they are concatenated into appropriate instructions.</p>
         <div className="content-wrapper">
           <h4 className="text-area-title">Prompt</h4>
-          <p className="text-area-description">This is the prompt that's used to evaluate if the call was successful.</p>
+          <p className="text-area-description">This is the prompt that&lsquo;s used to evaluate if the call was successful.</p>
           <TextArea className="text-area" rows={4} placeholder="Write your system prompts here..." />
 
           <Property/>

@@ -11,7 +11,7 @@ function Voice() {
       <div className="left-column">
 
         <h2 className="voice-configuration-title">Voice Configuration</h2>
-        <p className="voice-configuration-description">Choose from the list of voices, or sync your voice library if you aren't able to find your voice in the dropdown. If you are still facing any error, you can enable custom voice and add a voice ID manually.</p>
+        <p className="voice-configuration-description">Choose from the list of voices, or sync your voice library if you aren&lsquo;t able to find your voice in the dropdown. If you are still facing any error, you can enable custom voice and add a voice ID manually.</p>
         <div className="provider-container">
           <h4 className="provider">Provider</h4>
           <Select className="select-field"
@@ -150,7 +150,7 @@ function Voice() {
             <h4 className="emotional-header">Backchanneling Enabled</h4>
             <Switch className="emotional-switch" defaultChecked />
           </div>
-          <p className="emotional-detect-description">Make the bot say words like 'mhmm', 'ya' etc. while listening to make the conversation sounds natural. Default disabled</p>
+          <p className="emotional-detect-description">Make the bot say words like &lsquo;mhmm&lsquo;, &lsquo;ya&lsquo; etc. while listening to make the conversation sounds natural. Default disabled</p>
 
           <div className="emotional-detect">
             <h4 className="emotional-header">Background Denoising Enabled</h4>

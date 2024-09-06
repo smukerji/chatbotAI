@@ -36,7 +36,7 @@ export default function VoiceBot() {
           </div>
         </div>
         <h2>Create your voicebot</h2>
-        <h3>Let's create your own bot</h3>
+        <h3>Let&lsquo;s create your own bot</h3>
         <Steps className="stepper-steps"
           direction="vertical"
           size="small"

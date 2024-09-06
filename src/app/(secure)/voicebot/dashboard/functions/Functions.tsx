@@ -128,7 +128,7 @@ function Functions() {
       </div>
       <div className="right-column">
         <h3 className="title">Predefined Functions</h3>
-        <p className="description">We've pre-built functions for common use cases. You can enable them and configure them below.</p>
+        <p className="description">We&lsquo;ve pre-built functions for common use cases. You can enable them and configure them below.</p>
         <div className="wrapper">
           <h4 className="provider">Call Function</h4>
           <Select className="select-field"

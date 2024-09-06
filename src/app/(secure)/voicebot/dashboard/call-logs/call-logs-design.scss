@@ -1,0 +1,109 @@
+.call-log-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  .top-container {
+    display: flex;
+    gap: 1rem;
+
+    button {
+      border-radius: 1000px;
+      background: #F4F5F6;
+      height: 44px;
+
+      span {
+        color: #353945;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 24px;
+      }
+    }
+
+  }
+
+  .bottom-container {
+
+    display: flex;
+    width: 100%;
+
+    .left-container {
+      display: flex;
+      flex-direction: column;
+      min-height: 600px;
+      max-height: 879px;
+      overflow: auto;
+      width: 30%;
+      .list-items {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        padding: 8px;
+        flex: 1;
+
+        .splitter {
+          margin: 0.5rem 0;
+        }
+
+        .list-item {
+          display: flex;
+          justify-content: space-between;
+          flex-direction: column;
+
+          padding: 8px;
+
+          &:hover {
+            border-radius: 8px;
+            background: #E6E8EC;
+            cursor: pointer;
+          }
+
+          .number-details {
+            display: flex;
+            gap: 8px;
+            padding: 4px 0;
+            justify-content: space-between;
+
+            h2 {
+              color: #777E90;
+              font-size: 14px;
+              font-style: normal;
+              font-weight: 500;
+              line-height: 24px;
+            }
+
+            p {
+              color: #777E90;
+              font-size: 14px;
+              font-style: normal;
+              font-weight: 500;
+              line-height: 24px;
+            }
+          }
+
+          .switch-input {
+            display: flex;
+            align-items: center;
+
+            h3 {
+              color: #141416;
+              font-size: 16px;
+              font-style: normal;
+              font-weight: 500;
+              line-height: 24px;
+            }
+
+
+          }
+
+        }
+      }
+
+    }
+
+    .right-container{
+      width: 70%;
+    }
+  }
+}

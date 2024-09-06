@@ -25,7 +25,7 @@ function Advance() {
         Privacy
       </h3>
       <p className="description">
-        We've pre-built functions for common use cases. You can enable them and configure them below.
+        We&lsquo;ve pre-built functions for common use cases. You can enable them and configure them below.
       </p>
       <div className="privacy-container">
         <div className="privacy-container-item">
@@ -352,7 +352,7 @@ function Advance() {
             Idle Message
           </h4>
           <p className="description">
-            Messages that the assistant will speak when the user hasn't responded.
+            Messages that the assistant will speak when the user hasn&lsquo;t responded.
           </p>
           <Select className="select-field"
 
