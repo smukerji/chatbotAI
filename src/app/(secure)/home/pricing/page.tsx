@@ -1,6 +1,7 @@
 import React from "react";
 import PricingWrapper from "./_components/pricingWrapper";
 import { generateMetadata } from "@/app/_helpers/pageSeo";
+import PricingWrapperNew from "./_components/PricingWrapperNew";
 
 export const metadata = generateMetadata({
   title: "Torri.AI Pricing Plans | Build AI Chatbots with Ease",
@@ -10,5 +11,5 @@ export const metadata = generateMetadata({
 });
 
 export default function Home() {
-  return <PricingWrapper />;
+  return <PricingWrapperNew />;
 }

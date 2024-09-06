@@ -30,7 +30,8 @@ const conversationHistoryMonthly: any =
   process.env.NEXT_PUBLIC_CONVERSATION_HISTORY_MONTHLY;
 const conversationHistoryYearly: any =
   process.env.NEXT_PUBLIC_CONVERSATION_HISTORY_YEARLY;
-const leads: any = process.env.NEXT_PUBLIC_LEADS_MONTHLY;
+const leadsMonthly: any = process.env.NEXT_PUBLIC_LEADS_MONTHLY;
+const leadsYearly: any = process.env.NEXT_PUBLIC_LEADS_YEARLY;
 const onBoarding: any = process.env.NEXT_PUBLIC_ONBOARDING_FEES;
 const msgSmall: any = process.env.NEXT_PUBLIC_MESSAGESMALL_PLAN_ID;
 const msgLarge: any = process.env.NEXT_PUBLIC_MESSAGELARGE_PLAN_ID;
@@ -93,7 +94,8 @@ function DummyPaymentMethod({
     [trainingDataYearly]: false,
     [conversationHistoryMonthly]: false,
     [conversationHistoryYearly]: false,
-    [leads]: false,
+    [leadsMonthly]: false,
+    [leadsYearly]: false,
     [onBoarding]: false,
     [msgSmall]: false,
     [msgLarge]: false,
@@ -193,12 +195,11 @@ function DummyPaymentMethod({
 
   const fetchProductDetail = async (id: string) => {
     try {
-      setLoading(true);
+      // setLoading(true);
       const productDetail = await axios.get(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/retrieve-product?priceId=${id}`
       );
       // setTotalPrice((prev) => prev + productDetail.data.data.unit_amount / 100);
-      console.log("product detail", productDetail.data.data.recurring.interval);
 
       return {
         amount: productDetail.data.data.unit_amount / 100,
@@ -242,7 +243,10 @@ function DummyPaymentMethod({
           ? conversationHistoryYearly
           : conversationHistoryMonthly
       );
-      const leadsPrice = findPrice(prices, leads);
+      const leadsPrice = findPrice(
+        prices,
+        interval === "year" ? leadsYearly : leadsMonthly
+      );
       const whatsappPlanPrice = findPrice(
         prices,
         interval === "year" ? whatsappPriceIdYearly : whatsappPriceIdMonthly
@@ -282,630 +286,673 @@ function DummyPaymentMethod({
 
   return (
     <>
-      {/* {loading ? (
+      {loading ? (
         <Loader />
-      ) : ( */}
-      <div className="card-main new-card">
-        <div className="card-head">Billing Info</div>
-        <form className="cardElementForm broad-card" onSubmit={handleSubmit}>
-          <div className="left white-left">
-            <div className="top-left">
-              <div className="plan-name">Individual Plan</div>
-              <div className="price">
-                {/* <span>${Number(price) / 100}</span> */}
-                <span>${planPrice}</span>
-                <span className="price-duration">
-                  Per {interval === "year" ? "Year" : "Month"}
-                </span>
-              </div>
-            </div>
-            {/* <Image src={line} alt={"no image"} /> */}
-            {/* {(plan == 1 || plan == 3 || plan == 2 || plan == 4) && defaultChecked && ( */}
-            <div className="social-integration">
-              <div
-                className="drop-down-icon"
-                onClick={() => toggleDropdown("social")}
-              >
-                <span>
-                  <Image src={ArrowDown} alt="arrow-down" />
-                </span>
-                Social Integrations
-              </div>
-              {isSocialDropdownOpen && (
-                <div
-                  className="dropdown-content"
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "baseline",
-                    width: "100%",
-                  }}
-                >
-                  {/* Social Integrations checkboxes */}
-
-                  <div
-                    className={`checkbox ${
-                      checkedIntegrations[
-                        interval === "year"
-                          ? whatsappPriceIdYearly
-                          : whatsappPriceIdMonthly
-                      ]
-                        ? "active-label"
-                        : ""
-                    }`}
-                  >
-                    <div className={`check-label`}>
-                      <input
-                        type="checkbox"
-                        // defaultChecked={defaultChecked}
-                        checked={
-                          checkedIntegrations[
-                            interval === "year"
-                              ? whatsappPriceIdYearly
-                              : whatsappPriceIdMonthly
-                          ] || false
-                        }
-                        className="price-checkbox"
-                        id="whatsappIntegrationCheckbox"
-                        onChange={(e) => {
-                          handleChange(
-                            e,
-                            interval === "year"
-                              ? whatsappPriceIdYearly
-                              : whatsappPriceIdMonthly
-                          );
-                        }}
-                      />
-                      <label
-                        htmlFor="whatsappIntegrationCheckbox"
-                        className="checkbox-label"
-                      >
-                        Whatsapp Integration
-                      </label>
-                    </div>
-
-                    <div className="pricing">
-                      <p>${addonPrices.whatsappPlanPrice ?? 0}</p>
-                    </div>
-                  </div>
-                  <div
-                    className={`checkbox ${
-                      checkedIntegrations[
-                        interval === "year"
-                          ? slackPriceIdYearly
-                          : slackPriceIdMonthly
-                      ]
-                        ? "active-label"
-                        : ""
-                    }`}
-                  >
-                    <div className="check-label">
-                      <input
-                        type="checkbox"
-                        // defaultChecked={defaultChecked}
-                        checked={
-                          checkedIntegrations[
-                            interval === "year"
-                              ? slackPriceIdYearly
-                              : slackPriceIdMonthly
-                          ] || false
-                        }
-                        id="slackIntegrationCheckbox"
-                        className="price-checkbox"
-                        onChange={(e) => {
-                          handleChange(
-                            e,
-                            interval === "year"
-                              ? slackPriceIdYearly
-                              : slackPriceIdMonthly
-                          );
-                        }}
-                      />
-                      <label
-                        htmlFor="slackIntegrationCheckbox"
-                        className="checkbox-label"
-                      >
-                        Slack Integration
-                      </label>
-                    </div>
-                    <div className="pricing">
-                      <p>${addonPrices.slackPlanPrice ?? 0}</p>
-                    </div>
-                  </div>
-
-                  <div
-                    className={`checkbox ${
-                      checkedIntegrations[
-                        interval === "year"
-                          ? telegramPriceIdYearly
-                          : telegramPriceIdMonthly
-                      ]
-                        ? "active-label"
-                        : ""
-                    }`}
-                  >
-                    <div className="check-label">
-                      <input
-                        type="checkbox"
-                        // defaultChecked={defaultChecked}
-                        checked={
-                          checkedIntegrations[
-                            interval === "year"
-                              ? telegramPriceIdYearly
-                              : telegramPriceIdMonthly
-                          ] || false
-                        }
-                        id="telegramIntegrationCheckbox"
-                        className="price-checkbox"
-                        onChange={(e) => {
-                          handleChange(
-                            e,
-                            interval === "year"
-                              ? telegramPriceIdYearly
-                              : telegramPriceIdMonthly
-                          );
-                        }}
-                      />
-                      <label
-                        htmlFor="telegramIntegrationCheckbox"
-                        className="checkbox-label"
-                      >
-                        Telegram Integration
-                      </label>
-                    </div>
-
-                    <div className="pricing">
-                      <p>${addonPrices.telegramPlanPrice ?? 0}</p>
-                    </div>
-                  </div>
-
-                  {/* instagram */}
-                  <div className="checkbox hidden">
-                    <div className="check-label ">
-                      <input
-                        type="checkbox"
-                        // defaultChecked={defaultChecked}
-                        checked={
-                          checkedIntegrations[
-                            interval === "year"
-                              ? telegramPriceIdYearly
-                              : telegramPriceIdMonthly
-                          ] || false
-                        }
-                        id="instagramIntegrationCheckbox"
-                        className="price-checkbox"
-                        // onChange={(e) => {
-                        //   handleChange(e, telegramPriceId);
-                        // }}
-                        disabled
-                      />
-                      <label
-                        htmlFor="instagramIntegrationCheckbox"
-                        className="checkbox-label"
-                      >
-                        Instagram
-                      </label>
-                    </div>
-
-                    <div className="pricing coming-soon">
-                      <p>Coming Soon</p>
-                    </div>
-                  </div>
-                  {/* Messenger */}
-                  <div className="checkbox hidden">
-                    <div className="check-label">
-                      <input
-                        type="checkbox"
-                        // defaultChecked={defaultChecked}
-                        checked={
-                          checkedIntegrations[
-                            interval === "year"
-                              ? telegramPriceIdYearly
-                              : telegramPriceIdMonthly
-                          ] || false
-                        }
-                        id="messengerIntegrationCheckbox"
-                        className="price-checkbox"
-                        // onChange={(e) => {
-                        //   handleChange(e, telegramPriceId);
-                        // }}
-                        disabled
-                      />
-                      <label
-                        htmlFor="messengerIntegrationCheckbox"
-                        className="checkbox-label"
-                      >
-                        Messenger
-                      </label>
-                    </div>
-                    <div className="pricing coming-soon">
-                      <p>Coming Soon</p>
-                    </div>
-                  </div>
-                  {/* Sevenrooms */}
-                  <div className="checkbox hidden">
-                    <div className="check-label">
-                      <input
-                        type="checkbox"
-                        // defaultChecked={defaultChecked}
-                        checked={
-                          checkedIntegrations[
-                            interval === "year"
-                              ? telegramPriceIdYearly
-                              : telegramPriceIdMonthly
-                          ] || false
-                        }
-                        id="sevenroomsIntegrationCheckbox"
-                        className="price-checkbox"
-                        // onChange={(e) => {
-                        //   handleChange(e, telegramPriceId);
-                        // }}
-                        disabled
-                      />
-                      <label
-                        htmlFor="sevenroomsIntegrationCheckbox"
-                        className="checkbox-label"
-                      >
-                        Sevenrooms
-                      </label>
-                    </div>
-
-                    <div className="pricing coming-soon">
-                      <p>Coming Soon</p>
-                    </div>
-                  </div>
-                  {/* Mindbody */}
-                  <div className="checkbox hidden">
-                    <div className="check-label">
-                      <input
-                        type="checkbox"
-                        // defaultChecked={defaultChecked}
-                        checked={
-                          checkedIntegrations[
-                            interval === "year"
-                              ? telegramPriceIdYearly
-                              : telegramPriceIdMonthly
-                          ] || false
-                        }
-                        id="mindbodyIntegrationCheckbox"
-                        className="price-checkbox"
-                        // onChange={(e) => {
-                        //   handleChange(e, telegramPriceId);
-                        // }}
-                        disabled
-                      />
-                      <label
-                        htmlFor="mindbodyIntegrationCheckbox"
-                        className="checkbox-label"
-                      >
-                        Mindbody
-                      </label>
-                    </div>
-                    <div className="pricing coming-soon">
-                      <p>Coming Soon</p>
-                    </div>
-                  </div>
-                  {/* Hubspot */}
-                  <div className="checkbox hidden">
-                    <div className="check-label">
-                      <input
-                        type="checkbox"
-                        // defaultChecked={defaultChecked}
-                        checked={
-                          checkedIntegrations[
-                            interval === "year"
-                              ? telegramPriceIdYearly
-                              : telegramPriceIdMonthly
-                          ] || false
-                        }
-                        id="hubspotIntegrationCheckbox"
-                        className="price-checkbox"
-                        // onChange={(e) => {
-                        //   handleChange(e, telegramPriceId);
-                        // }}
-                        disabled
-                      />
-                      <label
-                        htmlFor="hubspotIntegrationCheckbox"
-                        className="checkbox-label"
-                      >
-                        Hubspot
-                      </label>
-                    </div>
-
-                    <div className="pricing coming-soon">
-                      <p>Coming Soon</p>
-                    </div>
-                  </div>
-                  {/* Zoho crm */}
-                  <div className="checkbox hidden">
-                    <div className="check-label">
-                      <input
-                        type="checkbox"
-                        // defaultChecked={defaultChecked}
-                        checked={
-                          checkedIntegrations[
-                            interval === "year"
-                              ? telegramPriceIdYearly
-                              : telegramPriceIdMonthly
-                          ] || false
-                        }
-                        id="zohocrmIntegrationCheckbox"
-                        className="price-checkbox"
-                        // onChange={(e) => {
-                        //   handleChange(e, telegramPriceId);
-                        // }}
-                        disabled
-                      />
-                      <label
-                        htmlFor="zohocrmIntegrationCheckbox"
-                        className="checkbox-label"
-                      >
-                        Zoho CRM
-                      </label>
-                    </div>
-
-                    <div className="pricing coming-soon">
-                      <p>Coming Soon</p>
-                    </div>
-                  </div>
+      ) : (
+        <div className="card-main new-card">
+          <div className="card-head">Billing Info</div>
+          <form className="cardElementForm broad-card" onSubmit={handleSubmit}>
+            <div className="left white-left">
+              <div className="top-left">
+                <div className="plan-name">Individual Plan</div>
+                <div className="price">
+                  {/* <span>${Number(price) / 100}</span> */}
+                  <span>${planPrice}</span>
+                  <span className="price-duration">
+                    Per {interval === "year" ? "Year" : "Month"}
+                  </span>
                 </div>
-              )}
-            </div>
-
-            <div className="other-addons social-integration">
-              <div
-                className="drop-down-icon"
-                onClick={() => toggleDropdown("other")}
-              >
-                {" "}
-                <span>
-                  <Image src={ArrowDown} alt="arrow-down" />
-                </span>
-                Other Add-ons
               </div>
-              {isOtherDropdownOpen && (
+              {/* <Image src={line} alt={"no image"} /> */}
+              {/* {(plan == 1 || plan == 3 || plan == 2 || plan == 4) && defaultChecked && ( */}
+              <div className="social-integration">
                 <div
-                  className="dropdown-content"
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "baseline",
-                    width: "100%",
-                  }}
+                  className="drop-down-icon"
+                  onClick={() => toggleDropdown("social")}
                 >
-                  {/* Other Add-ons checkboxes */}
-
-                  <div className="checkbox">
-                    <div className="check-label">
-                      <input
-                        type="checkbox"
-                        // defaultChecked={defaultChecked}
-                        checked={checkedIntegrations[onBoarding] || false}
-                        id="onboardingIntegrationCheckbox"
-                        className="price-checkbox"
-                        onChange={(e) => {
-                          handleChange(e, onBoarding);
-                        }}
-                      />
-                      <label
-                        htmlFor="onboardingIntegrationCheckbox"
-                        className="checkbox-label"
-                      >
-                        Onboarding
-                      </label>
-                    </div>
-
-                    <div className="pricing">
-                      <p>${addonPrices.onBoardingPrice ?? 0}</p>
-                    </div>
-                  </div>
-                  <div className="checkbox">
-                    <div className="check-label">
-                      <input
-                        type="checkbox"
-                        // defaultChecked={defaultChecked}
-                        checked={checkedIntegrations[msgSmall] || false}
-                        id="5kmessagesIntegrationCheckbox"
-                        className="price-checkbox"
-                        onChange={(e) => {
-                          handleChange(e, msgSmall);
-                        }}
-                      />
-                      <label
-                        htmlFor="5kmessagesIntegrationCheckbox"
-                        className="checkbox-label"
-                      >
-                        5K Messages
-                      </label>
-                    </div>
-
-                    <div className="pricing">
-                      <p>${addonPrices.msgSmallPrice ?? 0}</p>
-                    </div>
-                  </div>
-                  <div className="checkbox">
-                    <div className="check-label">
-                      <input
-                        type="checkbox"
-                        // defaultChecked={defaultChecked}
-                        checked={checkedIntegrations[msgLarge] || false}
-                        id="10kIntegrationCheckbox"
-                        className="price-checkbox"
-                        onChange={(e) => {
-                          handleChange(e, msgLarge);
-                        }}
-                      />
-                      <label
-                        htmlFor="10kIntegrationCheckbox"
-                        className="checkbox-label"
-                      >
-                        10K Messeges
-                      </label>
-                    </div>
-                    <div className="pricing">
-                      <p>${addonPrices.msgLargePrice ?? 0}</p>
-                    </div>
-                  </div>
-                  <div className="checkbox">
-                    <div className="check-label">
-                      <input
-                        type="checkbox"
-                        // defaultChecked={defaultChecked}
-                        checked={
-                          checkedIntegrations[
-                            interval === "year"
-                              ? trainingDataYearly
-                              : trainingDataMonthly
-                          ] || false
-                        }
-                        id="trainingIntegrationCheckbox"
-                        className="price-checkbox"
-                        onChange={(e) => {
-                          handleChange(
-                            e,
-                            interval === "year"
-                              ? trainingDataYearly
-                              : trainingDataMonthly
-                          );
-                        }}
-                      />
-                      <label
-                        htmlFor="trainingIntegrationCheckbox"
-                        className="checkbox-label"
-                      >
-                        Training Data(1M)
-                      </label>
-                    </div>
-
-                    <div className="pricing">
-                      <p>${addonPrices.trainingDataPrice ?? 0}</p>
-                    </div>
-                  </div>
-                  <div className="checkbox">
-                    <div className="check-label">
-                      <input
-                        type="checkbox"
-                        // defaultChecked={defaultChecked}
-                        checked={
-                          checkedIntegrations[
-                            interval === "year"
-                              ? conversationHistoryYearly
-                              : conversationHistoryMonthly
-                          ] || false
-                        }
-                        id="conversationhistoryIntegrationCheckbox"
-                        className="price-checkbox"
-                        onChange={(e) => {
-                          handleChange(
-                            e,
-                            interval === "year"
-                              ? conversationHistoryYearly
-                              : conversationHistoryMonthly
-                          );
-                        }}
-                      />
-                      <label
-                        htmlFor="conversationhistoryIntegrationCheckbox"
-                        className="checkbox-label"
-                      >
-                        Conversation History (3 Years)
-                      </label>
-                    </div>
-                    <div className="pricing">
-                      <p>${addonPrices.conversationHistoryPrice ?? 0}</p>
-                    </div>
-                  </div>
-                  <div className="checkbox">
-                    <div className="check-label">
-                      <input
-                        type="checkbox"
-                        // defaultChecked={defaultChecked}
-                        checked={checkedIntegrations[leads] || false}
-                        id="leadIntegrationCheckbox"
-                        className="price-checkbox"
-                        onChange={(e) => {
-                          handleChange(e, leads);
-                        }}
-                      />
-                      <label
-                        htmlFor="leadIntegrationCheckbox"
-                        className="checkbox-label"
-                      >
-                        Lead (Unlimited) Individual
-                      </label>
-                    </div>
-                    <div className="pricing">
-                      <p>${addonPrices.leadsPrice ?? 0}</p>
-                    </div>
-                  </div>
-                  <div className="checkbox hidden">
-                    <div className="check-label">
-                      <input
-                        type="checkbox"
-                        // defaultChecked={defaultChecked}
-                        // checked={checkedIntegrations[telegramPriceId] || false}
-                        id="sentimetIntegrationCheckbox"
-                        className="price-checkbox"
-                        // onChange={(e) => {
-                        //   handleChange(e, telegramPriceId);
-                        // }}
-                      />
-                      <label
-                        htmlFor="sentimetIntegrationCheckbox"
-                        className="checkbox-label"
-                      >
-                        Sentiment Dashbaord
-                      </label>
-                    </div>
-                    <div className="pricing coming-soon">
-                      <p>Coming soon</p>
-                    </div>
-                  </div>
+                  <span>
+                    <Image src={ArrowDown} alt="arrow-down" />
+                  </span>
+                  Social Integrations
                 </div>
-              )}
-            </div>
+                {isSocialDropdownOpen && (
+                  <div
+                    className="dropdown-content"
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "baseline",
+                      width: "100%",
+                    }}
+                  >
+                    {/* Social Integrations checkboxes */}
 
-            {/* )} */}
-            <div className="bottom-left">
-              <div className="total">Total</div>
-              <div className="total-price">${Number(totalPrice)}</div>
+                    <div
+                      className={`checkbox ${
+                        checkedIntegrations[
+                          interval === "year"
+                            ? whatsappPriceIdYearly
+                            : whatsappPriceIdMonthly
+                        ]
+                          ? "active-label"
+                          : ""
+                      }`}
+                    >
+                      <div className={`check-label`}>
+                        <input
+                          type="checkbox"
+                          // defaultChecked={defaultChecked}
+                          checked={
+                            checkedIntegrations[
+                              interval === "year"
+                                ? whatsappPriceIdYearly
+                                : whatsappPriceIdMonthly
+                            ] || false
+                          }
+                          className="price-checkbox"
+                          id="whatsappIntegrationCheckbox"
+                          onChange={(e) => {
+                            handleChange(
+                              e,
+                              interval === "year"
+                                ? whatsappPriceIdYearly
+                                : whatsappPriceIdMonthly
+                            );
+                          }}
+                        />
+                        <label
+                          htmlFor="whatsappIntegrationCheckbox"
+                          className="checkbox-label"
+                        >
+                          Whatsapp Integration
+                        </label>
+                      </div>
+
+                      <div className="pricing">
+                        <p>${addonPrices.whatsappPlanPrice ?? 0}</p>
+                      </div>
+                    </div>
+                    <div
+                      className={`checkbox ${
+                        checkedIntegrations[
+                          interval === "year"
+                            ? slackPriceIdYearly
+                            : slackPriceIdMonthly
+                        ]
+                          ? "active-label"
+                          : ""
+                      }`}
+                    >
+                      <div className="check-label">
+                        <input
+                          type="checkbox"
+                          // defaultChecked={defaultChecked}
+                          checked={
+                            checkedIntegrations[
+                              interval === "year"
+                                ? slackPriceIdYearly
+                                : slackPriceIdMonthly
+                            ] || false
+                          }
+                          id="slackIntegrationCheckbox"
+                          className="price-checkbox"
+                          onChange={(e) => {
+                            handleChange(
+                              e,
+                              interval === "year"
+                                ? slackPriceIdYearly
+                                : slackPriceIdMonthly
+                            );
+                          }}
+                        />
+                        <label
+                          htmlFor="slackIntegrationCheckbox"
+                          className="checkbox-label"
+                        >
+                          Slack Integration
+                        </label>
+                      </div>
+                      <div className="pricing">
+                        <p>${addonPrices.slackPlanPrice ?? 0}</p>
+                      </div>
+                    </div>
+
+                    <div
+                      className={`checkbox ${
+                        checkedIntegrations[
+                          interval === "year"
+                            ? telegramPriceIdYearly
+                            : telegramPriceIdMonthly
+                        ]
+                          ? "active-label"
+                          : ""
+                      }`}
+                    >
+                      <div className="check-label">
+                        <input
+                          type="checkbox"
+                          // defaultChecked={defaultChecked}
+                          checked={
+                            checkedIntegrations[
+                              interval === "year"
+                                ? telegramPriceIdYearly
+                                : telegramPriceIdMonthly
+                            ] || false
+                          }
+                          id="telegramIntegrationCheckbox"
+                          className="price-checkbox"
+                          onChange={(e) => {
+                            handleChange(
+                              e,
+                              interval === "year"
+                                ? telegramPriceIdYearly
+                                : telegramPriceIdMonthly
+                            );
+                          }}
+                        />
+                        <label
+                          htmlFor="telegramIntegrationCheckbox"
+                          className="checkbox-label"
+                        >
+                          Telegram Integration
+                        </label>
+                      </div>
+
+                      <div className="pricing">
+                        <p>${addonPrices.telegramPlanPrice ?? 0}</p>
+                      </div>
+                    </div>
+
+                    {/* instagram */}
+                    <div className="checkbox hidden">
+                      <div className="check-label ">
+                        <input
+                          type="checkbox"
+                          // defaultChecked={defaultChecked}
+                          checked={
+                            checkedIntegrations[
+                              interval === "year"
+                                ? telegramPriceIdYearly
+                                : telegramPriceIdMonthly
+                            ] || false
+                          }
+                          id="instagramIntegrationCheckbox"
+                          className="price-checkbox"
+                          // onChange={(e) => {
+                          //   handleChange(e, telegramPriceId);
+                          // }}
+                          disabled
+                        />
+                        <label
+                          htmlFor="instagramIntegrationCheckbox"
+                          className="checkbox-label"
+                        >
+                          Instagram
+                        </label>
+                      </div>
+
+                      <div className="pricing coming-soon">
+                        <p>Coming Soon</p>
+                      </div>
+                    </div>
+                    {/* Messenger */}
+                    <div className="checkbox hidden">
+                      <div className="check-label">
+                        <input
+                          type="checkbox"
+                          // defaultChecked={defaultChecked}
+                          checked={
+                            checkedIntegrations[
+                              interval === "year"
+                                ? telegramPriceIdYearly
+                                : telegramPriceIdMonthly
+                            ] || false
+                          }
+                          id="messengerIntegrationCheckbox"
+                          className="price-checkbox"
+                          // onChange={(e) => {
+                          //   handleChange(e, telegramPriceId);
+                          // }}
+                          disabled
+                        />
+                        <label
+                          htmlFor="messengerIntegrationCheckbox"
+                          className="checkbox-label"
+                        >
+                          Messenger
+                        </label>
+                      </div>
+                      <div className="pricing coming-soon">
+                        <p>Coming Soon</p>
+                      </div>
+                    </div>
+                    {/* Sevenrooms */}
+                    <div className="checkbox hidden">
+                      <div className="check-label">
+                        <input
+                          type="checkbox"
+                          // defaultChecked={defaultChecked}
+                          checked={
+                            checkedIntegrations[
+                              interval === "year"
+                                ? telegramPriceIdYearly
+                                : telegramPriceIdMonthly
+                            ] || false
+                          }
+                          id="sevenroomsIntegrationCheckbox"
+                          className="price-checkbox"
+                          // onChange={(e) => {
+                          //   handleChange(e, telegramPriceId);
+                          // }}
+                          disabled
+                        />
+                        <label
+                          htmlFor="sevenroomsIntegrationCheckbox"
+                          className="checkbox-label"
+                        >
+                          Sevenrooms
+                        </label>
+                      </div>
+
+                      <div className="pricing coming-soon">
+                        <p>Coming Soon</p>
+                      </div>
+                    </div>
+                    {/* Mindbody */}
+                    <div className="checkbox hidden">
+                      <div className="check-label">
+                        <input
+                          type="checkbox"
+                          // defaultChecked={defaultChecked}
+                          checked={
+                            checkedIntegrations[
+                              interval === "year"
+                                ? telegramPriceIdYearly
+                                : telegramPriceIdMonthly
+                            ] || false
+                          }
+                          id="mindbodyIntegrationCheckbox"
+                          className="price-checkbox"
+                          // onChange={(e) => {
+                          //   handleChange(e, telegramPriceId);
+                          // }}
+                          disabled
+                        />
+                        <label
+                          htmlFor="mindbodyIntegrationCheckbox"
+                          className="checkbox-label"
+                        >
+                          Mindbody
+                        </label>
+                      </div>
+                      <div className="pricing coming-soon">
+                        <p>Coming Soon</p>
+                      </div>
+                    </div>
+                    {/* Hubspot */}
+                    <div className="checkbox hidden">
+                      <div className="check-label">
+                        <input
+                          type="checkbox"
+                          // defaultChecked={defaultChecked}
+                          checked={
+                            checkedIntegrations[
+                              interval === "year"
+                                ? telegramPriceIdYearly
+                                : telegramPriceIdMonthly
+                            ] || false
+                          }
+                          id="hubspotIntegrationCheckbox"
+                          className="price-checkbox"
+                          // onChange={(e) => {
+                          //   handleChange(e, telegramPriceId);
+                          // }}
+                          disabled
+                        />
+                        <label
+                          htmlFor="hubspotIntegrationCheckbox"
+                          className="checkbox-label"
+                        >
+                          Hubspot
+                        </label>
+                      </div>
+
+                      <div className="pricing coming-soon">
+                        <p>Coming Soon</p>
+                      </div>
+                    </div>
+                    {/* Zoho crm */}
+                    <div className="checkbox hidden">
+                      <div className="check-label">
+                        <input
+                          type="checkbox"
+                          // defaultChecked={defaultChecked}
+                          checked={
+                            checkedIntegrations[
+                              interval === "year"
+                                ? telegramPriceIdYearly
+                                : telegramPriceIdMonthly
+                            ] || false
+                          }
+                          id="zohocrmIntegrationCheckbox"
+                          className="price-checkbox"
+                          // onChange={(e) => {
+                          //   handleChange(e, telegramPriceId);
+                          // }}
+                          disabled
+                        />
+                        <label
+                          htmlFor="zohocrmIntegrationCheckbox"
+                          className="checkbox-label"
+                        >
+                          Zoho CRM
+                        </label>
+                      </div>
+
+                      <div className="pricing coming-soon">
+                        <p>Coming Soon</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="other-addons social-integration">
+                <div
+                  className="drop-down-icon"
+                  onClick={() => toggleDropdown("other")}
+                >
+                  {" "}
+                  <span>
+                    <Image src={ArrowDown} alt="arrow-down" />
+                  </span>
+                  Other Add-ons
+                </div>
+                {isOtherDropdownOpen && (
+                  <div
+                    className="dropdown-content"
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "baseline",
+                      width: "100%",
+                    }}
+                  >
+                    {/* Other Add-ons checkboxes */}
+
+                    {/* <div className="checkbox">
+                      <div className="check-label">
+                        <input
+                          type="checkbox"
+                          // defaultChecked={defaultChecked}
+                          checked={checkedIntegrations[onBoarding] || false}
+                          id="onboardingIntegrationCheckbox"
+                          className="price-checkbox"
+                          onChange={(e) => {
+                            handleChange(e, onBoarding);
+                          }}
+                        />
+                        <label
+                          htmlFor="onboardingIntegrationCheckbox"
+                          className="checkbox-label"
+                        >
+                          Onboarding
+                        </label>
+                      </div>
+
+                      <div className="pricing">
+                        <p>${addonPrices.onBoardingPrice ?? 0}</p>
+                      </div>
+                    </div> */}
+                    <div
+                      className={`checkbox  ${
+                        checkedIntegrations[msgSmall] ? "active-label" : ""
+                      }`}
+                    >
+                      <div className="check-label">
+                        <input
+                          type="checkbox"
+                          // defaultChecked={defaultChecked}
+                          checked={checkedIntegrations[msgSmall] || false}
+                          id="5kmessagesIntegrationCheckbox"
+                          className="price-checkbox"
+                          onChange={(e) => {
+                            handleChange(e, msgSmall);
+                          }}
+                        />
+                        <label
+                          htmlFor="5kmessagesIntegrationCheckbox"
+                          className="checkbox-label"
+                        >
+                          5K Messages
+                        </label>
+                      </div>
+
+                      <div className="pricing">
+                        <p>${addonPrices.msgSmallPrice ?? 0}</p>
+                      </div>
+                    </div>
+                    <div
+                      className={`checkbox  ${
+                        checkedIntegrations[msgLarge] ? "active-label" : ""
+                      }`}
+                    >
+                      <div className="check-label">
+                        <input
+                          type="checkbox"
+                          // defaultChecked={defaultChecked}
+                          checked={checkedIntegrations[msgLarge] || false}
+                          id="10kIntegrationCheckbox"
+                          className="price-checkbox"
+                          onChange={(e) => {
+                            handleChange(e, msgLarge);
+                          }}
+                        />
+                        <label
+                          htmlFor="10kIntegrationCheckbox"
+                          className="checkbox-label"
+                        >
+                          10K Messeges
+                        </label>
+                      </div>
+                      <div className="pricing">
+                        <p>${addonPrices.msgLargePrice ?? 0}</p>
+                      </div>
+                    </div>
+                    <div
+                      className={`checkbox  ${
+                        checkedIntegrations[
+                          interval === "year"
+                            ? trainingDataYearly
+                            : trainingDataMonthly
+                        ]
+                          ? "active-label"
+                          : ""
+                      }`}
+                    >
+                      <div className="check-label">
+                        <input
+                          type="checkbox"
+                          // defaultChecked={defaultChecked}
+                          checked={
+                            checkedIntegrations[
+                              interval === "year"
+                                ? trainingDataYearly
+                                : trainingDataMonthly
+                            ] || false
+                          }
+                          id="trainingIntegrationCheckbox"
+                          className="price-checkbox"
+                          onChange={(e) => {
+                            handleChange(
+                              e,
+                              interval === "year"
+                                ? trainingDataYearly
+                                : trainingDataMonthly
+                            );
+                          }}
+                        />
+                        <label
+                          htmlFor="trainingIntegrationCheckbox"
+                          className="checkbox-label"
+                        >
+                          Training Data(1M)
+                        </label>
+                      </div>
+
+                      <div className="pricing">
+                        <p>${addonPrices.trainingDataPrice ?? 0}</p>
+                      </div>
+                    </div>
+                    <div
+                      className={`checkbox  ${
+                        checkedIntegrations[
+                          interval === "year"
+                            ? conversationHistoryYearly
+                            : conversationHistoryMonthly
+                        ]
+                          ? "active-label"
+                          : ""
+                      }`}
+                    >
+                      <div className="check-label">
+                        <input
+                          type="checkbox"
+                          // defaultChecked={defaultChecked}
+                          checked={
+                            checkedIntegrations[
+                              interval === "year"
+                                ? conversationHistoryYearly
+                                : conversationHistoryMonthly
+                            ] || false
+                          }
+                          id="conversationhistoryIntegrationCheckbox"
+                          className="price-checkbox"
+                          onChange={(e) => {
+                            handleChange(
+                              e,
+                              interval === "year"
+                                ? conversationHistoryYearly
+                                : conversationHistoryMonthly
+                            );
+                          }}
+                        />
+                        <label
+                          htmlFor="conversationhistoryIntegrationCheckbox"
+                          className="checkbox-label"
+                        >
+                          Conversation History (3 Years)
+                        </label>
+                      </div>
+                      <div className="pricing">
+                        <p>${addonPrices.conversationHistoryPrice ?? 0}</p>
+                      </div>
+                    </div>
+                    <div
+                      className={`checkbox  ${
+                        checkedIntegrations[
+                          interval === "year" ? leadsYearly : leadsMonthly
+                        ]
+                          ? "active-label"
+                          : ""
+                      }`}
+                    >
+                      <div className="check-label">
+                        <input
+                          type="checkbox"
+                          // defaultChecked={defaultChecked}
+                          checked={
+                            checkedIntegrations[
+                              interval === "year" ? leadsYearly : leadsMonthly
+                            ] || false
+                          }
+                          id="leadIntegrationCheckbox"
+                          className="price-checkbox"
+                          onChange={(e) => {
+                            handleChange(
+                              e,
+                              interval === "year" ? leadsYearly : leadsMonthly
+                            );
+                          }}
+                        />
+                        <label
+                          htmlFor="leadIntegrationCheckbox"
+                          className="checkbox-label"
+                        >
+                          Lead (Unlimited) Individual
+                        </label>
+                      </div>
+                      <div className="pricing">
+                        <p>${addonPrices.leadsPrice ?? 0}</p>
+                      </div>
+                    </div>
+                    <div className="checkbox hidden">
+                      <div className="check-label">
+                        <input
+                          type="checkbox"
+                          // defaultChecked={defaultChecked}
+                          // checked={checkedIntegrations[telegramPriceId] || false}
+                          id="sentimetIntegrationCheckbox"
+                          className="price-checkbox"
+                          // onChange={(e) => {
+                          //   handleChange(e, telegramPriceId);
+                          // }}
+                        />
+                        <label
+                          htmlFor="sentimetIntegrationCheckbox"
+                          className="checkbox-label"
+                        >
+                          Sentiment Dashbaord
+                        </label>
+                      </div>
+                      <div className="pricing coming-soon">
+                        <p>Coming soon</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* )} */}
+              <div className="bottom-left">
+                <div className="total">Total</div>
+                <div className="total-price">${Number(totalPrice)}</div>
+              </div>
             </div>
-          </div>
-          <div className="right white-right">
-            <div className="right-top">Pay with Card</div>
-            <div className="card-element">
-              <label className="card-label">Card Number</label>
-              <div className="cardNumber">
-                <CardNumberElement onChange={handleCardInputChange} />
+            <div className="right white-right">
+              <div className="right-top">Pay with Card</div>
+              <div className="card-element">
+                <label className="card-label">Card Number</label>
+                <div className="cardNumber">
+                  <CardNumberElement onChange={handleCardInputChange} />
+                </div>
+                <label className="card-label">Card Expiry</label>
+                <div className="cardExpiry">
+                  <CardExpiryElement onChange={handleCardInputChange} />
+                </div>
+                <label className="card-label">Card CVC</label>
+                <div className="cardCvc">
+                  <CardCvcElement onChange={handleCardInputChange} />
+                </div>
               </div>
-              <label className="card-label">Card Expiry</label>
-              <div className="cardExpiry">
-                <CardExpiryElement onChange={handleCardInputChange} />
-              </div>
-              <label className="card-label">Card CVC</label>
-              <div className="cardCvc">
-                <CardCvcElement onChange={handleCardInputChange} />
-              </div>
-            </div>
-            {/* <form onSubmit={handleSubmit}>
+              {/* <form onSubmit={handleSubmit}>
               <CardElement onChange={handleCardInputChange} />
             </form> */}
-            {error && <div>{error}</div>}
-            <Button
-              className="btn-card-submit"
-              // type="submit"
-              disabled={!stripe && disabled}
-              onClick={handleSubmit}
-              loading={paymentLoading}
-              style={{ display: "flex" }}
-            >
-              Subscribe
-            </Button>
-          </div>
-        </form>
-      </div>
-      {/* )} */}
+              {error && <div>{error}</div>}
+              <Button
+                className="btn-card-submit"
+                // type="submit"
+                disabled={!stripe && disabled}
+                onClick={handleSubmit}
+                loading={paymentLoading}
+                style={{ display: "flex" }}
+              >
+                Subscribe
+              </Button>
+            </div>
+          </form>
+        </div>
+      )}
     </>
   );
 }
