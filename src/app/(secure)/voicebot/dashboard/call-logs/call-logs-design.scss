@@ -27,6 +27,7 @@
 
     display: flex;
     width: 100%;
+    gap: 2.5rem;
 
     .left-container {
       display: flex;
@@ -104,6 +105,113 @@
 
     .right-container{
       width: 70%;
-    }
+      display: flex;
+      gap: 1.5rem;
+      flex-direction: column;
+      .recording-panel{
+        display: flex;
+        flex-direction: column;
+        .title{
+          color:  #23262F;
+          /* Subtitle/Large */
+          // font-family: "General Sans";
+          font-size: 20px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 28px;
+        }
+
+        .description{
+          color:  #777E90;
+          font-size: 14px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 24px;
+        }
+
+        .recording-area{
+          margin-top: 1rem;
+          border-radius: 16px;
+          border: 1px solid  #99AEF9;
+          >div:first-child{
+            padding: 16px 0px;
+          }
+        }
+
+        .buttons-wrapper{
+          margin-top: 1rem;
+          display: flex;
+          gap: 2rem;
+          .play-pause{
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            button{
+              border: none;
+              padding: 0;
+              margin: 0;
+            }
+            .button-text{
+              color: #353945;
+                /* Body/Medium */
+              font-size: 16px;
+              font-style: normal;
+              font-weight: 500;
+              line-height: 24px;
+            }
+          }
+          .download-btn{
+            border: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            .download-text{
+              color: #2E58EA;
+              font-size: 16px;
+              font-style: normal;
+              font-weight: 600;
+              line-height: 28px;
+            }
+          }
+        }
+
+      }
+            .logs-transcript {
+              border-radius: 16px;
+              border: 1px solid  #E6E8EC;
+              display: flex;
+              width: 795px;
+              padding: 20px;
+              flex-direction: column;
+              align-items: flex-start;
+              gap: 16px;
+            
+              .ant-tabs-nav-list {
+                gap: 2.5rem;
+                .ant-tabs-tab-btn {
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  gap: 12px;
+                }
+
+                .ant-tabs-tab-icon{
+                  display: flex;
+                }
+      
+                span:not(ant-tabs-tab-icon) {
+                  color: #2E58EA;
+                  font-size: 16px;
+                  font-style: normal;
+                  font-weight: 500;
+                  line-height: 24px;
+                }
+              }
+      
+            }
+            }
   }
 }

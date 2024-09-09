@@ -6,7 +6,7 @@ import React, {
   useCallback,
 } from 'react';
 import "./call-logs-design.scss";
-import { Input, Slider, Switch, Button, Pagination } from 'antd';
+import { Input, Slider, Switch, Button, Pagination, Tabs } from 'antd';
 import Image from 'next/image';
 import { useWavesurfer } from '@wavesurfer/react';
 import Timeline from 'wavesurfer.js/dist/plugins/timeline.esm.js';
@@ -17,6 +17,15 @@ import resumeCall from '../../../../../../public/voiceBot/SVG/sound.svg';
 import download from '../../../../../../public/voiceBot/SVG/document-download.svg';
 import recording from '../../../../../../public/voiceBot/SVG/Mask group.svg';
 import play from '../../../../../../public/voiceBot/SVG/play.svg';
+import playCircle from '../../../../../../public/voiceBot/SVG/play-circle.svg';
+import pauseCircle from '../../../../../../public/voiceBot/SVG/pause-circle.svg';
+
+import messageText from '../../../../../../public/voiceBot/SVG/message-text.svg';
+import messageTextColor from '../../../../../../public/voiceBot/SVG/message-text-colored.svg';
+
+import clock from '../../../../../../public/voiceBot/SVG/clock.svg';
+import shadeClock from '../../../../../../public/voiceBot/SVG/clock-shade.svg';
+
 import pause from '../../../../../../public/voiceBot/SVG/pause.svg';
 
 import { Flex, Modal, message, Spin } from 'antd';
@@ -44,6 +53,7 @@ type ListCallResponse = {
 };
 
 
+
 function CallLogs() {
   const [loading, setLoading] = useState<boolean>(false);
   const contacts = [
@@ -54,6 +64,27 @@ function CallLogs() {
     { id: 5, phone: '+84 (353) 085 867', email: 'tuan@sapakh.ai', toggle: false }
 
   ];
+
+  const Log_Transcriber_Data = [
+    {
+      id: 1,
+      image: clock,
+      image2: shadeClock,
+      name: "Logs",
+      children:"Logs Div"
+    },
+    {
+      id: 2,
+      image: messageText,
+      image2: messageTextColor,
+      name: "Transcriber",
+      children:"Transcriber Div"
+    }
+  ]
+
+  let logImageToShow = Log_Transcriber_Data[0].image;
+  let transcriberImageToShow = Log_Transcriber_Data[1].image;
+
   let activeLog = 2;
   const callLogIds = [
     {
@@ -90,15 +121,32 @@ function CallLogs() {
   const [callListData, setCallListData] = useState<ListCallResponse>();
   const containerRef = useRef(null);
 
+  const [activeKey, setActiveKey] = useState("");
+
   const { wavesurfer, isPlaying, currentTime, isReady } = useWavesurfer({
     container: containerRef,
-    height: 100,
-    waveColor: '#7c53efd5',
-    progressColor: '#4d03c5',
-    url: callListData?.recordingUrl,
+    height: 80,
+    waveColor: '#869ae1',
+    progressColor: '#4D72F5',
+    url: "https://auth.vapi.ai/storage/v1/object/public/recordings/fbadc714-a0d8-46af-b1bd-016b03c4d454-1725462488293-b330180c-2642-4ced-97c9-34d895095736-mono.wav",
     dragToSeek: true,
     plugins: useMemo(() => [Timeline.create()], []),
   });
+
+  wavesurfer?.on('ready', (data: any) => {
+    console.log('on ready ', data);
+    // wavesurfer.setTime(1)
+  });
+
+  const onPlayPause = useCallback(() => {
+    wavesurfer && wavesurfer.playPause();
+  }, [wavesurfer]);
+
+  const onTabChange = (newActiveKey: string) => {
+    setActiveKey(newActiveKey);
+  };
+
+  console.log("state active key ", activeKey);
 
 
   return (
@@ -116,9 +164,9 @@ function CallLogs() {
           <div className='list-items'>
             {
               contacts.map((contact, index) => (
-                <>
+                <div key={index}>
                   {index !== 0 && <hr className="splitter" />}
-                  <div className='list-item'>
+                  <div className='list-item' >
                     <div className='number-details'>
                       <h2 className='date'> 12, June 2024 </h2>
                       <p>  12 min </p>
@@ -127,7 +175,7 @@ function CallLogs() {
                       <h3>customer ended the call</h3>
                     </div>
                   </div>
-                </>
+                </div>
 
               ))
             }
@@ -138,7 +186,44 @@ function CallLogs() {
         </div>
 
         <div className="right-container">
-
+          <div className="recording-panel">
+            <h3 className='title'>Call Logs</h3>
+            <p className='description'>This section allows you to configure the model for the assistant.</p>
+            <div className="recording-area">
+              <div ref={containerRef}></div>
+            </div>
+            <div className='buttons-wrapper'>
+              <div className='play-pause'>
+                <Button>
+                  <Image alt="phone-call" src={playCircle}></Image>
+                </Button>
+                <span className="button-text">0:00</span>
+              </div>
+            
+              <Button className='download-btn'>
+                <Image alt='downlaod' src={download}></Image>
+                <span className='download-text'>Download</span>
+              </Button>
+            </div>
+          </div>
+          <div className="logs-transcript">
+            <Tabs
+              defaultActiveKey="1"
+              items={Log_Transcriber_Data.map((Icon, i) => {
+                const id:string = String(Icon.id);
+                return {
+                  key: id,
+                  label: ` ${Icon.name}`,
+                  children: `${Icon.children}`,
+                  icon: <Image alt="Icon-Image" src={activeKey === "1" ? Icon.image : Icon.image2}></Image>,
+                };
+              },
+              
+              )}
+              onChange={onTabChange}
+             
+            />
+          </div>
         </div>
 
       </div>
