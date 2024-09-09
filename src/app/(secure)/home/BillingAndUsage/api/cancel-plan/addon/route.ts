@@ -16,7 +16,7 @@ async function delPlan(req: any, res: NextResponse) {
     const stripe = new Stripe(stripeKey);
 
     const db = (await clientPromise!)?.db();
-    let { u_id } = await req.json();
+    let { u_id, price_id } = await req.json();
     const collectionUser = db.collection("users");
     const userData = await collectionUser.findOne({
       _id: new ObjectId(u_id),
@@ -28,29 +28,56 @@ async function delPlan(req: any, res: NextResponse) {
       return { msg: "Subscription not found", status: 0 };
     }
 
+    // Retrieve the current subscription
+    const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+
+    // Find the subscription item that matches the price_id
+    const subscriptionItem: any = subscription.items.data.find(
+      (item) => item.price.id === price_id
+    );
+
+    if (!subscriptionItem) {
+      return { msg: "Plan not found", status: 0 };
+    }
+
+    // const productId: string = subscriptionItem.plan.product;
+
+    // const product = await stripe.products.retrieve(productId);
+    // console.log("jjjjjjjjjjjjj", product);
+
     //ANCHOR -  DELETE PLAN FROM USER DETAILS
 
-    // Schedule cancellation at the end of the billing period
+    const updatedItems = subscription.items.data.map((item) => {
+      if (item.price.id === price_id) {
+        // Mark this item for removal
+        return { id: item.id, quantity: 0 };
+      }
+      return { id: item.id, quantity: item.quantity };
+    });
+
+    if (updatedItems.length === 0) {
+      return {
+        msg: "Cannot remove all items from the subscription",
+        status: 0,
+      };
+    }
+
+    // Update subscription with only the remaining items after the billing period ends
     const updatedSubscription = await stripe.subscriptions.update(
-      subscriptionId,
+      userData.subId,
       {
-        cancel_at_period_end: true,
+        proration_behavior: "none", // Prevent immediate changes
+        items: updatedItems, // Keep remaining subscription items
       }
     );
 
-    const deletePlan = await collectionUser.updateMany(
-      { _id: new ObjectId(u_id) },
-      {
-        $set: {
-          status: "cancel",
-          nextIsWhatsapp: false,
-        },
-      }
-    );
+    if (!updatedSubscription) {
+      return { msg: "subscription was not updated", status: 0 };
+    }
 
     return { msg: "Plan deleted successfully", status: true };
   } catch (error) {
-    return { msg: "finding error", status: 0 };
+    return { msg: "finding error", status: 0, error };
   }
 }
 

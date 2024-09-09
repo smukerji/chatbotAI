@@ -67,6 +67,20 @@ function AddOnsDetail() {
     return addonData?.some((item: any) => item.id === planId);
   };
 
+  const cancelAddon = async (priceId: any) => {
+    try {
+      const response = await axios.put(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/BillingAndUsage/api/cancel-plan/addon`,
+        {
+          u_id: cookies.userId,
+          price_id: priceId,
+        }
+      );
+
+      console.log(">>>>>>>>>>>>>", response.data);
+    } catch (error) {}
+  };
+
   const fetchAddonDetail = async () => {
     try {
       const response = await axios.post(
@@ -129,14 +143,25 @@ function AddOnsDetail() {
                     <div className="next-renewal-date-text">
                       Auto Renewal due on
                     </div>
-                    <div className="next-renewal-date-date">{"03/04/24"}</div>
+                    <div className="next-renewal-date-date">{endDate}</div>
                   </div>
                 )}
               </div>
               {/* <Button className="pricing-button">Get Add-on</Button> */}
               {isPlanActive(whatsappPriceIdMonthly) ||
               isPlanActive(whatsappPriceIdYearly) ? (
-                <p className="cancel-plan">Cancel</p>
+                <p
+                  className="cancel-plan"
+                  onClick={() =>
+                    cancelAddon(
+                      interval === "month"
+                        ? whatsappPriceIdMonthly
+                        : whatsappPriceIdYearly
+                    )
+                  }
+                >
+                  Cancel
+                </p>
               ) : (
                 <button className="app-integration-price-btn">
                   <span className="app-integration-price-btn-text">
@@ -172,14 +197,25 @@ function AddOnsDetail() {
                     <div className="next-renewal-date-text">
                       Auto Renewal due on
                     </div>
-                    <div className="next-renewal-date-date">{"03/04/24"}</div>
+                    <div className="next-renewal-date-date">{endDate}</div>
                   </div>
                 )}
               </div>
               {/* <Button className="pricing-button">Get Add-on</Button> */}
               {isPlanActive(telegramPriceIdMonthly) ||
               isPlanActive(telegramPriceIdYearly) ? (
-                <p className="cancel-plan">Cancel</p>
+                <p
+                  className="cancel-plan"
+                  onClick={() =>
+                    cancelAddon(
+                      interval === "month"
+                        ? telegramPriceIdMonthly
+                        : telegramPriceIdYearly
+                    )
+                  }
+                >
+                  Cancel
+                </p>
               ) : (
                 <button className="app-integration-price-btn">
                   <span className="app-integration-price-btn-text">
@@ -215,14 +251,25 @@ function AddOnsDetail() {
                     <div className="next-renewal-date-text">
                       Auto Renewal due on
                     </div>
-                    <div className="next-renewal-date-date">{"03/04/24"}</div>
+                    <div className="next-renewal-date-date">{endDate}</div>
                   </div>
                 )}
               </div>
               {/* <Button className="pricing-button">Get Add-on</Button> */}
               {isPlanActive(slackPriceIdMonthly) ||
               isPlanActive(slackPriceIdYearly) ? (
-                <p className="cancel-plan">Cancel</p>
+                <p
+                  className="cancel-plan"
+                  onClick={() =>
+                    cancelAddon(
+                      interval === "month"
+                        ? slackPriceIdMonthly
+                        : slackPriceIdYearly
+                    )
+                  }
+                >
+                  Cancel
+                </p>
               ) : (
                 <button className="app-integration-price-btn">
                   <span className="app-integration-price-btn-text">
@@ -258,14 +305,25 @@ function AddOnsDetail() {
                     <div className="next-renewal-date-text">
                       Auto Renewal due on
                     </div>
-                    <div className="next-renewal-date-date">{"03/04/24"}</div>
+                    <div className="next-renewal-date-date">{endDate}</div>
                   </div>
                 )}
               </div>
               {/* <Button className="pricing-button">Get Add-on</Button> */}
               {isPlanActive(trainingDataMonthly) ||
               isPlanActive(trainingDataYearly) ? (
-                <p className="cancel-plan">Cancel</p>
+                <p
+                  className="cancel-plan"
+                  onClick={() =>
+                    cancelAddon(
+                      interval === "month"
+                        ? trainingDataMonthly
+                        : trainingDataYearly
+                    )
+                  }
+                >
+                  Cancel
+                </p>
               ) : (
                 <button className="app-integration-price-btn">
                   <span className="app-integration-price-btn-text">
@@ -299,13 +357,18 @@ function AddOnsDetail() {
                     <div className="next-renewal-date-text">
                       Auto Renewal due on
                     </div>
-                    <div className="next-renewal-date-date">{"03/04/24"}</div>
+                    <div className="next-renewal-date-date">{endDate}</div>
                   </div>
                 )}
               </div>
               {/* <Button className="pricing-button">Get Add-on</Button> */}
               {isPlanActive(msgSmall) ? (
-                <p className="cancel-plan">Cancel</p>
+                <p
+                  className="cancel-plan"
+                  onClick={() => cancelAddon(msgSmall)}
+                >
+                  Cancel
+                </p>
               ) : (
                 <button className="app-integration-price-btn">
                   <span className="app-integration-price-btn-text">
@@ -339,13 +402,18 @@ function AddOnsDetail() {
                     <div className="next-renewal-date-text">
                       Auto Renewal due on
                     </div>
-                    <div className="next-renewal-date-date">{"03/04/24"}</div>
+                    <div className="next-renewal-date-date">{endDate}</div>
                   </div>
                 )}
               </div>
               {/* <Button className="pricing-button">Get Add-on</Button> */}
               {isPlanActive(msgLarge) ? (
-                <p className="cancel-plan">Cancel</p>
+                <p
+                  className="cancel-plan"
+                  onClick={() => cancelAddon(msgLarge)}
+                >
+                  Cancel
+                </p>
               ) : (
                 <button className="app-integration-price-btn">
                   <span className="app-integration-price-btn-text">
@@ -381,14 +449,25 @@ function AddOnsDetail() {
                     <div className="next-renewal-date-text">
                       Auto Renewal due on
                     </div>
-                    <div className="next-renewal-date-date">{"03/04/24"}</div>
+                    <div className="next-renewal-date-date">{endDate}</div>
                   </div>
                 )}
               </div>
               {/* <Button className="pricing-button">Get Add-on</Button> */}
               {isPlanActive(conversationHistoryMonthly) ||
               isPlanActive(conversationHistoryYearly) ? (
-                <p className="cancel-plan">Cancel</p>
+                <p
+                  className="cancel-plan"
+                  onClick={() =>
+                    cancelAddon(
+                      interval === "month"
+                        ? conversationHistoryMonthly
+                        : conversationHistoryYearly
+                    )
+                  }
+                >
+                  Cancel
+                </p>
               ) : (
                 <button className="app-integration-price-btn">
                   <span className="app-integration-price-btn-text">
@@ -423,13 +502,22 @@ function AddOnsDetail() {
                     <div className="next-renewal-date-text">
                       Auto Renewal due on
                     </div>
-                    <div className="next-renewal-date-date">{"03/04/24"}</div>
+                    <div className="next-renewal-date-date">{endDate}</div>
                   </div>
                 )}
               </div>
               {/* <Button className="pricing-button">Get Add-on</Button> */}
               {isPlanActive(leadsMonthly) || isPlanActive(leadsYearly) ? (
-                <p className="cancel-plan">Cancel</p>
+                <p
+                  className="cancel-plan"
+                  onClick={() =>
+                    cancelAddon(
+                      interval === "month" ? leadsMonthly : leadsYearly
+                    )
+                  }
+                >
+                  Cancel
+                </p>
               ) : (
                 <button className="app-integration-price-btn">
                   <span className="app-integration-price-btn-text">

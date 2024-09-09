@@ -63,12 +63,10 @@ export async function POST(req: any, res: any) {
         for (const planId of planIds) {
           console.log(`Processing planId: ${planId}`);
 
-          const planData = await collectionPlan.findOne({ priceId: planId });
-
-          if (!planData) {
-            console.error(`Plan data not found for priceId: ${planId}`);
-            continue;
-          }
+          // if (!planData) {
+          //   console.error(`Plan data not found for priceId: ${planId}`);
+          //   continue;
+          // }
 
           if (planId === process.env.NEXT_PUBLIC_WHATSAPP_PLAN_ID_MONTHLY) {
             await collection.updateOne(
@@ -104,6 +102,11 @@ export async function POST(req: any, res: any) {
               }
             );
           } else if (planId === process.env.NEXT_PUBLIC_MESSAGESMALL_PLAN_ID) {
+            const planData = await collectionPlan.findOne({ priceId: planId });
+            const Details = await collectionDetails.findOne({
+              userId: String(userData._id),
+            });
+
             await collectionDetails.updateMany(
               { userId: String(userData._id) },
               {
@@ -115,6 +118,11 @@ export async function POST(req: any, res: any) {
               }
             );
           } else if (planId === process.env.NEXT_PUBLIC_MESSAGELARGE_PLAN_ID) {
+            const planData = await collectionPlan.findOne({ priceId: planId });
+            const Details = await collectionDetails.findOne({
+              userId: String(userData._id),
+            });
+
             await collectionDetails.updateMany(
               { userId: String(userData._id) },
               {
@@ -126,6 +134,12 @@ export async function POST(req: any, res: any) {
               }
             );
           } else if (planId === process.env.NEXT_PUBLIC_TRAINING_DATA_MONTHLY) {
+            const planData = await collectionPlan.findOne({ priceId: planId });
+
+            const Details = await collectionDetails.findOne({
+              userId: String(userData._id),
+            });
+
             await collectionDetails.updateMany(
               { userId: String(userData._id) },
               {
@@ -137,6 +151,12 @@ export async function POST(req: any, res: any) {
               }
             );
           } else if (planId === process.env.NEXT_PUBLIC_LEADS_MONTHLY) {
+            const planData = await collectionPlan.findOne({ priceId: planId });
+
+            const Details = await collectionDetails.findOne({
+              userId: String(userData._id),
+            });
+
             await collectionDetails.updateMany(
               { userId: String(userData._id) },
               {
@@ -151,6 +171,12 @@ export async function POST(req: any, res: any) {
           } else if (
             planId === process.env.NEXT_PUBLIC_CONVERSATION_HISTORY_MONTHLY
           ) {
+            const planData = await collectionPlan.findOne({ priceId: planId });
+
+            const Details = await collectionDetails.findOne({
+              userId: String(userData._id),
+            });
+
             await collectionDetails.updateMany(
               { userId: String(userData._id) },
               {

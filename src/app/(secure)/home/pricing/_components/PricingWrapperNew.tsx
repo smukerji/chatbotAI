@@ -45,7 +45,7 @@ function PricingWrapperNew() {
     const a = encryptPriceId(priceId);
     const encryptedPriceId = encodeURIComponent(a);
 
-    router.push(`/home/pricing/dummy-checkout?priceId=${encryptedPriceId}`);
+    router.push(`/home/pricing/plan-checkout?priceId=${encryptedPriceId}`);
   }
 
   const checkPlan = async () => {

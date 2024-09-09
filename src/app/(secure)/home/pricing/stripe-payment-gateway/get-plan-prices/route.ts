@@ -18,14 +18,14 @@ async function getPlanPrices(req: any, res: NextResponse) {
     const stripeKey: any = process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY;
     const stripe = new Stripe(stripeKey);
 
-    const priceId = data.stripePlanId;
+    // const priceId = data.stripePlanId;
 
-    if (!priceId) {
-      return {
-        status: 400,
-        message: "No plan found",
-      };
-    }
+    // if (!priceId) {
+    //   return {
+    //     status: 400,
+    //     message: "No plan found",
+    //   };
+    // }
 
     const allPrices = await stripe.prices.list({ limit: 100 });
 

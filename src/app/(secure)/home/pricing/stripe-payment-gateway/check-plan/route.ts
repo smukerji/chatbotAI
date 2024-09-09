@@ -27,7 +27,7 @@ async function checkCurrentPlan(req: any, res: NextResponse) {
 
   if (!priceId) {
     return {
-      status: 400,
+      status: 200,
       message: "No plan found",
     };
   }

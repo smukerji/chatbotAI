@@ -13,6 +13,7 @@ import Loader from "./Loader";
 import ArrowDown from "../../../../../../public/svgs/arrow-down-bold.svg";
 import Image from "next/image";
 import { useCookies } from "react-cookie";
+import DangerIcon from "../../../../../../public/svgs/danger.svg";
 
 const whatsappPriceIdMonthly: any =
   process.env.NEXT_PUBLIC_WHATSAPP_PLAN_ID_MONTHLY;
@@ -67,6 +68,12 @@ function DummyPaymentMethod({
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [prices, setPrices] = useState([]);
   const [interval, setInterval] = useState("");
+  const [cardErrors, setCardErrors] = useState({
+    cardNumber: "",
+    expiryDate: "",
+    cvc: "",
+    paymentFailed: false,
+  });
   const [addonPrices, setAddonPrices] = useState<any>({
     msgSmallPrice: null,
     msgLargePrice: null,
@@ -108,6 +115,31 @@ function DummyPaymentMethod({
     // and display errors, if any, to the user
     // Also control the disabled state of the submit button
     // if the input field is empty
+    console.log("coming insidesss ", event);
+
+    if (event.elementType === "cardNumber") {
+      setCardErrors((prev) => {
+        return {
+          ...prev,
+          cardNumber: event?.error?.message ?? "",
+        };
+      });
+    } else if (event.elementType === "cardExpiry") {
+      setCardErrors((prev) => {
+        return {
+          ...prev,
+          expiryDate: event?.error?.message ?? "",
+        };
+      });
+    } else if (event.elementType === "cardCvc") {
+      setCardErrors((prev) => {
+        return {
+          ...prev,
+          cvc: event?.error?.message ?? "",
+        };
+      });
+    }
+
     setDisabled(event?.empty);
     setError(event?.error?.message ?? "");
   }
@@ -123,18 +155,20 @@ function DummyPaymentMethod({
   async function handleSubmit(event: any) {
     try {
       event.preventDefault();
-      setLoading(true); // Start loader
+      // setLoading(true); // Start loader
       setPaymentLoading(true);
 
       if (!stripe || !elements) {
         // Stripe.js has not loaded yet.
-        setLoading(false);
+        // setLoading(false);
+        setPaymentLoading(false);
         return;
       }
 
       const cardElement = elements.getElement(CardNumberElement);
       if (!cardElement) {
-        setLoading(false);
+        // setLoading(false);
+        setPaymentLoading(false);
         setError("Card element not found");
         return;
       }
@@ -155,19 +189,25 @@ function DummyPaymentMethod({
       );
 
       if (stripePayload.error) {
-        setError(
-          stripePayload.error.message ?? "Payment failed. Please try again."
-        );
-        setLoading(false);
+        // setError(
+        //   stripePayload.error.message ?? "Payment failed. Please try again."
+        // );
+        setCardErrors((prev) => {
+          return {
+            ...prev,
+            paymentFailed: true,
+          };
+        });
+        // setLoading(false);
         setPaymentLoading(false);
       } else {
         // setSuccess("Payment succeeded! Thank you for your purchase.");
         message.success("Payment succeeded! Thank you for your purchase.");
-        setLoading(false);
+        // setLoading(false);
         setPaymentLoading(false);
       }
     } catch (error) {
-      setLoading(false);
+      // setLoading(false);
       setPaymentLoading(false);
       console.log("error", error);
     }
@@ -193,6 +233,7 @@ function DummyPaymentMethod({
     }
   };
 
+  // fetch already subscribed product details
   const fetchProductDetail = async (id: string) => {
     try {
       // setLoading(true);
@@ -211,6 +252,7 @@ function DummyPaymentMethod({
     }
   };
 
+  // fetch all products prices
   const fetchPrices = async () => {
     try {
       setLoading(true);
@@ -926,19 +968,32 @@ function DummyPaymentMethod({
                 <div className="cardNumber">
                   <CardNumberElement onChange={handleCardInputChange} />
                 </div>
+                {cardErrors.cardNumber && (
+                  <div className="card-error cvc-error">
+                    {cardErrors.cardNumber}
+                  </div>
+                )}
                 <label className="card-label">Card Expiry</label>
                 <div className="cardExpiry">
                   <CardExpiryElement onChange={handleCardInputChange} />
                 </div>
+                {cardErrors.expiryDate && (
+                  <div className="card-error cvc-error">
+                    {cardErrors.expiryDate}
+                  </div>
+                )}
                 <label className="card-label">Card CVC</label>
                 <div className="cardCvc">
                   <CardCvcElement onChange={handleCardInputChange} />
                 </div>
+                {cardErrors.cvc && (
+                  <div className="card-error cvc-error">{cardErrors.cvc}</div>
+                )}
               </div>
               {/* <form onSubmit={handleSubmit}>
               <CardElement onChange={handleCardInputChange} />
             </form> */}
-              {error && <div>{error}</div>}
+
               <Button
                 className="btn-card-submit"
                 // type="submit"
@@ -949,6 +1004,20 @@ function DummyPaymentMethod({
               >
                 Subscribe
               </Button>
+
+              {cardErrors.paymentFailed && (
+                <div className="payment-failed">
+                  <div>
+                    <Image src={DangerIcon} alt="danger" />
+                  </div>
+                  <div>
+                    <p className="title">Payment failed</p>
+                    <p className="description">
+                      Payment failed. Please try again.
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </form>
         </div>
