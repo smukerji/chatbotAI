@@ -82,8 +82,6 @@ function CallLogs() {
     }
   ]
 
-  let logImageToShow = Log_Transcriber_Data[0].image;
-  let transcriberImageToShow = Log_Transcriber_Data[1].image;
 
   let activeLog = 2;
   const callLogIds = [

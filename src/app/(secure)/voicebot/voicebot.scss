@@ -40,7 +40,7 @@
           .heading_title{
             // width: 135px;
               color:  #23262F;
-              font-family: "General Sans";
+              // font-family: "General Sans";
               font-size: 16px;
               font-style: normal;
               font-weight: 600;
@@ -51,7 +51,7 @@
           .heading_description{
             color:  #23262F;
               /* Body/Small */
-              font-family: "General Sans";
+              // font-family: "General Sans";
               font-size: 14px;
               font-style: normal;
               font-weight: 500;
@@ -129,9 +129,17 @@
             gap: 80px;
             .previous-button{
                padding-left: 10px;
+               border: none;
               .arrow-left{
                 width: 24px;
                   height: 24px;
+              }
+              .previous-button-text{
+                color:  #23262F;
+                font-size: 16px;
+                font-style: normal;
+                font-weight: 500;
+                line-height: 24px;
               }
             }
     }
@@ -143,7 +151,7 @@
     // background: violet;
 
     .main-voiceboot__title {
-      font-family: "General Sans";
+      // font-family: "General Sans";
       font-size: 36px;
       font-style: normal;
       font-weight: 600;
@@ -152,7 +160,7 @@
 
     .main-voiceboot__subtitle {
       color: #777E90;
-      font-family: "General Sans";
+      // font-family: "General Sans";
       font-size: 16px;
       font-style: normal;
       font-weight: 500;
@@ -209,7 +217,7 @@
 
             .card_header {
               color: #000;
-              font-family: "General Sans";
+              // font-family: "General Sans";
               font-size: 16px;
               font-style: normal;
               font-weight: 600;
@@ -231,7 +239,7 @@
 
           .card_sub-header {
             color: #777E90;
-            font-family: "General Sans";
+            // font-family: "General Sans";
             font-size: 16px;
             font-style: normal;
             font-weight: 500;
@@ -277,7 +285,7 @@
           }
 
           .card_sub-header {
-            font-family: "General Sans";
+            // font-family: "General Sans";
             font-size: 16px;
             font-style: normal;
             font-weight: 500;

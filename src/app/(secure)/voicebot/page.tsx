@@ -73,7 +73,7 @@ export default function VoiceBot() {
             <Image className="arrow-left" alt="left arrow" src={leftArrow} width={100} height={100}>
 
             </Image>
-            <span>
+            <span className="previous-button-text">
               Previous
             </span>
           </Button>
