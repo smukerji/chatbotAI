@@ -43,6 +43,8 @@ const createSubscription = async (req: any, res: NextApiResponse) => {
         0
       ),
       clientSecret: paymentIntent.client_secret,
+      invoice: subscription.latest_invoice.id,
+      createDate: subscription.start_date,
     };
   } catch (e) {
     console.error(e);

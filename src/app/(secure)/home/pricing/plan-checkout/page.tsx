@@ -24,6 +24,7 @@ const stripePromise = loadStripe(
 function page() {
   const searchParams = useSearchParams();
   const a: any = searchParams ? searchParams.get("priceId") : null;
+  const source: any = searchParams ? searchParams.get("source") : null;
   const encryptedPriceId = decodeURIComponent(a);
   const [loader, setLoader] = useState(true);
   const [subscriptionDetail, setSubscriptionDetail]: any = useState();
@@ -107,6 +108,7 @@ function page() {
               interval={subscriptionDetail?.interval}
               customerId={customerId}
               priceId={priceId}
+              source={source}
             />
           )}
         </Elements>

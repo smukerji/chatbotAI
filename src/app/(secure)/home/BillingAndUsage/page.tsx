@@ -223,7 +223,12 @@ function BillingAndUsage() {
                 Cancel My Plan
               </p>
               <button className="btn-upgrade" onClick={explorePlan}>
-                <span className="btn-text">Upgrade Plan</span>
+                <span
+                  className="btn-text"
+                  onClick={() => router.push("/home/pricing")}
+                >
+                  Upgrade Plan
+                </span>
               </button>
             </div>
           </div>

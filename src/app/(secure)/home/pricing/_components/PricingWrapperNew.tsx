@@ -48,6 +48,15 @@ function PricingWrapperNew() {
     router.push(`/home/pricing/plan-checkout?priceId=${encryptedPriceId}`);
   }
 
+  async function handleAddonClick(priceId: string) {
+    const a = encryptPriceId(priceId);
+    const encryptedPriceId = encodeURIComponent(a);
+
+    router.push(
+      `/home/pricing/plan-checkout?priceId=${encryptedPriceId}&source=addon`
+    );
+  }
+
   const checkPlan = async () => {
     try {
       setLoading(true);
@@ -160,7 +169,11 @@ function PricingWrapperNew() {
           />
         </div>
 
-        <PricingAddons pricing={prices} />
+        <PricingAddons
+          pricing={prices}
+          isYearlyPlan={isYearlyPlan}
+          handleAddonClick={(priceId: string) => handleAddonClick(priceId)}
+        />
       </div>
     </>
   );
