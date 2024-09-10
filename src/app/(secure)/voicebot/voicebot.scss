@@ -37,26 +37,27 @@
 
         .selected-assistant-header {
           margin-left: 8px;
-          .heading_title{
+
+          .heading_title {
             // width: 135px;
-              color:  #23262F;
-              // font-family: "General Sans";
-              font-size: 16px;
-              font-style: normal;
-              font-weight: 600;
-              // display: inline-block;
-              line-height: 24px;
+            color: #23262F;
+            // font-family: "General Sans";
+            font-size: 16px;
+            font-style: normal;
+            font-weight: 600;
+            // display: inline-block;
+            line-height: 24px;
           }
 
-          .heading_description{
-            color:  #23262F;
-              /* Body/Small */
-              // font-family: "General Sans";
-              font-size: 14px;
-              font-style: normal;
-              font-weight: 500;
-              line-height: 24px;
-              /* 171.429% */
+          .heading_description {
+            color: #23262F;
+            /* Body/Small */
+            // font-family: "General Sans";
+            font-size: 14px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 24px;
+            /* 171.429% */
           }
         }
       }
@@ -122,26 +123,37 @@
 
     }
 
-    .navigation-button{
-         
+    .navigation-button {
+
       margin-top: auto;
-          display: flex;
-            gap: 80px;
-            .previous-button{
-               padding-left: 10px;
-               border: none;
-              .arrow-left{
-                width: 24px;
-                  height: 24px;
-              }
-              .previous-button-text{
-                color:  #23262F;
-                font-size: 16px;
-                font-style: normal;
-                font-weight: 500;
-                line-height: 24px;
-              }
-            }
+      display: flex;
+      gap: 80px;
+
+      .previous-button {
+        padding-left: 10px;
+        border: none;
+
+        .arrow-left {
+          width: 24px;
+          height: 24px;
+        }
+
+        .previous-button-text {
+          color: #23262F;
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 24px;
+        }
+      }
+
+      .continue-button > span {
+        color: #FCFCFD;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 24px;
+      }
     }
 
   }
