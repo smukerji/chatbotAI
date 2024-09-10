@@ -148,24 +148,34 @@ const initialState = {
 
 // Create the context
 export const CreateVoiceBotContext = createContext({
-  state: initialState,
-  updateState: (newState: any) => {},
-});
-
-// Create the provider component
-export const VoiceBotDataProvider = ({ children }: { children: ReactNode }) => {
-  const [state, setState] = useState(initialState);
-
-  const updateState = (newState: any) => {
-    setState((prevState) => ({
-      ...prevState,
-      ...newState,
-    }));
+    state: initialState,
+    updateState: (key: string, value: any) => {},
+  });
+  
+  // Create the provider component
+  export const VoiceBotDataProvider = ({ children }: { children: ReactNode }) => {
+    const [state, setState] = useState(initialState);
+  
+    const updateNestedState = (obj: any, key: string, value: any): any => {
+      for (const k in obj) {
+        if (k === key) {
+          obj[k] = value;
+        } else if (typeof obj[k] === "object" && obj[k] !== null) {
+          obj[k] = updateNestedState(obj[k], key, value);
+        }
+      }
+      return obj;
+    };
+  
+    const updateState = (key: string, value: any) => {
+      setState((prevState) => ({
+        ...updateNestedState({ ...prevState }, key, value),
+      }));
+    };
+  
+    return (
+      <CreateVoiceBotContext.Provider value={{ state, updateState }}>
+        {children}
+      </CreateVoiceBotContext.Provider>
+    );
   };
-
-  return (
-    <CreateVoiceBotContext.Provider value={{ state, updateState }}>
-      {children}
-    </CreateVoiceBotContext.Provider>
-  );
-};
