@@ -78,7 +78,7 @@ export default function VoiceBot() {
             </span>
           </Button>
 
-          <Button type="primary" onClick={() => {
+          <Button className="continue-button" type="primary" onClick={() => {
             router.push("/voicebot/dashboard");
           }}>Continue</Button>
         </div>
