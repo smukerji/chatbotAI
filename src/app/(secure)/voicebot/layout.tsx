@@ -19,6 +19,7 @@ export default function VoiceBotsLayout({
     redirect(`/account/login?returnUrl=${returnUrl}`);
   }
   return (
+
     <CreateBotDataProvider>
       <ChatbotSettingDataProvider>{children}</ChatbotSettingDataProvider>
     </CreateBotDataProvider>
