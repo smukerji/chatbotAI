@@ -2,13 +2,25 @@ import dynamic from "next/dynamic";
 import "./model-design.scss";
 import { Input, Slider, Switch } from 'antd';
 import { Select, ConfigProvider } from 'antd';
+import { CreateVoiceBotContext } from "../../../../_helpers/client/Context/VoiceBotContextApi"
 
-import { useState } from "react";
+
+import { useState, useContext } from "react";
 
 
 const { TextArea } = Input;
 
 function Model() {
+
+  const voiceBotContextData: any = useContext(CreateVoiceBotContext);
+  console.log("context data ", voiceBotContextData);
+  const voicebotDetails = voiceBotContextData.state;
+
+  voiceBotContextData.updateState("hipaaEnabled", true);
+
+  console.log("your voicebot details ", voicebotDetails)
+  
+
 
   const [stepsCount, setStepsCount] = useState<number>(5);
 

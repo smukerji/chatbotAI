@@ -3,6 +3,7 @@ import { auth } from "../../_helpers/server/auth";
 import { redirect } from "next/navigation";
 import { CreateBotDataProvider } from "../../_helpers/client/Context/CreateBotContext";
 import { ChatbotSettingDataProvider } from "../../_helpers/client/Context/ChatbotSettingContext";
+import { VoiceBotDataProvider } from "@/app/_helpers/client/Context/VoiceBotContextApi";
 
 export default function VoiceBotsLayout({
   children,
@@ -20,8 +21,11 @@ export default function VoiceBotsLayout({
   }
   return (
 
-    <CreateBotDataProvider>
-      <ChatbotSettingDataProvider>{children}</ChatbotSettingDataProvider>
-    </CreateBotDataProvider>
+    // <CreateBotDataProvider>
+    //   <ChatbotSettingDataProvider>{children}</ChatbotSettingDataProvider>
+    // </CreateBotDataProvider>
+    <VoiceBotDataProvider>
+      {children}
+    </VoiceBotDataProvider>
   );
 }

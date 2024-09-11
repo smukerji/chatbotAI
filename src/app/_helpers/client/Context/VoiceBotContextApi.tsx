@@ -148,8 +148,8 @@ const initialState = {
 
 // Create the context
 export const CreateVoiceBotContext = createContext({
-    state: initialState,
-    updateState: (key: string, value: any) => {},
+    // state: initialState,
+    // updateState: (key: string, value: any) => {},
   });
   
   // Create the provider component
@@ -157,9 +157,11 @@ export const CreateVoiceBotContext = createContext({
     const [state, setState] = useState(initialState);
   
     const updateNestedState = (obj: any, key: string, value: any): any => {
+      debugger;
       for (const k in obj) {
         if (k === key) {
           obj[k] = value;
+          return obj;
         } else if (typeof obj[k] === "object" && obj[k] !== null) {
           obj[k] = updateNestedState(obj[k], key, value);
         }
