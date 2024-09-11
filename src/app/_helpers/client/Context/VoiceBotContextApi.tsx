@@ -3,6 +3,7 @@ import { createContext, useState, ReactNode } from "react";
 
 // Define the initial state based on the provided data structure
 const initialState = {
+  firstMessage: "",
   transcriber: {
     provider: "deepgram",
     model: "nova-2",
@@ -108,7 +109,7 @@ const initialState = {
     { provider: "twilio", timeout: 60, record: false, recordingChannels: "mono" },
   ],
   name: "",
-  firstMessage: "",
+ 
   voicemailDetection: {
     provider: "twilio",
     voicemailDetectionTypes: ["machine_end_beep", "machine_end_silence"],
@@ -168,6 +169,22 @@ export const CreateVoiceBotContext = createContext({
       }
       return obj;
     };
+
+    // const updateNestedState = (obj: any, key: string, value: any): any => {
+    //   for (const k in obj) {
+    //     debugger;
+    //     if (k === key) {
+    //       obj[k] = value;
+    //       return true; // Indicate that the key was found and updated
+    //     } else if (typeof obj[k] === "object" && obj[k] !== null) {
+    //       const updated = updateNestedState(obj[k], key, value);
+    //       if (updated) {
+    //         return true; // Propagate the success up the call stack
+    //       }
+    //     }
+    //   }
+    //   return false; // Indicate that the key was not found in this branch
+    // };
   
     const updateState = (key: string, value: any) => {
       setState((prevState) => ({

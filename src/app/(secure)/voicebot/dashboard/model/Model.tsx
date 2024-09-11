@@ -13,15 +13,20 @@ const { TextArea } = Input;
 function Model() {
 
   const voiceBotContextData: any = useContext(CreateVoiceBotContext);
-  console.log("context data ", voiceBotContextData);
+  // console.log("context data ", voiceBotContextData);
   const voicebotDetails = voiceBotContextData.state;
 
-  voiceBotContextData.updateState("hipaaEnabled", true);
+  // voiceBotContextData.updateState("provider", "11labs");
 
-  console.log("your voicebot details ", voicebotDetails)
+  const firstMessageEnterHandler = (e:React.ChangeEvent<HTMLInputElement>) => {
+    console.log("first message ", e.target.value);
+    const enteredValue: string = e.target.value;
+    voiceBotContextData.updateState("firstMessage", enteredValue);
+    console.log("first message from the context after updated ",voicebotDetails);
+  }
+
+  console.log("your voicebot details ", voicebotDetails);
   
-
-
   const [stepsCount, setStepsCount] = useState<number>(5);
 
   const providersOption: {value: string; label: string; }[] = [
@@ -69,7 +74,7 @@ function Model() {
       <div className="left-column">
         <h4 className="input-header">First Message</h4>
         <p className="input-description">The first message that the assistant will say.</p>
-        <Input className="input-field" placeholder="Hi, Provide me the first message!" />
+        <Input className="input-field" placeholder="Hi, Provide me the first message!" onChange={firstMessageEnterHandler} />
 
         <h4 className="input-header second">First Message</h4>
         <p className="input-description">The first message that the assistant will say.</p>
