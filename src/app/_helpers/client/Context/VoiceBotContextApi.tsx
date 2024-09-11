@@ -14,7 +14,7 @@ const initialState = {
     endpointing: 255,
   },
   model: {
-    messages: [{ content: "", role: "assistant" }],
+    messages: [{ content: "default", role: "assistant" }],
     tools: [
       {
         async: false,
@@ -191,9 +191,15 @@ export const CreateVoiceBotContext = createContext({
         ...updateNestedState({ ...prevState }, key, value),
       }));
     };
+
+    const updateTheVoiceBotInfo = (key: any) => (value: any) => {
+      debugger;
+      setState((prevState) => ({ ...prevState, [key]: value }));
+    }
+    
   
     return (
-      <CreateVoiceBotContext.Provider value={{ state, updateState }}>
+      <CreateVoiceBotContext.Provider value={{ state, updateState, updateTheVoiceBotInfo }}>
         {children}
       </CreateVoiceBotContext.Provider>
     );

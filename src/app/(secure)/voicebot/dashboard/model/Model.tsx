@@ -5,7 +5,7 @@ import { Select, ConfigProvider } from 'antd';
 import { CreateVoiceBotContext } from "../../../../_helpers/client/Context/VoiceBotContextApi"
 
 
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 
 
 const { TextArea } = Input;
@@ -16,19 +16,40 @@ function Model() {
   // console.log("context data ", voiceBotContextData);
   const voicebotDetails = voiceBotContextData.state;
 
+  const [stepsCount, setStepsCount] = useState<number>(5);
+  const [firstMessage, setFirstMessage] = useState<string>("");
+  const [systemPrompt, setSystemPrompt] = useState<string>("default");
+
+
+
+  useEffect(() => {
+    // Set the initial value from the context
+    setFirstMessage(voicebotDetails.firstMessage || "");
+    setSystemPrompt(voicebotDetails["model"]["messages"][0]["context"] || "");
+  }, [voicebotDetails.firstMessage, voicebotDetails["model"]["messages"][0]["context"]]);
+
   // voiceBotContextData.updateState("provider", "11labs");
 
   const firstMessageEnterHandler = (e:React.ChangeEvent<HTMLInputElement>) => {
     console.log("first message ", e.target.value);
     const enteredValue: string = e.target.value;
-    voiceBotContextData.updateState("firstMessage", enteredValue);
+    setFirstMessage(enteredValue);
+    // voiceBotContextData.updateState("firstMessage", enteredValue);
+    voiceBotContextData.updateTheVoiceBotInfo("firstMessage")(enteredValue);
     console.log("first message from the context after updated ",voicebotDetails);
+  }
+
+  const systemPromptEnterHandler = (e:React.ChangeEvent<HTMLTextAreaElement>) => {
+    console.log("system prompt ", e.target.value);
+    const enteredValue: string = e.target.value;
+    setSystemPrompt(enteredValue);
+    // voiceBotContextData.updateState("model.messages[0].context", enteredValue);
+    voiceBotContextData.updateTheVoiceBotInfo("model.messages[0].context")(enteredValue);
+    console.log("system prompt from the context after updated ",voicebotDetails);
   }
 
   console.log("your voicebot details ", voicebotDetails);
   
-  const [stepsCount, setStepsCount] = useState<number>(5);
-
   const providersOption: {value: string; label: string; }[] = [
       {
         value: '1',
@@ -74,11 +95,19 @@ function Model() {
       <div className="left-column">
         <h4 className="input-header">First Message</h4>
         <p className="input-description">The first message that the assistant will say.</p>
-        <Input className="input-field" placeholder="Hi, Provide me the first message!" onChange={firstMessageEnterHandler} />
+        <Input className="input-field" 
+        placeholder="Hi, Provide me the first message!" 
+        onChange={firstMessageEnterHandler}  
+        value={firstMessage}/>
 
-        <h4 className="input-header second">First Message</h4>
-        <p className="input-description">The first message that the assistant will say.</p>
-        <TextArea className="text-area" rows={4} placeholder="Write your system prompts here..." />
+        <h4 className="input-header second">System Prompt</h4>
+        <p className="input-description">The context allows you to customize your voicebot&lsquo;s personality, role and instructions. </p>
+        <TextArea className="text-area"
+         rows={4} 
+         placeholder="Write your system prompts here..." 
+          value={systemPrompt}
+          onChange={systemPromptEnterHandler}
+         />
 
       </div>
 
