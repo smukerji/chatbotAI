@@ -21,6 +21,7 @@ import { TableRowSelection } from "antd/es/table/interface";
 import { transformDataSource } from "./utils/transformedDataSource";
 import PaymentTable from "./_components/PaymentTable";
 import CancelPlanModal from "./_components/CancelPlanModal";
+import Loader from "../pricing/_components/Loader";
 
 function BillingAndUsage() {
   const [cookies, setCookie] = useCookies(["userId"]);
@@ -39,6 +40,7 @@ function BillingAndUsage() {
   const [whatsapp, setWhatsapp] = useState(false);
   const userDetailContext: any = useContext(UserDetailsContext);
   const userDetails = userDetailContext?.userDetails;
+  const [loading, setLoading] = useState(true);
   // const [columns, setColumns] = useState([])
 
   //ANCHOR - API CALL TO CANCEL WHATSAPP INTEGRATION FOR NEXT BILLING CYCLE
@@ -95,6 +97,7 @@ function BillingAndUsage() {
   //ANCHOR - API CALL FOR COLLECTING DATA FROM DATABASE
   const myFunction = async () => {
     try {
+      setLoading(true);
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/BillingAndUsage/api`,
         {
@@ -128,8 +131,10 @@ function BillingAndUsage() {
       } else {
         setDuration("Billed yearly");
       }
+      setLoading(false);
     } catch (error) {
       console.log(error);
+      setLoading(false);
     }
   };
 
@@ -140,59 +145,67 @@ function BillingAndUsage() {
   if (status === "authenticated" || cookies?.userId) {
     return (
       <>
-        <Modal
-          title="Are you sure to cancel the plan?"
-          open={isModalOpen}
-          onOk={handleOk}
-          onCancel={handleCancel}
-          cancelText="Keep"
-          okText="Cancel"
-          closeIcon={null}
-          className="model cancel-modal"
-          centered
-        >
-          {/* <p>Are you sure to cancel your plan?</p> */}
-          <CancelPlanModal planDetail={planDetail} date={date} />
-        </Modal>
-        <Modal
-          title="Cancel My Plan"
-          open={isWhatsappModalOpen}
-          onOk={handleWhatsappOk}
-          onCancel={handleWhatsappCancel}
-          cancelText="Keep"
-          okText="Cancel"
-          // closeIcon={null}
-          className="modelCancelWhatsapp"
-          centered
-        >
-          <p>Are you sure to cancel Whatsapp integration from next cycle?</p>
-        </Modal>
-        <div className="billing-main">
-          <div className="billing-head">Billing & Usage</div>
-          <div className="message-count">
-            <div className="message-head"></div>
-          </div>
-          <div className="plan-head">My Plan</div>
-          <div className="plan-details">
-            <div className="name-features">
-              <div className="plan-name-container">
-                <span className="plan-name">{userDetails?.plan?.name}</span>
-                {duration != "" && (
-                  <div className="plan-duration">
-                    <span className="plan-duration-text">Billed Monthly</span>
-                  </div>
-                )}
+        {loading ? (
+          <Loader />
+        ) : (
+          <>
+            <Modal
+              title="Are you sure to cancel the plan?"
+              open={isModalOpen}
+              onOk={handleOk}
+              onCancel={handleCancel}
+              cancelText="Keep"
+              okText="Cancel"
+              closeIcon={null}
+              className="model cancel-modal"
+              centered
+            >
+              {/* <p>Are you sure to cancel your plan?</p> */}
+              <CancelPlanModal planDetail={planDetail} date={date} />
+            </Modal>
+            <Modal
+              title="Cancel My Plan"
+              open={isWhatsappModalOpen}
+              onOk={handleWhatsappOk}
+              onCancel={handleWhatsappCancel}
+              cancelText="Keep"
+              okText="Cancel"
+              // closeIcon={null}
+              className="modelCancelWhatsapp"
+              centered
+            >
+              <p>
+                Are you sure to cancel Whatsapp integration from next cycle?
+              </p>
+            </Modal>
+            <div className="billing-main">
+              <div className="billing-head">Billing & Usage</div>
+              <div className="message-count">
+                <div className="message-head"></div>
               </div>
-              <div className="plan-feature">
-                <div className="next-renewal-date">
-                  <div className="next-renewal-date-text">
-                    Auto Renewal due on
+              <div className="plan-head">My Plan</div>
+              <div className="plan-details">
+                <div className="name-features">
+                  <div className="plan-name-container">
+                    <span className="plan-name">{userDetails?.plan?.name}</span>
+                    {duration != "" && (
+                      <div className="plan-duration">
+                        <span className="plan-duration-text">
+                          Billed Monthly
+                        </span>
+                      </div>
+                    )}
                   </div>
-                  <div className="next-renewal-date-date">{date}</div>
-                </div>
-              </div>
-              <div className="plan-feature">
-                {/* <div className="plan-message">
+                  <div className="plan-feature">
+                    <div className="next-renewal-date">
+                      <div className="next-renewal-date-text">
+                        Auto Renewal due on
+                      </div>
+                      <div className="next-renewal-date-date">{date}</div>
+                    </div>
+                  </div>
+                  <div className="plan-feature">
+                    {/* <div className="plan-message">
                   {" "}
                   {formatNumber(
                     userDetails?.plan?.messageLimit
@@ -201,43 +214,48 @@ function BillingAndUsage() {
                   )}{" "}
                   Messages
                 </div> */}
-                {/* <Image className="dot-image" src={circle} alt="no image" /> */}
-                {/* <div className="plan-chatbot">
+                    {/* <Image className="dot-image" src={circle} alt="no image" /> */}
+                    {/* <div className="plan-chatbot">
                   {userDetails?.plan?.numberOfChatbot} Chatbots
                 </div>
                 <Image className="dot-image" src={circle} alt="no image" /> */}
 
-                <div className="more-details">
-                  <p className="more-details-text">
-                    More Details{" "}
-                    <span>
-                      <Image src={downArrow} alt="down-arrow" />
-                    </span>
+                    <div className="more-details">
+                      <p className="more-details-text">
+                        More Details{" "}
+                        <span>
+                          <Image src={downArrow} alt="down-arrow" />
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="cancel-upgrade-btns">
+                  <p
+                    className="cancel-plan"
+                    onClick={() => setIsModalOpen(true)}
+                  >
+                    Cancel My Plan
                   </p>
+                  <button className="btn-upgrade" onClick={explorePlan}>
+                    <span
+                      className="btn-text"
+                      onClick={() => router.push("/home/pricing")}
+                    >
+                      Upgrade Plan
+                    </span>
+                  </button>
                 </div>
               </div>
+
+              <AddOnsDetail date={date} />
+              <div className="manage-plan">Payment history</div>
             </div>
 
-            <div className="cancel-upgrade-btns">
-              <p className="cancel-plan" onClick={() => setIsModalOpen(true)}>
-                Cancel My Plan
-              </p>
-              <button className="btn-upgrade" onClick={explorePlan}>
-                <span
-                  className="btn-text"
-                  onClick={() => router.push("/home/pricing")}
-                >
-                  Upgrade Plan
-                </span>
-              </button>
-            </div>
-          </div>
-
-          <AddOnsDetail />
-          <div className="manage-plan">Payment history</div>
-        </div>
-
-        <PaymentTable />
+            <PaymentTable />
+          </>
+        )}
       </>
     );
   } else if (status === "unauthenticated") {

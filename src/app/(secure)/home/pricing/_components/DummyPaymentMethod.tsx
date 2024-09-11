@@ -73,6 +73,7 @@ function DummyPaymentMethod({
   const [interval, setInterval] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [subscriptionDetail, setSubscriptionDetail] = useState();
+  const [parentPlanName, setParentPlanName] = useState("");
   const [cardErrors, setCardErrors] = useState({
     cardNumber: "",
     expiryDate: "",
@@ -92,6 +93,8 @@ function DummyPaymentMethod({
   });
 
   const u_id: any = cookies.userId;
+
+  console.log("source in comp", source);
 
   const [checkedIntegrations, setCheckedIntegrations] = useState<{
     [key: string]: boolean;
@@ -187,40 +190,59 @@ function DummyPaymentMethod({
       }
 
       // Call the subscribe endpoint and create a Stripe subscription
-      // object. Returns the subscription ID and client secret
-      const subscription = await axios.post(
-        `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/create-subscription`,
-        { priceId: newPriceId, customerId: customerId }
-      );
-      const stripePayload = await stripe.confirmCardPayment(
-        subscription.data.clientSecret, // returned by subscribe endpoint
-        {
-          payment_method: {
-            card: cardElement,
-          },
-        }
-      );
+      let subscription;
+      let paymentIntentStatus;
 
-      if (stripePayload.error) {
-        // setError(
-        //   stripePayload.error.message ?? "Payment failed. Please try again."
-        // );
-        setCardErrors((prev) => {
-          return {
+      if (source == "addon") {
+        console.log("coming into addon");
+
+        // Call your update endpoint to add an addon to the existing subscription
+        subscription = await axios.post(
+          `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/add-addon`,
+          { priceId: newPriceId, customerId: customerId, u_id: u_id }
+        );
+      } else {
+        console.log("this is handlesubmit");
+
+        // object. Returns the subscription ID and client secret
+        subscription = await axios.post(
+          `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/create-subscription`,
+          { priceId: newPriceId, customerId: customerId }
+        );
+      }
+      paymentIntentStatus = subscription.data.paymentIntentStatus;
+
+      console.log("payment Intet status", paymentIntentStatus);
+
+      // Check if payment intent is already confirmed
+      if (paymentIntentStatus === "requires_payment_method") {
+        const stripePayload = await stripe.confirmCardPayment(
+          subscription.data.clientSecret,
+          {
+            payment_method: {
+              card: cardElement,
+            },
+          }
+        );
+
+        if (stripePayload.error) {
+          setCardErrors((prev) => ({
             ...prev,
             paymentFailed: true,
-          };
-        });
-        // setLoading(false);
-        setPaymentLoading(false);
-      } else {
-        // setSuccess("Payment succeeded! Thank you for your purchase.");
+          }));
+        } else {
+          setSubscriptionDetail(subscription.data);
+
+          setIsModalOpen(true);
+        }
+      } else if (paymentIntentStatus === "succeeded") {
         setSubscriptionDetail(subscription.data);
-        // message.success("Payment succeeded! Thank you for your purchase.");
+
+        // Payment has already succeeded, no need to confirm again
         setIsModalOpen(true);
-        // setLoading(false);
-        setPaymentLoading(false);
       }
+
+      setPaymentLoading(false);
     } catch (error) {
       // setLoading(false);
       setPaymentLoading(false);
@@ -261,6 +283,7 @@ function DummyPaymentMethod({
       return {
         amount: productDetail.data.data.unit_amount / 100,
         interval: productDetail.data.data.recurring.interval ?? "month",
+        productName: productDetail.data.product,
       };
     } catch (error) {
     } finally {
@@ -339,10 +362,12 @@ function DummyPaymentMethod({
       setTotalPrice(price?.amount);
       setPlanPrice(price?.amount);
       setInterval(price?.interval);
+      setParentPlanName(price?.productName);
     });
     fetchPrices();
   }, []);
 
+  // check the checkbox if coming from any addon
   useEffect(() => {
     if (source === "addon") {
       setCheckedIntegrations((prev) => ({
@@ -351,8 +376,6 @@ function DummyPaymentMethod({
       }));
     }
   }, []);
-
-  console.log("sourceeee", source, newPriceId);
 
   return (
     <>
@@ -367,6 +390,7 @@ function DummyPaymentMethod({
             />
           )}
 
+          {/* ----------------------------Main card start----------------------------- */}
           <div className="card-main new-card">
             <div className="card-head">Billing Info</div>
             <form
@@ -376,7 +400,7 @@ function DummyPaymentMethod({
               <div className="left white-left">
                 {source != "addon" && (
                   <div className="top-left">
-                    <div className="plan-name">Individual Plan</div>
+                    <div className="plan-name">{parentPlanName}</div>
                     <div className="price">
                       {/* <span>${Number(price) / 100}</span> */}
                       <span>${planPrice}</span>

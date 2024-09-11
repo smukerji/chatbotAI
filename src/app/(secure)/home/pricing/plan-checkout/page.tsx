@@ -82,6 +82,8 @@ function page() {
     getCustomer();
   }, []);
 
+  console.log("source in page", source);
+
   // console.log("subscriptoooo", subscriptionDetail);
   // console.log("pricingggg", priceId, encryptedPriceId);
 

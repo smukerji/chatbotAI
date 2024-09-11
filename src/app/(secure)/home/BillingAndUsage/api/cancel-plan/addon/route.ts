@@ -16,11 +16,20 @@ async function delPlan(req: any, res: NextResponse) {
     const stripe = new Stripe(stripeKey);
 
     const db = (await clientPromise!)?.db();
-    let { u_id, price_id } = await req.json();
+    let { u_id, price_id, plan_name } = await req.json();
     const collectionUser = db.collection("users");
+    const collectionData = db.collection("user-details");
     const userData = await collectionUser.findOne({
       _id: new ObjectId(u_id),
     });
+
+    const Details = await collectionData.findOne({
+      userId: String(userData._id),
+    });
+
+    if (!Details) {
+      return { msg: "Addon details not found." };
+    }
 
     const subscriptionId = userData.subId;
 
@@ -75,6 +84,17 @@ async function delPlan(req: any, res: NextResponse) {
       return { msg: "subscription was not updated", status: 0 };
     }
 
+    const dynamicKey = `isNext${plan_name}`;
+
+    await collectionData.updateMany(
+      { userId: String(userData?._id) },
+      {
+        $set: {
+          [dynamicKey]: false,
+        },
+      }
+    );
+
     return { msg: "Plan deleted successfully", status: true };
   } catch (error) {
     return { msg: "finding error", status: 0, error };
@@ -88,9 +108,18 @@ async function getAddonDetail(req: any, res: NextResponse) {
     const db = (await clientPromise!)?.db();
     let { u_id } = await req.json();
     const collectionUser = db.collection("users");
+    const collectionDetails = db.collection("user-details");
     const userData = await collectionUser.findOne({
       _id: new ObjectId(u_id),
     });
+
+    const Details = await collectionDetails.findOne({
+      userId: String(userData._id),
+    });
+
+    if (!Details) {
+      return { msg: "Addon details not found." };
+    }
 
     const subscriptionId = userData.subId;
 
@@ -115,6 +144,7 @@ async function getAddonDetail(req: any, res: NextResponse) {
     return {
       subscriptionData: subscriptionData,
       endDate: subscription.current_period_end,
+      addonDetails: Details,
     };
   } catch (error) {
     return { msg: "finding error", status: 0 };
