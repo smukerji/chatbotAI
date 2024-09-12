@@ -16,6 +16,7 @@ import img2 from "../../../../../../public/pricingImages/image 52.svg";
 import img3 from "../../../../../../public/pricingImages/messages-3.svg";
 import img4 from "../../../../../../public/pricingImages/voice-cricle.svg";
 import Image from "next/image";
+import SecondaryHeader from "@/app/_components/Secondary-Header/SecondaryHeader";
 
 const msgSmall: any = process.env.NEXT_PUBLIC_MESSAGESMALL_PLAN_ID;
 const msgLarge: any = process.env.NEXT_PUBLIC_MESSAGELARGE_PLAN_ID;
@@ -47,34 +48,42 @@ function PricingWrapperNew() {
   }
 
   async function handleClick(priceId: string) {
-    const a = encryptPriceId(priceId);
-    const encryptedPriceId = encodeURIComponent(a);
+    if (cookies?.userId) {
+      const a = encryptPriceId(priceId);
+      const encryptedPriceId = encodeURIComponent(a);
 
-    router.push(
-      `/home/pricing/plan-checkout?priceId=${encryptedPriceId}&type=recurring`
-    );
+      router.push(
+        `/home/pricing/plan-checkout?priceId=${encryptedPriceId}&type=recurring`
+      );
+    } else {
+      router.push("/account/login");
+    }
   }
 
   async function handleAddonClick(priceId: string) {
-    const a = encryptPriceId(priceId);
-    const encryptedPriceId = encodeURIComponent(a);
+    if (cookies?.userId) {
+      const a = encryptPriceId(priceId);
+      const encryptedPriceId = encodeURIComponent(a);
 
-    let type;
+      let type;
 
-    if (
-      priceId === msgSmall ||
-      priceId === msgLarge ||
-      priceId === onBoarding ||
-      priceId === trainingData
-    ) {
-      type = "oneoff";
+      if (
+        priceId === msgSmall ||
+        priceId === msgLarge ||
+        priceId === onBoarding ||
+        priceId === trainingData
+      ) {
+        type = "oneoff";
+      } else {
+        type = "recurring";
+      }
+
+      router.push(
+        `/home/pricing/plan-checkout?priceId=${encryptedPriceId}&source=addon&type=${type}`
+      );
     } else {
-      type = "recurring";
+      router.push("/account/login");
     }
-
-    router.push(
-      `/home/pricing/plan-checkout?priceId=${encryptedPriceId}&source=addon&type=${type}`
-    );
   }
 
   const checkPlan = async () => {
@@ -123,6 +132,7 @@ function PricingWrapperNew() {
 
   return (
     <>
+      {status === "unauthenticated" && !u_id && <SecondaryHeader />}
       {loading && <Loader />}
       <div className="main new-main">
         <Image className="img1" src={img1} alt="img1" />

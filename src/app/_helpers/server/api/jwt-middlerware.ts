@@ -25,6 +25,7 @@ export function isPublicPath(req: NextRequest) {
     "GET:/blog/api/allslugs",
     "GET:/blog/api/previewblog",
     "POST:/blog/api/previewblog",
+    "POST:/home/pricing/stripe-payment-gateway/get-plan-prices",
   ];
 
   return publicPaths.includes(`${req.method}:${req.nextUrl.pathname}`);
