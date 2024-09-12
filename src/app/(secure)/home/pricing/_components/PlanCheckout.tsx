@@ -8,6 +8,7 @@ import { useSearchParams } from "next/navigation";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import Loader from "./Loader";
+import CryptoJS from "crypto-js";
 
 const stripePromise = loadStripe(
   String(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY)
