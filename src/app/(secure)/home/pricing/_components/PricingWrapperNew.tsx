@@ -17,6 +17,11 @@ import img3 from "../../../../../../public/pricingImages/messages-3.svg";
 import img4 from "../../../../../../public/pricingImages/voice-cricle.svg";
 import Image from "next/image";
 
+const msgSmall: any = process.env.NEXT_PUBLIC_MESSAGESMALL_PLAN_ID;
+const msgLarge: any = process.env.NEXT_PUBLIC_MESSAGELARGE_PLAN_ID;
+const onBoarding: any = process.env.NEXT_PUBLIC_ONBOARDING_FEES;
+const trainingData: any = process.env.NEXT_PUBLIC_TRAINING_DATA_MONTHLY;
+
 function PricingWrapperNew() {
   const [loading, setLoading] = useState(false);
   const [cookies, setCookie] = useCookies(["userId"]);
@@ -45,15 +50,30 @@ function PricingWrapperNew() {
     const a = encryptPriceId(priceId);
     const encryptedPriceId = encodeURIComponent(a);
 
-    router.push(`/home/pricing/plan-checkout?priceId=${encryptedPriceId}`);
+    router.push(
+      `/home/pricing/plan-checkout?priceId=${encryptedPriceId}&type=recurring`
+    );
   }
 
   async function handleAddonClick(priceId: string) {
     const a = encryptPriceId(priceId);
     const encryptedPriceId = encodeURIComponent(a);
 
+    let type;
+
+    if (
+      priceId === msgSmall ||
+      priceId === msgLarge ||
+      priceId === onBoarding ||
+      priceId === trainingData
+    ) {
+      type = "oneoff";
+    } else {
+      type = "recurring";
+    }
+
     router.push(
-      `/home/pricing/plan-checkout?priceId=${encryptedPriceId}&source=addon`
+      `/home/pricing/plan-checkout?priceId=${encryptedPriceId}&source=addon&type=${type}`
     );
   }
 
@@ -69,7 +89,6 @@ function PricingWrapperNew() {
       );
 
       setActivePlan(checkPlan?.data?.price);
-      console.log("check plan", checkPlan.data);
     } catch (error) {
       console.log("error", error);
     } finally {
@@ -100,7 +119,7 @@ function PricingWrapperNew() {
     window.scrollTo(0, 0);
   }, []);
 
-  console.log("prices", prices);
+  // console.log("prices", prices);
 
   return (
     <>

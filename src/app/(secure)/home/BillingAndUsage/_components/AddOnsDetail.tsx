@@ -25,7 +25,7 @@ const telegramPriceIdMonthly: any =
 const telegramPriceIdYearly: any =
   process.env.NEXT_PUBLIC_TELEGRAM_PLAN_ID_YEARLY;
 
-const trainingDataMonthly: any = process.env.NEXT_PUBLIC_TRAINING_DATA_MONTHLY;
+const trainingData: any = process.env.NEXT_PUBLIC_TRAINING_DATA_MONTHLY;
 const trainingDataYearly: any = process.env.NEXT_PUBLIC_TRAINING_DATA_YEARLY;
 
 const conversationHistoryMonthly: any =
@@ -385,8 +385,7 @@ function AddOnsDetail({ date }: any) {
                     </span>{" "}
                     Training Data
                   </p>
-                  {(isPlanActive(trainingDataMonthly) ||
-                    isPlanActive(trainingDataYearly)) && (
+                  {isPlanActive(trainingData) && (
                     <div className="plan-duration">
                       <span className="plan-duration-text">
                         Billed {interval === "month" ? "Monthly" : "Yearly"}
@@ -395,8 +394,7 @@ function AddOnsDetail({ date }: any) {
                   )}
                 </div>
 
-                {(isPlanActive(trainingDataMonthly) ||
-                  isPlanActive(trainingDataYearly)) && (
+                {isPlanActive(trainingData) && (
                   <div className="next-renewal-date">
                     <div className="next-renewal-date-text">
                       {isNextAddon?.isNextTrainingData === false
@@ -417,18 +415,10 @@ function AddOnsDetail({ date }: any) {
                     Get Add-on
                   </span>
                 </button>
-              ) : isPlanActive(trainingDataMonthly) ||
-                isPlanActive(trainingDataYearly) ? (
+              ) : isPlanActive(trainingData) ? (
                 <p
                   className="cancel-plan"
-                  onClick={() =>
-                    cancelAddon(
-                      interval === "month"
-                        ? trainingDataMonthly
-                        : trainingDataYearly,
-                      "TrainingData"
-                    )
-                  }
+                  onClick={() => cancelAddon(trainingData, "TrainingData")}
                 >
                   Cancel
                 </p>

@@ -6,7 +6,7 @@ import {
   useElements,
   useStripe,
 } from "@stripe/react-stripe-js";
-import { Button, message, Modal } from "antd";
+import { Button, message, Modal, Tooltip } from "antd";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import Loader from "./Loader";
@@ -26,7 +26,7 @@ const telegramPriceIdMonthly: any =
   process.env.NEXT_PUBLIC_TELEGRAM_PLAN_ID_MONTHLY;
 const telegramPriceIdYearly: any =
   process.env.NEXT_PUBLIC_TELEGRAM_PLAN_ID_YEARLY;
-const trainingDataMonthly: any = process.env.NEXT_PUBLIC_TRAINING_DATA_MONTHLY;
+const trainingData: any = process.env.NEXT_PUBLIC_TRAINING_DATA_MONTHLY;
 const trainingDataYearly: any = process.env.NEXT_PUBLIC_TRAINING_DATA_YEARLY;
 const conversationHistoryMonthly: any =
   process.env.NEXT_PUBLIC_CONVERSATION_HISTORY_MONTHLY;
@@ -50,12 +50,14 @@ function DummyPaymentMethod({
   customerId,
   priceId,
   source,
+  type,
 }: {
   price: string;
   interval: string;
   customerId: string;
   priceId: string;
   source: string;
+  type: string;
 }) {
   const [disabled, setDisabled] = useState(false);
   const [error, setError] = useState("");
@@ -94,8 +96,6 @@ function DummyPaymentMethod({
 
   const u_id: any = cookies.userId;
 
-  console.log("source in comp", source);
-
   const [checkedIntegrations, setCheckedIntegrations] = useState<{
     [key: string]: boolean;
   }>({
@@ -105,7 +105,7 @@ function DummyPaymentMethod({
     [slackPriceIdYearly]: false,
     [telegramPriceIdMonthly]: false,
     [telegramPriceIdYearly]: false,
-    [trainingDataMonthly]: false,
+    [trainingData]: false,
     [trainingDataYearly]: false,
     [conversationHistoryMonthly]: false,
     [conversationHistoryYearly]: false,
@@ -194,16 +194,47 @@ function DummyPaymentMethod({
       let paymentIntentStatus;
 
       if (source == "addon") {
-        console.log("coming into addon");
-
         // Call your update endpoint to add an addon to the existing subscription
         subscription = await axios.post(
           `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/add-addon`,
           { priceId: newPriceId, customerId: customerId, u_id: u_id }
         );
-      } else {
-        console.log("this is handlesubmit");
 
+        const isOneOff = subscription.data.isOneOff;
+
+        if (isOneOff) {
+          // Handle one-time payment flow by finalizing the invoice and processing the payment
+          const invoiceId = subscription.data.invoice;
+
+          // // Call Stripe to finalize the invoice (this can also be done in the backend)
+          // await stripe.invoices.finalizeInvoice(invoiceId);
+
+          // // Fetch the latest invoice and confirm payment
+          // const invoice = await stripe.invoices.retrieve(invoiceId);
+          // const clientSecret = invoice.payment_intent;
+
+          const stripePayload = await stripe.confirmCardPayment(
+            subscription.data.clientSecret,
+            {
+              payment_method: {
+                card: cardElement,
+              },
+            }
+          );
+
+          if (stripePayload.error) {
+            setCardErrors((prev) => ({
+              ...prev,
+              paymentFailed: true,
+            }));
+          } else {
+            setSubscriptionDetail(subscription.data);
+            setIsModalOpen(true); // Open modal to confirm success
+          }
+        } else {
+          paymentIntentStatus = subscription.data.paymentIntentStatus;
+        }
+      } else {
         // object. Returns the subscription ID and client secret
         subscription = await axios.post(
           `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/create-subscription`,
@@ -211,8 +242,6 @@ function DummyPaymentMethod({
         );
       }
       paymentIntentStatus = subscription.data.paymentIntentStatus;
-
-      console.log("payment Intet status", paymentIntentStatus);
 
       // Check if payment intent is already confirmed
       if (paymentIntentStatus === "requires_payment_method") {
@@ -255,18 +284,16 @@ function DummyPaymentMethod({
     const isChecked = e.target.checked;
     const price: any = await fetchProductDetail(integrationId);
 
-    console.log("intergration id", integrationId);
-
     setCheckedIntegrations((prev) => ({
       ...prev,
       [integrationId]: isChecked,
     }));
 
     if (isChecked) {
-      setTotalPrice((prev) => prev + price.amount);
+      setTotalPrice((prev) => prev + Number(price?.amount));
       setNewPriceId((prev) => [...prev, integrationId]); // Add the integrationId to the array
     } else {
-      setTotalPrice((prev) => prev - price.amount);
+      setTotalPrice((prev) => prev - Number(price?.amount));
       setNewPriceId((prev) => prev.filter((id) => id !== integrationId)); // Remove the integrationId from the array
     }
   };
@@ -282,7 +309,7 @@ function DummyPaymentMethod({
 
       return {
         amount: productDetail.data.data.unit_amount / 100,
-        interval: productDetail.data.data.recurring.interval ?? "month",
+        interval: productDetail?.data?.data?.recurring?.interval ?? "month",
         productName: productDetail.data.product,
       };
     } catch (error) {
@@ -315,10 +342,7 @@ function DummyPaymentMethod({
       const msgSmallPrice = findPrice(prices, msgSmall);
       const msgLargePrice = findPrice(prices, msgLarge);
       const onBoardingPrice = findPrice(prices, onBoarding);
-      const trainingDataPrice = findPrice(
-        prices,
-        interval === "year" ? trainingDataYearly : trainingDataMonthly
-      );
+      const trainingDataPrice = findPrice(prices, trainingData);
       const conversationHistoryPrice = findPrice(
         prices,
         interval === "year"
@@ -425,6 +449,7 @@ function DummyPaymentMethod({
                       onChange={(e) => {
                         handleChange(e, onBoarding);
                       }}
+                      disabled={type != "oneoff" && true}
                     />
                     <label
                       htmlFor="onboardingIntegrationCheckbox"
@@ -485,6 +510,7 @@ function DummyPaymentMethod({
                               : whatsappPriceIdMonthly
                           );
                         }}
+                        disabled={type == "oneoff" && true}
                       />
                       <label
                         htmlFor="whatsappIntegrationCheckbox"
@@ -543,6 +569,7 @@ function DummyPaymentMethod({
                                   : slackPriceIdMonthly
                               );
                             }}
+                            disabled={type == "oneoff" && true}
                           />
                           <label
                             htmlFor="slackIntegrationCheckbox"
@@ -588,6 +615,7 @@ function DummyPaymentMethod({
                                   : telegramPriceIdMonthly
                               );
                             }}
+                            disabled={type == "oneoff" && true}
                           />
                           <label
                             htmlFor="telegramIntegrationCheckbox"
@@ -826,6 +854,7 @@ function DummyPaymentMethod({
                         onChange={(e) => {
                           handleChange(e, msgSmall);
                         }}
+                        disabled={type != "oneoff" && true}
                       />
                       <label
                         htmlFor="5kmessagesIntegrationCheckbox"
@@ -867,6 +896,7 @@ function DummyPaymentMethod({
                             onChange={(e) => {
                               handleChange(e, msgLarge);
                             }}
+                            disabled={type != "oneoff" && true}
                           />
                           <label
                             htmlFor="10kIntegrationCheckbox"
@@ -881,11 +911,7 @@ function DummyPaymentMethod({
                       </div>
                       <div
                         className={`checkbox  ${
-                          checkedIntegrations[
-                            interval === "year"
-                              ? trainingDataYearly
-                              : trainingDataMonthly
-                          ]
+                          checkedIntegrations[trainingData]
                             ? "active-label"
                             : ""
                         }`}
@@ -894,23 +920,13 @@ function DummyPaymentMethod({
                           <input
                             type="checkbox"
                             // defaultChecked={defaultChecked}
-                            checked={
-                              checkedIntegrations[
-                                interval === "year"
-                                  ? trainingDataYearly
-                                  : trainingDataMonthly
-                              ] || false
-                            }
+                            checked={checkedIntegrations[trainingData] || false}
                             id="trainingIntegrationCheckbox"
                             className="price-checkbox"
                             onChange={(e) => {
-                              handleChange(
-                                e,
-                                interval === "year"
-                                  ? trainingDataYearly
-                                  : trainingDataMonthly
-                              );
+                              handleChange(e, trainingData);
                             }}
+                            disabled={type != "oneoff" && true}
                           />
                           <label
                             htmlFor="trainingIntegrationCheckbox"
@@ -956,6 +972,7 @@ function DummyPaymentMethod({
                                   : conversationHistoryMonthly
                               );
                             }}
+                            disabled={type == "oneoff" && true}
                           />
                           <label
                             htmlFor="conversationhistoryIntegrationCheckbox"
@@ -994,6 +1011,7 @@ function DummyPaymentMethod({
                                 interval === "year" ? leadsYearly : leadsMonthly
                               );
                             }}
+                            disabled={type == "oneoff" && true}
                           />
                           <label
                             htmlFor="leadIntegrationCheckbox"

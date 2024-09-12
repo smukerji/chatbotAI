@@ -18,7 +18,7 @@ import Leads from "../../../../../../public/svgs/leads.svg";
 import Sentiment from "../../../../../../public/svgs/sentimentdashboard.svg";
 import Onboarding from "../../../../../../public/svgs/onboarding.svg";
 
-const trainingDataMonthly: any = process.env.NEXT_PUBLIC_TRAINING_DATA_MONTHLY;
+const trainingData: any = process.env.NEXT_PUBLIC_TRAINING_DATA_MONTHLY;
 const trainingDataYearly: any = process.env.NEXT_PUBLIC_TRAINING_DATA_YEARLY;
 const conversationHistoryMonthly: any =
   process.env.NEXT_PUBLIC_CONVERSATION_HISTORY_MONTHLY;
@@ -54,10 +54,7 @@ function PricingAddons({ pricing, handleAddonClick, isYearlyPlan }: any) {
   const msgSmallPrice = findPrice(pricing, msgSmall);
   const msgLargePrice = findPrice(pricing, msgLarge);
   const onBoardingPrice = findPrice(pricing, onBoarding);
-  const trainingDataPrice = findPrice(
-    pricing,
-    isYearlyPlan ? trainingDataYearly : trainingDataMonthly
-  );
+  const trainingDataPrice = findPrice(pricing, trainingData);
   const conversationHistoryPrice = findPrice(
     pricing,
     isYearlyPlan ? conversationHistoryYearly : conversationHistoryMonthly
@@ -397,11 +394,7 @@ function PricingAddons({ pricing, handleAddonClick, isYearlyPlan }: any) {
                 </div>
                 <Button
                   className="pricing-button"
-                  onClick={() =>
-                    handleAddonClick(
-                      isYearlyPlan ? trainingDataYearly : trainingDataMonthly
-                    )
-                  }
+                  onClick={() => handleAddonClick(trainingData)}
                 >
                   Get Add-on
                 </Button>

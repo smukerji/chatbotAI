@@ -38,8 +38,6 @@ function StarterPlanBox({
       activePlan?.id === yearlyStarterPlanId) &&
     activePlan?.active;
 
-  console.log("active plannnn", activePlan, isPlanActive);
-
   return (
     <>
       <div className="plan-box plan-box-even">

@@ -4,6 +4,11 @@ import { ObjectId } from "mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
 import Stripe from "stripe";
 
+const msgSmall: any = process.env.NEXT_PUBLIC_MESSAGESMALL_PLAN_ID;
+const msgLarge: any = process.env.NEXT_PUBLIC_MESSAGELARGE_PLAN_ID;
+const onBoarding: any = process.env.NEXT_PUBLIC_ONBOARDING_FEES;
+const trainingData: any = process.env.NEXT_PUBLIC_TRAINING_DATA_MONTHLY;
+
 const addAddon = async (req: any, res: NextApiResponse) => {
   const stripeKey: any = process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY;
   try {
@@ -34,19 +39,58 @@ const addAddon = async (req: any, res: NextApiResponse) => {
       };
     });
 
-    const subscription: any = await stripe.subscriptions.update(
-      subscriptionId,
-      {
+    // Separate one-off purchases and recurring add-ons
+    const oneOffAddons = [msgSmall, msgLarge, onBoarding, trainingData];
+    const isOneOff = priceId.some((id: string) => oneOffAddons.includes(id));
+
+    let paymentIntent;
+    let subscription: any;
+    let invoice: any;
+
+    // If the add-on is a one-off purchase, create a new invoice
+    if (isOneOff) {
+      // console.log("Processing one-off purchase. Creating new invoice...");
+
+      for (let price of priceId) {
+        // console.log("priceee", price);
+
+        subscription = await stripe.invoiceItems.create({
+          customer: customerId,
+          price: price, // Assuming a single one-off item
+          // expand: ["latest_invoice.payment_intent"],
+        });
+
+        // console.log("invoiceItem", subscription);
+
+        invoice = await stripe.invoices.create({
+          customer: customerId,
+          collection_method: "charge_automatically",
+          auto_advance: true,
+          // expand: ["latest_invoice.payment_intent"],
+        });
+
+        const finalizedInvoice = await stripe.invoices.finalizeInvoice(
+          invoice.id
+        );
+
+        const invoiceId = await stripe.invoices.retrieve(invoice.id);
+
+        // console.log(">>>>>>>", finalizedInvoice, "<<<<<<<<<<<<<<", invoiceId);
+        const clientSecret = invoiceId.payment_intent;
+
+        paymentIntent = finalizedInvoice.payment_intent;
+      }
+    } else {
+      subscription = await stripe.subscriptions.update(subscriptionId, {
         items: pricePlans,
         proration_behavior: "create_prorations", // To calculate prorated amount
         expand: ["latest_invoice.payment_intent"],
         payment_behavior: "default_incomplete",
-      }
-    );
-
+      });
+      paymentIntent = subscription?.latest_invoice?.payment_intent;
+    }
     const priceIds = pricePlans.map((plan: any) => plan.price);
 
-    console.log("price plans", priceIds);
     // Optional but recommended
     // Save the subscription object or ID to your database
 
@@ -56,19 +100,10 @@ const addAddon = async (req: any, res: NextApiResponse) => {
     // complete the payment on the frontend later.
 
     // Get the PaymentIntent and its clientSecret
-    const paymentIntent = subscription?.latest_invoice?.payment_intent;
 
+    // update the database
     for (const planId of priceIds) {
-      console.log(`Processing planId: ${planId}`);
-
-      // if (!planData) {
-      //   console.error(`Plan data not found for priceId: ${planId}`);
-      //   continue;
-      // }
-
       if (planId === process.env.NEXT_PUBLIC_WHATSAPP_PLAN_ID_MONTHLY) {
-        console.log("should come inside this");
-
         await collection.updateOne(
           { customerId: customerId },
           {
@@ -110,7 +145,7 @@ const addAddon = async (req: any, res: NextApiResponse) => {
           {
             $set: {
               messageLimit:
-                Number(Details?.messageLimit) + (planData.messageLimit ?? 0),
+                Number(Details?.messageLimit) + (planData?.messageLimit ?? 0),
             },
           }
         );
@@ -189,15 +224,18 @@ const addAddon = async (req: any, res: NextApiResponse) => {
 
     return {
       code: "addon_added",
-      subscriptionId: subscription.id,
-      price: subscription.items.data.reduce(
+      subscriptionId: subscription?.id,
+      price: subscription?.items?.data?.reduce(
         (acc: any, current: any) => acc + current?.plan?.amount,
         0
       ),
-      clientSecret: paymentIntent.client_secret,
-      invoice: subscription.latest_invoice.id,
-      createDate: subscription.start_date,
-      paymentIntentStatus: paymentIntent.status,
+      clientSecret: paymentIntent?.client_secret,
+      invoice: subscription?.latest_invoice?.id
+        ? subscription?.latest_invoice?.id
+        : invoice.id,
+      createDate: subscription?.start_date,
+      paymentIntentStatus: paymentIntent?.status,
+      isOneOff: isOneOff,
     };
   } catch (e) {
     console.error(e);

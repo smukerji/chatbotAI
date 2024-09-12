@@ -37,15 +37,15 @@ async function delPlan(req: any, res: NextResponse) {
       }
     );
 
-    const deletePlan = await collectionUser.updateMany(
-      { _id: new ObjectId(u_id) },
-      {
-        $set: {
-          status: "cancel",
-          nextIsWhatsapp: false,
-        },
-      }
-    );
+    // const deletePlan = await collectionUser.updateMany(
+    //   { _id: new ObjectId(u_id) },
+    //   {
+    //     $set: {
+    //       status: "cancel",
+    //       nextIsWhatsapp: false,
+    //     },
+    //   }
+    // );
 
     return { msg: "Plan deleted successfully", status: true };
   } catch (error) {

@@ -25,6 +25,7 @@ function page() {
   const searchParams = useSearchParams();
   const a: any = searchParams ? searchParams.get("priceId") : null;
   const source: any = searchParams ? searchParams.get("source") : null;
+  const type: any = searchParams ? searchParams.get("type") : null;
   const encryptedPriceId = decodeURIComponent(a);
   const [loader, setLoader] = useState(true);
   const [subscriptionDetail, setSubscriptionDetail]: any = useState();
@@ -82,8 +83,6 @@ function page() {
     getCustomer();
   }, []);
 
-  console.log("source in page", source);
-
   // console.log("subscriptoooo", subscriptionDetail);
   // console.log("pricingggg", priceId, encryptedPriceId);
 
@@ -111,6 +110,7 @@ function page() {
               customerId={customerId}
               priceId={priceId}
               source={source}
+              type={type}
             />
           )}
         </Elements>
