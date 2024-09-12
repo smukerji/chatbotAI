@@ -14,7 +14,7 @@ const initialState = {
     endpointing: 255,
   },
   model: {
-    messages: [{ content: "default", role: "assistant" }],
+    messages: [{ content: "default", role: "system" }],
     tools: [
       {
         async: false,
@@ -157,15 +157,14 @@ export const CreateVoiceBotContext = createContext({
   export const VoiceBotDataProvider = ({ children }: { children: ReactNode }) => {
     const [state, setState] = useState(initialState);
   
-    const updateNestedState = (obj: any, key: string, value: any): any => {
-      debugger;
-      for (const k in obj) {
-        if (k === key) {
-          obj[k] = value;
-          return obj;
-        } else if (typeof obj[k] === "object" && obj[k] !== null) {
-          obj[k] = updateNestedState(obj[k], key, value);
-        }
+    const updateNestedState = (obj: any, path: string[], value: any): any => {
+      // debugger;
+      const [key, ...rest] = path;
+      if (rest.length === 0) {
+        obj[key] = value;
+      } else {
+        if (!obj[key]) obj[key] = {};
+        obj[key] = updateNestedState(obj[key], rest, value);
       }
       return obj;
     };
@@ -187,13 +186,15 @@ export const CreateVoiceBotContext = createContext({
     // };
   
     const updateState = (key: string, value: any) => {
+      // debugger
+      const path = key.split(".");
       setState((prevState) => ({
-        ...updateNestedState({ ...prevState }, key, value),
+        ...updateNestedState({ ...prevState }, path, value),
       }));
     };
 
     const updateTheVoiceBotInfo = (key: any) => (value: any) => {
-      debugger;
+      // debugger;
       setState((prevState) => ({ ...prevState, [key]: value }));
     }
     
