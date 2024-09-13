@@ -49,6 +49,18 @@
       background: #FFF;
     }
 
+    .invalid-input {
+      border-color: #F00000;
+    }
+
+    .invalidation-message{
+      color: #F00000;
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 20px;
+    }
+
     .text-area {
       color: #23262F;
       font-family: "General Sans";
@@ -78,6 +90,10 @@
       }
     }
 
+    .invalid-input{
+      border-color: #F00000;
+    }
+
 
 
     // height: 50vh;
@@ -92,6 +108,15 @@
       font-style: normal;
       font-weight: 500;
       line-height: 24px;
+    }
+
+    .ant-select{
+      &.error{
+        .ant-select-selector{
+          // border: #F00000;
+          border-color: #F00000 !important;
+        }
+      }
     }
 
     .select-field {
@@ -138,6 +163,18 @@
       }
     }
 
+    .invalid-input {
+      border-color: #F00000;
+    }
+
+    .invalidation-message {
+      color: #F00000;
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 20px;
+    }
+
     .model {
 
       margin-top: 2rem;
@@ -160,6 +197,7 @@
     .temprature {
       display: flex;
       justify-content: space-between;
+      align-items: center;
 
       .temprature_title {
         color: #353945;
@@ -179,6 +217,16 @@
         font-style: normal;
         font-weight: 500;
         line-height: 24px;
+      }
+
+      .temparature-input{
+        width: 10%;
+        color:  #353945;
+        /* Body/Medium */
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 24px
       }
 
 
@@ -213,6 +261,18 @@
       border-radius: 12px;
       border: 1px solid #E6E8EC;
       background: #FFF;
+    }
+
+    .invalid-input{
+      border-color: #F00000;
+    }
+
+    .invalidation-message{
+      color: #F00000;
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 20px;
     }
 
     .temprature {
