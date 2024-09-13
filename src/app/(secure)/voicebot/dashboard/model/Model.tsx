@@ -28,6 +28,8 @@ function Model() {
   const [inputValidationMessage, setinputValidationMessage] = useState<string>("");
   const [systemPromptValidationMessage, setSystemPromptValidationMessage] = useState<string>("");
   const [providerValidationMessage, setProviderValidationMessage] = useState<string>("");
+  const [modelValidationMessage, setModelValidationMessage] = useState<string>("");
+
 
   const [emotionRecognitionEnabled, setEmotionRecognitionEnabled] = useState<boolean>(false);
 
@@ -103,10 +105,23 @@ function Model() {
     }
   }
 
+
+
   const modelChangeHandler = (value: string, option: any) => {
 
     setSelectedModel(option.label);
+    setModelValidationMessage("");// Clear validation message on valid selection
     voiceBotContextData.updateState("model.model", option.label);
+  }
+
+  const handleModelBlur = () => {
+    if (selectedProvider) {
+      if (!selectedModel) {
+        setModelValidationMessage("Please select a model");
+      }
+    }
+
+   
   }
 
   const stepsCountChangeHandler = (value: number) => {
@@ -189,7 +204,7 @@ function Model() {
       <div className="right-column">
         <h4 className="provider">Provider</h4>
         <Select
-          className={providerValidationMessage ? "select-field error" : "select-field"}
+          className={providerValidationMessage ? "select-field error-provider" : "select-field"}
           placeholder="Select the provider"
           onChange={providerChangeHandler}
           onBlur={handleProviderBlur}
@@ -201,12 +216,14 @@ function Model() {
 
         <h4 className="provider model">Model</h4>
         <Select
-          className="select-field"
+          className={modelValidationMessage ? "select-field error-model" : "select-field"}
           placeholder="Select the model"
           value={selectedModel}
           options={models}
           onChange={modelChangeHandler}
+          onBlur={handleModelBlur}
         />
+        {modelValidationMessage && <p className="invalidation-message">{modelValidationMessage}</p>}
         <p className="model-info">GPT-4o is more accurate but fast and cheaper</p>
 
         <h4 className="provider knowledge-base">Knowledge Base</h4>

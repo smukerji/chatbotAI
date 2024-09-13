@@ -111,9 +111,15 @@
     }
 
     .ant-select{
-      &.error{
+      &.error-provider{
         .ant-select-selector{
           // border: #F00000;
+          border-color: #F00000 !important;
+        }
+      }
+      
+      &.error-model{
+        .ant-select-selector{
           border-color: #F00000 !important;
         }
       }
@@ -228,10 +234,6 @@
         font-weight: 500;
         line-height: 24px
       }
-
-
-
-
 
     }
 
