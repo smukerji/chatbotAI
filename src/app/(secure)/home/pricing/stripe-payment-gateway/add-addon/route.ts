@@ -28,6 +28,7 @@ const addAddon = async (req: any, res: NextApiResponse) => {
     if (!subscriptionId) {
       return {
         msg: "Parent Subscription not found. Please, add parent subscription first",
+        parentFound: false,
       };
     }
 
@@ -52,7 +53,7 @@ const addAddon = async (req: any, res: NextApiResponse) => {
       // console.log("Processing one-off purchase. Creating new invoice...");
 
       for (let price of priceId) {
-        // console.log("priceee", price);
+        console.log("priceee", price, customerId);
 
         subscription = await stripe.invoiceItems.create({
           customer: customerId,
@@ -60,25 +61,44 @@ const addAddon = async (req: any, res: NextApiResponse) => {
           // expand: ["latest_invoice.payment_intent"],
         });
 
-        // console.log("invoiceItem", subscription);
-
-        invoice = await stripe.invoices.create({
+        // Create an invoice immediately for one-off purchases
+        const invoice: any = await stripe.invoices.create({
           customer: customerId,
-          collection_method: "charge_automatically",
+          collection_method: "charge_automatically", // Automatic charge when finalized
           auto_advance: true,
-          // expand: ["latest_invoice.payment_intent"],
         });
 
-        const finalizedInvoice = await stripe.invoices.finalizeInvoice(
+        console.log("subscriptiosssss", subscription);
+
+        // Finalize the invoice to trigger payment
+        const finalizedInvoice: any = await stripe.invoices.finalizeInvoice(
           invoice.id
         );
 
-        const invoiceId = await stripe.invoices.retrieve(invoice.id);
+        console.log("invoice>>>", finalizedInvoice);
+        // paymentIntent = await stripe.paymentIntents.create({
+        //   amount: subscription.amount,
+        //   currency: subscription.currency,
+        //   // automatic_payment_methods: { enabled: true },
+        //   confirmation_method: "automatic",
+        // });
 
-        // console.log(">>>>>>>", finalizedInvoice, "<<<<<<<<<<<<<<", invoiceId);
-        const clientSecret = invoiceId.payment_intent;
-
-        paymentIntent = finalizedInvoice.payment_intent;
+        // console.log("invoiceItem", paymentIntent, ">>>>>", finalizedInvoice);
+        if (finalizedInvoice) {
+          return {
+            code: "addon_added",
+            clientSecret: finalizedInvoice.client_secret,
+            invoice: finalizedInvoice.id,
+            paymentIntentStatus: finalizedInvoice.status,
+            isOneOff: true,
+            parentFound: true,
+          };
+        } else {
+          return {
+            code: "invoice_pending",
+            msg: "Invoice created but no payment intent available",
+          };
+        }
       }
     } else {
       subscription = await stripe.subscriptions.update(subscriptionId, {
@@ -232,10 +252,11 @@ const addAddon = async (req: any, res: NextApiResponse) => {
       clientSecret: paymentIntent?.client_secret,
       invoice: subscription?.latest_invoice?.id
         ? subscription?.latest_invoice?.id
-        : invoice.id,
+        : paymentIntent?.id,
       createDate: subscription?.start_date,
       paymentIntentStatus: paymentIntent?.status,
       isOneOff: isOneOff,
+      parentFound: true,
     };
   } catch (e) {
     console.error(e);

@@ -202,44 +202,23 @@ function DummyPaymentMethod({
 
         const isOneOff = subscription.data.isOneOff;
 
-        if (isOneOff) {
-          // Handle one-time payment flow by finalizing the invoice and processing the payment
-          const invoiceId = subscription.data.invoice;
-
-          // // Call Stripe to finalize the invoice (this can also be done in the backend)
-          // await stripe.invoices.finalizeInvoice(invoiceId);
-
-          // // Fetch the latest invoice and confirm payment
-          // const invoice = await stripe.invoices.retrieve(invoiceId);
-          // const clientSecret = invoice.payment_intent;
-
-          const stripePayload = await stripe.confirmCardPayment(
-            subscription.data.clientSecret,
-            {
-              payment_method: {
-                card: cardElement,
-              },
-            }
-          );
-
-          if (stripePayload.error) {
-            setCardErrors((prev) => ({
-              ...prev,
-              paymentFailed: true,
-            }));
-          } else {
-            setSubscriptionDetail(subscription.data);
-            setIsModalOpen(true); // Open modal to confirm success
-          }
-        } else {
-          paymentIntentStatus = subscription.data.paymentIntentStatus;
+        if (!subscription.data.parentFound) {
+          setPaymentLoading(false);
+          message.error(subscription.data.msg);
+          return;
         }
       } else {
         // object. Returns the subscription ID and client secret
         subscription = await axios.post(
           `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/create-subscription`,
-          { priceId: newPriceId, customerId: customerId }
+          { priceId: newPriceId, customerId: customerId, u_id: u_id }
         );
+
+        if (subscription.data.alreadyExist) {
+          message.error(subscription.data.msg);
+          setPaymentLoading(false);
+          return;
+        }
       }
       paymentIntentStatus = subscription.data.paymentIntentStatus;
 

@@ -1,4 +1,6 @@
 import { apiHandler } from "@/app/_helpers/server/api/api-handler";
+import clientPromise from "@/db";
+import { ObjectId } from "mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
 import Stripe from "stripe";
 
@@ -7,7 +9,26 @@ const createSubscription = async (req: any, res: NextApiResponse) => {
   try {
     const stripe = new Stripe(stripeKey);
 
-    const { customerId, priceId } = req.json();
+    const { customerId, priceId, u_id } = req.json();
+
+    const db = (await clientPromise!).db();
+    const collection = db.collection("users");
+    const data = await collection.findOne({ _id: new ObjectId(u_id) });
+
+    const subId = data.subId;
+
+    if (subId) {
+      const existingSubscription = await stripe.subscriptions.retrieve(subId);
+      const status = existingSubscription.status;
+
+      if (status == "active") {
+        return {
+          msg: "Subscription already exists. You can upgrade it only.",
+          subscriptionId: existingSubscription.id,
+          alreadyExist: true,
+        };
+      }
+    }
 
     // console.log("customer id ", customerId);
 
@@ -35,6 +56,8 @@ const createSubscription = async (req: any, res: NextApiResponse) => {
     // Get the PaymentIntent and its clientSecret
     const paymentIntent = subscription?.latest_invoice?.payment_intent;
 
+    console.log("paymentintetttt", paymentIntent);
+
     return {
       code: "subscription_created",
       subscriptionId: subscription.id,
@@ -45,6 +68,7 @@ const createSubscription = async (req: any, res: NextApiResponse) => {
       clientSecret: paymentIntent.client_secret,
       invoice: subscription.latest_invoice.id,
       createDate: subscription.start_date,
+      alreadyExist: false,
       paymentIntentStatus: paymentIntent.status,
     };
   } catch (e) {
