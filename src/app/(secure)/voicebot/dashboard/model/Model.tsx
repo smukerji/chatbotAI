@@ -44,9 +44,6 @@ function Model() {
     setStepsCount(voicebotDetails["model"]["temperature"] || 0);
     setMaxToken(voicebotDetails["model"]["maxTokens"] || "");
     setEmotionRecognitionEnabled(voicebotDetails["model"]["emotionRecognitionEnabled"]);
-    let check = voicebotDetails["model"]["emotionRecognitionEnabled"];
-    let check2 = emotionRecognitionEnabled;
-    debugger;
 
   },[ voicebotDetails.firstMessage, 
       voicebotDetails["model"]["messages"][0]["content"], 
@@ -134,7 +131,7 @@ function Model() {
 
   const maxTokenChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    debugger
+    // debugger
     setMaxToken(value);
     const intValue = parseInt(value, 10);
     if (!isNaN(intValue) && intValue <= 1000) {
