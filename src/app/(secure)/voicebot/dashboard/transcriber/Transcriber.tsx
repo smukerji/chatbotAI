@@ -3,23 +3,44 @@ import "./design.scss";
 import { Input, Slider, Switch } from 'antd';
 import { Select, ConfigProvider } from 'antd';
 
-import { useState } from "react";
-import { language } from "gray-matter";
-import { mode } from "crypto-js";
+import { useState, useContext, useEffect } from "react";
+import { CreateVoiceBotContext } from "../../../../_helpers/client/Context/VoiceBotContextApi"
+
 
 
 const { TextArea } = Input;
 
 function Transcriber() {
 
+  const voiceBotContextData: any = useContext(CreateVoiceBotContext);
+  const voicebotDetails = voiceBotContextData.state;
+
+
+
   const [models, setModels] = useState<{ value: string; label: string }[]>([]);
-  const [language,setLanguage] = useState<{ value: string; label: string }[]>([]);
+  const [selectedModel, setSelectedModel] = useState<string | undefined>(undefined);
+  const [language, setLanguage] = useState<{ value: string; label: string }[]>([]);
+  const [selectedLanguage, setSelectedLanguage] = useState<string | undefined>(undefined);
   const [selectedProvider, setSelectedProvider] = useState<string | undefined>(undefined);
+
+
+  useEffect(() => {
+    // Set the initial value from the context
+    setSelectedProvider(voicebotDetails["transcriber"]["provider"]);
+    setSelectedModel(voicebotDetails["transcriber"]["model"]);
+    setSelectedLanguage(voicebotDetails["transcriber"]["language"]);
+
+  }, [
+    voicebotDetails["transcriber"]["provider"],
+    voicebotDetails["transcriber"]["model"],
+    voicebotDetails["transcriber"]["language"]
+  ]);
 
 
   const providerChangeHandler = (value:any,options:any)=>{
 
     setSelectedProvider(options.label);
+    voiceBotContextData.updateState("transcriber.provider", options.label);
 
     // Update models based on selected provider
     const selectedProvider = providerList.find(provider => provider.label === options.label);
@@ -31,7 +52,53 @@ function Transcriber() {
       setModels([]);
       setLanguage([]);
     }
+
+    //reset the model value
+    setSelectedModel(undefined);
+    voiceBotContextData.updateState("transcriber.model", undefined);
+    setSelectedLanguage(undefined);
+    voiceBotContextData.updateState("transcriber.language", undefined);
   }
+
+  const modelChangeHandler = (value: string, option: any) => {
+    // debugger;
+    setSelectedModel(option.label);
+    // setModelValidationMessage("");// Clear validation message on valid selection
+    voiceBotContextData.updateState("transcriber.model", option.label);
+  }
+
+  const modelChangeHandlerListUpdate = () => {
+    // debugger
+    if (models.length === 0 && selectedProvider) {
+      console.log("selected model providers ", selectedProvider)
+      // debugger;
+      const selectedProviderList = providerList.find(provider => provider.label === selectedProvider);
+      if (selectedProviderList) {
+        setModels(selectedProviderList.model.map(model => ({ value: model+".", label: model })));
+        // setLanguage(selectedProviderList.language.map(language => ({ value: language+".", label: language })));
+      }
+    }
+  }
+
+  const languageChangeHandlerListUpdate = () => {
+    if(language.length === 0 && selectedProvider){
+      const selectedProviderList = providerList.find(provider => provider.label === selectedProvider);
+      if (selectedProviderList) {
+        // setModels(selectedProviderList.model.map(model => ({ value: model+".", label: model })));
+        setLanguage(selectedProviderList.language.map(language => ({ value: language+".", label: language })));
+      }
+    }
+  }
+
+  const languageChangeHandler = (value: string, option: any) => {
+    // debugger;
+    setSelectedLanguage(option.label);
+    // setModelValidationMessage("");// Clear validation message on valid selection
+    voiceBotContextData.updateState("transcriber.language", option.label);
+  }
+
+
+  console.log("your voicebot details ", voicebotDetails["transcriber"]);
 
 
 
@@ -351,21 +418,8 @@ function Transcriber() {
           className="select-field"
           placeholder="Select the provider"
           onChange={providerChangeHandler}
-          options={[
-            {
-              value: '1',
-              label: 'deepgram',
-            },
-            {
-              value: '2',
-              label: 'talkscriber',
-            },
-            {
-              value: '3',
-              label: 'gladia',
-            }
-          ]
-        }
+          options={providerList}
+          value={selectedProvider}
         />
 
         <h4 className="provider model">Model</h4>
@@ -373,6 +427,9 @@ function Transcriber() {
           className="select-field"
           placeholder="Select the model"
           options={models}
+          onChange={modelChangeHandler}
+          onClick={modelChangeHandlerListUpdate}
+          value={selectedModel}
         />
         <p className="model-info">GPT-4 is more accurate but slower and costlier than GPT-3.5 Turbo (1 min = 1 credit for GPT-3.5 Turbo, 20 credits for GPT-4).</p>
 
@@ -383,6 +440,9 @@ function Transcriber() {
           className="select-field"
           placeholder="Select the model"
           options={language}
+          onChange={languageChangeHandler}
+          onClick={languageChangeHandlerListUpdate}
+          value={selectedLanguage}
         />
       </div>
     </div>

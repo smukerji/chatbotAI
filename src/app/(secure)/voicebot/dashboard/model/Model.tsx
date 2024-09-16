@@ -46,12 +46,12 @@ function Model() {
     setEmotionRecognitionEnabled(voicebotDetails["model"]["emotionRecognitionEnabled"]);
 
   },[ voicebotDetails.firstMessage, 
-      voicebotDetails["model"]["messages"][0]["content"], 
+      voicebotDetails["model"]["messages"][0]["content"],
       voicebotDetails["model"]["provider"],
-    voicebotDetails["model"]["model"],
-    voicebotDetails["model"]["temperature"],
-    voicebotDetails["model"]["maxTokens"],
-    voicebotDetails["model"]["emotionRecognitionEnabled"]
+      voicebotDetails["model"]["model"],
+      voicebotDetails["model"]["temperature"],
+      voicebotDetails["model"]["maxTokens"],
+      voicebotDetails["model"]["emotionRecognitionEnabled"]
     ]);
 
 
@@ -112,6 +112,16 @@ function Model() {
     setSelectedModel(option.label);
     setModelValidationMessage("");// Clear validation message on valid selection
     voiceBotContextData.updateState("model.model", option.label);
+  }
+
+  const modelChangeHandlerListUpdate = () => {
+    // debugger
+    if (models.length === 0 && selectedProvider) {
+      const selectedProviderList = providersOption.find(provider => provider.label === selectedProvider);
+      if (selectedProviderList) {
+        setModels(selectedProviderList.models.map(model => ({ value: model + ".", label: model })));
+      }
+    }
   }
 
   const handleModelBlur = () => {
@@ -221,6 +231,7 @@ function Model() {
           value={selectedModel}
           options={models}
           onChange={modelChangeHandler}
+          onClick={modelChangeHandlerListUpdate}
           onBlur={handleModelBlur}
         />
         {modelValidationMessage && <p className="invalidation-message">{modelValidationMessage}</p>}
