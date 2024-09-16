@@ -4,6 +4,21 @@ import Stripe from "stripe";
 import { ObjectId } from "mongodb";
 const stripe = new Stripe(String(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY));
 
+const businessPlanMonthly = process.env.NEXT_PUBLIC_BUSINESS_PLAN_MONTHLY;
+const businessPlanYearly = process.env.NEXT_PUBLIC_BUSINESS_PLAN_YEARLY;
+const individualPlanMonthly = process.env.NEXT_PUBLIC_INDIVIDUAL_PLAN_MONTHLY;
+const individualPlanYearly = process.env.NEXT_PUBLIC_INDIVIDUAL_PLAN_YEARLY;
+const starterPlanMonthly = process.env.NEXT_PUBLIC_STARTER_PLAN_MONTHLY;
+const starterPlanYearly = process.env.NEXT_PUBLIC_STARTER_PLAN_YEARLY;
+
+const parentPlanIds = [
+  businessPlanMonthly,
+  businessPlanYearly,
+  individualPlanMonthly,
+  individualPlanYearly,
+  starterPlanMonthly,
+  starterPlanYearly,
+];
 export async function POST(req: any, res: any) {
   if (req.method !== "POST") {
     res.setHeader("Allow", ["POST"]);
@@ -28,6 +43,8 @@ export async function POST(req: any, res: any) {
     console.error("Webhook signature verification failed.", err);
     return res.status(400).end();
   }
+
+  console.log("eventtttttt", event.type);
 
   const planIds =
     event?.data?.object?.items?.data.map((item: any) => item?.plan?.id) || [];
@@ -324,24 +341,84 @@ export async function POST(req: any, res: any) {
         break;
 
       case "customer.subscription.updated":
-        userData = await collection.findOne({
-          customerId: event.data.object.customer,
-        });
+        // only runs if parent planid is updated. Cause for addon it is already written in addon route
+        console.log("coming in uodteeeee webhoooookkkk", planIds);
+        console.log(
+          planIds.some((planId: any) => parentPlanIds.includes(planId))
+        );
 
-        if (!userData) {
-          console.error(
-            `User not found for customerId: ${event.data.object.customer}`
-          );
-          break;
-        }
+        if (planIds.some((planId: any) => parentPlanIds.includes(planId))) {
+          console.log("coming in iffffffff");
 
-        Details = await collectionDetails.findOne({
-          userId: String(userData._id),
-        });
+          userData = await collection.findOne({
+            customerId: event.data.object.customer,
+          });
 
-        if (!Details) {
-          console.error(`Details not found for userId: ${userData._id}`);
-          break;
+          if (!userData) {
+            console.error(
+              `User not found for customerId: ${event.data.object.customer}`
+            );
+            break;
+          }
+
+          Details = await collectionDetails.findOne({
+            userId: String(userData._id),
+          });
+
+          if (!Details) {
+            console.error(`Details not found for userId: ${userData._id}`);
+            break;
+          }
+
+          for (let planId of planIds) {
+            console.log("planiiddddddddoooooo", planId, event.data.object);
+
+            const planData = await collectionPlan.findOne({ priceId: planId });
+
+            if (!planData) {
+              console.error(`Plan data not found for priceId: ${planId}`);
+            }
+
+            await collection.updateOne(
+              { customerId: event.data.object.customer },
+              {
+                $set: {
+                  subId: event.data.object.id ?? null,
+                  endDate: date,
+                  plan: planData.name ?? "",
+                  planId: planData._id ?? null,
+                  status: "active",
+                  duration: event.data.object.items.data[0].plan.interval,
+                  stripePlanId: planData.priceId ?? null,
+                  isWhatsapp: planData.isWhatsapp ?? false,
+                  subIdWhatsapp: event.data.object.id ?? null,
+                  nextIsWhatsapp: planData.isWhatsapp ?? false,
+                  lastUpdatedAt: new Date(),
+                  planIds: planIds,
+                },
+              }
+            );
+
+            await collectionDetails.updateMany(
+              { userId: String(userData?._id) },
+              {
+                $set: {
+                  trainingDataLimit: planData.trainingDataLimit ?? 1000000,
+                  totalMessageCount: 0,
+                  messageLimit: planData.messageLimit ?? 2000,
+                  chatbotLimit: planData.numberOfChatbot ?? 1,
+                  websiteCrawlingLimit: planData.websiteCrawlingLimit ?? 10,
+                  conversationHistory: planData.conversationHistory ?? "2",
+                  leads: planData.leads ?? "10",
+                  models: planData.models ?? "3.5&4o",
+                  // isWhatsapp: planData.isWhatsapp ?? false,
+                  isTelegram: planData.isTelegram ?? false,
+                  subIdTelegram: event.data.object.id ?? null,
+                  lastUpdatedAt: new Date(),
+                },
+              }
+            );
+          }
         }
 
         break;

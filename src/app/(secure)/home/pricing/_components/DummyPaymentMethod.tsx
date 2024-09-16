@@ -189,6 +189,21 @@ function DummyPaymentMethod({
         return;
       }
 
+      const { paymentMethod, error } = await stripe.createPaymentMethod({
+        type: "card",
+        card: cardElement,
+      });
+
+      if (error) {
+        // Handle error (e.g., show error message to the user)
+        console.error(error);
+        setCardErrors((prev) => ({
+          ...prev,
+          paymentFailed: true,
+          errorMessage: error.message,
+        }));
+      }
+
       // Call the subscribe endpoint and create a Stripe subscription
       let subscription;
       let paymentIntentStatus;
@@ -211,7 +226,12 @@ function DummyPaymentMethod({
         // object. Returns the subscription ID and client secret
         subscription = await axios.post(
           `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/create-subscription`,
-          { priceId: newPriceId, customerId: customerId, u_id: u_id }
+          {
+            priceId: newPriceId,
+            customerId: customerId,
+            u_id: u_id,
+            paymentMethodId: paymentMethod?.id,
+          }
         );
 
         if (subscription.data.alreadyExist) {
@@ -223,17 +243,18 @@ function DummyPaymentMethod({
       paymentIntentStatus = subscription.data.paymentIntentStatus;
 
       // Check if payment intent is already confirmed
-      if (paymentIntentStatus === "requires_payment_method") {
-        const stripePayload = await stripe.confirmCardPayment(
-          subscription.data.clientSecret,
-          {
+      if (
+        paymentIntentStatus === "requires_payment_method" ||
+        paymentIntentStatus === "requires_confirmation"
+      ) {
+        const { error: stripeError, paymentIntent } =
+          await stripe.confirmCardPayment(subscription.data.clientSecret, {
             payment_method: {
               card: cardElement,
             },
-          }
-        );
+          });
 
-        if (stripePayload.error) {
+        if (stripeError) {
           setCardErrors((prev) => ({
             ...prev,
             paymentFailed: true,
