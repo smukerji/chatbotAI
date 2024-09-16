@@ -43,7 +43,10 @@ function Model() {
 
     setStepsCount(voicebotDetails["model"]["temperature"] || 0);
     setMaxToken(voicebotDetails["model"]["maxTokens"] || "");
-    setEmotionRecognitionEnabled(voicebotDetails["model"]["emotionRecognitionEnabled"] || false);
+    setEmotionRecognitionEnabled(voicebotDetails["model"]["emotionRecognitionEnabled"]);
+    let check = voicebotDetails["model"]["emotionRecognitionEnabled"];
+    let check2 = emotionRecognitionEnabled;
+    debugger;
 
   },[ voicebotDetails.firstMessage, 
       voicebotDetails["model"]["messages"][0]["content"], 
@@ -267,7 +270,7 @@ function Model() {
 
         <div className="temprature emotional-detect">
           <h4 className="emotional-header">Emotion Detects</h4>
-          <Switch className="emotional-switch" defaultValue={emotionRecognitionEnabled} onChange={emotionRecognitionChangeHandler}/>
+          <Switch className="emotional-switch" value={emotionRecognitionEnabled} onChange={emotionRecognitionChangeHandler}/>
         </div>
 
       </div>
