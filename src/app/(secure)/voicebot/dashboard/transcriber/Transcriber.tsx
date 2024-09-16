@@ -12,11 +12,33 @@ const { TextArea } = Input;
 
 function Transcriber() {
 
+  const [models, setModels] = useState<{ value: string; label: string }[]>([]);
+  const [language,setLanguage] = useState<{ value: string; label: string }[]>([]);
+  const [selectedProvider, setSelectedProvider] = useState<string | undefined>(undefined);
+
+
+  const providerChangeHandler = (value:any,options:any)=>{
+
+    setSelectedProvider(options.label);
+
+    // Update models based on selected provider
+    const selectedProvider = providerList.find(provider => provider.label === options.label);
+
+    if (selectedProvider) {
+      setModels(selectedProvider.model.map(model => ({ value: model+".", label: model })));
+      setLanguage(selectedProvider.language.map(language => ({ value: language+".", label: language })));
+    } else {
+      setModels([]);
+      setLanguage([]);
+    }
+  }
+
+
 
   const providerList = [
     {
       value: "1",
-      lable: "deepgram",
+      label: "deepgram",
       language:[
         "bg",
         "ca",
@@ -108,7 +130,7 @@ function Transcriber() {
     },
     {
       value: "2",
-      lable: "talkscriber",
+      label: "talkscriber",//label
       language:[
         "en", // English
         "zh", // Chinese
@@ -152,8 +174,8 @@ function Transcriber() {
         "sk", // Slovak
         "te", // Telugu
         "fa", // Persian
-        "lv",
-        "bn",
+        "lv", // Latvian
+        "bn", // Bengali
         "sr",
         "az",
         "sl",
@@ -214,7 +236,7 @@ function Transcriber() {
     },
     {
       value: "3",
-      lable: "gladia",
+      label: "gladia",
       language: [
         "af",
         "sq",
@@ -321,9 +343,6 @@ function Transcriber() {
     }
   ]
   
-
-
-
   return (
     <div className="transcribe-container">
       <div className="left-column">
@@ -331,6 +350,7 @@ function Transcriber() {
         <Select
           className="select-field"
           placeholder="Select the provider"
+          onChange={providerChangeHandler}
           options={[
             {
               value: '1',
@@ -344,27 +364,15 @@ function Transcriber() {
               value: '3',
               label: 'gladia',
             }
-          ]}
+          ]
+        }
         />
 
         <h4 className="provider model">Model</h4>
         <Select
           className="select-field"
           placeholder="Select the model"
-          options={[
-            {
-              value: '1',
-              label: 'deepgram',
-            },
-            {
-              value: '2',
-              label: 'talkscriber',
-            },
-            {
-              value: '3',
-              label: 'gladia',
-            }
-          ]}
+          options={models}
         />
         <p className="model-info">GPT-4 is more accurate but slower and costlier than GPT-3.5 Turbo (1 min = 1 credit for GPT-3.5 Turbo, 20 credits for GPT-4).</p>
 
@@ -374,20 +382,7 @@ function Transcriber() {
         <Select
           className="select-field"
           placeholder="Select the model"
-          options={[
-            {
-              value: '1',
-              label: 'deepgram',
-            },
-            {
-              value: '2',
-              label: 'talkscriber',
-            },
-            {
-              value: '3',
-              label: 'gladia',
-            }
-          ]}
+          options={language}
         />
       </div>
     </div>
