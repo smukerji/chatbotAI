@@ -130,8 +130,6 @@ function Model() {
         setModelValidationMessage("Please select a model");
       }
     }
-
-   
   }
 
   const stepsCountChangeHandler = (value: number) => {

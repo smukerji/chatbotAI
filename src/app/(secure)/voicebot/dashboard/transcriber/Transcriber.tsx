@@ -22,6 +22,9 @@ function Transcriber() {
   const [language, setLanguage] = useState<{ value: string; label: string }[]>([]);
   const [selectedLanguage, setSelectedLanguage] = useState<string | undefined>(undefined);
   const [selectedProvider, setSelectedProvider] = useState<string | undefined>(undefined);
+  const [providerValidationMessage, setProviderValidationMessage] = useState<string>("");
+  const [modelValidationMessage, setModelValidationMessage] = useState<string>("");
+  const [languageValidationMessage, setLanguageValidationMessage] = useState<string>("");
 
 
   useEffect(() => {
@@ -40,6 +43,7 @@ function Transcriber() {
   const providerChangeHandler = (value:any,options:any)=>{
 
     setSelectedProvider(options.label);
+    setProviderValidationMessage(""); // Clear validation message on valid selection
     voiceBotContextData.updateState("transcriber.provider", options.label);
 
     // Update models based on selected provider
@@ -60,10 +64,17 @@ function Transcriber() {
     voiceBotContextData.updateState("transcriber.language", undefined);
   }
 
+  const handleProviderBlur = () => {
+    if (!selectedProvider) {
+      setProviderValidationMessage("Please select a provider");
+    }
+  }
+
+
   const modelChangeHandler = (value: string, option: any) => {
     // debugger;
     setSelectedModel(option.label);
-    // setModelValidationMessage("");// Clear validation message on valid selection
+    setModelValidationMessage("");// Clear validation message on valid selection
     voiceBotContextData.updateState("transcriber.model", option.label);
   }
 
@@ -76,6 +87,14 @@ function Transcriber() {
       if (selectedProviderList) {
         setModels(selectedProviderList.model.map(model => ({ value: model+".", label: model })));
         // setLanguage(selectedProviderList.language.map(language => ({ value: language+".", label: language })));
+      }
+    }
+  }
+
+  const handleModelBlur = () => {
+    if (selectedProvider) {
+      if (!selectedModel) {
+        setModelValidationMessage("Please select a model");
       }
     }
   }
@@ -93,14 +112,20 @@ function Transcriber() {
   const languageChangeHandler = (value: string, option: any) => {
     // debugger;
     setSelectedLanguage(option.label);
-    // setModelValidationMessage("");// Clear validation message on valid selection
+    setLanguageValidationMessage("");// Clear validation message on valid selection
     voiceBotContextData.updateState("transcriber.language", option.label);
+  }
+
+  const handleLanguageBlur = () => {
+    if (selectedProvider) {
+      if (!selectedLanguage) {
+        setLanguageValidationMessage("Please select a language");
+      }
+    }
   }
 
 
   console.log("your voicebot details ", voicebotDetails["transcriber"]);
-
-
 
   const providerList = [
     {
@@ -415,35 +440,42 @@ function Transcriber() {
       <div className="left-column">
         <h4 className="provider">Provider</h4>
         <Select
-          className="select-field"
+          className={providerValidationMessage ? "select-field error-provider" : "select-field"}
           placeholder="Select the provider"
           onChange={providerChangeHandler}
+          onBlur={handleProviderBlur}
           options={providerList}
           value={selectedProvider}
         />
+        {providerValidationMessage && <p className="invalidation-message">{providerValidationMessage}</p>}
 
         <h4 className="provider model">Model</h4>
         <Select
-          className="select-field"
+          className={modelValidationMessage ? "select-field error-model" : "select-field"}
           placeholder="Select the model"
           options={models}
           onChange={modelChangeHandler}
           onClick={modelChangeHandlerListUpdate}
+          onBlur={handleModelBlur}
           value={selectedModel}
         />
+        {modelValidationMessage && <p className="invalidation-message">{modelValidationMessage}</p>}
+        
         <p className="model-info">GPT-4 is more accurate but slower and costlier than GPT-3.5 Turbo (1 min = 1 credit for GPT-3.5 Turbo, 20 credits for GPT-4).</p>
 
       </div>
       <div className="right-column">
         <h4 className="provider language">Language</h4>
         <Select
-          className="select-field"
-          placeholder="Select the model"
+          className={languageValidationMessage ? "select-field error-language" : "select-field"}
+          placeholder="Select the Language"
           options={language}
           onChange={languageChangeHandler}
           onClick={languageChangeHandlerListUpdate}
+          onBlur={handleLanguageBlur}
           value={selectedLanguage}
         />
+        {languageValidationMessage && <p className="invalidation-message">{languageValidationMessage}</p>}
       </div>
     </div>
   )

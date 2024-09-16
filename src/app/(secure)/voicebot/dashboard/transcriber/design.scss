@@ -20,6 +20,29 @@
         font-weight: 500;
         line-height: 24px;
       }
+
+      .invalidation-message {
+        color: #F00000;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 20px;
+      }
+
+      .ant-select {
+        &.error-provider {
+          .ant-select-selector {
+            // border: #F00000;
+            border-color: #F00000 !important;
+          }
+        }
+
+        &.error-model {
+          .ant-select-selector {
+            border-color: #F00000 !important;
+          }
+        }
+      }
     
       .select-field {
         width: 100%;
@@ -86,6 +109,24 @@
           font-weight: 500;
           line-height: 24px;
         }
+
+                .invalidation-message {
+                  color: #F00000;
+                  font-size: 14px;
+                  font-style: normal;
+                  font-weight: 500;
+                  line-height: 20px;
+                }
+        
+                .ant-select {
+                  &.error-language {
+                    .ant-select-selector {
+                      // border: #F00000;
+                      border-color: #F00000 !important;
+                    }
+                  }
+        
+                }
       
         .select-field {
           width: 100%;
