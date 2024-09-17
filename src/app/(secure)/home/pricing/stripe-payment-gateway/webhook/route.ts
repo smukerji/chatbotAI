@@ -342,14 +342,8 @@ export async function POST(req: any, res: any) {
 
       case "customer.subscription.updated":
         // only runs if parent planid is updated. Cause for addon it is already written in addon route
-        console.log("coming in uodteeeee webhoooookkkk", planIds);
-        console.log(
-          planIds.some((planId: any) => parentPlanIds.includes(planId))
-        );
 
         if (planIds.some((planId: any) => parentPlanIds.includes(planId))) {
-          console.log("coming in iffffffff");
-
           userData = await collection.findOne({
             customerId: event.data.object.customer,
           });
@@ -371,12 +365,9 @@ export async function POST(req: any, res: any) {
           }
 
           for (let planId of planIds) {
-            console.log("planiiddddddddoooooo", planId, event.data.object);
-
             const planData = await collectionPlan.findOne({ priceId: planId });
 
             if (!planData) {
-              console.error(`Plan data not found for priceId: ${planId}`);
             }
 
             await collection.updateOne(

@@ -54,6 +54,7 @@ const createSubscription = async (req: any, res: NextApiResponse) => {
 
       let isUpgrade = false;
       let prorationBehavior: any = "create_prorations";
+      let updateNow = true;
 
       if (priceId.length > 1) {
         return {
@@ -96,13 +97,14 @@ const createSubscription = async (req: any, res: NextApiResponse) => {
         console.log("dddddddowwwwwnnnnnnnnn gradeeeeeee");
 
         prorationBehavior = "none"; // No proration for downgrades
+        updateNow = false; // We will update at the next cycle, not now
       }
       await attachPaymentMethodToCustomer(customerId, paymentMethodId);
 
       // -----------------------------------Update the subscription with the new plan--------------------------------------------------
-      const updatedSubscription: any = await stripe.subscriptions.update(
-        subId,
-        {
+      let updatedSubscription: any;
+      if (updateNow) {
+        updatedSubscription = await stripe.subscriptions.update(subId, {
           items: [
             {
               id: existingSubscription?.items?.data[0]?.id,
@@ -111,8 +113,33 @@ const createSubscription = async (req: any, res: NextApiResponse) => {
           ],
           proration_behavior: prorationBehavior,
           expand: ["latest_invoice.payment_intent"],
-        }
-      );
+        });
+      } else {
+        const schedule = await stripe.subscriptionSchedules.create({
+          // from_subscription: subId, // Link to the current active subscription
+          customer: customerId,
+          end_behavior: "release", // Keep the subscription active after the schedule ends
+          start_date: existingSubscription.current_period_end, // Schedule the downgrade for the next billing cycle
+          phases: [
+            {
+              items: [
+                {
+                  price: mainPlanId, // Downgrade plan ID
+                  quantity: 1,
+                },
+              ],
+              proration_behavior: "none", // No proration for downgrades
+            },
+          ],
+        });
+
+        // Handle the response for deferred downgrades
+        return {
+          code: "downgrade_scheduled",
+          subscriptionId: schedule.id,
+          msg: "Downgrade scheduled for the next billing cycle.",
+        };
+      }
 
       const paymentIntent = updatedSubscription?.latest_invoice?.payment_intent;
 
@@ -166,7 +193,6 @@ const createSubscription = async (req: any, res: NextApiResponse) => {
         clientSecret: paymentIntent?.client_secret,
         invoice: updatedSubscription?.latest_invoice?.id,
         createDate: updatedSubscription?.start_date,
-        alreadyExist: true,
         paymentIntentStatus: paymentIntent?.status,
       };
     }
