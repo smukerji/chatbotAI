@@ -11,6 +11,12 @@ const individualPlanYearly = process.env.NEXT_PUBLIC_INDIVIDUAL_PLAN_YEARLY;
 const starterPlanMonthly = process.env.NEXT_PUBLIC_STARTER_PLAN_MONTHLY;
 const starterPlanYearly = process.env.NEXT_PUBLIC_STARTER_PLAN_YEARLY;
 
+// one-off addons
+const msgSmall: any = process.env.NEXT_PUBLIC_MESSAGESMALL_PLAN_ID;
+const msgLarge: any = process.env.NEXT_PUBLIC_MESSAGELARGE_PLAN_ID;
+const onBoarding: any = process.env.NEXT_PUBLIC_ONBOARDING_FEES;
+const trainingData: any = process.env.NEXT_PUBLIC_TRAINING_DATA_MONTHLY;
+
 const parentPlanIds = [
   businessPlanMonthly,
   businessPlanYearly,
@@ -78,11 +84,6 @@ export async function POST(req: any, res: any) {
         }
 
         for (const planId of planIds) {
-          // if (!planData) {
-          //   console.error(`Plan data not found for priceId: ${planId}`);
-          //   continue;
-          // }
-
           if (planId === process.env.NEXT_PUBLIC_WHATSAPP_PLAN_ID_MONTHLY) {
             await collection.updateOne(
               { customerId: event.data.object.customer },
@@ -113,55 +114,6 @@ export async function POST(req: any, res: any) {
                 $set: {
                   isTelegram: true,
                   subIdTelegram: event.data.object.id,
-                },
-              }
-            );
-          } else if (planId === process.env.NEXT_PUBLIC_MESSAGESMALL_PLAN_ID) {
-            const planData = await collectionPlan.findOne({ priceId: planId });
-            const Details = await collectionDetails.findOne({
-              userId: String(userData._id),
-            });
-
-            await collectionDetails.updateMany(
-              { userId: String(userData._id) },
-              {
-                $set: {
-                  messageLimit:
-                    Number(Details?.messageLimit) +
-                    (planData.messageLimit ?? 0),
-                },
-              }
-            );
-          } else if (planId === process.env.NEXT_PUBLIC_MESSAGELARGE_PLAN_ID) {
-            const planData = await collectionPlan.findOne({ priceId: planId });
-            const Details = await collectionDetails.findOne({
-              userId: String(userData._id),
-            });
-
-            await collectionDetails.updateMany(
-              { userId: String(userData._id) },
-              {
-                $set: {
-                  messageLimit:
-                    Number(Details?.messageLimit) +
-                    Number(planData.messageLimit ?? 0),
-                },
-              }
-            );
-          } else if (planId === process.env.NEXT_PUBLIC_TRAINING_DATA_MONTHLY) {
-            const planData = await collectionPlan.findOne({ priceId: planId });
-
-            const Details = await collectionDetails.findOne({
-              userId: String(userData._id),
-            });
-
-            await collectionDetails.updateMany(
-              { userId: String(userData._id) },
-              {
-                $set: {
-                  trainingDataLimit:
-                    Number(Details?.trainingDataLimit) +
-                    Number(planData.trainingDataLimit ?? 0),
                 },
               }
             );
@@ -254,7 +206,21 @@ export async function POST(req: any, res: any) {
         break;
 
       case "invoice.paid":
-        date = new Date(event.data.object.lines.data[0].period.end * 1000);
+        // Separate one-off purchases and recurring add-ons
+        const oneOffAddons = [msgSmall, msgLarge, onBoarding, trainingData];
+        const isOneOff = planIds.every((id: any) => oneOffAddons.includes(id));
+        const oneOffIds =
+          event?.data?.object?.lines?.data.map(
+            (item: any) => item?.price?.id
+          ) || [];
+        console.log(
+          "planidsss",
+          planIds,
+          event?.data?.object?.lines?.data.map(
+            (item: any) => item?.price?.id
+          ) || []
+        );
+
         userData = await collection.findOne({
           customerId: event.data.object.customer,
         });
@@ -266,28 +232,85 @@ export async function POST(req: any, res: any) {
           break;
         }
 
-        const paymentStatus =
-          event.data.object.status === "paid" ? "success" : "failed";
-        const currentDate = new Date();
-        const formattedDate = currentDate.toLocaleString("en-US", {
-          month: "short",
-          day: "2-digit",
-          year: "numeric",
-        });
+        if (isOneOff) {
+          for (let planId of oneOffIds) {
+            if (planId == process.env.NEXT_PUBLIC_MESSAGESMALL_PLAN_ID) {
+              const planData = await collectionPlan.findOne({
+                priceId: planId,
+              });
+              const Details = await collectionDetails.findOne({
+                userId: String(userData._id),
+              });
 
-        await collectionPayment.insertOne({
-          userId: String(userData._id),
-          status: paymentStatus,
-          date: formattedDate,
-          price: `$${event.data.object.amount_paid / 100}`,
-          paymentId: event.data.object.id ?? null,
-        });
+              await collectionDetails.updateMany(
+                { userId: String(userData._id) },
+                {
+                  $set: {
+                    messageLimit:
+                      Number(Details?.messageLimit) +
+                      (planData.messageLimit ?? 0),
+                  },
+                }
+              );
+            } else if (planId == process.env.NEXT_PUBLIC_MESSAGELARGE_PLAN_ID) {
+              const planData = await collectionPlan.findOne({
+                priceId: planId,
+              });
+              const Details = await collectionDetails.findOne({
+                userId: String(userData._id),
+              });
 
-        // Optionally update subscription end date if it's a renewal
-        await collection.updateOne(
-          { customerId: event.data.object.customer },
-          { $set: { endDate: date } }
-        );
+              await collectionDetails.updateMany(
+                { userId: String(userData._id) },
+                {
+                  $set: {
+                    messageLimit:
+                      Number(Details?.messageLimit) +
+                      Number(planData.messageLimit ?? 0),
+                  },
+                }
+              );
+            } else if (planId == process.env.NEXT_PUBLIC_ONBOARDING_FEES) {
+              const planData = await collectionPlan.findOne({
+                priceId: planId,
+              });
+              const Details = await collectionDetails.findOne({
+                userId: String(userData._id),
+              });
+
+              await collection.updateOne(
+                { customerId: event.data.object.customer },
+                {
+                  $set: {
+                    isOnboarding: planData.isOnboarding,
+                  },
+                }
+              );
+            } else if (
+              planId == process.env.NEXT_PUBLIC_TRAINING_DATA_MONTHLY
+            ) {
+              const planData = await collectionPlan.findOne({
+                priceId: planId,
+              });
+
+              const Details = await collectionDetails.findOne({
+                userId: String(userData._id),
+              });
+
+              await collectionDetails.updateMany(
+                { userId: String(userData._id) },
+                {
+                  $set: {
+                    trainingDataLimit:
+                      Number(Details?.trainingDataLimit) +
+                      Number(planData.trainingDataLimit ?? 0),
+                  },
+                }
+              );
+            }
+          }
+        }
+
         break;
 
       case "customer.subscription.deleted":

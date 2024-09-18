@@ -164,6 +164,8 @@ function DummyPaymentMethod({
   // On submit subscription functionality
   async function handleSubmit(event: any) {
     try {
+      console.log("coming handle submit");
+
       setCardErrors((prev) => {
         return {
           ...prev,
@@ -210,14 +212,24 @@ function DummyPaymentMethod({
 
       if (source == "addon") {
         // Call your update endpoint to add an addon to the existing subscription
+        console.log("coming here in addon call");
+
         subscription = await axios.post(
           `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/add-addon`,
-          { priceId: newPriceId, customerId: customerId, u_id: u_id }
+          {
+            priceId: newPriceId,
+            customerId: customerId,
+            u_id: u_id,
+            paymentMethodId: paymentMethod?.id,
+          }
         );
+        console.log("subscriptionnnssss", subscription);
 
-        const isOneOff = subscription.data.isOneOff;
+        // const isOneOff = subscription.data.isOneOff;
 
         if (!subscription.data.parentFound) {
+          console.log("coming insideee iffff");
+
           setPaymentLoading(false);
           message.error(subscription.data.msg);
           return;
@@ -240,7 +252,10 @@ function DummyPaymentMethod({
           return;
         }
       }
+      console.log("subscription", subscription.data);
+
       paymentIntentStatus = subscription.data.paymentIntentStatus;
+      console.log("paymentIntentss", paymentIntentStatus);
 
       // Check if payment intent is already confirmed
       if (
@@ -264,7 +279,12 @@ function DummyPaymentMethod({
 
           setIsModalOpen(true);
         }
-      } else if (paymentIntentStatus === "succeeded") {
+      } else if (
+        paymentIntentStatus === "succeeded" ||
+        paymentIntentStatus === "paid"
+      ) {
+        console.log("coming insdiee elseeee");
+
         setSubscriptionDetail(subscription.data);
 
         // Payment has already succeeded, no need to confirm again
@@ -407,12 +427,12 @@ function DummyPaymentMethod({
         <Loader />
       ) : (
         <>
-          {isModalOpen && (
+          {/* {isModalOpen && (
             <PaymentSucessmodal
               isModalOpen={isModalOpen}
               subscriptionDetail={subscriptionDetail}
             />
-          )}
+          )} */}
 
           {/* ----------------------------Main card start----------------------------- */}
           <div className="card-main new-card">

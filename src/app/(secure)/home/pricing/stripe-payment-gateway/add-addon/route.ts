@@ -9,12 +9,34 @@ const msgLarge: any = process.env.NEXT_PUBLIC_MESSAGELARGE_PLAN_ID;
 const onBoarding: any = process.env.NEXT_PUBLIC_ONBOARDING_FEES;
 const trainingData: any = process.env.NEXT_PUBLIC_TRAINING_DATA_MONTHLY;
 
-const addAddon = async (req: any, res: NextApiResponse) => {
-  const stripeKey: any = process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY;
-  try {
-    const stripe = new Stripe(stripeKey);
+const stripeKey: any = process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY;
+const stripe = new Stripe(stripeKey);
 
-    const { customerId, priceId, u_id } = req.json();
+// attach payment method to customer
+const attachPaymentMethodToCustomer = async (
+  customerId: string,
+  paymentMethodId: string
+) => {
+  try {
+    // Attach the payment method to the customer
+    await stripe.paymentMethods.attach(paymentMethodId, {
+      customer: customerId,
+    });
+
+    // Set the payment method as the default for future invoices
+    await stripe.customers.update(customerId, {
+      invoice_settings: {
+        default_payment_method: paymentMethodId,
+      },
+    });
+  } catch (error) {
+    throw new Error(`Error attaching payment method: ${error}`);
+  }
+};
+
+const addAddon = async (req: any, res: NextApiResponse) => {
+  try {
+    const { customerId, priceId, u_id, paymentMethodId } = req.json();
 
     const db = (await clientPromise!).db();
     const collection = db.collection("users");
@@ -48,57 +70,55 @@ const addAddon = async (req: any, res: NextApiResponse) => {
     let subscription: any;
     let invoice: any;
 
+    await attachPaymentMethodToCustomer(customerId, paymentMethodId);
+
     // If the add-on is a one-off purchase, create a new invoice
     if (isOneOff) {
       // console.log("Processing one-off purchase. Creating new invoice...");
+      let paidInvoice: any;
 
       for (let price of priceId) {
-        console.log("priceee", price, customerId);
+        // Create the invoice item (one-off addon)
+        // Create the invoice for the customer
 
-        subscription = await stripe.invoiceItems.create({
+        const invoice = await stripe.invoices.create({
           customer: customerId,
-          price: price, // Assuming a single one-off item
-          // expand: ["latest_invoice.payment_intent"],
+          auto_advance: false, // We will finalize it manually
+          default_payment_method: paymentMethodId,
         });
 
-        // Create an invoice immediately for one-off purchases
-        const invoice: any = await stripe.invoices.create({
+        const invoiceItem = await stripe.invoiceItems.create({
           customer: customerId,
-          collection_method: "charge_automatically", // Automatic charge when finalized
-          auto_advance: true,
+          price: price,
+          quantity: 1, // Modify this if needed
+          invoice: invoice.id,
         });
 
-        console.log("subscriptiosssss", subscription);
-
-        // Finalize the invoice to trigger payment
-        const finalizedInvoice: any = await stripe.invoices.finalizeInvoice(
+        // Finalize the invoice to make it ready for payment
+        const finalizedInvoice = await stripe.invoices.finalizeInvoice(
           invoice.id
         );
 
-        console.log("invoice>>>", finalizedInvoice);
-        // paymentIntent = await stripe.paymentIntents.create({
-        //   amount: subscription.amount,
-        //   currency: subscription.currency,
-        //   // automatic_payment_methods: { enabled: true },
-        //   confirmation_method: "automatic",
-        // });
-
-        // console.log("invoiceItem", paymentIntent, ">>>>>", finalizedInvoice);
-        if (finalizedInvoice) {
-          return {
-            code: "addon_added",
-            clientSecret: finalizedInvoice.client_secret,
-            invoice: finalizedInvoice.id,
-            paymentIntentStatus: finalizedInvoice.status,
-            isOneOff: true,
-            parentFound: true,
-          };
-        } else {
-          return {
-            code: "invoice_pending",
-            msg: "Invoice created but no payment intent available",
-          };
-        }
+        // Pay the invoice immediately to charge the customer
+        paidInvoice = await stripe.invoices.pay(invoice.id);
+      }
+      if (paidInvoice.status === "paid") {
+        return {
+          code: "addon_added",
+          subscriptionId: subscriptionId,
+          invoice: paidInvoice.id,
+          createDate: paidInvoice.status_transitions.finalized_at,
+          paymentIntentStatus: paidInvoice.status,
+          isOneOff: isOneOff,
+          parentFound: true,
+        };
+      } else {
+        return {
+          code: "addon_add_failed",
+          subscriptionId: subscriptionId,
+          isOneOff: isOneOff,
+          parentFound: true,
+        };
       }
     } else {
       subscription = await stripe.subscriptions.update(subscriptionId, {
@@ -110,16 +130,6 @@ const addAddon = async (req: any, res: NextApiResponse) => {
       paymentIntent = subscription?.latest_invoice?.payment_intent;
     }
     const priceIds = pricePlans.map((plan: any) => plan.price);
-
-    // Optional but recommended
-    // Save the subscription object or ID to your database
-
-    // Send the subscription ID and a client secret that the
-    // Stripe subscription API creates. The subscription ID
-    // and client secret will be used to
-    // complete the payment on the frontend later.
-
-    // Get the PaymentIntent and its clientSecret
 
     // update the database
     for (const planId of priceIds) {
