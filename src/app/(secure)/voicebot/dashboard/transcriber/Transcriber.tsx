@@ -1,7 +1,7 @@
 import dynamic from "next/dynamic";
 import "./design.scss";
 import { Input, Slider, Switch } from 'antd';
-import { Select, ConfigProvider } from 'antd';
+import { Select } from 'antd';
 
 import { useState, useContext, useEffect } from "react";
 import { CreateVoiceBotContext } from "../../../../_helpers/client/Context/VoiceBotContextApi"
