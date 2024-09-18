@@ -13,6 +13,11 @@ function Voice() {
   const [selectedVoice, setSelectedVoice] = useState<string | undefined>(undefined);
   const [voices, setVoices] = useState<{ value: string; label: string }[]>([]);
   const [voiceValidationMessage, setVoiceValidationMessage] = useState<string>("");
+  const [backgroundSound, setBackgroundSound] = useState<string | undefined>(undefined);
+  const [minCharecters, setMinCharecters] = useState<number>();
+  const [inputMinCharValidationMessage, setInputMinCharValidationMessage] = useState<string>("");
+  const [selectedPunctuationBoundaries, setSelectedPunctuationBoundaries] = useState<string[]>([]);
+  
 
   const voiceBotContextData: any = useContext(CreateVoiceBotContext);
   const voicebotDetails = voiceBotContextData.state;
@@ -69,6 +74,23 @@ function Voice() {
       }
   ];
 
+  const punctuationBoundary = [
+    { value: "0", label: "。" },
+    { value: "1", label: "，" },
+    { value: "2", label: "." },
+    { value: "3", label: "!" },
+    { value: "4", label: "?" },
+    { value: "5", label: ";" },
+    { value: "6", label: "،" },
+    { value: "7", label: "۔" },
+    { value: "8", label: "।" },
+    { value: "9", label: "॥" },
+    { value: "10", label: "|" },
+    { value: "11", label: "||" },
+    { value: "12", label: "," },
+    { value: "13", label: ":" }
+];
+
   const providerChangeHandler = (value: any, options: any) => {
 
     setSelectedProvider(options.label);
@@ -109,6 +131,35 @@ function Voice() {
       }
     }
   }
+
+  const minCharChangeHandler = (e:  React.ChangeEvent<HTMLInputElement>) => {
+    const intValue = parseInt(e.target.value, 10);
+    setMinCharecters(intValue);
+    if(!isNaN(intValue) && intValue <= 80 && intValue >= 0) {
+      setInputMinCharValidationMessage("");
+      
+      voiceBotContextData.updateState("voice.chunkPlan.minCharacters", intValue);
+    }
+    else{
+      // setMinCharecters(undefined);
+      voiceBotContextData.updateState("voice.chunkPlan.minCharacters", 0);
+      setInputMinCharValidationMessage("Please enter a valid number between 0 and 80");
+    }
+   
+  }
+
+  const backgroundSoundChangeHandler = (value: string, option: any) => {
+    setBackgroundSound(option.label);
+    voiceBotContextData.updateState("backgroundSound", option.label);
+  }
+
+  const punctuationChangeHandler = (value: any, options: any) => {
+    debugger;
+    setSelectedPunctuationBoundaries(options);
+    const labelOnly = options.map((option: any) => option.label);
+    voiceBotContextData.updateState("voice.chunkPlan.punctuationBoundaries", labelOnly);
+  }
+  console.log("background sound ", voicebotDetails["backgroundSound"]);
 
 
   console.log("your voicebot details ", voicebotDetails["voice"]);
@@ -164,73 +215,51 @@ function Voice() {
               <h4>Background Sound</h4>
               <Select
                 className="select-field"
-
-                placeholder="Select the voice model"
-
-
+                placeholder="Select the background sound"
                 options={[
                   {
                     value: '1',
-                    label: 'deepgram',
+                    label: 'Off',
                   },
                   {
                     value: '2',
-                    label: 'talkscriber',
+                    label: 'Office',
                   },
                   {
                     value: '3',
-                    label: 'gladia',
+                    label: 'Default',
                   }
                 ]}
+                value={backgroundSound}
+                
+
+                onChange={backgroundSoundChangeHandler}
+
+
               />
             </div>
             <div className="wrapper-content">
               <h4>Input Min Characters</h4>
-              <Select
-                className="select-field"
-
-                placeholder="Select the voice model"
-
-
-                options={[
-                  {
-                    value: '1',
-                    label: 'deepgram',
-                  },
-                  {
-                    value: '2',
-                    label: 'talkscriber',
-                  },
-                  {
-                    value: '3',
-                    label: 'gladia',
-                  }
-                ]}
+              <Input
+                className={inputMinCharValidationMessage ? "min-charecters-input invalid-input" : "min-charecters-input"}
+                placeholder="300"
+                type="number"
+                value={minCharecters}
+                onChange={minCharChangeHandler}
               />
+              {inputMinCharValidationMessage && <p className="invalidation-message">{inputMinCharValidationMessage}</p>}
             </div>
           </div>
 
           <h4 className="provider">Punctuation Boundaries</h4>
           <Select
             className="select-field"
-
+            mode="multiple"
             placeholder="No Puncutation Boundaries Added."
+            onChange={punctuationChangeHandler}
+            value={selectedPunctuationBoundaries}
 
-
-            options={[
-              {
-                value: '1',
-                label: 'deepgram',
-              },
-              {
-                value: '2',
-                label: 'talkscriber',
-              },
-              {
-                value: '3',
-                label: 'gladia',
-              }
-            ]}
+            options={punctuationBoundary}
           />
 
           <div className="emotional-detect">

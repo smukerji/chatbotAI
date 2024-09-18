@@ -267,6 +267,37 @@
         }
       }
 
+
+      .min-charecters-input{
+        margin-top: 0.5rem;
+        font-size: 16px;
+        font-style: normal;
+        font-family: "General Sans";
+        font-weight: 500;
+        line-height: 24px;
+        padding: 12px 16px;
+        border-radius: 12px;
+        border: 1px solid #E6E8EC;
+        background: #FFF;
+      }
+
+      .invalid-input {
+        border-color: #F00000;
+      }
+
+      .invalidation-message {
+        color: #F00000;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 20px;
+      }
+
+
+
+
+
+
       .emotional-detect {
         display: flex;
         justify-content: space-between;
