@@ -7,7 +7,7 @@ import { CreateVoiceBotContext } from "../../../../_helpers/client/Context/Voice
 
 
 function Voice() {
-  const [stepsCount, setStepsCount] = useState<number>(5);
+  // const [stepsCount, setStepsCount] = useState<number>(5);
   const [selectedProvider, setSelectedProvider] = useState<string | undefined>(undefined);
   const [providerValidationMessage, setProviderValidationMessage] = useState<string>("");
   const [selectedVoice, setSelectedVoice] = useState<string | undefined>(undefined);
@@ -30,6 +30,26 @@ function Voice() {
 
   const voiceBotContextData: any = useContext(CreateVoiceBotContext);
   const voicebotDetails = voiceBotContextData.state;
+
+  useEffect(() => {
+    setSelectedProvider(voicebotDetails["voice"]["provider"] || undefined);
+    setSelectedVoice(voicebotDetails["voice"]["voiceId"] || undefined);
+    setBackgroundSound(voicebotDetails["backgroundSound"] || undefined);
+    setMinCharecters(voicebotDetails["voice"]["chunkPlan"]["minCharacters"] || undefined);
+    setSelectedPunctuationBoundaries(voicebotDetails["voice"]["chunkPlan"]["punctuationBoundaries"] || []);
+    setFillerInjectionEnabled(voicebotDetails["voice"]["fillerInjectionEnabled"] || false);
+    setBackchannelingEnabled(voicebotDetails["backchannelingEnabled"] || false);
+    setBackgroundDenoisingEnabled(voicebotDetails["backgroundDenoisingEnabled"] || false);
+  },[
+    voicebotDetails["voice"]["provider"],
+    voicebotDetails["voice"]["voiceId"],
+    voicebotDetails["backgroundSound"],
+    voicebotDetails["voice"]["chunkPlan"]["minCharacters"],
+    voicebotDetails["voice"]["chunkPlan"]["punctuationBoundaries"],
+    voicebotDetails["voice"]["fillerInjectionEnabled"],
+    voicebotDetails["backchannelingEnabled"],
+    voicebotDetails["backgroundDenoisingEnabled"]
+  ]);
 
   
   const voiceProviderList = [
@@ -166,7 +186,7 @@ function Voice() {
     debugger;
     setSelectedPunctuationBoundaries(options);
     const labelOnly = options.map((option: any) => option.label);
-    voiceBotContextData.updateState("voice.chunkPlan.punctuationBoundaries", labelOnly);
+    voiceBotContextData.updateState("voice.chunkPlan.punctuationBoundaries", options);
   }
   console.log("background sound ", voicebotDetails["backgroundSound"]);
 
@@ -205,14 +225,10 @@ function Voice() {
           <h4 className="provider">Provider</h4>
           <Select
             className={providerValidationMessage ? "select-field error-provider" : "select-field"}
-
             placeholder="Select the provider"
-
             onChange={providerChangeHandler}
             onBlur={handleProviderBlur}
             value={selectedProvider}
-
-
             options={voiceProviderList}
           />
           {providerValidationMessage && <p className="invalidation-message">{providerValidationMessage}</p>}
@@ -294,19 +310,19 @@ function Voice() {
 
           <div className="emotional-detect">
             <h4 className="emotional-header">Filler Injection Enabled</h4>
-            <Switch className="emotional-switch" onChange={fillerInjectionCheckChangeHandler}/>
+            <Switch className="emotional-switch" value={fillerInjectionEnabled} onChange={fillerInjectionCheckChangeHandler}/>
           </div>
           <p className="emotional-detect-description">This determines whether fillers are injected into the Model output before inputting it into the Voice provider.</p>
 
           <div className="emotional-detect">
             <h4 className="emotional-header">Backchanneling Enabled</h4>
-            <Switch className="emotional-switch" onChange={backchannelingCheckChangeHandler} />
+            <Switch className="emotional-switch" value={backchannelingEnabled} onChange={backchannelingCheckChangeHandler} />
           </div>
           <p className="emotional-detect-description">Make the bot say words like &lsquo;mhmm&lsquo;, &lsquo;ya&lsquo; etc. while listening to make the conversation sounds natural. Default disabled</p>
 
           <div className="emotional-detect">
             <h4 className="emotional-header">Background Denoising Enabled</h4>
-            <Switch className="emotional-switch" onChange={backgroundDenoisingCheckChangeHandler} />
+            <Switch className="emotional-switch" value={backgroundDenoisingEnabled} onChange={backgroundDenoisingCheckChangeHandler} />
           </div>
           <p className="emotional-detect-description">Filter background noise while the user is talking.</p>
 
