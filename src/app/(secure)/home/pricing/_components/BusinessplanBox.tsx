@@ -1,6 +1,7 @@
 import Image from "next/image";
 import React from "react";
-import tickCircle from "../../../../../../public/svgs/tick-circle.svg";
+import tickCircleWhite from "../../../../../../public/svgs/tick-circle-white.svg";
+import tickCircleBlue from "../../../../../../public/svgs/tick-circle.svg";
 
 const monthlyStarterPlanId: any = process.env.NEXT_PUBLIC_BUSINESS_PLAN_MONTHLY;
 const yearlyStarterPlanId: any = process.env.NEXT_PUBLIC_BUSINESS_PLAN_YEARLY;
@@ -34,6 +35,8 @@ function BusinessplanBox({
     (activePlan?.id === monthlyStarterPlanId ||
       activePlan?.id === yearlyStarterPlanId) &&
     activePlan?.active;
+
+  const tickCircle = isPlanActive ? tickCircleWhite : tickCircleBlue;
 
   return (
     <>
@@ -114,7 +117,9 @@ function BusinessplanBox({
             disabled={isPlanActive}
             title={isPlanActive ? "Active Plan" : undefined}
           >
-            <span className="btn-text">Get Started</span>
+            <span className="btn-text">
+              {isPlanActive ? "Current Plan" : "Get Started"}
+            </span>
           </button>
         </div>
       </div>

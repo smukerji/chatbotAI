@@ -26,42 +26,13 @@ import Loader from "../pricing/_components/Loader";
 function BillingAndUsage() {
   const [cookies, setCookie] = useCookies(["userId"]);
   const { status } = useSession();
-  const [plan, setPlan] = useState("");
-  const [msg, setMsg] = useState(0);
-  const [chat, setChat] = useState(0);
   const [date, setDate] = useState<any>();
-  const [duration, setDuration] = useState("");
-  const [disable, setDisable] = useState(false);
-  const [buttonDisable, setButtonDisable] = useState(false);
-  const [planDetail, setPlanDetail] = useState();
+  const [planDetail, setPlanDetail] = useState<any>();
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isWhatsappModalOpen, setIsWhatsappModalOpen] = useState(false);
-  const [whatsapp, setWhatsapp] = useState(false);
-  const userDetailContext: any = useContext(UserDetailsContext);
-  const userDetails = userDetailContext?.userDetails;
   const [loading, setLoading] = useState(true);
+  const [plan, setPlan] = useState<any>();
   // const [columns, setColumns] = useState([])
-
-  //ANCHOR - API CALL TO CANCEL WHATSAPP INTEGRATION FOR NEXT BILLING CYCLE
-  const handleWhatsappOk = async () => {
-    if (whatsapp == true) {
-      const response = await axios.put(
-        `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/BillingAndUsage/api`,
-        {
-          u_id: cookies.userId,
-          x: 1,
-        }
-      );
-      if (response.data.status == true) {
-        message.success(response.data.msg);
-      } else {
-        message.error(response.data.msg);
-      }
-      setWhatsapp(false);
-      setIsWhatsappModalOpen(false);
-    }
-  };
 
   //ANCHOR - API CALL TO CANCEL PLAN FOR NEXT BILLING CYCLE
   const handleOk = async () => {
@@ -77,13 +48,8 @@ function BillingAndUsage() {
     } else {
       message.error(response.data.msg);
     }
-    setDisable(true);
+    // setDisable(true);
     setIsModalOpen(false);
-    setWhatsapp(false);
-    setIsWhatsappModalOpen(false);
-  };
-  const handleWhatsappCancel = () => {
-    setIsWhatsappModalOpen(false);
   };
 
   const handleCancel = () => {
@@ -105,32 +71,21 @@ function BillingAndUsage() {
         }
       );
 
-      setChat(response?.data?.chatbot);
-      setMsg(response?.data?.message);
-      setPlan(response?.data?.plan);
-      setWhatsapp(response?.data?.whatsappIntegration);
       setPlanDetail(response?.data?.planDetail);
+      setPlan(response.data);
       const newDate = new Date(response?.data?.nextRenewal);
       const options: any = { year: "numeric", month: "short", day: "2-digit" };
       const formattedDate: any = newDate.toLocaleDateString("en-US", options);
       setDate(formattedDate);
-      // setDataSource(response?.data?.paymentDetails);
-      if (response?.data?.status == "cancel") {
-        setDisable(true);
-        setButtonDisable(true);
-      } else if (response?.data?.status == undefined) {
-        setButtonDisable(false);
-      } else {
-        setButtonDisable(true);
-      }
+      // if (response?.data?.status == "cancel") {
+      //   setDisable(true);
+      //   setButtonDisable(true);
+      // } else if (response?.data?.status == undefined) {
+      //   setButtonDisable(false);
+      // } else {
+      //   setButtonDisable(true);
+      // }
 
-      if (!response?.data?.duration) {
-        setDuration("7 days free trial");
-      } else if (response?.data?.duration == "month") {
-        setDuration("Billed monthly");
-      } else {
-        setDuration("Billed yearly");
-      }
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -163,21 +118,7 @@ function BillingAndUsage() {
               {/* <p>Are you sure to cancel your plan?</p> */}
               <CancelPlanModal planDetail={planDetail} date={date} />
             </Modal>
-            <Modal
-              title="Cancel My Plan"
-              open={isWhatsappModalOpen}
-              onOk={handleWhatsappOk}
-              onCancel={handleWhatsappCancel}
-              cancelText="Keep"
-              okText="Cancel"
-              // closeIcon={null}
-              className="modelCancelWhatsapp"
-              centered
-            >
-              <p>
-                Are you sure to cancel Whatsapp integration from next cycle?
-              </p>
-            </Modal>
+
             <div className="billing-main">
               <div className="billing-head">Billing & Usage</div>
               <div className="message-count">
@@ -187,11 +128,12 @@ function BillingAndUsage() {
               <div className="plan-details">
                 <div className="name-features">
                   <div className="plan-name-container">
-                    <span className="plan-name">{userDetails?.plan?.name}</span>
-                    {duration != "" && (
+                    <span className="plan-name">{planDetail?.name}</span>
+                    {plan?.duration != "" && (
                       <div className="plan-duration">
                         <span className="plan-duration-text">
-                          Billed Monthly
+                          Billed{" "}
+                          {plan?.duration === "month" ? "Monthly" : "Yearly"}
                         </span>
                       </div>
                     )}

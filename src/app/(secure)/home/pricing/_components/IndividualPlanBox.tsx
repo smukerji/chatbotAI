@@ -1,6 +1,7 @@
 import Image from "next/image";
 import React from "react";
-import tickCircle from "../../../../../../public/svgs/tick-circle.svg";
+import tickCircleBlue from "../../../../../../public/svgs/tick-circle.svg";
+import tickCircleWhite from "../../../../../../public/svgs/tick-circle-white.svg";
 
 const monthlyStarterPlanId: any =
   process.env.NEXT_PUBLIC_INDIVIDUAL_PLAN_MONTHLY;
@@ -35,6 +36,8 @@ function IndividualPlanBox({
     (activePlan?.id === monthlyStarterPlanId ||
       activePlan?.id === yearlyStarterPlanId) &&
     activePlan?.active;
+
+  const tickCircle = isPlanActive ? tickCircleWhite : tickCircleBlue;
 
   console.log("active plan", activePlan);
 
@@ -126,7 +129,9 @@ function IndividualPlanBox({
             disabled={isPlanActive}
             title={isPlanActive ? "Active Plan" : undefined}
           >
-            <span className="btn-text">Get Started</span>
+            <span className="btn-text">
+              {isPlanActive ? "Current Plan" : "Get Started"}
+            </span>
           </button>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import React from "react";
-import tickCircle from "../../../../../../public/svgs/tick-circle-white.svg";
+import tickCircleWhite from "../../../../../../public/svgs/tick-circle-white.svg";
+import tickCircleBlue from "../../../../../../public/svgs/tick-circle.svg";
 import { useRouter } from "next/navigation";
 import CryptoJS from "crypto-js";
 
@@ -38,12 +39,14 @@ function StarterPlanBox({
       activePlan?.id === yearlyStarterPlanId) &&
     activePlan?.active;
 
+  const tickCircle = isPlanActive ? tickCircleWhite : tickCircleBlue;
+
   return (
     <>
-      <div className="plan-box plan-box-even">
+      <div className={`plan-box ${isPlanActive && "plan-box-even"}`}>
         <div className="plan-plan plan-row">
           <div className="plan-name-price">
-            <span className="plan-name plan-name-even">Starter Plan</span>
+            <span className={`plan-name plan-name-even`}>Starter Plan</span>
             <span className="plan-placeholder plan-placeholder-even">
               <span className="free-trial">For startups or personal use</span>
             </span>
@@ -134,7 +137,9 @@ function StarterPlanBox({
             disabled={isPlanActive}
             title={isPlanActive ? "Active Plan" : undefined}
           >
-            <span className="btn-text">Get Started</span>
+            <span className="btn-text">
+              {isPlanActive ? "Current Plan" : "Get Started"}
+            </span>
           </button>
         </div>
       </div>

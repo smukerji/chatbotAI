@@ -98,6 +98,10 @@ function PricingWrapperNew() {
       );
 
       setActivePlan(checkPlan?.data?.price);
+
+      // for setting tab monthly/yearly according to active plan
+      const duration = checkPlan?.data?.duration;
+      setIsYearlyPlan(duration === "month" ? false : true);
     } catch (error) {
       console.log("error", error);
     } finally {
@@ -128,7 +132,7 @@ function PricingWrapperNew() {
     window.scrollTo(0, 0);
   }, []);
 
-  // console.log("prices", prices);
+  console.log("activePlan", activePlan);
 
   return (
     <>

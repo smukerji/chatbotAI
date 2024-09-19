@@ -267,6 +267,26 @@
 
       &.plan-box-even {
         background: #2e58ea;
+
+        .plan-name-even {
+          color: #fcfcfd;
+        }
+
+        .plan-text-even {
+          color: #fcfcfd;
+        }
+
+        .plan-placeholder-even {
+          color: #fcfcfd;
+        }
+
+        .price-sign-even {
+          color: #fcfcfd;
+        }
+
+        .price-number-even {
+          color: #fcfcfd;
+        }
       }
 
       .plan-plan {
@@ -291,9 +311,9 @@
             font-weight: 600;
             line-height: 32px;
 
-            &.plan-name-even {
-              color: #fcfcfd;
-            }
+            // &.plan-name-even {
+            //   color: #fcfcfd;
+            // }
           }
 
           .plan-placeholder {
@@ -305,9 +325,9 @@
             line-height: 24px;
             // width: 266px;
 
-            &.plan-placeholder-even {
-              color: #fcfcfd;
-            }
+            // &.plan-placeholder-even {
+            //   color: #fcfcfd;
+            // }
 
             .free-trial {
               font-weight: 500;
@@ -339,9 +359,9 @@
               line-height: 28px;
 
               /* 140% */
-              &.price-sign-even {
-                color: #fcfcfd;
-              }
+              // &.price-sign-even {
+              //   color: #fcfcfd;
+              // }
             }
 
             .price-number {
@@ -354,10 +374,10 @@
               font-weight: 600;
               line-height: 72px;
 
-              /* 120% */
-              &.price-number-even {
-                color: #fcfcfd;
-              }
+              // /* 120% */
+              // &.price-number-even {
+              //   color: #fcfcfd;
+              // }
 
               @media only screen and (max-width: 768px) {
                 font-size: 50px;
@@ -387,9 +407,9 @@
             font-weight: 600;
             line-height: 24px;
 
-            &.plan-name-even {
-              color: #fcfcfd;
-            }
+            // &.plan-name-even {
+            //   color: #fcfcfd;
+            // }
           }
 
           .plan-placeholder {
@@ -400,10 +420,6 @@
             font-weight: 500;
             line-height: 22px;
             // width: 266px;
-
-            &.plan-placeholder-even {
-              color: #fcfcfd;
-            }
 
             .free-trial {
               font-weight: 500;
@@ -435,9 +451,6 @@
               line-height: 28px;
 
               /* 140% */
-              &.price-sign-even {
-                color: #fcfcfd;
-              }
             }
 
             .price-number {
@@ -451,9 +464,6 @@
               line-height: 44px;
 
               /* 120% */
-              &.price-number-even {
-                color: #fcfcfd;
-              }
 
               @media only screen and (max-width: 768px) {
                 font-size: 50px;
@@ -592,9 +602,9 @@
                 font-weight: 500;
                 line-height: 24px;
 
-                &.plan-text-even {
-                  color: #fcfcfd;
-                }
+                // &.plan-text-even {
+                //   color: #fcfcfd;
+                // }
 
                 &.plan-text-not {
                   color: var(--Primary-4, #99aef9);
@@ -641,9 +651,9 @@
               font-weight: 500;
               line-height: 24px;
 
-              &.plan-text-even {
-                color: #fcfcfd;
-              }
+              // &.plan-text-even {
+              //   color: #fcfcfd;
+              // }
             }
 
             .plan-text-head {
