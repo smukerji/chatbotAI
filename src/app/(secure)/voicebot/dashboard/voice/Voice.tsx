@@ -17,6 +17,15 @@ function Voice() {
   const [minCharecters, setMinCharecters] = useState<number>();
   const [inputMinCharValidationMessage, setInputMinCharValidationMessage] = useState<string>("");
   const [selectedPunctuationBoundaries, setSelectedPunctuationBoundaries] = useState<string[]>([]);
+
+  const [fillerInjectionEnabled, setFillerInjectionEnabled] = useState<boolean>(false);
+  //backchanneling
+  const [backchannelingEnabled, setBackchannelingEnabled] = useState<boolean>(false);
+  //background denoising
+  const [backgroundDenoisingEnabled, setBackgroundDenoisingEnabled] = useState<boolean>(false);
+
+
+
   
 
   const voiceBotContextData: any = useContext(CreateVoiceBotContext);
@@ -161,8 +170,29 @@ function Voice() {
   }
   console.log("background sound ", voicebotDetails["backgroundSound"]);
 
+  const fillerInjectionCheckChangeHandler = (checked: boolean) => {
+    setFillerInjectionEnabled(checked);
+    console.log("checked ", checked);
 
-  console.log("your voicebot details ", voicebotDetails["voice"]);
+    voiceBotContextData.updateState("voice.fillerInjectionEnabled", checked);
+  }
+
+  const backchannelingCheckChangeHandler = (checked: boolean) => {
+    setBackchannelingEnabled(checked);
+    console.log("checked ", checked);
+
+    voiceBotContextData.updateState("backchannelingEnabled", checked);
+  }
+
+  const backgroundDenoisingCheckChangeHandler = (checked: boolean) => {
+    setBackgroundDenoisingEnabled(checked);
+    console.log("checked ", checked);
+
+    voiceBotContextData.updateState("backgroundDenoisingEnabled", checked);
+  }
+
+
+  console.log("your voicebot details ", voicebotDetails);
 
   return (
     <div className="voice-container">
@@ -264,19 +294,19 @@ function Voice() {
 
           <div className="emotional-detect">
             <h4 className="emotional-header">Filler Injection Enabled</h4>
-            <Switch className="emotional-switch" defaultChecked />
+            <Switch className="emotional-switch" onChange={fillerInjectionCheckChangeHandler}/>
           </div>
           <p className="emotional-detect-description">This determines whether fillers are injected into the Model output before inputting it into the Voice provider.</p>
 
           <div className="emotional-detect">
             <h4 className="emotional-header">Backchanneling Enabled</h4>
-            <Switch className="emotional-switch" defaultChecked />
+            <Switch className="emotional-switch" onChange={backchannelingCheckChangeHandler} />
           </div>
           <p className="emotional-detect-description">Make the bot say words like &lsquo;mhmm&lsquo;, &lsquo;ya&lsquo; etc. while listening to make the conversation sounds natural. Default disabled</p>
 
           <div className="emotional-detect">
             <h4 className="emotional-header">Background Denoising Enabled</h4>
-            <Switch className="emotional-switch" defaultChecked />
+            <Switch className="emotional-switch" onChange={backgroundDenoisingCheckChangeHandler} />
           </div>
           <p className="emotional-detect-description">Filter background noise while the user is talking.</p>
 
