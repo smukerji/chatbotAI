@@ -15,7 +15,7 @@ import ToolFor from "./tool-for/ToolFor";
 const { Option } = Select;
 function Functions() {
 
-  const [openModel, setOpenModel] = useState<boolean>(true);
+  const [openModel, setOpenModel] = useState<boolean>(false);
 
   const countryFlag: any = 
     [
@@ -96,10 +96,10 @@ function Functions() {
         <h3 className="title">Tools</h3>
         <p className="description">Tools are a way you can enable your voicebots to perform certain actions and tasks during the call. Add your tools From the Tools Library page to your voicebots to connect with Make.com or GHL workflows. You can also have custom tools with your own backend.</p>
         <div className="wrapper">
-          <h4 className="provider">Provider</h4>
+          <h4 className="provider">Select tool</h4>
           <Select className="select-field"
 
-            placeholder="Select the provider"
+            placeholder="Select the tool"
 
 
             options={[
@@ -203,7 +203,10 @@ function Functions() {
         <CustomModel
           setOpen={setOpenModel}
           title={"Create a Tool"}
-          content={<ToolFor />} />
+          content={<Make />} 
+          componentTitle={"Choose a provider"}
+          componentDescription={"Create a custom tool or choose from one of the supported providers."}
+          />
       }
     
 

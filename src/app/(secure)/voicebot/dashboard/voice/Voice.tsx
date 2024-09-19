@@ -25,9 +25,6 @@ function Voice() {
   const [backgroundDenoisingEnabled, setBackgroundDenoisingEnabled] = useState<boolean>(false);
 
 
-
-  
-
   const voiceBotContextData: any = useContext(CreateVoiceBotContext);
   const voicebotDetails = voiceBotContextData.state;
 
