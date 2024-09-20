@@ -12,13 +12,121 @@ import infoCircleImg from "../../../../../../public/voiceBot/SVG/info-circle.svg
 import qoutDownImg from "../../../../../../public/voiceBot/SVG/quote-down-circle.svg";
 import tickSquareImg from "../../../../../../public/voiceBot/SVG/tick-square.svg";
 import firstLineImg from "../../../../../../public/voiceBot/SVG/firstline.svg";
-import { useState } from "react";
 
+import { useState, useContext, useEffect } from "react";
+
+import { CreateVoiceBotContext } from "../../../../_helpers/client/Context/VoiceBotContextApi"
 
 const { Option } = Select;
 function Advance() {
 
+  const voiceBotContextData: any = useContext(CreateVoiceBotContext);
+  const voicebotDetails = voiceBotContextData.state;
+
+
   const [stepsCount, setStepsCount] = useState<number>(5);
+
+  /**
+   * @param Privacy
+   */
+  const [hipaaCompliance, sethipaaCompliance] = useState<boolean>(false);
+  const [audioRecording, setaudioRecording] = useState<boolean>(true);
+  const [videoRecording, setvideoRecording] = useState<boolean>(false);
+
+  /**
+   * 
+   * @param PipelineConfiguration
+   */
+  
+  const [silenceTimeout, setSilenceTimeout] = useState<number>(300); //available
+  const [responseDelay, setResponseDelay] = useState<number>(1.5);
+  const [llmRequestDelay, setLlmRequestDelay] = useState<number>(1.5);
+  const [interruptionThreshold, setInterruptionThreshold] = useState<number>(6);
+  const [maximumDuration, setMaximumDuration] = useState<number>(1600); //available
+
+  /**
+   * 
+   * @param Messaging
+   */
+
+  const [serverUrl, setServerUrl] = useState<string>("");
+  const [clientMessages, setClientMessages] = useState<string[]>([]);
+  const [serverMessages, setServerMessages] = useState<string[]>([]);
+  const [voicemailMessage, setVoicemailMessage] = useState<string>("");
+  const [endCallMessage, setEndCallMessage] = useState<string>("");
+  const [idleMessage, setIdleMessage] = useState<string[]>([]);
+
+  const clientMessageList = [
+    { value: "1", label: "conversation update" },
+    { value: "2", label: "function-call" },
+    { value: "3", label: "function-call-result" },
+    { value: "4", label: "hang" },
+    { value: "5", label: "metadata" },
+    { value: "6", label: "model-output" },
+    { value: "7", label: "speech-update" },
+    { value: "8", label: "status update" },
+    { value: "9", label: "transcript" },
+    { value: "10", label: "tool-calls" },
+    { value: "11", label: "tools-calls-result" },
+    { value: "12", label: "user-interrupted" },
+    { value: "13", label: "voice-input" }
+  ];
+
+  const serverUrlInputHandler = (e:React.ChangeEvent<HTMLInputElement>)=>{
+    setServerUrl(e.target.value.trim());
+    voiceBotContextData.updateState("serverUrl", e.target.value.trim());
+  }
+
+  const silenceTimeoutChangeHandler = (value: number) => {
+    setSilenceTimeout(value);
+    voiceBotContextData.updateState("silenceTimeoutSeconds", value);
+  }
+
+  const responseDelayChangeHandler = (value: number) => {
+    setResponseDelay(value);
+  }
+
+  const llmRequestDelayChangeHandler = (value: number) => {
+    setLlmRequestDelay(value);
+  }
+
+  const interruptionThresholdChangeHandler = (value: number) => {
+    setInterruptionThreshold(value);
+  }
+
+  const maximumDurationChangeHandler = (value: number) => {
+    setMaximumDuration(value);
+    voiceBotContextData.updateState("maxDurationSeconds", value);
+  }
+
+  const hipaaCheckChangeHandler = (checked: boolean) => {
+    sethipaaCompliance(checked);
+    console.log("checked ", checked);
+
+    voiceBotContextData.updateState("hipaaEnabled", checked);
+  }
+
+  const audioRecordingCheckChangeHandler = (checked: boolean) => {
+    setaudioRecording(checked);
+    console.log("checked ", checked);
+
+    voiceBotContextData.updateState("analysisPlan.artifactPlan.recordingEnabled", checked);
+  }
+
+  const videoRecordingCheckChangeHandler = (checked: boolean) => {
+    setvideoRecording(checked);
+    console.log("checked ", checked);
+
+    voiceBotContextData.updateState("analysisPlan.artifactPlan.videoRecordingEnabled", checked);
+  }
+
+  const clientMessageChangeChangeHandler = (value: any, options: any) => {
+    setClientMessages(options);
+    voiceBotContextData.updateState("clientMessages", options);
+  }
+  
+  console.log("clientMessages", voicebotDetails["clientMessages"]);
+
   return (
     <div className="advance-container">
       <h3 className="title">
@@ -35,7 +143,7 @@ function Advance() {
           <div className="second-container">
             <div className="second-container-content">
               <h3 className="compliance-title">HIPAA Compliance</h3>
-              <Switch className="hipaa-complaince-switch" defaultChecked />
+              <Switch className="hipaa-complaince-switch" value={hipaaCompliance} onChange={hipaaCheckChangeHandler} />
             </div>
             <p className="description">
               When this is enabled, no logs, recordings, or transcriptions will be stored.
@@ -52,7 +160,7 @@ function Advance() {
           <div className="second-container">
             <div className="second-container-content">
               <h3 className="compliance-title">Video Recording</h3>
-              <Switch className="hipaa-complaince-switch" defaultChecked />
+              <Switch className="hipaa-complaince-switch" value={videoRecording} onChange={videoRecordingCheckChangeHandler} />
             </div>
             <p className="description">
               When this is enabled, no logs, recordings, or transcriptions will be stored.
@@ -68,7 +176,7 @@ function Advance() {
           <div className="second-container">
             <div className="second-container-content">
               <h3 className="compliance-title">Audio Recording</h3>
-              <Switch className="hipaa-complaince-switch" defaultChecked />
+              <Switch className="hipaa-complaince-switch" value={audioRecording} onChange={audioRecordingCheckChangeHandler} />
             </div>
             <p className="description">
               When this is enabled, no logs, recordings, or transcriptions will be stored.
@@ -103,7 +211,7 @@ function Advance() {
           </div>
           <div className="right-column">
             <div className="thrid-container-content">
-              <Slider className="slider" min={2} max={10} value={stepsCount} onChange={setStepsCount} />
+              <Slider className="slider" step={1} min={10} max={600} value={silenceTimeout} onChange={silenceTimeoutChangeHandler} />
               <div className="point-notation">
                 <span className="point-notation-value">10(sec)</span>
                 <span className="point-notation-value">600(sec)</span>
@@ -111,7 +219,7 @@ function Advance() {
             </div>
             <div className="fourth-container-content">
               <h2 className="selectedValue">
-                300
+                {silenceTimeout}
               </h2>
             </div>
           </div>
@@ -227,15 +335,15 @@ function Advance() {
           </div>
           <div className="right-column">
             <div className="thrid-container-content">
-              <Slider className="slider" min={2} max={10} value={stepsCount} onChange={setStepsCount} />
+              <Slider className="slider" step={1} min={10} max={3600} value={maximumDuration} onChange={maximumDurationChangeHandler} />
               <div className="point-notation">
                 <span className="point-notation-value">10(sec)</span>
-                <span className="point-notation-value">600(sec)</span>
+                <span className="point-notation-value">3600(sec)</span>
               </div>
             </div>
             <div className="fourth-container-content">
               <h2 className="selectedValue">
-                1600
+                {maximumDuration}
               </h2>
             </div>
           </div>
@@ -259,7 +367,7 @@ function Advance() {
           <p className="description">
             This is the URL Vapi will use to communicate messages via HTTP POST Requests. This is used for retrieving context, function calling, and end-of-call reports. <a href="" className="read-more">Read more</a>
           </p>
-          <Input className="input-field" placeholder="https://www.yourserver.com/api" />
+          <Input className="input-field" value={serverUrl} placeholder="Endpoint Url to handle Server Messages" onChange={serverUrlInputHandler} />
 
           <hr className="splitter" />
         </div>
@@ -271,25 +379,13 @@ function Advance() {
             These are the messages that will be sent to the Client SDKs.
           </p>
           <Select className="select-field"
-
-            placeholder="Select the provider"
             mode="multiple"
+            placeholder="Select the provider"
             allowClear
+            options={clientMessageList}
+            onChange={clientMessageChangeChangeHandler}
+            value={clientMessages}
 
-            options={[
-              {
-                value: '1',
-                label: 'deepgram',
-              },
-              {
-                value: '2',
-                label: 'talkscriber',
-              },
-              {
-                value: '3',
-                label: 'gladia',
-              }
-            ]}
           />
 
           <hr className="splitter" />

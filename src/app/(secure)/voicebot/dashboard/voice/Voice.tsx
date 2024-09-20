@@ -180,7 +180,6 @@ function Voice() {
   }
 
   const punctuationChangeHandler = (value: any, options: any) => {
-    debugger;
     setSelectedPunctuationBoundaries(options);
     const labelOnly = options.map((option: any) => option.label);
     voiceBotContextData.updateState("voice.chunkPlan.punctuationBoundaries", options);

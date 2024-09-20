@@ -216,10 +216,15 @@
       }
 
             .select-field {
+
               width: 50vw;
       
-              height: 41.45px;
+              height: fit-content;
               margin-top: 8px;
+
+              .ant-select-selector{
+                min-height: 49.45px;
+              }
       
               input {
                 color: #23262F;

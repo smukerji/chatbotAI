@@ -51,7 +51,7 @@ const initialState = {
     chunkPlan: {
       enabled: true,
       minCharacters: 300,
-      punctuationBoundaries: [],
+      punctuationBoundaries: [],//need to update this beffore sending it to vapi server
       formatPlan: {
         enabled: true,
         numberToDigitsCutoff: 2025,
@@ -72,7 +72,7 @@ const initialState = {
     "tool-calls",
     "user-interrupted",
     "voice-input",
-  ],
+  ],//need to update this before sending to the vapi server
   serverMessages: [
     "conversation-update",
     "end-of-call-report",
