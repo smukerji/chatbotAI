@@ -60,6 +60,8 @@ const initialState = {
     },
   },
   firstMessageMode: "assistant-speaks-first",
+  llmRequestDelaySeconds:0.1,
+  responseDelaySeconds: 0.1,
   hipaaEnabled: false,
   clientMessages: [],//need to update this before sending to the vapi server
   serverMessages: [],//need to update this before sending to the vapi server
@@ -73,6 +75,7 @@ const initialState = {
     { provider: "twilio", timeout: 60, record: false, recordingChannels: "mono" },
   ],
   name: "",
+  numWordsToInterruptAssistant: 0,
  
   voicemailDetection: {
     provider: "twilio",

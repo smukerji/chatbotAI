@@ -39,9 +39,9 @@ function Advance() {
    */
   
   const [silenceTimeout, setSilenceTimeout] = useState<number>(300); //available
-  const [responseDelay, setResponseDelay] = useState<number>(1.5);
-  const [llmRequestDelay, setLlmRequestDelay] = useState<number>(1.5);
-  const [interruptionThreshold, setInterruptionThreshold] = useState<number>(6);
+  const [responseDelay, setResponseDelay] = useState<number>(0);
+  const [llmRequestDelay, setLlmRequestDelay] = useState<number>(0);
+  const [interruptionThreshold, setInterruptionThreshold] = useState<number>(0);
   const [maximumDuration, setMaximumDuration] = useState<number>(1600); //available
 
   /**
@@ -73,7 +73,12 @@ function Advance() {
     setMaxIdleCount(voicebotDetails.analysisPlan.messagePlan.idleMessageMaxSpokenCount);
     setIdleTimeout(voicebotDetails.analysisPlan.messagePlan.idleTimeoutSeconds);
     setMaximumDuration(voicebotDetails.maxDurationSeconds);
-  }, [voicebotDetails.silenceTimeoutSeconds, voicebotDetails.serverUrl, voicebotDetails.hipaaEnabled, voicebotDetails.analysisPlan.artifactPlan.recordingEnabled, voicebotDetails.analysisPlan.artifactPlan.videoRecordingEnabled, voicebotDetails.clientMessages, voicebotDetails.serverMessages, voicebotDetails.endCallMessage, voicebotDetails.analysisPlan.messagePlan.idleMessages, voicebotDetails.voicemailMessage, voicebotDetails.analysisPlan.messagePlan.idleMessageMaxSpokenCount, voicebotDetails.analysisPlan.messagePlan.idleTimeoutSeconds, voicebotDetails.maxDurationSeconds]); 
+    setResponseDelay(voicebotDetails.responseDelaySeconds);
+    setLlmRequestDelay(voicebotDetails.llmRequestDelaySeconds);
+    setInterruptionThreshold(voicebotDetails.numWordsToInterruptAssistant);
+
+
+  }, [voicebotDetails.silenceTimeoutSeconds, voicebotDetails.serverUrl, voicebotDetails.hipaaEnabled, voicebotDetails.analysisPlan.artifactPlan.recordingEnabled, voicebotDetails.analysisPlan.artifactPlan.videoRecordingEnabled, voicebotDetails.clientMessages, voicebotDetails.serverMessages, voicebotDetails.endCallMessage, voicebotDetails.analysisPlan.messagePlan.idleMessages, voicebotDetails.voicemailMessage, voicebotDetails.analysisPlan.messagePlan.idleMessageMaxSpokenCount, voicebotDetails.analysisPlan.messagePlan.idleTimeoutSeconds, voicebotDetails.maxDurationSeconds, voicebotDetails.responseDelaySeconds, voicebotDetails.llmRequestDelaySeconds, voicebotDetails.numWordsToInterruptAssistant]); 
 
 
   const clientMessageList = [
@@ -134,14 +139,17 @@ function Advance() {
 
   const responseDelayChangeHandler = (value: number) => {
     setResponseDelay(value);
+    voiceBotContextData.updateState("responseDelaySeconds", value);
   }
 
   const llmRequestDelayChangeHandler = (value: number) => {
     setLlmRequestDelay(value);
+    voiceBotContextData.updateState("llmRequestDelaySeconds", value);
   }
 
   const interruptionThresholdChangeHandler = (value: number) => {
     setInterruptionThreshold(value);
+    voiceBotContextData.updateState("numWordsToInterruptAssistant", value);
   }
 
   const maximumDurationChangeHandler = (value: number) => {
@@ -333,15 +341,16 @@ function Advance() {
           </div>
           <div className="right-column">
             <div className="thrid-container-content">
-              <Slider className="slider" min={2} max={10} value={stepsCount} onChange={setStepsCount} />
+              <Slider className="slider" step={0.1} min={0} max={2} value={responseDelay} 
+              onChange={responseDelayChangeHandler} />
               <div className="point-notation">
-                <span className="point-notation-value">10(sec)</span>
-                <span className="point-notation-value">600(sec)</span>
+                <span className="point-notation-value">0(sec)</span>
+                <span className="point-notation-value">2(sec)</span>
               </div>
             </div>
             <div className="fourth-container-content">
               <h2 className="selectedValue">
-                1.5
+                {responseDelay}
               </h2>
             </div>
           </div>
@@ -364,7 +373,7 @@ function Advance() {
           </div>
           <div className="right-column">
             <div className="thrid-container-content">
-              <Slider className="slider" min={2} max={10} value={stepsCount} onChange={setStepsCount} />
+              <Slider className="slider" step={0.1} min={0} max={3} value={llmRequestDelay} onChange={llmRequestDelayChangeHandler} />
               <div className="point-notation">
                 <span className="point-notation-value">10(sec)</span>
                 <span className="point-notation-value">600(sec)</span>
@@ -372,7 +381,7 @@ function Advance() {
             </div>
             <div className="fourth-container-content">
               <h2 className="selectedValue">
-                1.5
+               {llmRequestDelay}
               </h2>
             </div>
           </div>
@@ -395,7 +404,7 @@ function Advance() {
           </div>
           <div className="right-column">
             <div className="thrid-container-content">
-              <Slider className="slider" min={2} max={10} value={stepsCount} onChange={setStepsCount} />
+              <Slider className="slider" step={1} min={0} max={10} value={interruptionThreshold} onChange={interruptionThresholdChangeHandler} />
               <div className="point-notation">
                 <span className="point-notation-value">10(sec)</span>
                 <span className="point-notation-value">600(sec)</span>
@@ -403,7 +412,7 @@ function Advance() {
             </div>
             <div className="fourth-container-content">
               <h2 className="selectedValue">
-                6
+                {interruptionThreshold}
               </h2>
             </div>
           </div>
