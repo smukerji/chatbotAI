@@ -52,9 +52,29 @@ function Advance() {
   const [serverUrl, setServerUrl] = useState<string>("");
   const [clientMessages, setClientMessages] = useState<string[]>([]);
   const [serverMessages, setServerMessages] = useState<string[]>([]);
-  const [voicemailMessage, setVoicemailMessage] = useState<string>("");
   const [endCallMessage, setEndCallMessage] = useState<string>("");
   const [idleMessage, setIdleMessage] = useState<string[]>([]);
+  const [voiceMailMessage, setVoiceMailMessage] = useState<string>("");
+  const [maxIdleCount, setMaxIdleCount] = useState<number>();
+  const [idleTimeout, setIdleTimeout] = useState<number>();
+
+  
+  useEffect(() => {
+    setSilenceTimeout(voicebotDetails.silenceTimeoutSeconds);
+    setServerUrl(voicebotDetails.serverUrl);
+    sethipaaCompliance(voicebotDetails.hipaaEnabled);
+    setaudioRecording(voicebotDetails.analysisPlan.artifactPlan.recordingEnabled);
+    setvideoRecording(voicebotDetails.analysisPlan.artifactPlan.videoRecordingEnabled);
+    setClientMessages(voicebotDetails.clientMessages);
+    setServerMessages(voicebotDetails.serverMessages);
+    setEndCallMessage(voicebotDetails.endCallMessage);
+    setIdleMessage(voicebotDetails.analysisPlan.messagePlan.idleMessages);
+    setVoiceMailMessage(voicebotDetails.voicemailMessage);
+    setMaxIdleCount(voicebotDetails.analysisPlan.messagePlan.idleMessageMaxSpokenCount);
+    setIdleTimeout(voicebotDetails.analysisPlan.messagePlan.idleTimeoutSeconds);
+    setMaximumDuration(voicebotDetails.maxDurationSeconds);
+  }, [voicebotDetails.silenceTimeoutSeconds, voicebotDetails.serverUrl, voicebotDetails.hipaaEnabled, voicebotDetails.analysisPlan.artifactPlan.recordingEnabled, voicebotDetails.analysisPlan.artifactPlan.videoRecordingEnabled, voicebotDetails.clientMessages, voicebotDetails.serverMessages, voicebotDetails.endCallMessage, voicebotDetails.analysisPlan.messagePlan.idleMessages, voicebotDetails.voicemailMessage, voicebotDetails.analysisPlan.messagePlan.idleMessageMaxSpokenCount, voicebotDetails.analysisPlan.messagePlan.idleTimeoutSeconds, voicebotDetails.maxDurationSeconds]); 
+
 
   const clientMessageList = [
     { value: "1", label: "conversation update" },
@@ -71,6 +91,36 @@ function Advance() {
     { value: "12", label: "user-interrupted" },
     { value: "13", label: "voice-input" }
   ];
+
+   const serverMessageList = [
+    { value: "1", label: "conversation-update" },
+    { value: "2", label: "end-of-call-report" },
+    { value: "3", label: "function-call" },
+    { value: "4", label: "hang" },
+    { value: "5", label: "model-output" },
+    { value: "6", label: "phone-call-control" },
+    { value: "7", label: "speech-update" },
+    { value: "8", label: "status-update" },
+    { value: "9", label: "transcript" },
+    { value: "10", label: "tool-calls" },
+    { value: "11", label: "transfer-destination-request" },
+    { value: "12", label: "user-interrupted" },
+    { value: "13", label: "voice-input" }
+  ];
+
+  const idleMessageList = [
+    { value: "1", label: "Are you still there?" },
+    { value: "2", label: "Is there anything else you need help with?" },
+    { value: "3", label: "Feel free to ask me any questions." },
+    { value: "4", label: "How can I assist you further?" },
+    { value: "5", label: "Let me know if there's anything you need." },
+    { value: "6", label: "I'm still here if you need assistance." },
+    { value: "7", label: "I'm ready to help whenever you are." },
+    { value: "8", label: "Is there something specific you're looking for?" },
+    { value: "9", label: "I'm here to help with any questions you have." }
+  ];
+
+
 
   const serverUrlInputHandler = (e:React.ChangeEvent<HTMLInputElement>)=>{
     setServerUrl(e.target.value.trim());
@@ -116,7 +166,6 @@ function Advance() {
   const videoRecordingCheckChangeHandler = (checked: boolean) => {
     setvideoRecording(checked);
     console.log("checked ", checked);
-
     voiceBotContextData.updateState("analysisPlan.artifactPlan.videoRecordingEnabled", checked);
   }
 
@@ -124,8 +173,51 @@ function Advance() {
     setClientMessages(options);
     voiceBotContextData.updateState("clientMessages", options);
   }
+
+  const serverMessageChangeChangeHandler = (value: any, options: any) => {
+    setServerMessages(options);
+    voiceBotContextData.updateState("serverMessages", options);
+  }
+
+  const voiceMessageEnterHandler = (e:React.ChangeEvent<HTMLInputElement>) => {
+    const enteredValue: string = e.target.value;
+    // debugger;
+    setVoiceMailMessage(enteredValue);
+    if (enteredValue.trim().length == 0) {
+      voiceBotContextData.updateState("voicemailMessage",enteredValue);
+    } else {
+      voiceBotContextData.updateState("voicemailMessage",enteredValue);
+    }
+  }
+
+  const endCallMessageEnterHandler = (e:React.ChangeEvent<HTMLInputElement>) => {
+    const enteredValue: string = e.target.value;
+    // debugger;
+    setEndCallMessage(enteredValue);
+    if (enteredValue.trim().length == 0) {
+      voiceBotContextData.updateState("endCallMessage",enteredValue);
+    } else {
+      voiceBotContextData.updateState("endCallMessage",enteredValue);
+    }
+  }
+
+  const idleMessageChangeChangeHandler = (value: any, options: any) => {
+    setIdleMessage(options);
+    voiceBotContextData.updateState("analysisPlan.messagePlan.idleMessages", options);
+  }
+
+  const maxIdleCountChangeHandler = (value: number) => {
+    setMaxIdleCount(value);
+    voiceBotContextData.updateState("analysisPlan.messagePlan.idleMessageMaxSpokenCount", value);
+  }
+
+  const idleTimeoutChangeHandler = (value: number) => {
+    setIdleTimeout(value);
+    voiceBotContextData.updateState("analysisPlan.messagePlan.idleTimeoutSeconds", value);
+  }
   
-  console.log("clientMessages", voicebotDetails["clientMessages"]);
+  // console.log("server messages ",serverMessages);
+  console.log("your voicebot details ", voicebotDetails);
 
   return (
     <div className="advance-container">
@@ -149,7 +241,6 @@ function Advance() {
               When this is enabled, no logs, recordings, or transcriptions will be stored.
             </p>
           </div>
-
 
         </div>
         <hr className="splitter" />
@@ -402,21 +493,12 @@ function Advance() {
             placeholder="Select the provider"
             mode="multiple"
             allowClear
+            value={serverMessages}
+            onChange={
+              serverMessageChangeChangeHandler
+            }
 
-            options={[
-              {
-                value: '1',
-                label: 'deepgram',
-              },
-              {
-                value: '2',
-                label: 'talkscriber',
-              },
-              {
-                value: '3',
-                label: 'gladia',
-              }
-            ]}
+            options={serverMessageList}
           />
 
           <hr className="splitter" />
@@ -428,7 +510,10 @@ function Advance() {
           <p className="description">
             This is the message that the assistant will say if the call is forwarded to voicemail.
           </p>
-          <Input className="input-field" placeholder="https://www.yourserver.com/api" />
+          <Input className="input-field" placeholder="https://www.yourserver.com/api"
+          onChange={voiceMessageEnterHandler}  
+          value={voiceMailMessage}
+           />
 
           <hr className="splitter" />
         </div>
@@ -439,7 +524,10 @@ function Advance() {
           <p className="description">
             This is the message that the assistant will say if it ends the call.
           </p>
-          <Input className="input-field" placeholder="https://www.yourserver.com/api" />
+          <Input className="input-field" placeholder="https://www.yourserver.com/api"
+          value={endCallMessage}
+          onChange={endCallMessageEnterHandler}
+           />
 
           <hr className="splitter" />
         </div>
@@ -450,25 +538,14 @@ function Advance() {
           <p className="description">
             Messages that the assistant will speak when the user hasn&lsquo;t responded.
           </p>
+
           <Select className="select-field"
-
+            mode="multiple"
+            allowClear
             placeholder="Select the provider"
-           
-
-            options={[
-              {
-                value: '1',
-                label: 'deepgram',
-              },
-              {
-                value: '2',
-                label: 'talkscriber',
-              },
-              {
-                value: '3',
-                label: 'gladia',
-              }
-            ]}
+            value={idleMessage}
+            onChange={idleMessageChangeChangeHandler}
+            options={idleMessageList}
           />
 
           {/* <hr className="splitter" /> */}
@@ -491,7 +568,7 @@ function Advance() {
             </div>
             <div className="right-column">
               <div className="thrid-container-content">
-                <Slider className="slider" min={2} max={10} value={stepsCount} onChange={setStepsCount} />
+                <Slider className="slider" step={1} min={0} max={10} value={maxIdleCount} onChange={maxIdleCountChangeHandler} />
                 <div className="point-notation">
                   <span className="point-notation-value">1</span>
                   <span className="point-notation-value">10</span>
@@ -499,7 +576,7 @@ function Advance() {
               </div>
               <div className="fourth-container-content">
                 <h2 className="selectedValue">
-                  6
+                  {maxIdleCount}
                 </h2>
               </div>
             </div>
@@ -522,7 +599,7 @@ function Advance() {
             </div>
             <div className="right-column">
               <div className="thrid-container-content">
-                <Slider className="slider" min={2} max={10} value={stepsCount} onChange={setStepsCount} />
+                <Slider className="slider" step={0.1} min={0} max={10} value={idleTimeout} onChange={idleTimeoutChangeHandler} />
                 <div className="point-notation">
                   <span className="point-notation-value">5(sec)</span>
                   <span className="point-notation-value">10(sec)</span>
@@ -530,7 +607,7 @@ function Advance() {
               </div>
               <div className="fourth-container-content">
                 <h2 className="selectedValue">
-                  6
+                  {idleTimeout}
                 </h2>
               </div>
             </div>
