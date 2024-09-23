@@ -12,6 +12,8 @@ import LeadsIcon from "../../../../../../public/svgs/leads.svg";
 import axios from "axios";
 import { useCookies } from "react-cookie";
 import moment from "moment";
+import CryptoJS from "crypto-js";
+
 import { useRouter } from "next/navigation";
 
 const whatsappPriceIdMonthly: any =
@@ -41,6 +43,8 @@ const onBoarding: any = process.env.NEXT_PUBLIC_ONBOARDING_FEES;
 const msgSmall: any = process.env.NEXT_PUBLIC_MESSAGESMALL_PLAN_ID;
 const msgLarge: any = process.env.NEXT_PUBLIC_MESSAGELARGE_PLAN_ID;
 
+const cryptoSecret = process.env.NEXT_PUBLIC_CRYPTO_SECRET;
+
 function formatDate(timestamp: number) {
   const timestampMS = timestamp * 1000; // Convert Unix timestamp to milliseconds
 
@@ -51,6 +55,13 @@ function formatDate(timestamp: number) {
   const formattedDate = date.toLocaleDateString("en-GB"); // en-GB formats it as DD/MM/YYYY
 
   return formattedDate;
+}
+
+function encryptPriceId(priceId: string) {
+  if (!cryptoSecret) {
+    throw new Error("Crypto secret is not defined");
+  }
+  return CryptoJS.AES.encrypt(priceId, cryptoSecret).toString();
 }
 
 function AddOnsDetail({ date }: any) {
@@ -124,9 +135,31 @@ function AddOnsDetail({ date }: any) {
     }
   };
 
-  const addAddon = () => {
-    router.push("/home/pricing");
-  };
+  async function addAddon(priceId: string) {
+    if (cookies?.userId) {
+      const a = encryptPriceId(priceId);
+      const encryptedPriceId = encodeURIComponent(a);
+
+      let type;
+
+      if (
+        priceId === msgSmall ||
+        priceId === msgLarge ||
+        priceId === onBoarding ||
+        priceId === trainingData
+      ) {
+        type = "oneoff";
+      } else {
+        type = "recurring";
+      }
+
+      router.push(
+        `/home/pricing/plan-checkout?priceId=${encryptedPriceId}&source=addon&type=${type}`
+      );
+    } else {
+      router.push("/account/login");
+    }
+  }
 
   useEffect(() => {
     fetchAddonDetail();
@@ -186,7 +219,7 @@ function AddOnsDetail({ date }: any) {
                     <div className="next-renewal-date-text">
                       {isNextAddon?.isNextWhatsapp === false
                         ? "Expiry Date:"
-                        : "Auto Renewal duo on"}
+                        : "Auto Renewal due on"}
                     </div>
                     <div className="next-renewal-date-date">{endDate}</div>
                   </div>
@@ -204,32 +237,36 @@ function AddOnsDetail({ date }: any) {
                     Get Add-on
                   </span>
                 </button>
+              ) : isPlanActive(whatsappPriceIdMonthly) ||
+                isPlanActive(whatsappPriceIdYearly) ? (
+                <p
+                  className="cancel-plan"
+                  onClick={() =>
+                    cancelAddon(
+                      interval === "month"
+                        ? whatsappPriceIdMonthly
+                        : whatsappPriceIdYearly,
+                      "Whatsapp"
+                    )
+                  }
+                >
+                  Cancel
+                </p>
               ) : (
-                isPlanActive(whatsappPriceIdMonthly) ||
-                (isPlanActive(whatsappPriceIdYearly) ? (
-                  <p
-                    className="cancel-plan"
-                    onClick={() =>
-                      cancelAddon(
-                        interval === "month"
-                          ? whatsappPriceIdMonthly
-                          : whatsappPriceIdYearly,
-                        "Whatsapp"
-                      )
-                    }
-                  >
-                    Cancel
-                  </p>
-                ) : (
-                  <button
-                    className="app-integration-price-btn"
-                    onClick={addAddon}
-                  >
-                    <span className="app-integration-price-btn-text">
-                      Get Add-on
-                    </span>
-                  </button>
-                ))
+                <button
+                  className="app-integration-price-btn"
+                  onClick={() =>
+                    addAddon(
+                      interval === "month"
+                        ? whatsappPriceIdMonthly
+                        : whatsappPriceIdYearly
+                    )
+                  }
+                >
+                  <span className="app-integration-price-btn-text">
+                    Get Add-on
+                  </span>
+                </button>
               )}
             </div>
 
@@ -259,7 +296,7 @@ function AddOnsDetail({ date }: any) {
                     <div className="next-renewal-date-text">
                       {isNextAddon?.isNextTelegram === false
                         ? "Expiry Date:"
-                        : "Auto Renewal duo on"}
+                        : "Auto Renewal due on"}
                     </div>
                     <div className="next-renewal-date-date">{endDate}</div>
                   </div>
@@ -276,32 +313,36 @@ function AddOnsDetail({ date }: any) {
                     Get Add-on
                   </span>
                 </button>
+              ) : isPlanActive(telegramPriceIdMonthly) ||
+                isPlanActive(telegramPriceIdYearly) ? (
+                <p
+                  className="cancel-plan"
+                  onClick={() =>
+                    cancelAddon(
+                      interval === "month"
+                        ? telegramPriceIdMonthly
+                        : telegramPriceIdYearly,
+                      "Telegram"
+                    )
+                  }
+                >
+                  Cancel
+                </p>
               ) : (
-                isPlanActive(telegramPriceIdMonthly) ||
-                (isPlanActive(telegramPriceIdYearly) ? (
-                  <p
-                    className="cancel-plan"
-                    onClick={() =>
-                      cancelAddon(
-                        interval === "month"
-                          ? telegramPriceIdMonthly
-                          : telegramPriceIdYearly,
-                        "Telegram"
-                      )
-                    }
-                  >
-                    Cancel
-                  </p>
-                ) : (
-                  <button
-                    className="app-integration-price-btn "
-                    onClick={addAddon}
-                  >
-                    <span className="app-integration-price-btn-text">
-                      Get Add-on
-                    </span>
-                  </button>
-                ))
+                <button
+                  className="app-integration-price-btn "
+                  onClick={() =>
+                    addAddon(
+                      interval === "month"
+                        ? telegramPriceIdMonthly
+                        : telegramPriceIdYearly
+                    )
+                  }
+                >
+                  <span className="app-integration-price-btn-text">
+                    Get Add-on
+                  </span>
+                </button>
               )}
             </div>
 
@@ -331,7 +372,7 @@ function AddOnsDetail({ date }: any) {
                     <div className="next-renewal-date-text">
                       {isNextAddon?.isNextSlack === false
                         ? "Expiry Date:"
-                        : "Auto Renewal duo on"}
+                        : "Auto Renewal due on"}
                     </div>
                     <div className="next-renewal-date-date">{endDate}</div>
                   </div>
@@ -366,7 +407,13 @@ function AddOnsDetail({ date }: any) {
               ) : (
                 <button
                   className="app-integration-price-btn"
-                  onClick={addAddon}
+                  onClick={() =>
+                    addAddon(
+                      interval === "month"
+                        ? slackPriceIdMonthly
+                        : slackPriceIdYearly
+                    )
+                  }
                 >
                   <span className="app-integration-price-btn-text">
                     Get Add-on
@@ -399,7 +446,7 @@ function AddOnsDetail({ date }: any) {
                     <div className="next-renewal-date-text">
                       {isNextAddon?.isNextTrainingData === false
                         ? "Expiry Date:"
-                        : "Auto Renewal duo on"}
+                        : "Auto Renewal due on"}
                     </div>
                     <div className="next-renewal-date-date">{endDate}</div>
                   </div>
@@ -425,7 +472,7 @@ function AddOnsDetail({ date }: any) {
               ) : (
                 <button
                   className="app-integration-price-btn"
-                  onClick={addAddon}
+                  onClick={() => addAddon(trainingData)}
                 >
                   <span className="app-integration-price-btn-text">
                     Get Add-on
@@ -458,7 +505,7 @@ function AddOnsDetail({ date }: any) {
                     <div className="next-renewal-date-text">
                       {isNextAddon?.isNextMsgSmall === false
                         ? "Expiry Date:"
-                        : "Auto Renewal duo on"}
+                        : "Auto Renewal due on"}
                     </div>
                     <div className="next-renewal-date-date">{endDate}</div>
                   </div>
@@ -484,7 +531,7 @@ function AddOnsDetail({ date }: any) {
               ) : (
                 <button
                   className="app-integration-price-btn"
-                  onClick={addAddon}
+                  onClick={() => addAddon(msgSmall)}
                 >
                   <span className="app-integration-price-btn-text">
                     Get Add-on
@@ -517,7 +564,7 @@ function AddOnsDetail({ date }: any) {
                     <div className="next-renewal-date-text">
                       {isNextAddon?.isNextMsgLarge === false
                         ? "Expiry Date:"
-                        : "Auto Renewal duo on"}
+                        : "Auto Renewal due on"}
                     </div>
                     <div className="next-renewal-date-date">{endDate}</div>
                   </div>
@@ -543,7 +590,7 @@ function AddOnsDetail({ date }: any) {
               ) : (
                 <button
                   className="app-integration-price-btn"
-                  onClick={addAddon}
+                  onClick={() => addAddon(msgLarge)}
                 >
                   <span className="app-integration-price-btn-text">
                     Get Add-on
@@ -578,7 +625,7 @@ function AddOnsDetail({ date }: any) {
                     <div className="next-renewal-date-text">
                       {isNextAddon?.isNextConversationHistory === false
                         ? "Expiry Date:"
-                        : "Auto Renewal duo on"}
+                        : "Auto Renewal due on"}
                     </div>
                     <div className="next-renewal-date-date">{endDate}</div>
                   </div>
@@ -613,7 +660,13 @@ function AddOnsDetail({ date }: any) {
               ) : (
                 <button
                   className="app-integration-price-btn"
-                  onClick={addAddon}
+                  onClick={() =>
+                    addAddon(
+                      interval === "month"
+                        ? conversationHistoryMonthly
+                        : conversationHistoryYearly
+                    )
+                  }
                 >
                   <span className="app-integration-price-btn-text">
                     Get Add-on
@@ -647,7 +700,7 @@ function AddOnsDetail({ date }: any) {
                     <div className="next-renewal-date-text">
                       {isNextAddon?.isNextLeads === false
                         ? "Expiry Date:"
-                        : "Auto Renewal duo on"}
+                        : "Auto Renewal due on"}
                     </div>
                     <div className="next-renewal-date-date">{endDate}</div>
                   </div>
@@ -679,7 +732,11 @@ function AddOnsDetail({ date }: any) {
                 <button className="app-integration-price-btn">
                   <span
                     className="app-integration-price-btn-text"
-                    onClick={addAddon}
+                    onClick={() =>
+                      addAddon(
+                        interval === "month" ? leadsMonthly : leadsYearly
+                      )
+                    }
                   >
                     Get Add-on
                   </span>

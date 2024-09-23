@@ -156,11 +156,12 @@ function Header() {
                   {userDetails?.totalMessageCount}
                 </span>
                 /
-                {formatNumber(
-                  userDetails?.plan?.messageLimit
-                    ? userDetails?.plan?.messageLimit
-                    : 10000
-                )}
+                {userDetails?.plan?.messageLimit &&
+                  formatNumber(
+                    userDetails?.plan?.messageLimit
+                      ? userDetails?.plan?.messageLimit
+                      : 0
+                  )}
               </span>
             </div>
 

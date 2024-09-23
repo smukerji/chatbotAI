@@ -28,7 +28,8 @@ function PaymentSucessmodal({ isModalOpen, subscriptionDetail }: any) {
         setCountdown((prev) => {
           if (prev === 1) {
             clearInterval(interval); // Clear interval when countdown reaches 1
-            router.push("/chatbot"); // Redirect to homepage or another route
+            // router.push("/chatbot"); // Redirect to homepage or another route
+            window.location.href = "/chatbot";
           }
           return prev - 1; // Decrease countdown by 1
         });

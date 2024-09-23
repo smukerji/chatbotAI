@@ -164,6 +164,7 @@ const createSubscription = async (req: any, res: NextApiResponse) => {
           prorationAmount: invoice.total / 100,
           msg: "Subscription upgraded and prorated amount charged.",
           paymentIntentStatus: paymentIntent.status,
+          createDate: updatedSubscription?.start_date,
         };
       }
 

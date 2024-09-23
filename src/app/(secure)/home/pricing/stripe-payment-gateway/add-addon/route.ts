@@ -127,7 +127,10 @@ const addAddon = async (req: any, res: NextApiResponse) => {
         expand: ["latest_invoice.payment_intent"],
         payment_behavior: "default_incomplete",
       });
-      paymentIntent = subscription?.latest_invoice?.payment_intent;
+
+      // Step 2: Get the latest invoice from the subscription
+      const latestInvoice = subscription?.latest_invoice;
+      paymentIntent = latestInvoice?.payment_intent;
     }
     const priceIds = pricePlans.map((plan: any) => plan.price);
 

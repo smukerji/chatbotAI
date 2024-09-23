@@ -43,7 +43,7 @@ function IndividualPlanBox({
 
   return (
     <>
-      <div className="plan-box">
+      <div className={`plan-box ${isPlanActive && "plan-box-even"}`}>
         <div className="plan-plan plan-row">
           <div className="plan-name-price">
             <span className="plan-name">Individual Plan</span>

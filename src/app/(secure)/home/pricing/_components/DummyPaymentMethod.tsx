@@ -51,6 +51,7 @@ function DummyPaymentMethod({
   priceId,
   source,
   type,
+  isActive,
 }: {
   price: string;
   interval: string;
@@ -58,6 +59,7 @@ function DummyPaymentMethod({
   priceId: string;
   source: string;
   type: string;
+  isActive: boolean;
 }) {
   const [disabled, setDisabled] = useState(false);
   const [error, setError] = useState("");
@@ -427,13 +429,12 @@ function DummyPaymentMethod({
         <Loader />
       ) : (
         <>
-          {/* {isModalOpen && (
+          {isModalOpen && (
             <PaymentSucessmodal
               isModalOpen={isModalOpen}
               subscriptionDetail={subscriptionDetail}
             />
-          )} */}
-
+          )}
           {/* ----------------------------Main card start----------------------------- */}
           <div className="card-main new-card">
             <div className="card-head">Billing Info</div>
@@ -454,8 +455,6 @@ function DummyPaymentMethod({
                     </div>
                   </div>
                 )}
-                {/* <Image src={line} alt={"no image"} /> */}
-                {/* {(plan == 1 || plan == 3 || plan == 2 || plan == 4) && defaultChecked && ( */}
 
                 {/* -----------------------------------Onboarding------------------------------------------ */}
                 <div className="checkbox">
@@ -469,7 +468,7 @@ function DummyPaymentMethod({
                       onChange={(e) => {
                         handleChange(e, onBoarding);
                       }}
-                      disabled={type != "oneoff" && true}
+                      disabled={type != "oneoff" || isActive}
                     />
                     <label
                       htmlFor="onboardingIntegrationCheckbox"
@@ -530,7 +529,7 @@ function DummyPaymentMethod({
                               : whatsappPriceIdMonthly
                           );
                         }}
-                        disabled={type == "oneoff" && true}
+                        disabled={type == "oneoff" || isActive}
                       />
                       <label
                         htmlFor="whatsappIntegrationCheckbox"
@@ -589,7 +588,7 @@ function DummyPaymentMethod({
                                   : slackPriceIdMonthly
                               );
                             }}
-                            disabled={type == "oneoff" && true}
+                            disabled={type == "oneoff" || isActive}
                           />
                           <label
                             htmlFor="slackIntegrationCheckbox"
@@ -635,7 +634,7 @@ function DummyPaymentMethod({
                                   : telegramPriceIdMonthly
                               );
                             }}
-                            disabled={type == "oneoff" && true}
+                            disabled={type == "oneoff" || isActive}
                           />
                           <label
                             htmlFor="telegramIntegrationCheckbox"
@@ -874,7 +873,7 @@ function DummyPaymentMethod({
                         onChange={(e) => {
                           handleChange(e, msgSmall);
                         }}
-                        disabled={type != "oneoff" && true}
+                        disabled={type != "oneoff" || isActive}
                       />
                       <label
                         htmlFor="5kmessagesIntegrationCheckbox"
@@ -916,7 +915,7 @@ function DummyPaymentMethod({
                             onChange={(e) => {
                               handleChange(e, msgLarge);
                             }}
-                            disabled={type != "oneoff" && true}
+                            disabled={type != "oneoff" || isActive}
                           />
                           <label
                             htmlFor="10kIntegrationCheckbox"
@@ -946,7 +945,7 @@ function DummyPaymentMethod({
                             onChange={(e) => {
                               handleChange(e, trainingData);
                             }}
-                            disabled={type != "oneoff" && true}
+                            disabled={type != "oneoff" || isActive}
                           />
                           <label
                             htmlFor="trainingIntegrationCheckbox"
@@ -992,7 +991,7 @@ function DummyPaymentMethod({
                                   : conversationHistoryMonthly
                               );
                             }}
-                            disabled={type == "oneoff" && true}
+                            disabled={type == "oneoff" || isActive}
                           />
                           <label
                             htmlFor="conversationhistoryIntegrationCheckbox"
@@ -1031,7 +1030,7 @@ function DummyPaymentMethod({
                                 interval === "year" ? leadsYearly : leadsMonthly
                               );
                             }}
-                            disabled={type == "oneoff" && true}
+                            disabled={type == "oneoff" || isActive}
                           />
                           <label
                             htmlFor="leadIntegrationCheckbox"

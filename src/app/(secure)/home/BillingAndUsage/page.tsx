@@ -44,6 +44,7 @@ function BillingAndUsage() {
       }
     );
     if (response.data.status == true) {
+      myFunction();
       message.success(response.data.msg);
     } else {
       message.error(response.data.msg);
@@ -97,6 +98,8 @@ function BillingAndUsage() {
     myFunction();
   }, []);
 
+  console.log("plannnn", plan?.isNextPlan);
+
   if (status === "authenticated" || cookies?.userId) {
     return (
       <>
@@ -141,7 +144,9 @@ function BillingAndUsage() {
                   <div className="plan-feature">
                     <div className="next-renewal-date">
                       <div className="next-renewal-date-text">
-                        Auto Renewal due on
+                        {plan?.isNextPlan === false
+                          ? "Expires on"
+                          : "Auto Renewal due on"}
                       </div>
                       <div className="next-renewal-date-date">{date}</div>
                     </div>
@@ -174,12 +179,17 @@ function BillingAndUsage() {
                 </div>
 
                 <div className="cancel-upgrade-btns">
-                  <p
-                    className="cancel-plan"
-                    onClick={() => setIsModalOpen(true)}
-                  >
-                    Cancel My Plan
-                  </p>
+                  {plan?.isNextPlan === false ? (
+                    <p className="cancel-plan">Cancelled</p>
+                  ) : (
+                    <p
+                      className="cancel-plan"
+                      onClick={() => setIsModalOpen(true)}
+                    >
+                      Cancel My Plan
+                    </p>
+                  )}
+
                   <button className="btn-upgrade" onClick={explorePlan}>
                     <span
                       className="btn-text"

@@ -29,7 +29,7 @@ function PricingWrapperNew() {
   const [isYearlyPlan, setIsYearlyPlan] = useState(false);
   const [prices, setPrices] = useState([]);
   const router = useRouter();
-  const [activePlan, setActivePlan] = useState();
+  const [activePlan, setActivePlan] = useState<any>();
   const cryptoSecret = process.env.NEXT_PUBLIC_CRYPTO_SECRET;
 
   const { status } = useSession();
@@ -51,10 +51,15 @@ function PricingWrapperNew() {
     if (cookies?.userId) {
       const a = encryptPriceId(priceId);
       const encryptedPriceId = encodeURIComponent(a);
+      const isActive = activePlan?.active;
 
-      router.push(
-        `/home/pricing/plan-checkout?priceId=${encryptedPriceId}&type=recurring`
-      );
+      let urlParams = `priceId=${encryptedPriceId}&type=recurring`;
+
+      if (isActive) {
+        urlParams += `&isActive=${isActive}`;
+      }
+
+      router.push(`/home/pricing/plan-checkout?${urlParams}`);
     } else {
       router.push("/account/login");
     }
@@ -101,7 +106,7 @@ function PricingWrapperNew() {
 
       // for setting tab monthly/yearly according to active plan
       const duration = checkPlan?.data?.duration;
-      setIsYearlyPlan(duration === "month" ? false : true);
+      setIsYearlyPlan(duration === "year" ? true : false);
     } catch (error) {
       console.log("error", error);
     } finally {
@@ -132,7 +137,7 @@ function PricingWrapperNew() {
     window.scrollTo(0, 0);
   }, []);
 
-  console.log("activePlan", activePlan);
+  console.log("active plan", activePlan);
 
   return (
     <>

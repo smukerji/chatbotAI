@@ -40,11 +40,11 @@ function BusinessplanBox({
 
   return (
     <>
-      <div className="plan-box">
+      <div className={`plan-box ${isPlanActive && "plan-box-even"}`}>
         <div className="plan-plan plan-row">
           <div className="plan-name-price">
-            <span className="plan-name">Business Plan</span>
-            <span className="plan-placeholder">
+            <span className="plan-name plan-name-even">Business Plan</span>
+            <span className="plan-placeholder plan-placeholder-even">
               For small and medium businesses
             </span>
           </div>

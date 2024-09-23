@@ -267,25 +267,43 @@
 
       &.plan-box-even {
         background: #2e58ea;
+        .plan-row {
+          .plan-name-price {
+            .plan-name {
+              color: #fcfcfd;
+            }
+            .plan-placeholder {
+              color: #fcfcfd;
+            }
+          }
 
-        .plan-name-even {
-          color: #fcfcfd;
+          .plan-price-container {
+            .plan-price-frame {
+              .price-sign {
+                color: #fcfcfd;
+              }
+
+              .price-number {
+                color: #fcfcfd;
+              }
+            }
+          }
         }
 
-        .plan-text-even {
-          color: #fcfcfd;
-        }
+        .plan-container-list {
+          .plan-details-new {
+            .plan-item {
+              .plan-text {
+                color: #fcfcfd;
+              }
+            }
+          }
 
-        .plan-placeholder-even {
-          color: #fcfcfd;
-        }
-
-        .price-sign-even {
-          color: #fcfcfd;
-        }
-
-        .price-number-even {
-          color: #fcfcfd;
+          .select-plan-btn {
+            color: #2e58ea;
+            background-color: #fff;
+            border: 1px solid #fff;
+          }
         }
       }
 

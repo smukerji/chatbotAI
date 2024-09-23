@@ -47,6 +47,17 @@ async function delPlan(req: any, res: NextResponse) {
     //   }
     // );
 
+    console.log("kkkkk", u_id);
+
+    await collectionUser.updateMany(
+      { _id: new ObjectId(u_id) },
+      {
+        $set: {
+          isNextPlan: false,
+        },
+      }
+    );
+
     return { msg: "Plan deleted successfully", status: true };
   } catch (error) {
     return { msg: "finding error", status: 0 };

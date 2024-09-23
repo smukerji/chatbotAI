@@ -21,6 +21,8 @@ async function getUserDetails(req: any, res: NextResponse) {
     const planId = data.planId;
     const data_plan = await collectionPlan.findOne({ _id: planId });
 
+    console.log("adadadasdsadsa", data);
+
     return {
       plan: data.plan,
       nextRenewal: data.endDate,
@@ -30,6 +32,7 @@ async function getUserDetails(req: any, res: NextResponse) {
       status: data.status,
       whatsappIntegration: data.nextIsWhatsapp,
       planDetail: data_plan,
+      isNextPlan: data.isNextPlan,
     };
   } catch (error) {}
 }

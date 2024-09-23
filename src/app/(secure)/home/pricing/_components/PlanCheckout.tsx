@@ -19,6 +19,7 @@ function PlanCheckout() {
   const a: any = searchParams ? searchParams.get("priceId") : null;
   const source: any = searchParams ? searchParams.get("source") : null;
   const type: any = searchParams ? searchParams.get("type") : null;
+  const isActive: any = searchParams ? searchParams.get("isActive") : false;
   const encryptedPriceId = decodeURIComponent(a);
   const [loader, setLoader] = useState(true);
   const [subscriptionDetail, setSubscriptionDetail]: any = useState();
@@ -75,6 +76,9 @@ function PlanCheckout() {
   useEffect(() => {
     getCustomer();
   }, []);
+
+  console.log(">>>>>>>", isActive);
+
   return (
     <>
       <div>
@@ -100,6 +104,7 @@ function PlanCheckout() {
               priceId={priceId}
               source={source}
               type={type}
+              isActive={isActive}
             />
           )}
         </Elements>
