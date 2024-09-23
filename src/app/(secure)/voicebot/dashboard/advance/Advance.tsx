@@ -191,22 +191,16 @@ function Advance() {
     const enteredValue: string = e.target.value;
     // debugger;
     setVoiceMailMessage(enteredValue);
-    if (enteredValue.trim().length == 0) {
-      voiceBotContextData.updateState("voicemailMessage",enteredValue);
-    } else {
-      voiceBotContextData.updateState("voicemailMessage",enteredValue);
-    }
+    voiceBotContextData.updateState("voicemailMessage",enteredValue.trim());
+    
   }
 
   const endCallMessageEnterHandler = (e:React.ChangeEvent<HTMLInputElement>) => {
     const enteredValue: string = e.target.value;
     // debugger;
     setEndCallMessage(enteredValue);
-    if (enteredValue.trim().length == 0) {
-      voiceBotContextData.updateState("endCallMessage",enteredValue);
-    } else {
-      voiceBotContextData.updateState("endCallMessage",enteredValue);
-    }
+    voiceBotContextData.updateState("endCallMessage",enteredValue.trim());
+    
   }
 
   const idleMessageChangeChangeHandler = (value: any, options: any) => {

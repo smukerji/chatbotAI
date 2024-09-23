@@ -13,7 +13,54 @@ function Analysis() {
   const voiceBotContextData: any = useContext(CreateVoiceBotContext);
   const voicebotDetails = voiceBotContextData.state;
 
+  const [systemPrompts, setSystemPrompts] = useState<string>();
+  const [successEvaluationPrompts, setSuccessEvaluationPrompts] = useState<string>();
+  const [evaluationRubik, setEvaluationRubik] = useState<string>();
+  const [structuredDataPrompts, setStructuredDataPrompts] = useState<string>();
   const [stepsCount, setStepsCount] = useState<number>(5);
+
+  const systemPromptEnterHandler = (e:React.ChangeEvent<HTMLTextAreaElement>) => {
+    const enteredValue: string = e.target.value;
+    setSystemPrompts(enteredValue);
+    voiceBotContextData.updateState("analysisPlan.summaryPrompt", enteredValue.trim());
+  }
+
+  const successEvaluationPromptEnterHandler = (e:React.ChangeEvent<HTMLTextAreaElement>) => {
+    const enteredValue: string = e.target.value;
+    setSuccessEvaluationPrompts(enteredValue);
+    voiceBotContextData.updateState("analysisPlan.successEvaluationPrompt", enteredValue.trim());
+  }
+
+  const structuredDataPromptEnterHandler = (e:React.ChangeEvent<HTMLTextAreaElement>) => {
+    const enteredValue: string = e.target.value;
+    setStructuredDataPrompts(enteredValue);
+    voiceBotContextData.updateState("analysisPlan.structuredDataPrompt", enteredValue.trim());
+  }
+
+
+  const rubikChangeHandler = (value: string, option: any) => {
+    // debugger;
+    setEvaluationRubik(option.label);
+    voiceBotContextData.updateState("analysisPlan.successEvaluationRubric", option.label);
+  }
+
+    // console.log("server messages ",serverMessages);
+    console.log("your voicebot details ", voicebotDetails["analysisPlan"]);
+
+
+  const evaluationRubicList = [
+    { "value": "1", "label": "NumericScale" },
+    { "value": "2", "label": "DescriptiveScale" },
+    { "value": "3", "label": "Checklist" },
+    { "value": "4", "label": "Matrix" },
+    { "value": "5", "label": "PercentageScale" },
+    { "value": "6", "label": "LikertScale" },
+    { "value": "7", "label": "AutomaticRubric" },
+    { "value": "8", "label": "PassFail" }
+  ];
+
+
+
   return (
     <div className="analysis-container">
       <div className="summary-container">
@@ -21,8 +68,10 @@ function Analysis() {
         <p className="description">This is the prompt that&lsquo;s used to summarize the call. The output is stored in call.analysis.summary. You can also find the summary in the Call Logs Page.</p>
         <div className="content-wrapper">
           <h4 className="text-area-title">Prompt</h4>
-          <TextArea className="text-area" rows={4} placeholder="Write your system prompts here..." />
-
+          <TextArea className="text-area" rows={4} placeholder="Write your system prompts here..." 
+          value={systemPrompts}
+          onChange={systemPromptEnterHandler}
+          />
         </div>
       </div>
 
@@ -32,7 +81,10 @@ function Analysis() {
         <div className="content-wrapper">
           <h4 className="text-area-title">Prompt</h4>
           <p className="text-area-description">This is the prompt that&lsquo;s used to evaluate if the call was successful.</p>
-          <TextArea className="text-area" rows={4} placeholder="Write your system prompts here..." />
+          <TextArea className="text-area" rows={4} placeholder="Write your system prompts here..." 
+          value={successEvaluationPrompts}
+          onChange={successEvaluationPromptEnterHandler}
+          />
 
           <h4 className="text-area-title spacer">Success Evaluation Rubric</h4>
           <p className="text-area-description">This enforces the rubric of the evaluation upon the Success Evaluation. </p>
@@ -40,22 +92,10 @@ function Analysis() {
             className="select-field"
 
             placeholder="Select the provider"
+            onChange={rubikChangeHandler}
+            value={evaluationRubik}
 
-
-            options={[
-              {
-                value: '1',
-                label: 'deepgram',
-              },
-              {
-                value: '2',
-                label: 'talkscriber',
-              },
-              {
-                value: '3',
-                label: 'gladia',
-              }
-            ]}
+            options={evaluationRubicList}
           />
         </div>
       </div>
@@ -66,7 +106,10 @@ function Analysis() {
         <div className="content-wrapper">
           <h4 className="text-area-title">Prompt</h4>
           <p className="text-area-description">This is the prompt that&lsquo;s used to extract structured data from the call.</p>
-          <TextArea className="text-area" rows={4} placeholder="Write your system prompts here..." />
+          <TextArea className="text-area" rows={4} placeholder="Write your system prompts here..."
+           onChange={structuredDataPromptEnterHandler}
+            value={structuredDataPrompts}
+          />
 
           <Property/>
 
