@@ -59,10 +59,10 @@ function Dashboard() {
               <li className={tab == "model" ? "active" : ""} onClick={()=> changeHandler("model")}>Model</li>
               <li className={tab == "transcriber" ? "active" : ""} onClick={() => changeHandler("transcriber")}>Transcriber</li>
               <li className={tab == "voice" ? "active" : ""} onClick={() => changeHandler("voice")}>Voice</li>
-              <li className={tab == "tool" ? "active" : ""} onClick={() => changeHandler("tool")}>Tool</li>
+              {/* <li className={tab == "tool" ? "active" : ""} onClick={() => changeHandler("tool")}>Tool</li> */}
               <li className={tab == "advance" ? "active" : ""} onClick={() => changeHandler("advance")}>Advance</li>
               <li className={tab == "analysis" ? "active" : ""} onClick={() => changeHandler("analysis")}>Analysis</li>
-              <li className={tab == "phone-number" ? "active" : ""} onClick={() => changeHandler("phone-number")}>Phone Number</li>
+              {/* <li className={tab == "phone-number" ? "active" : ""} onClick={() => changeHandler("phone-number")}>Phone Number</li> */}
               <li className={tab == "call-logs" ? "active" : ""} onClick={() => changeHandler("call-logs")}>Call Logs</li>
 
             </ul>

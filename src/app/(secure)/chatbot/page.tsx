@@ -213,6 +213,8 @@ function Chatbot() {
         {/*------------------------------------------title----------------------------------------------*/}
         <div className="title-container">
           <h1 className="title">My Chatbots</h1>
+          <h1 className="title">My Chatbots</h1>
+          
           <div className="action-container">
             <div className="chatbot-list-action">
               <Icon

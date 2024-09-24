@@ -82,6 +82,46 @@ function CallLogs() {
     }
   ]
 
+  const formatTime = (seconds: number) =>
+    [seconds / 60, seconds % 60]
+      .map((v) => `0${Math.floor(v)}`.slice(-2))
+      .join(':');
+
+  const [callListData, setCallListData] = useState<ListCallResponse>();
+  const [callLogsList, setCallLogsList] = useState<ListCallResponse[]>([]);
+  const containerRef = useRef(null);
+
+  const [activeKey, setActiveKey] = useState("");
+
+  let callLogResponse:any;
+
+  async function getLogRecord(){
+    const options = {
+      method: 'GET',
+      headers: {Authorization: 'Bearer 36d15d26-9036-4dcc-b646-0f7564106615'}
+    };
+
+    debugger;
+
+    callLogResponse = await fetch('https://api.vapi.ai/v2/call?limit=10&page=1&assistantId=9529df0a-110c-48ee-8de2-6a851e5b4352', options);
+
+    const data = await callLogResponse.json();
+
+    setCallLogsList(data.results);
+
+
+  }
+
+
+  useEffect( () => {
+
+    getLogRecord();
+
+
+  }, []);
+
+  console.log("your call logs ", callLogsList);
+
 
   let activeLog = 2;
   const callLogIds = [
@@ -111,15 +151,7 @@ function CallLogs() {
     },
   ];
 
-  const formatTime = (seconds: number) =>
-    [seconds / 60, seconds % 60]
-      .map((v) => `0${Math.floor(v)}`.slice(-2))
-      .join(':');
 
-  const [callListData, setCallListData] = useState<ListCallResponse>();
-  const containerRef = useRef(null);
-
-  const [activeKey, setActiveKey] = useState("");
 
   const { wavesurfer, isPlaying, currentTime, isReady } = useWavesurfer({
     container: containerRef,
@@ -161,12 +193,12 @@ function CallLogs() {
         <div className="left-container">
           <div className='list-items'>
             {
-              contacts.map((contact, index) => (
+              callLogsList.map((contact, index) => (
                 <div key={index}>
                   {index !== 0 && <hr className="splitter" />}
                   <div className='list-item' >
                     <div className='number-details'>
-                      <h2 className='date'> 12, June 2024 </h2>
+                      <h2 className='date'>{contact.createdAt} </h2>
                       <p>  12 min </p>
                     </div>
                     <div className='switch-input'>
@@ -179,7 +211,7 @@ function CallLogs() {
             }
           </div>
           <div className='bottom-button'>
-            <Pagination defaultCurrent={1} total={50} />
+            <Pagination defaultCurrent={1} total={50}  />
           </div>
         </div>
 
