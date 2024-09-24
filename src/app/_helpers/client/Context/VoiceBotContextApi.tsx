@@ -100,7 +100,8 @@ const initialState = {
     successEvaluationRubric: "NumericScale",
     successEvaluationRequestTimeoutSeconds: 10.5,
     structuredDataPrompt: "",
-    structuredDataSchema: { type: "string", items: {}, properties: {}, description: "", required: [""] },
+    structuredDataSchema: { type: "object", items: {}, properties: [],/**this type is {} not [], [] is given for ui manage only. This need to refactor before the time value send to the vapi server */
+     description: "", required: [""] },
     artifactPlan: { recordingEnabled: true, videoRecordingEnabled: false, recordingS3PathPrefix: "" },
     messagePlan: { idleMessages: [""], idleMessageMaxSpokenCount: 5.5, idleTimeoutSeconds: 17.5 },
     startSpeakingPlan: {

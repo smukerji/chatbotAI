@@ -25,10 +25,12 @@ function Property() {
       setCurrentProperty(undefined);
     }
 
-
-
+    //stored into the contextAPI
+    voiceBotContextData.updateState("analysisPlan.structuredDataSchema.properties", properties);
 
   }, [properties]);
+
+  console.log("Context analysis ", voicebotDetails["analysisPlan"]);
 
 
   const addPropertyHandler = () => {
