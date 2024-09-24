@@ -78,14 +78,6 @@ function BillingAndUsage() {
       const options: any = { year: "numeric", month: "short", day: "2-digit" };
       const formattedDate: any = newDate.toLocaleDateString("en-US", options);
       setDate(formattedDate);
-      // if (response?.data?.status == "cancel") {
-      //   setDisable(true);
-      //   setButtonDisable(true);
-      // } else if (response?.data?.status == undefined) {
-      //   setButtonDisable(false);
-      // } else {
-      //   setButtonDisable(true);
-      // }
 
       setLoading(false);
     } catch (error) {
@@ -97,8 +89,6 @@ function BillingAndUsage() {
   useEffect(() => {
     myFunction();
   }, []);
-
-  console.log("plannnn", plan?.isNextPlan);
 
   if (status === "authenticated" || cookies?.userId) {
     return (
@@ -201,7 +191,7 @@ function BillingAndUsage() {
                 </div>
               </div>
 
-              <AddOnsDetail date={date} />
+              <AddOnsDetail date={date} isNextPlan={plan?.isNextPlan} />
               <div className="manage-plan">Payment history</div>
             </div>
 

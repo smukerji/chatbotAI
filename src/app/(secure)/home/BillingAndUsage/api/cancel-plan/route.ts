@@ -17,9 +17,19 @@ async function delPlan(req: any, res: NextResponse) {
     const db = (await clientPromise!)?.db();
     let { u_id } = await req.json();
     const collectionUser = db.collection("users");
+    const collectionData = db.collection("user-details");
+
     const userData = await collectionUser.findOne({
       _id: new ObjectId(u_id),
     });
+
+    const Details = await collectionData.findOne({
+      userId: String(userData._id),
+    });
+
+    if (!Details) {
+      return { msg: "Addon details not found." };
+    }
 
     const subscriptionId = userData.subId;
 
@@ -47,13 +57,23 @@ async function delPlan(req: any, res: NextResponse) {
     //   }
     // );
 
-    console.log("kkkkk", u_id);
-
     await collectionUser.updateMany(
       { _id: new ObjectId(u_id) },
       {
         $set: {
           isNextPlan: false,
+        },
+      }
+    );
+
+    await collectionData.updateMany(
+      { userId: String(userData?._id) },
+      {
+        $set: {
+          isNextWhatsapp: false,
+          isNextTelegram: false,
+          isNextSlack: false,
+          isNextConversationHistory: false,
         },
       }
     );

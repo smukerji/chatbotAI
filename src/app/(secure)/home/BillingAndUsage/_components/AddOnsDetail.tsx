@@ -64,7 +64,7 @@ function encryptPriceId(priceId: string) {
   return CryptoJS.AES.encrypt(priceId, cryptoSecret).toString();
 }
 
-function AddOnsDetail({ date }: any) {
+function AddOnsDetail({ date, isNextPlan }: any) {
   const formattedDate = moment(date, "MMM DD, YYYY").format("DD/MM/YYYY");
   const [isOpen, setIsOpen] = useState(true);
   const [cookies, setCookie] = useCookies(["userId"]);
@@ -228,7 +228,7 @@ function AddOnsDetail({ date }: any) {
               {/* <Button className="pricing-button">Get Add-on</Button> */}
 
               {/* if plan is active show cancel button */}
-              {isNextAddon?.isNextWhatsapp === false ? (
+              {isNextAddon?.isNextWhatsapp === false || isNextPlan === false ? (
                 <button
                   className="app-integration-price-btn cursor-disabled"
                   disabled
@@ -304,7 +304,7 @@ function AddOnsDetail({ date }: any) {
               </div>
               {/* <Button className="pricing-button">Get Add-on</Button> */}
 
-              {isNextAddon?.isNextTelegram === false ? (
+              {isNextAddon?.isNextTelegram === false || isNextPlan === false ? (
                 <button
                   className="app-integration-price-btn cursor-disabled"
                   disabled
@@ -380,7 +380,7 @@ function AddOnsDetail({ date }: any) {
               </div>
               {/* <Button className="pricing-button">Get Add-on</Button> */}
 
-              {isNextAddon?.isNextSlack === false ? (
+              {isNextAddon?.isNextSlack === false || isNextPlan === false ? (
                 <button
                   className="app-integration-price-btn cursor-disabled"
                   disabled
@@ -453,7 +453,8 @@ function AddOnsDetail({ date }: any) {
                 )}
               </div>
               {/* <Button className="pricing-button">Get Add-on</Button> */}
-              {isNextAddon?.isNextTrainingData === false ? (
+              {isNextAddon?.isNextTrainingData === false ||
+              isNextPlan === false ? (
                 <button
                   className="app-integration-price-btn cursor-disabled"
                   disabled
@@ -512,7 +513,7 @@ function AddOnsDetail({ date }: any) {
                 )}
               </div>
               {/* <Button className="pricing-button">Get Add-on</Button> */}
-              {isNextAddon?.isNextMsgSmall === false ? (
+              {isNextAddon?.isNextMsgSmall === false || isNextPlan === false ? (
                 <button
                   className="app-integration-price-btn cursor-disabled"
                   disabled
@@ -571,7 +572,7 @@ function AddOnsDetail({ date }: any) {
                 )}
               </div>
               {/* <Button className="pricing-button">Get Add-on</Button> */}
-              {isNextAddon?.isNextMsgLarge === false ? (
+              {isNextAddon?.isNextMsgLarge === false || isNextPlan === false ? (
                 <button
                   className="app-integration-price-btn cursor-disabled"
                   disabled
@@ -632,7 +633,8 @@ function AddOnsDetail({ date }: any) {
                 )}
               </div>
               {/* <Button className="pricing-button">Get Add-on</Button> */}
-              {isNextAddon?.isNextConversationHostory === false ? (
+              {isNextAddon?.isNextConversationHistory === false ||
+              isNextPlan === false ? (
                 <button
                   className="app-integration-price-btn cursor-disabled"
                   disabled
@@ -707,7 +709,7 @@ function AddOnsDetail({ date }: any) {
                 )}
               </div>
               {/* <Button className="pricing-button">Get Add-on</Button> */}
-              {isNextAddon?.isNextLeads === false ? (
+              {isNextAddon?.isNextLeads === false || isNextPlan === false ? (
                 <button
                   className="app-integration-price-btn cursor-disabled"
                   disabled

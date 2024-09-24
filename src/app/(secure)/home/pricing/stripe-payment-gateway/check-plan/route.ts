@@ -46,12 +46,12 @@ async function checkCurrentPlan(req: any, res: NextResponse) {
       slackIntegration: details.isSlack,
       telegramIntegration: details.isTelegram,
       hubspotIntegration: true,
+      isNextPlan: data?.isNextPlan,
     };
   } else {
     return {
       msg: 0,
-      text: "Get started",
-      whatsAppIntegration: data.isWhatsapp,
+      text: "No Plan Found",
     };
   }
 }

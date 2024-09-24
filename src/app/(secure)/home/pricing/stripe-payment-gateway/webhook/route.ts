@@ -367,8 +367,6 @@ export async function POST(req: any, res: any) {
         // only runs if parent planid is updated. Cause for addon it is already written in addon route
 
         if (planIds.some((planId: any) => parentPlanIds.includes(planId))) {
-          console.log("coming inside update even for addon>>>>>>>>>");
-
           userData = await collection.findOne({
             customerId: event.data.object.customer,
           });
@@ -400,8 +398,6 @@ export async function POST(req: any, res: any) {
               planId == businessPlanMonthly ||
               planId == businessPlanYearly
             ) {
-              console.log("coming inside for loop----------- ");
-
               const planData = await collectionPlan.findOne({
                 priceId: planId,
               });

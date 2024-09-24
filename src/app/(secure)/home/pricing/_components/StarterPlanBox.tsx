@@ -30,6 +30,7 @@ function StarterPlanBox({
   prices,
   isYearlyPlan,
   activePlan,
+  isNextPlan,
 }: any) {
   // Get the filtered prices
   const { monthlyPrice, yearlyPrice } = findStarterPlanPrice(prices);
@@ -126,21 +127,30 @@ function StarterPlanBox({
             </div>
           </div>
 
-          <button
-            className="pay-btn plan1 select-plan-btn"
-            // onClick={changePlan}
-            onClick={() =>
-              handleClick(
-                isYearlyPlan ? yearlyStarterPlanId : monthlyStarterPlanId
-              )
-            }
-            disabled={isPlanActive}
-            title={isPlanActive ? "Active Plan" : undefined}
-          >
-            <span className="btn-text">
-              {isPlanActive ? "Current Plan" : "Get Started"}
-            </span>
-          </button>
+          {isPlanActive && isNextPlan == false ? (
+            <button
+              className="pay-btn plan1 select-plan-btn"
+              disabled={isPlanActive}
+              title={isPlanActive ? "Cancelled" : undefined}
+            >
+              <span className="btn-text">Cancelled</span>
+            </button>
+          ) : (
+            <button
+              className="pay-btn plan1 select-plan-btn"
+              onClick={() =>
+                handleClick(
+                  isYearlyPlan ? yearlyStarterPlanId : monthlyStarterPlanId
+                )
+              }
+              disabled={isPlanActive}
+              title={isPlanActive ? "Active Plan" : undefined}
+            >
+              <span className="btn-text">
+                {isPlanActive ? "Current Plan" : "Get Started"}
+              </span>
+            </button>
+          )}
         </div>
       </div>
     </>

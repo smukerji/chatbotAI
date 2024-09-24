@@ -166,8 +166,6 @@ function DummyPaymentMethod({
   // On submit subscription functionality
   async function handleSubmit(event: any) {
     try {
-      console.log("coming handle submit");
-
       setCardErrors((prev) => {
         return {
           ...prev,
@@ -200,7 +198,6 @@ function DummyPaymentMethod({
 
       if (error) {
         // Handle error (e.g., show error message to the user)
-        console.error(error);
         setCardErrors((prev) => ({
           ...prev,
           paymentFailed: true,
@@ -214,7 +211,6 @@ function DummyPaymentMethod({
 
       if (source == "addon") {
         // Call your update endpoint to add an addon to the existing subscription
-        console.log("coming here in addon call");
 
         subscription = await axios.post(
           `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/add-addon`,
@@ -225,13 +221,10 @@ function DummyPaymentMethod({
             paymentMethodId: paymentMethod?.id,
           }
         );
-        console.log("subscriptionnnssss", subscription);
 
         // const isOneOff = subscription.data.isOneOff;
 
         if (!subscription.data.parentFound) {
-          console.log("coming insideee iffff");
-
           setPaymentLoading(false);
           message.error(subscription.data.msg);
           return;
@@ -254,10 +247,8 @@ function DummyPaymentMethod({
           return;
         }
       }
-      console.log("subscription", subscription.data);
 
       paymentIntentStatus = subscription.data.paymentIntentStatus;
-      console.log("paymentIntentss", paymentIntentStatus);
 
       // Check if payment intent is already confirmed
       if (
@@ -285,8 +276,6 @@ function DummyPaymentMethod({
         paymentIntentStatus === "succeeded" ||
         paymentIntentStatus === "paid"
       ) {
-        console.log("coming insdiee elseeee");
-
         setSubscriptionDetail(subscription.data);
 
         // Payment has already succeeded, no need to confirm again
@@ -297,7 +286,6 @@ function DummyPaymentMethod({
     } catch (error) {
       // setLoading(false);
       setPaymentLoading(false);
-      console.log("error", error);
     }
   }
 
@@ -352,7 +340,7 @@ function DummyPaymentMethod({
       );
       setPrices(response.data.prices);
     } catch (error) {
-      console.log("error", error);
+      // console.log("error", error);
     } finally {
       setLoading(false);
     }
@@ -650,11 +638,10 @@ function DummyPaymentMethod({
                       </div>
 
                       {/* instagram */}
-                      <div className="checkbox hidden">
+                      {/* <div className="checkbox hidden">
                         <div className="check-label ">
                           <input
                             type="checkbox"
-                            // defaultChecked={defaultChecked}
                             checked={
                               checkedIntegrations[
                                 interval === "year"
@@ -664,9 +651,6 @@ function DummyPaymentMethod({
                             }
                             id="instagramIntegrationCheckbox"
                             className="price-checkbox"
-                            // onChange={(e) => {
-                            //   handleChange(e, telegramPriceId);
-                            // }}
                             disabled
                           />
                           <label
@@ -680,13 +664,12 @@ function DummyPaymentMethod({
                         <div className="pricing coming-soon">
                           <p>Coming Soon</p>
                         </div>
-                      </div>
+                      </div> */}
                       {/* Messenger */}
-                      <div className="checkbox hidden">
+                      {/* <div className="checkbox hidden">
                         <div className="check-label">
                           <input
                             type="checkbox"
-                            // defaultChecked={defaultChecked}
                             checked={
                               checkedIntegrations[
                                 interval === "year"
@@ -696,9 +679,7 @@ function DummyPaymentMethod({
                             }
                             id="messengerIntegrationCheckbox"
                             className="price-checkbox"
-                            // onChange={(e) => {
-                            //   handleChange(e, telegramPriceId);
-                            // }}
+                          
                             disabled
                           />
                           <label
@@ -711,13 +692,12 @@ function DummyPaymentMethod({
                         <div className="pricing coming-soon">
                           <p>Coming Soon</p>
                         </div>
-                      </div>
+                      </div> */}
                       {/* Sevenrooms */}
-                      <div className="checkbox hidden">
+                      {/* <div className="checkbox hidden">
                         <div className="check-label">
                           <input
                             type="checkbox"
-                            // defaultChecked={defaultChecked}
                             checked={
                               checkedIntegrations[
                                 interval === "year"
@@ -727,9 +707,7 @@ function DummyPaymentMethod({
                             }
                             id="sevenroomsIntegrationCheckbox"
                             className="price-checkbox"
-                            // onChange={(e) => {
-                            //   handleChange(e, telegramPriceId);
-                            // }}
+
                             disabled
                           />
                           <label
@@ -743,13 +721,12 @@ function DummyPaymentMethod({
                         <div className="pricing coming-soon">
                           <p>Coming Soon</p>
                         </div>
-                      </div>
+                      </div> */}
                       {/* Mindbody */}
-                      <div className="checkbox hidden">
+                      {/* <div className="checkbox hidden">
                         <div className="check-label">
                           <input
                             type="checkbox"
-                            // defaultChecked={defaultChecked}
                             checked={
                               checkedIntegrations[
                                 interval === "year"
@@ -759,9 +736,7 @@ function DummyPaymentMethod({
                             }
                             id="mindbodyIntegrationCheckbox"
                             className="price-checkbox"
-                            // onChange={(e) => {
-                            //   handleChange(e, telegramPriceId);
-                            // }}
+                            
                             disabled
                           />
                           <label
@@ -774,13 +749,12 @@ function DummyPaymentMethod({
                         <div className="pricing coming-soon">
                           <p>Coming Soon</p>
                         </div>
-                      </div>
+                      </div> */}
                       {/* Hubspot */}
-                      <div className="checkbox hidden">
+                      {/* <div className="checkbox hidden">
                         <div className="check-label">
                           <input
                             type="checkbox"
-                            // defaultChecked={defaultChecked}
                             checked={
                               checkedIntegrations[
                                 interval === "year"
@@ -790,9 +764,7 @@ function DummyPaymentMethod({
                             }
                             id="hubspotIntegrationCheckbox"
                             className="price-checkbox"
-                            // onChange={(e) => {
-                            //   handleChange(e, telegramPriceId);
-                            // }}
+                            
                             disabled
                           />
                           <label
@@ -806,13 +778,12 @@ function DummyPaymentMethod({
                         <div className="pricing coming-soon">
                           <p>Coming Soon</p>
                         </div>
-                      </div>
+                      </div> */}
                       {/* Zoho crm */}
-                      <div className="checkbox hidden">
+                      {/* <div className="checkbox hidden">
                         <div className="check-label">
                           <input
                             type="checkbox"
-                            // defaultChecked={defaultChecked}
                             checked={
                               checkedIntegrations[
                                 interval === "year"
@@ -822,9 +793,7 @@ function DummyPaymentMethod({
                             }
                             id="zohocrmIntegrationCheckbox"
                             className="price-checkbox"
-                            // onChange={(e) => {
-                            //   handleChange(e, telegramPriceId);
-                            // }}
+                            
                             disabled
                           />
                           <label
@@ -838,7 +807,7 @@ function DummyPaymentMethod({
                         <div className="pricing coming-soon">
                           <p>Coming Soon</p>
                         </div>
-                      </div>
+                      </div> */}
                     </div>
                   )}
                 </div>
@@ -1043,17 +1012,12 @@ function DummyPaymentMethod({
                           <p>${addonPrices.leadsPrice ?? 0}</p>
                         </div>
                       </div>
-                      <div className="checkbox hidden">
+                      {/* <div className="checkbox hidden">
                         <div className="check-label">
                           <input
                             type="checkbox"
-                            // defaultChecked={defaultChecked}
-                            // checked={checkedIntegrations[telegramPriceId] || false}
                             id="sentimetIntegrationCheckbox"
                             className="price-checkbox"
-                            // onChange={(e) => {
-                            //   handleChange(e, telegramPriceId);
-                            // }}
                           />
                           <label
                             htmlFor="sentimetIntegrationCheckbox"
@@ -1065,7 +1029,7 @@ function DummyPaymentMethod({
                         <div className="pricing coming-soon">
                           <p>Coming soon</p>
                         </div>
-                      </div>
+                      </div> */}
                     </div>
                   )}
                 </div>

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import zoho from "../../../../../../public/svgs/zohocrm.svg";
 import whatsapp from "../../../../../../public/whatsapp.webp";
 import telegram from "../../../../../../public/telegram.webp";
@@ -17,6 +17,8 @@ import Conversation from "../../../../../../public/svgs/conversationhistory.svg"
 import Leads from "../../../../../../public/svgs/leads.svg";
 import Sentiment from "../../../../../../public/svgs/sentimentdashboard.svg";
 import Onboarding from "../../../../../../public/svgs/onboarding.svg";
+import axios from "axios";
+import { useCookies } from "react-cookie";
 
 const trainingData: any = process.env.NEXT_PUBLIC_TRAINING_DATA_MONTHLY;
 const trainingDataYearly: any = process.env.NEXT_PUBLIC_TRAINING_DATA_YEARLY;
@@ -44,11 +46,24 @@ function findPrice(prices: any, envPriceId: string) {
   return priceObj ? priceObj.unit_amount / 100 : null;
 }
 
-function PricingAddons({ pricing, handleAddonClick, isYearlyPlan }: any) {
+function PricingAddons({
+  pricing,
+  handleAddonClick,
+  isYearlyPlan,
+  isNextPlan,
+}: any) {
   const [isOpen, setIsOpen] = useState(true);
+  const [cookies, setCookie] = useCookies(["userId"]);
+  const [addonData, setAddonData] = useState<any>();
+  const [isNextAddon, setIsNextAddon] = useState<any>(null);
 
   const handleClick = () => {
     setIsOpen(!isOpen);
+  };
+
+  // Utility function to check if a plan is active
+  const isPlanActive = (planId: number) => {
+    return addonData?.some((item: any) => item.id === planId);
   };
 
   const msgSmallPrice = findPrice(pricing, msgSmall);
@@ -75,6 +90,26 @@ function PricingAddons({ pricing, handleAddonClick, isYearlyPlan }: any) {
     pricing,
     isYearlyPlan ? telegramIdYearly : telegramIdMonthly
   );
+
+  const fetchAddonDetail = async () => {
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/BillingAndUsage/api/cancel-plan/addon`,
+        {
+          u_id: cookies.userId,
+        }
+      );
+
+      setAddonData(response.data.subscriptionData);
+      setIsNextAddon(response.data.addonDetails);
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchAddonDetail();
+  }, []);
 
   return (
     <>
@@ -110,25 +145,33 @@ function PricingAddons({ pricing, handleAddonClick, isYearlyPlan }: any) {
                             </p>
                           </div>
                         </div>
-                        <button
-                          className="app-integration-price-btn"
-                          //   disabled={whatsappDisable || !enableOne}
-                          //   title={
-                          //     telegramDisable || !enableOne ? NOTVALIDPLAN : undefined
-                          //   }
-                          //   onClick={WhatsappAddOn}
-                          onClick={() =>
-                            handleAddonClick(
-                              isYearlyPlan
-                                ? whatsappIdYearly
-                                : whatsappIdMonthly
-                            )
-                          }
-                        >
-                          <span className="app-integration-price-btn-text">
-                            Get Add-on
-                          </span>
-                        </button>
+                        {isPlanActive(whatsappIdMonthly) ||
+                        isPlanActive(whatsappIdYearly) ? (
+                          <button
+                            className="app-integration-price-btn"
+                            disabled
+                            title="Already Purchased"
+                          >
+                            <span className="app-integration-price-btn-text">
+                              Get Add-on
+                            </span>
+                          </button>
+                        ) : (
+                          <button
+                            className="app-integration-price-btn"
+                            onClick={() =>
+                              handleAddonClick(
+                                isYearlyPlan
+                                  ? whatsappIdYearly
+                                  : whatsappIdMonthly
+                              )
+                            }
+                          >
+                            <span className="app-integration-price-btn-text">
+                              Get Add-on
+                            </span>
+                          </button>
+                        )}
                       </div>
                       <div className="app-integration">
                         <div className="integration-name-container">
@@ -144,25 +187,33 @@ function PricingAddons({ pricing, handleAddonClick, isYearlyPlan }: any) {
                             </p>
                           </div>
                         </div>
-                        <button
-                          className="app-integration-price-btn"
-                          //   disabled={telegramDisable || !enableOne}
-                          //   onClick={TelegramAddOn}
-                          //   title={
-                          //     telegramDisable || !enableOne ? NOTVALIDPLAN : undefined
-                          //   }
-                          onClick={() =>
-                            handleAddonClick(
-                              isYearlyPlan
-                                ? telegramIdYearly
-                                : telegramIdMonthly
-                            )
-                          }
-                        >
-                          <span className="app-integration-price-btn-text">
-                            Get Add-on
-                          </span>
-                        </button>
+                        {isPlanActive(telegramIdMonthly) ||
+                        isPlanActive(telegramIdYearly) ? (
+                          <button
+                            className="app-integration-price-btn"
+                            disabled
+                            title="Already Purchased"
+                          >
+                            <span className="app-integration-price-btn-text">
+                              Get Add-on
+                            </span>
+                          </button>
+                        ) : (
+                          <button
+                            className="app-integration-price-btn"
+                            onClick={() =>
+                              handleAddonClick(
+                                isYearlyPlan
+                                  ? telegramIdYearly
+                                  : telegramIdMonthly
+                              )
+                            }
+                          >
+                            <span className="app-integration-price-btn-text">
+                              Get Add-on
+                            </span>
+                          </button>
+                        )}
                         {/* <div className="app-integration-price coming-soon">
                       Coming soon
                     </div> */}
@@ -182,24 +233,31 @@ function PricingAddons({ pricing, handleAddonClick, isYearlyPlan }: any) {
                             </p>
                           </div>
                         </div>
-                        {/* <div className='app-integration-price coming-soon'>Coming soon</div> */}
-                        <button
-                          className="app-integration-price-btn"
-                          //   disabled={slackDisable || !enableOne}
-                          //   title={
-                          //     slackDisable || !enableOne ? NOTVALIDPLAN : undefined
-                          //   }
-                          //   onClick={slackAddOn}
-                          onClick={() =>
-                            handleAddonClick(
-                              isYearlyPlan ? slackIdYearly : slackIdMonthly
-                            )
-                          }
-                        >
-                          <span className="app-integration-price-btn-text">
-                            Get Add-on
-                          </span>
-                        </button>
+                        {isPlanActive(slackIdMonthly) ||
+                        isPlanActive(slackIdYearly) ? (
+                          <button
+                            className="app-integration-price-btn"
+                            disabled
+                            title="Already Purchased"
+                          >
+                            <span className="app-integration-price-btn-text">
+                              Get Add-on
+                            </span>
+                          </button>
+                        ) : (
+                          <button
+                            className="app-integration-price-btn"
+                            onClick={() =>
+                              handleAddonClick(
+                                isYearlyPlan ? slackIdYearly : slackIdMonthly
+                              )
+                            }
+                          >
+                            <span className="app-integration-price-btn-text">
+                              Get Add-on
+                            </span>
+                          </button>
+                        )}
                       </div>
 
                       <div className="app-integration">
@@ -212,13 +270,7 @@ function PricingAddons({ pricing, handleAddonClick, isYearlyPlan }: any) {
                           />
                           <p className="integration-name">Instagram</p>
                         </div>
-                        {/* <button
-                      className='app-integration-price-btn'
-                      disabled={hubspotDisable || !enableOne}
-                      onClick={HubspotAddOn}
-                    >
-                      <span className='app-integration-price-btn-text'>Get for $7 USD</span>
-                    </button> */}
+
                         <div className="app-integration-price coming-soon">
                           Coming soon
                         </div>
@@ -351,6 +403,7 @@ function PricingAddons({ pricing, handleAddonClick, isYearlyPlan }: any) {
                     </div>
                   </div>
                 </div>
+
                 <Button
                   className="pricing-button"
                   onClick={() => handleAddonClick(msgSmall)}
@@ -371,6 +424,7 @@ function PricingAddons({ pricing, handleAddonClick, isYearlyPlan }: any) {
                     </div>
                   </div>
                 </div>
+
                 <Button
                   className="pricing-button"
                   onClick={() => handleAddonClick(msgLarge)}
@@ -392,6 +446,7 @@ function PricingAddons({ pricing, handleAddonClick, isYearlyPlan }: any) {
                     </div>
                   </div>
                 </div>
+
                 <Button
                   className="pricing-button"
                   onClick={() => handleAddonClick(trainingData)}
@@ -414,18 +469,31 @@ function PricingAddons({ pricing, handleAddonClick, isYearlyPlan }: any) {
                     </div>
                   </div>
                 </div>
-                <Button
-                  className="pricing-button"
-                  onClick={() =>
-                    handleAddonClick(
-                      isYearlyPlan
-                        ? conversationHistoryYearly
-                        : conversationHistoryMonthly
-                    )
-                  }
-                >
-                  Get Add-on
-                </Button>
+                {isPlanActive(conversationHistoryMonthly) ||
+                isPlanActive(conversationHistoryYearly) ? (
+                  <Button
+                    className="pricing-button"
+                    disabled
+                    title="Already Purchased"
+                  >
+                    <span className="app-integration-price-btn-text">
+                      Get Add-on
+                    </span>
+                  </Button>
+                ) : (
+                  <Button
+                    className="pricing-button"
+                    onClick={() =>
+                      handleAddonClick(
+                        isYearlyPlan
+                          ? conversationHistoryYearly
+                          : conversationHistoryMonthly
+                      )
+                    }
+                  >
+                    Get Add-on
+                  </Button>
+                )}
               </div>
 
               <div className="pricing-card">
@@ -443,14 +511,28 @@ function PricingAddons({ pricing, handleAddonClick, isYearlyPlan }: any) {
                     </div>
                   </div>
                 </div>
-                <Button
-                  className="pricing-button"
-                  onClick={() =>
-                    handleAddonClick(isYearlyPlan ? leadsYearly : leadsMonthly)
-                  }
-                >
-                  Get Add-on
-                </Button>
+                {isPlanActive(leadsMonthly) || isPlanActive(leadsYearly) ? (
+                  <Button
+                    className="pricing-button"
+                    disabled
+                    title="Already Purchased"
+                  >
+                    <span className="app-integration-price-btn-text">
+                      Get Add-on
+                    </span>
+                  </Button>
+                ) : (
+                  <Button
+                    className="pricing-button"
+                    onClick={() =>
+                      handleAddonClick(
+                        isYearlyPlan ? leadsYearly : leadsMonthly
+                      )
+                    }
+                  >
+                    Get Add-on
+                  </Button>
+                )}
               </div>
               <div className="pricing-card coming-soon">
                 <div className="pricing-info">
@@ -479,12 +561,24 @@ function PricingAddons({ pricing, handleAddonClick, isYearlyPlan }: any) {
                     </div>
                   </div>
                 </div>
-                <Button
-                  className="pricing-button"
-                  onClick={() => handleAddonClick(onBoarding)}
-                >
-                  Get Add-on
-                </Button>
+                {isPlanActive(onBoarding) ? (
+                  <Button
+                    className="pricing-button"
+                    disabled
+                    title="Already Purchased"
+                  >
+                    <span className="app-integration-price-btn-text">
+                      Get Add-on
+                    </span>
+                  </Button>
+                ) : (
+                  <Button
+                    className="pricing-button"
+                    onClick={() => handleAddonClick(onBoarding)}
+                  >
+                    Get Add-on
+                  </Button>
+                )}
               </div>
             </div>
           </>

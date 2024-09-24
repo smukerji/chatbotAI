@@ -50,8 +50,6 @@ const createSubscription = async (req: any, res: NextApiResponse) => {
       const existingSubscription = await stripe.subscriptions.retrieve(subId);
       const currentPlanId = existingSubscription.items.data[0].price.id;
 
-      console.log("current plan id", currentPlanId, existingSubscription);
-
       let isUpgrade = false;
       let prorationBehavior: any = "create_prorations";
       let updateNow = true;
@@ -77,8 +75,6 @@ const createSubscription = async (req: any, res: NextApiResponse) => {
         (currentPlanId == individualPlanYearly &&
           mainPlanId == businessPlanYearly)
       ) {
-        console.log("coming in upgrade sectionnnnnnnnnnnnnnnnnn");
-
         isUpgrade = true;
       }
       // Downgrade logic (no proration, takes effect next cycle)
@@ -94,8 +90,6 @@ const createSubscription = async (req: any, res: NextApiResponse) => {
         (currentPlanId == individualPlanYearly &&
           mainPlanId == starterPlanYearly)
       ) {
-        console.log("dddddddowwwwwnnnnnnnnn gradeeeeeee");
-
         prorationBehavior = "none"; // No proration for downgrades
         updateNow = false; // We will update at the next cycle, not now
       }

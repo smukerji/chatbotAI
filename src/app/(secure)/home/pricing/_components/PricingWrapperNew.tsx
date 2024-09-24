@@ -31,6 +31,7 @@ function PricingWrapperNew() {
   const router = useRouter();
   const [activePlan, setActivePlan] = useState<any>();
   const cryptoSecret = process.env.NEXT_PUBLIC_CRYPTO_SECRET;
+  const [isNextPlan, setIsNextPlan] = useState();
 
   const { status } = useSession();
 
@@ -104,6 +105,8 @@ function PricingWrapperNew() {
 
       setActivePlan(checkPlan?.data?.price);
 
+      setIsNextPlan(checkPlan?.data?.isNextPlan);
+
       // for setting tab monthly/yearly according to active plan
       const duration = checkPlan?.data?.duration;
       setIsYearlyPlan(duration === "year" ? true : false);
@@ -137,7 +140,7 @@ function PricingWrapperNew() {
     window.scrollTo(0, 0);
   }, []);
 
-  console.log("active plan", activePlan);
+  // console.log("active plan", activePlan);
 
   return (
     <>
@@ -192,18 +195,21 @@ function PricingWrapperNew() {
             prices={prices}
             isYearlyPlan={isYearlyPlan}
             activePlan={activePlan}
+            isNextPlan={isNextPlan}
           />
           <IndividualPlanBox
             handleClick={(priceId: string) => handleClick(priceId)}
             prices={prices}
             isYearlyPlan={isYearlyPlan}
             activePlan={activePlan}
+            isNextPlan={isNextPlan}
           />
           <BusinessplanBox
             handleClick={(priceId: string) => handleClick(priceId)}
             prices={prices}
             isYearlyPlan={isYearlyPlan}
             activePlan={activePlan}
+            isNextPlan={isNextPlan}
           />
         </div>
 
@@ -211,6 +217,7 @@ function PricingWrapperNew() {
           pricing={prices}
           isYearlyPlan={isYearlyPlan}
           handleAddonClick={(priceId: string) => handleAddonClick(priceId)}
+          isNextPlan={isNextPlan}
         />
       </div>
     </>
