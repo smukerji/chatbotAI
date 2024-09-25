@@ -59,7 +59,7 @@ const formatTime = (seconds: number) =>
 
 
 function CallLogs() {
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(0);
   
@@ -96,6 +96,7 @@ function CallLogs() {
   let callLogResponse:any;
 
   async function getLogRecord(pageNumber:number = 1,pageLimit:number = 10) {
+    setLoading(true);
     const options = {
       method: 'GET',
       headers: {Authorization: 'Bearer 36d15d26-9036-4dcc-b646-0f7564106615'}
@@ -137,13 +138,13 @@ function CallLogs() {
     }
 
     setTotalPages(totalPage);
+    
+    setLoading(false);
 
   }
 
-
-
   useEffect( () => {
-
+  
     getLogRecord();
 
   }, []);
@@ -176,7 +177,6 @@ function CallLogs() {
      //set the callListData
      setCallListData(resData);
   }
-
 
   const [callLogUrl, setCallLogUrl] = useState<string>('');
 
@@ -229,88 +229,101 @@ const formatCallDuration = (createdAt: string, endedAt: string): string => {
 
   return (
     <div className='call-log-container'>
-      <div className='top-container'>
-        <Button>Today</Button>
-        <Button>Last 7 day</Button>
-        <Button>Last month</Button>
-        <Button>Select date range</Button>
+      {
+        !loading ? (
+    <>
+            <div className='top-container'>
+              <Button>Today</Button>
+              <Button>Last 7 day</Button>
+              <Button>Last month</Button>
+              <Button>Select date range</Button>
 
-      </div>
-      <div className='bottom-container'>
+            </div>
+            <div className='bottom-container'>
 
-        <div className="left-container">
-          <div className='list-items'>
-            {
-              callLogsList.map((contact, index) => (
-                <div key={index}>
-                  {index !== 0 && <hr className="splitter" />}
-                  <div className={selectedLog == index ? 'list-item list-item-active' : 'list-item'} onClick={() => activeLogChangeHandler(index)} >
-                    <div className='number-details'>
-                        <h2 className='date'>{new Date(contact.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })} </h2>
-                        <p>
-                        {formatCallDuration(contact.createdAt, contact.endedAt)}
-                        </p>
+              <div className="left-container">
+                <div className='list-items'>
+                  {
+                    callLogsList.map((contact, index) => (
+                      <div key={index}>
+                        {index !== 0 && <hr className="splitter" />}
+                        <div className={selectedLog == index ? 'list-item list-item-active' : 'list-item'} onClick={() => activeLogChangeHandler(index)} >
+                          <div className='number-details'>
+                              <h2 className='date'>{new Date(contact.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })} </h2>
+                              <p>
+                              {formatCallDuration(contact.createdAt, contact.endedAt)}
+                              </p>
+                          </div>
+                          <div className='switch-input'>
+                            <h3>{contact.endedReason.split("-").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")}</h3>
+                          </div>
+                        </div>
+                      </div>
+
+                    ))
+                  }
+                </div>
+                <div className='bottom-button'>
+                  <Pagination current={currentPage} onChange={paginationDataHandler} total={totalPages}    />
+                </div>
+              </div>
+
+              <div className="right-container">
+                <div className="recording-panel">
+                  <h3 className='title'>Call Logs</h3>
+                  <p className='description'>This section allows you to configure the model for the assistant.</p>
+                  <div className="recording-area">
+                    <div ref={containerRef}></div>
+                  </div>
+                  <div className='buttons-wrapper'>
+                    <div className='play-pause'>
+                      <Button onClick={onPlayPause}>
+                        
+                          <Image width={30}
+                            height={32} alt="phone-call" src={isPlaying ? pause : playCircle}></Image>
+                      </Button>
+                      <span className="button-text">{formatTime(currentTime)}</span>
                     </div>
-                    <div className='switch-input'>
-                      <h3>{contact.endedReason.split("-").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")}</h3>
-                    </div>
+                  
+                    <Button className='download-btn'   onClick={() =>
+                        window.open(callListData?.recordingUrl, '_blank')
+                      }>
+                      <Image alt='downlaod' src={download}></Image>
+                      <span className='download-text'>Download</span>
+                    </Button>
                   </div>
                 </div>
-
-              ))
-            }
-          </div>
-          <div className='bottom-button'>
-            <Pagination current={currentPage} onChange={paginationDataHandler} total={totalPages}    />
-          </div>
-        </div>
-
-        <div className="right-container">
-          <div className="recording-panel">
-            <h3 className='title'>Call Logs</h3>
-            <p className='description'>This section allows you to configure the model for the assistant.</p>
-            <div className="recording-area">
-              <div ref={containerRef}></div>
-            </div>
-            <div className='buttons-wrapper'>
-              <div className='play-pause'>
-                <Button onClick={onPlayPause}>
+                <div className="logs-transcript">
+                  <Tabs
+                    defaultActiveKey="1"
+                    items={Log_Transcriber_Data.map((Icon, i) => {
+                      const id:string = String(Icon.id);
+                      return {
+                        key: id,
+                        label: ` ${Icon.name}`,
+                        children:Icon.children,
+                        icon: <Image alt="Icon-Image" src={activeKey === "1" ? Icon.image : Icon.image2}></Image>,
+                      };
+                    },
+                    
+                    )}
+                    onChange={onTabChange}
                   
-                    <Image width={30}
-                      height={32} alt="phone-call" src={isPlaying ? pause : playCircle}></Image>
-                </Button>
-                <span className="button-text">{formatTime(currentTime)}</span>
+                  />
+                </div>
               </div>
-            
-              <Button className='download-btn'   onClick={() =>
-                  window.open(callListData?.recordingUrl, '_blank')
-                }>
-                <Image alt='downlaod' src={download}></Image>
-                <span className='download-text'>Download</span>
-              </Button>
-            </div>
-          </div>
-          <div className="logs-transcript">
-            <Tabs
-              defaultActiveKey="1"
-              items={Log_Transcriber_Data.map((Icon, i) => {
-                const id:string = String(Icon.id);
-                return {
-                  key: id,
-                  label: ` ${Icon.name}`,
-                  children:Icon.children,
-                  icon: <Image alt="Icon-Image" src={activeKey === "1" ? Icon.image : Icon.image2}></Image>,
-                };
-              },
-              
-              )}
-              onChange={onTabChange}
-             
-            />
-          </div>
-        </div>
 
-      </div>
+            </div>
+          </>
+        ) : (
+          <Flex align="center" gap="middle" className="loader">
+          <Spin size="large" />
+        </Flex>
+
+        )
+      }
+      
+      
     </div>
        
   )
