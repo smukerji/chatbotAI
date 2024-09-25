@@ -33,7 +33,7 @@
       display: flex;
       flex-direction: column;
       min-height: 600px;
-      max-height: 881px;
+      max-height: 890px;
       overflow: auto;
       width: 30%;
       .list-items {
@@ -99,6 +99,12 @@
           }
 
         }
+
+        .list-item-active{
+          background: #9cbdff !important;
+          cursor: pointer;
+          border-radius: 8px;
+        }
       }
       .bottom-button{
         margin-top: 2rem;
@@ -153,6 +159,10 @@
               border: none;
               padding: 0;
               margin: 0;
+              .play-pause-image{
+                width: 32px;
+                height: 32px;
+              }
             }
             .button-text{
               color: #353945;
