@@ -11,8 +11,6 @@ import galaryImg from "../../../../public/voiceBot/SVG/gallery-add.svg";
 import leftArrow from "../../../../public/voiceBot/SVG/arrow-left.svg"
 import { useRouter } from "next/navigation";
 
-
-
 export default function VoiceBot() {
 
   const router = useRouter();
@@ -22,13 +20,25 @@ export default function VoiceBot() {
     title: "",
     subTitle:""
   }]
+
+
+
   return (
     <div className="parents-voicebot">
       {/*------------------------------------------stepper----------------------------------------------*/}
       <div className="stepper">
         <div className="voicebot-avatar">
           <div className="voicebot-avatar-img">
+          <input
+                  type="file"
+                  id="profileImageId"
+                  style={{ display: "none" }}
+                  accept="image/*"
+                  // onChange={imageHandler}
+                />
+          <label htmlFor="profileImageId" className="file-label">
             <Image alt="" src={galaryImg} className="galary_image"></Image>
+          </label>
           </div>
           <div className="voicebot-avatar-img__info">
             <h4 className="voicebot-avatar-img__botname">Your Bot Name</h4>
@@ -45,7 +55,16 @@ export default function VoiceBot() {
             {
               title: <div className="selected-assistant">
                 <div className="mini-selected-assistant-image">
+                <input
+                  type="file"
+                  id="profileImageId"
+                  style={{ display: "none" }}
+                  accept="image/*"
+                  // onChange={imageHandler}
+                />
+                <label htmlFor="profileImageId" className="file-label">
                   <Image alt="" src={img} width={100} height={100}></Image>
+                </label>
                 </div>
                 <div className="selected-assistant-header">
                   <h3 className="heading_title">
@@ -90,7 +109,7 @@ export default function VoiceBot() {
       {/*------------------------------------------main-voicebot----------------------------------------------*/}
       <div className="main-voicebot">
         <h2 className="main-voiceboot__title">
-          Let’s create a new assistant
+          Let&lsquo;s create a new assistant
         </h2>
         <h4 className="main-voiceboot__subtitle">
           Get started by selecting the AI assistant that best fits your needs and preferences.
@@ -107,7 +126,7 @@ export default function VoiceBot() {
                   <div className="header-information">
                     <div className="header_container">
                       <h2 className="card_header">
-                        Sales Agent
+                        Sales Agent!!!!!!!!!!
                       </h2>
                       <div className="image-info">
                         <Image src={infoImage} alt="" height={100} width={100}></Image>

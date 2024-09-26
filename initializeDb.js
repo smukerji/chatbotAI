@@ -192,6 +192,68 @@ async function initializeDb() {
   //     },
   //   }
   // );
+
+
+  // // Create voice-assistance-template collection
+  // const voiceAssistanceTemplateCollection = db.collection("voice-assistance-template");
+
+  
+  // // Define records to be inserted
+  // const records = [
+  //   {
+  //     assistantType: "Customer Support",
+  //     industryType: "Assistant",
+  //     dispcrtion:"AI Chatbot agent",
+  //     systemPrompt: "Provide technical support for TechSolutions products.",
+  //     imageUrl: "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/voice-assistant-images/IT-Support-Agent-ch9EFzJktleXygVkY4HjvuqAyI8rmn.svg"
+  //   },
+  //   {
+  //     assistantType: "Sales",
+  //     industryType: "Assistant",
+  //     dispcrtion:"AI Chatbot agent",
+  //     systemPrompt: "Assist customers with product inquiries and purchases.",
+  //     imageUrl: "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/voice-assistant-images/sales-agent-LlKqKiq99GKxpaITxhr1NuZLxi4dLg.svg"
+  //   },
+  //   {
+  //     assistantType: "IT Support Agent",
+  //     industryType: "Assistant",
+  //     dispcrtion:"AI Chatbot agent",
+  //     systemPrompt: "Assist customers with product inquiries and purchases.",
+  //     imageUrl: "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/voice-assistant-images/IT-Support-Agent-ch9EFzJktleXygVkY4HjvuqAyI8rmn.svg"
+  //   },
+  //   {
+  //     assistantType: "Hospitality",
+  //     industryType: "Expert",
+  //     dispcrtion:"Your personal Concierge",
+  //     systemPrompt: "Provide information about medical services and appointments.",
+  //     imageUrl: "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/voice-assistant-images/expert-hospitality-FwXySwMiX21076xeplOJqoy3U7h1wX.svg"
+  //   },
+  //   {
+  //     assistantType: "Real Estate",
+  //     industryType: "Expert",
+  //     dispcrtion:"Our own Real Estate agent",
+  //     systemPrompt: "Assist students with course information and enrollment.",
+  //     imageUrl: "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/voice-assistant-images/expert-real-estate-sUoZig2KaPFJh2r028aXvIvZZUJkD9.svg"
+  //   },
+  //   {
+  //     assistantType: "Health & Fitness",
+  //     industryType: "Expert",
+  //     dispcrtion:"Personal gym assistant",
+  //     systemPrompt: "Assist students with course information and enrollment.",
+  //     imageUrl: "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/voice-assistant-images/expert-health-fitness-yEB6C0WD1xMDi7q9ImuYJEtSAq8bP6.svg"
+  //   },
+  //   {
+  //     assistantType: "IT and Software",
+  //     industryType: "Expert",
+  //     dispcrtion:"IT support assistant",
+  //     systemPrompt: "Assist students with course information and enrollment.",
+  //     imageUrl: "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/voice-assistant-images/expert-IT-Software-5xo0jGEu5m7rEEINLF3x7UBbgIuubk.svg"
+  //   }
+  // ];
+
+  // await voiceAssistanceTemplateCollection.insertMany(records);
+
+  
   console.log("Database initialized successfully");
   process.exit();
 }
