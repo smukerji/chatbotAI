@@ -166,6 +166,7 @@ function PricingAddons({
                                   : whatsappIdMonthly
                               )
                             }
+                            disabled={isNextPlan == false}
                           >
                             <span className="app-integration-price-btn-text">
                               Get Add-on
@@ -208,6 +209,7 @@ function PricingAddons({
                                   : telegramIdMonthly
                               )
                             }
+                            disabled={isNextPlan == false}
                           >
                             <span className="app-integration-price-btn-text">
                               Get Add-on
@@ -252,6 +254,7 @@ function PricingAddons({
                                 isYearlyPlan ? slackIdYearly : slackIdMonthly
                               )
                             }
+                            disabled={isNextPlan == false}
                           >
                             <span className="app-integration-price-btn-text">
                               Get Add-on
@@ -407,6 +410,7 @@ function PricingAddons({
                 <Button
                   className="pricing-button"
                   onClick={() => handleAddonClick(msgSmall)}
+                  disabled={isNextPlan == false}
                 >
                   Get Add-on
                 </Button>
@@ -428,6 +432,7 @@ function PricingAddons({
                 <Button
                   className="pricing-button"
                   onClick={() => handleAddonClick(msgLarge)}
+                  disabled={isNextPlan == false}
                 >
                   Get Add-on
                 </Button>
@@ -450,6 +455,7 @@ function PricingAddons({
                 <Button
                   className="pricing-button"
                   onClick={() => handleAddonClick(trainingData)}
+                  disabled={isNextPlan == false}
                 >
                   Get Add-on
                 </Button>
@@ -490,6 +496,7 @@ function PricingAddons({
                           : conversationHistoryMonthly
                       )
                     }
+                    disabled={isNextPlan == false}
                   >
                     Get Add-on
                   </Button>
@@ -529,6 +536,7 @@ function PricingAddons({
                         isYearlyPlan ? leadsYearly : leadsMonthly
                       )
                     }
+                    disabled={isNextPlan == false}
                   >
                     Get Add-on
                   </Button>
@@ -575,6 +583,7 @@ function PricingAddons({
                   <Button
                     className="pricing-button"
                     onClick={() => handleAddonClick(onBoarding)}
+                    disabled={isNextPlan == false}
                   >
                     Get Add-on
                   </Button>
