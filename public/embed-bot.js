@@ -62,7 +62,7 @@
   `;
   // Get the script element
   const scriptElement = document.querySelector(
-    'script[src="https://torri.ai/embed-bot.js"]'
+    'script[src="https://chatbot-ai-silk.vercel.app/embed-bot.js"]'
   );
 
   // Access the data attributes
@@ -72,7 +72,7 @@
   // Fetch bot settings
   try {
     const response = await fetch(
-      `https://torri.ai/chatbot/popup/details/api?chatbotId=${param1}`
+      `https://chatbot-ai-silk.vercel.app/chatbot/popup/details/api?chatbotId=${param1}`
     );
     if (!response.ok) throw new Error("Network response was not ok");
 
@@ -119,7 +119,7 @@
 
   iframe = `<iframe
     id="chat-frame-widget"
-    src="https://torri.ai/embed-bot?chatbotID=${param1}"
+    src="https://chatbot-ai-silk.vercel.app/embed-bot?chatbotID=${param1}"
     frameborder="0"
   ></iframe>
   <button id="btn-trigger-chat">${icon_img}</button>
@@ -154,7 +154,7 @@
 
   window.addEventListener("message", function (event) {
     // Validate the origin of the message
-    if (event.origin !== "https://torri.ai") {
+    if (event.origin !== "https://chatbot-ai-silk.vercel.app") {
       return;
     }
 
