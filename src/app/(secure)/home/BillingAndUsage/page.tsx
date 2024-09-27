@@ -172,29 +172,27 @@ function BillingAndUsage() {
                   </div>
                 </div>
 
-                {plan.length > 0 && (
-                  <div className="cancel-upgrade-btns">
-                    {plan?.isNextPlan === false ? (
-                      <p className="cancel-plan">Cancelled</p>
-                    ) : (
-                      <p
-                        className="cancel-plan"
-                        onClick={() => setIsModalOpen(true)}
-                      >
-                        Cancel My Plan
-                      </p>
-                    )}
+                <div className="cancel-upgrade-btns">
+                  {plan?.isNextPlan === false ? (
+                    <p className="cancel-plan">Cancelled</p>
+                  ) : (
+                    <p
+                      className="cancel-plan"
+                      onClick={() => setIsModalOpen(true)}
+                    >
+                      Cancel My Plan
+                    </p>
+                  )}
 
-                    <button className="btn-upgrade" onClick={explorePlan}>
-                      <span
-                        className="btn-text"
-                        onClick={() => router.push("/home/pricing")}
-                      >
-                        Upgrade Plan
-                      </span>
-                    </button>
-                  </div>
-                )}
+                  <button className="btn-upgrade" onClick={explorePlan}>
+                    <span
+                      className="btn-text"
+                      onClick={() => router.push("/home/pricing")}
+                    >
+                      Upgrade Plan
+                    </span>
+                  </button>
+                </div>
               </div>
 
               <AddOnsDetail date={date} isNextPlan={plan?.isNextPlan} />
