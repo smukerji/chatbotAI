@@ -47,20 +47,16 @@ async function register(request: any) {
     const saltRounds = 10;
     const hashPassword = await bcrypt.hash(password, saltRounds);
     let currentDate = new Date();
-    let endDate = new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000);
-    /// get the starter plan ID
-    const starterPlan = await db
-      .collection("plans")
-      .findOne({ name: "individual" });
+    let endDate = new Date();
 
     /// register new user
     const userResult = await collection.insertOne({
       username,
       email,
       password: hashPassword,
-      planId: starterPlan?._id,
+      planId: null,
       startDate: currentDate,
-      isWhatsapp: true,
+      isWhatsapp: false,
       endDate: endDate,
       isVerified: false,
     });
@@ -71,10 +67,13 @@ async function register(request: any) {
     await db.collection("user-details").insertOne({
       userId: userId,
       totalMessageCount: 0,
-      messageLimit: starterPlan?.messageLimit,
-      chatbotLimit: starterPlan?.numberOfChatbot,
-      trainingDataLimit: starterPlan?.trainingDataLimit,
-      websiteCrawlingLimit: starterPlan?.websiteCrawlingLimit,
+      messageLimit: 0,
+      chatbotLimit: 0,
+      trainingDataLimit: 0,
+      websiteCrawlingLimit: "0",
+      conversationHistory: "",
+      leads: "",
+      models: "",
     });
     msg = "Please check your email to verify your account.";
 
