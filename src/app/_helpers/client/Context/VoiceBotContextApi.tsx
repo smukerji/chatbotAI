@@ -115,6 +115,10 @@ const initialState = {
   },
 };
 
+
+
+
+
 // Create the context
 export const CreateVoiceBotContext = createContext({
     // state: initialState,
@@ -124,6 +128,8 @@ export const CreateVoiceBotContext = createContext({
   // Create the provider component
   export const VoiceBotDataProvider = ({ children }: { children: ReactNode }) => {
     const [state, setState] = useState(initialState);
+
+    const [currentAssistantPage, setCurrentAssistantPage] = useState(0);
   
     const updateNestedState = (obj: any, path: string[], value: any): any => {
       // debugger;
@@ -168,7 +174,7 @@ export const CreateVoiceBotContext = createContext({
     
   
     return (
-      <CreateVoiceBotContext.Provider value={{ state, updateState, updateTheVoiceBotInfo }}>
+      <CreateVoiceBotContext.Provider value={{ state, updateState, updateTheVoiceBotInfo, currentAssistantPage, setCurrentAssistantPage }}>
         {children}
       </CreateVoiceBotContext.Provider>
     );

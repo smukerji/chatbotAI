@@ -114,6 +114,18 @@
       .voicebot-avatar-img__info {
         display: flex;
         align-items: center;
+        gap: 1rem;
+        margin: auto 1px auto auto;
+        width: 88%;
+
+        .assi-input-field{
+          color:  #141416;
+          /* Subtitle/Large */
+          font-size: 20px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 28px;
+        }
 
         .voicebot-avatar-img__botname {
           display: inline-block;
@@ -122,6 +134,7 @@
 
         .voicebot-avatar-img__botimg {
           display: inline-block;
+          cursor: pointer;
         }
       }
 
@@ -149,6 +162,10 @@
           font-weight: 500;
           line-height: 24px;
         }
+      }
+
+      .hideit{
+        display: none;
       }
 
       .continue-button > span {
