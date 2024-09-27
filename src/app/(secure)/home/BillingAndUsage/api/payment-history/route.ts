@@ -38,6 +38,13 @@ async function getPaymentHistory(req: any, res: NextResponse) {
 
     // const paymentDetails = await cursor.toArray();
 
+    if (!data.customerId) {
+      return {
+        msg: "No payment history found",
+        paymentDetails: [],
+      };
+    }
+
     const subscriptions = await stripe.subscriptions.list({
       limit: 100,
       customer: data.customerId,

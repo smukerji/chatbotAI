@@ -227,8 +227,6 @@ const Leads = ({ chatbotId }: any) => {
     setOpenDatePicker(false);
   };
 
-  console.log("leads filterre", leadsFilter);
-
   return (
     <div className="leads-container">
       <div className="action-container">

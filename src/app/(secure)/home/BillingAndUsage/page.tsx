@@ -121,8 +121,10 @@ function BillingAndUsage() {
               <div className="plan-details">
                 <div className="name-features">
                   <div className="plan-name-container">
-                    <span className="plan-name">{planDetail?.name}</span>
-                    {plan?.duration != "" && (
+                    <span className="plan-name">
+                      {planDetail?.name ? planDetail.name : "No Plan Found"}
+                    </span>
+                    {plan.duration && plan.duration != "" && (
                       <div className="plan-duration">
                         <span className="plan-duration-text">
                           Billed{" "}
@@ -131,16 +133,18 @@ function BillingAndUsage() {
                       </div>
                     )}
                   </div>
-                  <div className="plan-feature">
-                    <div className="next-renewal-date">
-                      <div className="next-renewal-date-text">
-                        {plan?.isNextPlan === false
-                          ? "Expires on"
-                          : "Auto Renewal due on"}
+                  {date !== "Invalid Date" && (
+                    <div className="plan-feature">
+                      <div className="next-renewal-date">
+                        <div className="next-renewal-date-text">
+                          {plan?.isNextPlan === false
+                            ? "Expires on"
+                            : "Auto Renewal due on"}
+                        </div>
+                        <div className="next-renewal-date-date">{date}</div>
                       </div>
-                      <div className="next-renewal-date-date">{date}</div>
                     </div>
-                  </div>
+                  )}
                   <div className="plan-feature">
                     {/* <div className="plan-message">
                   {" "}
@@ -157,38 +161,40 @@ function BillingAndUsage() {
                 </div>
                 <Image className="dot-image" src={circle} alt="no image" /> */}
 
-                    <div className="more-details">
+                    {/* <div className="more-details">
                       <p className="more-details-text">
                         More Details{" "}
                         <span>
                           <Image src={downArrow} alt="down-arrow" />
                         </span>
                       </p>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
 
-                <div className="cancel-upgrade-btns">
-                  {plan?.isNextPlan === false ? (
-                    <p className="cancel-plan">Cancelled</p>
-                  ) : (
-                    <p
-                      className="cancel-plan"
-                      onClick={() => setIsModalOpen(true)}
-                    >
-                      Cancel My Plan
-                    </p>
-                  )}
+                {plan.length > 0 && (
+                  <div className="cancel-upgrade-btns">
+                    {plan?.isNextPlan === false ? (
+                      <p className="cancel-plan">Cancelled</p>
+                    ) : (
+                      <p
+                        className="cancel-plan"
+                        onClick={() => setIsModalOpen(true)}
+                      >
+                        Cancel My Plan
+                      </p>
+                    )}
 
-                  <button className="btn-upgrade" onClick={explorePlan}>
-                    <span
-                      className="btn-text"
-                      onClick={() => router.push("/home/pricing")}
-                    >
-                      Upgrade Plan
-                    </span>
-                  </button>
-                </div>
+                    <button className="btn-upgrade" onClick={explorePlan}>
+                      <span
+                        className="btn-text"
+                        onClick={() => router.push("/home/pricing")}
+                      >
+                        Upgrade Plan
+                      </span>
+                    </button>
+                  </div>
+                )}
               </div>
 
               <AddOnsDetail date={date} isNextPlan={plan?.isNextPlan} />
