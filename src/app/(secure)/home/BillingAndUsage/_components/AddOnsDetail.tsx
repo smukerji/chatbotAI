@@ -64,7 +64,7 @@ function encryptPriceId(priceId: string) {
   return CryptoJS.AES.encrypt(priceId, cryptoSecret).toString();
 }
 
-function AddOnsDetail({ date, isNextPlan }: any) {
+function AddOnsDetail({ date, isNextPlan, planName }: any) {
   const formattedDate = moment(date, "MMM DD, YYYY").format("DD/MM/YYYY");
   const [isOpen, setIsOpen] = useState(true);
   const [cookies, setCookie] = useCookies(["userId"]);
@@ -165,6 +165,8 @@ function AddOnsDetail({ date, isNextPlan }: any) {
     fetchAddonDetail();
   }, []);
 
+  console.log("planNamee", planName);
+
   return (
     <>
       <Modal
@@ -240,7 +242,9 @@ function AddOnsDetail({ date, isNextPlan }: any) {
               ) : isPlanActive(whatsappPriceIdMonthly) ||
                 isPlanActive(whatsappPriceIdYearly) ? (
                 <p
-                  className="cancel-plan"
+                  className={`cancel-plan ${
+                    planName == "business" ? "btn-disabled" : ""
+                  }`}
                   onClick={() =>
                     cancelAddon(
                       interval === "month"
@@ -316,7 +320,9 @@ function AddOnsDetail({ date, isNextPlan }: any) {
               ) : isPlanActive(telegramPriceIdMonthly) ||
                 isPlanActive(telegramPriceIdYearly) ? (
                 <p
-                  className="cancel-plan"
+                  className={`cancel-plan ${
+                    planName == "business" ? "btn-disabled" : ""
+                  }`}
                   onClick={() =>
                     cancelAddon(
                       interval === "month"

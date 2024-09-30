@@ -38,6 +38,9 @@ const onBoarding: any = process.env.NEXT_PUBLIC_ONBOARDING_FEES;
 const msgSmall: any = process.env.NEXT_PUBLIC_MESSAGESMALL_PLAN_ID;
 const msgLarge: any = process.env.NEXT_PUBLIC_MESSAGELARGE_PLAN_ID;
 
+const businessMonthly: any = process.env.NEXT_PUBLIC_BUSINESS_PLAN_MONTHLY;
+const businessYearly: any = process.env.NEXT_PUBLIC_BUSINESS_PLAN_YEARLY;
+
 function findPrice(prices: any, envPriceId: string) {
   const priceObj = prices.find(
     (price: any) => price.priceId === envPriceId
@@ -411,6 +414,22 @@ function DummyPaymentMethod({
     }
   }, []);
 
+  useEffect(() => {
+    if (priceId === businessMonthly) {
+      setCheckedIntegrations((prev) => ({
+        ...prev,
+        [whatsappPriceIdMonthly]: true,
+        [telegramPriceIdMonthly]: true,
+      }));
+    } else if (priceId === businessYearly) {
+      setCheckedIntegrations((prev) => ({
+        ...prev,
+        [whatsappPriceIdYearly]: true,
+        [telegramPriceIdYearly]: true,
+      }));
+    }
+  }, []);
+
   return (
     <>
       {loading ? (
@@ -517,7 +536,12 @@ function DummyPaymentMethod({
                               : whatsappPriceIdMonthly
                           );
                         }}
-                        disabled={type == "oneoff" || isActive}
+                        disabled={
+                          type == "oneoff" ||
+                          isActive ||
+                          priceId === businessMonthly ||
+                          priceId === businessYearly
+                        }
                       />
                       <label
                         htmlFor="whatsappIntegrationCheckbox"
@@ -622,7 +646,12 @@ function DummyPaymentMethod({
                                   : telegramPriceIdMonthly
                               );
                             }}
-                            disabled={type == "oneoff" || isActive}
+                            disabled={
+                              type == "oneoff" ||
+                              isActive ||
+                              priceId === businessMonthly ||
+                              priceId === businessYearly
+                            }
                           />
                           <label
                             htmlFor="telegramIntegrationCheckbox"

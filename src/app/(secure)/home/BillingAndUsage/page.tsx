@@ -8,7 +8,7 @@ import { useCookies } from "react-cookie";
 import { useSession } from "next-auth/react";
 // import { redirect } from "next/navigation";
 import { getDate } from "@/app/_helpers/client/getTime";
-import { Table, Modal, message, TableProps } from "antd";
+import { Table, Modal, message, TableProps, Button } from "antd";
 import { redirect, useRouter } from "next/navigation";
 import { UserDetailsContext } from "../../../_helpers/client/Context/UserDetailsContext";
 import { formatNumber } from "../../../_helpers/client/formatNumber";
@@ -22,6 +22,7 @@ import { transformDataSource } from "./utils/transformedDataSource";
 import PaymentTable from "./_components/PaymentTable";
 import CancelPlanModal from "./_components/CancelPlanModal";
 import Loader from "../pricing/_components/Loader";
+import LimitReachedModal from "../../chatbot/dashboard/_components/Modal/LimitReachedModal";
 
 function BillingAndUsage() {
   const [cookies, setCookie] = useCookies(["userId"]);
@@ -32,6 +33,9 @@ function BillingAndUsage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [plan, setPlan] = useState<any>();
+  const [isPlanNotification, setIsPlanNotification] = useState(false);
+  const [user, setUser] = useState<any>(null);
+
   // const [columns, setColumns] = useState([])
 
   //ANCHOR - API CALL TO CANCEL PLAN FOR NEXT BILLING CYCLE
@@ -74,9 +78,12 @@ function BillingAndUsage() {
 
       setPlanDetail(response?.data?.planDetail);
       setPlan(response.data);
+      console.log("response data", response.data);
+
       const newDate = new Date(response?.data?.nextRenewal);
       const options: any = { year: "numeric", month: "short", day: "2-digit" };
       const formattedDate: any = newDate.toLocaleDateString("en-US", options);
+
       setDate(formattedDate);
 
       setLoading(false);
@@ -86,9 +93,33 @@ function BillingAndUsage() {
     }
   };
 
+  const getUser = async () => {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/user?userId=${cookies.userId}`
+    );
+
+    setUser(response.data.user);
+  };
+
+  const handleUpgradePlan = () => {
+    setIsPlanNotification(false);
+    router.push("/home/pricing");
+  };
+
   useEffect(() => {
+    getUser();
     myFunction();
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      const planId = user?.planId;
+
+      if (!planId) {
+        setIsPlanNotification(true);
+      }
+    }
+  }, [user]);
 
   if (status === "authenticated" || cookies?.userId) {
     return (
@@ -110,6 +141,23 @@ function BillingAndUsage() {
             >
               {/* <p>Are you sure to cancel your plan?</p> */}
               <CancelPlanModal planDetail={planDetail} date={date} />
+            </Modal>
+
+            <Modal
+              title="Upgrade Now to create new Chatbots!"
+              open={isPlanNotification}
+              onCancel={() => {}}
+              footer={[
+                <Button key="submit" type="primary" onClick={handleUpgradePlan}>
+                  Upgrade Now
+                </Button>,
+              ]}
+              closable={false}
+              centered
+              className="subscription-expire-popup"
+              width={800}
+            >
+              <p>Upgrade now to access your chatbots!</p>
             </Modal>
 
             <div className="billing-main">
@@ -195,7 +243,11 @@ function BillingAndUsage() {
                 </div>
               </div>
 
-              <AddOnsDetail date={date} isNextPlan={plan?.isNextPlan} />
+              <AddOnsDetail
+                date={date}
+                isNextPlan={plan?.isNextPlan}
+                planName={plan?.plan}
+              />
               <div className="manage-plan">Payment history</div>
             </div>
 

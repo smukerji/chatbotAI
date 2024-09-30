@@ -14,6 +14,11 @@ const individualPlanYearly = process.env.NEXT_PUBLIC_INDIVIDUAL_PLAN_YEARLY;
 const starterPlanMonthly = process.env.NEXT_PUBLIC_STARTER_PLAN_MONTHLY;
 const starterPlanYearly = process.env.NEXT_PUBLIC_STARTER_PLAN_YEARLY;
 
+const whatsappMonthly = process.env.NEXT_PUBLIC_WHATSAPP_PLAN_ID_MONTHLY;
+const whatsappYearly = process.env.NEXT_PUBLIC_WHATSAPP_PLAN_ID_YEARLY;
+const telegramMonthly = process.env.NEXT_PUBLIC_TELEGRAM_PLAN_ID_MONTHLY;
+const telegramYearly = process.env.NEXT_PUBLIC_TELEGRAM_PLAN_ID_YEARLY;
+
 // attach payment method to customer
 const attachPaymentMethodToCustomer = async (
   customerId: string,
@@ -202,6 +207,25 @@ const createSubscription = async (req: any, res: NextApiResponse) => {
         price: price,
       };
     });
+
+    // Check if the business plan (monthly or yearly) is selected and add WhatsApp and Telegram as free add-ons
+    if (
+      priceId.includes(businessPlanMonthly) ||
+      priceId.includes(businessPlanYearly)
+    ) {
+      const whatsappPlan = priceId.includes(businessPlanMonthly)
+        ? whatsappMonthly
+        : whatsappYearly;
+      const telegramPlan = priceId.includes(businessPlanMonthly)
+        ? telegramMonthly
+        : telegramYearly;
+
+      // Add WhatsApp and Telegram as free add-ons by setting quantity to 0
+      pricePlans.push(
+        { price: whatsappPlan, quantity: 0 },
+        { price: telegramPlan, quantity: 0 }
+      );
+    }
 
     const subscription: any = await stripe.subscriptions.create({
       customer: customerId,

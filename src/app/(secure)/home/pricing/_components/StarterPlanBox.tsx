@@ -42,6 +42,8 @@ function StarterPlanBox({
 
   const tickCircle = isPlanActive ? tickCircleWhite : tickCircleBlue;
 
+  console.log("active plan, ", activePlan);
+
   return (
     <>
       <div className={`plan-box ${isPlanActive && "plan-box-even"}`}>
