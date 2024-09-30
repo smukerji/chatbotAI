@@ -64,6 +64,13 @@
           }
         }
       }
+      .steps-assistant-heading{
+        color:  #2E58EA;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 24px;
+      }
     }
 
     .voicebot-avatar {
@@ -168,13 +175,19 @@
         display: none;
       }
 
-      .continue-button > span {
-        color: #FCFCFD;
-        font-size: 16px;
-        font-style: normal;
-        font-weight: 500;
-        line-height: 24px;
-      }
+      .continue-button
+      {
+      
+        
+        span 
+        {
+          color: #FCFCFD;
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 24px;
+        }
+      }  
     }
 
   }
@@ -280,6 +293,9 @@
           }
         }
 
+      }
+      .selected-assistant{
+        background: #9fb5ff !important;
       }
 
       .custom_assistant-card {

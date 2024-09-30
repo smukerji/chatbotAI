@@ -13,11 +13,11 @@ async function getAssistantTemplate(req: NextRequest) {
         const collection = db?.collection("voice-assistance-template");
         const assistantTemplates = await collection?.find({}).toArray();
         return {assistantTemplates};
-        return {message: "Hello from assistant template"};
 
     }
     catch(error:any){
         return {error: error.message};
+        
 
     }
    

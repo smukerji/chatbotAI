@@ -1,6 +1,6 @@
 "use client";
 import "./voicebot.scss"
-import { Button, Input, Steps } from 'antd';
+import { Button, Input, message, Steps } from 'antd';
 import editIcon from "../../../../public/svgs/edit-2.svg";
 import Image from "next/image";
 
@@ -15,6 +15,9 @@ import { useState, useContext, useEffect } from "react";
 
 // import { CreateVoiceBotContext } from "../../../../_helpers/client/Context/VoiceBotContextApi"/
 import { CreateVoiceBotContext } from "../../_helpers/client/Context/VoiceBotContextApi";
+import { debug } from "console";
+import { isAbsolute } from "path";
+
 
 export default function VoiceBot() {
 
@@ -30,11 +33,20 @@ export default function VoiceBot() {
   }];
 
   const [currentPage, setCurrentPage] = useState<number>(1);
+
   const [selectedAssistant, setSelectedAssistant] = useState<any>(null);
+  const [selectedAssistantIndex, setSelectedAssistantIndex] = useState<number>(-1);
   const [assistantList, setAssistantList] = useState<any>([]);
+
   const [industryExpertList, setIndustryExpertList] = useState<any>([]);
+  const [selecteExpertIndex, setSelectedExpertIndex] = useState<number>(-1);
   const [selectedIndustryExpert, setSelectedIndustryExpert] = useState<any>(null);
+
   const [assistantName, setAssistantName] = useState<string>("");
+  const [stepsCounter, setStepsCounter] = useState<number>(0);
+
+  const [acknowledgedData, setAcknowledgedData] = useState<any>({});
+  const [assistantImagePath, setassistantImagePath] = useState<string>("");
 
   async function  getVoiceAssistantTemplateData() {
     try{
@@ -46,13 +58,11 @@ export default function VoiceBot() {
         }
       );
       const data = await res.json();
-      debugger;
 
       let assistantDataList = data?.assistantTemplates.filter((assistance:any)=> assistance?.industryType === "Assistant");
       let industryExpertDataList = data?.assistantTemplates.filter((assistance:any)=> assistance?.industryType === "Expert");
       setAssistantList(assistantDataList);
       setIndustryExpertList(industryExpertDataList);
-      debugger;
 
     }
     catch(error: any) {
@@ -64,29 +74,153 @@ export default function VoiceBot() {
     getVoiceAssistantTemplateData();
   }, []);
 
-  const assistantNameChangeHandler = (e:React.ChangeEvent<HTMLInputElement>) =>{
+  const selectedAssistantChangeHandler = (choosenAssistant: any,index:number) => {
+    setSelectedAssistantIndex(index);
+    debugger;
+    setSelectedAssistant(choosenAssistant);
+  }
 
+  const selectedExpertChangeHandler = (choosenExpert: any,index:number) => {
+    setSelectedExpertIndex(index);
+    setSelectedIndustryExpert(choosenExpert);
+  }
+
+  const assistantNameChangeHandler = (e:React.ChangeEvent<HTMLInputElement>) => {
+    const enteredValue = e.target.value.trim();
+    setAssistantName(enteredValue);
+    voiceBotContextData.updateState("name", enteredValue);
 
   }
 
-  const continuesChangeHandler = ()=>{
+  console.log("your voicebot details ", voicebotDetails.name);
+
+  const continuesChangeHandler = () => {
+
+    if (selectedAssistantIndex === -1) {
+      message.warning("Please select an assistant first!");
+      return;
+    }
 
     voiceBotContextData.setCurrentAssistantPage(1);
-
+    setStepsCounter(1);
     // router.push("/voicebot/dashboard");
-   
   }
+
+    // Function to check if a file is an image
+    const isImageFile = (file: any) => {
+      const acceptedImageTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/gif",
+        "image/svg+xml",
+      ];
+      return acceptedImageTypes.includes(file.type);
+    };
+
+  const imageHandler = async (e: any) => {
+    const selectedFile = e.target.files[0];
+
+    debugger;
+
+    // Check if a file is selected and it's an image
+    if (selectedFile && isImageFile(selectedFile)) {
+      /// upload the image file to vercel
+      try {
+        // setIsLoading(!isLoading);
+        /// delete any existing URL if any
+        if(acknowledgedData?.isAcknowledged){
+          fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}api/delete-img`, {
+                method: "POST",
+                body: JSON.stringify({ url: assistantImagePath }),
+              });
+        }
+        
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/upload-img?filename=${selectedFile.name}`,
+          {
+            method: "POST",
+            body: selectedFile,
+          }
+        );
+
+        if (!res.ok) {
+          throw await res.json();
+        }
+        const data = await res.json();
+        // setIconImage(data?.uploadUrl);
+        debugger;
+        const assistantTemplateIDs = [selectedAssistant?._id, selectedIndustryExpert?._id];
+        const imagePath = data?.uploadUrl;
+        setassistantImagePath(imagePath);
+        const voiceAssistantName = assistantName;
+        if(acknowledgedData?.isAcknowledged){
+          const assistantUpdateResponse = await fetch(
+            `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/voice`,
+            {
+              method: "PUT",
+              body: JSON.stringify({
+                assistantName: voiceAssistantName,
+                assistantTemplateIDs: assistantTemplateIDs,
+                imageUrl: imagePath,
+                recordId: acknowledgedData?.insertedId
+              })
+            }
+          );
+
+          const assistantUpdateResponseParse = await assistantUpdateResponse.json();
+          setAcknowledgedData({
+            isAcknowledged: assistantUpdateResponseParse?.result?.acknowledged,
+            insertedId: assistantUpdateResponseParse?.result?.insertedId
+          });
+
+        }
+        else{
+          const assistantCreateResponse = await fetch(
+            `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/voice`,
+            {
+              method: "POST",
+              body: JSON.stringify({
+                assistantName: voiceAssistantName,
+                assistantTemplateIDs: assistantTemplateIDs,
+                imageUrl: imagePath
+              })
+            }
+          );
+  
+          const assistantCreateResponseParse = await assistantCreateResponse.json();
+          debugger;
+          setAcknowledgedData({
+            isAcknowledged: assistantCreateResponseParse?.result?.acknowledged,
+            insertedId: assistantCreateResponseParse?.result?.insertedId
+          });
+  
+        }
+       
+
+       //
+
+        //add the entry to the database
+      } catch (error: any) {
+        message.error(error.message);
+        return; 
+      } finally {
+        // setIsLoading((prev) => !prev);
+      }
+
+      // setFileName(selectedFile.name);
+    } else {
+      // Display an error message or handle the invalid file selection as needed
+      message.error("Invalid file format.");
+      return;
+    }
+  };
 
   const previousChangeHandler = ()=>{
 
     voiceBotContextData.setCurrentAssistantPage(0);
-
+    setStepsCounter(0);
     // router.push("/voicebot/dashboard");
-   
   }
-
-  
-  
 
   return (
     <div className="parents-voicebot">
@@ -99,7 +233,7 @@ export default function VoiceBot() {
                   id="profileImageId"
                   style={{ display: "none" }}
                   accept="image/*"
-                  // onChange={imageHandler}
+                  onChange={imageHandler}
                 />
           <label htmlFor="profileImageId" className="file-label">
             <Image alt="" src={galaryImg} className="galary_image"></Image>
@@ -111,6 +245,7 @@ export default function VoiceBot() {
               placeholder="Your Assistant Name"
               onChange={assistantNameChangeHandler}
               id="assistantNameInput"
+              value={assistantName}
             />
             <Button style={{border:"none", margin:0, padding:0, background:"transparent"}}
               icon={<Image src={editIcon} alt="edit name" />}
@@ -128,56 +263,88 @@ export default function VoiceBot() {
         <Steps className="stepper-steps"
           direction="vertical"
           size="small"
-          current={1}
+          current={stepsCounter}
           items={[
             {
-              title: <div className="selected-assistant">
+              title:
+                selectedAssistant !== null ?
+                  <div className="selected-assistant">
+                    <div className="mini-selected-assistant-image">
+                      <input
+                        type="file"
+                        id="profileImageId"
+                        style={{ display: "none" }}
+                        accept="image/*"
+                      // onChange={imageHandler}
+                      />
+                      <label htmlFor="profileImageId" className="file-label">
+                        <Image alt={selectedAssistant.assistantType} src={selectedAssistant.imageUrl} width={100} height={100}></Image>
+                      </label>
+                    </div>
+                    <div className="selected-assistant-header">
+                      <h3 className="heading_title">
+                        {selectedAssistant.assistantType}
+                      </h3>
+                      <h4 className="heading_description">
+                        {selectedAssistant.dispcrtion}
+                      </h4>
+                    </div>
+                  </div>
+                  :
+                  <div>
+                    <h3 className="steps-assistant-heading">Choose your assistant</h3>
+                  </div>,
+              description: "" /*<div> gggg</div> */},
+            {
+              title: selectedIndustryExpert !== null ?
+              <div className="selected-assistant">
                 <div className="mini-selected-assistant-image">
-                <input
-                  type="file"
-                  id="profileImageId"
-                  style={{ display: "none" }}
-                  accept="image/*"
+                  <input
+                    type="file"
+                    id="profileImageId"
+                    style={{ display: "none" }}
+                    accept="image/*"
                   // onChange={imageHandler}
-                />
-                <label htmlFor="profileImageId" className="file-label">
-                  <Image alt="" src={img} width={100} height={100}></Image>
-                </label>
+                  />
+                  <label htmlFor="profileImageId" className="file-label">
+                    <Image alt={selectedIndustryExpert.assistantType} src={selectedIndustryExpert.imageUrl} width={100} height={100}></Image>
+                  </label>
                 </div>
                 <div className="selected-assistant-header">
                   <h3 className="heading_title">
-                    Your assistant
+                    {selectedIndustryExpert.assistantType}
                   </h3>
                   <h4 className="heading_description">
-                    Customer Service Representative
+                    {selectedIndustryExpert.dispcrtion}
                   </h4>
                 </div>
+              </div>
+              :
+              <div>
+                <h3 className="steps-assistant-heading">Choose your Industry Expert!</h3>
               </div>,
-              description: "" /*<div> gggg</div> */},
-            {
-              title: 'Choose your AI expert',
-              description:"Description information! ",
+              description:"",
             },
-            {
-              title: 'Done',
-              description:"Test your voice bot",
-            },
+            
           ]}
         />
 
-        <div className="navigation-button">
-          {voiceBotContextData.currentAssistantPage !== 0 && (
-            <Button className="previous-button" onClick={previousChangeHandler}>
+        <div className={"navigation-button"}>
+          {/* {voiceBotContextData.currentAssistantPage !== 0 && ( */}
+            <Button 
+              className="previous-button" 
+              onClick={previousChangeHandler} 
+              style={{ visibility: voiceBotContextData.currentAssistantPage === 0 ? 'hidden' : 'visible' }}
+            >
               <Image className="arrow-left" alt="left arrow" src={leftArrow} width={100} height={100} />
               <span className="previous-button-text">Previous</span>
             </Button>
-          )}
-          <Button className="continue-button" type="primary" onClick={continuesChangeHandler} style={{ marginLeft: voiceBotContextData.currentAssistantPage === 0 ? 0 : 'auto' }}>
+          {/* // )} */}
+          <Button className="continue-button" type="primary" onClick={continuesChangeHandler} >
             Continue
           </Button>
         </div>
       
-
       </div>
       {/*------------------------------------------stepper-end----------------------------------------------*/}
 
@@ -209,7 +376,9 @@ export default function VoiceBot() {
             voiceBotContextData.currentAssistantPage === 0 ? (
               assistantList.map((assistant: any, index:number) => {
                 return (
-                <div className="assistant-card" key={index}>
+                  <div className={ selectedAssistantIndex === index ? "assistant-card selected-assistant" : "assistant-card "} key={index} onClick={() => {
+                    selectedAssistantChangeHandler(assistant,index);
+                }}>
                   <div className="card-image">
                   <Image src={assistant.imageUrl} alt="" height={100} width={100}></Image>
                   </div>
@@ -235,7 +404,9 @@ export default function VoiceBot() {
             (
               industryExpertList.map((assistant: any, index:number) => {
                 return (
-                  <div className="assistant-card" key={index}>
+                  <div className={ selecteExpertIndex === index ? "assistant-card selected-assistant" : "assistant-card "} key={index} onClick={() => {
+                    selectedExpertChangeHandler(assistant,index);
+                }}>
                     <div className="card-image">
                     <Image src={assistant.imageUrl} alt="" height={100} width={100}></Image>
                     </div>
