@@ -11,6 +11,7 @@ import Model from "../dashboard/model/Model";
 import React, { useContext, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import "./dashboard.scss";
+import { useRouter, useSearchParams} from "next/navigation";
 
 
 import leftArrow from "../../../../../public/voiceBot/SVG/arrow-left.svg"
@@ -25,9 +26,20 @@ import Advance from "./advance/Advance";
 import Analysis from "./analysis/Analysis";
 import PhoneNumber from "./phone-number/PhoneNumber";
 import CallLogs from "./call-logs/CallLogs";
-function Dashboard() {
 
-  let [tab, setTab] = useState<string>("model");;
+import { CreateVoiceBotContext } from "../../../_helpers/client/Context/VoiceBotContextApi"
+
+function Dashboard() {
+  const router = useRouter();
+    /// fetch the params
+  const params: any = useSearchParams();
+
+  let [tab, setTab] = useState<string>("model");
+
+  const editChatbotSource = params.get("voicBotName") ?? "VoiceBot";
+
+  const voiceBotContextData: any = useContext(CreateVoiceBotContext);
+  const voicebotDetails = voiceBotContextData.state;
 
   let tabValue = "model";
 
@@ -36,17 +48,14 @@ function Dashboard() {
     setTab(value);
   }
 
-
   return (
   
-
-
     <div className="voice-bot-container">
       <div className="top">
         <div className="headers">
           <div className="header-title">
             <Image className="image" alt="back_arrow" src={leftArrow}></Image>
-            <h1 className="title">ChatBot Name</h1>
+            <h1 className="title">{voicebotDetails.name}</h1>
 
           </div>
           <div className="header-description">
