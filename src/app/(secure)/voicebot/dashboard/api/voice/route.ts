@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { apiHandler } from "../../../../../_helpers/server/api/api-handler";
 import clientPromise from "../../../../../../db";
+import { ObjectId } from "mongodb";
 
 module.exports = apiHandler({
     POST: createVoiceBot,
@@ -39,7 +40,8 @@ async function updateVoiceBot(req: NextRequest) {
          */
         
         const { assistantName, assistantTemplateIDs, imageUrl, recordId } = await req.json();
-        const result = await collection?.updateOne({ _id: recordId }, { $set: { assistantName, assistantTemplateIDs, imageUrl } });
+        const objectID = new ObjectId(recordId);
+        const result = await collection?.updateOne({ _id: objectID }, { $set: { assistantName, assistantTemplateIDs, imageUrl } });
         return { result };
     } catch (error: any) {
         return { error: error.message };
