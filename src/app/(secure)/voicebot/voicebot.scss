@@ -84,6 +84,13 @@
           align-items: center;
         }
       }
+      .invalidation-message {
+        color: #F00000;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 20px;
+      }
     }
 
     button {
@@ -107,6 +114,11 @@
       border-radius: 12px;
       background: #F4F5F6;
 
+      & > :last-child {
+        margin-top: -23px;
+        margin-left: -68px;
+      }
+
       .voicebot-avatar-img {
         display: flex;
         width: 120px;
@@ -124,6 +136,10 @@
         gap: 1rem;
         margin: auto 1px auto auto;
         width: 88%;
+        .assistant-input-wrapper{
+          display: flex;
+          flex-direction: column;
+        }
 
         .assi-input-field{
           color:  #141416;
@@ -133,6 +149,12 @@
           font-weight: 500;
           line-height: 28px;
         }
+
+        .invalid-input {
+          border-color: #F00000;
+        }
+
+        
 
         .voicebot-avatar-img__botname {
           display: inline-block;

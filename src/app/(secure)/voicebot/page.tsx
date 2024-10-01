@@ -15,8 +15,7 @@ import { useState, useContext, useEffect } from "react";
 
 // import { CreateVoiceBotContext } from "../../../../_helpers/client/Context/VoiceBotContextApi"/
 import { CreateVoiceBotContext } from "../../_helpers/client/Context/VoiceBotContextApi";
-import { debug } from "console";
-import { isAbsolute } from "path";
+
 
 
 export default function VoiceBot() {
@@ -47,6 +46,8 @@ export default function VoiceBot() {
 
   const [acknowledgedData, setAcknowledgedData] = useState<any>({});
   const [assistantImagePath, setassistantImagePath] = useState<string>("");
+
+  const [inputValidationMessage, setinputValidationMessage] = useState<string>("");
 
   async function  getVoiceAssistantTemplateData() {
     try{
@@ -87,23 +88,113 @@ export default function VoiceBot() {
 
   const assistantNameChangeHandler = (e:React.ChangeEvent<HTMLInputElement>) => {
     const enteredValue = e.target.value.trim();
+
     setAssistantName(enteredValue);
-    voiceBotContextData.updateState("name", enteredValue);
+    if (enteredValue.trim().length == 0) {
+      setinputValidationMessage("Please, Provide Name!");
+      voiceBotContextData.updateState("name", enteredValue);
+    }
+    else {
+      setinputValidationMessage("");
+      voiceBotContextData.updateState("name", enteredValue);
+    }
 
   }
 
   console.log("your voicebot details ", voicebotDetails.name);
 
-  const continuesChangeHandler = () => {
+  const continuesChangeHandler = async () => {
+    if(assistantName.trim().length === 0){
+      setinputValidationMessage("Please, Provide Name!");
+      return;
+    }
 
     if (selectedAssistantIndex === -1) {
       message.warning("Please select an assistant first!");
       return;
     }
 
+
+    
     voiceBotContextData.setCurrentAssistantPage(1);
     setStepsCounter(1);
+
+    if (voiceBotContextData.currentAssistantPage === 1) {
+      if (selecteExpertIndex === -1) {
+        message.warning("Please select an Industry Expert first!");
+        return;
+      }
+      else{
+        const assistantTemplateIDs = [selectedAssistant?._id, selectedIndustryExpert?._id];
+
+        if(acknowledgedData?.isAcknowledged){//update the data
+          debugger
+          try{
+    
+            const assistantUpdateResponse = await fetch(
+              `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/voice`,
+              {
+                method: "PUT",
+                body: JSON.stringify({
+                  assistantName: assistantName,
+                  assistantTemplateIDs: assistantTemplateIDs,
+                  imageUrl: assistantImagePath,
+                  recordId: acknowledgedData?.insertedId
+                })
+              }
+            );
+      
+            const assistantUpdateResponseParse = await assistantUpdateResponse.json();
+            debugger;
+    
+            router.push(`/voicebot/dashboard?voicBotName=${assistantName}`);
+    
+          }
+          catch(error: any) {
+            console.log(error);
+            message.error(error.message);
+          }
+         
+          debugger;
+        }
+        else{//create the data
+          debugger
+          try{
+            const assistantCreateResponse = await fetch(
+              `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/voice`,
+              {
+                method: "POST",
+                body: JSON.stringify({
+                  assistantName: assistantName,
+                  assistantTemplateIDs: assistantTemplateIDs,
+                  imageUrl: assistantImagePath
+                })
+              }
+            );
+      
+            const assistantCreateResponseParse = await assistantCreateResponse.json();
+            debugger;
+            router.push(`/voicebot/dashboard?voicBotName=${assistantName}`);
+          }
+          catch(error: any) {
+            console.log(error);
+            message.error(error.message);
+          }
+       
+          debugger;
+        }
+      }
+    }
+
+    debugger;
     // router.push("/voicebot/dashboard");
+    // router.push({
+    //   pathname: "/voicebot/dashboard",
+    //   query:{
+    //     assistantName,
+    //     selectedAssistantIndex,
+    //   }
+    // })
   }
 
     // Function to check if a file is an image
@@ -170,7 +261,7 @@ export default function VoiceBot() {
           const assistantUpdateResponseParse = await assistantUpdateResponse.json();
           setAcknowledgedData({
             isAcknowledged: assistantUpdateResponseParse?.result?.acknowledged,
-            insertedId: assistantUpdateResponseParse?.result?.insertedId
+            insertedId: assistantUpdateResponseParse?.result?.upsertedId ? assistantUpdateResponseParse?.result?.upsertedId :  acknowledgedData?.insertedId 
           });
 
         }
@@ -226,37 +317,43 @@ export default function VoiceBot() {
     <div className="parents-voicebot">
       {/*------------------------------------------stepper----------------------------------------------*/}
       <div className="stepper">
-        <div className="voicebot-avatar">
-          <div className="voicebot-avatar-img">
-          <input
-                  type="file"
-                  id="profileImageId"
-                  style={{ display: "none" }}
-                  accept="image/*"
-                  onChange={imageHandler}
-                />
-          <label htmlFor="profileImageId" className="file-label">
-            <Image alt="" src={galaryImg} className="galary_image"></Image>
-          </label>
+        <div className="voicebot-avatar"  >
+          <div className="voicebot-avatar-img" style={{ backgroundImage: `url(${assistantImagePath})` }}>
+            <input
+              type="file"
+              id="profileImageId"
+              style={{ display: "none" }}
+              accept="image/*"
+              onChange={imageHandler}
+            />
+            <label htmlFor="profileImageId" className="file-label">
+              <Image alt="" src={galaryImg} className="galary_image"></Image>
+            </label>
           </div>
-            <div className="voicebot-avatar-img__info">
+          <div className="voicebot-avatar-img__info">
+            {/* <div className="assistant-input-wrapper"> */}
             <Input
-              className={"assi-input-field"}
+              // className={inputValidationMessage ? "input-field invalid-input" : "input-field"} 
+              className={inputValidationMessage ? "assi-input-field invalid-input" : "assi-input-field"}
               placeholder="Your Assistant Name"
               onChange={assistantNameChangeHandler}
               id="assistantNameInput"
               value={assistantName}
             />
-            <Button style={{border:"none", margin:0, padding:0, background:"transparent"}}
+
+            {/* </div> */}
+
+            <Button style={{ border: "none", margin: 0, padding: 0, background: "transparent" }}
               icon={<Image src={editIcon} alt="edit name" />}
               onClick={() => {
-              const inputElement = document.getElementById("assistantNameInput") as HTMLInputElement;
-              if (inputElement) {
-                inputElement.focus();
-              }
+                const inputElement = document.getElementById("assistantNameInput") as HTMLInputElement;
+                if (inputElement) {
+                  inputElement.focus();
+                }
               }}
             />
-            </div>
+          </div>
+          {inputValidationMessage && <p className="invalidation-message">{inputValidationMessage}</p>}
         </div>
         <h2>Create your voicebot</h2>
         <h3>Let&lsquo;s create your own bot</h3>
@@ -294,57 +391,58 @@ export default function VoiceBot() {
                   <div>
                     <h3 className="steps-assistant-heading">Choose your assistant</h3>
                   </div>,
-              description: "" /*<div> gggg</div> */},
+              description: "" /*<div> gggg</div> */
+            },
             {
               title: selectedIndustryExpert !== null ?
-              <div className="selected-assistant">
-                <div className="mini-selected-assistant-image">
-                  <input
-                    type="file"
-                    id="profileImageId"
-                    style={{ display: "none" }}
-                    accept="image/*"
-                  // onChange={imageHandler}
-                  />
-                  <label htmlFor="profileImageId" className="file-label">
-                    <Image alt={selectedIndustryExpert.assistantType} src={selectedIndustryExpert.imageUrl} width={100} height={100}></Image>
-                  </label>
+                <div className="selected-assistant">
+                  <div className="mini-selected-assistant-image">
+                    <input
+                      type="file"
+                      id="profileImageId"
+                      style={{ display: "none" }}
+                      accept="image/*"
+                    // onChange={imageHandler}
+                    />
+                    <label htmlFor="profileImageId" className="file-label">
+                      <Image alt={selectedIndustryExpert.assistantType} src={selectedIndustryExpert.imageUrl} width={100} height={100}></Image>
+                    </label>
+                  </div>
+                  <div className="selected-assistant-header">
+                    <h3 className="heading_title">
+                      {selectedIndustryExpert.assistantType}
+                    </h3>
+                    <h4 className="heading_description">
+                      {selectedIndustryExpert.dispcrtion}
+                    </h4>
+                  </div>
                 </div>
-                <div className="selected-assistant-header">
-                  <h3 className="heading_title">
-                    {selectedIndustryExpert.assistantType}
-                  </h3>
-                  <h4 className="heading_description">
-                    {selectedIndustryExpert.dispcrtion}
-                  </h4>
-                </div>
-              </div>
-              :
-              <div>
-                <h3 className="steps-assistant-heading">Choose your Industry Expert!</h3>
-              </div>,
-              description:"",
+                :
+                <div>
+                  <h3 className="steps-assistant-heading">Choose your Industry Expert!</h3>
+                </div>,
+              description: "",
             },
-            
+
           ]}
         />
 
         <div className={"navigation-button"}>
           {/* {voiceBotContextData.currentAssistantPage !== 0 && ( */}
-            <Button 
-              className="previous-button" 
-              onClick={previousChangeHandler} 
-              style={{ visibility: voiceBotContextData.currentAssistantPage === 0 ? 'hidden' : 'visible' }}
-            >
-              <Image className="arrow-left" alt="left arrow" src={leftArrow} width={100} height={100} />
-              <span className="previous-button-text">Previous</span>
-            </Button>
+          <Button
+            className="previous-button"
+            onClick={previousChangeHandler}
+            style={{ visibility: voiceBotContextData.currentAssistantPage === 0 ? 'hidden' : 'visible' }}
+          >
+            <Image className="arrow-left" alt="left arrow" src={leftArrow} width={100} height={100} />
+            <span className="previous-button-text">Previous</span>
+          </Button>
           {/* // )} */}
           <Button className="continue-button" type="primary" onClick={continuesChangeHandler} >
             Continue
           </Button>
         </div>
-      
+
       </div>
       {/*------------------------------------------stepper-end----------------------------------------------*/}
 
