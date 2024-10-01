@@ -131,7 +131,7 @@ function PaymentTable() {
           },
         }}
         scroll={{
-          x: 600,
+          x: 767,
         }}
         onChange={onChange}
         loading={loading}

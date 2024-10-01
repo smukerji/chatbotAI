@@ -85,7 +85,7 @@ export default function AuthBtn() {
           </div>
 
           <a href="/account/register" style={{ textDecoration: "none" }}>
-            <div className="try-free-btn">Register for Free</div>
+            <div className="try-free-btn">Register</div>
           </a>
         </>
       )}

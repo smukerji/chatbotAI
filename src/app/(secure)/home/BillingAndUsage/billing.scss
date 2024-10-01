@@ -255,6 +255,10 @@
       // gap: 20px;
       // padding: 20px 0;
       margin: 0;
+
+      @media only screen and (max-width: 767px) {
+        flex-direction: column;
+      }
     }
 
     .pricing-card {
@@ -431,6 +435,10 @@
         &.cursor-disabled {
           cursor: not-allowed;
         }
+      }
+
+      @media only screen and (max-width: 767px) {
+        width: 100%;
       }
     }
 
@@ -677,7 +685,26 @@
           }
         }
       }
+      .cancel-upgrade-btns {
+        flex-direction: column-reverse;
+      }
     }
+  }
+
+  @media only screen and (max-width: 590px) {
+    .plan-details {
+      flex-direction: column;
+
+      .cancel-upgrade-btns {
+        flex-direction: row-reverse;
+      }
+    }
+  }
+
+  @media only screen and (max-width: 991px) {
+    margin: 0;
+    padding: 20px 20px;
+    width: 100%;
   }
 }
 
@@ -702,6 +729,12 @@
   @media only screen and (max-width: 768px) {
     margin: 25px;
     width: 90%;
+  }
+
+  @media only screen and (max-width: 991px) {
+    margin: 0;
+    padding: 20px 20px;
+    width: 100%;
   }
 }
 
