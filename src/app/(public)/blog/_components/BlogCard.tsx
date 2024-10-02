@@ -158,54 +158,6 @@ const BlogCard = () => {
                 </div>
               );
             })}
-
-            {/* <div
-              className={`category ${
-                activeCategory === "Casestudy" ? "active" : ""
-              }`}
-              onClick={() => {
-                handleChangeCategory("Casestudy");
-              }}
-            >
-              <Icon Icon={CaseStudyIcon} />
-              <p>Casestudy</p>
-            </div>
-
-            <div
-              className={`category ${
-                activeCategory === "Research" ? "active" : ""
-              }`}
-              onClick={() => {
-                handleChangeCategory("Research");
-              }}
-            >
-              <Icon Icon={ResearchIcon} />
-              <p>Research</p>
-            </div>
-
-            <div
-              className={`category ${
-                activeCategory === "Company" ? "active" : ""
-              }`}
-              onClick={() => {
-                handleChangeCategory("Company");
-              }}
-            >
-              <Icon Icon={CompanyIcon} />
-              <p>Company</p>
-            </div>
-
-            <div
-              className={`category ${
-                activeCategory === "Stories" ? "active" : ""
-              }`}
-              onClick={() => {
-                handleChangeCategory("Stories");
-              }}
-            >
-              <Icon Icon={StoriesIcon} />
-              <p>Stories</p>
-            </div> */}
           </div>
 
           <div className="blog-card-wrapper">
@@ -228,10 +180,11 @@ const BlogCard = () => {
                     {/* <p className="empty"></p> */}
                     <p className="date">
                       {blog?.publishDate
-                        ?.split("T")[0]
-                        .split("-")
-                        .reverse()
-                        .join("-") || ""}
+                        ? new Date(blog.publishDate).toLocaleDateString(
+                            "en-GB",
+                            { day: "2-digit", month: "short", year: "numeric" }
+                          )
+                        : ""}
                     </p>
                   </div>
                   <Link href={`/blog/${blog?.slug}`}>

@@ -1211,8 +1211,18 @@ function Chat({
             );
           })}
         </div>
-        <a className="powered-by" target="_blank" href="https://torri.ai">
-          Powered by Torri.AI
+        <a
+          className="powered-by"
+          target="_blank"
+          href={`${
+            chatbot?.id === "35910e5d-d751-4ba0-a52c-50d4c9302352"
+              ? "https://www.creolestudios.com/?utm_source=ASGTG+Website&utm_medium=referral&utm_campaign=ASGTG"
+              : "https://torri.ai"
+          }`}
+        >
+          {chatbot?.id === "35910e5d-d751-4ba0-a52c-50d4c9302352"
+            ? "Powered by Creole Studios"
+            : "Powered by Torri.AI"}
         </a>
         <div
           className="chat-question"

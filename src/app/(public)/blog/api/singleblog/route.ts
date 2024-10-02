@@ -6,8 +6,6 @@ import { NextRequest } from "next/server";
 // Function to get single blog from contentful api
 
 async function getSingleBlog(request: NextRequest) {
-  console.log("coming in request");
-
   const slug = request.nextUrl.searchParams.get("slug") || "";
 
   const query = `
@@ -23,8 +21,12 @@ async function getSingleBlog(request: NextRequest) {
         introPara
         content
         publishDate
-        tags
         description
+        contentfulMetadata{
+          tags{
+            name
+          }
+        }
       }
     }
   }

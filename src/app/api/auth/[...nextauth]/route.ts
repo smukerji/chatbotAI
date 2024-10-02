@@ -34,7 +34,7 @@ export const authOptions: NextAuthOptions = {
       /// db connection
 
       let currentDate = new Date();
-      let endDate = new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+      let endDate = new Date();
 
       const db = (await clientPromise!).db();
 
@@ -57,8 +57,8 @@ export const authOptions: NextAuthOptions = {
             $set: {
               startDate: currentDate,
               endDate: endDate,
-              planId: starterPlan?._id,
-              isWhatsapp: true,
+              planId: null,
+              isWhatsapp: false,
               username:
                 username[0] + `${username?.[1] ? "_" + username?.[1] : ""}`,
             },
@@ -81,10 +81,13 @@ export const authOptions: NextAuthOptions = {
         await db.collection("user-details").insertOne({
           userId: userId,
           totalMessageCount: 0,
-          messageLimit: starterPlan?.messageLimit,
-          chatbotLimit: starterPlan?.numberOfChatbot,
-          trainingDataLimit: starterPlan?.trainingDataLimit,
-          websiteCrawlingLimit: starterPlan?.websiteCrawlingLimit,
+          messageLimit: 0,
+          chatbotLimit: 0,
+          trainingDataLimit: 0,
+          websiteCrawlingLimit: "0",
+          conversationHistory: "0",
+          leads: "0",
+          models: "",
         });
       }
     },

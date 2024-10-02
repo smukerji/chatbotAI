@@ -159,7 +159,7 @@ function Header() {
                 {formatNumber(
                   userDetails?.plan?.messageLimit
                     ? userDetails?.plan?.messageLimit
-                    : 10000
+                    : 0
                 )}
               </span>
             </div>

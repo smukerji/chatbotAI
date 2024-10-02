@@ -30,7 +30,6 @@ async function getBlogs(request: NextRequest) {
         description
         author
         publishDate
-        tags
         category
         slug
         contentfulMetadata{

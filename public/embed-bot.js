@@ -11,8 +11,6 @@
       }
 
        #chat-widget {
-        width: 100%;
-        height: 100%;
         bottom: 0;
         display: unset;
       }
@@ -38,7 +36,7 @@
       position: fixed;
       bottom: 20px;
       display: grid;
-      z-index: 1;
+      z-index: 999;
     }
 
     #btn-trigger-chat {
@@ -74,7 +72,6 @@
   // Fetch bot settings
   try {
     const response = await fetch(
-      // `https://chatbot-ai-silk.vercel.app/chatbot/popup/details/api?chatbotId=${param1}`
       `https://chatbot-ai-silk.vercel.app/chatbot/popup/details/api?chatbotId=${param1}`
     );
     if (!response.ok) throw new Error("Network response was not ok");

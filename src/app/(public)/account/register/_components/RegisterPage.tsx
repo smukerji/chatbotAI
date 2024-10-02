@@ -276,7 +276,7 @@ function RegisterPage() {
           <div className="register-form">
             <h1>
               <span>Welcome! </span>
-              <span>Get Started for Free!</span>
+              <span>Get Started</span>
             </h1>
 
             <div className="input-container">

@@ -1,20 +1,20 @@
-import { NextResponse } from 'next/server';
-import clientPromise from '@/db';
-import Stripe from 'stripe';
-import { ObjectId } from 'mongodb';
+import { NextResponse } from "next/server";
+import clientPromise from "@/db";
+import Stripe from "stripe";
+import { ObjectId } from "mongodb";
 const stripe = new Stripe(String(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY));
-import express from 'express';
+import express from "express";
 const app = express();
 
 export async function POST(req: any, res: any) {
-  if (req.method === 'POST') {
+  if (req.method === "POST") {
     const db = (await clientPromise!).db();
-    const collection = db.collection('users');
-    const collectionDetails = db.collection('user-details');
-    const collectionPlan = db.collection('plans');
-    const collectionPayment = db.collection('payment-history');
+    const collection = db.collection("users");
+    const collectionDetails = db.collection("user-details");
+    const collectionPlan = db.collection("plans");
+    const collectionPayment = db.collection("payment-history");
 
-    const sig = req.headers.get('stripe-signature');
+    const sig = req.headers.get("stripe-signature");
     const endpointSecret: any = process.env.NEXT_PUBLIC_STRIPE_WEBHOOK_PUBLIC;
 
     let event: any;
@@ -22,7 +22,7 @@ export async function POST(req: any, res: any) {
     try {
       event = stripe.webhooks.constructEvent(body, sig, endpointSecret);
     } catch (err) {
-      console.error('Webhook signature verification failed.', err);
+      console.error("Webhook signature verification failed.", err);
       return res.status(400).end();
     }
     // Handle the event
@@ -34,7 +34,7 @@ export async function POST(req: any, res: any) {
     let Details;
     let status;
     switch (event.type) {
-      case 'customer.subscription.created':
+      case "customer.subscription.created":
         date = new Date(event.data.object.current_period_end * 1000);
         userData = await collection.findOne({
           customerId: event.data.object.customer,
@@ -57,8 +57,8 @@ export async function POST(req: any, res: any) {
                   $set: {
                     isWhatsapp: true,
                     subIdWhatsapp: event.data.object.id,
-                    nextIsWhatsapp: true
-                  }
+                    nextIsWhatsapp: true,
+                  },
                 }
               );
             } else if (addOns.name == "Slack") {
@@ -112,7 +112,9 @@ export async function POST(req: any, res: any) {
             }
           }
         } else {
-          planData = await collectionPlan.findOne({ planIdYear: event.data.object.plan.id });
+          planData = await collectionPlan.findOne({
+            planIdYear: event.data.object.plan.id,
+          });
         }
         if (planData == null) {
         } else {
@@ -170,21 +172,20 @@ export async function POST(req: any, res: any) {
       //   break;
       case "invoice.paid":
         date = new Date(event.data.object.lines.data[0].period.end * 1000);
-        console.log(date);
         planData = await collection.findOne({
           customerId: event.data.object.customer,
         });
         if (event.data.object.status == "paid") {
           status = "success";
         } else {
-          status = 'failed';
+          status = "failed";
         }
         var currentDat = new Date();
 
-        var formattedDate = currentDat.toLocaleString('en-US', {
-          month: 'short',
-          day: '2-digit',
-          year: 'numeric'
+        var formattedDate = currentDat.toLocaleString("en-US", {
+          month: "short",
+          day: "2-digit",
+          year: "numeric",
         });
         const updatePayment = await collectionPayment.insertOne({
           userId: String(planData._id),
@@ -198,8 +199,8 @@ export async function POST(req: any, res: any) {
             { customerId: event.data.object.customer },
             {
               $set: {
-                endDate: date
-              }
+                endDate: date,
+              },
             }
           );
         }
@@ -207,7 +208,6 @@ export async function POST(req: any, res: any) {
         break;
 
       case "customer.subscription.deleted":
-        console.log("subscription_schedule.canceled", event.data.object);
         userData = await collection.findOne({
           customerId: event.data.object.customer,
         });
@@ -286,7 +286,7 @@ export async function POST(req: any, res: any) {
 
       //   break;
       default:
-        console.warn('Unhandled event type:', event.type);
+        console.warn("Unhandled event type:", event.type);
     }
 
     // Return a response to acknowledge receipt of the event
@@ -294,7 +294,6 @@ export async function POST(req: any, res: any) {
   }
 
   // Respond to other HTTP methods
-  res.setHeader('Allow', ['POST']);
+  res.setHeader("Allow", ["POST"]);
   return `Method ${req.method} Not Allowed`;
 }
-

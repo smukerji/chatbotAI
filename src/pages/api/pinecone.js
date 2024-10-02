@@ -104,8 +104,6 @@ export default async function handler(req, res) {
         retriever: vectorStore.asRetriever({
           filter: { chatbotId: chatbotId },
         }),
-
-        verbose: true,
       });
 
       /// getting the relveant similaritiy search
