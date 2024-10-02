@@ -67,6 +67,36 @@ function Chatbot() {
   /// managing share chatbot
   const [openShareModal, setOpenShareModal] = useState(false);
 
+  /**
+   * 
+   * description Voicebot properties
+   * 
+   */
+
+
+  /**
+   * states goes here
+   */
+  const [isVoiceBotActived, setIsVoiceBotActived] = useState(false);
+
+
+  /**
+   * Handler goes heres
+   */
+
+  const voiceBotActiveDeactiveHandler = (activeValue:boolean) => {
+    setIsVoiceBotActived(activeValue);
+  }
+
+
+
+
+  /**
+   * 
+   * voice bot property ended
+   * 
+   */
+
   /// state for opening menu for the chabot list
   const [openMenu, setOpenMenu]: any = useState(null);
   const changeMenu = (value: any) => {
@@ -206,160 +236,165 @@ function Chatbot() {
 
   if (status === "authenticated" || cookies?.userId) {
     return (
-      <div
-        className="chatbot-list-container"
-        onClick={() => openMenu && setOpenMenu(null)}
-      >
-        {/*------------------------------------------title----------------------------------------------*/}
-        <div className="title-container">
-          <h1 className="title">My Chatbots</h1>
-          <h1 className="title">My Chatbots</h1>
-          
-          <div className="action-container">
-            <div className="chatbot-list-action">
-              <Icon
-                className={listType == "grid" ? "active" : ""}
-                Icon={GridIcon}
-                click={() => setListType("grid")}
-              />
-              <Icon
-                className={listType == "table" ? "active" : ""}
-                Icon={MenuIcon}
-                click={() => setListType("table")}
-              />
-              {/* <Image
-                className={listType == "grid" ? "active" : ""}
-                src={gridIcon}
-                alt="grid-icon"
-                onClick={() => setListType("grid")}
-              />
-              <Image
-                className={listType == "table" ? "active" : ""}
-                src={menuIcon}
-                alt="menu-icon"
-                onClick={() => setListType("table")}
-              /> */}
-            </div>
-            {/* <Link href={`${process.env.NEXT_PUBLIC_WEBSITE_URL}home`}> */}
-            <button
-              onClick={() => {
-                // showModal()
-                /// check if user has exceeded the number of creation of bots
-                if (
-                  userDetails?.noOfChatbotsUserCreated + 1 >
-                  userDetails?.plan?.numberOfChatbot
-                ) {
-                  setOpenLimitModel(true);
-                  return;
+      <>
+        <div
+          className="chatbot-list-container"
+          onClick={() => openMenu && setOpenMenu(null)}
+        >
+          {/*------------------------------------------title----------------------------------------------*/}
+          <div className="title-container">
+            <h1 className="title" onClick={ ()=> voiceBotActiveDeactiveHandler(false) }>My Chatbots</h1>
+            <h1 className="title" onClick={()=> voiceBotActiveDeactiveHandler(true)}>My Voicebot</h1>
+
+            <div className="action-container">
+              <div className="chatbot-list-action">
+                <Icon
+                  className={listType == "grid" ? "active" : ""}
+                  Icon={GridIcon}
+                  click={() => setListType("grid")}
+                />
+                <Icon
+                  className={listType == "table" ? "active" : ""}
+                  Icon={MenuIcon}
+                  click={() => setListType("table")}
+                />
+                
+              </div>
+              {/* <Link href={`${process.env.NEXT_PUBLIC_WEBSITE_URL}home`}> */}
+              <button
+                onClick={() => {
+                  // showModal()
+                  /// check if user has exceeded the number of creation of bots
+                  if (
+                    userDetails?.noOfChatbotsUserCreated + 1 >
+                    userDetails?.plan?.numberOfChatbot
+                  ) {
+                    setOpenLimitModel(true);
+                    return;
+                  }
+
+                  setOpenNewChatbotNameModal(true);
+                }}
+                disabled={
+                  loading || (user && new Date(user?.endDate) < new Date())
                 }
+              >
+                New Chatbot
+              </button>
+              {/* </Link> */}
+            </div>
 
-                setOpenNewChatbotNameModal(true);
-              }}
-              disabled={
-                loading || (user && new Date(user?.endDate) < new Date())
-              }
-            >
-              New Chatbot
-            </button>
-            {/* </Link> */}
+            {openLimitModal ? (
+              <LimitReachedModal setOpenLimitModel={setOpenLimitModel} />
+            ) : (
+              <></>
+            )}
           </div>
-          {openLimitModal ? (
-            <LimitReachedModal setOpenLimitModel={setOpenLimitModel} />
-          ) : (
-            <></>
-          )}
+
+
+          {
+            !isVoiceBotActived ?
+              <>
+                {/*------------------------------------------chatbot-list-grid----------------------------------------------*/}
+                {listType === "grid" && (
+                  <>
+                    <GridLayout
+                      chatbotData={chatbotData}
+                      changeMenu={changeMenu}
+                      openMenu={openMenu}
+                      openChatbot={openChatbot}
+                      setOpenShareModal={setOpenShareModal}
+                      chatbotId={chatbotId}
+                      setChatbotId={setChatbotId}
+                      setOpenDeleteModal={setOpenDeleteModal}
+                      setOpenRenameModal={setOpenRenameModal}
+                    // disabled={user && new Date(user?.endDate) < new Date()}
+                    />
+                  </>
+                )}
+
+                {/*------------------------------------------chatbot-list-table----------------------------------------------*/}
+                {listType === "table" && (
+                  <TableLayout
+                    chatbotData={chatbotData}
+                    changeMenu={changeMenu}
+                    openMenu={openMenu}
+                    openChatbot={openChatbot}
+                    setOpenShareModal={setOpenShareModal}
+                    chatbotId={chatbotId}
+                    setChatbotId={setChatbotId}
+                    setOpenDeleteModal={setOpenDeleteModal}
+                    setOpenRenameModal={setOpenRenameModal}
+                  // disabled={user && new Date(user?.endDate) < new Date()}
+                  />
+                )}
+                <DeleteModal
+                  open={openDeleteModal}
+                  setOpen={setOpenDeleteModal}
+                  chatbotId={chatbotId}
+                  setChangeFlag={setChangeFlag}
+                  changeFlag={changeFlag}
+                />
+                <ShareModal
+                  open={openShareModal}
+                  setOpen={setOpenShareModal}
+                  chatbotId={chatbotId}
+                />
+                <RenameModal
+                  open={openRenameModal}
+                  setOpen={setOpenRenameModal}
+                  chatbotId={chatbotId}
+                  setChangeFlag={setChangeFlag}
+                  changeFlag={changeFlag}
+                />
+
+                <NewChatbotNameModal
+                  open={openNewChatbotNameModal}
+                  setOpen={setOpenNewChatbotNameModal}
+                  chatbotId={chatbotId}
+                />
+
+                {/*------------------------------------------loading/no-chatbots----------------------------------------------*/}
+                {!loading && chatbotData?.length == 0 && (
+                  <div className="no-chatbots-container">
+                    <Image src={noChatbotBg} alt="no-chatbot-bg" />
+                    <p>
+                      You haven&apos;t created any Chatbots. Go ahead and create a New
+                      Chatbot!
+                    </p>
+                  </div>
+                )}
+                {loading && <Spin indicator={antIcon} />}
+
+                {!loading && chatbotData?.length == 0 && (
+                  <Modal
+                    title="Upgrade Now to create new Chatbots!"
+                    open={isPlanNotification}
+                    onCancel={() => { }}
+                    footer={[
+                      <Button key="submit" type="primary" onClick={handleUpgradePlan}>
+                        Upgrade Now
+                      </Button>,
+                    ]}
+                    closable={false}
+                    centered
+                    className="subscription-expire-popup"
+                    width={800}
+                  >
+                    <p>Upgrade now to access your chatbots!</p>
+                  </Modal>
+                )}
+
+              </>
+              :
+              <div className="voicebot-list-container">
+                voicebot
+              </div>
+          }
         </div>
-
-        {/*------------------------------------------chatbot-list-grid----------------------------------------------*/}
-        {listType === "grid" && (
-          <>
-            <GridLayout
-              chatbotData={chatbotData}
-              changeMenu={changeMenu}
-              openMenu={openMenu}
-              openChatbot={openChatbot}
-              setOpenShareModal={setOpenShareModal}
-              chatbotId={chatbotId}
-              setChatbotId={setChatbotId}
-              setOpenDeleteModal={setOpenDeleteModal}
-              setOpenRenameModal={setOpenRenameModal}
-              // disabled={user && new Date(user?.endDate) < new Date()}
-            />
-          </>
-        )}
-
-        {/*------------------------------------------chatbot-list-table----------------------------------------------*/}
-        {listType === "table" && (
-          <TableLayout
-            chatbotData={chatbotData}
-            changeMenu={changeMenu}
-            openMenu={openMenu}
-            openChatbot={openChatbot}
-            setOpenShareModal={setOpenShareModal}
-            chatbotId={chatbotId}
-            setChatbotId={setChatbotId}
-            setOpenDeleteModal={setOpenDeleteModal}
-            setOpenRenameModal={setOpenRenameModal}
-            // disabled={user && new Date(user?.endDate) < new Date()}
-          />
-        )}
-        <DeleteModal
-          open={openDeleteModal}
-          setOpen={setOpenDeleteModal}
-          chatbotId={chatbotId}
-          setChangeFlag={setChangeFlag}
-          changeFlag={changeFlag}
-        />
-        <ShareModal
-          open={openShareModal}
-          setOpen={setOpenShareModal}
-          chatbotId={chatbotId}
-        />
-        <RenameModal
-          open={openRenameModal}
-          setOpen={setOpenRenameModal}
-          chatbotId={chatbotId}
-          setChangeFlag={setChangeFlag}
-          changeFlag={changeFlag}
-        />
-
-        <NewChatbotNameModal
-          open={openNewChatbotNameModal}
-          setOpen={setOpenNewChatbotNameModal}
-          chatbotId={chatbotId}
-        />
-
-        {/*------------------------------------------loading/no-chatbots----------------------------------------------*/}
-        {!loading && chatbotData?.length == 0 && (
-          <div className="no-chatbots-container">
-            <Image src={noChatbotBg} alt="no-chatbot-bg" />
-            <p>
-              You haven&apos;t created any Chatbots. Go ahead and create a New
-              Chatbot!
-            </p>
-          </div>
-        )}
-        {loading && <Spin indicator={antIcon} />}
-
-        {!loading && chatbotData?.length == 0 && (
-          <Modal
-            title="Upgrade Now to create new Chatbots!"
-            open={isPlanNotification}
-            onCancel={() => {}}
-            footer={[
-              <Button key="submit" type="primary" onClick={handleUpgradePlan}>
-                Upgrade Now
-              </Button>,
-            ]}
-            closable={false}
-            centered
-            className="subscription-expire-popup"
-            width={800}
-          >
-            <p>Upgrade now to access your chatbots!</p>
-          </Modal>
-        )}
-      </div>
+        
+      </>
+     
     );
   } else if (status === "unauthenticated") {
     redirect("/account/login");

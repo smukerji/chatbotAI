@@ -15,7 +15,11 @@
       font-style: normal;
       font-weight: 600;
       line-height: 40px; /* 133.333% */
+      &:hover {
+        cursor: pointer;
+      }
     }
+
 
     .action-container {
       display: flex;
@@ -306,6 +310,7 @@
 
     .title-container {
       //   flex-direction: column;
+      
 
       h1 {
         font-size: 22px;

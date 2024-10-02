@@ -10,6 +10,7 @@ import customTemplate from "../../../../public/voiceBot/SVG/profile-circle.svg"
 import galaryImg from "../../../../public/voiceBot/SVG/gallery-add.svg";
 import leftArrow from "../../../../public/voiceBot/SVG/arrow-left.svg"
 import { useRouter } from "next/navigation";
+import { useCookies } from "react-cookie";
 
 import { useState, useContext, useEffect } from "react";
 
@@ -32,6 +33,8 @@ export default function VoiceBot() {
   }];
 
   const [currentPage, setCurrentPage] = useState<number>(1);
+  
+  const [cookies, setCookie] = useCookies(["userId"]);
 
   const [selectedAssistant, setSelectedAssistant] = useState<any>(null);
   const [selectedAssistantIndex, setSelectedAssistantIndex] = useState<number>(-1);
@@ -160,6 +163,9 @@ export default function VoiceBot() {
         else{//create the data
           debugger
           try{
+
+
+
             const assistantCreateResponse = await fetch(
               `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/voice`,
               {
@@ -167,7 +173,8 @@ export default function VoiceBot() {
                 body: JSON.stringify({
                   assistantName: assistantName,
                   assistantTemplateIDs: assistantTemplateIDs,
-                  imageUrl: assistantImagePath
+                  imageUrl: assistantImagePath,
+                  userId:cookies.userId
                 })
               }
             );
@@ -273,7 +280,8 @@ export default function VoiceBot() {
               body: JSON.stringify({
                 assistantName: voiceAssistantName,
                 assistantTemplateIDs: assistantTemplateIDs,
-                imageUrl: imagePath
+                imageUrl: imagePath,
+                userId:cookies.userId
               })
             }
           );

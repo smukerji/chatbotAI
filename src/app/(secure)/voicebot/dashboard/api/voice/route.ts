@@ -15,6 +15,15 @@ async function createVoiceBot(req: NextRequest) {
         const db = (await clientPromise!).db();
         const collection = db?.collection("voice-assistance");
         const voicBotData = await req.json();
+
+        // Convert assistantTemplateIDs to ObjectId
+        if (voicBotData.assistantTemplateIDs && Array.isArray(voicBotData.assistantTemplateIDs)) {
+            voicBotData.assistantTemplateIDs = voicBotData.assistantTemplateIDs.map((id: string) => new ObjectId(id));
+        }
+        if(voicBotData.userId && typeof voicBotData.userId === "string"){
+            voicBotData.userId = new ObjectId(voicBotData.userId);
+        }
+        
         const result = await collection?.insertOne(voicBotData);
         return { result };
         
@@ -39,7 +48,11 @@ async function updateVoiceBot(req: NextRequest) {
                   });
          */
         
-        const { assistantName, assistantTemplateIDs, imageUrl, recordId } = await req.json();
+        let { assistantName, assistantTemplateIDs, imageUrl, recordId } = await req.json();
+         // Convert assistantTemplateIDs to ObjectId
+         if (assistantTemplateIDs && Array.isArray(assistantTemplateIDs)) {
+            assistantTemplateIDs = assistantTemplateIDs.map((id: string) => new ObjectId(id));
+        }
         const objectID = new ObjectId(recordId);
         const result = await collection?.updateOne({ _id: objectID }, { $set: { assistantName, assistantTemplateIDs, imageUrl } });
         return { result };
