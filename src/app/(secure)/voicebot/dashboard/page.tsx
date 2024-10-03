@@ -43,6 +43,13 @@ function Dashboard() {
 
   let tabValue = "model";
 
+  useEffect(() => {
+    debugger;
+    if (!voiceBotContextData?.assistantMongoId) {
+      router.push("/chatbot");
+    }
+  }, []);
+
   const changeHandler = (value: string) => {
     console.log("working , clicking")
     setTab(value);
@@ -54,8 +61,10 @@ function Dashboard() {
       <div className="top">
         <div className="headers">
           <div className="header-title">
-            <Image className="image" alt="back_arrow" src={leftArrow}></Image>
-            <h1 className="title">{voicebotDetails.name}</h1>
+            <Image className="image" alt="back_arrow" src={leftArrow} onClick={()=>{
+              router.push("/chatbot")
+            }}></Image>
+            <h1 className="title">{voicebotDetails.name || editChatbotSource}</h1>
 
           </div>
           <div className="header-description">

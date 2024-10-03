@@ -181,6 +181,7 @@ export default function VoiceBot() {
       
             const assistantCreateResponseParse = await assistantCreateResponse.json();
             debugger;
+            voiceBotContextData.setAssistantMongoId(assistantCreateResponseParse?.result?.insertedId);            
             router.push(`/voicebot/dashboard?voicBotName=${assistantName}`);
           }
           catch(error: any) {
@@ -288,6 +289,7 @@ export default function VoiceBot() {
   
           const assistantCreateResponseParse = await assistantCreateResponse.json();
           debugger;
+          voiceBotContextData.setAssistantMongoId(assistantCreateResponseParse?.result?.insertedId);  
           setAcknowledgedData({
             isAcknowledged: assistantCreateResponseParse?.result?.acknowledged,
             insertedId: assistantCreateResponseParse?.result?.insertedId

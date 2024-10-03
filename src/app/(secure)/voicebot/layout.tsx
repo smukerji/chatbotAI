@@ -26,6 +26,6 @@ export default function VoiceBotsLayout({
     // </CreateBotDataProvider>
     <VoiceBotDataProvider>
       {children}
-    </VoiceBotDataProvider>
+     </VoiceBotDataProvider>
   );
 }

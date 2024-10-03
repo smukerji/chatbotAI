@@ -29,6 +29,9 @@ import { CreateBotContext } from "../../_helpers/client/Context/CreateBotContext
 import { UserDetailsContext } from "../../_helpers/client/Context/UserDetailsContext";
 import { JWT_EXPIRED } from "../../_helpers/errorConstants";
 import axios from "axios";
+import voiceAssistantPreview from "../../../../public/voiceBot/voice-bot-preview.svg";
+
+import { CreateVoiceBotContext } from "../../_helpers/client/Context/VoiceBotContextApi"
 // import GridIcon from "../../as";
 
 const antIcon = (
@@ -71,13 +74,18 @@ function Chatbot() {
    * 
    * description Voicebot properties
    * 
+   * 
    */
 
+  const voiceBotContextData: any = useContext(CreateVoiceBotContext);
+  const voicebotDetails = voiceBotContextData.state;
 
   /**
    * states goes here
    */
   const [isVoiceBotActived, setIsVoiceBotActived] = useState(false);
+
+  const [voiceAssistantList, setVoiceAssistantList] = useState([]);
 
 
   /**
@@ -87,6 +95,41 @@ function Chatbot() {
   const voiceBotActiveDeactiveHandler = (activeValue:boolean) => {
     setIsVoiceBotActived(activeValue);
   }
+
+  const getAllVoiceAssistantData = async () => {
+ 
+    debugger;
+    const res = await fetch(
+     `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/assistant?userId=${cookies.userId}`,
+      {
+        method: "GET",
+      }
+    );
+    const data = await res.json();
+
+    debugger;
+    setVoiceAssistantList(data?.assistants);
+    
+  }
+
+  const selectedAssistantHandler = (assistantId: string) => {
+    debugger;
+    voiceBotContextData.setAssistantMongoId(assistantId);
+    router.push("/voicebot/dashboard");
+  }
+
+
+  /**
+   * UseEffect goes here
+   */
+
+useEffect(() => {
+  const fetchData = async () => {
+    await getAllVoiceAssistantData();
+  };
+
+  fetchData();
+}, []);
 
 
 
@@ -243,8 +286,8 @@ function Chatbot() {
         >
           {/*------------------------------------------title----------------------------------------------*/}
           <div className="title-container">
-            <h1 className="title" onClick={ ()=> voiceBotActiveDeactiveHandler(false) }>My Chatbots</h1>
-            <h1 className="title" onClick={()=> voiceBotActiveDeactiveHandler(true)}>My Voicebot</h1>
+            <h1 className={!isVoiceBotActived ? "title activate-title" : "title"} onClick={ ()=> voiceBotActiveDeactiveHandler(false) }>My Chatbots</h1>
+            <h1 className={isVoiceBotActived ? "title activate-title" : "title"} onClick={()=> voiceBotActiveDeactiveHandler(true)}>My Voicebot</h1>
 
             <div className="action-container">
               <div className="chatbot-list-action">
@@ -261,34 +304,44 @@ function Chatbot() {
                 
               </div>
               {/* <Link href={`${process.env.NEXT_PUBLIC_WEBSITE_URL}home`}> */}
-              <button
-                onClick={() => {
-                  // showModal()
-                  /// check if user has exceeded the number of creation of bots
-                  if (
-                    userDetails?.noOfChatbotsUserCreated + 1 >
-                    userDetails?.plan?.numberOfChatbot
-                  ) {
-                    setOpenLimitModel(true);
-                    return;
-                  }
+             { isVoiceBotActived ?
+             <button onClick={()=>{
 
-                  setOpenNewChatbotNameModal(true);
-                }}
-                disabled={
-                  loading || (user && new Date(user?.endDate) < new Date())
-                }
-              >
-                New Chatbot
-              </button>
+              router.push("/voicebot");
+             }}>
+                New Voicebot
+             </button>
+             :
+                <button
+                  onClick={ () =>  {
+                    // showModal()
+                    /// check if user has exceeded the number of creation of bots
+                    if (
+                      userDetails?.noOfChatbotsUserCreated + 1 >
+                      userDetails?.plan?.numberOfChatbot
+                    ) {
+                      setOpenLimitModel(true);
+                      return;
+                    }
+
+                    setOpenNewChatbotNameModal(true);
+                  }}
+                  disabled={
+                    loading || (user && new Date(user?.endDate) < new Date())
+                  }
+                >
+                  New Chatbot
+                </button>
+             }
+            
               {/* </Link> */}
             </div>
 
-            {openLimitModal ? (
+            {/* {openLimitModal ? (
               <LimitReachedModal setOpenLimitModel={setOpenLimitModel} />
             ) : (
               <></>
-            )}
+            )} */}
           </div>
 
 
@@ -366,7 +419,7 @@ function Chatbot() {
                 )}
                 {loading && <Spin indicator={antIcon} />}
 
-                {!loading && chatbotData?.length == 0 && (
+                {/* {!loading && chatbotData?.length == 0 && (
                   <Modal
                     title="Upgrade Now to create new Chatbots!"
                     open={isPlanNotification}
@@ -383,12 +436,37 @@ function Chatbot() {
                   >
                     <p>Upgrade now to access your chatbots!</p>
                   </Modal>
-                )}
+                )} */}
 
               </>
               :
               <div className="voicebot-list-container">
-                voicebot
+                {voiceAssistantList.map((assistant: any, index: number) => (
+                  <div key={index} className="voicebot-list-card" onClick={()=> selectedAssistantHandler(assistant._id) }>
+                    <div className="assistant-image">
+                      <Image alt="assistant image" src={voiceAssistantPreview}></Image>
+                    </div>
+                    <div className="assistant-title">{assistant.assistantName}</div>
+                    <div className="info-content">
+                      <div className="info">
+                        <div className="info-label">Total Minutes:</div>
+                        <div className="value">100</div>
+                      </div>
+                      <div className="info">
+                        <div className="info-label">Call Count:</div>
+                        <div className="value">90</div>
+                      </div>
+                      <div className="info">
+                        <div className="info-label">Last Trained:</div>
+                        <div className="value">9</div>
+                      </div>
+                      <div className="info">
+                        <div className="info-label">Last Used:</div>
+                        <div className="value">Yesterday</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
           }
         </div>

@@ -1,6 +1,7 @@
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "../_helpers/server/auth";
+import { VoiceBotDataProvider } from "../_helpers/client/Context/VoiceBotContextApi";
 
 export default function HomeLayout({
   children,
@@ -15,5 +16,9 @@ export default function HomeLayout({
     const returnUrl = encodeURIComponent(headers().get("x-invoke-path") || "/");
     redirect(`/account/login?returnUrl=${returnUrl}`);
   }
-  return <>{children}</>;
+  return <>
+            {/* <VoiceBotDataProvider> */}
+            {children}
+            {/* </VoiceBotDataProvider> */}
+            </>;
 }
