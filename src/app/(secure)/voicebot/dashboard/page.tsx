@@ -45,10 +45,61 @@ function Dashboard() {
 
   useEffect(() => {
     debugger;
-    if (!voiceBotContextData?.assistantMongoId) {
+    if (!voiceBotContextData?.assistantInfo) {
       router.push("/chatbot");
     }
+
+    if(voiceBotContextData.assistantInfo?.assistantVapiId) {
+
+      //get the assistant record from the vapi's side
+
+
+    }
+    else{
+      //  the system prompt based on the mongo record
+
+      
+      //refactor the analysis data
+      let assistantData = voicebotDetails;
+      let analysisData = assistantData?.analysisPlan;
+      let sturctureData = analysisData?.structuredDataSchema;
+      let propertyArrayData = sturctureData?.properties;
+
+      const propertiesObject = propertyArrayData?.reduce((acc:any, item:any) => {
+        acc[item.name] = {
+          type: item.type,
+          description: item.description
+        };
+        return acc;
+      }, {});
+
+      //object assigned to the properties
+      if (sturctureData) {
+        sturctureData.properties = propertiesObject;
+        analysisData.structuredDataSchema = sturctureData;
+        assistantData.analysis = analysisData;
+      }
+     
+
+      //refactor the punctualtion boundaries
+      assistantData.voice.chunkPlan.punctuationBoundaries = assistantData.voice.chunkPlan.punctuationBoundaries.map((item: any) => item.value);
+
+      //refactor the client messages
+
+
+
+    }
   }, []);
+
+
+  const vapiAssistantPublishHandler = () => {
+    // publish the assistant to the vapi
+
+    //validate the assistant require field first,
+
+    //call the post api to publish the assistant to the vapi
+
+  }
 
   const changeHandler = (value: string) => {
     console.log("working , clicking")
@@ -93,7 +144,7 @@ function Dashboard() {
                 <span className="button-text">Demo Talk</span>
               </div>
             </Button>
-            <Button className="publish-button">Publish</Button>
+            <Button className="publish-button" onClick={vapiAssistantPublishHandler}>Publish</Button>
           </div>
         </div>
       </div>

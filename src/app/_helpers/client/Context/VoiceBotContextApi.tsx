@@ -37,7 +37,7 @@ const initialState = {
     toolIds: [""],
     provider: "",
     model: "",
-    temperature: 0, 
+    temperature: 0,
     knowledgeBase: { provider: "canonical", topK: 5.5, fileIds: [""] },
     maxTokens: 300,
     emotionRecognitionEnabled: false,
@@ -60,7 +60,7 @@ const initialState = {
     },
   },
   firstMessageMode: "assistant-speaks-first",
-  llmRequestDelaySeconds:0.1,
+  llmRequestDelaySeconds: 0.1,
   responseDelaySeconds: 0.1,
   hipaaEnabled: false,
   clientMessages: [],//need to update this before sending to the vapi server
@@ -76,7 +76,7 @@ const initialState = {
   ],
   name: "",
   numWordsToInterruptAssistant: 0,
- 
+
   voicemailDetection: {
     provider: "twilio",
     voicemailDetectionTypes: ["machine_end_beep", "machine_end_silence"],
@@ -100,10 +100,12 @@ const initialState = {
     successEvaluationRubric: "NumericScale",
     successEvaluationRequestTimeoutSeconds: 10.5,
     structuredDataPrompt: "",
-    structuredDataSchema: { type: "object", items: {}, properties: [],/**this type is {} not [], [] is given for ui manage only. This need to refactor before the time value send to the vapi server */
-     description: "", required: [""] },
+    structuredDataSchema: {
+      type: "object", items: {}, properties: [],/**this type is {} not [], [] is given for ui manage only. This need to refactor before the time value send to the vapi server */
+      description: "", required: [""]
+    },
     artifactPlan: { recordingEnabled: true, videoRecordingEnabled: false, recordingS3PathPrefix: "" },
-    messagePlan: { idleMessages: [""], idleMessageMaxSpokenCount: 5.5, idleTimeoutSeconds: 17.5 },
+    messagePlan: { idleMessages: [], idleMessageMaxSpokenCount: 5.5, idleTimeoutSeconds: 17.5 },
     startSpeakingPlan: {
       waitSeconds: 0.4,
       smartEndpointingEnabled: false,
@@ -121,65 +123,69 @@ const initialState = {
 
 // Create the context
 export const CreateVoiceBotContext = createContext({
-    // state: initialState,
-    // updateState: (key: string, value: any) => {},
-  });
-  
-  // Create the provider component
-  export const VoiceBotDataProvider = ({ children }: { children: ReactNode }) => {
-    const [state, setState] = useState(initialState);
+  // state: initialState,
+  // updateState: (key: string, value: any) => {},
+});
 
-    const [isLoading, setIsLoading] = useState(false);
+// Create the provider component
+export const VoiceBotDataProvider = ({ children }: { children: ReactNode }) => {
+  const [state, setState] = useState(initialState);
 
-    const [assistantMongoId, setAssistantMongoId] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-    const [currentAssistantPage, setCurrentAssistantPage] = useState(0);
-  
-    const updateNestedState = (obj: any, path: string[], value: any): any => {
-      // debugger;
-      const [key, ...rest] = path;
-      if (rest.length === 0) {
-        obj[key] = value;
-      } else {
-        if (!obj[key]) obj[key] = {};
-        obj[key] = updateNestedState(obj[key], rest, value);
-      }
-      return obj;
-    };
+  const [assistantMongoId, setAssistantMongoId] = useState(null);
 
-    // const updateNestedState = (obj: any, key: string, value: any): any => {
-    //   for (const k in obj) {
-    //     debugger;
-    //     if (k === key) {
-    //       obj[k] = value;
-    //       return true; // Indicate that the key was found and updated
-    //     } else if (typeof obj[k] === "object" && obj[k] !== null) {
-    //       const updated = updateNestedState(obj[k], key, value);
-    //       if (updated) {
-    //         return true; // Propagate the success up the call stack
-    //       }
-    //     }
-    //   }
-    //   return false; // Indicate that the key was not found in this branch
-    // };
-  
-    const updateState = (key: string, value: any) => {
-      // debugger
-      const path = key.split(".");
-      setState((prevState) => ({
-        ...updateNestedState({ ...prevState }, path, value),
-      }));
-    };
+  const [currentAssistantPage, setCurrentAssistantPage] = useState(0);
 
-    const updateTheVoiceBotInfo = (key: any) => (value: any) => {
-      // debugger;
-      setState((prevState) => ({ ...prevState, [key]: value }));
+  const [assistantVapiId, setAssistantVapiId] = useState(null);
+
+  const [assistantInfo, setAssistantInfo] = useState(null);
+
+  const updateNestedState = (obj: any, path: string[], value: any): any => {
+    // debugger;
+    const [key, ...rest] = path;
+    if (rest.length === 0) {
+      obj[key] = value;
+    } else {
+      if (!obj[key]) obj[key] = {};
+      obj[key] = updateNestedState(obj[key], rest, value);
     }
-    
-  
-    return (
-      <CreateVoiceBotContext.Provider value={{ state, updateState, updateTheVoiceBotInfo, currentAssistantPage, setCurrentAssistantPage, isLoading, setIsLoading ,setAssistantMongoId, assistantMongoId}}>
-        {children}
-      </CreateVoiceBotContext.Provider>
-    );
+    return obj;
   };
+
+  // const updateNestedState = (obj: any, key: string, value: any): any => {
+  //   for (const k in obj) {
+  //     debugger;
+  //     if (k === key) {
+  //       obj[k] = value;
+  //       return true; // Indicate that the key was found and updated
+  //     } else if (typeof obj[k] === "object" && obj[k] !== null) {
+  //       const updated = updateNestedState(obj[k], key, value);
+  //       if (updated) {
+  //         return true; // Propagate the success up the call stack
+  //       }
+  //     }
+  //   }
+  //   return false; // Indicate that the key was not found in this branch
+  // };
+
+  const updateState = (key: string, value: any) => {
+    // debugger
+    const path = key.split(".");
+    setState((prevState) => ({
+      ...updateNestedState({ ...prevState }, path, value),
+    }));
+  };
+
+  const updateTheVoiceBotInfo = (key: any) => (value: any) => {
+    // debugger;
+    setState((prevState) => ({ ...prevState, [key]: value }));
+  }
+
+
+  return (
+    <CreateVoiceBotContext.Provider value={{ state, updateState, updateTheVoiceBotInfo, currentAssistantPage, setCurrentAssistantPage, isLoading, setIsLoading, setAssistantMongoId, assistantMongoId, assistantVapiId, setAssistantVapiId, assistantInfo, setAssistantInfo }}>
+      {children}
+    </CreateVoiceBotContext.Provider>
+  );
+};

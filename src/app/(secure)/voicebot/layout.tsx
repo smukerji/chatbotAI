@@ -24,8 +24,10 @@ export default function VoiceBotsLayout({
     // <CreateBotDataProvider>
     //   <ChatbotSettingDataProvider>{children}</ChatbotSettingDataProvider>
     // </CreateBotDataProvider>
-    <VoiceBotDataProvider>
+    // <VoiceBotDataProvider>
+    <>
       {children}
-     </VoiceBotDataProvider>
+    </>
+    //  {/* </VoiceBotDataProvider>///// */}
   );
 }

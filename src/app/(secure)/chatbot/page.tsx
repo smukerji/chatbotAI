@@ -112,9 +112,16 @@ function Chatbot() {
     
   }
 
-  const selectedAssistantHandler = (assistantId: string) => {
+  const selectedAssistantHandler = (assistantInfo: any) => {
+
     debugger;
-    voiceBotContextData.setAssistantMongoId(assistantId);
+
+    voiceBotContextData.setAssistantInfo(assistantInfo);
+    // voiceBotContextData.setAssistantMongoId(assistantInfo._id);
+    // if(assistantInfo?.vapiId){
+    //   voiceBotContextData.setAssistantVapiId(assistantInfo.vapiId);
+    // }
+
     router.push("/voicebot/dashboard");
   }
 
@@ -442,7 +449,7 @@ useEffect(() => {
               :
               <div className="voicebot-list-container">
                 {voiceAssistantList.map((assistant: any, index: number) => (
-                  <div key={index} className="voicebot-list-card" onClick={()=> selectedAssistantHandler(assistant._id) }>
+                  <div key={index} className="voicebot-list-card" onClick={()=> selectedAssistantHandler(assistant) }>
                     <div className="assistant-image">
                       <Image alt="assistant image" src={voiceAssistantPreview}></Image>
                     </div>

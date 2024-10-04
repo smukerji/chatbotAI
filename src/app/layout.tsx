@@ -66,9 +66,11 @@ export default function RootLayout({
           <main
             className={`${josefinSans.variable} ${quickSand.variable} ${poppins.variable}`}
             >
+              <VoiceBotDataProvider>
             {children}
+          </VoiceBotDataProvider>
           
-          </main>
+            </main>
         </LayoutWrapper>
         <Script
           id="zsiqscript"
