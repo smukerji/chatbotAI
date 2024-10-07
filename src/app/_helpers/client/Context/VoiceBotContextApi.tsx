@@ -101,11 +101,11 @@ const initialState = {
     successEvaluationRequestTimeoutSeconds: 10.5,
     structuredDataPrompt: "",
     structuredDataSchema: {
-      type: "object", items: {}, properties: [],/**this type is {} not [], [] is given for ui manage only. This need to refactor before the time value send to the vapi server */
+      type: "object", items: {}, properties: [""],/**this type is {} not [], [] is given for ui manage only. This need to refactor before the time value send to the vapi server */
       description: "", required: [""]
     },
     artifactPlan: { recordingEnabled: true, videoRecordingEnabled: false, recordingS3PathPrefix: "" },
-    messagePlan: { idleMessages: [], idleMessageMaxSpokenCount: 5.5, idleTimeoutSeconds: 17.5 },
+    messagePlan: { idleMessages: [] /**this need to be update before sending to the vapi server. */, idleMessageMaxSpokenCount: 5.5, idleTimeoutSeconds: 17.5 },
     startSpeakingPlan: {
       waitSeconds: 0.4,
       smartEndpointingEnabled: false,
