@@ -54,6 +54,10 @@ function Model() {
       voicebotDetails["model"]["emotionRecognitionEnabled"]
     ]);
 
+    // useEffect(() => {
+
+    // },[]);
+
 
   const firstMessageEnterHandler = (e:React.ChangeEvent<HTMLInputElement>) => {
     const enteredValue: string = e.target.value;
@@ -61,10 +65,10 @@ function Model() {
     setFirstMessage(enteredValue);
     if (enteredValue.trim().length == 0) {
       setinputValidationMessage("Type the first message for the assistant");
-      voiceBotContextData.updateTheVoiceBotInfo("firstMessage")("");
+      voiceBotContextData.updateState("firstMessage", "");
     } else {
       setinputValidationMessage("");
-      voiceBotContextData.updateTheVoiceBotInfo("firstMessage")(enteredValue);
+      voiceBotContextData.updateState("firstMessage",enteredValue);
     }
   }
 
