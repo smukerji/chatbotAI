@@ -126,7 +126,7 @@
 `;
   if (chatbotBubbleAlignment === "left") {
     cssStyles = cssStyles.replace("right: 20px", "left: 20px");
-    iframe = iframe.replace("position: fixed;", "position: unset;");
+    cssStyles = cssStyles.replace("position: fixed;", "position: unset;");
   }
 
   chatWidget.innerHTML = iframe;
