@@ -3,6 +3,7 @@ import {
   Button,
   Dropdown,
   MenuProps,
+  message,
   Modal,
   Radio,
   RadioChangeEvent,
@@ -58,46 +59,45 @@ function Dashboard() {
     else{
       //  the system prompt based on the mongo record
 
-      
-      //refactor the analysis data
-      let assistantData = voicebotDetails;
-      let analysisData = assistantData?.analysisPlan;
-      let sturctureData = analysisData?.structuredDataSchema;
-      let propertyArrayData = sturctureData?.properties;
-
-      const propertiesObject = propertyArrayData?.reduce((acc:any, item:any) => {
-        acc[item.name] = {
-          type: item.type,
-          description: item.description
-        };
-        return acc;
-      }, {});
-
-      //object assigned to the properties
-      if (sturctureData) {
-        sturctureData.properties = propertiesObject;
-        analysisData.structuredDataSchema = sturctureData;
-        assistantData.analysis = analysisData;
-      }
-     
-
-      //refactor the punctualtion boundaries
-      assistantData.voice.chunkPlan.punctuationBoundaries = assistantData.voice.chunkPlan.punctuationBoundaries.map((item: any) => item.value);
-
-      //refactor the client messages
-
-
 
     }
+    // editChatbotSource = voiceBotContextData?.assistantInfo
   }, []);
 
 
-  const vapiAssistantPublishHandler = () => {
+  const vapiAssistantPublishHandler = async () => {
     // publish the assistant to the vapi
 
     //validate the assistant require field first,
 
     //call the post api to publish the assistant to the vapi
+    
+    try{
+
+      const assistantCreateResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/vapi/assistant`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            assistantVapiData: voicebotDetails,
+            assistantLocalData:voiceBotContextData.assistantInfo
+          })
+        }
+      );
+
+      const assistantCreateResponseParse = await assistantCreateResponse.json();
+      debugger;
+      
+
+
+    }
+    catch(error:any){
+      console.log("error", error);
+      message.error("Error while publishing the assistant");
+    }
+      
+      
+
 
   }
 
@@ -115,7 +115,7 @@ function Dashboard() {
             <Image className="image" alt="back_arrow" src={leftArrow} onClick={()=>{
               router.push("/chatbot")
             }}></Image>
-            <h1 className="title">{voicebotDetails.name || editChatbotSource}</h1>
+            <h1 className="title">{voicebotDetails.name || voiceBotContextData?.assistantInfo?.assistantName || editChatbotSource}</h1>
 
           </div>
           <div className="header-description">
