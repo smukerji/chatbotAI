@@ -74,6 +74,7 @@ function Dashboard() {
     
     try{
 
+      debugger;
       const assistantCreateResponse = await fetch(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/vapi/assistant`,
         {

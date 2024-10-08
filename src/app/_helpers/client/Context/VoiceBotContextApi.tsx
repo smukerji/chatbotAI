@@ -10,7 +10,7 @@ const initialState = {
     language: "",
     smartFormat: false,
     languageDetectionEnabled: false,
-    keywords: [""],
+    // keywords: [""],
     endpointing: 255,
   },
   model: {
@@ -50,7 +50,7 @@ const initialState = {
     speed: 1.25,
     chunkPlan: {
       enabled: true,
-      minCharacters: 300,
+      minCharacters: 10,
       punctuationBoundaries: [],//need to update this beffore sending it to vapi server
       formatPlan: {
         enabled: true,
@@ -63,8 +63,8 @@ const initialState = {
   llmRequestDelaySeconds: 0.1,
   responseDelaySeconds: 0.1,
   hipaaEnabled: false,
-  clientMessages: [],//need to update this before sending to the vapi server
-  serverMessages: [],//need to update this before sending to the vapi server
+  // clientMessages: [],//need to update this before sending to the vapi server
+  // serverMessages: [],//need to update this before sending to the vapi server
   silenceTimeoutSeconds: 30,
   maxDurationSeconds: 600,
   backgroundSound: "office",
@@ -88,10 +88,10 @@ const initialState = {
   },
   voicemailMessage: "",
   endCallMessage: "",
-  endCallPhrases: [""],
+  // endCallPhrases: [""],
   metadata: {},
-  serverUrl: "",
-  serverUrlSecret: "",
+  // serverUrl: "",
+  // serverUrlSecret: "",
   analysisPlan: {
     summaryPrompt: "",
     summaryRequestTimeoutSeconds: 10.5,
@@ -102,7 +102,7 @@ const initialState = {
     structuredDataPrompt: "",
     structuredDataSchema: {
       type: "object", items: {}, properties: [""],/**this type is {} not [], [] is given for ui manage only. This need to refactor before the time value send to the vapi server */
-      description: "", required: [""]
+      description: ""
     },
     artifactPlan: { recordingEnabled: true, videoRecordingEnabled: false, recordingS3PathPrefix: "" },
     messagePlan: { idleMessages: [] /**this need to be update before sending to the vapi server. */, idleMessageMaxSpokenCount: 5.5, idleTimeoutSeconds: 17.5 },
