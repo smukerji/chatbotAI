@@ -113,11 +113,11 @@
           ? "32"
           : "64"
       }"
-      style="border-radius: 50%;"
+      style="border-radius: 50%; max-width: 64px; max-height: 64px;"
     />
   `;
 
-  iframe = `<iframe
+  let iframe = `<iframe
     id="chat-frame-widget"
     src="https://torri.ai/embed-bot?chatbotID=${param1}"
     frameborder="0"
@@ -154,7 +154,7 @@
 
   window.addEventListener("message", function (event) {
     // Validate the origin of the message
-    if (event.origin !== "https://torri.ai") {
+    if (event.origin !== "http://localhost:3000") {
       return;
     }
 
@@ -162,7 +162,7 @@
     if (event.data === "disable-iframe") {
       frameWidget.style.display = "none";
       /// add the button if the screen size is less than 768px
-      btn.style.display = "block";
+      btn.style.display = "inline-flex";
     }
   });
 })();
