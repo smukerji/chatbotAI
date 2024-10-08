@@ -12,10 +12,10 @@ async function createVapiAssistant(req: NextRequest) {
 
     try {
 
+        const voicBotData = await req.json();
+        
         const db = (await clientPromise!).db();
         const collection = db?.collection("voice-assistance");
-        const voicBotData = await req.json();
-
         // Convert assistantTemplateIDs to ObjectId
         if (voicBotData.assistantTemplateIDs && Array.isArray(voicBotData.assistantTemplateIDs)) {
             voicBotData.assistantTemplateIDs = voicBotData.assistantTemplateIDs.map((id: string) => new ObjectId(id));
@@ -24,8 +24,7 @@ async function createVapiAssistant(req: NextRequest) {
             voicBotData.userId = new ObjectId(voicBotData.userId);
         }
         
-        const result = await collection?.insertOne(voicBotData);
-        return { result };
+        return { result:"result" };
         
     }
     catch (error: any) {
@@ -33,3 +32,33 @@ async function createVapiAssistant(req: NextRequest) {
     }
 
 }
+
+
+/**
+ * //refactor the analysis data
+      let assistantData = voicebotDetails;
+      let analysisData = assistantData?.analysisPlan;
+      let sturctureData = analysisData?.structuredDataSchema;
+      let propertyArrayData = sturctureData?.properties;
+
+      const propertiesObject = propertyArrayData?.reduce((acc:any, item:any) => {
+        acc[item.name] = {
+          type: item.type,
+          description: item.description
+        };
+        return acc;
+      }, {});
+
+      //object assigned to the properties
+      if (sturctureData) {
+        sturctureData.properties = propertiesObject;
+        analysisData.structuredDataSchema = sturctureData;
+        assistantData.analysis = analysisData;
+      }
+     
+
+      //refactor the punctualtion boundaries
+      assistantData.voice.chunkPlan.punctuationBoundaries = assistantData.voice.chunkPlan.punctuationBoundaries.map((item: any) => item.value);
+
+      //refactor the client messages
+ */
