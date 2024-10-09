@@ -1,5 +1,5 @@
 "use client";
-import { createContext, useState, ReactNode } from "react";
+import { createContext, useState, useEffect, ReactNode } from "react";
 
 // Define the initial state based on the provided data structure
 const initialState = {
@@ -8,37 +8,37 @@ const initialState = {
     provider: "",
     model: "",
     language: "",
-    smartFormat: false,
+    // smartFormat: false,
     languageDetectionEnabled: false,
     // keywords: [""],
     endpointing: 255,
   },
   model: {
     messages: [{ content: "default", role: "system" }],
-    tools: [
-      {
-        async: false,
-        messages: [
-          {
-            type: "request-start",
-            content: "",
-            conditions: [{ value: "", operator: "eq", param: "" }],
-          },
-        ],
-        type: "dtmf",
-        function: {
-          name: "",
-          description: "",
-          parameters: { type: "object", properties: {}, required: [""] },
-        },
-        server: { timeoutSeconds: 20, url: "", secret: "" },
-      },
-    ],
+    // tools: [
+    //   {
+    //     async: false,
+    //     messages: [
+    //       {
+    //         type: "request-start",
+    //         content: "",
+    //         conditions: [{ value: "", operator: "eq", param: "" }],
+    //       },
+    //     ],
+    //     type: "dtmf",
+    //     function: {
+    //       name: "",
+    //       description: "",
+    //       parameters: { type: "object", properties: {}, required: [""] },
+    //     },
+    //     server: { timeoutSeconds: 20, url: "", secret: "" },
+    //   },
+    // ],
     toolIds: [""],
     provider: "",
     model: "",
     temperature: 0,
-    knowledgeBase: { provider: "canonical", topK: 5.5, fileIds: [""] },
+    // knowledgeBase: { provider: "canonical", topK: 5.5, fileIds: [""] },
     maxTokens: 300,
     emotionRecognitionEnabled: false,
     numFastTurns: 1,
@@ -55,7 +55,7 @@ const initialState = {
       formatPlan: {
         enabled: true,
         numberToDigitsCutoff: 2025,
-        replacements: [{ type: "exact", key: "", value: "" }],
+        // replacements: [{ type: "exact", key: "", value: "" }],
       },
     },
   },
@@ -101,8 +101,7 @@ const initialState = {
     successEvaluationRequestTimeoutSeconds: 10.5,
     structuredDataPrompt: "",
     structuredDataSchema: {
-      type: "object", items: {}, properties: [""],/**this type is {} not [], [] is given for ui manage only. This need to refactor before the time value send to the vapi server */
-      description: ""
+      type: "object",  properties: [""],/**this type is {} not [], [] is given for ui manage only. This need to refactor before the time value send to the vapi server */
     },
     artifactPlan: { recordingEnabled: true, videoRecordingEnabled: false, recordingS3PathPrefix: "" },
     messagePlan: { idleMessages: [] /**this need to be update before sending to the vapi server. */, idleMessageMaxSpokenCount: 5.5, idleTimeoutSeconds: 17.5 },
@@ -141,6 +140,8 @@ export const VoiceBotDataProvider = ({ children }: { children: ReactNode }) => {
 
   const [assistantInfo, setAssistantInfo] = useState(null);
 
+  const [isPublishEnabled, setIsPublishEnabled] = useState(false);
+
   const updateNestedState = (obj: any, path: string[], value: any): any => {
     // debugger;
     const [key, ...rest] = path;
@@ -152,22 +153,6 @@ export const VoiceBotDataProvider = ({ children }: { children: ReactNode }) => {
     }
     return obj;
   };
-
-  // const updateNestedState = (obj: any, key: string, value: any): any => {
-  //   for (const k in obj) {
-  //     debugger;
-  //     if (k === key) {
-  //       obj[k] = value;
-  //       return true; // Indicate that the key was found and updated
-  //     } else if (typeof obj[k] === "object" && obj[k] !== null) {
-  //       const updated = updateNestedState(obj[k], key, value);
-  //       if (updated) {
-  //         return true; // Propagate the success up the call stack
-  //       }
-  //     }
-  //   }
-  //   return false; // Indicate that the key was not found in this branch
-  // };
 
   const updateState = (key: string, value: any) => {
     // debugger
@@ -182,9 +167,21 @@ export const VoiceBotDataProvider = ({ children }: { children: ReactNode }) => {
     setState((prevState) => ({ ...prevState, [key]: value }));
   }
 
+  useEffect(() => {
+    const { provider, model, language } = state.transcriber;
+    const { messages: modelMessages, provider: modelProvider, model: modelsModel, maxTokens } = state.model;
+    const {chunkPlan} = state.voice;
+    const {punctuationBoundaries,minCharacters} = chunkPlan;
+    debugger;
+    if (provider && model && language && modelProvider && modelsModel && state.firstMessage && state.name && maxTokens && punctuationBoundaries.length > 0 && minCharacters > 0 && modelMessages[0].content.length > 0) {
+      setIsPublishEnabled(true);
+    } else {
+      setIsPublishEnabled(false);
+    }
+  }, [state]);
 
   return (
-    <CreateVoiceBotContext.Provider value={{ state, updateState, updateTheVoiceBotInfo, currentAssistantPage, setCurrentAssistantPage, isLoading, setIsLoading, setAssistantMongoId, assistantMongoId, assistantVapiId, setAssistantVapiId, assistantInfo, setAssistantInfo }}>
+    <CreateVoiceBotContext.Provider value={{ state, updateState, updateTheVoiceBotInfo, currentAssistantPage, setCurrentAssistantPage, isLoading, setIsLoading, setAssistantMongoId, assistantMongoId, assistantVapiId, setAssistantVapiId, assistantInfo, setAssistantInfo , isPublishEnabled}}>
       {children}
     </CreateVoiceBotContext.Provider>
   );

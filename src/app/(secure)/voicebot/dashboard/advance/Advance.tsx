@@ -454,7 +454,8 @@ function Advance() {
       </p>
 
       <div className="messaging-contaner">
-        <div className="messeging-container-content">
+        
+        {/* <div className="messeging-container-content">
           <h4 className="title">
             Server URL
           </h4>
@@ -464,8 +465,8 @@ function Advance() {
           <Input className="input-field" value={serverUrl} placeholder="Endpoint Url to handle Server Messages" onChange={serverUrlInputHandler} />
 
           <hr className="splitter" />
-        </div>
-        <div className="messeging-container-content">
+        </div> */}
+        {/* <div className="messeging-container-content">
           <h4 className="title">
             Client Messages
           </h4>
@@ -483,8 +484,8 @@ function Advance() {
           />
 
           <hr className="splitter" />
-        </div>
-        <div className="messeging-container-content">
+        </div> */}
+        {/* <div className="messeging-container-content">
           <h4 className="title">
             Server Messages
           </h4>
@@ -505,7 +506,7 @@ function Advance() {
           />
 
           <hr className="splitter" />
-        </div>
+        </div> */}
         <div className="messeging-container-content">
           <h4 className="title">
             Voicemail Message

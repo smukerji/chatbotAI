@@ -201,7 +201,7 @@ function Model() {
         <h4 className="input-header second">System Prompt</h4>
         <p className="input-description">The context allows you to customize your voicebot&lsquo;s personality, role and instructions. </p>
         
-        <TextArea className="text-area"
+        <TextArea className={systemPromptValidationMessage ? "text-area invalid-input" : "text-area"}
          rows={4} 
          placeholder="Write your system prompts here..." 
          value={systemPrompt}
@@ -236,7 +236,7 @@ function Model() {
         {modelValidationMessage && <p className="invalidation-message">{modelValidationMessage}</p>}
         <p className="model-info">GPT-4o is more accurate but fast and cheaper</p>
 
-        <h4 className="provider knowledge-base">Knowledge Base</h4>
+        {/* <h4 className="provider knowledge-base">Knowledge Base</h4>
         <Select
           className="select-field"
           placeholder="Select the model"
@@ -254,7 +254,7 @@ function Model() {
               label: 'gladia',
             }
           ]}
-        />
+        /> */}
 
         <div className="temprature model">
           <h4 className="temprature_title">Temperatures</h4>

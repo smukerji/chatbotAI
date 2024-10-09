@@ -61,9 +61,15 @@ function Dashboard() {
 
 
     }
-    // editChatbotSource = voiceBotContextData?.assistantInfo
+    debugger;
+    if(voiceBotContextData?.assistantInfo?.assistantName){
+      voiceBotContextData.updateState("name",voiceBotContextData?.assistantInfo?.assistantName);
+    }
   }, []);
 
+
+  useEffect(() => {
+  }, [voiceBotContextData?.isPublishEnabled]);
 
   const vapiAssistantPublishHandler = async () => {
     // publish the assistant to the vapi
@@ -71,6 +77,12 @@ function Dashboard() {
     //validate the assistant require field first,
 
     //call the post api to publish the assistant to the vapi
+
+    debugger;
+    if(~voiceBotContextData?.isPublishEnabled){
+      message.error("Please fill the required fields to publish the assistant");
+      return;
+    }
     
     try{
 
@@ -88,6 +100,10 @@ function Dashboard() {
 
       const assistantCreateResponseParse = await assistantCreateResponse.json();
       debugger;
+      if(assistantCreateResponseParse?.error){
+        message.error("Error while publishing the assistant");
+        return;
+      }
       
 
 
@@ -145,7 +161,7 @@ function Dashboard() {
                 <span className="button-text">Demo Talk</span>
               </div>
             </Button>
-            <Button className="publish-button" onClick={vapiAssistantPublishHandler}>Publish</Button>
+            <Button className={~voiceBotContextData?.isPublishEnabled ? "publish-button" : "publish-button publish-button-disabled" } onClick={vapiAssistantPublishHandler}>Publish</Button>
           </div>
         </div>
       </div>

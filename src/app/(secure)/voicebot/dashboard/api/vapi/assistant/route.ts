@@ -16,6 +16,7 @@ async function createVapiAssistant(req: NextRequest) {
 
       const localData = voicBotData?.assistantLocalData;
       const vapiData = voicBotData?.assistantVapiData;
+      return {result:"done"}
 
 
       /**
@@ -57,19 +58,29 @@ async function createVapiAssistant(req: NextRequest) {
         vapiData.analysisPlan.structuredDataSchema.properties = propertiesObject;
     }
     else{
-        vapiData.analysisPlan.structuredDataSchema.properties = {};
-    }
+      vapiData.analysisPlan.structuredDataSchema.properties = {};
+      delete vapiData.analysisPlan.structuredDataSchema;
+      }
 
-
+      delete vapiData.model.toolIds;
+      // delete vapiData.voice.chunkPlan.punctuationBoundaries;
+      delete vapiData.analysisPlan.artifactPlan;
+      delete vapiData.analysisPlan.messagePlan;
+      delete vapiData.analysisPlan.startSpeakingPlan;
+      delete vapiData.analysisPlan.stopSpeakingPlan;
+      delete vapiData.analysisPlan.monitorPlan;
+      delete vapiData.analysisPlan.credentialIds;
+      
     //punctuation boundaries refactor
     vapiData.voice.chunkPlan.punctuationBoundaries = vapiData.voice.chunkPlan.punctuationBoundaries.map((item: any) => item.label);
 
-    
+    //check if punctuation boundaries is empty
+    let punctionBon = vapiData.voice.chunkPlan.punctuationBoundaries;
+    if(Array.isArray(punctionBon) && punctionBon.length === 0){
+      vapiData.voice.chunkPlan.punctuationBoundaries = ["，", "。"];
+      }
+      
 
-   
-
-
-        
       const db = (await clientPromise!).db();
       const collection = db?.collection("voice-assistance");
       
@@ -120,33 +131,3 @@ async function createVapiAssistant(req: NextRequest) {
     }
 
 }
-
-
-/**
- * //refactor the analysis data
-      let assistantData = voicebotDetails;
-      let analysisData = assistantData?.analysisPlan;
-      let sturctureData = analysisData?.structuredDataSchema;
-      let propertyArrayData = sturctureData?.properties;
-
-      const propertiesObject = propertyArrayData?.reduce((acc:any, item:any) => {
-        acc[item.name] = {
-          type: item.type,
-          description: item.description
-        };
-        return acc;
-      }, {});
-
-      //object assigned to the properties
-      if (sturctureData) {
-        sturctureData.properties = propertiesObject;
-        analysisData.structuredDataSchema = sturctureData;
-        assistantData.analysis = analysisData;
-      }
-     
-
-      //refactor the punctualtion boundaries
-      assistantData.voice.chunkPlan.punctuationBoundaries = assistantData.voice.chunkPlan.punctuationBoundaries.map((item: any) => item.value);
-
-      //refactor the client messages
- */
