@@ -161,7 +161,7 @@ function Dashboard() {
                 <span className="button-text">Demo Talk</span>
               </div>
             </Button>
-            <Button className={~voiceBotContextData?.isPublishEnabled ? "publish-button" : "publish-button publish-button-disabled" } onClick={vapiAssistantPublishHandler}>Publish</Button>
+            <Button className={!voiceBotContextData?.isPublishEnabled ? "publish-button publish-button-disabled" : "publish-button" } onClick={vapiAssistantPublishHandler}>Publish</Button>
           </div>
         </div>
       </div>
