@@ -79,7 +79,7 @@ function Dashboard() {
     //call the post api to publish the assistant to the vapi
 
     debugger;
-    if(~voiceBotContextData?.isPublishEnabled){
+    if(!voiceBotContextData?.isPublishEnabled){
       message.error("Please fill the required fields to publish the assistant");
       return;
     }
@@ -105,17 +105,12 @@ function Dashboard() {
         return;
       }
       
-
-
     }
     catch(error:any){
       console.log("error", error);
       message.error("Error while publishing the assistant");
     }
-      
-      
-
-
+   
   }
 
   const changeHandler = (value: string) => {

@@ -16,7 +16,7 @@ async function createVapiAssistant(req: NextRequest) {
 
       const localData = voicBotData?.assistantLocalData;
       const vapiData = voicBotData?.assistantVapiData;
-      return {result:"done"}
+      // return {result:"done"}
 
 
       /**
@@ -113,15 +113,7 @@ async function createVapiAssistant(req: NextRequest) {
 
             return { error: "Failed to update voicebot record" };
         }
-        
-
-        // Convert assistantTemplateIDs to ObjectId
-        if (voicBotData.assistantTemplateIDs && Array.isArray(voicBotData.assistantTemplateIDs)) {
-            voicBotData.assistantTemplateIDs = voicBotData.assistantTemplateIDs.map((id: string) => new ObjectId(id));
-        }
-        if(voicBotData.userId && typeof voicBotData.userId === "string"){
-            voicBotData.userId = new ObjectId(voicBotData.userId);
-        }
+      
         
         return { result:"result" };
         
