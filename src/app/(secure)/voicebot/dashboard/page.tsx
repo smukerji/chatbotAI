@@ -27,8 +27,11 @@ import Advance from "./advance/Advance";
 import Analysis from "./analysis/Analysis";
 import PhoneNumber from "./phone-number/PhoneNumber";
 import CallLogs from "./call-logs/CallLogs";
+import Vapi from '@vapi-ai/web';
 
-import { CreateVoiceBotContext } from "../../../_helpers/client/Context/VoiceBotContextApi"
+import { CreateVoiceBotContext } from "../../../_helpers/client/Context/VoiceBotContextApi";
+
+const vapi = new Vapi(process.env.NEXT_PUBLIC_VAP_API as string); // Vapi public key
 
 function Dashboard() {
   const router = useRouter();
@@ -41,6 +44,7 @@ function Dashboard() {
 
   const voiceBotContextData: any = useContext(CreateVoiceBotContext);
   const voicebotDetails = voiceBotContextData.state;
+
 
   let tabValue = "model";
 
@@ -70,6 +74,16 @@ function Dashboard() {
 
   useEffect(() => {
   }, [voiceBotContextData?.isPublishEnabled]);
+
+  const makeVapiAssistantCall = async () => {
+    if(voiceBotContextData.assistantInfo["vapiAssistantId"]){
+      
+    }
+    else{
+      message.error("Assistant is not published yet");
+    }
+    
+  }
 
   const vapiAssistantPublishHandler = async () => {
     // publish the assistant to the vapi
@@ -104,7 +118,14 @@ function Dashboard() {
         message.error("Error while publishing the assistant");
         return;
       }
-      
+      if(assistantCreateResponseParse?.assistantVapiId){
+        voiceBotContextData.setAssistantInfo({
+          ...voiceBotContextData.assistantInfo,
+          vapiAssistantId:assistantCreateResponseParse.assistantVapiId
+        });
+        message.success("Assistant published successfully");
+      }
+
     }
     catch(error:any){
       console.log("error", error);
@@ -150,7 +171,7 @@ function Dashboard() {
             <hr />
           </div>
           <div className="button-container">
-            <Button className="demo-call-button">
+            <Button className="demo-call-button" onClick={makeVapiAssistantCall}>
               <div className="button-content">
                 <Image alt="phone-call" src={callOutgoing}></Image>
                 <span className="button-text">Demo Talk</span>

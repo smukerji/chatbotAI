@@ -18,32 +18,6 @@ async function createVapiAssistant(req: NextRequest) {
       const vapiData = voicBotData?.assistantVapiData;
       // return {result:"done"}
 
-
-      /**
-       * refactor the vapi data
-       * 
-       * serverUrl is empty then remove it from the payload
-       * 
-       * 'analysisPlan.property artifactPlan should not exist'
-            6 =
-            'analysisPlan.property messagePlan should not exist'
-            7 =
-            'analysisPlan.property startSpeakingPlan should not exist'
-            8 =
-            'analysisPlan.property stopSpeakingPlan should not exist'
-            9 =
-            'analysisPlan.property monitorPlan should not exist'
-            10 =
-            'analysisPlan.property credentialIds should not exist'
-
-       * all above should check, if empty remove them
-
-        * Refactor the StrucctureDataSchema
-            
-       */
-
-      //structure data schema refactor
-
       let propertyArrayData = vapiData.analysisPlan.structuredDataSchema.properties;
 
     if (Array.isArray(propertyArrayData) && propertyArrayData[0] !== "") {
@@ -85,37 +59,68 @@ async function createVapiAssistant(req: NextRequest) {
       const collection = db?.collection("voice-assistance");
       
       //check if the record is exist in the db
-        const voiceBotRecord = await collection?.findOne({ _id: new ObjectId(localData._id) });
+        const voiceBotRecord = await collection?.findOne({ 
+          _id: new ObjectId(localData._id)
+        });
         if (!voiceBotRecord) {
             return { error: "VoiceBot record not found" };
         }
+        else{
+          //if record is exist then check if the vapi assistant id is exist or not
+          const voiceBotRecordVapiExist = await collection?.findOne({ 
+            _id: new ObjectId(localData._id),
+            vapiAssistantId: { $exists: true }
+          });
 
-        //send the data to the vapi server
-        const options = {
-            method: 'POST',
-            headers: {Authorization: `Bearer ${process.env.VAPI_PRIVATE_KEY}`, 'Content-Type': 'application/json'},
-            body: JSON.stringify(vapiData)
-          };
 
-        let vapiResponse = await fetch('https://api.vapi.ai/assistant', options);
-        let vapiResponseData = await vapiResponse.json();
-        if (!vapiResponseData?.id) {
-            return { error: "Failed to create assistant" };
+          if (voiceBotRecordVapiExist) { //check if the record is already exist then update the record
+            const options = {
+              method: 'PUT',
+              headers: { Authorization: `Bearer ${process.env.VAPI_PRIVATE_KEY}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify(vapiData)
+            };
+
+            // let vapiResponse = await fetch(`https://api.vapi.ai/assistant/${}`, options);
+            // let vapiResponseData = await vapiResponse.json();
+            // if (!vapiResponseData?.id) {
+            //   return { error: "Failed to update the assistant" };
+            // }
+            // return { result: "Updated Successfully!"}
+          }
+          else { //if the record is not exist then create the record
+            //send the data to the vapi server
+            const options = {
+              method: 'POST',
+              headers: { Authorization: `Bearer ${process.env.VAPI_PRIVATE_KEY}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify(vapiData)
+            };
+
+            let vapiResponse = await fetch('https://api.vapi.ai/assistant', options);
+            let vapiResponseData = await vapiResponse.json();
+            if (!vapiResponseData?.id) {
+              return { error: "Failed to create assistant" };
+            }
+
+            //update the voicebot record with the vapi assistant id
+            const updateResult = await collection?.updateOne({ _id: new ObjectId(localData._id) }, { $set: { vapiAssistantId: vapiResponseData.id } });
+
+            //if the record is not updated
+            if (updateResult?.modifiedCount !== 1) {
+              // delete the assistant from the vapi server
+              return { error: "Failed to update voicebot record" };
+            }
+            else {
+              return { result: "result", assistantVapiId: vapiResponseData?.id };
+            }
+
+          }
+
         }
-        
-        //update the voicebot record with the vapi assistant id
-        const updateResult = await collection?.updateOne({ _id: new ObjectId(localData._id) }, { $set: { vapiAssistantId: vapiResponseData.id } });
 
-        //if the record is not updated
-        if(updateResult?.modifiedCount !== 1){
-            // delete the assistant from the vapi server
-
-
-            return { error: "Failed to update voicebot record" };
-        }
+    
       
         
-        return { result:"result" };
+       
         
     }
     catch (error: any) {

@@ -51,7 +51,8 @@ const initialState = {
     chunkPlan: {
       enabled: true,
       minCharacters: 10,
-      punctuationBoundaries: [],//need to update this beffore sending it to vapi server
+      punctuationBoundaries: [{ value: "0", label: "。" },
+        { value: "1", label: "，" }],//need to update this beffore sending it to vapi server
       formatPlan: {
         enabled: true,
         numberToDigitsCutoff: 2025,
