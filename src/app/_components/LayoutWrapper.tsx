@@ -23,6 +23,7 @@ const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
     <SessionProvider>
       <UserDetailsDataProvider>
         {path !== "/" &&
+          path !== "/home-assistant" &&
           path !== "/account/login" &&
           path !== "/account/register" &&
           path !== "/terms" &&
