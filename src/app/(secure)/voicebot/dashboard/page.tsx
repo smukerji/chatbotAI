@@ -33,6 +33,14 @@ import { CreateVoiceBotContext } from "../../../_helpers/client/Context/VoiceBot
 
 const vapi = new Vapi(process.env.NEXT_PUBLIC_VAP_API as string); // Vapi public key
 
+enum CALLSTATUS {
+  VOID,
+  CONNECTING,
+  LISTENING,
+  SPEAKING,
+  CALLSTOP
+}
+
 function Dashboard() {
   const router = useRouter();
     /// fetch the params
@@ -41,6 +49,11 @@ function Dashboard() {
   let [tab, setTab] = useState<string>("model");
 
   const editChatbotSource = params.get("voicBotName") ?? "VoiceBot";
+
+  const [isListening, setIsListening] = useState(CALLSTATUS.VOID);
+  const [isMuted, setIsMuted] = useState(false);
+
+  const [showMakeCallButton, setShowMakeCallButton] = useState(true);
 
   const voiceBotContextData: any = useContext(CreateVoiceBotContext);
   const voicebotDetails = voiceBotContextData.state;
@@ -54,7 +67,7 @@ function Dashboard() {
       router.push("/chatbot");
     }
 
-    if(voiceBotContextData.assistantInfo?.assistantVapiId) {
+    if(voiceBotContextData.assistantInfo?.vapiAssistantId) {
 
       //get the assistant record from the vapi's side
 
@@ -63,7 +76,6 @@ function Dashboard() {
     else{
       //  the system prompt based on the mongo record
 
-
     }
     debugger;
     if(voiceBotContextData?.assistantInfo?.assistantName){
@@ -71,19 +83,79 @@ function Dashboard() {
     }
   }, []);
 
-
   useEffect(() => {
   }, [voiceBotContextData?.isPublishEnabled]);
 
   const makeVapiAssistantCall = async () => {
-    if(voiceBotContextData.assistantInfo["vapiAssistantId"]){
-      
+    let isIdAvaliable = voiceBotContextData.assistantInfo["vapiAssistantId"];
+    debugger;
+    if(isIdAvaliable){
+      //if vapi assistant id is present then make the call to the vapi
+      vapi.start(isIdAvaliable); // assistance ID
+      // debugger;
+      setIsListening(CALLSTATUS.CONNECTING);
     }
     else{
       message.error("Assistant is not published yet");
     }
     
   }
+
+  vapi.on("call-start", () => {
+    // debugger;
+    setIsListening(CALLSTATUS.CONNECTING);
+    setShowMakeCallButton(false);
+    console.log("Call has started.");
+  });
+
+  vapi.on("call-end", () => {
+
+    vapi.stop();
+    setIsMuted(false);
+    setShowMakeCallButton(true);
+    console.log("Call has ended.");
+    setIsListening(CALLSTATUS.CALLSTOP);
+
+  });
+
+  vapi.on("speech-start", () => {
+    // debugger;
+    setIsListening(CALLSTATUS.SPEAKING);
+    setShowMakeCallButton(false);
+    // lottieRefs.current.play();
+    console.log("Assistant speech has started.");
+  });
+
+  vapi.on("error", (e) => {
+    // debugger;
+    // lottieRefs.current.pause();
+    console.error(e);
+    setShowMakeCallButton(true);
+    setIsMuted(false);
+    vapi.stop();
+    setIsListening(CALLSTATUS.CALLSTOP);
+  });
+
+  const stopCallHandler = () => {
+
+    vapi.stop();
+    setShowMakeCallButton(true);
+    setIsMuted(false);
+    setIsListening(CALLSTATUS.CALLSTOP);
+  };
+
+  const muteCallHandler = () => {
+    if(isMuted){ // if the call is muted then unmute the call
+      vapi.setMuted(false);
+      setIsMuted(false);
+    }
+    else{ // if the call is unmute then mute the call
+      vapi.setMuted(true);
+      setIsMuted(true);
+    }
+  }
+
+
 
   const vapiAssistantPublishHandler = async () => {
     // publish the assistant to the vapi
@@ -171,12 +243,43 @@ function Dashboard() {
             <hr />
           </div>
           <div className="button-container">
-            <Button className="demo-call-button" onClick={makeVapiAssistantCall}>
-              <div className="button-content">
-                <Image alt="phone-call" src={callOutgoing}></Image>
-                <span className="button-text">Demo Talk</span>
-              </div>
-            </Button>
+            {
+              showMakeCallButton ?
+
+                <Button className="demo-call-button" onClick={makeVapiAssistantCall}>
+                  <div className="button-content">
+                    <Image alt="phone-call" src={callOutgoing}></Image>
+                    <span className="button-text">
+                      {
+
+                        isListening == CALLSTATUS.VOID ? "Demo Talk!" :
+                          isListening == CALLSTATUS.CONNECTING ? "Calling..." :
+                            isListening == CALLSTATUS.SPEAKING ? "speaking..." :
+                              isListening == CALLSTATUS.LISTENING ? "listening..." :
+                                isListening == CALLSTATUS.CALLSTOP ? "Call Again" : "Demo Talk!"
+                      }
+
+                    </span>
+                  </div>
+                </Button>
+                :
+                <div className="after-call-container">
+                  <Button className="button-content" onClick={muteCallHandler}>
+                      <span className="button-text">
+                        {isMuted ? "Unmute call" : "Mute call"}
+                      </span>
+                    
+                  </Button>
+
+                  <Button className="button-content" onClick={stopCallHandler}>
+                   
+                      <span className="button-text">
+                        End Call
+                      </span>
+                  
+                  </Button>
+                </div>
+            }
             <Button className={!voiceBotContextData?.isPublishEnabled ? "publish-button publish-button-disabled" : "publish-button" } onClick={vapiAssistantPublishHandler}>Publish</Button>
           </div>
         </div>
