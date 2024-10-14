@@ -4,6 +4,7 @@ import React, {
   useEffect,
   useRef,
   useCallback,
+  useContext,
 } from 'react';
 import "./call-logs-design.scss";
 import { Input, Slider, Switch, Button, Pagination, Tabs } from 'antd';
@@ -30,6 +31,7 @@ import pause from '../../../../../../public/voiceBot/SVG/pause.svg';
 
 import { Flex, Modal, message, Spin } from 'antd';
 import Transcription from './transcription/Transcription';
+import { CreateVoiceBotContext } from '@/app/_helpers/client/Context/VoiceBotContextApi';
 type ListCallResponseMessage = {
   role: string;
   message: string;
@@ -59,6 +61,10 @@ const formatTime = (seconds: number) =>
 
 
 function CallLogs() {
+
+  const voiceBotContextData: any = useContext(CreateVoiceBotContext);
+  const voicebotDetails = voiceBotContextData.state;
+
   const [loading, setLoading] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(0);
@@ -96,16 +102,25 @@ function CallLogs() {
   let callLogResponse:any;
 
   async function getLogRecord(pageNumber:number = 1,pageLimit:number = 10) {
+
+    
     setLoading(true);
+    debugger;
+
     const options = {
       method: 'GET',
-      headers: {Authorization: 'Bearer 36d15d26-9036-4dcc-b646-0f7564106615'}
+      headers: {Authorization: process.env.NEXT_PUBLIC_VAP_PRI_KEY as string} //private api key
     };
-    callLogResponse = await fetch(`https://api.vapi.ai/v2/call?limit=${pageLimit}&page=${pageNumber}&assistantId=9529df0a-110c-48ee-8de2-6a851e5b4352`, options);
+
+    let assId = voiceBotContextData.assistantInfo["vapiAssistantId"];
+    debugger;
+
+    callLogResponse = await fetch(`https://api.vapi.ai/v2/call?limit=${pageLimit}&page=${pageNumber}&assistantId=${assId}`, options);
     const data = await callLogResponse.json();
     setCallLogsList(data.results);
     setCallLogUrl(data.results[0].recordingUrl);
     const firstCallLog = data.results[0];
+    debugger;
 
     let resData: ListCallResponse = {
       id: firstCallLog.id,
@@ -144,7 +159,7 @@ function CallLogs() {
   }
 
   useEffect( () => {
-  
+  debugger;
     getLogRecord();
 
   }, []);
@@ -155,6 +170,7 @@ function CallLogs() {
     setSelectedLog(index);
     setCallLogUrl(callLogsList[index].recordingUrl);
     const data = callLogsList[index];
+    debugger;
 
     let resData: ListCallResponse = {
       id: data.id,
@@ -255,7 +271,7 @@ const formatCallDuration = (createdAt: string, endedAt: string): string => {
                               </p>
                           </div>
                           <div className='switch-input'>
-                            <h3>{contact.endedReason.split("-").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")}</h3>
+                            <h3>{contact?.endedReason?.split("-").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")}</h3>
                           </div>
                         </div>
                       </div>
