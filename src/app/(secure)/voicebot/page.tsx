@@ -181,7 +181,10 @@ export default function VoiceBot() {
       
             const assistantCreateResponseParse = await assistantCreateResponse.json();
             debugger;
-            voiceBotContextData.setAssistantMongoId(assistantCreateResponseParse?.result?.insertedId);            
+            voiceBotContextData.setAssistantMongoId(assistantCreateResponseParse?.result?.insertedId); 
+            let assistantData = assistantCreateResponseParse?.record;;
+            voiceBotContextData.setAssistantInfo(assistantData);            
+
             router.push(`/voicebot/dashboard?voicBotName=${assistantName}`);
           }
           catch(error: any) {
@@ -189,12 +192,12 @@ export default function VoiceBot() {
             message.error(error.message);
           }
        
-          debugger;
+     
         }
       }
     }
 
-    debugger;
+   
     // router.push("/voicebot/dashboard");
     // router.push({
     //   pathname: "/voicebot/dashboard",
@@ -290,6 +293,8 @@ export default function VoiceBot() {
           const assistantCreateResponseParse = await assistantCreateResponse.json();
           debugger;
           voiceBotContextData.setAssistantMongoId(assistantCreateResponseParse?.result?.insertedId);  
+          let assistantData = assistantCreateResponseParse?.record;;
+            voiceBotContextData.setAssistantInfo(assistantData);
           setAcknowledgedData({
             isAcknowledged: assistantCreateResponseParse?.result?.acknowledged,
             insertedId: assistantCreateResponseParse?.result?.insertedId

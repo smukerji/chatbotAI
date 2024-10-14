@@ -62,6 +62,8 @@ function Dashboard() {
   let tabValue = "model";
 
   useEffect(() => {
+    let data = voiceBotContextData?.assistantInfo;
+    console.log(data);
     debugger;
     if (!voiceBotContextData?.assistantInfo) {
       router.push("/chatbot");

@@ -25,7 +25,13 @@ async function createVoiceBot(req: NextRequest) {
         }
         
         const result = await collection?.insertOne(voicBotData);
-        return { result };
+        if(result.insertedId){
+            const insertedRecord = await collection?.findOne({ _id: result.insertedId });
+            return { record: insertedRecord , result};
+        } else {
+            return { error: "Failed to insert record" };
+        }
+     
         
     }
     catch (error: any) {
