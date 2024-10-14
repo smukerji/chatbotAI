@@ -259,6 +259,12 @@ useEffect(() => {
     router.push("/home/pricing");
   };
 
+
+  const createVoiceBotHandler = () => {
+    voiceBotContextData.reInitiateState();
+    router.push("/voicebot");
+  }
+
   /// view chatbot
   function openChatbot(id: any) {
     /// send the user to dashboard page
@@ -312,10 +318,7 @@ useEffect(() => {
               </div>
               {/* <Link href={`${process.env.NEXT_PUBLIC_WEBSITE_URL}home`}> */}
              { isVoiceBotActived ?
-             <button onClick={()=>{
-
-              router.push("/voicebot");
-             }}>
+             <button onClick={createVoiceBotHandler}>
                 New Voicebot
              </button>
              :
