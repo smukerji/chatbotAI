@@ -163,6 +163,10 @@ export const VoiceBotDataProvider = ({ children }: { children: ReactNode }) => {
     }));
   };
 
+  const reInitiateState = () => {
+    setState(initialState);
+  }
+
   const updateTheVoiceBotInfo = (key: any) => (value: any) => {
     // debugger;
     setState((prevState) => ({ ...prevState, [key]: value }));
@@ -173,7 +177,7 @@ export const VoiceBotDataProvider = ({ children }: { children: ReactNode }) => {
     const { messages: modelMessages, provider: modelProvider, model: modelsModel, maxTokens } = state.model;
     const {chunkPlan} = state.voice;
     const {punctuationBoundaries,minCharacters} = chunkPlan;
-    debugger;
+
     if (provider && model && language && modelProvider && modelsModel && state.firstMessage && state.name && maxTokens && punctuationBoundaries.length > 0 && minCharacters > 0 && modelMessages[0].content.length > 0) {
       setIsPublishEnabled(true);
     } else {
@@ -182,7 +186,7 @@ export const VoiceBotDataProvider = ({ children }: { children: ReactNode }) => {
   }, [state]);
 
   return (
-    <CreateVoiceBotContext.Provider value={{ state, updateState, updateTheVoiceBotInfo, currentAssistantPage, setCurrentAssistantPage, isLoading, setIsLoading, setAssistantMongoId, assistantMongoId, assistantVapiId, setAssistantVapiId, assistantInfo, setAssistantInfo , isPublishEnabled}}>
+    <CreateVoiceBotContext.Provider value={{ state, updateState, updateTheVoiceBotInfo, currentAssistantPage, setCurrentAssistantPage, isLoading, setIsLoading, setAssistantMongoId, assistantMongoId, assistantVapiId, setAssistantVapiId, assistantInfo, setAssistantInfo , isPublishEnabled, reInitiateState}}>
       {children}
     </CreateVoiceBotContext.Provider>
   );
