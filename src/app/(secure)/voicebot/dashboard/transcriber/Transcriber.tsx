@@ -438,7 +438,7 @@ function Transcriber() {
   return (
     <div className="transcribe-container">
       <div className="left-column">
-        <h4 className="provider">Provider</h4>
+        <h4 className="provider">Provider <span style={{ fontWeight: 'bold', color: providerValidationMessage ? 'red' : 'black' }}>*</span></h4>
         <Select
           className={providerValidationMessage ? "select-field error-provider" : "select-field"}
           placeholder="Select the provider"
@@ -449,7 +449,7 @@ function Transcriber() {
         />
         {providerValidationMessage && <p className="invalidation-message">{providerValidationMessage}</p>}
 
-        <h4 className="provider model">Model</h4>
+        <h4 className="provider model">Model <span style={{ fontWeight: 'bold', color: modelValidationMessage ? 'red' : 'black' }}>*</span></h4>
         <Select
           className={modelValidationMessage ? "select-field error-model" : "select-field"}
           placeholder="Select the model"
@@ -465,7 +465,7 @@ function Transcriber() {
 
       </div>
       <div className="right-column">
-        <h4 className="provider language">Language</h4>
+        <h4 className="provider language">Language <span style={{ fontWeight: 'bold', color: languageValidationMessage ? 'red' : 'black' }}>*</span></h4>
         <Select
           className={languageValidationMessage ? "select-field error-language" : "select-field"}
           placeholder="Select the Language"

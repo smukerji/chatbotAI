@@ -189,7 +189,9 @@ function Model() {
     <div className="model-container">
 
       <div className="left-column">
-        <h4 className="input-header">First Message</h4>
+        <h4 className="input-header">First Message <span style={{ fontWeight: 'bold', color: inputValidationMessage ? 'red' : 'black' }}>*</span>
+
+        </h4>
         <p className="input-description">The first message that the assistant will say.</p>
         <Input className={inputValidationMessage ? "input-field invalid-input" : "input-field"} 
         placeholder="Hi, Provide me the first message!" 
@@ -198,7 +200,7 @@ function Model() {
 
         {inputValidationMessage && <p className="invalidation-message">{inputValidationMessage}</p>}
 
-        <h4 className="input-header second">System Prompt</h4>
+        <h4 className="input-header second">System Prompt <span style={{ fontWeight: 'bold', color: systemPromptValidationMessage ? 'red' : 'black' }}>*</span></h4>
         <p className="input-description">The context allows you to customize your voicebot&lsquo;s personality, role and instructions. </p>
         
         <TextArea className={systemPromptValidationMessage ? "text-area invalid-input" : "text-area"}
@@ -211,7 +213,7 @@ function Model() {
       </div>
 
       <div className="right-column">
-        <h4 className="provider">Provider</h4>
+        <h4 className="provider">Provider <span style={{ fontWeight: 'bold', color: providerValidationMessage ? 'red' : 'black' }}>*</span></h4>
         <Select
           className={providerValidationMessage ? "select-field error-provider" : "select-field"}
           placeholder="Select the provider"
@@ -222,8 +224,7 @@ function Model() {
         />
         {providerValidationMessage && <p className="invalidation-message">{providerValidationMessage}</p>}
 
-
-        <h4 className="provider model">Model</h4>
+        <h4 className="provider model">Model <span style={{ fontWeight: 'bold', color: modelValidationMessage ? 'red' : 'black' }}>*</span></h4>
         <Select
           className={modelValidationMessage ? "select-field error-model" : "select-field"}
           placeholder="Select the model"
