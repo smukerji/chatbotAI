@@ -143,7 +143,7 @@ function Model() {
 
   const maxTokenChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    // debugger
+    debugger
     setMaxToken(value);
     const intValue = parseInt(value, 10);
     if (!isNaN(intValue) && intValue <= 1000) {
@@ -265,7 +265,7 @@ function Model() {
 
         <Slider className="slider" step={0.1} min={0} max={2} value={stepsCount} onChange={stepsCountChangeHandler} />
 
-        <h4 className="man-token">Max Token</h4>
+        <h4 className="man-token">Max Token <span style={{ fontWeight: 'bold', color: validationMessage ? 'red' : 'black' }}>*</span></h4>
 
         <Input
           className={validationMessage ? "max-token-input invalid-input" : "max-token-input"}
