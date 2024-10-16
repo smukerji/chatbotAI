@@ -178,7 +178,7 @@ export const VoiceBotDataProvider = ({ children }: { children: ReactNode }) => {
     const {chunkPlan} = state.voice;
     const {punctuationBoundaries,minCharacters} = chunkPlan;
 
-    if (provider && model && language && modelProvider && modelsModel && state.firstMessage && state.name && maxTokens && punctuationBoundaries.length > 0 && minCharacters > 0 && modelMessages[0].content.length > 0) {
+    if (provider && model && language && modelProvider && modelsModel && state.firstMessage && state.name && maxTokens && (typeof maxTokens === 'number') && punctuationBoundaries.length > 0 && minCharacters > 0 && modelMessages[0].content.length > 0) {
       setIsPublishEnabled(true);
     } else {
       setIsPublishEnabled(false);
