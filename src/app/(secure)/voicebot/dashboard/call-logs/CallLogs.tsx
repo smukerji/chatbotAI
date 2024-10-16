@@ -115,47 +115,55 @@ function CallLogs() {
     let assId = voiceBotContextData.assistantInfo["vapiAssistantId"];
     debugger;
 
-    callLogResponse = await fetch(`https://api.vapi.ai/v2/call?limit=${pageLimit}&page=${pageNumber}&assistantId=${assId}`, options);
-    const data = await callLogResponse.json();
-    setCallLogsList(data.results);
-    setCallLogUrl(data.results[0].recordingUrl);
-    const firstCallLog = data.results[0];
-    debugger;
+    try {
+      callLogResponse = await fetch(`https://api.vapi.ai/v2/call?limit=${pageLimit}&page=${pageNumber}&assistantId=${assId}`, options);
+      const data = await callLogResponse.json();
+      setCallLogsList(data.results);
+      setCallLogUrl(data.results[0]?.recordingUrl);
+      const firstCallLog = data.results[0];
+      debugger;
 
-    let resData: ListCallResponse = {
-      id: firstCallLog.id,
-      assistantId: firstCallLog.assistantId,
-      type: firstCallLog.type,
-      startedAt: firstCallLog.startedAt,
-      endedAt: firstCallLog.endedAt,
-      transcript: firstCallLog.transcript,
-      recordingUrl: firstCallLog.recordingUrl,
-      summary: firstCallLog.summary,
-      createdAt: firstCallLog.createdAt,
-      updatedAt: firstCallLog.updatedAt,
-      orgId: firstCallLog.orgId,
-      cost: firstCallLog.cost,
-      status: firstCallLog.status,
-      endedReason: firstCallLog.endedReason,
-      messages: firstCallLog.messages,
-    };
+      let resData: ListCallResponse = {
+        id: firstCallLog.id,
+        assistantId: firstCallLog.assistantId,
+        type: firstCallLog.type,
+        startedAt: firstCallLog.startedAt,
+        endedAt: firstCallLog.endedAt,
+        transcript: firstCallLog.transcript,
+        recordingUrl: firstCallLog.recordingUrl,
+        summary: firstCallLog.summary,
+        createdAt: firstCallLog.createdAt,
+        updatedAt: firstCallLog.updatedAt,
+        orgId: firstCallLog.orgId,
+        cost: firstCallLog.cost,
+        status: firstCallLog.status,
+        endedReason: firstCallLog.endedReason,
+        messages: firstCallLog.messages,
+      };
 
-     //set the callListData
-     setCallListData(resData);
+      //set the callListData
+      setCallListData(resData);
 
 
 
-    //manage the pagination data
-    let totalPage = data.metadata.totalItems / data.metadata.itemsPerPage;
-    if(totalPage % 1 !== 0){
-      totalPage = Math.floor(totalPage) + 1;
-      totalPage = totalPage * pageLimit;
+      //manage the pagination data
+      let totalPage = data.metadata.totalItems / data.metadata.itemsPerPage;
+      if (totalPage % 1 !== 0) {
+        totalPage = Math.floor(totalPage) + 1;
+        totalPage = totalPage * pageLimit;
+      }
+
+      setTotalPages(totalPage);
+
+      setLoading(false);
+
+    }
+    catch (error: any) {
+
+      setLoading(false);
     }
 
-    setTotalPages(totalPage);
     
-    setLoading(false);
-
   }
 
   useEffect( () => {
@@ -247,6 +255,7 @@ const formatCallDuration = (createdAt: string, endedAt: string): string => {
     <div className='call-log-container'>
       {
         !loading ? (
+          callLogsList.length > 1 ?          
     <>
             <div className='top-container'>
               <Button>Today</Button>
@@ -330,7 +339,13 @@ const formatCallDuration = (createdAt: string, endedAt: string): string => {
               </div>
 
             </div>
-          </>
+            </>
+            :
+            <>
+              <div>
+                No Data available
+              </div>
+            </>
         ) : (
           <Flex align="center" gap="middle" className="loader">
           <Spin size="large" />

@@ -99,6 +99,9 @@ function Transcriber() {
     }
   }
 
+
+  
+
   const languageChangeHandlerListUpdate = () => {
     if(language.length === 0 && selectedProvider){
       const selectedProviderList = providerList.find(provider => provider.label === selectedProvider);
