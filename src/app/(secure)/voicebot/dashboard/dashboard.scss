@@ -45,6 +45,7 @@
     .middle-container {
       display: flex;
       justify-content: space-between;
+      // position: relative;
 
 
       .list-container {
@@ -90,7 +91,33 @@
       .button-container {
         display: flex;
         gap: 12px;
+        position: relative;
 
+
+        .circle-button{
+          border-radius: 12px;
+          border: 1px solid var(--Neutral-4, #B1B5C3);
+        
+          height: 100%;
+          padding: 0;
+          width: 100%;
+          .cirle-button-inner-wrapper{
+            display: flex;
+            padding: 13px 14px;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+          }
+        }
+      
+        .content-holder{
+          position: absolute;
+          z-index: 2;
+          border-radius: 16px;
+          background:  #FCFCFD;
+          box-shadow: 0px 4px 26px 0px rgba(0, 0, 0, 0.16);
+          top: 78px;
+        }
 
         .demo-call-button {
           height: 100%;
@@ -136,6 +163,8 @@
         }
       }
 
+     
+
 
       .publish-button {
         padding: 12px 16px;
@@ -157,6 +186,21 @@
       }
     }
   }
+
+  .additional-circle-items-behinds{
+    position: fixed;
+    z-index: 1;
+    height: 100%;
+    width: 100%;
+    top: 70px;
+    left: 0;
+    background: rgb(169 163 163 / 0%);
+    backdrop-filter: blur(1px);
+  }
+  .additional-circle-items-behinds-hide{
+    display: none;
+  }
+
 }
 
 .bottom {
