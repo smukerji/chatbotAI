@@ -17,6 +17,7 @@ import { useRouter, useSearchParams} from "next/navigation";
 
 import leftArrow from "../../../../../public/voiceBot/SVG/arrow-left.svg"
 import callOutgoing from "../../../../../public/voiceBot/SVG/call-outgoing.svg"
+import moreCircle from "../../../../../public/voiceBot/more-circle.svg"
 
 import arrowIcon from "../../../../../public/svgs/Feather Icon.svg";
 import Image from "next/image";
@@ -52,6 +53,8 @@ function Dashboard() {
 
   const [isListening, setIsListening] = useState(CALLSTATUS.VOID);
   const [isMuted, setIsMuted] = useState(false);
+  
+  const [isMoreContentVisible, setIsMoreContentVisible] = useState(false);
 
   const [showMakeCallButton, setShowMakeCallButton] = useState(true);
 
@@ -64,7 +67,6 @@ function Dashboard() {
   useEffect(() => {
     let data = voiceBotContextData?.assistantInfo;
     console.log(data);
-    debugger;
     if (!voiceBotContextData?.assistantInfo) {
       router.push("/chatbot");
     }
@@ -73,13 +75,11 @@ function Dashboard() {
 
       //get the assistant record from the vapi's side
 
-
     }
     else{
       //  the system prompt based on the mongo record
 
     }
-    debugger;
     if(voiceBotContextData?.assistantInfo?.assistantName){
       voiceBotContextData.updateState("name",voiceBotContextData?.assistantInfo?.assistantName);
     }
@@ -157,6 +157,10 @@ function Dashboard() {
     }
   }
 
+  const showAdditionalContentItemHandler = () => {
+    setIsMoreContentVisible(!isMoreContentVisible);
+  }
+
 
 
   const vapiAssistantPublishHandler = async () => {
@@ -174,7 +178,6 @@ function Dashboard() {
     
     try{
 
-      debugger;
       const assistantCreateResponse = await fetch(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/vapi/assistant`,
         {
@@ -242,9 +245,18 @@ function Dashboard() {
               <li className={tab == "call-logs" ? "active" : ""} onClick={() => changeHandler("call-logs")}>Call Logs</li>
 
             </ul>
-            <hr />
+            <hr style={{ width: "830px" }} />
           </div>
           <div className="button-container">
+            <Button className="circle-button" onClick={showAdditionalContentItemHandler}>
+              <div className="cirle-button-inner-wrapper">
+              <Image width={24} height={24} alt="arrow" src={moreCircle}></Image>
+              </div>
+            </Button>
+            
+            <div className="content-holder">
+                additional items
+              </div>
             {
               showMakeCallButton ?
 
@@ -284,6 +296,7 @@ function Dashboard() {
             }
             <Button className={!voiceBotContextData?.isPublishEnabled ? "publish-button publish-button-disabled" : "publish-button" } onClick={vapiAssistantPublishHandler}>Publish</Button>
           </div>
+          
         </div>
       </div>
       <div className="bottom">
@@ -354,6 +367,12 @@ function Dashboard() {
         }
 
       </div>
+
+      <div className={isMoreContentVisible ? "additional-circle-items-behinds" : "additional-circle-items-behinds-hide"}>
+              
+        </div>
+
+    
 
 
     </div>
