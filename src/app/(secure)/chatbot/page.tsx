@@ -61,6 +61,7 @@ function Chatbot() {
 
   /// loading state
   const [loading, setLoading] = useState(false);
+  const [voiceBotLoading, setVoiceBotLoading] = useState(false);
 
   /// state for showing the chabot list
   const [listType, setListType]: any = useState("grid");
@@ -97,18 +98,29 @@ function Chatbot() {
   }
 
   const getAllVoiceAssistantData = async () => {
- 
-    debugger;
-    const res = await fetch(
-     `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/assistant?userId=${cookies.userId}`,
-      {
-        method: "GET",
-      }
-    );
-    const data = await res.json();
+    setVoiceBotLoading(true);
+    try{
+      debugger;
+      const res = await fetch(
+       `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/assistant?userId=${cookies.userId}`,
+        {
+          method: "GET",
+        }
+      );
+      const data = await res.json();
+  
+      debugger;
+      setVoiceAssistantList(data?.assistants);
+    }
+    catch(error:any){
+      console.log("Error in fetching voice assistant data", error);
+      message.error("Error in fetching voice assistant data");
 
-    debugger;
-    setVoiceAssistantList(data?.assistants);
+    }
+    finally{
+      setVoiceBotLoading(false);
+    }
+   
     
   }
 
@@ -299,8 +311,10 @@ useEffect(() => {
         >
           {/*------------------------------------------title----------------------------------------------*/}
           <div className="title-container">
-            <h1 className={!isVoiceBotActived ? "title activate-title" : "title"} onClick={ ()=> voiceBotActiveDeactiveHandler(false) }>My Chatbots</h1>
-            <h1 className={isVoiceBotActived ? "title activate-title" : "title"} onClick={()=> voiceBotActiveDeactiveHandler(true)}>My Voicebot</h1>
+            <div className="title-header-container">
+              <h1 className={!isVoiceBotActived ? "title activate-title" : "title"} onClick={ ()=> voiceBotActiveDeactiveHandler(false) }>My Chatbots</h1>
+              <h1 className={isVoiceBotActived ? "title activate-title" : "title"} onClick={()=> voiceBotActiveDeactiveHandler(true)}>My Voicebot</h1>
+            </div>
 
             <div className="action-container">
               <div className="chatbot-list-action">
@@ -450,34 +464,52 @@ useEffect(() => {
 
               </>
               :
-              <div className="voicebot-list-container">
-                {voiceAssistantList.map((assistant: any, index: number) => (
-                  <div key={index} className="voicebot-list-card" onClick={()=> selectedAssistantHandler(assistant) }>
-                    <div className="assistant-image">
-                      <Image alt="assistant image" src={voiceAssistantPreview}></Image>
-                    </div>
-                    <div className="assistant-title">{assistant.assistantName}</div>
-                    <div className="info-content">
-                      <div className="info">
-                        <div className="info-label">Total Minutes:</div>
-                        <div className="value">100</div>
+              <>
+                {
+                  voiceBotLoading ?
+                    <Spin indicator={antIcon} />
+                    : voiceAssistantList?.length == 0 ?
+                      <div className="no-chatbots-container">
+                        <Image src={noChatbotBg} alt="no-chatbot-bg" />
+                        <p>
+                          You haven&apos;t created any Voicebot. Go ahead and create a New
+                          Voicebot!
+                        </p>
                       </div>
-                      <div className="info">
-                        <div className="info-label">Call Count:</div>
-                        <div className="value">90</div>
+                      : 
+                      <div className="voicebot-list-container">
+                        {voiceAssistantList.map((assistant: any, index: number) => (
+                          <div key={index} className="voicebot-list-card" onClick={() => selectedAssistantHandler(assistant)}>
+                            <div className="assistant-image">
+                              <Image alt="assistant image" src={voiceAssistantPreview}></Image>
+                            </div>
+                            <div className="assistant-title">{assistant.assistantName}</div>
+                            <div className="info-content">
+                              <div className="info">
+                                <div className="info-label">Total Minutes:</div>
+                                <div className="value">100</div>
+                              </div>
+                              <div className="info">
+                                <div className="info-label">Call Count:</div>
+                                <div className="value">90</div>
+                              </div>
+                              <div className="info">
+                                <div className="info-label">Last Trained:</div>
+                                <div className="value">9</div>
+                              </div>
+                              <div className="info">
+                                <div className="info-label">Last Used:</div>
+                                <div className="value">Yesterday</div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                      <div className="info">
-                        <div className="info-label">Last Trained:</div>
-                        <div className="value">9</div>
-                      </div>
-                      <div className="info">
-                        <div className="info-label">Last Used:</div>
-                        <div className="value">Yesterday</div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                }
+
+
+              </>
+             
           }
         </div>
         
