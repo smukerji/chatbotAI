@@ -89,9 +89,9 @@ const HeaderAssistant = () => {
             </div>
           </div>
         </div>
-        {/* <div className="login-register-container">
+        <div className="login-register-container">
           <AuthBtn />
-        </div> */}
+        </div>
       </div>
     </>
   );

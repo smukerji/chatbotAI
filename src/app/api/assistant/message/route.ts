@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 
 export async function POST(req: NextRequest) {
@@ -6,7 +6,9 @@ export async function POST(req: NextRequest) {
     apiKey: process.env.NEXT_PUBLIC_OPENAI_KEY,
   });
 
-  const { message, threadId }: any = req.json();
+  const assistantId: any = process.env.NEXT_PUBLIC_ASSISTANT_ID;
+
+  const { message, threadId }: any = await req.json();
 
   if (!message || !threadId) {
     return {
@@ -20,11 +22,11 @@ export async function POST(req: NextRequest) {
       content: message,
     });
 
-    console.log("thread message", threadMessages);
+    const stream = await openai.beta.threads.runs.stream(threadId, {
+      assistant_id: assistantId,
+    });
 
-    return {
-      message: threadMessages,
-    };
+    return new Response(stream.toReadableStream());
   } catch (error) {
     return {
       error: error,

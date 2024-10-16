@@ -36,6 +36,8 @@ export default function AuthBtn() {
 
   const isLoggedIn = session?.user || userId !== undefined;
 
+  console.log("window", window.location.pathname);
+
   return (
     <>
       {/* <div
@@ -71,22 +73,32 @@ export default function AuthBtn() {
         </div>
       ) : (
         <>
-          <div
-            className="login-btn"
-            onClick={() => {
-              const dataToSend = {
-                key: window.location.pathname + window.location.hash,
-              };
-              const queryString = new URLSearchParams(dataToSend).toString();
-              window.location.href = `/account/login?${queryString}`;
-            }}
-          >
-            Log In
-          </div>
+          {window.location.pathname !== "/home-assistant" ? (
+            <>
+              <div
+                className="login-btn"
+                onClick={() => {
+                  const dataToSend = {
+                    key: window.location.pathname + window.location.hash,
+                  };
+                  const queryString = new URLSearchParams(
+                    dataToSend
+                  ).toString();
+                  window.location.href = `/account/login?${queryString}`;
+                }}
+              >
+                Log In
+              </div>
 
-          <a href="/account/register" style={{ textDecoration: "none" }}>
-            <div className="try-free-btn">Register</div>
-          </a>
+              <a href="/account/register" style={{ textDecoration: "none" }}>
+                <div className="try-free-btn">Register</div>
+              </a>
+            </>
+          ) : (
+            <a href={`/account/login`} style={{ textDecoration: "none" }}>
+              <div className="try-free-btn login">Log in</div>
+            </a>
+          )}
         </>
       )}
     </>

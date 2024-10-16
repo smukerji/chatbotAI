@@ -3,4 +3,18 @@
   background-size: cover;
   background-position: center;
   height: 100vh;
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background: url("../../../../public/home-assistant/Ellipse.png") no-repeat;
+    background-size: clamp(390px, 25vw, 24vw);
+    background-position: left bottom;
+    width: 25%;
+    height: 30%;
+    z-index: 1;
+  }
 }

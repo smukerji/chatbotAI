@@ -429,6 +429,8 @@ function Chat({
     // }
   }
 
+  console.log("messages", messages);
+
   /// refresh the chat window
   const refreshChat = () => {
     setMessages([]);

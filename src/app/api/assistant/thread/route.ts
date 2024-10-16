@@ -1,3 +1,4 @@
+import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
 export async function GET() {
@@ -8,11 +9,9 @@ export async function GET() {
   try {
     const thread = await openai.beta.threads.create();
 
-    console.log("thread", thread);
-
-    return {
-      thread: thread,
-    };
+    return NextResponse.json({
+      thread,
+    });
   } catch (error) {
     return {
       error: error,
