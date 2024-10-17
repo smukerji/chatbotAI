@@ -9,7 +9,7 @@ import {
   RadioChangeEvent,
 } from "antd";
 import Model from "../dashboard/model/Model";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState,useRef } from "react";
 import dynamic from "next/dynamic";
 import "./dashboard.scss";
 import { useRouter, useSearchParams} from "next/navigation";
@@ -18,6 +18,11 @@ import { useRouter, useSearchParams} from "next/navigation";
 import leftArrow from "../../../../../public/voiceBot/SVG/arrow-left.svg"
 import callOutgoing from "../../../../../public/voiceBot/SVG/call-outgoing.svg"
 import moreCircle from "../../../../../public/voiceBot/more-circle.svg"
+
+import documentCopy from "../../../../../public/voiceBot/document-copy.svg"
+
+import documentTrash from "../../../../../public/voiceBot/documents-trash.svg"
+
 
 import arrowIcon from "../../../../../public/svgs/Feather Icon.svg";
 import Image from "next/image";
@@ -60,6 +65,8 @@ function Dashboard() {
 
   const voiceBotContextData: any = useContext(CreateVoiceBotContext);
   const voicebotDetails = voiceBotContextData.state;
+
+  const divRef = useRef<HTMLDivElement>(null);
 
 
   let tabValue = "model";
@@ -158,7 +165,12 @@ function Dashboard() {
   }
 
   const showAdditionalContentItemHandler = () => {
-    setIsMoreContentVisible(!isMoreContentVisible);
+
+    //prevent the div to disappear instantly
+    setTimeout(() => {
+      setIsMoreContentVisible(!isMoreContentVisible);
+    }, 0);
+
   }
 
 
@@ -216,6 +228,26 @@ function Dashboard() {
     setTab(value);
   }
 
+  const tatabyebyeHandler = () => {
+    setIsMoreContentVisible(false);
+  }
+
+  
+  const handleDocumentClick = (event: MouseEvent) => {
+    // debugger;
+    if (divRef.current && !divRef.current.contains(event.target as Node)) {
+      setIsMoreContentVisible(false);
+    }
+  };
+
+
+  useEffect(() => {
+    document.addEventListener('click', handleDocumentClick);
+    return () => {
+      document.removeEventListener('click', handleDocumentClick);
+    };
+  }, []);
+
   return (
   
     <div className="voice-bot-container">
@@ -254,9 +286,21 @@ function Dashboard() {
               </div>
             </Button>
             
-            <div className="content-holder">
-                additional items
-              </div>
+           { isMoreContentVisible && (<div ref={divRef} className="content-holder"  onClick={(e) => e.stopPropagation()} >
+              <Button className="duplicate-assistant-button">
+                <div className="duplicate-assistant-button-content">
+                  <Image alt="" src={documentCopy} className="duplicate-assistant-button-icon"></Image>
+                  <span className="duplicate-assistant-button-text">Duplicate</span>
+                </div>
+              </Button>
+              <Button className="delete-assistant-button">
+                <div className="delete-assistant-button-content">
+                  <Image alt="" src={documentTrash} className="delete-assistant-button-icon"></Image>
+                  <span className="delete-assistant-button-text">Delete</span>
+                </div>
+              </Button>
+            </div>)
+            }
             {
               showMakeCallButton ?
 
@@ -368,9 +412,9 @@ function Dashboard() {
 
       </div>
 
-      <div className={isMoreContentVisible ? "additional-circle-items-behinds" : "additional-circle-items-behinds-hide"}>
+      {/* <div className={isMoreContentVisible ? "additional-circle-items-behinds" : "additional-circle-items-behinds-hide"} onClick={tatabyebyeHandler}>
               
-        </div>
+        </div> */}
 
     
 

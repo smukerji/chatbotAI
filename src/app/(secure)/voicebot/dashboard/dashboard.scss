@@ -111,12 +111,66 @@
         }
       
         .content-holder{
+          display: flex;
+          width: 157px;
+          padding: 16px;
+          flex-direction: column;
+          gap: 20px;
           position: absolute;
           z-index: 2;
           border-radius: 16px;
           background:  #FCFCFD;
           box-shadow: 0px 4px 26px 0px rgba(0, 0, 0, 0.16);
           top: 78px;
+
+          .duplicate-assistant-button{
+            border: none;
+            padding: 0;
+            background: #FCFCFD;
+            box-shadow: none;
+
+            .duplicate-assistant-button-content{
+              display: flex;
+              gap: 1rem;
+
+              justify-content: center;
+              align-items: center;
+              place-content: flex-start;
+              .duplicate-assistant-button-text{
+                color: #141416;
+                text-align: center;
+                font-size: 16px;
+                font-style: normal;
+                font-weight: 500;
+                line-height: 24px;
+              }
+            }
+          }
+
+          .delete-assistant-button{
+            border: none;
+            padding: 0;
+            background: #FCFCFD;
+            box-shadow: none;
+
+            .delete-assistant-button-content{
+              display: flex;
+              gap: 1rem;
+
+              justify-content: center;
+              align-items: center;
+              place-content: flex-start;
+              .delete-assistant-button-text{
+                color: #DB0000;
+                text-align: center;
+                /* Body/Medium */
+                font-size: 16px;
+                font-style: normal;
+                font-weight: 500;
+                line-height: 24px; 
+              }
+            }
+          }
         }
 
         .demo-call-button {
