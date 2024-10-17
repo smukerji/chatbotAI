@@ -133,7 +133,7 @@ function Chatbot() {
     // if(assistantInfo?.vapiId){
     //   voiceBotContextData.setAssistantVapiId(assistantInfo.vapiId);
     // }
-
+    voiceBotContextData.setCurrentAssistantPage(0);
     router.push("/voicebot/dashboard");
   }
 
