@@ -18,8 +18,6 @@ function Property() {
   const [properties, setProperties] = useState<{ id: number; type: string; name: string; description: string,saved:boolean }[]>([]);
   const [currentProperty, setCurrentProperty] = useState<{ id: number; type: string; name: string; description: string }>();
 
-
-
   useEffect(() => {
     if (properties.every(prop => prop.saved)) {
       setCurrentProperty(undefined);
@@ -129,12 +127,17 @@ function Property() {
           value={property.type ? property.type : undefined}
           onChange={(_: string, options: any) => storedPropertyByIndexChangeHandler(property.id, 'type', options.label)}
           options={[
-          { value: '1', label: 'String' },
-          { value: '2', label: 'Number' },
-          { value: '3', label: 'Boolean' },
-          { value: '4', label: 'Object' },
-          { value: '5', label: 'Array' }
+          { value: '1', label: 'string' },
+          { value: '2', label: 'number' },
+          { value: '3', label: 'boolean' },
+          { value: '4', label: 'object' },
+          { value: '5', label: 'array' },
+          { value: '6', label: 'integer'}
           ]}
+
+          /**
+           * string, number, integer, boolean, array, object
+           */
           // disabled={property.saved}
         />
         <div className="button-wrapper">

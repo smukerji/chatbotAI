@@ -34,7 +34,7 @@ const initialState = {
     //     server: { timeoutSeconds: 20, url: "", secret: "" },
     //   },
     // ],
-    toolIds: [""],
+    toolIds: [""],//we deleted this field in the backend
     provider: "",
     model: "",
     temperature: 0,
@@ -104,16 +104,17 @@ const initialState = {
     structuredDataSchema: {
       type: "object",  properties: [""],/**this type is {} not [], [] is given for ui manage only. This need to refactor before the time value send to the vapi server */
     },
-    artifactPlan: { recordingEnabled: true, videoRecordingEnabled: false, recordingS3PathPrefix: "" },
-    messagePlan: { idleMessages: [] /**this need to be update before sending to the vapi server. */, idleMessageMaxSpokenCount: 5.5, idleTimeoutSeconds: 17.5 },
+    
+    artifactPlan: { recordingEnabled: true, videoRecordingEnabled: false, recordingS3PathPrefix: "" },//deleted
+    messagePlan: { idleMessages: [] /**this need to be update before sending to the vapi server. */, idleMessageMaxSpokenCount: 5.5, idleTimeoutSeconds: 17.5 },//delete
     startSpeakingPlan: {
       waitSeconds: 0.4,
       smartEndpointingEnabled: false,
       transcriptionEndpointingPlan: { onPunctuationSeconds: 0.1, onNoPunctuationSeconds: 1.5, onNumberSeconds: 0.5 },
-    },
-    stopSpeakingPlan: { numWords: 0, voiceSeconds: 0.2, backoffSeconds: 1 },
-    monitorPlan: { listenEnabled: false, controlEnabled: false },
-    credentialIds: [""],
+    },//deleted
+    stopSpeakingPlan: { numWords: 0, voiceSeconds: 0.2, backoffSeconds: 1 },//deleted
+    monitorPlan: { listenEnabled: false, controlEnabled: false },//deleted
+    credentialIds: [""],//deleted
   },
 };
 

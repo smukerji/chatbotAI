@@ -4,7 +4,8 @@ import clientPromise from "../../../../../../../db";
 import { ObjectId } from "mongodb";
 
 module.exports = apiHandler({
-    POST: createVapiAssistant
+    POST: createVapiAssistant,
+    GET: getSingleAssistantDataFromVapi
   });
 
   //  voicebot/dashboard/api/template
@@ -32,7 +33,6 @@ async function createVapiAssistant(req: NextRequest) {
         vapiData.analysisPlan.structuredDataSchema.properties = propertiesObject;
     }
     else{
-      vapiData.analysisPlan.structuredDataSchema.properties = {};
       delete vapiData.analysisPlan.structuredDataSchema;
       }
 
@@ -117,14 +117,55 @@ async function createVapiAssistant(req: NextRequest) {
 
         }
 
-    
-      
-        
-       
-        
     }
     catch (error: any) {
         return { error: error.message };
     }
+
+}
+
+async function getSingleAssistantDataFromVapi(req: NextRequest) {
+  let step = 1;
+  try{
+
+    const vapiAssiId:string = req.nextUrl.searchParams.get("assistantId") as string;
+
+    if(!vapiAssiId){
+      return { error: "Assistant Id is required" };
+    }
+    //db access
+    const db = (await clientPromise!).db();
+    const collectionVoiceAssistant = db?.collection("voice-assistance");
+
+    //check if the assistant id is exist in the db
+    const voiceBotRecordVapiExist = await collectionVoiceAssistant?.findOne({ 
+      vapiAssistantId: vapiAssiId
+    });
+
+    if (!voiceBotRecordVapiExist) {
+      return { error: "VoiceBot record not found" };
+    }
+
+    //get the assistant data from the vapi server
+
+    const options = {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${process.env.VAPI_PRIVATE_KEY}` }
+    };
+
+    let vapiResponse = await fetch(`https://api.vapi.ai/assistant/${vapiAssiId}`, options);
+
+    let vapiResponseData = await vapiResponse.json();
+    if (!vapiResponseData?.id) {
+      return { error: "Failed to get the assistant" };
+    }
+
+    return { result: vapiResponseData };
+
+  }
+  catch(error:any){
+    console.log(`error in step ${step}`, error);
+    return { error: error.message };
+  }
 
 }
