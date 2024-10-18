@@ -1,0 +1,47 @@
+.pricing-plan {
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8.899999618530273px);
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.heading {
+  color: #23262f;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  text-transform: capitalize;
+  margin: 5px 0;
+}
+
+.price {
+  color: #777e90;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px;
+  span {
+    color: #23262f;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px; /* 150% */
+  }
+}
+
+p {
+  color: #777e90;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  margin: 0 0 5px;
+}
+
+.heading-pricing {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

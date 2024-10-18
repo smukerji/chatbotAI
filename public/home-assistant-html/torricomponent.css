@@ -1,0 +1,36 @@
+.service {
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8.899999618530273px);
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.heading {
+  color: #212121;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  letter-spacing: 0.2px;
+  text-transform: capitalize;
+  margin: 5px 0;
+}
+
+p {
+  color: #606060;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  margin: 0 0 5px;
+}
+
+.main-class {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  background-color: transparent;
+  width: 100%;
+}

@@ -13,8 +13,17 @@ export async function POST(request: NextRequest) {
     threadId,
     runId,
     // { tool_outputs: [{ output: result, tool_call_id: toolCallId }] },
-    { tool_outputs: toolCallOutputs }
+    {
+      tool_outputs: [
+        {
+          output: JSON.stringify(toolCallOutputs[0].output),
+          tool_call_id: toolCallOutputs[0].tool_call_id,
+        },
+      ],
+    }
   );
+
+  console.log("steaaraa", stream.toReadableStream());
 
   return new Response(stream.toReadableStream());
 }

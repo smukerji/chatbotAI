@@ -8,6 +8,7 @@ import axios from "axios";
 import { AssistantStream } from "openai/lib/AssistantStream.mjs";
 import { AssistantStreamEvent } from "openai/resources/beta/assistants.mjs";
 import { RequiredActionFunctionToolCall } from "openai/resources/beta/threads/runs/runs.mjs";
+import Header from "@/app/_components/Header/Header";
 
 const ChatAssistant = () => {
   const chatWindowRef: any = useRef(null);
@@ -68,11 +69,39 @@ const ChatAssistant = () => {
     });
   };
 
-  const functionCallHandler = async (
-    call: RequiredActionFunctionToolCall
-  ) => {};
+  const functionCallHandler = async (call: RequiredActionFunctionToolCall) => {
+    if (
+      call?.function?.name !== "show_pricing_plan" &&
+      call?.function?.name !== "explore_torri_ai" &&
+      call?.function?.name !== "explore_services"
+    )
+      return;
+
+    console.log("call function", call.function);
+
+    if (call?.function?.name === "show_pricing_plan") {
+      const pricingPlan = `
+    <iframe src="http://localhost:3000/home-assistant-html/TorriPricing.html" frameborder="0"></iframe>
+      `;
+
+      return pricingPlan;
+    } else if (call?.function?.name === "explore_services") {
+      const torriServices = `
+    <iframe src="http://localhost:3000/home-assistant-html/TorriServices.html" frameborder="0"></iframe>
+      `;
+      return torriServices;
+    } else {
+      const torriHtmlContent = `
+    <iframe src="http://localhost:3000/home-assistant-html/TorriComponent.html" frameborder="0"></iframe>
+      `;
+      return torriHtmlContent;
+    }
+  };
 
   const submitActionResult = async (runId: any, toolCallOutputs: any) => {
+    console.log("toolcall outputsss", toolCallOutputs);
+    setLoading(true);
+
     const response: any = await fetch(
       `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/assistant/thread/action`,
       {
@@ -87,21 +116,30 @@ const ChatAssistant = () => {
         }),
       }
     );
+
+    console.log("responseee", response);
+
     const stream = AssistantStream.fromReadableStream(response.body);
     handleReadableStream(stream);
+    setLoading(false);
   };
 
   //   handleRequiresAction - handle function call
   const handleRequiresAction = async (event: any) => {
+    setLoading(true);
     const runId = event.data.id;
     const toolCalls = event.data.required_action.submit_tool_outputs.tool_calls;
     // loop over tool calls and call function handler
     const toolCallOutputs = await Promise.all(
       toolCalls.map(async (toolCall: any) => {
         const result = await functionCallHandler(toolCall);
+        console.log("resultttt", result);
+
         return { output: result, tool_call_id: toolCall.id };
       })
     );
+    console.log("tool outputs", toolCallOutputs);
+
     submitActionResult(runId, toolCallOutputs);
   };
 
@@ -134,8 +172,10 @@ const ChatAssistant = () => {
 
     // events without helpers yet (e.g. requires_action and run.done)
     stream.on("event", (event) => {
-      if (event.event === "thread.run.requires_action")
+      if (event.event === "thread.run.requires_action") {
+        setLoading(true);
         handleRequiresAction(event);
+      }
       if (event.event === "thread.run.completed") handleRunCompleted();
     });
   };

@@ -151,6 +151,29 @@
           word-break: break-word;
           white-space: pre-line;
 
+          iframe {
+            body {
+              &::-webkit-scrollbar {
+                width: 5px;
+              }
+
+              /* Track */
+              &::-webkit-scrollbar-track {
+                background: #f1f1f1;
+              }
+
+              /* Handle */
+              &::-webkit-scrollbar-thumb {
+                background: #888;
+              }
+
+              /* Handle on hover */
+              &::-webkit-scrollbar-thumb:hover {
+                background: red;
+              }
+            }
+          }
+
           img {
             width: fit-content;
             max-width: 100%;
