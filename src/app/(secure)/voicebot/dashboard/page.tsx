@@ -78,9 +78,10 @@ function Dashboard() {
       router.push("/chatbot");
     }
 
+    debugger;
     if(voiceBotContextData.assistantInfo?.vapiAssistantId) {
 
-      //get the assistant record from the vapi's side
+      getAssistantData(voiceBotContextData.assistantInfo?.vapiAssistantId);
 
     }
     else{
@@ -91,6 +92,100 @@ function Dashboard() {
       voiceBotContextData.updateState("name",voiceBotContextData?.assistantInfo?.assistantName);
     }
   }, []);
+
+  const getAssistantData = async (vapiAssiId:string)=>{
+
+        //get the assistant record from the vapi's side
+        try{
+
+          const assistantDataResponse = await fetch(
+            `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/vapi/assistant/?assistantId=${vapiAssiId}`,
+            {
+              method: "GET",
+            }
+          );
+
+          const assistantDataResponseParse = await assistantDataResponse.json();
+          debugger;
+          if(assistantDataResponseParse?.error){
+            message.error("Error while getting the assistant data");
+            return;
+          }
+          debugger;
+
+          if(assistantDataResponseParse?.result){
+
+            const vapiAssistanceData = assistantDataResponseParse?.result;
+
+            let assistantData:any = {};
+            assistantData.firstMessage = vapiAssistanceData.firstMessage;
+            assistantData.transcriber = vapiAssistanceData.transcriber;
+            assistantData.model = vapiAssistanceData.model;
+            assistantData.voice = vapiAssistanceData.voice;
+            //piping the voice data
+            let punctuationBoundaries = assistantData.voice.chunkPlan.punctuationBoundaries; 
+            // ["。","，"]
+            const punctuationBoundaryPredefineValues = [
+              { value: "0", label: "。" },
+              { value: "1", label: "，" },
+              { value: "2", label: "." },
+              { value: "3", label: "!" },
+              { value: "4", label: "?" },
+              { value: "5", label: ";" },
+              { value: "6", label: "،" },
+              { value: "7", label: "۔" },
+              { value: "8", label: "।" },
+              { value: "9", label: "॥" },
+              { value: "10", label: "|" },
+              { value: "11", label: "||" },
+              { value: "12", label: "," },
+              { value: "13", label: ":" }
+            ];
+
+            let punctuationBoundariesArray = punctuationBoundaryPredefineValues.filter(item => 
+              punctuationBoundaries.includes(item.label)
+            );
+
+            assistantData.voice.chunkPlan.punctuationBoundaries = punctuationBoundariesArray;
+            assistantData.firstMessageMode = vapiAssistanceData.firstMessageMode;
+            assistantData.llmRequestDelaySeconds = vapiAssistanceData.llmRequestDelaySeconds;
+            assistantData.responseDelaySeconds = vapiAssistanceData.responseDelaySeconds;
+            assistantData.hipaaEnabled = vapiAssistanceData.hipaaEnabled;
+            assistantData.silenceTimeoutSeconds = vapiAssistanceData.silenceTimeoutSeconds;
+            assistantData.maxDurationSeconds = vapiAssistanceData.maxDurationSeconds;
+            assistantData.backgroundSound = vapiAssistanceData.backgroundSound;
+            assistantData.backchannelingEnabled = vapiAssistanceData.backchannelingEnabled;
+            assistantData.backgroundDenoisingEnabled = vapiAssistanceData.backgroundDenoisingEnabled;
+            assistantData.modelOutputInMessagesEnabled = vapiAssistanceData.modelOutputInMessagesEnabled;
+            assistantData.name = vapiAssistanceData.name;
+            assistantData.numWordsToInterruptAssistant = vapiAssistanceData.numWordsToInterruptAssistant;
+            assistantData.voicemailDetection = vapiAssistanceData.voicemailDetection;
+            assistantData.voicemailMessage = vapiAssistanceData.voicemailMessage;
+            assistantData.endCallMessage = vapiAssistanceData.endCallMessage;
+            // endCallPhrases= [""],
+            assistantData.metadata = vapiAssistanceData.metadata;
+
+            assistantData.analysisPlan = vapiAssistanceData.analysisPlan;
+
+
+            message.success("Assistant Created successfully");
+          }
+
+
+
+
+  
+          
+  
+  
+        }
+        catch(error:any){
+          debugger;
+          console.log("error", error);
+          message.error("Error while getting the assistant data");
+        }
+  
+  }
 
   useEffect(() => {
   }, [voiceBotContextData?.isPublishEnabled]);

@@ -65,6 +65,7 @@ export default function VoiceBot() {
 
       let assistantDataList = data?.assistantTemplates.filter((assistance:any)=> assistance?.industryType === "Assistant");
       let industryExpertDataList = data?.assistantTemplates.filter((assistance:any)=> assistance?.industryType === "Expert");
+      debugger;
       setAssistantList(assistantDataList);
       setIndustryExpertList(industryExpertDataList);
 
@@ -487,6 +488,7 @@ export default function VoiceBot() {
           </div>
             {
             voiceBotContextData.currentAssistantPage === 0 ? (
+              assistantList.length > 0  ?
               assistantList.map((assistant: any, index:number) => {
                 return (
                   <div className={ selectedAssistantIndex === index ? "assistant-card selected-assistant" : "assistant-card "} key={index} onClick={() => {
@@ -512,6 +514,10 @@ export default function VoiceBot() {
                 </div>
                 );
               })
+              :
+              <div>
+                loadding....
+              </div>
             ) 
             : 
             (
