@@ -117,7 +117,8 @@ function Dashboard() {
 
             const vapiAssistanceData = assistantDataResponseParse?.result;
 
-            let assistantData:any = {};
+            debugger;
+            let assistantData:any = voiceBotContextData.state ;
             assistantData.firstMessage = vapiAssistanceData.firstMessage;
             assistantData.transcriber = vapiAssistanceData.transcriber;
             assistantData.model = vapiAssistanceData.model;
@@ -165,19 +166,67 @@ function Dashboard() {
             // endCallPhrases= [""],
             assistantData.metadata = vapiAssistanceData.metadata;
 
-            assistantData.analysisPlan = vapiAssistanceData.analysisPlan;
 
+            let analysysPlanPickData = vapiAssistanceData.analysisPlan;
 
-            message.success("Assistant Created successfully");
+            if(analysysPlanPickData?.structuredDataSchema && analysysPlanPickData?.structuredDataSchema?.properties){
+              let propertiesData = analysysPlanPickData?.structuredDataSchema?.properties;
+              if(Object.keys(propertiesData).length > 0){
+
+                const propertyArrayData = Object.entries(propertiesData).map(([name, value]: [string, any]) => ({
+                  name,
+                  type: value.type,
+                  description: value.description
+                }));
+                // assistantData.analysisPlan = vapiAssistanceData.analysisPlan;
+                assistantData.analysisPlan.structuredDataSchema.properties = propertyArrayData;
+              }
+              else{
+                assistantData.analysisPlan.structuredDataRequestTimeoutSeconds = vapiAssistanceData.analysisPlan.tructuredDataRequestTimeoutSeconds;
+                assistantData.analysisPlan.successEvaluationRequestTimeoutSeconds = vapiAssistanceData.analysisPlan.successEvaluationRequestTimeoutSeconds;
+                assistantData.analysisPlan.successEvaluationRubric = vapiAssistanceData.analysisPlan.successEvaluationRubric;
+                assistantData.analysisPlan.summaryRequestTimeoutSeconds = vapiAssistanceData.analysisPlan.summaryRequestTimeoutSeconds;
+
+              }
+            }
+            else{
+              assistantData.analysisPlan.structuredDataRequestTimeoutSeconds = vapiAssistanceData.analysisPlan.tructuredDataRequestTimeoutSeconds;
+              assistantData.analysisPlan.successEvaluationRequestTimeoutSeconds = vapiAssistanceData.analysisPlan.successEvaluationRequestTimeoutSeconds;
+              assistantData.analysisPlan.successEvaluationRubric = vapiAssistanceData.analysisPlan.successEvaluationRubric;
+              assistantData.analysisPlan.summaryRequestTimeoutSeconds = vapiAssistanceData.analysisPlan.summaryRequestTimeoutSeconds;
+
+            }
+
+            if(vapiAssistanceData?.messagePlan && vapiAssistanceData?.messagePlan?.idleMessages){
+              let messagePlanPickData = vapiAssistanceData.messagePlan.idleMessages;
+              
+              const idleMessageList = [
+                { value: "1", label: "Are you still there?" },
+                { value: "2", label: "Is there anything else you need help with?" },
+                { value: "3", label: "Feel free to ask me any questions." },
+                { value: "4", label: "How can I assist you further?" },
+                { value: "5", label: "Let me know if there's anything you need." },
+                { value: "6", label: "I'm still here if you need assistance." },
+                { value: "7", label: "I'm ready to help whenever you are." },
+                { value: "8", label: "Is there something specific you're looking for?" },
+                { value: "9", label: "I'm here to help with any questions you have." }
+              ];
+              
+              if(messagePlanPickData.length > 0){
+                const idleMessageArray = idleMessageList.filter(item => 
+                  messagePlanPickData.includes(item.label)
+                );
+                assistantData.analysisPlan.messagePlan.idleMessages = idleMessageArray;
+              }
+              
+            }
+
+            //update the context data
+            voiceBotContextData.setState(assistantData);
+            message.success("Assistant Fetch Successfully");
+
           }
 
-
-
-
-  
-          
-  
-  
         }
         catch(error:any){
           debugger;

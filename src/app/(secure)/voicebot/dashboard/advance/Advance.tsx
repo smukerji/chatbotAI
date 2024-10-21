@@ -64,7 +64,7 @@ function Advance() {
     setServerUrl(voicebotDetails.serverUrl);
     sethipaaCompliance(voicebotDetails.hipaaEnabled);
     setaudioRecording(voicebotDetails.analysisPlan.artifactPlan.recordingEnabled);
-    setvideoRecording(voicebotDetails.analysisPlan.artifactPlan.videoRecordingEnabled);
+    // setvideoRecording(voicebotDetails.analysisPlan.artifactPlan.videoRecordingEnabled);
     setClientMessages(voicebotDetails.clientMessages);
     setServerMessages(voicebotDetails.serverMessages);
     setEndCallMessage(voicebotDetails.endCallMessage);
@@ -78,8 +78,17 @@ function Advance() {
     setInterruptionThreshold(voicebotDetails.numWordsToInterruptAssistant);
 
 
-  }, [voicebotDetails.silenceTimeoutSeconds, voicebotDetails.serverUrl, voicebotDetails.hipaaEnabled, voicebotDetails.analysisPlan.artifactPlan.recordingEnabled, voicebotDetails.analysisPlan.artifactPlan.videoRecordingEnabled, voicebotDetails.clientMessages, voicebotDetails.serverMessages, voicebotDetails.endCallMessage, voicebotDetails.analysisPlan.messagePlan.idleMessages, voicebotDetails.voicemailMessage, voicebotDetails.analysisPlan.messagePlan.idleMessageMaxSpokenCount, voicebotDetails.analysisPlan.messagePlan.idleTimeoutSeconds, voicebotDetails.maxDurationSeconds, voicebotDetails.responseDelaySeconds, voicebotDetails.llmRequestDelaySeconds, voicebotDetails.numWordsToInterruptAssistant]); 
+  }, [voicebotDetails.silenceTimeoutSeconds, voicebotDetails.serverUrl, voicebotDetails.hipaaEnabled,voicebotDetails.analysisPlan.artifactPlan.recordingEnabled,  voicebotDetails.analysisPlan.artifactPlan.videoRecordingEnabled, voicebotDetails.clientMessages, voicebotDetails.serverMessages, voicebotDetails.endCallMessage, voicebotDetails.analysisPlan.messagePlan.idleMessages, voicebotDetails.voicemailMessage, voicebotDetails.analysisPlan.messagePlan.idleMessageMaxSpokenCount, voicebotDetails.analysisPlan.messagePlan.idleTimeoutSeconds, voicebotDetails.maxDurationSeconds, voicebotDetails.responseDelaySeconds, voicebotDetails.llmRequestDelaySeconds, voicebotDetails.numWordsToInterruptAssistant]); 
 
+
+  /**
+   * artifactPlan;
+     messagePlan;
+     startSpeakingPlan;
+     stopSpeakingPlan;
+     monitorPlan;
+     credentialIds
+   */
 
   const clientMessageList = [
     { value: "1", label: "conversation update" },
