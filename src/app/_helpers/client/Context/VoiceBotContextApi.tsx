@@ -187,7 +187,7 @@ export const VoiceBotDataProvider = ({ children }: { children: ReactNode }) => {
   }, [state]);
 
   return (
-    <CreateVoiceBotContext.Provider value={{ state, updateState, updateTheVoiceBotInfo, currentAssistantPage, setCurrentAssistantPage, isLoading, setIsLoading, setAssistantMongoId, assistantMongoId, assistantVapiId, setAssistantVapiId, assistantInfo, setAssistantInfo , isPublishEnabled, reInitiateState}}>
+    <CreateVoiceBotContext.Provider value={{ state, setState,updateState, updateTheVoiceBotInfo, currentAssistantPage, setCurrentAssistantPage, isLoading, setIsLoading, setAssistantMongoId, assistantMongoId, assistantVapiId, setAssistantVapiId, assistantInfo, setAssistantInfo , isPublishEnabled, reInitiateState}}>
       {children}
     </CreateVoiceBotContext.Provider>
   );

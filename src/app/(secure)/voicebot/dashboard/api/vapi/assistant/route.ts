@@ -39,7 +39,9 @@ async function createVapiAssistant(req: NextRequest) {
       delete vapiData.model.toolIds;
       // delete vapiData.voice.chunkPlan.punctuationBoundaries;
       delete vapiData.analysisPlan.artifactPlan;
-      delete vapiData.analysisPlan.messagePlan;
+      if(vapiData.analysisPlan.messagePlan?.idleMessages.length <= 0){//not grether than 0
+        delete vapiData.analysisPlan.messagePlan;
+      }
       delete vapiData.analysisPlan.startSpeakingPlan;
       delete vapiData.analysisPlan.stopSpeakingPlan;
       delete vapiData.analysisPlan.monitorPlan;
