@@ -35,6 +35,8 @@ import {
   CaretUpOutlined,
   DownOutlined,
 } from "@ant-design/icons";
+import ChatV2 from "./_components/Chat-v2/ChatV2";
+import { functionCallHandler } from "@/app/_helpers/client/functionCallHandler";
 
 function Dashboard() {
   const { status } = useSession();
@@ -80,6 +82,7 @@ function Dashboard() {
 
   /// sesstion Id and date for current chat window
   const [sessionID, setSessionID]: any = useState();
+  const [threadId, setThreadId] = useState("");
   const [sessionStartDate, setSessionStartDate]: any = useState();
 
   const [isPlanNotification, setIsPlanNotification] = useState(false);
@@ -281,9 +284,19 @@ function Dashboard() {
   //   if (isPlanNotification) botContext?.handleChange("editChatbot")("history");
   // }, [isPlanNotification]);
 
+  const createThread = async () => {
+    const res = await fetch(`/api/assistants/threads`, {
+      method: "POST",
+    });
+    const data = await res.json();
+    setThreadId(data.threadId);
+  };
+
   useEffect(() => {
     setSessionID(uuid());
     setSessionStartDate(getDate());
+    // create a new threadID when chat component created
+    createThread();
   }, []);
 
   /// managing delete chatbot
@@ -522,19 +535,36 @@ function Dashboard() {
           {/*------------------------------------------chatbot-component----------------------------------------------*/}
           {editChatbot == "chatbot" && (
             <>
-              <Chat
-                chatbot={chatbot}
-                messages={messages}
-                setMessages={setMessages}
-                messagesTime={messagesTime}
-                setMessagesTime={setMessagesTime}
-                sessionID={sessionID}
-                sessionStartDate={sessionStartDate}
-                setSessionID={setSessionID}
-                setSessionStartDate={setSessionStartDate}
-                isPlanNotification={isPlanNotification}
-                setIsPlanNotification={setIsPlanNotification}
-              />
+              {chatbot?.botType == "bot-v2" ? (
+                <ChatV2
+                  chatbot={chatbot}
+                  messages={messages}
+                  setMessages={setMessages}
+                  messagesTime={messagesTime}
+                  setMessagesTime={setMessagesTime}
+                  threadID={threadId}
+                  sessionStartDate={sessionStartDate}
+                  setThreadId={createThread}
+                  setSessionStartDate={setSessionStartDate}
+                  isPlanNotification={isPlanNotification}
+                  setIsPlanNotification={setIsPlanNotification}
+                  functionCallHandler={functionCallHandler}
+                />
+              ) : (
+                <Chat
+                  chatbot={chatbot}
+                  messages={messages}
+                  setMessages={setMessages}
+                  messagesTime={messagesTime}
+                  setMessagesTime={setMessagesTime}
+                  sessionID={sessionID}
+                  sessionStartDate={sessionStartDate}
+                  setSessionID={setSessionID}
+                  setSessionStartDate={setSessionStartDate}
+                  isPlanNotification={isPlanNotification}
+                  setIsPlanNotification={setIsPlanNotification}
+                />
+              )}
             </>
           )}
           {/*------------------------------------------settings-component----------------------------------------------*/}
@@ -562,6 +592,7 @@ function Dashboard() {
                 chatbotName={chatbot.name}
                 isPlanNotification={isPlanNotification}
                 setIsPlanNotification={setIsPlanNotification}
+                botType={chatbot.botType}
               />
             </>
           )}

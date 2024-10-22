@@ -27,6 +27,11 @@ export default async function handler(req, res) {
     const userId = body?.userId;
     const messages = body?.messages;
 
+    console.log("userQuery", userQuery);
+    console.log("chatbotId", chatbotId);
+    console.log("userId", userId);
+    console.log("messages", messages);
+
     // /// create the embedding of user query
     // const embed = await createEmbedding(userQuery);
 

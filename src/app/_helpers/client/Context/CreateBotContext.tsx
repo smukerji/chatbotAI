@@ -1,5 +1,6 @@
 "use client";
 import { createContext, useState } from "react";
+import { AssistantType } from "../../assistant-creation-contants";
 
 export const CreateBotContext = createContext({});
 
@@ -43,6 +44,7 @@ export const CreateBotDataProvider = ({ children }: any) => {
     leadSessionsEmail: "",
 
     chatbotName: "",
+    assistantType: AssistantType.SALES_AGENT_SHOPIFY,
   };
   const [createBotInfo, setCreateBotInfo] = useState(initialCreateBotInfo);
 

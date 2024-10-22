@@ -77,6 +77,7 @@ async function fetchCustomBots(userId: string) {
         userId: { $first: "$userId" },
         chatbotId: { $first: "$chatbotId" },
         chatbotName: { $first: "$chatbotName" },
+        botType: { $first: "$botType" },
         lastUsed: { $first: "$lastUsed" },
         noOfMessagesSent: { $first: "$noOfMessagesSent" },
         createdAt: { $first: "$createdAt" },
@@ -100,6 +101,7 @@ async function fetchCustomBots(userId: string) {
     id: doc.chatbotId,
     name: doc.chatbotName,
     lastUsed: doc?.lastUsed,
+    botType: doc?.botType,
     noOfMessagesSent: doc?.noOfMessagesSent,
     lastTrained: doc.chatbotSettings[0][0]?.lastTrained,
     numberOfCharacterTrained:

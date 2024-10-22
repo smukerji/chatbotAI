@@ -81,12 +81,14 @@
         font-style: normal;
         font-weight: 500;
         line-height: 24px;
+        width: 86%;
+        word-wrap: break-word;
         /* 150% */
       }
 
       .chatbot-id {
         display: flex;
-        align-items: center;
+        align-items: start;
         gap: 8px;
       }
 
