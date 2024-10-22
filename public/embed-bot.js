@@ -154,7 +154,7 @@
 
   window.addEventListener("message", function (event) {
     // Validate the origin of the message
-    if (event.origin !== "http://localhost:3000") {
+    if (event.origin !== "https://torri.ai") {
       return;
     }
 

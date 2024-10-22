@@ -29,6 +29,11 @@ import {
   theme,
   visibility,
 } from "../../app/_helpers/constant";
+import {
+  getAssistantTools,
+  getSystemInstruction,
+} from "../../app/_helpers/assistant-creation-contants";
+import OpenAI from "openai";
 
 import {
   deleteFileVectorsById,
@@ -54,9 +59,7 @@ export default async function handler(req, res) {
           res.status(500).send("Error parsing formdata");
           return;
         }
-        // const qaImage = QAfiles?.qaImage ? QAfiles?.qaImage[0] : null;
-        // console.log(JSON.parse(fields?.qaList));
-        // return;
+
         const files = JSON.parse(fields?.defaultFileList);
         const userId = fields?.userId[0];
         const numberOfCharacterTrained = fields?.numberOfCharacterTrained[0];
@@ -92,14 +95,12 @@ export default async function handler(req, res) {
 
         const chatbotId =
           fields?.chatbotId[0] !== "undefined" ? fields?.chatbotId[0] : uuid();
+        const assistantType = fields?.assistantType[0];
         const qaList = JSON.parse(fields?.qaList);
         const text = fields?.text[0];
         const crawledList = JSON.parse(fields?.crawledList[0]);
         const deleteCrawlList = JSON.parse(fields?.deleteCrawlList[0]);
         const isTextUpdated = JSON.parse(fields?.isTextUpdated[0]);
-        // return;
-        // console.log(chatbotId);
-        // return;
 
         /// deleting the file list
         const deleteFileList = JSON.parse(fields?.deleteFileList[0]);
@@ -112,17 +113,11 @@ export default async function handler(req, res) {
             // Check if an image file is present for this Q&A pair
             const imageFile = QAfiles[`qaList[${i}].image`];
 
-            // qa.image = imageFile
-            //   ? uuid() + "-" + imageFile[0].originalFilename
-            //   : qa.image == ""
-            //   ? null
-            //   : qa.image; // Use the file path or null if no image
-
             /// store the images files in server
             if (imageFile) {
               qa.image = uuid() + "-" + imageFile[0].originalFilename;
               /// store the images
-              var oldPath = imageFile[0].filepath;
+              const oldPath = imageFile[0].filepath;
 
               const readStream = fs.createReadStream(oldPath);
 
@@ -139,46 +134,12 @@ export default async function handler(req, res) {
                   console.log("Error storing file", err);
                   reject(err);
                 });
-
-              /// store the file on google drive
-              // authorize()
-              //   .then((authClient) =>
-              //     uploadFile(authClient, oldPath, qa.image)
-              //       .then((file) => {
-              //         qa.image = file.data.id;
-              //         console.log("Stored file to drive", qa.image);
-              //         resolve(1);
-              //       })
-              //       .catch((err) => {
-              //         console.log("Error storing file", err);
-              //         reject(err);
-              //       })
-              //   )
-              //   .catch((err) => {
-              //     console.log("Error uploading file to Google Drive:", err);
-              //     reject(err);
-              //   });
-              /// move the file from tmp to server
-              // mv(oldPath, newPath, function (err) {
-              //   console.log("Error storing file", err);
-              // });
             } else {
               qa.image = qa.image == "" ? null : qa.image; // Use the file path or null if no image
               resolve(1);
             }
           });
         });
-        // for (let i = 0; i < qaList.length; i++) {
-        //   // qaList.push(qaItem);
-        // }
-        // console.log("QAlist", qaList);
-        // const responseCode = updateChatbot ? 200 : 200;
-        // const responseText = updateChatbot
-        //   ? "Chatbot re-trained successfully"
-        //   : "Chabot trained successfully";
-        // return res.status(responseCode).send(responseText);
-
-        // console.log(qaList);
 
         /// if new chatbot is being created the new chatbot entry
         let collection = db.collection("chatbots-data");
@@ -526,9 +487,6 @@ export default async function handler(req, res) {
           } catch (err) {
             return res.status(400).send(err);
           }
-          // setTimeout(() => {
-          //   console.log("db crawl source", dbCrawlSource);
-          // }, 5000);
         } else if (crawledList.length > 0 && updateChatbot) {
           /// geenrated the ID's for each chunks and storing in DB before upserting in pinecone
           const dbCrawlSource = [];
@@ -568,15 +526,13 @@ export default async function handler(req, res) {
                 source: "crawling",
               });
 
-              console.log("Db crawlinfg source", dbCrawlSource);
-
               collection.findOneAndUpdate(
                 { chatbotId: chatbotId, source: "crawling" },
                 {
                   $set: {
                     content:
                       previousLinksContent?.content?.length > 0
-                        ? [...previousLinksContent?.content, ...dbCrawlSource]
+                        ? [...previousLinksContent.content, ...dbCrawlSource]
                         : dbCrawlSource,
                   },
                 },
@@ -599,13 +555,38 @@ export default async function handler(req, res) {
           /// create the chatbot entry in DB
           const chatbotName = fields?.chatbotText[0];
           let userChatbotsCollection = db.collection("user-chatbots");
+
+          /// create the openai assistant
+          const openai = new OpenAI({
+            apiKey: process.env.NEXT_PUBLIC_OPENAI_KEY,
+            project: process.env.NEXT_PUBLIC_OPENAI_PROJ_KEY,
+            organization: process.env.NEXT_PUBLIC_OPENAI_ORG_KEY,
+          });
+
+          /// create the assistant based on the type of assistant with the necessary instructions and function calls
+          const systemInstruction = getSystemInstruction(assistantType);
+          const tools = getAssistantTools(assistantType);
+          const assistant = await openai.beta.assistants.create({
+            model: models[0],
+            instructions: systemInstruction,
+            name: chatbotName,
+            tools: tools,
+          });
+
           await userChatbotsCollection.insertOne({
             userId,
-            chatbotId,
+            chatbotId: assistant.id,
             chatbotName,
             lastUsed: currrentTime,
             createdAt: currrentTime,
             noOfMessagesSent: 0,
+            botType: "bot-v2",
+            integrations: {
+              shopify: {
+                store: process.env.SHOPIFY_TEMP_STORE,
+                token: process.env.SHOPIFY_TEMP_TOKEN,
+              },
+            },
           });
           //send email once chatbot is created
           try {
@@ -629,17 +610,18 @@ export default async function handler(req, res) {
             //   MessageStream: "outbound",
             // })
           } catch (error) {
-            return res.status(400).send(error);
+            console.log("Error while sending email", error);
           }
+
           /// set the default settings for the chatbot in DB
           await db.collection("chatbot-settings").insertOne({
             userId: userId,
-            chatbotId: chatbotId,
-            model: models[0],
+            chatbotId: assistant.id,
+            // model: models[0],
             visibility: visibility.PUBLIC,
-            temperature: 0,
+            // temperature: 0,
             numberOfCharacterTrained: numberOfCharacterTrained,
-            instruction: defaultModelInstruction,
+            // instruction: defaultModelInstruction,
             initialMessage: initialMessage,
             suggestedMessages: defaultSuggestedMessage,
             messagePlaceholder: defaultPlaceholderMessage,
