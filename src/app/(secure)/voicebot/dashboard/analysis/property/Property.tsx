@@ -19,14 +19,20 @@ function Property() {
   const [currentProperty, setCurrentProperty] = useState<{ id: number; type: string; name: string; description: string }>();
 
   useEffect(() => {
+
+    const contextPropertyData = voicebotDetails["analysisPlan"]?.structuredDataSchema?.properties;
+    if(contextPropertyData.length > 0){
+      setProperties(contextPropertyData);
+    }
+
     if (properties.every(prop => prop.saved)) {
       setCurrentProperty(undefined);
     }
-
     //stored into the contextAPI
     voiceBotContextData.updateState("analysisPlan.structuredDataSchema.properties", properties);
+    debugger;
 
-  }, [properties]);
+  }, [voicebotDetails.analysisPlan.structuredDataSchema.properties]);
 
   console.log("Context analysis ", voicebotDetails["analysisPlan"]);
 
@@ -37,6 +43,7 @@ function Property() {
     const newProperty = { id: properties.length + 1, type: '', name: '', description: '' , saved:false};
     setCurrentProperty(newProperty);
     setProperties([...properties, newProperty]);
+    debugger;
   };
 
 
@@ -48,18 +55,26 @@ function Property() {
       message.error('Please fill all fields');
       return;
     }
+    let propertyData = properties.map(prop => prop.id === id ? { ...prop, saved: true } : prop);
     //update the property to save
-    setProperties(properties.map(prop => prop.id === id ? { ...prop, saved: true } : prop));
+    setProperties(propertyData);
 
     //check if properties are saved then set current property to undefined
    
     //stored into the contextAPI
 
+    voiceBotContextData.updateState("analysisPlan.structuredDataSchema.properties", propertyData);
 
   };
 
   const deletePropertyHandler = (id: number) => {
-    setProperties(properties.filter(prop => prop.id !== id));
+    let property = properties.filter(prop => prop.id !== id);
+
+    setProperties(property);
+    //delete from the contextAPI
+    //stored into the contextAPI
+    voiceBotContextData.updateState("analysisPlan.structuredDataSchema.properties", property);
+
     // setCurrentProperty(undefined);
   };
 
@@ -94,7 +109,6 @@ function Property() {
       setCurrentProperty(newProperty2);
       break;
     }
-
   }
 
   const currentPropertyNameChangeHandler = (id:number,input:string) => {

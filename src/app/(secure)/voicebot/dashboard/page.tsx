@@ -72,8 +72,7 @@ function Dashboard() {
   let tabValue = "model";
 
   useEffect(() => {
-    let data = voiceBotContextData?.assistantInfo;
-    console.log(data);
+
     if (!voiceBotContextData?.assistantInfo) {
       router.push("/chatbot");
     }
@@ -173,10 +172,12 @@ function Dashboard() {
               let propertiesData = analysysPlanPickData?.structuredDataSchema?.properties;
               if(Object.keys(propertiesData).length > 0){
 
-                const propertyArrayData = Object.entries(propertiesData).map(([name, value]: [string, any]) => ({
+                const propertyArrayData = Object.entries(propertiesData).map(([name, value]: [string, any],index:number) => ({
+                  id: index,
                   name,
                   type: value.type,
-                  description: value.description
+                  description: value.description,
+                  saved:true
                 }));
                 // assistantData.analysisPlan = vapiAssistanceData.analysisPlan;
                 assistantData.analysisPlan.structuredDataSchema.properties = propertyArrayData;
@@ -237,6 +238,8 @@ function Dashboard() {
   }
 
   useEffect(() => {
+    console.log("isPublishEnabled", voiceBotContextData?.isPublishEnabled);
+    debugger;
   }, [voiceBotContextData?.isPublishEnabled]);
 
   const makeVapiAssistantCall = async () => {
@@ -334,6 +337,7 @@ function Dashboard() {
     
     try{
 
+      debugger;
       const assistantCreateResponse = await fetch(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/vapi/assistant`,
         {
@@ -357,6 +361,7 @@ function Dashboard() {
           vapiAssistantId:assistantCreateResponseParse.assistantVapiId
         });
         message.success("Assistant published successfully");
+        voiceBotContextData.setIsPublishEnabled(false);
       }
 
     }
