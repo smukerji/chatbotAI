@@ -39,9 +39,9 @@ async function createVapiAssistant(req: NextRequest) {
       delete vapiData.model.toolIds;
       // delete vapiData.voice.chunkPlan.punctuationBoundaries;
       delete vapiData.analysisPlan.artifactPlan;
-      if(vapiData.analysisPlan.messagePlan?.idleMessages.length <= 0){//not grether than 0
-        delete vapiData.analysisPlan.messagePlan;
-      }
+      // if(vapiData.analysisPlan.messagePlan?.idleMessages.length <= 0){//not grether than 0
+      // }
+      delete vapiData.analysisPlan.messagePlan;
       delete vapiData.analysisPlan.startSpeakingPlan;
       delete vapiData.analysisPlan.stopSpeakingPlan;
       delete vapiData.analysisPlan.monitorPlan;
@@ -82,12 +82,12 @@ async function createVapiAssistant(req: NextRequest) {
               body: JSON.stringify(vapiData)
             };
 
-            // let vapiResponse = await fetch(`https://api.vapi.ai/assistant/${}`, options);
-            // let vapiResponseData = await vapiResponse.json();
-            // if (!vapiResponseData?.id) {
-            //   return { error: "Failed to update the assistant" };
-            // }
-            // return { result: "Updated Successfully!"}
+            let vapiResponse = await fetch(`https://api.vapi.ai/assistant/${voiceBotRecordVapiExist.vapiAssistantId}`, options);
+            let vapiResponseData = await vapiResponse.json();
+            if (!vapiResponseData?.id) {
+              return { error: "Failed to update the assistant" };
+            }
+            return { result: "Updated Successfully!"}
           }
           else { //if the record is not exist then create the record
             //send the data to the vapi server

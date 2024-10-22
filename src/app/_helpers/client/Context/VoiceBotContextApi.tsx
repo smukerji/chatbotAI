@@ -180,6 +180,7 @@ export const VoiceBotDataProvider = ({ children }: { children: ReactNode }) => {
     const {punctuationBoundaries,minCharacters} = chunkPlan;
 
     if (provider && model && language && modelProvider && modelsModel && state.firstMessage && state.name && maxTokens && (typeof maxTokens === 'number') && punctuationBoundaries.length > 0 && minCharacters > 0 && modelMessages[0].content.length > 0) {
+      
       setIsPublishEnabled(true);
     } else {
       setIsPublishEnabled(false);
@@ -187,7 +188,7 @@ export const VoiceBotDataProvider = ({ children }: { children: ReactNode }) => {
   }, [state]);
 
   return (
-    <CreateVoiceBotContext.Provider value={{ state, setState,updateState, updateTheVoiceBotInfo, currentAssistantPage, setCurrentAssistantPage, isLoading, setIsLoading, setAssistantMongoId, assistantMongoId, assistantVapiId, setAssistantVapiId, assistantInfo, setAssistantInfo , isPublishEnabled, reInitiateState}}>
+    <CreateVoiceBotContext.Provider value={{ state, setState,updateState, updateTheVoiceBotInfo, currentAssistantPage, setCurrentAssistantPage, isLoading, setIsLoading, setAssistantMongoId, assistantMongoId, assistantVapiId, setAssistantVapiId, assistantInfo, setAssistantInfo , isPublishEnabled, setIsPublishEnabled, reInitiateState}}>
       {children}
     </CreateVoiceBotContext.Provider>
   );
