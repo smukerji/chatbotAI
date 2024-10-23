@@ -144,6 +144,8 @@ export const VoiceBotDataProvider = ({ children }: { children: ReactNode }) => {
 
   const [isPublishEnabled, setIsPublishEnabled] = useState(false);
 
+  const [publishLoading,setPublishLoading] = useState(false);
+
   const updateNestedState = (obj: any, path: string[], value: any): any => {
     // debugger;
     const [key, ...rest] = path;
@@ -178,17 +180,23 @@ export const VoiceBotDataProvider = ({ children }: { children: ReactNode }) => {
     const { messages: modelMessages, provider: modelProvider, model: modelsModel, maxTokens } = state.model;
     const {chunkPlan} = state.voice;
     const {punctuationBoundaries,minCharacters} = chunkPlan;
-
+   
+    debugger;
     if (provider && model && language && modelProvider && modelsModel && state.firstMessage && state.name && maxTokens && (typeof maxTokens === 'number') && punctuationBoundaries.length > 0 && minCharacters > 0 && modelMessages[0].content.length > 0) {
       
       setIsPublishEnabled(true);
+      if(publishLoading){
+        setIsPublishEnabled(false);
+        setPublishLoading(false);
+      }
     } else {
       setIsPublishEnabled(false);
+      setPublishLoading(false);
     }
-  }, [state]);
+  }, [state,publishLoading]);
 
   return (
-    <CreateVoiceBotContext.Provider value={{ state, setState,updateState, updateTheVoiceBotInfo, currentAssistantPage, setCurrentAssistantPage, isLoading, setIsLoading, setAssistantMongoId, assistantMongoId, assistantVapiId, setAssistantVapiId, assistantInfo, setAssistantInfo , isPublishEnabled, setIsPublishEnabled, reInitiateState}}>
+    <CreateVoiceBotContext.Provider value={{ state, setState,updateState, updateTheVoiceBotInfo, currentAssistantPage, setCurrentAssistantPage, isLoading, setIsLoading, setAssistantMongoId, assistantMongoId, assistantVapiId, setAssistantVapiId, assistantInfo, setAssistantInfo , isPublishEnabled, setIsPublishEnabled, reInitiateState,setPublishLoading,publishLoading}}>
       {children}
     </CreateVoiceBotContext.Provider>
   );

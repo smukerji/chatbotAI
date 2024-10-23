@@ -146,11 +146,11 @@ function Model() {
     debugger
     setMaxToken(value);
     const intValue = parseInt(value, 10);
-    if (!isNaN(intValue) && intValue <= 1000) {
+    if (!isNaN(intValue) && intValue <= 1000 && intValue > 50) {
       setValidationMessage("");
       voiceBotContextData.updateState("model.maxTokens", intValue);
     } else {
-      setValidationMessage("Value must be less than or equal to 1000");
+      setValidationMessage("Value must be greater than 50 and less than or equal to 1000");
       voiceBotContextData.updateState("model.maxTokens", 0);
     }
   }

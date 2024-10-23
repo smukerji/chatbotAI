@@ -224,6 +224,7 @@ function Dashboard() {
 
             //update the context data
             voiceBotContextData.setState(assistantData);
+            voiceBotContextData.setPublishLoading(true);
             message.success("Assistant Fetch Successfully");
 
           }
@@ -238,9 +239,11 @@ function Dashboard() {
   }
 
   useEffect(() => {
-    console.log("isPublishEnabled", voiceBotContextData?.isPublishEnabled);
+    // console.log("isPublishEnabled", voiceBotContextData?.isPublishEnabled);
     debugger;
-  }, [voiceBotContextData?.isPublishEnabled]);
+  }, [voiceBotContextData?.publishLoading]);
+
+  console.log("isPublishEnabled", voiceBotContextData?.isPublishEnabled);
 
   const makeVapiAssistantCall = async () => {
     let isIdAvaliable = voiceBotContextData.assistantInfo["vapiAssistantId"];
@@ -361,7 +364,10 @@ function Dashboard() {
           vapiAssistantId:assistantCreateResponseParse.assistantVapiId
         });
         message.success("Assistant published successfully");
-        voiceBotContextData.setIsPublishEnabled(false);
+        voiceBotContextData.setPublishLoading(true);
+        voiceBotContextData.setState({});
+        voiceBotContextData.setState(voiceBotContextData.state);
+
       }
 
     }

@@ -87,7 +87,7 @@ async function createVapiAssistant(req: NextRequest) {
             if (!vapiResponseData?.id) {
               return { error: "Failed to update the assistant" };
             }
-            return { result: "Updated Successfully!"}
+            return { result: "result", assistantVapiId: vapiResponseData?.id };
           }
           else { //if the record is not exist then create the record
             //send the data to the vapi server
