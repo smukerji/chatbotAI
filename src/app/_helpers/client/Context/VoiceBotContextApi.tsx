@@ -146,6 +146,8 @@ export const VoiceBotDataProvider = ({ children }: { children: ReactNode }) => {
 
   const [publishLoading,setPublishLoading] = useState(false);
 
+  const [afterPublishLoading,setAfterPublishLoading] = useState(false);
+
   const updateNestedState = (obj: any, path: string[], value: any): any => {
     // debugger;
     const [key, ...rest] = path;
@@ -175,7 +177,21 @@ export const VoiceBotDataProvider = ({ children }: { children: ReactNode }) => {
     setState((prevState) => ({ ...prevState, [key]: value }));
   }
 
+
   useEffect(() => {
+    debugger;
+    if(afterPublishLoading){
+      debugger;
+      setAfterPublishLoading(false);
+
+      setIsPublishEnabled(false);
+      setPublishLoading(false);
+    }
+  },[afterPublishLoading]);
+
+
+  useEffect(() => {
+    debugger;
     const { provider, model, language } = state.transcriber;
     const { messages: modelMessages, provider: modelProvider, model: modelsModel, maxTokens } = state.model;
     const {chunkPlan} = state.voice;
@@ -193,10 +209,10 @@ export const VoiceBotDataProvider = ({ children }: { children: ReactNode }) => {
       setIsPublishEnabled(false);
       setPublishLoading(false);
     }
-  }, [state,publishLoading]);
+  }, [state]);
 
   return (
-    <CreateVoiceBotContext.Provider value={{ state, setState,updateState, updateTheVoiceBotInfo, currentAssistantPage, setCurrentAssistantPage, isLoading, setIsLoading, setAssistantMongoId, assistantMongoId, assistantVapiId, setAssistantVapiId, assistantInfo, setAssistantInfo , isPublishEnabled, setIsPublishEnabled, reInitiateState,setPublishLoading,publishLoading}}>
+    <CreateVoiceBotContext.Provider value={{ state, setState,updateState, updateTheVoiceBotInfo, currentAssistantPage, setCurrentAssistantPage, isLoading, setIsLoading, setAssistantMongoId, assistantMongoId, assistantVapiId, setAssistantVapiId, assistantInfo, setAssistantInfo , isPublishEnabled, setIsPublishEnabled, reInitiateState,setPublishLoading,publishLoading,afterPublishLoading,setAfterPublishLoading}}>
       {children}
     </CreateVoiceBotContext.Provider>
   );

@@ -238,10 +238,6 @@ function Dashboard() {
   
   }
 
-  useEffect(() => {
-    // console.log("isPublishEnabled", voiceBotContextData?.isPublishEnabled);
-    debugger;
-  }, [voiceBotContextData?.publishLoading]);
 
   console.log("isPublishEnabled", voiceBotContextData?.isPublishEnabled);
 
@@ -364,9 +360,14 @@ function Dashboard() {
           vapiAssistantId:assistantCreateResponseParse.assistantVapiId
         });
         message.success("Assistant published successfully");
-        voiceBotContextData.setPublishLoading(true);
-        voiceBotContextData.setState({});
-        voiceBotContextData.setState(voiceBotContextData.state);
+        // voiceBotContextData.setPublishLoading(true);
+        voiceBotContextData.setAfterPublishLoading(true);
+        // Log the state before and after the state changes
+      // console.log("State before reset:", voiceBotContextData.state);
+      // voiceBotContextData.setState({});
+      // console.log("State after reset to empty object:", voiceBotContextData.state);
+      // voiceBotContextData.setState(voiceBotContextData.state);
+      // console.log("State after resetting to previous state:", voiceBotContextData.state);
 
       }
 
@@ -377,6 +378,8 @@ function Dashboard() {
     }
    
   }
+
+  console.log(" publish loading  value after publish", voiceBotContextData?.publishLoading);
 
   const changeHandler = (value: string) => {
     console.log("working , clicking")

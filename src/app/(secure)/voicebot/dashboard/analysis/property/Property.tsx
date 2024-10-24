@@ -29,7 +29,7 @@ function Property() {
       setCurrentProperty(undefined);
     }
     //stored into the contextAPI
-    voiceBotContextData.updateState("analysisPlan.structuredDataSchema.properties", properties);
+    // voiceBotContextData.updateState("analysisPlan.structuredDataSchema.properties", properties);
     debugger;
 
   }, [voicebotDetails.analysisPlan.structuredDataSchema.properties]);

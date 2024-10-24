@@ -52,6 +52,13 @@ export default function VoiceBot() {
 
   const [inputValidationMessage, setinputValidationMessage] = useState<string>("");
 
+
+  const [isInputVisible, setIsInputVisible] = useState<boolean>(false);
+
+  const handleInputBlur = () => {
+    setIsInputVisible(false);
+  };
+
   async function  getVoiceAssistantTemplateData() {
     try{
 
@@ -353,15 +360,19 @@ export default function VoiceBot() {
               className={inputValidationMessage ? "assi-input-field invalid-input" : "assi-input-field"}
               placeholder="Your Assistant Name"
               onChange={assistantNameChangeHandler}
+              onBlur={handleInputBlur}
               id="assistantNameInput"
               value={assistantName}
+              disabled={!isInputVisible}
             />
+              
 
             {/* </div> */}
 
             <Button style={{ border: "none", margin: 0, padding: 0, background: "transparent" }}
               icon={<Image src={editIcon} alt="edit name" />}
               onClick={() => {
+                setIsInputVisible(true);
                 const inputElement = document.getElementById("assistantNameInput") as HTMLInputElement;
                 if (inputElement) {
                   inputElement.focus();
