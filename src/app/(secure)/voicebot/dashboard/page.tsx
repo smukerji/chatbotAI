@@ -85,6 +85,7 @@ function Dashboard() {
     }
     else{
       //  the system prompt based on the mongo record
+      message.info("Assistant is not published yet");
 
     }
     if(voiceBotContextData?.assistantInfo?.assistantName){
