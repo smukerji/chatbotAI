@@ -600,7 +600,6 @@ function ChatV2({
   const refreshChat = () => {
     setMessages([]);
     setMessagesTime([]);
-    userDetailContext?.handleChange("isLeadFormSubmitted")(false);
     setLeadDetails({
       name: "",
       email: "",
@@ -629,6 +628,7 @@ function ChatV2({
         ]);
       });
     } else {
+      userDetailContext?.handleChange("isLeadFormSubmitted")(false);
       botSettings?.initialMessage?.map((message: string, index: number) => {
         setMessages((prevMessages: any) => [
           ...prevMessages,
@@ -669,8 +669,6 @@ function ChatV2({
     const pn = parsePhoneNumber(value, {
       regionCode: country.iso2,
     });
-
-    console.log(pn);
 
     // const numberInfo = pn.toJSON();
     setIsNumberValid(pn.valid);
@@ -875,7 +873,7 @@ function ChatV2({
           <div className="detail">
             <div className="temperature">
               <span>Temperature</span>
-              <span>{botSettings?.temperature}</span>
+              <span style={{ width: "auto" }}>{botSettings?.temperature}</span>
             </div>
 
             <Slider
