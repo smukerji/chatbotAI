@@ -87,7 +87,7 @@ function PaymentTable() {
   }, []);
 
   useEffect(() => {
-    if (dataSource.length > 0) {
+    if (dataSource?.length > 0) {
       const data: any = transformDataSource(dataSource);
       setTransformedDataSource(data);
     }

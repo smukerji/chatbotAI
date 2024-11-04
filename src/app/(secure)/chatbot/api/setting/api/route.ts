@@ -6,6 +6,7 @@ import { getDate } from "../../../../../_helpers/client/getTime";
 import joi from "joi";
 import { authOptions } from "../../../../../api/auth/[...nextauth]/route";
 import { getServerSession } from "next-auth";
+import { openai } from "@/app/openai";
 
 module.exports = apiHandler({
   POST: retriveChatbotSettings,
@@ -114,6 +115,15 @@ async function updateChatbotSettings(request: NextRequest) {
       },
       { $set: { chatbotName: chatbotRename } }
     );
+
+    /// update chatbot name using assistant api
+    try {
+      const assistant = await openai.beta.assistants.update(chatbotId, {
+        name: chatbotRename,
+      });
+    } catch (error) {
+      console.log("Error while updating assistant name", error);
+    }
   } else {
     /// update the chatbot settings table
     const {
@@ -144,7 +154,6 @@ async function updateChatbotSettings(request: NextRequest) {
       rateLimitTime,
       allowIframe,
     } = body;
-    
 
     /// extract only the field that need to be updated
     const updateFields = {
@@ -186,10 +195,19 @@ async function updateChatbotSettings(request: NextRequest) {
       ...(rateLimitMessage !== undefined && { rateLimitMessage }),
       ...(rateLimitTime !== undefined && { rateLimitTime }),
       ...(allowIframe !== undefined && { allowIframe }),
-
     };
     const collection = db.collection("chatbot-settings");
 
+    /// update the assistant configuration
+    try {
+      const assistant = await openai.beta.assistants.update(chatbotId, {
+        instructions: updateFields.instruction,
+        model: updateFields.model,
+        temperature: updateFields.temperature,
+      });
+    } catch (error) {
+      console.log("Error while updating assistant configuration", error);
+    }
     /// update the name
     await collection.updateOne(
       {
@@ -239,7 +257,7 @@ updateChatbotSettings.schema = joi.object({
   leadFields: joi.object().optional(),
   botVisibility: joi.string().optional(),
   rateLimit: joi.number().optional(),
-  rateLimitMessage:joi.string().optional(),
+  rateLimitMessage: joi.string().optional(),
   rateLimitTime: joi.number().optional(),
   allowIframe: joi.boolean().optional(),
 });
