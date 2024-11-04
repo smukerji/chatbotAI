@@ -93,6 +93,49 @@ function Dashboard() {
     }
   }, []);
 
+  const duplicateAssistantHandler = async ()=>{
+
+    if(!voiceBotContextData?.assistantInfo["vapiAssistantId"]){
+      message.error("Assistant is not published yet");
+      return;
+    }
+    else {
+      try {
+        const assistantCreateResponse = await fetch(
+          `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/vapi/duplicate`,
+          {
+            method: "POST",
+            body: JSON.stringify({
+              assistantLocalData: voiceBotContextData.assistantInfo
+            })
+          }
+        );
+
+        const assistantCreateResponseParse = await assistantCreateResponse.json();
+        debugger;
+        if(assistantCreateResponseParse?.record){
+          message.success(assistantCreateResponseParse?.result);
+          voiceBotContextData.setAssistantInfo(
+          {  ...assistantCreateResponseParse.record}
+          );
+
+          getAssistantData(assistantCreateResponseParse.record?.vapiAssistantId);
+
+        }
+        
+        console.log("assistantCreateResponse", assistantCreateResponseParse);
+
+      }
+      catch (error: any) {
+
+        message.error(error);
+
+      }
+
+    }
+ 
+  }
+
   const getAssistantData = async (vapiAssiId:string)=>{
 
         //get the assistant record from the vapi's side
@@ -446,7 +489,7 @@ function Dashboard() {
             </Button>
             
            { isMoreContentVisible && (<div ref={divRef} className="content-holder"  onClick={(e) => e.stopPropagation()} >
-              <Button className="duplicate-assistant-button">
+              <Button className="duplicate-assistant-button" onClick={duplicateAssistantHandler}>
                 <div className="duplicate-assistant-button-content">
                   <Image alt="" src={documentCopy} className="duplicate-assistant-button-icon"></Image>
                   <span className="duplicate-assistant-button-text">Duplicate</span>
