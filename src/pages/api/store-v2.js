@@ -63,6 +63,7 @@ export default async function handler(req, res) {
         const files = JSON.parse(fields?.defaultFileList);
         const userId = fields?.userId[0];
         const numberOfCharacterTrained = fields?.numberOfCharacterTrained[0];
+        const chatbotName = fields?.chatbotText[0];
 
         /// using this variable to check if the chatbot needs to be retrained and has updated QA and Text source
         const updateChatbot = JSON.parse(fields?.updateChatbot[0]);
@@ -93,9 +94,34 @@ export default async function handler(req, res) {
           return;
         }
 
-        const chatbotId =
-          fields?.chatbotId[0] !== "undefined" ? fields?.chatbotId[0] : uuid();
+        /// if assistant is being created for the first time
+        let assistant;
         const assistantType = fields?.assistantType[0];
+        if (!updateChatbot) {
+          /// create the openai object
+          const openai = new OpenAI({
+            apiKey: process.env.NEXT_PUBLIC_OPENAI_KEY,
+            project: process.env.NEXT_PUBLIC_OPENAI_PROJ_KEY,
+            organization: process.env.NEXT_PUBLIC_OPENAI_ORG_KEY,
+          });
+
+          /// create the assistant based on the type of assistant with the necessary instructions and function calls
+          const systemInstruction = getSystemInstruction(assistantType);
+          const tools = getAssistantTools(assistantType);
+          assistant = await openai.beta.assistants.create({
+            model: models[0],
+            instructions: systemInstruction,
+            name: chatbotName,
+            tools: tools,
+            temperature: 1,
+          });
+        }
+
+        const chatbotId =
+          fields?.chatbotId[0] !== "undefined"
+            ? fields?.chatbotId[0]
+            : assistant.id;
+
         const qaList = JSON.parse(fields?.qaList);
         const text = fields?.text[0];
         const crawledList = JSON.parse(fields?.crawledList[0]);
@@ -553,29 +579,11 @@ export default async function handler(req, res) {
         if (!updateChatbot) {
           const currrentTime = new Date().getTime();
           /// create the chatbot entry in DB
-          const chatbotName = fields?.chatbotText[0];
           let userChatbotsCollection = db.collection("user-chatbots");
-
-          /// create the openai assistant
-          const openai = new OpenAI({
-            apiKey: process.env.NEXT_PUBLIC_OPENAI_KEY,
-            project: process.env.NEXT_PUBLIC_OPENAI_PROJ_KEY,
-            organization: process.env.NEXT_PUBLIC_OPENAI_ORG_KEY,
-          });
-
-          /// create the assistant based on the type of assistant with the necessary instructions and function calls
-          const systemInstruction = getSystemInstruction(assistantType);
-          const tools = getAssistantTools(assistantType);
-          const assistant = await openai.beta.assistants.create({
-            model: models[0],
-            instructions: systemInstruction,
-            name: chatbotName,
-            tools: tools,
-          });
 
           await userChatbotsCollection.insertOne({
             userId,
-            chatbotId: assistant.id,
+            chatbotId: chatbotId,
             chatbotName,
             lastUsed: currrentTime,
             createdAt: currrentTime,
@@ -613,15 +621,17 @@ export default async function handler(req, res) {
             console.log("Error while sending email", error);
           }
 
+          const systemInstruction = getSystemInstruction(assistantType);
+
           /// set the default settings for the chatbot in DB
           await db.collection("chatbot-settings").insertOne({
             userId: userId,
-            chatbotId: assistant.id,
-            // model: models[0],
+            chatbotId: chatbotId,
+            model: models[0],
             visibility: visibility.PUBLIC,
-            // temperature: 0,
+            temperature: 1,
             numberOfCharacterTrained: numberOfCharacterTrained,
-            // instruction: defaultModelInstruction,
+            instruction: systemInstruction,
             initialMessage: initialMessage,
             suggestedMessages: defaultSuggestedMessage,
             messagePlaceholder: defaultPlaceholderMessage,
