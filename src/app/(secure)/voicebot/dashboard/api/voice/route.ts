@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { apiHandler } from "../../../../../_helpers/server/api/api-handler";
 import clientPromise from "../../../../../../db";
 import { ObjectId } from "mongodb";
+import { VoiceBotData,VoiceData } from "./types";
 
 module.exports = apiHandler({
     POST: createVoiceBot,
@@ -23,7 +24,7 @@ async function createVoiceBot(req: NextRequest) {
         if(voicBotData.userId && typeof voicBotData.userId === "string"){
             voicBotData.userId = new ObjectId(voicBotData.userId);
         }
-        let insertData = {...voicBotData, isDeleted: false};
+        let insertData:VoiceData = {...voicBotData, isDeleted: false};
         
         const result = await collection?.insertOne(insertData);
         if(result.insertedId){
