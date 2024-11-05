@@ -7,6 +7,7 @@ import { PineconeStore } from "@langchain/pinecone";
 import { OpenAI, OpenAIEmbeddings } from "@langchain/openai";
 import { PromptTemplate } from "@langchain/core/prompts";
 import { MultiQueryRetriever } from "langchain/retrievers/multi_query";
+import { openai } from "@/app/openai";
 
 export default async function handler(req, res) {
   if (req.method === "POST") {
@@ -26,7 +27,6 @@ export default async function handler(req, res) {
     const chatbotId = body?.chatbotId;
     const userId = body?.userId;
     const messages = body?.messages;
-
     // /// create the embedding of user query
     // const embed = await createEmbedding(userQuery);
 
@@ -149,6 +149,13 @@ export default async function handler(req, res) {
 
     /// close the cursor
     await cursor.close();
+
+    /// delete the assistant from openai
+    try {
+      const assistant = await openai.beta.assistants.del(chatbotId);
+    } catch (error) {
+      console.error("Error during assistant deletion:", error);
+    }
 
     vectorId = [].concat(...vectorId);
     /// delete the vectors

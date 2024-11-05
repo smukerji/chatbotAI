@@ -113,11 +113,11 @@
           ? "32"
           : "64"
       }"
-      style="border-radius: 50%;"
+      style="border-radius: 50%; max-width: 64px; max-height: 64px;"
     />
   `;
 
-  iframe = `<iframe
+  let iframe = `<iframe
     id="chat-frame-widget"
     src="https://chatbot-ai-silk.vercel.app/embed-bot?chatbotID=${param1}"
     frameborder="0"
@@ -126,7 +126,7 @@
 `;
   if (chatbotBubbleAlignment === "left") {
     cssStyles = cssStyles.replace("right: 20px", "left: 20px");
-    iframe = iframe.replace("position: fixed;", "position: unset;");
+    cssStyles = cssStyles.replace("position: fixed;", "position: unset;");
   }
 
   chatWidget.innerHTML = iframe;
@@ -162,7 +162,7 @@
     if (event.data === "disable-iframe") {
       frameWidget.style.display = "none";
       /// add the button if the screen size is less than 768px
-      btn.style.display = "block";
+      btn.style.display = "inline-flex";
     }
   });
 })();

@@ -35,6 +35,7 @@ function Home({
   chatbotName,
   isPlanNotification,
   setIsPlanNotification,
+  botType,
 }: any) {
   const { status } = useSession();
   const router = useRouter();
@@ -233,25 +234,25 @@ function Home({
       return;
     }
 
-    if (
-      qaCount === 0 &&
-      textCharCount === 0 &&
-      defaultFileList.length === 0 &&
-      crawledList.length === 0
-    ) {
-      message.warning("Please add some content to create the bot").then(() => {
-        botContext?.handleChange("isLoading")(false);
-      });
-      return;
-    }
-    if (totalCharCount < 100) {
-      message
-        .warning("Minimum of 100 characters required to create the bot")
-        .then(() => {
-          botContext?.handleChange("isLoading")(false);
-        });
-      return;
-    }
+    // if (
+    //   qaCount === 0 &&
+    //   textCharCount === 0 &&
+    //   defaultFileList.length === 0 &&
+    //   crawledList.length === 0
+    // ) {
+    //   message.warning("Please add some content to create the bot").then(() => {
+    //     botContext?.handleChange("isLoading")(false);
+    //   });
+    //   return;
+    // }
+    // if (totalCharCount < 100) {
+    //   message
+    //     .warning("Minimum of 100 characters required to create the bot")
+    //     .then(() => {
+    //       botContext?.handleChange("isLoading")(false);
+    //     });
+    //   return;
+    // }
     for await (const item of botDetails?.qaList) {
       if (item.question.length < 10 || item.answer.length < 20) {
         message
@@ -298,30 +299,20 @@ function Home({
         JSON.stringify(botDetails?.deleteCrawlList)
       );
       //// default chatbot set
-      formData.append(
-        "userId",
-        // chatbotId === "123d148a-be02-4749-a612-65be9d96266c"
-        //   ? "651d111b8158397ebd0e65fb"
-        //   : chatbotId === "34cceb84-07b9-4b3e-ad6f-567a1c8f3557"
-        //   ? "65795294269d08529b8cd743"
-        //   : chatbotId === "f0893732-3302-46b2-922a-95e79ef3524c"
-        //   ? "651d111b8158397ebd0e65fb"
-        //   : chatbotId === "f8095ef4-6cd0-4373-a45e-8fe15cb6dd0f"
-        //   ? "6523fee523c290d75609a1fa"
-        cookies.userId
-      );
+      formData.append("userId", cookies.userId);
       formData.append("qaList", JSON.stringify(botDetails?.qaList));
       formData.append("text", text);
       formData.append(
         "chatbotText",
         chatbotName ? chatbotName : botDetails?.chatbotName
       );
+      formData.append("assistantType", botDetails?.assistantType);
 
       // botContext?.handleChange("isLoading")(true);
       setLoadingComponent(true);
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/store`,
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/store-v2`,
         {
           headers: {
             cache: "no-store",
@@ -365,6 +356,7 @@ function Home({
             JSON.stringify({
               id: chatbotId,
               name: chatbotName ? chatbotName : botDetails?.chatbotName,
+              botType: botType,
             })
           )}`;
         });
@@ -378,6 +370,7 @@ function Home({
             JSON.stringify({
               id: chatbotId,
               name: chatbotName ? chatbotName : botDetails?.chatbotName,
+              botType: botType,
             })
           )}`;
         });

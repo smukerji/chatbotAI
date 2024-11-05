@@ -3,12 +3,13 @@ import React, { useState, useEffect } from "react";
 import "./chatbot.css"; // You can style it with CSS
 import { MessageOutlined, CloseOutlined } from "@ant-design/icons";
 import Chat from "@/app/(secure)/chatbot/dashboard/_components/Chat/Chat";
+import ChatV2 from "../../(secure)/chatbot/dashboard/_components/Chat-v2/ChatV2";
+import { functionCallHandler } from "@/app/_helpers/client/functionCallHandler";
 import { useSearchParams } from "next/navigation";
 import { getDate, getTime } from "../../_helpers/client/getTime";
 import { v4 as uuid } from "uuid";
 import { defaultChatBubbleIconColor } from "../../_helpers/constant";
 import chatbubble from "../../../../public/create-chatbot-svgs/message-2.svg";
-
 import Image from "next/image";
 import axios from "axios";
 
@@ -21,6 +22,7 @@ function Chatbot() {
   const [messagesTime, setMessagesTime] = useState([]);
 
   const [sessionID, setSessionID] = useState();
+  const [threadId, setThreadId] = useState("");
   const [sessionStartDate, setSessionStartDate] = useState();
 
   const [userId, setUserId] = useState();
@@ -47,6 +49,9 @@ function Chatbot() {
 
   /// state to keep the chatbot open or close
   const [state, setState] = useState(false);
+
+  const [botType, setBotType] = useState("bot-v1");
+
   function toggleChatbot() {
     setState(!state);
   }
@@ -67,6 +72,14 @@ function Chatbot() {
     setUser(response.data.user);
   };
 
+  const createThread = async () => {
+    const res = await fetch(`/api/assistants/threads`, {
+      method: "POST",
+    });
+    const data = await res.json();
+    setThreadId(data.threadId);
+  };
+
   useEffect(() => {
     const planEndTimer = setInterval(() => {
       if (user) {
@@ -82,9 +95,13 @@ function Chatbot() {
   }, [user]);
 
   useEffect(() => {
+    // create a new threadID when chat component created
+    createThread();
+  }, []);
+
+  useEffect(() => {
     setSessionID(uuid());
     setSessionStartDate(getDate());
-
     const fetchBotDetails = async () => {
       setIsBotDetailsFetched(true);
       const response = await axios.get(
@@ -110,6 +127,7 @@ function Chatbot() {
       setUserDetails(botDetails?.chatbotSettings[0]?.userDetails);
       setUserMessageColor(botDetails?.chatbotSettings[0]?.userMessageColor);
       setMessagePlaceholder(botDetails?.chatbotSettings[0]?.messagePlaceholder);
+      setBotType(botDetails?.botType);
       botDetails?.chatbotSettings[0]?.initialMessage?.map((message, index) => {
         // setMessages((prev): any => {
         //   [
@@ -147,32 +165,62 @@ function Chatbot() {
     <>
       {/* {state && ( */}
       <div className="embed-chatbot-container">
-        <Chat
-          chatbot={chatbot}
-          messages={messages}
-          setMessages={setMessages}
-          messagesTime={messagesTime}
-          setMessagesTime={setMessagesTime}
-          sessionID={sessionID}
-          sessionStartDate={sessionStartDate}
-          setSessionID={setSessionID}
-          setSessionStartDate={setSessionStartDate}
-          isPopUp={true}
-          userId={userId}
-          chatbotName={chatbotName}
-          chatbotDisplayName={displayName}
-          suggestedMessages={suggestedMessages}
-          initialMessage={initialMessage}
-          profilePictureUrl={profilePictureUrl}
-          leadFields={leadFields}
-          leadTitle={leadTitle}
-          userLeadDetails={userDetails}
-          isPlanNotification={isPlanNotification}
-          setIsPlanNotification={setIsPlanNotification}
-          userMessageColor={userMessageColor}
-          messagePlaceholder={messagePlaceholder}
-          userLocation={userLocation}
-        />
+        {botType === "bot-v1" ? (
+          <Chat
+            chatbot={chatbot}
+            messages={messages}
+            setMessages={setMessages}
+            messagesTime={messagesTime}
+            setMessagesTime={setMessagesTime}
+            sessionID={sessionID}
+            sessionStartDate={sessionStartDate}
+            setSessionID={setSessionID}
+            setSessionStartDate={setSessionStartDate}
+            isPopUp={true}
+            userId={userId}
+            chatbotName={chatbotName}
+            chatbotDisplayName={displayName}
+            suggestedMessages={suggestedMessages}
+            initialMessage={initialMessage}
+            profilePictureUrl={profilePictureUrl}
+            leadFields={leadFields}
+            leadTitle={leadTitle}
+            userLeadDetails={userDetails}
+            isPlanNotification={isPlanNotification}
+            setIsPlanNotification={setIsPlanNotification}
+            userMessageColor={userMessageColor}
+            messagePlaceholder={messagePlaceholder}
+            userLocation={userLocation}
+          />
+        ) : (
+          <ChatV2
+            chatbot={chatbot}
+            messages={messages}
+            setMessages={setMessages}
+            messagesTime={messagesTime}
+            setMessagesTime={setMessagesTime}
+            threadID={threadId}
+            sessionStartDate={sessionStartDate}
+            setThreadId={createThread}
+            setSessionStartDate={setSessionStartDate}
+            isPopUp={true}
+            userId={userId}
+            chatbotName={chatbotName}
+            chatbotDisplayName={displayName}
+            suggestedMessages={suggestedMessages}
+            initialMessage={initialMessage}
+            profilePictureUrl={profilePictureUrl}
+            leadFields={leadFields}
+            leadTitle={leadTitle}
+            userLeadDetails={userDetails}
+            isPlanNotification={isPlanNotification}
+            setIsPlanNotification={setIsPlanNotification}
+            userMessageColor={userMessageColor}
+            messagePlaceholder={messagePlaceholder}
+            userLocation={userLocation}
+            functionCallHandler={functionCallHandler}
+          />
+        )}
       </div>
       {/* )} */}
 
