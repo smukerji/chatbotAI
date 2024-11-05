@@ -284,7 +284,7 @@ function parseAssistantData(assistantDataResponseParse: any) {
         assistantData.backchannelingEnabled = vapiAssistanceData.backchannelingEnabled;
         assistantData.backgroundDenoisingEnabled = vapiAssistanceData.backgroundDenoisingEnabled;
         assistantData.modelOutputInMessagesEnabled = vapiAssistanceData.modelOutputInMessagesEnabled;
-        assistantData.name = vapiAssistanceData.name;
+   
         assistantData.numWordsToInterruptAssistant = vapiAssistanceData.numWordsToInterruptAssistant;
         assistantData.voicemailDetection = vapiAssistanceData.voicemailDetection;
         assistantData.voicemailMessage = vapiAssistanceData.voicemailMessage;
