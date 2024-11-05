@@ -23,16 +23,15 @@ async function createVoiceBot(req: NextRequest) {
         if(voicBotData.userId && typeof voicBotData.userId === "string"){
             voicBotData.userId = new ObjectId(voicBotData.userId);
         }
+        let insertData = {...voicBotData, isDeleted: false};
         
-        const result = await collection?.insertOne(voicBotData);
+        const result = await collection?.insertOne(insertData);
         if(result.insertedId){
             const insertedRecord = await collection?.findOne({ _id: result.insertedId });
             return { record: insertedRecord , result};
         } else {
             return { error: "Failed to insert record" };
         }
-     
-        
     }
     catch (error: any) {
         return { error: error.message };
