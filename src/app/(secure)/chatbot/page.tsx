@@ -333,7 +333,7 @@ const initialState = {
   const getAllVoiceAssistantData = async () => {
     setVoiceBotLoading(true);
     try{
-      debugger;
+      ;
       const res = await fetch(
        `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/assistant?userId=${cookies.userId}`,
         {
@@ -342,7 +342,7 @@ const initialState = {
       );
       const data = await res.json();
   
-      debugger;
+      ;
       setVoiceAssistantList(data?.assistants);
     }
     catch(error:any){
@@ -359,7 +359,7 @@ const initialState = {
 
   const selectedAssistantHandler = (assistantInfo: any) => {
 
-    debugger;
+    ;
 
     voiceBotContextData.setAssistantInfo(assistantInfo);
 

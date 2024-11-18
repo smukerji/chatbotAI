@@ -53,13 +53,10 @@ function PricingWrapperNew() {
       const a = encryptPriceId(priceId);
       const encryptedPriceId = encodeURIComponent(a);
       const isActive = activePlan?.active;
-
       let urlParams = `priceId=${encryptedPriceId}&type=recurring`;
-
       if (isActive) {
         urlParams += `&isActive=${isActive}`;
       }
-
       router.push(`/home/pricing/plan-checkout?${urlParams}`);
     } else {
       router.push("/account/login");

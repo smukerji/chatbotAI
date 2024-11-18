@@ -72,7 +72,7 @@ export default function VoiceBot() {
 
       let assistantDataList = data?.assistantTemplates.filter((assistance:any)=> assistance?.industryType === "Assistant");
       let industryExpertDataList = data?.assistantTemplates.filter((assistance:any)=> assistance?.industryType === "Expert");
-      debugger;
+      ;
       setAssistantList(assistantDataList);
       setIndustryExpertList(industryExpertDataList);
 
@@ -88,7 +88,7 @@ export default function VoiceBot() {
 
   const selectedAssistantChangeHandler = (choosenAssistant: any,index:number) => {
     setSelectedAssistantIndex(index);
-    debugger;
+    ;
     setSelectedAssistant(choosenAssistant);
   }
 
@@ -139,7 +139,7 @@ export default function VoiceBot() {
         const assistantTemplateIDs = [selectedAssistant?._id, selectedIndustryExpert?._id];
 
         if(acknowledgedData?.isAcknowledged){//update the data
-          debugger
+          
           try{
     
             const assistantUpdateResponse = await fetch(
@@ -156,7 +156,7 @@ export default function VoiceBot() {
             );
       
             const assistantUpdateResponseParse = await assistantUpdateResponse.json();
-            debugger;
+            ;
     
             router.push(`/voicebot/dashboard?voicBotName=${assistantName}`);
     
@@ -166,10 +166,10 @@ export default function VoiceBot() {
             message.error(error.message);
           }
          
-          debugger;
+          ;
         }
         else{//create the data
-          debugger
+          
           try{
 
 
@@ -188,7 +188,7 @@ export default function VoiceBot() {
             );
       
             const assistantCreateResponseParse = await assistantCreateResponse.json();
-            debugger;
+            ;
             voiceBotContextData.setAssistantMongoId(assistantCreateResponseParse?.result?.insertedId); 
             let assistantData = assistantCreateResponseParse?.record;;
             voiceBotContextData.setAssistantInfo(assistantData);            
@@ -230,7 +230,7 @@ export default function VoiceBot() {
   const imageHandler = async (e: any) => {
     const selectedFile = e.target.files[0];
 
-    debugger;
+    ;
 
     // Check if a file is selected and it's an image
     if (selectedFile && isImageFile(selectedFile)) {
@@ -258,7 +258,7 @@ export default function VoiceBot() {
         }
         const data = await res.json();
         // setIconImage(data?.uploadUrl);
-        debugger;
+        ;
         const assistantTemplateIDs = [selectedAssistant?._id, selectedIndustryExpert?._id];
         const imagePath = data?.uploadUrl;
         setassistantImagePath(imagePath);
@@ -299,7 +299,7 @@ export default function VoiceBot() {
           );
   
           const assistantCreateResponseParse = await assistantCreateResponse.json();
-          debugger;
+          ;
           voiceBotContextData.setAssistantMongoId(assistantCreateResponseParse?.result?.insertedId);  
           let assistantData = assistantCreateResponseParse?.record;;
             voiceBotContextData.setAssistantInfo(assistantData);

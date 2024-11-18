@@ -149,7 +149,7 @@ export const VoiceBotDataProvider = ({ children }: { children: ReactNode }) => {
   const [afterPublishLoading,setAfterPublishLoading] = useState(false);
 
   const updateNestedState = (obj: any, path: string[], value: any): any => {
-    // debugger;
+    // ;
     const [key, ...rest] = path;
     if (rest.length === 0) {
       obj[key] = value;
@@ -161,7 +161,7 @@ export const VoiceBotDataProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const updateState = (key: string, value: any) => {
-    // debugger
+    // 
     const path = key.split(".");
     setState((prevState) => ({
       ...updateNestedState({ ...prevState }, path, value),
@@ -173,15 +173,15 @@ export const VoiceBotDataProvider = ({ children }: { children: ReactNode }) => {
   }
 
   const updateTheVoiceBotInfo = (key: any) => (value: any) => {
-    // debugger;
+    // ;
     setState((prevState) => ({ ...prevState, [key]: value }));
   }
 
 
   useEffect(() => {
-    debugger;
+    ;
     if(afterPublishLoading){
-      debugger;
+      ;
       setAfterPublishLoading(false);
 
       setIsPublishEnabled(false);
@@ -191,13 +191,13 @@ export const VoiceBotDataProvider = ({ children }: { children: ReactNode }) => {
 
 
   useEffect(() => {
-    debugger;
+    ;
     const { provider, model, language } = state.transcriber;
     const { messages: modelMessages, provider: modelProvider, model: modelsModel, maxTokens } = state.model;
     const {chunkPlan} = state.voice;
     const {punctuationBoundaries,minCharacters} = chunkPlan;
    
-    debugger;
+    ;
     if (provider && model && language && modelProvider && modelsModel && state.firstMessage && state.name && maxTokens && (typeof maxTokens === 'number') && punctuationBoundaries.length > 0 && minCharacters > 0 && modelMessages[0].content.length > 0) {
       
       setIsPublishEnabled(true);

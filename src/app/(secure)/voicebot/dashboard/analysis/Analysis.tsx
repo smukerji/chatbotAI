@@ -39,7 +39,7 @@ function Analysis() {
 
 
   const rubikChangeHandler = (value: string, option: any) => {
-    // debugger;
+    // ;
     setEvaluationRubik(option.label);
     voiceBotContextData.updateState("analysisPlan.successEvaluationRubric", option.label);
   }

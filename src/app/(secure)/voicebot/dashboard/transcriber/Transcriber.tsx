@@ -72,17 +72,17 @@ function Transcriber() {
 
 
   const modelChangeHandler = (value: string, option: any) => {
-    // debugger;
+    // ;
     setSelectedModel(option.label);
     setModelValidationMessage("");// Clear validation message on valid selection
     voiceBotContextData.updateState("transcriber.model", option.label);
   }
 
   const modelChangeHandlerListUpdate = () => {
-    // debugger
+    // 
     if (models.length === 0 && selectedProvider) {
       console.log("selected model providers ", selectedProvider)
-      // debugger;
+      // ;
       const selectedProviderList = providerList.find(provider => provider.label === selectedProvider);
       if (selectedProviderList) {
         setModels(selectedProviderList.model.map(model => ({ value: model+".", label: model })));
@@ -113,7 +113,7 @@ function Transcriber() {
   }
 
   const languageChangeHandler = (value: string, option: any) => {
-    // debugger;
+    // ;
     setSelectedLanguage(option.label);
     setLanguageValidationMessage("");// Clear validation message on valid selection
     voiceBotContextData.updateState("transcriber.language", option.label);

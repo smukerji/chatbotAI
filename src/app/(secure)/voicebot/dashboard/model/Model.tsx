@@ -61,7 +61,7 @@ function Model() {
 
   const firstMessageEnterHandler = (e:React.ChangeEvent<HTMLInputElement>) => {
     const enteredValue: string = e.target.value;
-    // debugger;
+    // ;
     setFirstMessage(enteredValue);
     if (enteredValue.trim().length == 0) {
       setinputValidationMessage("Type the first message for the assistant");
@@ -85,7 +85,7 @@ function Model() {
   }
 
   const providerChangeHandler = (value: string,option:any) => {
-    debugger;
+    ;
     setSelectedProvider(option.label);
     setProviderValidationMessage(""); // Clear validation message on valid selection
     voiceBotContextData.updateState("model.provider", option.label);
@@ -119,7 +119,7 @@ function Model() {
   }
 
   const modelChangeHandlerListUpdate = () => {
-    // debugger
+    // 
     if (models.length === 0 && selectedProvider) {
       const selectedProviderList = providersOption.find(provider => provider.label === selectedProvider);
       if (selectedProviderList) {
@@ -143,7 +143,7 @@ function Model() {
 
   const maxTokenChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    debugger
+    
     setMaxToken(value);
     const intValue = parseInt(value, 10);
     if (!isNaN(intValue) && intValue <= 1000 && intValue > 50) {

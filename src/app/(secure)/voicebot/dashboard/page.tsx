@@ -77,7 +77,7 @@ function Dashboard() {
       router.push("/chatbot");
     }
 
-    debugger;
+    ;
     if(voiceBotContextData.assistantInfo?.vapiAssistantId) {
 
       getAssistantData(voiceBotContextData.assistantInfo?.vapiAssistantId);
@@ -112,7 +112,7 @@ function Dashboard() {
         );
 
         const assistantCreateResponseParse = await assistantCreateResponse.json();
-        debugger;
+        ;
         if(assistantCreateResponseParse?.record){
           message.success(assistantCreateResponseParse?.result);
           voiceBotContextData.setAssistantInfo(
@@ -149,18 +149,18 @@ function Dashboard() {
           );
 
           const assistantDataResponseParse = await assistantDataResponse.json();
-          debugger;
+          ;
           if(assistantDataResponseParse?.error){
             message.error("Error while getting the assistant data");
             return;
           }
-          debugger;
+          ;
 
           if(assistantDataResponseParse?.result){
 
             const vapiAssistanceData = assistantDataResponseParse?.result;
 
-            debugger;
+            ;
             let assistantData:any = voiceBotContextData.state ;
             assistantData.firstMessage = vapiAssistanceData.firstMessage;
             assistantData.transcriber = vapiAssistanceData.transcriber;
@@ -275,7 +275,7 @@ function Dashboard() {
 
         }
         catch(error:any){
-          debugger;
+          ;
           console.log("error", error);
           message.error("Error while getting the assistant data");
         }
@@ -287,11 +287,11 @@ function Dashboard() {
 
   const makeVapiAssistantCall = async () => {
     let isIdAvaliable = voiceBotContextData.assistantInfo["vapiAssistantId"];
-    debugger;
+    ;
     if(isIdAvaliable){
       //if vapi assistant id is present then make the call to the vapi
       vapi.start(isIdAvaliable); // assistance ID
-      // debugger;
+      // ;
       setIsListening(CALLSTATUS.CONNECTING);
     }
     else{
@@ -301,7 +301,7 @@ function Dashboard() {
   }
 
   vapi.on("call-start", () => {
-    // debugger;
+    // ;
     setIsListening(CALLSTATUS.CONNECTING);
     setShowMakeCallButton(false);
     console.log("Call has started.");
@@ -318,7 +318,7 @@ function Dashboard() {
   });
 
   vapi.on("speech-start", () => {
-    // debugger;
+    // ;
     setIsListening(CALLSTATUS.SPEAKING);
     setShowMakeCallButton(false);
     // lottieRefs.current.play();
@@ -326,7 +326,7 @@ function Dashboard() {
   });
 
   vapi.on("error", (e) => {
-    // debugger;
+    // ;
     // lottieRefs.current.pause();
     console.error(e);
     setShowMakeCallButton(true);
@@ -372,7 +372,7 @@ function Dashboard() {
 
     //call the post api to publish the assistant to the vapi
 
-    debugger;
+    ;
     if(!voiceBotContextData?.isPublishEnabled){
       message.error("Please fill the required fields to publish the assistant");
       return;
@@ -380,7 +380,7 @@ function Dashboard() {
     
     try{
 
-      debugger;
+      ;
       const assistantCreateResponse = await fetch(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/vapi/assistant`,
         {
@@ -393,7 +393,7 @@ function Dashboard() {
       );
 
       const assistantCreateResponseParse = await assistantCreateResponse.json();
-      debugger;
+      ;
       if(assistantCreateResponseParse?.error){
         message.error("Error while publishing the assistant");
         return;
@@ -436,7 +436,7 @@ function Dashboard() {
 
   
   const handleDocumentClick = (event: MouseEvent) => {
-    // debugger;
+    // ;
     if (divRef.current && !divRef.current.contains(event.target as Node)) {
       setIsMoreContentVisible(false);
     }
