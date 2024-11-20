@@ -1,7 +1,7 @@
 import React from "react";
 import PlanCheckout from "../_components/PlanCheckout";
 
-function page() {
+function PlanCheckoutPage() {
   return (
     <>
       <PlanCheckout />
@@ -9,4 +9,4 @@ function page() {
   );
 }
 
-export default page;
+export default PlanCheckoutPage;

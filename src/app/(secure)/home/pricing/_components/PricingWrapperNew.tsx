@@ -23,7 +23,7 @@ const msgLarge: any = process.env.NEXT_PUBLIC_MESSAGELARGE_PLAN_ID;
 const onBoarding: any = process.env.NEXT_PUBLIC_ONBOARDING_FEES;
 const trainingData: any = process.env.NEXT_PUBLIC_TRAINING_DATA_MONTHLY;
 
-function PricingWrapperNew() {
+function PricingWrapperNew({ firstPurchase = false }) {
   const [loading, setLoading] = useState(false);
   const [cookies, setCookie] = useCookies(["userId"]);
   const [isYearlyPlan, setIsYearlyPlan] = useState(false);
@@ -57,7 +57,9 @@ function PricingWrapperNew() {
       if (isActive) {
         urlParams += `&isActive=${isActive}`;
       }
-      router.push(`/home/pricing/plan-checkout?${urlParams}`);
+      router.push(
+        `/home/pricing/plan-checkout?${urlParams}&firstPurchase=${firstPurchase}`
+      );
     } else {
       router.push("/account/login");
     }
@@ -82,7 +84,7 @@ function PricingWrapperNew() {
       }
 
       router.push(
-        `/home/pricing/plan-checkout?priceId=${encryptedPriceId}&source=addon&type=${type}`
+        `/home/pricing/plan-checkout?priceId=${encryptedPriceId}&source=addon&type=${type}&firstPurchase=${firstPurchase}`
       );
     } else {
       router.push("/account/login");
@@ -142,8 +144,8 @@ function PricingWrapperNew() {
   return (
     <>
       {status === "unauthenticated" && !u_id && <SecondaryHeader />}
-      {loading && <Loader />}
       <div className="main new-main">
+        {loading && <Loader />}
         <Image className="img1" src={img1} alt="img1" />
         <Image className="img2" src={img2} alt="img2" />
         <Image className="img3" src={img3} alt="img3" />

@@ -11,7 +11,6 @@ import closeEyeIcon from "../../../../../../public/svgs/close-eye.svg";
 import "../login.scss";
 import { signIn, useSession } from "next-auth/react";
 import { LoadingOutlined } from "@ant-design/icons";
-import { redirect } from "next/navigation";
 import { useUserService } from "../../../../_services/useUserService";
 import { Spin, message } from "antd";
 import CaptchaErrorMessage from "@/app/_components/CaptchaErrorMessage";
