@@ -8,6 +8,8 @@ export const CreateAssistantFlowDataProvider = ({ children }: any) => {
   const initialCreateAssistantFlowInfo = {
     assistantName: "",
     currentAssistantFlowStep: 0,
+    assistantType: "",
+    industryExpertType: "",
   };
   const [createAssistantFlowInfo, setCreateAssistantFlowInfo] = useState(
     initialCreateAssistantFlowInfo
@@ -15,7 +17,6 @@ export const CreateAssistantFlowDataProvider = ({ children }: any) => {
 
   /// handle the changes
   const handleChange = (props: any) => (value: any) => {
-    console.log("createAssistantFlowInfo", createAssistantFlowInfo);
     setCreateAssistantFlowInfo((prevCreateAssistantFlowInfo) => ({
       ...prevCreateAssistantFlowInfo,
       [props]: value,

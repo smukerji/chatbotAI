@@ -541,7 +541,7 @@ function Chatbot() {
   };
 
   const createVoiceBotHandler = () => {
-    voiceBotContextData.reInitiateState();
+    // voiceBotContextData.reInitiateState();
     router.push("/voicebot");
   };
 

@@ -19,6 +19,8 @@ import { CreateVoiceBotContext } from "../../_helpers/client/Context/VoiceBotCon
 import SelectAssistantType from "./_components/SelectAssistantType/SelectAssistantType";
 import PricingWrapperNew from "../home/pricing/_components/PricingWrapperNew";
 import { CreateAssistantFlowContext } from "@/app/_helpers/client/Context/CreateAssistantFlowContext";
+import ChooseAssistant from "./_components/ChooseAssistant/ChooseAssistant";
+import ChooseIndustryExpert from "./_components/ChooseIndustryExpert/ChooseIndustryExpert";
 
 export default function VoiceBot() {
   // const voiceBotContextData: any = useContext(CreateVoiceBotContext);
@@ -549,122 +551,12 @@ export default function VoiceBot() {
         {createAssistantFlowContextDetails?.currentAssistantFlowStep === 1 && (
           <PricingWrapperNew firstPurchase={true} />
         )}
-        {/* <h2 className="main-voiceboot__title">
-          {voiceBotContextData.currentAssistantPage === 0
-            ? "Let's create a new assistant"
-            : "Choose your industry expert"}
-        </h2>
-        <h4 className="main-voiceboot__subtitle">
-          {voiceBotContextData.currentAssistantPage === 0
-            ? "Get started by selecting the AI assistant that best fits your needs and preferences."
-            : "Choose your specialized AI expert for tasks like translation, diagnostics, finance, or customer service needs."}
-        </h4> */}
-        {/* 
-        <div className="assistant-wrapper">
-          <div className="custom_assistant-card">
-            <div className="blank-template">
-              <div className="image-card">
-                <Image
-                  src={customTemplate}
-                  alt=""
-                  height={100}
-                  width={100}
-                ></Image>
-              </div>
-              <h3 className="card_sub-header">Blank Template</h3>
-            </div>
-          </div>
-          {voiceBotContextData.currentAssistantPage === 0 ? (
-            assistantList.length > 0 ? (
-              assistantList.map((assistant: any, index: number) => {
-                return (
-                  <div
-                    className={
-                      selectedAssistantIndex === index
-                        ? "assistant-card selected-assistant"
-                        : "assistant-card "
-                    }
-                    key={index}
-                    onClick={() => {
-                      selectedAssistantChangeHandler(assistant, index);
-                    }}
-                  >
-                    <div className="card-image">
-                      <Image
-                        src={assistant.imageUrl}
-                        alt=""
-                        height={100}
-                        width={100}
-                      ></Image>
-                    </div>
-                    <div className="header-information">
-                      <div className="header_container">
-                        <h2 className="card_header">
-                          {assistant.assistantType}
-                        </h2>
-                        <div className="image-info">
-                          <Image
-                            src={infoImage}
-                            alt=""
-                            height={100}
-                            width={100}
-                          ></Image>
-                        </div>
-                      </div>
-
-                      <h3 className="card_sub-header">
-                        {assistant.dispcrtion}
-                      </h3>
-                    </div>
-                  </div>
-                );
-              })
-            ) : (
-              <div>loadding....</div>
-            )
-          ) : (
-            industryExpertList.map((assistant: any, index: number) => {
-              return (
-                <div
-                  className={
-                    selecteExpertIndex === index
-                      ? "assistant-card selected-assistant"
-                      : "assistant-card "
-                  }
-                  key={index}
-                  onClick={() => {
-                    selectedExpertChangeHandler(assistant, index);
-                  }}
-                >
-                  <div className="card-image">
-                    <Image
-                      src={assistant.imageUrl}
-                      alt=""
-                      height={100}
-                      width={100}
-                    ></Image>
-                  </div>
-                  <div className="header-information">
-                    <div className="header_container">
-                      <h2 className="card_header">{assistant.assistantType}</h2>
-                      <div className="image-info">
-                        <Image
-                          src={infoImage}
-                          alt=""
-                          height={100}
-                          width={100}
-                        ></Image>
-                      </div>
-                    </div>
-
-                    <h3 className="card_sub-header">{assistant.dispcrtion}</h3>
-                  </div>
-                </div>
-              );
-            })
-          )}
-          
-        </div> */}
+        {createAssistantFlowContextDetails?.currentAssistantFlowStep === 2 && (
+          <ChooseAssistant />
+        )}
+        {createAssistantFlowContextDetails?.currentAssistantFlowStep === 3 && (
+          <ChooseIndustryExpert />
+        )}
       </div>
       {/*------------------------------------------main-voicebot-end----------------------------------------------*/}
     </div>

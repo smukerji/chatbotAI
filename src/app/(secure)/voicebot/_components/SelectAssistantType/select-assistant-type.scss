@@ -1,25 +1,4 @@
 .select-assistant-container {
-  .title {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    h1 {
-      color: #141416;
-      font-size: 36px;
-      font-style: normal;
-      font-weight: 600;
-      line-height: 44px; /* 122.222% */
-    }
-
-    span {
-      color: #777e90;
-      font-size: 16px;
-      font-style: normal;
-      font-weight: 500;
-      line-height: 24px; /* 150% */
-    }
-  }
-
   /* assistant types */
   .select-assistant-type {
     margin-top: 60px;
