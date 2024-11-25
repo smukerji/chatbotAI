@@ -21,6 +21,8 @@ import PricingWrapperNew from "../home/pricing/_components/PricingWrapperNew";
 import { CreateAssistantFlowContext } from "@/app/_helpers/client/Context/CreateAssistantFlowContext";
 import ChooseAssistant from "./_components/ChooseAssistant/ChooseAssistant";
 import ChooseIndustryExpert from "./_components/ChooseIndustryExpert/ChooseIndustryExpert";
+import Home from "../home/page";
+import { CreateBotContext } from "@/app/_helpers/client/Context/CreateBotContext";
 
 export default function VoiceBot() {
   // const voiceBotContextData: any = useContext(CreateVoiceBotContext);
@@ -28,10 +30,11 @@ export default function VoiceBot() {
   const createAssistantFlowContext: any = useContext(
     CreateAssistantFlowContext
   );
-
   const createAssistantFlowContextDetails =
     createAssistantFlowContext.createAssistantFlowInfo;
-  const router = useRouter();
+
+  const botContext: any = useContext(CreateBotContext);
+  const botDetails = botContext?.createBotInfo;
 
   let cardDetails = [
     {
@@ -40,6 +43,12 @@ export default function VoiceBot() {
       subTitle: "",
     },
   ];
+
+  /// data sources to train
+  const [qaData, setQaData]: any = useState();
+  const [textData, setTextData]: any = useState();
+  const [fileData, setFileData]: any = useState();
+  const [crawlData, setCrawlData]: any = useState();
 
   const [currentPage, setCurrentPage] = useState<number>(1);
 
@@ -116,6 +125,7 @@ export default function VoiceBot() {
     const enteredValue = e.target.value.trim();
 
     createAssistantFlowContext?.handleChange("assistantName")(enteredValue);
+    // botContext?.handleChange("chatbotName")(enteredValue);
   };
 
   const continuesChangeHandler = async () => {
@@ -498,7 +508,7 @@ export default function VoiceBot() {
               title: (
                 <div>
                   <h3 className="steps-assistant-heading">
-                    Choose your AI expert
+                    Choose your Industry
                   </h3>
                 </div>
               ),
@@ -544,7 +554,7 @@ export default function VoiceBot() {
       {/*------------------------------------------stepper-end----------------------------------------------*/}
 
       {/*------------------------------------------main-voicebot----------------------------------------------*/}
-      <div className="create-assistant-container">
+      <div className="create-assistant-containerp-items">
         {createAssistantFlowContextDetails?.currentAssistantFlowStep === 0 && (
           <SelectAssistantType />
         )}
@@ -556,6 +566,21 @@ export default function VoiceBot() {
         )}
         {createAssistantFlowContextDetails?.currentAssistantFlowStep === 3 && (
           <ChooseIndustryExpert />
+        )}
+        {createAssistantFlowContextDetails?.currentAssistantFlowStep === 4 && (
+          <>
+            <div className="title">
+              <h1>Create your AI Assistant</h1>
+              <span>Add your data sources to train your chatbot</span>
+            </div>
+            <Home
+              qaData={qaData}
+              textData={textData}
+              fileData={fileData}
+              crawlingData={crawlData}
+              chatbotName={"assistantName"}
+            />
+          </>
         )}
       </div>
       {/*------------------------------------------main-voicebot-end----------------------------------------------*/}

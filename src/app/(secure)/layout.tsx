@@ -2,6 +2,7 @@ import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "../_helpers/server/auth";
 import { CreateAssistantFlowDataProvider } from "../_helpers/client/Context/CreateAssistantFlowContext";
+import { CreateBotDataProvider } from "../_helpers/client/Context/CreateBotContext";
 
 export default function HomeLayout({
   children,
@@ -19,7 +20,7 @@ export default function HomeLayout({
   return (
     <>
       <CreateAssistantFlowDataProvider>
-        {children}
+        <CreateBotDataProvider>{children}</CreateBotDataProvider>
       </CreateAssistantFlowDataProvider>
     </>
   );

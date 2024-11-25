@@ -10,6 +10,13 @@
   height: 100%;
   overflow-y: auto;
 
+  .create-assistant-containerp-items {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+  }
+
   .stepper {
     margin-right: 60px;
     display: flex;
@@ -550,6 +557,66 @@
         // &.hover{
         //   cursor: pointer !important;
         // }
+      }
+    }
+  }
+
+  /// create chatbot data sources container
+  .create-chatbot-container {
+    padding: 0;
+    height: calc(100% - 85px);
+
+    .top .sources-header {
+      .title {
+        display: none;
+      }
+      p {
+        display: none;
+      }
+
+      .options-container {
+        padding-left: 0px;
+      }
+    }
+
+    .bottom {
+      margin-left: 0px;
+      height: calc(100% - 60px);
+
+      .left {
+        .source-upload-container {
+          height: calc(100% - 20px);
+
+          .ant-upload-wrapper .ant-upload-drag .ant-upload-drag-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+          }
+
+          .ant-upload-hint {
+            width: 70%;
+          }
+        }
+
+        .text-source-container {
+          height: 100%;
+          textarea {
+            height: calc(100% - 20px);
+          }
+
+          p {
+            margin: 10px 0 30px 16px;
+            padding: 0;
+          }
+        }
+
+        .qa-container {
+          height: calc(100% - 20px);
+        }
+
+        .website-source-container {
+          height: calc(100% - 20px);
+        }
       }
     }
   }

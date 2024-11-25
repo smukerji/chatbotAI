@@ -101,7 +101,6 @@ function Home({
     .createHash("sha1")
     .update(JSON.stringify(initialQAData))
     .digest("hex");
-
   /// creating the hash of latest QA
   const currentQAHash = crypto
     .createHash("sha1")
@@ -153,6 +152,7 @@ function Home({
 
     /// return the use to chatbot screen if chatbot name is empty
     if ((paramValue == "" || !paramValue) && !chatbotName) {
+      alert(`Chatbot name is missing. Please try again ${chatbotName}`);
       router.push("/chatbot");
       return;
     }
