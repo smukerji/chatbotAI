@@ -315,8 +315,8 @@ function Advance() {
             <div className="thrid-container-content">
               <Slider className="slider" step={1} min={10} max={600} value={silenceTimeout} onChange={silenceTimeoutChangeHandler} />
               <div className="point-notation">
-                <span className="point-notation-value">10(sec)</span>
-                <span className="point-notation-value">600(sec)</span>
+                <span className="point-notation-value">10 (sec)</span>
+                <span className="point-notation-value">600 (sec)</span>
               </div>
             </div>
             <div className="fourth-container-content">
@@ -347,8 +347,8 @@ function Advance() {
               <Slider className="slider" step={0.1} min={0} max={2} value={responseDelay} 
               onChange={responseDelayChangeHandler} />
               <div className="point-notation">
-                <span className="point-notation-value">0(sec)</span>
-                <span className="point-notation-value">2(sec)</span>
+                <span className="point-notation-value">0 (sec)</span>
+                <span className="point-notation-value">2 (sec)</span>
               </div>
             </div>
             <div className="fourth-container-content">
@@ -378,8 +378,8 @@ function Advance() {
             <div className="thrid-container-content">
               <Slider className="slider" step={0.1} min={0} max={3} value={llmRequestDelay} onChange={llmRequestDelayChangeHandler} />
               <div className="point-notation">
-                <span className="point-notation-value">10(sec)</span>
-                <span className="point-notation-value">600(sec)</span>
+                <span className="point-notation-value">10 (sec)</span>
+                <span className="point-notation-value">600 (sec)</span>
               </div>
             </div>
             <div className="fourth-container-content">
@@ -409,8 +409,8 @@ function Advance() {
             <div className="thrid-container-content">
               <Slider className="slider" step={1} min={0} max={10} value={interruptionThreshold} onChange={interruptionThresholdChangeHandler} />
               <div className="point-notation">
-                <span className="point-notation-value">10(sec)</span>
-                <span className="point-notation-value">600(sec)</span>
+                <span className="point-notation-value">10 (sec)</span>
+                <span className="point-notation-value">600 (sec)</span>
               </div>
             </div>
             <div className="fourth-container-content">
@@ -440,8 +440,8 @@ function Advance() {
             <div className="thrid-container-content">
               <Slider className="slider" step={1} min={10} max={3600} value={maximumDuration} onChange={maximumDurationChangeHandler} />
               <div className="point-notation">
-                <span className="point-notation-value">10(sec)</span>
-                <span className="point-notation-value">3600(sec)</span>
+                <span className="point-notation-value">10 (sec)</span>
+                <span className="point-notation-value">3600 (sec)</span>
               </div>
             </div>
             <div className="fourth-container-content">
@@ -614,8 +614,8 @@ function Advance() {
               <div className="thrid-container-content">
                 <Slider className="slider" step={0.1} min={0} max={10} value={idleTimeout} onChange={idleTimeoutChangeHandler} />
                 <div className="point-notation">
-                  <span className="point-notation-value">5(sec)</span>
-                  <span className="point-notation-value">10(sec)</span>
+                  <span className="point-notation-value">5 (sec)</span>
+                  <span className="point-notation-value">10 (sec)</span>
                 </div>
               </div>
               <div className="fourth-container-content">
