@@ -7,6 +7,7 @@ import {
   Modal,
   Radio,
   RadioChangeEvent,
+  Flex, Spin
 } from "antd";
 import Model from "../dashboard/model/Model";
 import React, { useContext, useEffect, useState,useRef } from "react";
@@ -66,6 +67,8 @@ function Dashboard() {
   const voiceBotContextData: any = useContext(CreateVoiceBotContext);
   const voicebotDetails = voiceBotContextData.state;
 
+  const [loading, setLoading] = useState(false);
+
   const divRef = useRef<HTMLDivElement>(null);
 
 
@@ -80,7 +83,9 @@ function Dashboard() {
     debugger;
     if(voiceBotContextData.assistantInfo?.vapiAssistantId) {
 
+     
       getAssistantData(voiceBotContextData.assistantInfo?.vapiAssistantId);
+ 
 
     }
     else{
@@ -178,6 +183,7 @@ function Dashboard() {
         //get the assistant record from the vapi's side
         try{
 
+          setLoading(true);
           const assistantDataResponse = await fetch(
             `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/vapi/assistant/?assistantId=${vapiAssiId}`,
             {
@@ -308,12 +314,15 @@ function Dashboard() {
             message.success("Assistant Fetch Successfully");
 
           }
-
+          setLoading(false);
         }
         catch(error:any){
         
           console.log("error", error);
           message.error("Error while getting the assistant data");
+        }
+        finally{
+          setLoading(false);
         }
   
   }
@@ -581,75 +590,85 @@ function Dashboard() {
           
         </div>
       </div>
+
+      {
+        loading ? (
+          <Flex align="center" gap="middle" className="loader">
+            <Spin size="large" />
+          </Flex>
+        ) :
+        (
+          <div className="bottom">
+
+            {
+              tab == "model" && (
+                <>
+                  <Model />
+                </>
+              )
+            }
+
+            {
+              tab == "transcriber" && (
+                <>
+                  <Transcriber />
+                </>
+              )
+            }
+
+            {
+              tab == "voice" && (
+                <>
+                  <Voice />
+                </>
+              )
+            }
+
+            {
+              tab == "tool" && (
+                <>
+                  <Functions />
+                </>
+              )
+            }
+
+            {
+              tab == "advance" && (
+                <>
+                  <Advance />
+                </>
+              )
+            }
+
+            {
+              tab == "analysis" && (
+                <>
+                  <Analysis />
+                </>
+              )
+            }
+
+            {
+              tab == "phone-number" && (
+                <>
+                  <PhoneNumber />
+                </>
+              )
+            }
+
+            {
+              tab == "call-logs" && (
+                <>
+                  <CallLogs />
+                </>
+              )
+            }
+
+          </div>
+        )
+
+      }
       
-      <div className="bottom">
-        
-
-        {
-          tab == "model" && (
-            <>
-              <Model />
-            </>
-          )
-        }
-
-        {
-          tab == "transcriber" && (
-            <>
-              <Transcriber />
-            </>
-          )
-        }
-
-        {
-          tab == "voice" && (
-            <>
-              <Voice/>
-            </>
-          )
-        }
-
-        {
-          tab == "tool" && (
-            <>
-              <Functions/>
-            </>
-          )
-        }
-
-        {
-          tab == "advance" && (
-            <>
-              <Advance />
-            </>
-          )
-        }
-
-        {
-          tab == "analysis" && (
-            <>
-              <Analysis />
-            </>
-          )
-        }
-
-        {
-          tab == "phone-number" && (
-            <>
-              <PhoneNumber />
-            </>
-          )
-        }
-
-        {
-          tab == "call-logs" && (
-            <>
-              <CallLogs />
-            </>
-          )
-        }
-
-      </div>
 
       {/* <div className={isMoreContentVisible ? "additional-circle-items-behinds" : "additional-circle-items-behinds-hide"} onClick={tatabyebyeHandler}>
               

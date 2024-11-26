@@ -172,8 +172,6 @@ export default function VoiceBot() {
           debugger
           try{
 
-
-
             const assistantCreateResponse = await fetch(
               `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/voice`,
               {

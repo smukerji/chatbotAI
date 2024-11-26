@@ -5,9 +5,9 @@ import { createContext, useState, useEffect, ReactNode } from "react";
 const initialState = {
   firstMessage: "",
   transcriber: {
-    provider: "",
-    model: "",
-    language: "",
+    provider: "deepgram",
+    model: "nova-2",
+    language: "en-IN",
     // smartFormat: false,
     languageDetectionEnabled: false,
     // keywords: [""],
