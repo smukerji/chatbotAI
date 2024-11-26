@@ -26,6 +26,7 @@ export function isPublicPath(req: NextRequest) {
     "GET:/blog/api/previewblog",
     "GET:/voicebot/dashboard/api/template",
     "GET:/voicebot/dashboard/api/assistant",
+    "DELETE:/voicebot/dashboard/api/assistant",
     "POST:/blog/api/previewblog",
     "POST:/home/pricing/stripe-payment-gateway/get-plan-prices",
   ];

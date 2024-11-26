@@ -91,15 +91,23 @@ function Dashboard() {
     if(voiceBotContextData?.assistantInfo?.assistantName){
       voiceBotContextData.updateState("name",voiceBotContextData?.assistantInfo?.assistantName);
     }
+
+    console.log("voice bot context data deatils ***",voiceBotContextData)
   }, []);
 
   const duplicateAssistantHandler = async ()=>{
 
+    /**
+     *  console.log("Assistant delete id ",voiceBotContextData.assistantInfo?._id);
+     */
+    debugger;
     if(!voiceBotContextData?.assistantInfo["vapiAssistantId"]){
       message.error("Assistant is not published yet");
       return;
     }
     else {
+
+      let data = voiceBotContextData.assistantInfo;
       try {
         const assistantCreateResponse = await fetch(
           `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/vapi/duplicate`,
@@ -112,7 +120,7 @@ function Dashboard() {
         );
 
         const assistantCreateResponseParse = await assistantCreateResponse.json();
-        debugger;
+      
         if(assistantCreateResponseParse?.record){
           message.success(assistantCreateResponseParse?.result);
           voiceBotContextData.setAssistantInfo(
@@ -136,6 +144,35 @@ function Dashboard() {
  
   }
 
+  const deleteAssistantHandler = async ()=>{
+
+    let data = voiceBotContextData.assistantInfo;
+
+    debugger;
+    const deleteId:string = data._id;
+    try{
+
+      const assistantDataResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/assistant?assistanceId=${deleteId}`,
+        {///voicebot/dashboard/api/assistant?assistanceId
+          method: "DELETE",
+        }
+      );
+
+      const assistantDataResponseParse = await assistantDataResponse.json();
+      debugger;
+      message.success(assistantDataResponseParse?.message);
+      router.push("/chatbot");
+
+
+    }
+    catch(error:any){
+      console.log("error", error);
+      message.error("Error while deleting the assistant");
+    }
+
+  }
+
   const getAssistantData = async (vapiAssiId:string)=>{
 
         //get the assistant record from the vapi's side
@@ -154,13 +191,12 @@ function Dashboard() {
             message.error("Error while getting the assistant data");
             return;
           }
-          debugger;
 
           if(assistantDataResponseParse?.result){
 
             const vapiAssistanceData = assistantDataResponseParse?.result;
 
-            debugger;
+            
             let assistantData:any = voiceBotContextData.state ;
             assistantData.firstMessage = vapiAssistanceData.firstMessage;
             assistantData.transcriber = vapiAssistanceData.transcriber;
@@ -275,7 +311,7 @@ function Dashboard() {
 
         }
         catch(error:any){
-          debugger;
+        
           console.log("error", error);
           message.error("Error while getting the assistant data");
         }
@@ -287,11 +323,11 @@ function Dashboard() {
 
   const makeVapiAssistantCall = async () => {
     let isIdAvaliable = voiceBotContextData.assistantInfo["vapiAssistantId"];
-    debugger;
+ 
     if(isIdAvaliable){
       //if vapi assistant id is present then make the call to the vapi
       vapi.start(isIdAvaliable); // assistance ID
-      // debugger;
+      
       setIsListening(CALLSTATUS.CONNECTING);
     }
     else{
@@ -301,7 +337,7 @@ function Dashboard() {
   }
 
   vapi.on("call-start", () => {
-    // debugger;
+   
     setIsListening(CALLSTATUS.CONNECTING);
     setShowMakeCallButton(false);
     console.log("Call has started.");
@@ -318,7 +354,7 @@ function Dashboard() {
   });
 
   vapi.on("speech-start", () => {
-    // debugger;
+    
     setIsListening(CALLSTATUS.SPEAKING);
     setShowMakeCallButton(false);
     // lottieRefs.current.play();
@@ -326,7 +362,7 @@ function Dashboard() {
   });
 
   vapi.on("error", (e) => {
-    // debugger;
+   
     // lottieRefs.current.pause();
     console.error(e);
     setShowMakeCallButton(true);
@@ -495,7 +531,7 @@ function Dashboard() {
                   <span className="duplicate-assistant-button-text">Duplicate</span>
                 </div>
               </Button>
-              <Button className="delete-assistant-button">
+              <Button className="delete-assistant-button" onClick={deleteAssistantHandler}>
                 <div className="delete-assistant-button-content">
                   <Image alt="" src={documentTrash} className="delete-assistant-button-icon"></Image>
                   <span className="delete-assistant-button-text">Delete</span>
@@ -545,6 +581,7 @@ function Dashboard() {
           
         </div>
       </div>
+      
       <div className="bottom">
         
 
@@ -618,14 +655,8 @@ function Dashboard() {
               
         </div> */}
 
-    
-
-
     </div>
 
-
-   
-    
 
     )
 }
