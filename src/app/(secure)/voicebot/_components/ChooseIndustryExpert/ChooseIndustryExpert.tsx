@@ -46,15 +46,15 @@ function ChooseIndustryExpert() {
             return (
               <button
                 className={
-                  createAssistantFlowContextDetails.industryExpertType ===
-                  assistant.abbreviation
+                  createAssistantFlowContextDetails.industryExpertType
+                    .abbreviation === assistant.abbreviation
                     ? "assistant-card selected-assistant"
                     : "assistant-card"
                 }
                 key={assistant._id}
                 onClick={() => {
                   createAssistantFlowContext.handleChange("industryExpertType")(
-                    assistant.abbreviation
+                    assistant
                   );
                 }}
               >

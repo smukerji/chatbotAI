@@ -1,10 +1,18 @@
-import React from "react";
+import React, { useContext } from "react";
 import "./select-assistant-type.scss";
 import Image from "next/image";
 import ChatbotImage from "../../../../../../public/sections-images/create-first-assistant/chatbot/chatbot-creation-image.jpg";
 import VoicebotImage from "../../../../../../public/sections-images/create-first-assistant/voicebot/voicebot-creation-image.jpg";
+import { CreateAssistantFlowContext } from "@/app/_helpers/client/Context/CreateAssistantFlowContext";
 
 function SelectAssistantType() {
+  /// get the context data
+  const createAssistantFlowContext: any = useContext(
+    CreateAssistantFlowContext
+  );
+  const createAssistantFlowContextDetails =
+    createAssistantFlowContext.createAssistantFlowInfo;
+
   /// select assistant type
   return (
     <div className="select-assistant-container">
@@ -16,12 +24,32 @@ function SelectAssistantType() {
       </div>
       <div className="select-assistant-type">
         <div className="assistant-type">
-          <div className="assistant-type-item">
+          <div
+            onClick={() =>
+              createAssistantFlowContext.handleChange("creationFlow")("chatbot")
+            }
+            className={`assistant-type-item ${
+              createAssistantFlowContextDetails.creationFlow === "chatbot"
+                ? "selected-assistant"
+                : ""
+            }`}
+          >
             <Image src={ChatbotImage} alt="assistant-type-1" />
             <h2>Chatbot</h2>
             <p>AI Custom Chat Agent</p>
           </div>
-          <div className="assistant-type-item">
+          <div
+            className={`assistant-type-item ${
+              createAssistantFlowContextDetails.creationFlow === "voicebot"
+                ? "selected-assistant"
+                : ""
+            }`}
+            onClick={() =>
+              createAssistantFlowContext.handleChange("creationFlow")(
+                "voicebot"
+              )
+            }
+          >
             <Image src={VoicebotImage} alt="assistant-type-2" />
             <h2>Voicebot</h2>
             <p>AI Custom Voice Agent</p>

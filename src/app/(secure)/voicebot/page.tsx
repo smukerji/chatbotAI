@@ -23,6 +23,7 @@ import ChooseAssistant from "./_components/ChooseAssistant/ChooseAssistant";
 import ChooseIndustryExpert from "./_components/ChooseIndustryExpert/ChooseIndustryExpert";
 import Home from "../home/page";
 import { CreateBotContext } from "@/app/_helpers/client/Context/CreateBotContext";
+import ShopifySecretModal from "./_components/Modals/ShopifySecretModal";
 
 export default function VoiceBot() {
   // const voiceBotContextData: any = useContext(CreateVoiceBotContext);
@@ -124,14 +125,45 @@ export default function VoiceBot() {
   ) => {
     const enteredValue = e.target.value.trim();
 
+    if (inputValidationMessage != "") setinputValidationMessage("");
+
     createAssistantFlowContext?.handleChange("assistantName")(enteredValue);
+
     // botContext?.handleChange("chatbotName")(enteredValue);
   };
 
   const continuesChangeHandler = async () => {
-    if (createAssistantFlowContextDetails?.assistantName.trim().length === 0) {
-      setinputValidationMessage("Please, Provide Assistant Name!");
-      return;
+    /// check for validation on each of the steps
+
+    /// validation for assistant name & creation flow
+    if (createAssistantFlowContextDetails?.currentAssistantFlowStep === 0) {
+      if (
+        createAssistantFlowContextDetails?.assistantName.trim().length === 0
+      ) {
+        setinputValidationMessage("Please, Provide Assistant Name!");
+        return;
+      }
+
+      if (createAssistantFlowContextDetails?.creationFlow === "") {
+        message.warning("Please select the type of assistant!");
+        return;
+      }
+    }
+
+    /// validation for assistant type
+    if (createAssistantFlowContextDetails?.currentAssistantFlowStep === 2) {
+      if (createAssistantFlowContextDetails?.assistantType === "") {
+        message.warning("Please select an assistant first!");
+        return;
+      }
+    }
+
+    /// validation for industry expert
+    if (createAssistantFlowContextDetails?.currentAssistantFlowStep === 3) {
+      if (createAssistantFlowContextDetails?.industryExpertType === "") {
+        message.warning("Please select an Industry Expert first!");
+        return;
+      }
     }
 
     // if (selectedAssistantIndex === -1) {
@@ -582,6 +614,15 @@ export default function VoiceBot() {
             />
           </>
         )}
+        {createAssistantFlowContextDetails?.currentAssistantFlowStep === 4 &&
+          createAssistantFlowContextDetails?.industryExpertType.abbreviation ===
+            "shopify" && (
+            <ShopifySecretModal
+              imageUrl={
+                createAssistantFlowContextDetails?.industryExpertType.imageUrl
+              }
+            />
+          )}
       </div>
       {/*------------------------------------------main-voicebot-end----------------------------------------------*/}
     </div>

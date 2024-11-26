@@ -15,11 +15,21 @@
       .assistant-type-item {
         padding: 24px;
         background: #fcfcfd;
+        cursor: pointer;
+        border-radius: 16px;
+
+        &.selected-assistant {
+          background: #9fb5ff !important;
+          border: 2px solid #2e58ea;
+          border-radius: 12px;
+        }
+
         @media screen and (max-width: 1400px) {
           padding: 16px;
         }
         img {
           max-width: 387px;
+          border-radius: 12px;
         }
         h2 {
           color: #000;

@@ -6,10 +6,16 @@ export const CreateAssistantFlowContext = createContext({});
 
 export const CreateAssistantFlowDataProvider = ({ children }: any) => {
   const initialCreateAssistantFlowInfo = {
+    creationFlow: "",
     assistantName: "",
     currentAssistantFlowStep: 0,
     assistantType: "",
-    industryExpertType: "",
+    industryExpertType: {
+      title: "",
+      description: "",
+      imageUrl: "",
+      abbreviation: "",
+    },
   };
   const [createAssistantFlowInfo, setCreateAssistantFlowInfo] = useState(
     initialCreateAssistantFlowInfo
