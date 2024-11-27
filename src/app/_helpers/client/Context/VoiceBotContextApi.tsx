@@ -35,8 +35,8 @@ const initialState = {
     //   },
     // ],
     toolIds: [""],//we deleted this field in the backend
-    provider: "",
-    model: "",
+    provider: "openai",
+    model: "gpt-4o",
     temperature: 0,
     // knowledgeBase: { provider: "canonical", topK: 5.5, fileIds: [""] },
     maxTokens: 300,
