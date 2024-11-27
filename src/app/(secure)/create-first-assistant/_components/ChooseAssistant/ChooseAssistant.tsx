@@ -17,7 +17,7 @@ function ChooseAssistant() {
     createAssistantFlowContext.createAssistantFlowInfo;
   /// get the assistant list from api
   async function getAssistantList() {
-    const res = await fetch(`/voicebot/assistant-types/api`);
+    const res = await fetch(`/create-first-assistant/assistant-types/api`);
     /// error handling
     if (!res.ok) {
       message.error("Failed to fetch assistant types");

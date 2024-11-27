@@ -55,8 +55,6 @@ function LoginPage() {
       const key = searchParams.get("key");
       message.success(`Welcome Back ${session.user?.name}`).then(() => {
         if (!key) {
-          console.log("redirected from here.....");
-
           window.location.href = "/chatbot";
         } else {
           window.location.href = String(key);

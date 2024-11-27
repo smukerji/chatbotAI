@@ -16,6 +16,8 @@ export const CreateAssistantFlowDataProvider = ({ children }: any) => {
       imageUrl: "",
       abbreviation: "",
     },
+    integrations: {},
+    integrationSecretVerified: false,
   };
   const [createAssistantFlowInfo, setCreateAssistantFlowInfo] = useState(
     initialCreateAssistantFlowInfo

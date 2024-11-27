@@ -4,9 +4,9 @@ import activeImg from "../../../../../../public/voiceBot/SVG/Ellipse 64.svg"
 import inActiveImg from "../../../../../../public/voiceBot/SVG/Ellipse 65.svg"
 import { Input, Slider, Switch, Button, Select } from 'antd';
 import { useState, useContext, useEffect } from "react";
-import Schema from "../../dashboard/functions/schema/Schema";
-import ToolFor from "../../dashboard/functions/tool-for/ToolFor";
-import Make from "../../dashboard/functions/make/Make";
+import Schema from "../../../voicebot/dashboard/functions/schema/Schema";
+import ToolFor from "../../../voicebot/dashboard/functions/tool-for/ToolFor";
+import Make from "../../../voicebot/dashboard/functions/make/Make";
 
 
 //define enum for MAKE, SCHEMA, TOOLFOR

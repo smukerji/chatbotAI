@@ -16,7 +16,7 @@ function ChooseIndustryExpert() {
 
   /// get the industry list from api
   async function getIndustryList() {
-    const res = await fetch(`/voicebot/industry-types/api`);
+    const res = await fetch(`/create-first-assistant/industry-types/api`);
     /// error handling
     if (!res.ok) {
       message.error("Failed to fetch industry types");
