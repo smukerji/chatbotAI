@@ -33,7 +33,7 @@ function PaymentSucessmodal({
           if (prev === 1) {
             clearInterval(interval); // Clear interval when countdown reaches 1
             if (firstPurchase == "true") {
-              router.push("/voicebot"); // Redirect to homepage or another route
+              router.push("/create-first-assistant"); // Redirect to homepage or another route
             } else {
               window.location.href = "/chatbot";
             }

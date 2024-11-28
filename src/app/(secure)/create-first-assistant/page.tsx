@@ -24,9 +24,11 @@ import ChooseIndustryExpert from "../create-first-assistant/_components/ChooseIn
 import Home from "../home/page";
 import { CreateBotContext } from "@/app/_helpers/client/Context/CreateBotContext";
 import ShopifySecretModal from "../create-first-assistant/_components/Modals/ShopifySecretModal";
+import axios from "axios";
 
 export default function FirstAssistant() {
-  // const voiceBotContextData: any = useContext(CreateVoiceBotContext);
+  const [cookies, setCookie] = useCookies(["userId"]);
+
   /// get the context data
   const createAssistantFlowContext: any = useContext(
     CreateAssistantFlowContext
@@ -37,39 +39,14 @@ export default function FirstAssistant() {
   const botContext: any = useContext(CreateBotContext);
   const botDetails = botContext?.createBotInfo;
 
-  let cardDetails = [
-    {
-      image: "",
-      title: "",
-      subTitle: "",
-    },
-  ];
-
   /// data sources to train
   const [qaData, setQaData]: any = useState();
   const [textData, setTextData]: any = useState();
   const [fileData, setFileData]: any = useState();
   const [crawlData, setCrawlData]: any = useState();
 
-  const [currentPage, setCurrentPage] = useState<number>(1);
-
-  const [cookies, setCookie] = useCookies(["userId"]);
-
-  const [selectedAssistant, setSelectedAssistant] = useState<any>(null);
-  const [selectedAssistantIndex, setSelectedAssistantIndex] =
-    useState<number>(-1);
-  const [assistantList, setAssistantList] = useState<any>([]);
-
-  const [industryExpertList, setIndustryExpertList] = useState<any>([]);
-  const [selecteExpertIndex, setSelectedExpertIndex] = useState<number>(-1);
-  const [selectedIndustryExpert, setSelectedIndustryExpert] =
-    useState<any>(null);
-
-  const [assistantName, setAssistantName] = useState<string>("");
-  // const [stepsCounter, setStepsCounter] = useState<number>(0);
-
-  const [acknowledgedData, setAcknowledgedData] = useState<any>({});
-  const [assistantImagePath, setassistantImagePath] = useState<string>("");
+  /// plan state to check if user purchased plan while onboarding
+  const [plan, setPlan]: any = useState();
 
   const [inputValidationMessage, setinputValidationMessage] =
     useState<string>("");
@@ -82,46 +59,7 @@ export default function FirstAssistant() {
 
   /// modal state handler
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-
-  async function getVoiceAssistantTemplateData() {
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/template`,
-        {
-          method: "GET",
-        }
-      );
-      const data = await res.json();
-
-      let assistantDataList = data?.assistantTemplates.filter(
-        (assistance: any) => assistance?.industryType === "Assistant"
-      );
-      let industryExpertDataList = data?.assistantTemplates.filter(
-        (assistance: any) => assistance?.industryType === "Expert"
-      );
-      setAssistantList(assistantDataList);
-      setIndustryExpertList(industryExpertDataList);
-    } catch (error: any) {
-      console.log(error);
-    }
-  }
-
-  useEffect(() => {
-    getVoiceAssistantTemplateData();
-  }, []);
-
-  const selectedAssistantChangeHandler = (
-    choosenAssistant: any,
-    index: number
-  ) => {
-    setSelectedAssistantIndex(index);
-    setSelectedAssistant(choosenAssistant);
-  };
-
-  const selectedExpertChangeHandler = (choosenExpert: any, index: number) => {
-    setSelectedExpertIndex(index);
-    setSelectedIndustryExpert(choosenExpert);
-  };
+  const [assistantImagePath, setassistantImagePath] = useState<string>("");
 
   const assistantNameChangeHandler = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -153,13 +91,17 @@ export default function FirstAssistant() {
       }
     }
 
-    alert(
-      `Please select the type of assistant! ${createAssistantFlowContextDetails?.industryExpertType}`
-    );
+    /// check for the pricing plan
+    if (createAssistantFlowContextDetails?.currentAssistantFlowStep === 1) {
+      if (!plan?.price) {
+        message.warning("Please select a plan first!");
+        return;
+      }
+    }
 
     /// validation for assistant type
     if (createAssistantFlowContextDetails?.currentAssistantFlowStep === 2) {
-      if (createAssistantFlowContextDetails?.assistantType === "") {
+      if (!createAssistantFlowContextDetails?.assistantType?.abbreviation) {
         message.warning("Please select an assistant first!");
         return;
       }
@@ -264,6 +206,29 @@ export default function FirstAssistant() {
     //   }
     // })
   };
+
+  const checkPlan = async () => {
+    try {
+      //ANCHOR - Checking existing plan details
+      const checkPlan = await axios.put(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing/stripe-payment-gateway/check-plan`,
+        {
+          u_id: cookies?.userId,
+        }
+      );
+
+      const planDetails = checkPlan.data;
+
+      setPlan(planDetails);
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+  useEffect(() => {
+    if (plan == undefined) {
+      checkPlan();
+    }
+  }, [createAssistantFlowContextDetails?.currentAssistantFlowStep]);
 
   // Function to check if a file is an image
   const isImageFile = (file: any) => {
@@ -466,35 +431,6 @@ export default function FirstAssistant() {
           items={[
             {
               title: (
-                // selectedAssistant !== null ? (
-                //   <div className="selected-assistant">
-                //     <div className="mini-selected-assistant-image">
-                //       <input
-                //         type="file"
-                //         id="profileImageId"
-                //         style={{ display: "none" }}
-                //         accept="image/*"
-                //         // onChange={imageHandler}
-                //       />
-                //       <label htmlFor="profileImageId" className="file-label">
-                //         <Image
-                //           alt={selectedAssistant.assistantType}
-                //           src={selectedAssistant.imageUrl}
-                //           width={100}
-                //           height={100}
-                //         ></Image>
-                //       </label>
-                //     </div>
-                //     <div className="selected-assistant-header">
-                //       <h3 className="heading_title">
-                //         {selectedAssistant.assistantType}
-                //       </h3>
-                //       <h4 className="heading_description">
-                //         {selectedAssistant.dispcrtion}
-                //       </h4>
-                //     </div>
-                //   </div>
-                // ) :
                 <div>
                   <h3 className="steps-assistant-heading">Create your bot</h3>
                 </div>
@@ -537,7 +473,45 @@ export default function FirstAssistant() {
               ),
             },
             {
-              title: (
+              title: createAssistantFlowContextDetails?.assistantType
+                ?.imageUrl ? (
+                <div className="selected-assistant">
+                  <div className="mini-selected-assistant-image">
+                    <input
+                      type="file"
+                      id="profileImageId"
+                      style={{ display: "none" }}
+                      accept="image/*"
+                      // onChange={imageHandler}
+                    />
+                    <label htmlFor="profileImageId" className="file-label">
+                      <Image
+                        alt={
+                          createAssistantFlowContextDetails?.assistantType
+                            ?.title
+                        }
+                        src={
+                          createAssistantFlowContextDetails?.assistantType
+                            ?.imageUrl
+                        }
+                        width={100}
+                        height={100}
+                      ></Image>
+                    </label>
+                  </div>
+                  <div className="selected-assistant-header">
+                    <h3 className="heading_title">
+                      {createAssistantFlowContextDetails?.assistantType?.title}
+                    </h3>
+                    <h4 className="heading_description">
+                      {
+                        createAssistantFlowContextDetails?.assistantType
+                          ?.description
+                      }
+                    </h4>
+                  </div>
+                </div>
+              ) : (
                 <div>
                   <h3 className="steps-assistant-heading">
                     Choose your assistant
@@ -546,7 +520,48 @@ export default function FirstAssistant() {
               ),
             },
             {
-              title: (
+              title: createAssistantFlowContextDetails?.industryExpertType
+                ?.imageUrl ? (
+                <div className="selected-assistant">
+                  <div className="mini-selected-assistant-image">
+                    <input
+                      type="file"
+                      id="profileImageId"
+                      style={{ display: "none" }}
+                      accept="image/*"
+                      // onChange={imageHandler}
+                    />
+                    <label htmlFor="profileImageId" className="file-label">
+                      <Image
+                        alt={
+                          createAssistantFlowContextDetails?.industryExpertType
+                            ?.title
+                        }
+                        src={
+                          createAssistantFlowContextDetails?.industryExpertType
+                            ?.imageUrl
+                        }
+                        width={100}
+                        height={100}
+                      ></Image>
+                    </label>
+                  </div>
+                  <div className="selected-assistant-header">
+                    <h3 className="heading_title">
+                      {
+                        createAssistantFlowContextDetails?.industryExpertType
+                          ?.title
+                      }
+                    </h3>
+                    <h4 className="heading_description">
+                      {
+                        createAssistantFlowContextDetails?.industryExpertType
+                          ?.description
+                      }
+                    </h4>
+                  </div>
+                </div>
+              ) : (
                 <div>
                   <h3 className="steps-assistant-heading">
                     Choose your Industry

@@ -17,6 +17,9 @@ export default function HomeLayout({
     const returnUrl = encodeURIComponent(headers().get("x-invoke-path") || "/");
     redirect(`/account/login?returnUrl=${returnUrl}`);
   }
+
+  console.log();
+
   return (
     <>
       <CreateAssistantFlowDataProvider>
