@@ -444,35 +444,6 @@ export default function FirstAssistant() {
             },
             {
               title: (
-                // selectedIndustryExpert !== null ? (
-                //   <div className="selected-assistant">
-                //     <div className="mini-selected-assistant-image">
-                //       <input
-                //         type="file"
-                //         id="profileImageId"
-                //         style={{ display: "none" }}
-                //         accept="image/*"
-                //         // onChange={imageHandler}
-                //       />
-                //       <label htmlFor="profileImageId" className="file-label">
-                //         <Image
-                //           alt={selectedIndustryExpert.assistantType}
-                //           src={selectedIndustryExpert.imageUrl}
-                //           width={100}
-                //           height={100}
-                //         ></Image>
-                //       </label>
-                //     </div>
-                //     <div className="selected-assistant-header">
-                //       <h3 className="heading_title">
-                //         {selectedIndustryExpert.assistantType}
-                //       </h3>
-                //       <h4 className="heading_description">
-                //         {selectedIndustryExpert.dispcrtion}
-                //       </h4>
-                //     </div>
-                //   </div>
-                // ) :
                 <div>
                   <h3 className="steps-assistant-heading">Select plan</h3>
                 </div>
