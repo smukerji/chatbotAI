@@ -12,7 +12,7 @@ export enum SelectedAssistantType {
 
 export const CreateAssistantFlowDataProvider = ({ children }: any) => {
   const initialCreateAssistantFlowInfo = {
-    creationFlow: "",
+    creationFlow: SelectedAssistantType.NULL,
     assistantName: "",
     currentAssistantFlowStep: 0,
     assistantType: {
