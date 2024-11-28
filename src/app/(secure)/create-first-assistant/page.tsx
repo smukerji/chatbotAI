@@ -40,6 +40,13 @@ export default function FirstAssistant() {
     createAssistantFlowContext.createAssistantFlowInfo;
 
   const botContext: any = useContext(CreateBotContext);
+
+  const voiceBotContextData: any = useContext(CreateVoiceBotContext);
+  const voiceBotContext = voiceBotContextData.state;
+  debugger;
+  console.log("your voice bot data ",voiceBotContext);
+
+  
   const botDetails = botContext?.createBotInfo;
 
   /// data sources to train
