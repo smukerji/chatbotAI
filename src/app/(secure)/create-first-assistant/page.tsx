@@ -634,7 +634,10 @@ export default function FirstAssistant() {
               textData={textData}
               fileData={fileData}
               crawlingData={crawlData}
-              chatbotName={"assistantName"}
+              chatbotName={createAssistantFlowContextDetails?.assistantName}
+              botType={"bot-v2"}
+              assistantType={`${createAssistantFlowContextDetails?.assistantType?.abbreviation}-${createAssistantFlowContextDetails?.industryExpertType?.abbreviation}`}
+              integrations={createAssistantFlowContextDetails?.integrations}
             />
           </>
         )}

@@ -36,6 +36,8 @@ function Home({
   isPlanNotification,
   setIsPlanNotification,
   botType,
+  assistantType,
+  integrations,
 }: any) {
   const { status } = useSession();
   const router = useRouter();
@@ -299,14 +301,17 @@ function Home({
         JSON.stringify(botDetails?.deleteCrawlList)
       );
       //// default chatbot set
+
       formData.append("userId", cookies.userId);
       formData.append("qaList", JSON.stringify(botDetails?.qaList));
       formData.append("text", text);
-      formData.append(
-        "chatbotText",
-        chatbotName ? chatbotName : botDetails?.chatbotName
-      );
-      formData.append("assistantType", botDetails?.assistantType);
+      formData.append("chatbotText", chatbotName || botDetails?.chatbotName);
+      formData.append("assistantType", assistantType);
+      formData.append("botType", botType);
+
+      if (!updateChatbot) {
+        formData.append("integrations", JSON.stringify(integrations));
+      }
 
       // botContext?.handleChange("isLoading")(true);
       setLoadingComponent(true);
@@ -357,6 +362,7 @@ function Home({
               id: chatbotId,
               name: chatbotName ? chatbotName : botDetails?.chatbotName,
               botType: botType,
+              assistantType: assistantType,
             })
           )}`;
         });
@@ -371,6 +377,7 @@ function Home({
               id: chatbotId,
               name: chatbotName ? chatbotName : botDetails?.chatbotName,
               botType: botType,
+              assistantType: assistantType,
             })
           )}`;
         });

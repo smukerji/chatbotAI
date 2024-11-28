@@ -569,53 +569,46 @@ function Dashboard() {
           )}
           {/*------------------------------------------settings-component----------------------------------------------*/}
           {editChatbot == "settings" && (
-            <>
-              <Settings
-                chatbotId={chatbot.id}
-                chatbotName={botDetails?.chatbotName}
-                isPlanNotification={isPlanNotification}
-                setIsPlanNotification={setIsPlanNotification}
-              />
-            </>
+            <Settings
+              chatbotId={chatbot.id}
+              chatbotName={botDetails?.chatbotName}
+              isPlanNotification={isPlanNotification}
+              setIsPlanNotification={setIsPlanNotification}
+            />
           )}
 
           {/*------------------------------------------sources-component----------------------------------------------*/}
           {editChatbot == "sources" && !loading && (
-            <>
-              <Home
-                updateChatbot="true"
-                qaData={qaData}
-                textData={textData}
-                fileData={fileData}
-                crawlingData={crawlData}
-                chatbotId={chatbot.id}
-                chatbotName={chatbot.name}
-                isPlanNotification={isPlanNotification}
-                setIsPlanNotification={setIsPlanNotification}
-                botType={chatbot.botType}
-              />
-            </>
+            <Home
+              updateChatbot="true"
+              qaData={qaData}
+              textData={textData}
+              fileData={fileData}
+              crawlingData={crawlData}
+              chatbotId={chatbot.id}
+              chatbotName={chatbot.name}
+              isPlanNotification={isPlanNotification}
+              setIsPlanNotification={setIsPlanNotification}
+              botType={chatbot.botType}
+              assistantType={chatbot.assistantType}
+            />
           )}
 
           {/*------------------------------------------integrations-component----------------------------------------------*/}
           {editChatbot == "integrations" && !loading && (
-            <>
-              <Integration
-                isPlanNotification={isPlanNotification}
-                setIsPlanNotification={setIsPlanNotification}
-              />
-            </>
+            <Integration
+              isPlanNotification={isPlanNotification}
+              setIsPlanNotification={setIsPlanNotification}
+            />
           )}
 
           {/*------------------------------------------embed-on-site-component----------------------------------------------*/}
           {editChatbot == "embedSite" && !loading && (
-            <>
-              <EmbedSite
-                chatbotId={chatbot.id}
-                isPlanNotification={isPlanNotification}
-                setIsPlanNotification={setIsPlanNotification}
-              />
-            </>
+            <EmbedSite
+              chatbotId={chatbot.id}
+              isPlanNotification={isPlanNotification}
+              setIsPlanNotification={setIsPlanNotification}
+            />
           )}
 
           {/*------------------------------------------history-component----------------------------------------------*/}
