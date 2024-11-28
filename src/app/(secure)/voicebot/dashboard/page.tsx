@@ -459,7 +459,7 @@ function Dashboard() {
             <Image className="image" alt="back_arrow" src={leftArrow} onClick={()=>{
               router.push("/chatbot")
             }}></Image>
-            <h1 className="title">{voicebotDetails.name || voiceBotContextData?.assistantInfo?.assistantName || editChatbotSource}</h1>
+            <h1 className="title">{voicebotDetails?.name || voiceBotContextData?.assistantInfo?.assistantName || editChatbotSource}</h1>
 
           </div>
           <div className="header-description">

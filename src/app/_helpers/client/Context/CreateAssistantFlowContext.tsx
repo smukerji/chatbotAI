@@ -4,16 +4,22 @@ import { AssistantType } from "../../assistant-creation-contants";
 
 export const CreateAssistantFlowContext = createContext({});
 
+export enum SelectedAssistantType {
+  NULL,
+  VOICE,
+  CHAT,
+}
+
 export const CreateAssistantFlowDataProvider = ({ children }: any) => {
   const initialCreateAssistantFlowInfo = {
-    creationFlow: "",
+    creationFlow: SelectedAssistantType.NULL,
     assistantName: "",
     currentAssistantFlowStep: 0,
     assistantType: {
       title: "",
       description: "",
       imageUrl: "",
-      abbreviation: "",
+      abbreviation: SelectedAssistantType.NULL,
     },
     industryExpertType: {
       title: "",
@@ -46,7 +52,7 @@ export const CreateAssistantFlowDataProvider = ({ children }: any) => {
       value={{
         createAssistantFlowInfo,
         handleChange,
-        resetCreateAssistantFlowInfo,
+        resetCreateAssistantFlowInfo
       }}
     >
       {children}

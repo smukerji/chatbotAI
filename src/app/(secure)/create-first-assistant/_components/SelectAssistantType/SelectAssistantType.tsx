@@ -3,7 +3,7 @@ import "./select-assistant-type.scss";
 import Image from "next/image";
 import ChatbotImage from "../../../../../../public/sections-images/create-first-assistant/chatbot/chatbot-creation-image.jpg";
 import VoicebotImage from "../../../../../../public/sections-images/create-first-assistant/voicebot/voicebot-creation-image.jpg";
-import { CreateAssistantFlowContext } from "@/app/_helpers/client/Context/CreateAssistantFlowContext";
+import { CreateAssistantFlowContext,SelectedAssistantType } from "@/app/_helpers/client/Context/CreateAssistantFlowContext";
 
 function SelectAssistantType() {
   /// get the context data
@@ -26,10 +26,10 @@ function SelectAssistantType() {
         <div className="assistant-type">
           <div
             onClick={() =>
-              createAssistantFlowContext.handleChange("creationFlow")("chatbot")
+              createAssistantFlowContext.handleChange("creationFlow")(SelectedAssistantType.CHAT)
             }
             className={`assistant-type-item ${
-              createAssistantFlowContextDetails.creationFlow === "chatbot"
+              createAssistantFlowContextDetails.creationFlow === SelectedAssistantType.CHAT
                 ? "selected-assistant"
                 : ""
             }`}
@@ -40,13 +40,13 @@ function SelectAssistantType() {
           </div>
           <div
             className={`assistant-type-item ${
-              createAssistantFlowContextDetails.creationFlow === "voicebot"
+              createAssistantFlowContextDetails.creationFlow === SelectedAssistantType.VOICE
                 ? "selected-assistant"
                 : ""
             }`}
             onClick={() =>
               createAssistantFlowContext.handleChange("creationFlow")(
-                "voicebot"
+                SelectedAssistantType.VOICE
               )
             }
           >
