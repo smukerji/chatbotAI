@@ -18,12 +18,11 @@ export default function HomeLayout({
     redirect(`/account/login?returnUrl=${returnUrl}`);
   }
 
-  console.log();
-
   return (
     <>
       <CreateAssistantFlowDataProvider>
-        <CreateBotDataProvider>{children}</CreateBotDataProvider>
+        <CreateBotDataProvider>
+          {children}</CreateBotDataProvider>
       </CreateAssistantFlowDataProvider>
     </>
   );
