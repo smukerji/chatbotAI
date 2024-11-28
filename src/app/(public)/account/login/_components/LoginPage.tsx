@@ -85,11 +85,18 @@ function LoginPage() {
         } else {
           const searchParams = new URLSearchParams(window.location.search);
           const key = searchParams.get("key");
-          message.info(`Welcome back ${data?.username}!`);
-          if (key == null) {
-            window.location.href = "/chatbot";
+          /// if the user is new and doesm't have any plan
+          if (!data?.plan) {
+            message.info(`Welcome ${data?.username}`);
+            window.location.href = "/create-first-assistant";
+            return;
           } else {
-            window.location.href = String(key);
+            message.info("Welcome back " + data?.username + "!");
+            if (key == null) {
+              window.location.href = "/chatbot";
+            } else {
+              window.location.href = String(key);
+            }
           }
 
           // Replace the current history entry

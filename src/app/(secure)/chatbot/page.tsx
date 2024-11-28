@@ -462,7 +462,7 @@ function Chatbot() {
 
     /// if user does not have any plan then redirect to create-first-bot page
     if (!response.data.user.planId) {
-      router.push("/voicebot");
+      router.push("/create-first-assistant");
     }
     setUser(response.data.user);
   };
@@ -559,166 +559,152 @@ function Chatbot() {
         )
       )}&editChatbotSource=${isPlanNotification ? "history" : "chatbot"}`
     );
-    // window.location.href = `${
-    //   process.env.NEXT_PUBLIC_WEBSITE_URL
-    // }chatbot/dashboard?${encodeURIComponent("chatbot")}=${encodeURIComponent(
-    //   JSON.stringify(
-    //     chatbotData.filter((data: any) => {
-    //       return data.id == id;
-    //     })[0]
-    //   )
-    // )}`;
   }
 
   if (status === "authenticated" || cookies?.userId) {
     return (
-      <>
-        <div
-          className="chatbot-list-container"
-          onClick={() => openMenu && setOpenMenu(null)}
-        >
-          {/*------------------------------------------title----------------------------------------------*/}
-          <div className="title-container">
-            <div className="title-header-container">
-              <h1
-                className={
-                  !isVoiceBotActived ? "title activate-title" : "title"
-                }
-                onClick={() => voiceBotActiveDeactiveHandler(false)}
-              >
-                My Chatbots
-              </h1>
-              <h1
-                className={isVoiceBotActived ? "title activate-title" : "title"}
-                onClick={() => voiceBotActiveDeactiveHandler(true)}
-              >
-                My Voicebot
-              </h1>
+      <div
+        className="chatbot-list-container"
+        onClick={() => openMenu && setOpenMenu(null)}
+      >
+        {/*------------------------------------------title----------------------------------------------*/}
+        <div className="title-container">
+          <div className="title-header-container">
+            <h1
+              className={!isVoiceBotActived ? "title activate-title" : "title"}
+              onClick={() => voiceBotActiveDeactiveHandler(false)}
+            >
+              My Chatbots
+            </h1>
+            <h1
+              className={isVoiceBotActived ? "title activate-title" : "title"}
+              onClick={() => voiceBotActiveDeactiveHandler(true)}
+            >
+              My Voicebot
+            </h1>
+          </div>
+
+          <div className="action-container">
+            <div className="chatbot-list-action">
+              <Icon
+                className={listType == "grid" ? "active" : ""}
+                Icon={GridIcon}
+                click={() => setListType("grid")}
+              />
+              <Icon
+                className={listType == "table" ? "active" : ""}
+                Icon={MenuIcon}
+                click={() => setListType("table")}
+              />
             </div>
-
-            <div className="action-container">
-              <div className="chatbot-list-action">
-                <Icon
-                  className={listType == "grid" ? "active" : ""}
-                  Icon={GridIcon}
-                  click={() => setListType("grid")}
-                />
-                <Icon
-                  className={listType == "table" ? "active" : ""}
-                  Icon={MenuIcon}
-                  click={() => setListType("table")}
-                />
-              </div>
-              {/* <Link href={`${process.env.NEXT_PUBLIC_WEBSITE_URL}home`}> */}
-              {isVoiceBotActived ? (
-                <button onClick={createVoiceBotHandler}>New Voicebot</button>
-              ) : (
-                <button
-                  onClick={() => {
-                    // showModal()
-                    /// check if user has exceeded the number of creation of bots
-                    if (
-                      userDetails?.noOfChatbotsUserCreated + 1 >
-                      userDetails?.plan?.numberOfChatbot
-                    ) {
-                      setOpenLimitModel(true);
-                      return;
-                    }
-
-                    setOpenNewChatbotNameModal(true);
-                  }}
-                  disabled={
-                    loading || (user && new Date(user?.endDate) < new Date())
+            {/* <Link href={`${process.env.NEXT_PUBLIC_WEBSITE_URL}home`}> */}
+            {isVoiceBotActived ? (
+              <button onClick={createVoiceBotHandler}>New Voicebot</button>
+            ) : (
+              <button
+                onClick={() => {
+                  // showModal()
+                  /// check if user has exceeded the number of creation of bots
+                  if (
+                    userDetails?.noOfChatbotsUserCreated + 1 >
+                    userDetails?.plan?.numberOfChatbot
+                  ) {
+                    setOpenLimitModel(true);
+                    return;
                   }
-                >
-                  New Chatbot
-                </button>
-              )}
 
-              {/* </Link> */}
-            </div>
+                  setOpenNewChatbotNameModal(true);
+                }}
+                disabled={
+                  loading || (user && new Date(user?.endDate) < new Date())
+                }
+              >
+                New Chatbot
+              </button>
+            )}
 
-            {/* {openLimitModal ? (
+            {/* </Link> */}
+          </div>
+
+          {/* {openLimitModal ? (
               <LimitReachedModal setOpenLimitModel={setOpenLimitModel} />
             ) : (
               <></>
             )} */}
-          </div>
+        </div>
 
-          {!isVoiceBotActived ? (
-            <>
-              {/*------------------------------------------chatbot-list-grid----------------------------------------------*/}
-              {listType === "grid" && (
-                <>
-                  <GridLayout
-                    chatbotData={chatbotData}
-                    changeMenu={changeMenu}
-                    openMenu={openMenu}
-                    openChatbot={openChatbot}
-                    setOpenShareModal={setOpenShareModal}
-                    chatbotId={chatbotId}
-                    setChatbotId={setChatbotId}
-                    setOpenDeleteModal={setOpenDeleteModal}
-                    setOpenRenameModal={setOpenRenameModal}
-                    // disabled={user && new Date(user?.endDate) < new Date()}
-                  />
-                </>
-              )}
-
-              {/*------------------------------------------chatbot-list-table----------------------------------------------*/}
-              {listType === "table" && (
-                <TableLayout
-                  chatbotData={chatbotData}
-                  changeMenu={changeMenu}
-                  openMenu={openMenu}
-                  openChatbot={openChatbot}
-                  setOpenShareModal={setOpenShareModal}
-                  chatbotId={chatbotId}
-                  setChatbotId={setChatbotId}
-                  setOpenDeleteModal={setOpenDeleteModal}
-                  setOpenRenameModal={setOpenRenameModal}
-                  // disabled={user && new Date(user?.endDate) < new Date()}
-                />
-              )}
-              <DeleteModal
-                open={openDeleteModal}
-                setOpen={setOpenDeleteModal}
+        {!isVoiceBotActived ? (
+          <>
+            {/*------------------------------------------chatbot-list-grid----------------------------------------------*/}
+            {listType === "grid" && (
+              <GridLayout
+                chatbotData={chatbotData}
+                changeMenu={changeMenu}
+                openMenu={openMenu}
+                openChatbot={openChatbot}
+                setOpenShareModal={setOpenShareModal}
                 chatbotId={chatbotId}
-                setChangeFlag={setChangeFlag}
-                changeFlag={changeFlag}
+                setChatbotId={setChatbotId}
+                setOpenDeleteModal={setOpenDeleteModal}
+                setOpenRenameModal={setOpenRenameModal}
+                // disabled={user && new Date(user?.endDate) < new Date()}
               />
-              <ShareModal
-                open={openShareModal}
-                setOpen={setOpenShareModal}
-                chatbotId={chatbotId}
-              />
-              <RenameModal
-                open={openRenameModal}
-                setOpen={setOpenRenameModal}
-                chatbotId={chatbotId}
-                setChangeFlag={setChangeFlag}
-                changeFlag={changeFlag}
-              />
+            )}
 
-              <NewChatbotNameModal
-                open={openNewChatbotNameModal}
-                setOpen={setOpenNewChatbotNameModal}
+            {/*------------------------------------------chatbot-list-table----------------------------------------------*/}
+            {listType === "table" && (
+              <TableLayout
+                chatbotData={chatbotData}
+                changeMenu={changeMenu}
+                openMenu={openMenu}
+                openChatbot={openChatbot}
+                setOpenShareModal={setOpenShareModal}
                 chatbotId={chatbotId}
+                setChatbotId={setChatbotId}
+                setOpenDeleteModal={setOpenDeleteModal}
+                setOpenRenameModal={setOpenRenameModal}
+                // disabled={user && new Date(user?.endDate) < new Date()}
               />
+            )}
+            <DeleteModal
+              open={openDeleteModal}
+              setOpen={setOpenDeleteModal}
+              chatbotId={chatbotId}
+              setChangeFlag={setChangeFlag}
+              changeFlag={changeFlag}
+            />
+            <ShareModal
+              open={openShareModal}
+              setOpen={setOpenShareModal}
+              chatbotId={chatbotId}
+            />
+            <RenameModal
+              open={openRenameModal}
+              setOpen={setOpenRenameModal}
+              chatbotId={chatbotId}
+              setChangeFlag={setChangeFlag}
+              changeFlag={changeFlag}
+            />
 
-              {/*------------------------------------------loading/no-chatbots----------------------------------------------*/}
-              {!loading && chatbotData?.length == 0 && (
-                <div className="no-chatbots-container">
-                  <Image src={noChatbotBg} alt="no-chatbot-bg" />
-                  <p>
-                    You haven&apos;t created any Chatbots. Go ahead and create a
-                    New Chatbot!
-                  </p>
-                </div>
-              )}
-              {loading && <Spin indicator={antIcon} />}
+            <NewChatbotNameModal
+              open={openNewChatbotNameModal}
+              setOpen={setOpenNewChatbotNameModal}
+              chatbotId={chatbotId}
+            />
 
-              {/* {!loading && chatbotData?.length == 0 && (
+            {/*------------------------------------------loading/no-chatbots----------------------------------------------*/}
+            {!loading && chatbotData?.length == 0 && (
+              <div className="no-chatbots-container">
+                <Image src={noChatbotBg} alt="no-chatbot-bg" />
+                <p>
+                  You haven&apos;t created any Chatbots. Go ahead and create a
+                  New Chatbot!
+                </p>
+              </div>
+            )}
+            {loading && <Spin indicator={antIcon} />}
+
+            {/* {!loading && chatbotData?.length == 0 && (
                   <Modal
                     title="Upgrade Now to create new Chatbots!"
                     open={isPlanNotification}
@@ -736,62 +722,61 @@ function Chatbot() {
                     <p>Upgrade now to access your chatbots!</p>
                   </Modal>
                 )} */}
-            </>
-          ) : (
-            <>
-              {voiceBotLoading ? (
-                <Spin indicator={antIcon} />
-              ) : voiceAssistantList?.length == 0 ? (
-                <div className="no-chatbots-container">
-                  <Image src={noChatbotBg} alt="no-chatbot-bg" />
-                  <p>
-                    You haven&apos;t created any Voicebot. Go ahead and create a
-                    New Voicebot!
-                  </p>
-                </div>
-              ) : (
-                <div className="voicebot-list-container">
-                  {voiceAssistantList.map((assistant: any, index: number) => (
-                    <div
-                      key={index}
-                      className="voicebot-list-card"
-                      onClick={() => selectedAssistantHandler(assistant)}
-                    >
-                      <div className="assistant-image">
-                        <Image
-                          alt="assistant image"
-                          src={voiceAssistantPreview}
-                        ></Image>
+          </>
+        ) : (
+          <>
+            {voiceBotLoading ? (
+              <Spin indicator={antIcon} />
+            ) : voiceAssistantList?.length == 0 ? (
+              <div className="no-chatbots-container">
+                <Image src={noChatbotBg} alt="no-chatbot-bg" />
+                <p>
+                  You haven&apos;t created any Voicebot. Go ahead and create a
+                  New Voicebot!
+                </p>
+              </div>
+            ) : (
+              <div className="voicebot-list-container">
+                {voiceAssistantList.map((assistant: any, index: number) => (
+                  <div
+                    key={index}
+                    className="voicebot-list-card"
+                    onClick={() => selectedAssistantHandler(assistant)}
+                  >
+                    <div className="assistant-image">
+                      <Image
+                        alt="assistant image"
+                        src={voiceAssistantPreview}
+                      ></Image>
+                    </div>
+                    <div className="assistant-title">
+                      {assistant.assistantName}
+                    </div>
+                    <div className="info-content">
+                      <div className="info">
+                        <div className="info-label">Total Minutes:</div>
+                        <div className="value">100</div>
                       </div>
-                      <div className="assistant-title">
-                        {assistant.assistantName}
+                      <div className="info">
+                        <div className="info-label">Call Count:</div>
+                        <div className="value">90</div>
                       </div>
-                      <div className="info-content">
-                        <div className="info">
-                          <div className="info-label">Total Minutes:</div>
-                          <div className="value">100</div>
-                        </div>
-                        <div className="info">
-                          <div className="info-label">Call Count:</div>
-                          <div className="value">90</div>
-                        </div>
-                        <div className="info">
-                          <div className="info-label">Last Trained:</div>
-                          <div className="value">9</div>
-                        </div>
-                        <div className="info">
-                          <div className="info-label">Last Used:</div>
-                          <div className="value">Yesterday</div>
-                        </div>
+                      <div className="info">
+                        <div className="info-label">Last Trained:</div>
+                        <div className="value">9</div>
+                      </div>
+                      <div className="info">
+                        <div className="info-label">Last Used:</div>
+                        <div className="value">Yesterday</div>
                       </div>
                     </div>
-                  ))}
-                </div>
-              )}
-            </>
-          )}
-        </div>
-      </>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+      </div>
     );
   } else if (status === "unauthenticated") {
     redirect("/account/login");

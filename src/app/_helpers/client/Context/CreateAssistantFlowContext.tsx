@@ -15,7 +15,12 @@ export const CreateAssistantFlowDataProvider = ({ children }: any) => {
     creationFlow: "",
     assistantName: "",
     currentAssistantFlowStep: 0,
-    assistantType: SelectedAssistantType.NULL,
+    assistantType: {
+      title: "",
+      description: "",
+      imageUrl: "",
+      abbreviation: SelectedAssistantType.NULL,
+    },
     industryExpertType: {
       title: "",
       description: "",
