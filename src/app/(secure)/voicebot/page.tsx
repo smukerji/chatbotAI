@@ -117,7 +117,7 @@ export default function VoiceBot() {
     }
   };
 
-  console.log("your voicebot details ", voicebotDetails.name);
+  console.log("your voicebot details ", voicebotDetails?.name);
 
   const continuesChangeHandler = async () => {
     if (assistantName.trim().length === 0) {
