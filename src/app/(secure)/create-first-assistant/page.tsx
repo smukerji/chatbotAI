@@ -18,7 +18,7 @@ import { useState, useContext, useEffect } from "react";
 import { CreateVoiceBotContext } from "../../_helpers/client/Context/VoiceBotContextApi";
 import SelectAssistantType from "../create-first-assistant/_components/SelectAssistantType/SelectAssistantType";
 import PricingWrapperNew from "../home/pricing/_components/PricingWrapperNew";
-import { CreateAssistantFlowContext } from "@/app/_helpers/client/Context/CreateAssistantFlowContext";
+import { CreateAssistantFlowContext, SelectedAssistantType } from "@/app/_helpers/client/Context/CreateAssistantFlowContext";
 import ChooseAssistant from "../create-first-assistant/_components/ChooseAssistant/ChooseAssistant";
 import ChooseIndustryExpert from "../create-first-assistant/_components/ChooseIndustryExpert/ChooseIndustryExpert";
 import Home from "../home/page";
@@ -147,7 +147,7 @@ export default function FirstAssistant() {
         return;
       }
 
-      if (createAssistantFlowContextDetails?.creationFlow === "") {
+      if (createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.NULL) {
         message.warning("Please select the type of assistant!");
         return;
       }
@@ -378,6 +378,12 @@ export default function FirstAssistant() {
   //     return;
   //   }
   // };
+
+
+  const assistantSelectHandler = (selectedAssistantValue: SelectedAssistantType)=>{
+
+
+  }
 
   const previousChangeHandler = () => {
     /// decrement the page
