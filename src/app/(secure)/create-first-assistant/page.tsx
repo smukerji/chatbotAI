@@ -621,7 +621,9 @@ export default function FirstAssistant() {
           <SelectAssistantType />
         )}
         {createAssistantFlowContextDetails?.currentAssistantFlowStep === 1 && (
-          <PricingWrapperNew firstPurchase={true} />
+          createAssistantFlowContext?.initialCreateAssistantFlowInfo?.creationFlow === SelectedAssistantType.CHAT ? (
+            <PricingWrapperNew firstPurchase={true} />
+          ) : null
         )}
         {createAssistantFlowContextDetails?.currentAssistantFlowStep === 2 && (
           <ChooseAssistant />
