@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import Image from 'next/image';
 // import infoImage from "../../../../public/voiceBot/SVG/info-circle.svg";
 import infoImage from "../../../../../../public/voiceBot/SVG/info-circle.svg";
+import { CreateVoiceBotContext } from '@/app/_helpers/client/Context/VoiceBotContextApi';
 
 interface IndustryExpertListProps {
   industryExpertList: any[];
@@ -14,6 +15,11 @@ const ChooseVoiceAssistantExpert: React.FC<IndustryExpertListProps> = ({
   selecteExpertIndex,
   selectedExpertChangeHandler,
 }) => {
+
+    const voiceBotContextData: any = useContext(CreateVoiceBotContext);
+    const voiceBotContext = voiceBotContextData.voiceBotContext;
+    debugger;
+    console.log(voiceBotContext);
   return (
     <>
       {industryExpertList.map((assistant, index) => (
