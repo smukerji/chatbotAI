@@ -31,10 +31,13 @@ import ShopifySecretModal from "../create-first-assistant/_components/Modals/Sho
 import axios from "axios";
 import ChooseVoiceAssistantType from "./_components/ChooseVoiceAssistantType/ChooseVoiceAssistantType";
 import ChooseVoiceAssistantExpert from "./_components/ChooseVoiceAssistantExpert/ChooseVoiceAssistantExpert";
+// import { useRouter } from "next/navigation";
 
 export default function FirstAssistant() {
   const [cookies, setCookie] = useCookies(["userId"]);
-
+  
+  const router = useRouter();
+                                                                                                                                                                                                        
   /// get the context data
   const createAssistantFlowContext: any = useContext(
     CreateAssistantFlowContext
@@ -147,8 +150,86 @@ export default function FirstAssistant() {
           message.warning("Please select an Industry Expert first!");
           return;
         }
-        createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(AssistantFlowStep.ADD_DATA_SOURCES);
+        if(createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.VOICE){
+          const assistantTemplateIDs = [
+            selectedAssistant?._id,
+            selectedIndustryExpert?._id,
+          ];
+
+          let assistantName = createAssistantFlowContextDetails?.assistantName;
+
+          if (acknowledgedData?.isAcknowledged) {
+            //update the data
+            debugger;
+            try {
+              const assistantUpdateResponse = await fetch(
+                `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/voice`,
+                {
+                  method: "PUT",
+                  body: JSON.stringify({
+                    assistantName: assistantName,
+                    assistantTemplateIDs: assistantTemplateIDs,
+                    imageUrl: assistantImagePath,
+                    recordId: acknowledgedData?.insertedId,
+                  }),
+                }
+              );
+
+              const assistantUpdateResponseParse =
+                await assistantUpdateResponse.json();
+              debugger;
+
+              router.push(`/voicebot/dashboard?voicBotName=${assistantName}`);
+            } catch (error: any) {
+              console.log(error);
+              message.error(error.message);
+            }
+
+            debugger;
+          } else {
+            //create the data
+            debugger;
+            try {
+              const assistantCreateResponse = await fetch(
+                `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/voice`,
+                {
+                  method: "POST",
+                  body: JSON.stringify({
+                    assistantName: assistantName,
+                    assistantTemplateIDs: assistantTemplateIDs,
+                    imageUrl: assistantImagePath,
+                    userId: cookies.userId,
+                  }),
+                }
+              );
+
+              const assistantCreateResponseParse =
+                await assistantCreateResponse.json();
+              debugger;
+              voiceBotContextData.setAssistantMongoId(
+                assistantCreateResponseParse?.result?.insertedId
+              );
+              let assistantData = assistantCreateResponseParse?.record;
+              voiceBotContextData.setAssistantInfo(assistantData);
+
+              router.push(`/voicebot/dashboard?voicBotName=${assistantName}`);
+            } catch (error: any) {
+              console.log(error);
+              message.error(error.message);
+            }
+          }
+
+        }
+        else{
+          createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(AssistantFlowStep.ADD_DATA_SOURCES);
+        }
       }
+      
+      else{
+        
+      }
+
+     
     // }
     // else if(createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.VOICE){
       
