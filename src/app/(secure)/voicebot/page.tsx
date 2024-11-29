@@ -95,7 +95,6 @@ export default function VoiceBot() {
     index: number
   ) => {
     setSelectedAssistantIndex(index);
-    debugger;
     setSelectedAssistant(choosenAssistant);
   };
 
@@ -566,7 +565,23 @@ export default function VoiceBot() {
             selecteExpertIndex={selecteExpertIndex}
             selectedExpertChangeHandler={selectedExpertChangeHandler}
           />
-          //   assistantList.length > 0 ? (
+       
+          )}
+         
+        </div>
+      </div>
+      {/*------------------------------------------main-voicebot-end----------------------------------------------*/}
+    </div>
+  );
+}
+
+
+
+
+
+
+
+   //   assistantList.length > 0 ? (
           //     assistantList.map((assistant: any, index: number) => {
           //       return (
           //         <div
@@ -653,11 +668,3 @@ export default function VoiceBot() {
           //       </div>
           //     );
           //   })
-          )}
-         
-        </div>
-      </div>
-      {/*------------------------------------------main-voicebot-end----------------------------------------------*/}
-    </div>
-  );
-}
