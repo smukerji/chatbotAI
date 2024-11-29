@@ -613,7 +613,9 @@ function Chatbot() {
                     return;
                   }
 
-                  setOpenNewChatbotNameModal(true);
+                  // setOpenNewChatbotNameModal(true);
+                  window.location.href =
+                    "/create-first-assistant?source=chatbot";
                 }}
                 disabled={
                   loading || (user && new Date(user?.endDate) < new Date())

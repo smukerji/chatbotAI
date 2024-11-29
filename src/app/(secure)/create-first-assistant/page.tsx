@@ -9,7 +9,7 @@ import infoImage from "../../../../public/voiceBot/SVG/info-circle.svg";
 import customTemplate from "../../../../public/voiceBot/SVG/profile-circle.svg";
 import galaryImg from "../../../../public/voiceBot/SVG/gallery-add.svg";
 import leftArrow from "../../../../public/voiceBot/SVG/arrow-left.svg";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCookies } from "react-cookie";
 
 import { useState, useContext, useEffect } from "react";
@@ -19,6 +19,7 @@ import { CreateVoiceBotContext } from "../../_helpers/client/Context/VoiceBotCon
 import SelectAssistantType from "../create-first-assistant/_components/SelectAssistantType/SelectAssistantType";
 import PricingWrapperNew from "../home/pricing/_components/PricingWrapperNew";
 import {
+  AssistantFlowStep,
   CreateAssistantFlowContext,
   SelectedAssistantType,
 } from "@/app/_helpers/client/Context/CreateAssistantFlowContext";
@@ -45,10 +46,12 @@ export default function FirstAssistant() {
 
   const voiceBotContextData: any = useContext(CreateVoiceBotContext);
   const voiceBotContext = voiceBotContextData.state;
-  console.log("your voice bot data ",voiceBotContext);
 
-  
   const botDetails = botContext?.createBotInfo;
+
+  /// fetch the params
+  const params: any = useSearchParams();
+  const source = decodeURIComponent(params.get("source"));
 
   /// data sources to train
   const [qaData, setQaData]: any = useState();
@@ -64,6 +67,9 @@ export default function FirstAssistant() {
   const [selectedIndustryExpert, setSelectedIndustryExpert] =
     useState<any>(null);
 
+    const [acknowledgedData, setAcknowledgedData] = useState<any>({});
+    const [assistantImagePath, setassistantImagePath] = useState<string>("");
+
   /// plan state to check if user purchased plan while onboarding
   const [plan, setPlan]: any = useState();
 
@@ -78,7 +84,6 @@ export default function FirstAssistant() {
 
   /// modal state handler
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-  const [assistantImagePath, setassistantImagePath] = useState<string>("");
 
   const assistantNameChangeHandler = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -93,91 +98,64 @@ export default function FirstAssistant() {
   };
 
   const continuesChangeHandler = async () => {
-    /// check for validation on each of the steps
 
-    if(createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.CHAT){
+    // if (createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.CHAT) {
+      /// change the steps according to the flow
+      if (createAssistantFlowContextDetails?.currentAssistantFlowStep === AssistantFlowStep.CHOOSE_BOT_TYPE) {
 
-    }
-    else if(createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.VOICE){
-      
-    }
-    /// validation for assistant name & creation flow
-    if (createAssistantFlowContextDetails?.currentAssistantFlowStep === 0) {
-      if (
-        createAssistantFlowContextDetails?.assistantName.trim().length === 0
-      ) {
-        setinputValidationMessage("Please, Provide Assistant Name!");
-        return;
-      }
+        /// validation for assistant name & creation flow
+        if (
+          createAssistantFlowContextDetails?.assistantName.trim().length === 0
+        ) {
+          setinputValidationMessage("Please, Provide Assistant Name!");
+          return;
+        }
 
-      if (
-        createAssistantFlowContextDetails?.creationFlow ===
-        SelectedAssistantType.NULL
-      ) {
-        message.warning("Please select the type of assistant!");
-        return;
-      }
-    }
-
-    /// check for the pricing plan
-    if (createAssistantFlowContextDetails?.currentAssistantFlowStep === 1 && createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.CHAT) {
-      if (!plan?.price) {
-        message.warning("Please select a plan first!");
-        return;
-      }
-    }
-
-    /// validation for assistant type
-    if (createAssistantFlowContextDetails?.currentAssistantFlowStep === 2) {
-      if (createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.CHAT) {
+        if (
+          createAssistantFlowContextDetails?.creationFlow ===
+          SelectedAssistantType.NULL
+        ) {
+          message.warning("Please select the type of assistant!");
+          return;
+        }
+        /// check for the pricing plan only if user is first time user
+        if (plan?.price) {
+          createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(
+            AssistantFlowStep.CHOOSE_ASSISTANT_TYPE
+          );
+          return;
+        }
+        createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(
+          AssistantFlowStep.CHOOSE_PLAN
+        );
+      } else if (createAssistantFlowContextDetails?.currentAssistantFlowStep === AssistantFlowStep.CHOOSE_PLAN && createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.CHAT) {
+        if (!plan?.price) {
+          message.warning("Please select a plan first!");
+          return;
+        }
+        createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(AssistantFlowStep.CHOOSE_ASSISTANT_TYPE);
+      } else if (createAssistantFlowContextDetails?.currentAssistantFlowStep === AssistantFlowStep.CHOOSE_ASSISTANT_TYPE) {
+        /// validation for assistant type
         if (!createAssistantFlowContextDetails?.assistantType?.abbreviation) {
           message.warning("Please select an assistant first!");
           return;
         }
-      }
-      else if(createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.VOICE) {
-        if (!selectedAssistant) {
-          message.warning("Please select an assistant first!");
-          return; 
-        }
-      }
-
-    }
-
-    /// validation for industry expert
-    if (createAssistantFlowContextDetails?.currentAssistantFlowStep === 3) {
-      if (createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.CHAT) {
+        createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(AssistantFlowStep.CHOOSE_INDUSTRY_EXPERT);
+      } else if (createAssistantFlowContextDetails?.currentAssistantFlowStep === AssistantFlowStep.CHOOSE_INDUSTRY_EXPERT) {
+        /// validation for industry expert
         if (!createAssistantFlowContextDetails?.industryExpertType?.abbreviation) {
           message.warning("Please select an Industry Expert first!");
           return;
         }
+        createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(AssistantFlowStep.ADD_DATA_SOURCES);
       }
-      else if(createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.VOICE) {
-        if (!selectedIndustryExpert) {
-          message.warning("Please select an Industry Expert first!");
-          return;
-        }
-      }
+    // }
+    // else if(createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.VOICE){
       
-    }
-
-    // if (selectedAssistantIndex === -1) {
-    //   message.warning("Please select an assistant first!");
-    //   return;
     // }
 
-    // if (voiceBotContextData.currentAssistantPage === -1) {
-    //   message.warning("Please select an Industry Expert first!");
-    //   return;
-    // }
 
-    /// increment the page
-    const nextAssistantFlowStep =
-      createAssistantFlowContextDetails?.currentAssistantFlowStep + 1;
-    createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(
-      nextAssistantFlowStep
-    );
-  
+
   };
 
   const checkPlan = async () => {
@@ -200,6 +178,12 @@ export default function FirstAssistant() {
 
   useEffect(() => {
     getVoiceAssistantTemplateData();
+  }, []);
+
+
+  /// call this on initial load as well as on every step change
+  useEffect(() => {
+    checkPlan();
   }, []);
 
   useEffect(() => {
@@ -263,12 +247,160 @@ export default function FirstAssistant() {
 
 
   const previousChangeHandler = () => {
-    /// decrement the page
-    const previousAssistantFlowStep =
-      createAssistantFlowContextDetails?.currentAssistantFlowStep - 1;
-    createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(
-      previousAssistantFlowStep
-    );
+
+    // if (createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.CHAT) {
+      /// adjust the steps according to the flow in reverse order
+      if ( createAssistantFlowContextDetails?.currentAssistantFlowStep === AssistantFlowStep.CHOOSE_PLAN  ) {
+        createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(AssistantFlowStep.CHOOSE_BOT_TYPE );
+      } else if ( createAssistantFlowContextDetails?.currentAssistantFlowStep ===   AssistantFlowStep.CHOOSE_ASSISTANT_TYPE ) {
+        /// if user is not first time user then skip the plan step
+        if (plan?.price) {
+          createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(AssistantFlowStep.CHOOSE_BOT_TYPE );
+          return;
+        }
+        createAssistantFlowContext?.handleChange("currentAssistantFlowStep")( AssistantFlowStep.CHOOSE_PLAN );
+      } else if ( createAssistantFlowContextDetails?.currentAssistantFlowStep === AssistantFlowStep.CHOOSE_INDUSTRY_EXPERT ) {
+        createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(  AssistantFlowStep.CHOOSE_ASSISTANT_TYPE );
+      } else if (createAssistantFlowContextDetails?.currentAssistantFlowStep === AssistantFlowStep.ADD_DATA_SOURCES ) {
+        createAssistantFlowContext?.handleChange("currentAssistantFlowStep")( AssistantFlowStep.CHOOSE_INDUSTRY_EXPERT );
+      }
+    // }
+    // else if(createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.VOICE){
+
+    // }
+
+
+
+    // const previousAssistantFlowStep =
+    //   createAssistantFlowContextDetails?.currentAssistantFlowStep - 1;
+    // createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(
+    //   previousAssistantFlowStep
+    // );
+  };
+
+  const imageHandler = async (e: any) => {
+
+    if(createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.NULL){
+      message.info("Please select the type of assistant first");
+      return ;
+    }
+    debugger;
+
+    if(createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.CHAT){
+      message.info("Image upload is not available for chatbot");
+      return ;
+    }
+
+    if(createAssistantFlowContextDetails?.assistantName.trim().length === 0){
+      message.info("Please provide assistant name first");
+      return ;
+    }
+
+    const selectedFile = e.target.files[0];
+
+    debugger;
+
+    // Check if a file is selected and it's an image
+    if (selectedFile && isImageFile(selectedFile)) {
+      /// upload the image file to vercel
+      try {
+        // setIsLoading(!isLoading);
+        /// delete any existing URL if any
+        if (acknowledgedData?.isAcknowledged) {
+          fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}api/delete-img`, {
+            method: "POST",
+            body: JSON.stringify({ url: assistantImagePath }),
+          });
+        }
+
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/upload-img?filename=${selectedFile.name}`,
+          {
+            method: "POST",
+            body: selectedFile,
+          }
+        );
+
+        if (!res.ok) {
+          throw await res.json();
+        }
+        const data = await res.json();
+        // setIconImage(data?.uploadUrl);
+        debugger;
+        const assistantTemplateIDs = [
+          selectedAssistant?._id,
+          selectedIndustryExpert?._id,
+        ];
+        const imagePath = data?.uploadUrl;
+        setassistantImagePath(imagePath);
+        // const voiceAssistantName = assistantName;
+        const voiceAssistantName = createAssistantFlowContextDetails?.assistantName;
+        if (acknowledgedData?.isAcknowledged) {
+          const assistantUpdateResponse = await fetch(
+            `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/voice`,
+            {
+              method: "PUT",
+              body: JSON.stringify({
+                assistantName: voiceAssistantName,
+                assistantTemplateIDs: assistantTemplateIDs,
+                imageUrl: imagePath,
+                recordId: acknowledgedData?.insertedId,
+              }),
+            }
+          );
+
+          const assistantUpdateResponseParse =
+            await assistantUpdateResponse.json();
+          setAcknowledgedData({
+            isAcknowledged: assistantUpdateResponseParse?.result?.acknowledged,
+            insertedId: assistantUpdateResponseParse?.result?.upsertedId
+              ? assistantUpdateResponseParse?.result?.upsertedId
+              : acknowledgedData?.insertedId,
+          });
+        } else {
+          const assistantCreateResponse = await fetch(
+            `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/voice`,
+            {
+              method: "POST",
+              body: JSON.stringify({
+                assistantName: voiceAssistantName,
+                assistantTemplateIDs: assistantTemplateIDs,
+                imageUrl: imagePath,
+                userId: cookies.userId,
+              }),
+            }
+          );
+
+          const assistantCreateResponseParse =
+            await assistantCreateResponse.json();
+          debugger;
+          voiceBotContextData.setAssistantMongoId(
+            assistantCreateResponseParse?.result?.insertedId
+          );
+          let assistantData = assistantCreateResponseParse?.record;
+          voiceBotContextData.setAssistantInfo(assistantData);
+          setAcknowledgedData({
+            isAcknowledged: assistantCreateResponseParse?.result?.acknowledged,
+            insertedId: assistantCreateResponseParse?.result?.insertedId,
+          });
+        }
+
+        //
+
+        //add the entry to the database
+      } catch (error: any) {
+        message.error(error.message);
+        return;
+      } finally {
+        // setIsLoading((prev) => !prev);
+      }
+
+      // setFileName(selectedFile.name);
+    } else {
+      // Display an error message or handle the invalid file selection as needed
+      message.error("Invalid file format.");
+      return;
+    }
   };
 
   return (
@@ -291,7 +423,7 @@ export default function FirstAssistant() {
               id="profileImageId"
               style={{ display: "none" }}
               accept="image/*"
-              // onChange={imageHandler}
+              onChange={imageHandler}
             />
             <label htmlFor="profileImageId" className="file-label">
               <Image alt="" src={galaryImg} className="galary_image"></Image>
@@ -339,8 +471,6 @@ export default function FirstAssistant() {
             <p className="invalidation-message">{inputValidationMessage}</p>
           )}
         </div>
-        {/* <h2>Create your voicebot</h2>
-        <h3>Let&lsquo;s create your own bot</h3> */}
         <Steps
           className="stepper-steps"
           direction="vertical"
@@ -348,20 +478,46 @@ export default function FirstAssistant() {
           current={createAssistantFlowContextDetails?.currentAssistantFlowStep}
           items={[
             {
+              /// if this steps is processed mark status as finsihsed
+              status:
+                createAssistantFlowContextDetails?.currentAssistantFlowStep ===
+                AssistantFlowStep.CHOOSE_BOT_TYPE
+                  ? "process"
+                  : "finish",
               title: (
                 <div>
                   <h3 className="steps-assistant-heading">Create your bot</h3>
                 </div>
               ),
             },
+            // Only include the plan step if the user doesn't have a plan
+            ...(plan?.price && source == "chatbot"
+              ? []
+              : [
+                  {
+                    status:
+                      createAssistantFlowContextDetails?.currentAssistantFlowStep ===
+                      AssistantFlowStep.CHOOSE_PLAN
+                        ? ("process" as "process")
+                        : plan?.price
+                        ? ("finish" as "finish")
+                        : ("wait" as "wait"),
+                    title: (
+                      <div>
+                        <h3 className="steps-assistant-heading">Select plan</h3>
+                      </div>
+                    ),
+                  },
+                ]),
             {
-              title: (
-                <div>
-                  <h3 className="steps-assistant-heading">Select plan</h3>
-                </div>
-              ),
-            },
-            {
+              status:
+                createAssistantFlowContextDetails?.currentAssistantFlowStep ===
+                AssistantFlowStep.CHOOSE_ASSISTANT_TYPE
+                  ? "process"
+                  : createAssistantFlowContextDetails?.assistantType
+                      ?.abbreviation
+                  ? "finish"
+                  : "wait",
               title: createAssistantFlowContextDetails?.assistantType
                 ?.imageUrl ? (
                 <div className="selected-assistant">
@@ -409,6 +565,14 @@ export default function FirstAssistant() {
               ),
             },
             {
+              status:
+                createAssistantFlowContextDetails?.currentAssistantFlowStep ===
+                AssistantFlowStep.CHOOSE_INDUSTRY_EXPERT
+                  ? "process"
+                  : createAssistantFlowContextDetails?.industryExpertType
+                      ?.abbreviation
+                  ? "finish"
+                  : "wait",
               title: createAssistantFlowContextDetails?.industryExpertType
                 ?.imageUrl ? (
                 <div className="selected-assistant">
@@ -459,6 +623,11 @@ export default function FirstAssistant() {
               ),
             },
             {
+              status:
+                createAssistantFlowContextDetails?.currentAssistantFlowStep ===
+                AssistantFlowStep.ADD_DATA_SOURCES
+                  ? "process"
+                  : "wait",
               title: (
                 <div>
                   <h3 className="steps-assistant-heading">Customize more</h3>
@@ -476,7 +645,7 @@ export default function FirstAssistant() {
             style={{
               visibility:
                 createAssistantFlowContextDetails?.currentAssistantFlowStep ===
-                0
+                AssistantFlowStep.CHOOSE_BOT_TYPE
                   ? "hidden"
                   : "visible",
             }}
@@ -500,10 +669,10 @@ export default function FirstAssistant() {
 
       {/*------------------------------------------main-voicebot----------------------------------------------*/}
       <div className="create-assistant-containerp-items">
-        {createAssistantFlowContextDetails?.currentAssistantFlowStep === 0 && (
-          <SelectAssistantType />
-        )}
-        {createAssistantFlowContextDetails?.currentAssistantFlowStep === 1 &&
+        {createAssistantFlowContextDetails?.currentAssistantFlowStep ===
+          AssistantFlowStep.CHOOSE_BOT_TYPE && <SelectAssistantType />}
+        {createAssistantFlowContextDetails?.currentAssistantFlowStep ===
+          AssistantFlowStep.CHOOSE_PLAN &&
           (createAssistantFlowContextDetails?.creationFlow ===
           SelectedAssistantType.CHAT ? (
             <PricingWrapperNew firstPurchase={true} />

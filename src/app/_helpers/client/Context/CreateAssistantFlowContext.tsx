@@ -10,11 +10,19 @@ export enum SelectedAssistantType {
   CHAT,
 }
 
+export enum AssistantFlowStep {
+  CHOOSE_BOT_TYPE = "choose-bot-type",
+  CHOOSE_PLAN = "choose-plan",
+  CHOOSE_ASSISTANT_TYPE = "choose-assistant-type",
+  CHOOSE_INDUSTRY_EXPERT = "choose-industry-expert",
+  ADD_DATA_SOURCES = "add-data-sources",
+}
+
 export const CreateAssistantFlowDataProvider = ({ children }: any) => {
   const initialCreateAssistantFlowInfo = {
     creationFlow: SelectedAssistantType.NULL,
     assistantName: "",
-    currentAssistantFlowStep: 0,
+    currentAssistantFlowStep: AssistantFlowStep.CHOOSE_BOT_TYPE,
     assistantType: {
       title: "",
       description: "",
@@ -52,7 +60,7 @@ export const CreateAssistantFlowDataProvider = ({ children }: any) => {
       value={{
         createAssistantFlowInfo,
         handleChange,
-        resetCreateAssistantFlowInfo
+        resetCreateAssistantFlowInfo,
       }}
     >
       {children}
