@@ -27,7 +27,7 @@ export const CreateAssistantFlowDataProvider = ({ children }: any) => {
       title: "",
       description: "",
       imageUrl: "",
-      abbreviation: SelectedAssistantType.NULL,
+      abbreviation: "",
     },
     industryExpertType: {
       title: "",

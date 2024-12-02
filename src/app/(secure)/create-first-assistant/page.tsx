@@ -29,10 +29,15 @@ import Home from "../home/page";
 import { CreateBotContext } from "@/app/_helpers/client/Context/CreateBotContext";
 import ShopifySecretModal from "../create-first-assistant/_components/Modals/ShopifySecretModal";
 import axios from "axios";
+import ChooseVoiceAssistantType from "./_components/ChooseVoiceAssistantType/ChooseVoiceAssistantType";
+import ChooseVoiceAssistantExpert from "./_components/ChooseVoiceAssistantExpert/ChooseVoiceAssistantExpert";
+// import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 
 export default function FirstAssistant() {
   const [cookies, setCookie] = useCookies(["userId"]);
+
+  const router = useRouter();
 
   /// get the context data
   const createAssistantFlowContext: any = useContext(
@@ -57,6 +62,17 @@ export default function FirstAssistant() {
   const [textData, setTextData]: any = useState();
   const [fileData, setFileData]: any = useState();
   const [crawlData, setCrawlData]: any = useState();
+  const [assistantList, setAssistantList] = useState<any>([]);
+  const [industryExpertList, setIndustryExpertList] = useState<any>([]);
+  const [selectedAssistantIndex, setSelectedAssistantIndex] =
+    useState<number>(-1);
+  const [selectedAssistant, setSelectedAssistant] = useState<any>(null);
+  const [selecteExpertIndex, setSelectedExpertIndex] = useState<number>(-1);
+  const [selectedIndustryExpert, setSelectedIndustryExpert] =
+    useState<any>(null);
+
+  const [acknowledgedData, setAcknowledgedData] = useState<any>({});
+  const [assistantImagePath, setassistantImagePath] = useState<string>("");
 
   /// plan state to check if user purchased plan while onboarding
   const [plan, setPlan]: any = useState();
@@ -73,7 +89,6 @@ export default function FirstAssistant() {
 
   /// modal state handler
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-  const [assistantImagePath, setassistantImagePath] = useState<string>("");
 
   const assistantNameChangeHandler = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -88,6 +103,8 @@ export default function FirstAssistant() {
   };
 
   const continuesChangeHandler = async () => {
+    debugger;
+    // if (createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.CHAT) {
     /// change the steps according to the flow
     if (
       createAssistantFlowContextDetails?.currentAssistantFlowStep ===
@@ -115,6 +132,7 @@ export default function FirstAssistant() {
         );
         return;
       }
+
       createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(
         AssistantFlowStep.CHOOSE_PLAN
       );
@@ -122,13 +140,22 @@ export default function FirstAssistant() {
       createAssistantFlowContextDetails?.currentAssistantFlowStep ===
       AssistantFlowStep.CHOOSE_PLAN
     ) {
-      if (!plan?.price) {
-        message.warning("Please select a plan first!");
-        return;
+      if (
+        createAssistantFlowContextDetails?.creationFlow ===
+        SelectedAssistantType.CHAT
+      ) {
+        if (!plan?.price) {
+          message.warning("Please select a plan first!");
+          return;
+        }
+        createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(
+          AssistantFlowStep.CHOOSE_ASSISTANT_TYPE
+        );
+      } else {
+        createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(
+          AssistantFlowStep.CHOOSE_ASSISTANT_TYPE
+        );
       }
-      createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(
-        AssistantFlowStep.CHOOSE_ASSISTANT_TYPE
-      );
     } else if (
       createAssistantFlowContextDetails?.currentAssistantFlowStep ===
       AssistantFlowStep.CHOOSE_ASSISTANT_TYPE
@@ -152,17 +179,90 @@ export default function FirstAssistant() {
         message.warning("Please select an Industry Expert first!");
         return;
       }
-      createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(
-        AssistantFlowStep.ADD_DATA_SOURCES
-      );
+      debugger;
+      if (
+        createAssistantFlowContextDetails?.creationFlow ===
+        SelectedAssistantType.VOICE
+      ) {
+        const assistantTemplateIDs = [
+          selectedAssistant?._id,
+          selectedIndustryExpert?._id,
+        ];
+
+        let assistantName = createAssistantFlowContextDetails?.assistantName;
+
+        if (acknowledgedData?.isAcknowledged) {
+          //update the data
+          debugger;
+          try {
+            const assistantUpdateResponse = await fetch(
+              `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/voice`,
+              {
+                method: "PUT",
+                body: JSON.stringify({
+                  assistantName: assistantName,
+                  assistantTemplateIDs: assistantTemplateIDs,
+                  imageUrl: assistantImagePath,
+                  recordId: acknowledgedData?.insertedId,
+                }),
+              }
+            );
+
+            const assistantUpdateResponseParse =
+              await assistantUpdateResponse.json();
+            debugger;
+
+            router.push(`/voicebot/dashboard?voicBotName=${assistantName}`);
+          } catch (error: any) {
+            console.log(error);
+            message.error(error.message);
+          }
+
+          debugger;
+        } else {
+          //create the data
+          debugger;
+          try {
+            const assistantCreateResponse = await fetch(
+              `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/voice`,
+              {
+                method: "POST",
+                body: JSON.stringify({
+                  assistantName: assistantName,
+                  assistantTemplateIDs: assistantTemplateIDs,
+                  imageUrl: assistantImagePath,
+                  userId: cookies.userId,
+                }),
+              }
+            );
+
+            const assistantCreateResponseParse =
+              await assistantCreateResponse.json();
+            debugger;
+            voiceBotContextData.setAssistantMongoId(
+              assistantCreateResponseParse?.result?.insertedId
+            );
+            let assistantData = assistantCreateResponseParse?.record;
+            voiceBotContextData.setAssistantInfo(assistantData);
+
+            router.push(`/voicebot/dashboard?voicBotName=${assistantName}`);
+          } catch (error: any) {
+            console.log(error);
+            message.error(error.message);
+          }
+        }
+      } else {
+        createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(
+          AssistantFlowStep.ADD_DATA_SOURCES
+        );
+      }
+    } else {
     }
 
-    /// increment the page
-    // const nextAssistantFlowStep =
-    //   createAssistantFlowContextDetails?.currentAssistantFlowStep + 1;
-    // createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(
-    //   nextAssistantFlowStep
-    // );
+    // }
+    // else if(createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.VOICE){
+
+    // }
   };
 
   const checkPlan = async () => {
@@ -182,6 +282,10 @@ export default function FirstAssistant() {
       console.log("error", error);
     }
   };
+
+  useEffect(() => {
+    getVoiceAssistantTemplateData();
+  }, []);
 
   /// call this on initial load as well as on every step change
   useEffect(() => {
@@ -205,110 +309,67 @@ export default function FirstAssistant() {
     return acceptedImageTypes.includes(file.type);
   };
 
-  // const imageHandler = async (e: any) => {
-  //   const selectedFile = e.target.files[0];
+  const assistantSelectHandler = (
+    selectedAssistantValue: SelectedAssistantType
+  ) => {};
 
-  //   // Check if a file is selected and it's an image
-  //   if (selectedFile && isImageFile(selectedFile)) {
-  //     /// upload the image file to vercel
-  //     try {
-  //       // setIsLoading(!isLoading);
-  //       /// delete any existing URL if any
-  //       if (acknowledgedData?.isAcknowledged) {
-  //         fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}api/delete-img`, {
-  //           method: "POST",
-  //           body: JSON.stringify({ url: assistantImagePath }),
-  //         });
-  //       }
+  async function getVoiceAssistantTemplateData() {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/template`,
+        {
+          method: "GET",
+        }
+      );
+      const data = await res.json();
 
-  //       const res = await fetch(
-  //         `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/upload-img?filename=${selectedFile.name}`,
-  //         {
-  //           method: "POST",
-  //           body: selectedFile,
-  //         }
-  //       );
+      let assistantDataList = data?.assistantTemplates.filter(
+        (assistance: any) => assistance?.industryType === "Assistant"
+      );
+      let industryExpertDataList = data?.assistantTemplates.filter(
+        (assistance: any) => assistance?.industryType === "Expert"
+      );
+      debugger;
+      setAssistantList(assistantDataList);
+      setIndustryExpertList(industryExpertDataList);
+    } catch (error: any) {
+      console.log(error);
+    }
+  }
 
-  //       if (!res.ok) {
-  //         throw await res.json();
-  //       }
-  //       const data = await res.json();
-  //       // setIconImage(data?.uploadUrl);
-  //       const assistantTemplateIDs = [
-  //         selectedAssistant?._id,
-  //         selectedIndustryExpert?._id,
-  //       ];
-  //       const imagePath = data?.uploadUrl;
-  //       setassistantImagePath(imagePath);
-  //       const voiceAssistantName = assistantName;
-  //       if (acknowledgedData?.isAcknowledged) {
-  //         const assistantUpdateResponse = await fetch(
-  //           `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/voice`,
-  //           {
-  //             method: "PUT",
-  //             body: JSON.stringify({
-  //               assistantName: voiceAssistantName,
-  //               assistantTemplateIDs: assistantTemplateIDs,
-  //               imageUrl: imagePath,
-  //               recordId: acknowledgedData?.insertedId,
-  //             }),
-  //           }
-  //         );
+  const selectedAssistantChangeHandler = (
+    choosenAssistant: any,
+    index: number
+  ) => {
+    setSelectedAssistantIndex(index);
+    debugger;
+    setSelectedAssistant(choosenAssistant);
+    let assistantTypeObj = {
+      title: choosenAssistant?.assistantType,
+      description: choosenAssistant?.dispcrtion,
+      imageUrl: choosenAssistant?.imageUrl,
+      abbreviation: choosenAssistant?._id,
+    };
+    createAssistantFlowContext?.handleChange("assistantType")(assistantTypeObj);
+  };
 
-  //         const assistantUpdateResponseParse =
-  //           await assistantUpdateResponse.json();
-  //         setAcknowledgedData({
-  //           isAcknowledged: assistantUpdateResponseParse?.result?.acknowledged,
-  //           insertedId: assistantUpdateResponseParse?.result?.upsertedId
-  //             ? assistantUpdateResponseParse?.result?.upsertedId
-  //             : acknowledgedData?.insertedId,
-  //         });
-  //       } else {
-  //         const assistantCreateResponse = await fetch(
-  //           `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/voice`,
-  //           {
-  //             method: "POST",
-  //             body: JSON.stringify({
-  //               assistantName: voiceAssistantName,
-  //               assistantTemplateIDs: assistantTemplateIDs,
-  //               imageUrl: imagePath,
-  //               userId: cookies.userId,
-  //             }),
-  //           }
-  //         );
-
-  //         const assistantCreateResponseParse =
-  //           await assistantCreateResponse.json();
-  //         voiceBotContextData.setAssistantMongoId(
-  //           assistantCreateResponseParse?.result?.insertedId
-  //         );
-  //         let assistantData = assistantCreateResponseParse?.record;
-  //         voiceBotContextData.setAssistantInfo(assistantData);
-  //         setAcknowledgedData({
-  //           isAcknowledged: assistantCreateResponseParse?.result?.acknowledged,
-  //           insertedId: assistantCreateResponseParse?.result?.insertedId,
-  //         });
-  //       }
-
-  //       //
-
-  //       //add the entry to the database
-  //     } catch (error: any) {
-  //       message.error(error.message);
-  //       return;
-  //     } finally {
-  //       // setIsLoading((prev) => !prev);
-  //     }
-
-  //     // setFileName(selectedFile.name);
-  //   } else {
-  //     // Display an error message or handle the invalid file selection as needed
-  //     message.error("Invalid file format.");
-  //     return;
-  //   }
-  // };
+  const selectedExpertChangeHandler = (choosenExpert: any, index: number) => {
+    setSelectedExpertIndex(index);
+    setSelectedIndustryExpert(choosenExpert);
+    debugger;
+    let industryExpertTypeObj = {
+      title: choosenExpert?.assistantType,
+      description: choosenExpert?.dispcrtion,
+      imageUrl: choosenExpert?.imageUrl,
+      abbreviation: choosenExpert?._id,
+    };
+    createAssistantFlowContext?.handleChange("industryExpertType")(
+      industryExpertTypeObj
+    );
+  };
 
   const previousChangeHandler = () => {
+    // if (createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.CHAT) {
     /// adjust the steps according to the flow in reverse order
     if (
       createAssistantFlowContextDetails?.currentAssistantFlowStep ===
@@ -346,12 +407,147 @@ export default function FirstAssistant() {
         AssistantFlowStep.CHOOSE_INDUSTRY_EXPERT
       );
     }
+    // }
+    // else if(createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.VOICE){
+
+    // }
 
     // const previousAssistantFlowStep =
     //   createAssistantFlowContextDetails?.currentAssistantFlowStep - 1;
     // createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(
     //   previousAssistantFlowStep
     // );
+  };
+
+  const imageHandler = async (e: any) => {
+    if (
+      createAssistantFlowContextDetails?.creationFlow ===
+      SelectedAssistantType.NULL
+    ) {
+      message.info("Please select the type of assistant first");
+      return;
+    }
+    debugger;
+
+    if (
+      createAssistantFlowContextDetails?.creationFlow ===
+      SelectedAssistantType.CHAT
+    ) {
+      message.info("Image upload is not available for chatbot");
+      return;
+    }
+
+    if (createAssistantFlowContextDetails?.assistantName.trim().length === 0) {
+      message.info("Please provide assistant name first");
+      return;
+    }
+
+    const selectedFile = e.target.files[0];
+
+    debugger;
+
+    // Check if a file is selected and it's an image
+    if (selectedFile && isImageFile(selectedFile)) {
+      /// upload the image file to vercel
+      try {
+        // setIsLoading(!isLoading);
+        /// delete any existing URL if any
+        if (acknowledgedData?.isAcknowledged) {
+          fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}api/delete-img`, {
+            method: "POST",
+            body: JSON.stringify({ url: assistantImagePath }),
+          });
+        }
+
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/upload-img?filename=${selectedFile.name}`,
+          {
+            method: "POST",
+            body: selectedFile,
+          }
+        );
+
+        if (!res.ok) {
+          throw await res.json();
+        }
+        const data = await res.json();
+        // setIconImage(data?.uploadUrl);
+        debugger;
+        const assistantTemplateIDs = [
+          selectedAssistant?._id,
+          selectedIndustryExpert?._id,
+        ];
+        const imagePath = data?.uploadUrl;
+        setassistantImagePath(imagePath);
+        // const voiceAssistantName = assistantName;
+        const voiceAssistantName =
+          createAssistantFlowContextDetails?.assistantName;
+        if (acknowledgedData?.isAcknowledged) {
+          const assistantUpdateResponse = await fetch(
+            `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/voice`,
+            {
+              method: "PUT",
+              body: JSON.stringify({
+                assistantName: voiceAssistantName,
+                assistantTemplateIDs: assistantTemplateIDs,
+                imageUrl: imagePath,
+                recordId: acknowledgedData?.insertedId,
+              }),
+            }
+          );
+
+          const assistantUpdateResponseParse =
+            await assistantUpdateResponse.json();
+          setAcknowledgedData({
+            isAcknowledged: assistantUpdateResponseParse?.result?.acknowledged,
+            insertedId: assistantUpdateResponseParse?.result?.upsertedId
+              ? assistantUpdateResponseParse?.result?.upsertedId
+              : acknowledgedData?.insertedId,
+          });
+        } else {
+          const assistantCreateResponse = await fetch(
+            `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/voice`,
+            {
+              method: "POST",
+              body: JSON.stringify({
+                assistantName: voiceAssistantName,
+                assistantTemplateIDs: assistantTemplateIDs,
+                imageUrl: imagePath,
+                userId: cookies.userId,
+              }),
+            }
+          );
+
+          const assistantCreateResponseParse =
+            await assistantCreateResponse.json();
+          debugger;
+          voiceBotContextData.setAssistantMongoId(
+            assistantCreateResponseParse?.result?.insertedId
+          );
+          let assistantData = assistantCreateResponseParse?.record;
+          voiceBotContextData.setAssistantInfo(assistantData);
+          setAcknowledgedData({
+            isAcknowledged: assistantCreateResponseParse?.result?.acknowledged,
+            insertedId: assistantCreateResponseParse?.result?.insertedId,
+          });
+        }
+
+        //
+
+        //add the entry to the database
+      } catch (error: any) {
+        message.error(error.message);
+        return;
+      } finally {
+        // setIsLoading((prev) => !prev);
+      }
+
+      // setFileName(selectedFile.name);
+    } else {
+      // Display an error message or handle the invalid file selection as needed
+      message.error("Invalid file format.");
+      return;
+    }
   };
 
   if (status === "authenticated" || cookies?.userId) {
@@ -375,7 +571,7 @@ export default function FirstAssistant() {
                 id="profileImageId"
                 style={{ display: "none" }}
                 accept="image/*"
-                // onChange={imageHandler}
+                onChange={imageHandler}
               />
               <label htmlFor="profileImageId" className="file-label">
                 <Image alt="" src={galaryImg} className="galary_image"></Image>
@@ -640,11 +836,35 @@ export default function FirstAssistant() {
               <PricingWrapperNew firstPurchase={true} />
             ) : null)}
           {createAssistantFlowContextDetails?.currentAssistantFlowStep ===
-            AssistantFlowStep.CHOOSE_ASSISTANT_TYPE && <ChooseAssistant />}
+            AssistantFlowStep.CHOOSE_ASSISTANT_TYPE &&
+            (createAssistantFlowContextDetails?.creationFlow ===
+            SelectedAssistantType.CHAT ? (
+              <ChooseAssistant />
+            ) : (
+              <div className="assistant-wrapper">
+                <ChooseVoiceAssistantType
+                  assistantList={assistantList}
+                  selectedAssistantIndex={selectedAssistantIndex}
+                  selectedAssistantChangeHandler={
+                    selectedAssistantChangeHandler
+                  }
+                />
+              </div>
+            ))}
           {createAssistantFlowContextDetails?.currentAssistantFlowStep ===
-            AssistantFlowStep.CHOOSE_INDUSTRY_EXPERT && (
-            <ChooseIndustryExpert />
-          )}
+            AssistantFlowStep.CHOOSE_INDUSTRY_EXPERT &&
+            (createAssistantFlowContextDetails?.creationFlow ===
+            SelectedAssistantType.CHAT ? (
+              <ChooseIndustryExpert />
+            ) : (
+              <div className="assistant-wrapper">
+                <ChooseVoiceAssistantExpert
+                  industryExpertList={industryExpertList}
+                  selecteExpertIndex={selecteExpertIndex}
+                  selectedExpertChangeHandler={selectedExpertChangeHandler}
+                />
+              </div>
+            ))}
           {createAssistantFlowContextDetails?.currentAssistantFlowStep ===
             AssistantFlowStep.ADD_DATA_SOURCES && (
             <>
@@ -680,7 +900,5 @@ export default function FirstAssistant() {
         {/*------------------------------------------main-voicebot-end----------------------------------------------*/}
       </div>
     );
-  } else if (status === "unauthenticated") {
-    redirect("/account/login");
   }
 }

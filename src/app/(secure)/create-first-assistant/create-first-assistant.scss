@@ -15,6 +15,86 @@
     flex-direction: column;
     height: 100%;
     width: 100%;
+
+    .assistant-wrapper{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 40px;
+
+      // display: flex;
+      .assistant-card {
+        display: flex;
+        width: 280px;
+        padding: 12px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        align-self: stretch;
+        background: #fcfcfd;
+        border-radius: 16px;
+
+        .card-image {
+          display: flex;
+          cursor: pointer;
+
+          img {
+            color: transparent;
+            height: 239px;
+            width: 100%;
+            border-radius: 12px;
+            // background: url(<path-to-image>) lightgray -32.037px -31.683px / 175.868% 125.585% no-repeat;
+            background-color: lightgray;
+            background-position: -32.037px -31.683px;
+            background-size: 175.868% 125.585%;
+            background-repeat: no-repeat;
+            align-self: stretch;
+          }
+        }
+
+        .header-information {
+          width: 100%;
+          cursor: pointer;
+
+          .header_container {
+            display: flex;
+            justify-content: space-between;
+
+            .card_header {
+              color: #000;
+              // font-family: "General Sans";
+              font-size: 16px;
+              font-style: normal;
+              font-weight: 600;
+              line-height: 24px;
+            }
+
+            .image-info {
+              img {
+                display: flex;
+                width: 24px;
+                height: 24px;
+                justify-content: center;
+                align-items: center;
+              }
+            }
+          }
+
+          .card_sub-header {
+            color: #777e90;
+            // font-family: "General Sans";
+            font-size: 16px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 24px;
+          }
+        }
+      }
+      .selected-assistant {
+        background: #9fb5ff !important;
+      }
+
+    }
+
   }
 
   .stepper {
