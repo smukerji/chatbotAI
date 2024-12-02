@@ -102,41 +102,40 @@ export default function FirstAssistant() {
 
   const continuesChangeHandler = async () => {
 
+    debugger;
     // if (createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.CHAT) {
       /// change the steps according to the flow
       if (createAssistantFlowContextDetails?.currentAssistantFlowStep === AssistantFlowStep.CHOOSE_BOT_TYPE) {
 
         /// validation for assistant name & creation flow
-        if (
-          createAssistantFlowContextDetails?.assistantName.trim().length === 0
-        ) {
+        if (createAssistantFlowContextDetails?.assistantName.trim().length === 0 ) {
           setinputValidationMessage("Please, Provide Assistant Name!");
           return;
         }
 
-        if (
-          createAssistantFlowContextDetails?.creationFlow ===
-          SelectedAssistantType.NULL
-        ) {
+        if (createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.NULL ) {
           message.warning("Please select the type of assistant!");
           return;
         }
         /// check for the pricing plan only if user is first time user
         if (plan?.price) {
-          createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(
-            AssistantFlowStep.CHOOSE_ASSISTANT_TYPE
-          );
+          createAssistantFlowContext?.handleChange("currentAssistantFlowStep")( AssistantFlowStep.CHOOSE_ASSISTANT_TYPE );
           return;
         }
-        createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(
-          AssistantFlowStep.CHOOSE_PLAN
-        );
-      } else if (createAssistantFlowContextDetails?.currentAssistantFlowStep === AssistantFlowStep.CHOOSE_PLAN && createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.CHAT) {
-        if (!plan?.price) {
-          message.warning("Please select a plan first!");
-          return;
+      
+        createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(AssistantFlowStep.CHOOSE_PLAN);
+      } else if (createAssistantFlowContextDetails?.currentAssistantFlowStep === AssistantFlowStep.CHOOSE_PLAN) {
+        if(createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.CHAT){
+          if (!plan?.price) {
+            message.warning("Please select a plan first!");
+            return;
+          }
+          createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(AssistantFlowStep.CHOOSE_ASSISTANT_TYPE);
         }
-        createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(AssistantFlowStep.CHOOSE_ASSISTANT_TYPE);
+        else{
+          createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(AssistantFlowStep.CHOOSE_ASSISTANT_TYPE);
+        }
+       
       } else if (createAssistantFlowContextDetails?.currentAssistantFlowStep === AssistantFlowStep.CHOOSE_ASSISTANT_TYPE) {
         /// validation for assistant type
         if (!createAssistantFlowContextDetails?.assistantType?.abbreviation) {
@@ -150,6 +149,7 @@ export default function FirstAssistant() {
           message.warning("Please select an Industry Expert first!");
           return;
         }
+        debugger;
         if(createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.VOICE){
           const assistantTemplateIDs = [
             selectedAssistant?._id,
@@ -318,12 +318,29 @@ export default function FirstAssistant() {
     index: number
   ) => {
     setSelectedAssistantIndex(index);
+    debugger;
     setSelectedAssistant(choosenAssistant);
+    let assistantTypeObj = {
+      title: choosenAssistant?.assistantType,
+      description: choosenAssistant?.dispcrtion,
+      imageUrl: choosenAssistant?.imageUrl,
+      abbreviation: choosenAssistant?._id,
+    }
+    createAssistantFlowContext?.handleChange("assistantType")(assistantTypeObj);
+
   };
 
   const selectedExpertChangeHandler = (choosenExpert: any, index: number) => {
     setSelectedExpertIndex(index);
     setSelectedIndustryExpert(choosenExpert);
+    debugger;
+    let industryExpertTypeObj = {
+      title: choosenExpert?.assistantType,
+      description: choosenExpert?.dispcrtion,
+      imageUrl: choosenExpert?.imageUrl,
+      abbreviation: choosenExpert?._id,
+    }
+    createAssistantFlowContext?.handleChange("industryExpertType")(industryExpertTypeObj);
   };
 
 
@@ -758,7 +775,7 @@ export default function FirstAssistant() {
           SelectedAssistantType.CHAT ? (
             <PricingWrapperNew firstPurchase={true} />
           ) : null)}
-              {createAssistantFlowContextDetails?.currentAssistantFlowStep === 2 && 
+              {createAssistantFlowContextDetails?.currentAssistantFlowStep === AssistantFlowStep.CHOOSE_ASSISTANT_TYPE && 
           (
             createAssistantFlowContextDetails?.creationFlow ===
             SelectedAssistantType.CHAT ?
@@ -772,7 +789,7 @@ export default function FirstAssistant() {
                 </div>
             )
           )}
-        {createAssistantFlowContextDetails?.currentAssistantFlowStep === 3 && 
+        {createAssistantFlowContextDetails?.currentAssistantFlowStep === AssistantFlowStep.CHOOSE_INDUSTRY_EXPERT && 
           (
             createAssistantFlowContextDetails?.creationFlow ===
             SelectedAssistantType.CHAT ?
