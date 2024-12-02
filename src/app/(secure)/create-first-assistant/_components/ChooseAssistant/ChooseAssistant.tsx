@@ -39,7 +39,7 @@ function ChooseAssistant() {
       {/* : "Choose your specialized AI expert for tasks like translation, diagnostics, finance, or customer service needs."} */}
 
       <div className="title">
-        <h1> Let's create a new assistant</h1>
+        <h1> Let&apos;s create a new assistant</h1>
         <span>
           Get started by selecting the AI assistant that best fits your needs
           and preferences.

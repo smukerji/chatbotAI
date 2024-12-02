@@ -2,7 +2,10 @@ import { message, Modal } from "antd";
 import React, { useContext } from "react";
 import Image from "next/image";
 import "./shopify-secret-modal.scss";
-import { CreateAssistantFlowContext } from "@/app/_helpers/client/Context/CreateAssistantFlowContext";
+import {
+  AssistantFlowStep,
+  CreateAssistantFlowContext,
+} from "@/app/_helpers/client/Context/CreateAssistantFlowContext";
 
 function ShopifySecretModal({ imageUrl, isOpen, setIsOpen }: any) {
   /// get the context data
@@ -14,7 +17,8 @@ function ShopifySecretModal({ imageUrl, isOpen, setIsOpen }: any) {
 
   /// if the user is on the last step, and has selected industry type that requires secret key
   if (
-    createAssistantFlowContextDetails?.currentAssistantFlowStep === 4 &&
+    createAssistantFlowContextDetails?.currentAssistantFlowStep ===
+      AssistantFlowStep.ADD_DATA_SOURCES &&
     createAssistantFlowContextDetails?.industryExpertType?.abbreviation ===
       "shopify" &&
     !createAssistantFlowContextDetails?.integrationSecretVerified
