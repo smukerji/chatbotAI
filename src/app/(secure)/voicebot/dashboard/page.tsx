@@ -80,7 +80,7 @@ function Dashboard() {
       router.push("/chatbot");
     }
 
-    debugger;
+    ;
     if(voiceBotContextData.assistantInfo?.vapiAssistantId) {
 
      
@@ -192,7 +192,7 @@ function Dashboard() {
           );
 
           const assistantDataResponseParse = await assistantDataResponse.json();
-          debugger;
+          ;
           if(assistantDataResponseParse?.error){
             message.error("Error while getting the assistant data");
             return;
@@ -417,7 +417,7 @@ function Dashboard() {
 
     //call the post api to publish the assistant to the vapi
 
-    debugger;
+    ;
     if(!voiceBotContextData?.isPublishEnabled){
       message.error("Please fill the required fields to publish the assistant");
       return;
@@ -425,7 +425,7 @@ function Dashboard() {
     
     try{
 
-      debugger;
+      ;
       const assistantCreateResponse = await fetch(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/vapi/assistant`,
         {
@@ -438,7 +438,7 @@ function Dashboard() {
       );
 
       const assistantCreateResponseParse = await assistantCreateResponse.json();
-      debugger;
+      ;
       if(assistantCreateResponseParse?.error){
         message.error("Error while publishing the assistant");
         return;
@@ -481,7 +481,7 @@ function Dashboard() {
 
   
   const handleDocumentClick = (event: MouseEvent) => {
-    // debugger;
+    // ;
     if (divRef.current && !divRef.current.contains(event.target as Node)) {
       setIsMoreContentVisible(false);
     }
@@ -504,7 +504,7 @@ function Dashboard() {
             <Image className="image" alt="back_arrow" src={leftArrow} onClick={()=>{
               router.push("/chatbot")
             }}></Image>
-            <h1 className="title">{voicebotDetails.name || voiceBotContextData?.assistantInfo?.assistantName || editChatbotSource}</h1>
+            <h1 className="title">{voicebotDetails?.name || voiceBotContextData?.assistantInfo?.assistantName || editChatbotSource}</h1>
 
           </div>
           <div className="header-description">

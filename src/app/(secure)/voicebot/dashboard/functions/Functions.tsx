@@ -8,7 +8,7 @@ import addImg from "../../../../../../public/voiceBot/SVG/add.svg";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import { useState } from "react";
-import CustomModel from "../../_components/CustomModel/CustomModel";
+import CustomModel from "../../../create-first-assistant/_components/CustomModel/CustomModel";
 import Schema from "./schema/Schema";
 import Make from "./make/Make";
 import ToolFor from "./tool-for/ToolFor";

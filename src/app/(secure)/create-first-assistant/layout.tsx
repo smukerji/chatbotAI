@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { CreateBotDataProvider } from "../../_helpers/client/Context/CreateBotContext";
 import { ChatbotSettingDataProvider } from "../../_helpers/client/Context/ChatbotSettingContext";
 
-export default function VoiceBotsLayout({
+export default function CreateFirstLayout({
   children,
 }: {
   children: React.ReactNode;

@@ -105,7 +105,7 @@ function CallLogs() {
 
     
     setLoading(true);
-    debugger;
+    ;
 
     const options = {
       method: 'GET',
@@ -113,7 +113,7 @@ function CallLogs() {
     };
 
     let assId = voiceBotContextData.assistantInfo["vapiAssistantId"];
-    debugger;
+    ;
 
     try {
       callLogResponse = await fetch(`https://api.vapi.ai/v2/call?limit=${pageLimit}&page=${pageNumber}&assistantId=${assId}`, options);
@@ -122,7 +122,7 @@ function CallLogs() {
       setCallLogsList(data.results);
       setCallLogUrl(data.results[0]?.recordingUrl);
       const firstCallLog = data.results[0];
-      debugger;
+      ;
 
       let resData: ListCallResponse = {
         id: firstCallLog.id,
@@ -168,7 +168,7 @@ function CallLogs() {
   }
 
   useEffect( () => {
-  debugger;
+  ;
     getLogRecord();
 
   }, []);
@@ -179,7 +179,7 @@ function CallLogs() {
     setSelectedLog(index);
     setCallLogUrl(callLogsList[index].recordingUrl);
     const data = callLogsList[index];
-    debugger;
+    ;
 
     let resData: ListCallResponse = {
       id: data.id,
@@ -247,7 +247,7 @@ const formatCallDuration = (createdAt: string, endedAt: string): string => {
 
   const paginationDataHandler = (page: number,pageLimit:number) => {
     setCurrentPage(page);
-    debugger;
+    ;
     getLogRecord(page,pageLimit);
   }
 

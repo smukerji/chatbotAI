@@ -30,7 +30,7 @@ function Property() {
     }
     //stored into the contextAPI
     // voiceBotContextData.updateState("analysisPlan.structuredDataSchema.properties", properties);
-    debugger;
+    ;
 
   }, [voicebotDetails.analysisPlan.structuredDataSchema.properties]);
 
@@ -43,7 +43,7 @@ function Property() {
     const newProperty = { id: properties.length + 1, type: '', name: '', description: '' , saved:false};
     setCurrentProperty(newProperty);
     setProperties([...properties, newProperty]);
-    debugger;
+    ;
   };
 
 
@@ -80,7 +80,7 @@ function Property() {
 
   const currentPropertyChangeHandler = (id:number,options:any)=>{
 
-    debugger;
+    ;
     if (currentProperty) {
       setCurrentProperty({ ...currentProperty, type: options.label });
       //set type into property too

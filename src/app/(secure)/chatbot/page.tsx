@@ -31,7 +31,7 @@ import { JWT_EXPIRED } from "../../_helpers/errorConstants";
 import axios from "axios";
 import voiceAssistantPreview from "../../../../public/voiceBot/voice-bot-preview.svg";
 
-import { CreateVoiceBotContext } from "../../_helpers/client/Context/VoiceBotContextApi"
+import { CreateVoiceBotContext } from "../../_helpers/client/Context/VoiceBotContextApi";
 // import GridIcon from "../../as";
 
 const antIcon = (
@@ -87,8 +87,10 @@ const initialState = {
     chunkPlan: {
       enabled: true,
       minCharacters: 10,
-      punctuationBoundaries: [{ value: "0", label: "。" },
-        { value: "1", label: "，" }],//need to update this beffore sending it to vapi server
+      punctuationBoundaries: [
+        { value: "0", label: "。" },
+        { value: "1", label: "，" },
+      ], //need to update this beffore sending it to vapi server
       formatPlan: {
         enabled: true,
         numberToDigitsCutoff: 2025,
@@ -109,7 +111,12 @@ const initialState = {
   backgroundDenoisingEnabled: false,
   modelOutputInMessagesEnabled: false,
   transportConfigurations: [
-    { provider: "twilio", timeout: 60, record: false, recordingChannels: "mono" },
+    {
+      provider: "twilio",
+      timeout: 60,
+      record: false,
+      recordingChannels: "mono",
+    },
   ],
   name: "",
   numWordsToInterruptAssistant: 0,
@@ -138,139 +145,177 @@ const initialState = {
     successEvaluationRequestTimeoutSeconds: 10.5,
     structuredDataPrompt: "",
     structuredDataSchema: {
-      type: "object",  properties: [""],/**this type is {} not [], [] is given for ui manage only. This need to refactor before the time value send to the vapi server */
+      type: "object",
+      properties: [
+        "",
+      ] /**this type is {} not [], [] is given for ui manage only. This need to refactor before the time value send to the vapi server */,
     },
-    
-    artifactPlan: { recordingEnabled: true, videoRecordingEnabled: false, recordingS3PathPrefix: "" },//deleted
-    messagePlan: { idleMessages: [] /**this need to be update before sending to the vapi server. */, idleMessageMaxSpokenCount: 5.5, idleTimeoutSeconds: 17.5 },//delete
+
+    artifactPlan: {
+      recordingEnabled: true,
+      videoRecordingEnabled: false,
+      recordingS3PathPrefix: "",
+    }, //deleted
+    messagePlan: {
+      idleMessages:
+        [] /**this need to be update before sending to the vapi server. */,
+      idleMessageMaxSpokenCount: 5.5,
+      idleTimeoutSeconds: 17.5,
+    }, //delete
     startSpeakingPlan: {
       waitSeconds: 0.4,
       smartEndpointingEnabled: false,
-      transcriptionEndpointingPlan: { onPunctuationSeconds: 0.1, onNoPunctuationSeconds: 1.5, onNumberSeconds: 0.5 },
-    },//deleted
-    stopSpeakingPlan: { numWords: 0, voiceSeconds: 0.2, backoffSeconds: 1 },//deleted
-    monitorPlan: { listenEnabled: false, controlEnabled: false },//deleted
-    credentialIds: [""],//deleted
+      transcriptionEndpointingPlan: {
+        onPunctuationSeconds: 0.1,
+        onNoPunctuationSeconds: 1.5,
+        onNumberSeconds: 0.5,
+      },
+    }, //deleted
+    stopSpeakingPlan: { numWords: 0, voiceSeconds: 0.2, backoffSeconds: 1 }, //deleted
+    monitorPlan: { listenEnabled: false, controlEnabled: false }, //deleted
+    credentialIds: [""], //deleted
   },
 };
 
 function Chatbot() {
-  
-const initialState = {
-  firstMessage: "",
-  transcriber: {
-    provider: "",
-    model: "",
-    language: "",
-    // smartFormat: false,
-    languageDetectionEnabled: false,
-    // keywords: [""],
-    endpointing: 255,
-  },
-  model: {
-    messages: [{ content: "default", role: "system" }],
-    // tools: [
-    //   {
-    //     async: false,
-    //     messages: [
-    //       {
-    //         type: "request-start",
-    //         content: "",
-    //         conditions: [{ value: "", operator: "eq", param: "" }],
-    //       },
-    //     ],
-    //     type: "dtmf",
-    //     function: {
-    //       name: "",
-    //       description: "",
-    //       parameters: { type: "object", properties: {}, required: [""] },
-    //     },
-    //     server: { timeoutSeconds: 20, url: "", secret: "" },
-    //   },
-    // ],
-    toolIds: [""],//we deleted this field in the backend
-    provider: "",
-    model: "",
-    temperature: 0,
-    // knowledgeBase: { provider: "canonical", topK: 5.5, fileIds: [""] },
-    maxTokens: 300,
-    emotionRecognitionEnabled: false,
-    numFastTurns: 1,
-  },
-  voice: {
-    fillerInjectionEnabled: false,
-    provider: "azure",
-    voiceId: "andrew",
-    speed: 1.25,
-    chunkPlan: {
-      enabled: true,
-      minCharacters: 10,
-      punctuationBoundaries: [{ value: "0", label: "。" },
-        { value: "1", label: "，" }],//need to update this beffore sending it to vapi server
-      formatPlan: {
+  const initialState = {
+    firstMessage: "",
+    transcriber: {
+      provider: "",
+      model: "",
+      language: "",
+      // smartFormat: false,
+      languageDetectionEnabled: false,
+      // keywords: [""],
+      endpointing: 255,
+    },
+    model: {
+      messages: [{ content: "default", role: "system" }],
+      // tools: [
+      //   {
+      //     async: false,
+      //     messages: [
+      //       {
+      //         type: "request-start",
+      //         content: "",
+      //         conditions: [{ value: "", operator: "eq", param: "" }],
+      //       },
+      //     ],
+      //     type: "dtmf",
+      //     function: {
+      //       name: "",
+      //       description: "",
+      //       parameters: { type: "object", properties: {}, required: [""] },
+      //     },
+      //     server: { timeoutSeconds: 20, url: "", secret: "" },
+      //   },
+      // ],
+      toolIds: [""], //we deleted this field in the backend
+      provider: "",
+      model: "",
+      temperature: 0,
+      // knowledgeBase: { provider: "canonical", topK: 5.5, fileIds: [""] },
+      maxTokens: 300,
+      emotionRecognitionEnabled: false,
+      numFastTurns: 1,
+    },
+    voice: {
+      fillerInjectionEnabled: false,
+      provider: "azure",
+      voiceId: "andrew",
+      speed: 1.25,
+      chunkPlan: {
         enabled: true,
-        numberToDigitsCutoff: 2025,
-        // replacements: [{ type: "exact", key: "", value: "" }],
+        minCharacters: 10,
+        punctuationBoundaries: [
+          { value: "0", label: "。" },
+          { value: "1", label: "，" },
+        ], //need to update this beffore sending it to vapi server
+        formatPlan: {
+          enabled: true,
+          numberToDigitsCutoff: 2025,
+          // replacements: [{ type: "exact", key: "", value: "" }],
+        },
       },
     },
-  },
-  firstMessageMode: "assistant-speaks-first",
-  llmRequestDelaySeconds: 0.1,
-  responseDelaySeconds: 0.1,
-  hipaaEnabled: false,
-  // clientMessages: [],//need to update this before sending to the vapi server
-  // serverMessages: [],//need to update this before sending to the vapi server
-  silenceTimeoutSeconds: 30,
-  maxDurationSeconds: 600,
-  backgroundSound: "office",
-  backchannelingEnabled: false,
-  backgroundDenoisingEnabled: false,
-  modelOutputInMessagesEnabled: false,
-  transportConfigurations: [
-    { provider: "twilio", timeout: 60, record: false, recordingChannels: "mono" },
-  ],
-  name: "",
-  numWordsToInterruptAssistant: 0,
+    firstMessageMode: "assistant-speaks-first",
+    llmRequestDelaySeconds: 0.1,
+    responseDelaySeconds: 0.1,
+    hipaaEnabled: false,
+    // clientMessages: [],//need to update this before sending to the vapi server
+    // serverMessages: [],//need to update this before sending to the vapi server
+    silenceTimeoutSeconds: 30,
+    maxDurationSeconds: 600,
+    backgroundSound: "office",
+    backchannelingEnabled: false,
+    backgroundDenoisingEnabled: false,
+    modelOutputInMessagesEnabled: false,
+    transportConfigurations: [
+      {
+        provider: "twilio",
+        timeout: 60,
+        record: false,
+        recordingChannels: "mono",
+      },
+    ],
+    name: "",
+    numWordsToInterruptAssistant: 0,
 
-  voicemailDetection: {
-    provider: "twilio",
-    voicemailDetectionTypes: ["machine_end_beep", "machine_end_silence"],
-    enabled: true,
-    machineDetectionTimeout: 31,
-    machineDetectionSpeechThreshold: 3500,
-    machineDetectionSpeechEndThreshold: 2750,
-    machineDetectionSilenceTimeout: 6000,
-  },
-  voicemailMessage: "",
-  endCallMessage: "",
-  // endCallPhrases: [""],
-  metadata: {},
-  // serverUrl: "",
-  // serverUrlSecret: "",
-  analysisPlan: {
-    summaryPrompt: "",
-    summaryRequestTimeoutSeconds: 10.5,
-    structuredDataRequestTimeoutSeconds: 10.5,
-    successEvaluationPrompt: "",
-    successEvaluationRubric: "NumericScale",
-    successEvaluationRequestTimeoutSeconds: 10.5,
-    structuredDataPrompt: "",
-    structuredDataSchema: {
-      type: "object",  properties: [""],/**this type is {} not [], [] is given for ui manage only. This need to refactor before the time value send to the vapi server */
+    voicemailDetection: {
+      provider: "twilio",
+      voicemailDetectionTypes: ["machine_end_beep", "machine_end_silence"],
+      enabled: true,
+      machineDetectionTimeout: 31,
+      machineDetectionSpeechThreshold: 3500,
+      machineDetectionSpeechEndThreshold: 2750,
+      machineDetectionSilenceTimeout: 6000,
     },
-    
-    artifactPlan: { recordingEnabled: true, videoRecordingEnabled: false, recordingS3PathPrefix: "" },//deleted
-    messagePlan: { idleMessages: [] /**this need to be update before sending to the vapi server. */, idleMessageMaxSpokenCount: 5.5, idleTimeoutSeconds: 17.5 },//delete
-    startSpeakingPlan: {
-      waitSeconds: 0.4,
-      smartEndpointingEnabled: false,
-      transcriptionEndpointingPlan: { onPunctuationSeconds: 0.1, onNoPunctuationSeconds: 1.5, onNumberSeconds: 0.5 },
-    },//deleted
-    stopSpeakingPlan: { numWords: 0, voiceSeconds: 0.2, backoffSeconds: 1 },//deleted
-    monitorPlan: { listenEnabled: false, controlEnabled: false },//deleted
-    credentialIds: [""],//deleted
-  },
-};
+    voicemailMessage: "",
+    endCallMessage: "",
+    // endCallPhrases: [""],
+    metadata: {},
+    // serverUrl: "",
+    // serverUrlSecret: "",
+    analysisPlan: {
+      summaryPrompt: "",
+      summaryRequestTimeoutSeconds: 10.5,
+      structuredDataRequestTimeoutSeconds: 10.5,
+      successEvaluationPrompt: "",
+      successEvaluationRubric: "NumericScale",
+      successEvaluationRequestTimeoutSeconds: 10.5,
+      structuredDataPrompt: "",
+      structuredDataSchema: {
+        type: "object",
+        properties: [
+          "",
+        ] /**this type is {} not [], [] is given for ui manage only. This need to refactor before the time value send to the vapi server */,
+      },
+
+      artifactPlan: {
+        recordingEnabled: true,
+        videoRecordingEnabled: false,
+        recordingS3PathPrefix: "",
+      }, //deleted
+      messagePlan: {
+        idleMessages:
+          [] /**this need to be update before sending to the vapi server. */,
+        idleMessageMaxSpokenCount: 5.5,
+        idleTimeoutSeconds: 17.5,
+      }, //delete
+      startSpeakingPlan: {
+        waitSeconds: 0.4,
+        smartEndpointingEnabled: false,
+        transcriptionEndpointingPlan: {
+          onPunctuationSeconds: 0.1,
+          onNoPunctuationSeconds: 1.5,
+          onNumberSeconds: 0.5,
+        },
+      }, //deleted
+      stopSpeakingPlan: { numWords: 0, voiceSeconds: 0.2, backoffSeconds: 1 }, //deleted
+      monitorPlan: { listenEnabled: false, controlEnabled: false }, //deleted
+      credentialIds: [""], //deleted
+    },
+  };
 
   const { status } = useSession();
   const router = useRouter();
@@ -305,10 +350,10 @@ const initialState = {
   const [openShareModal, setOpenShareModal] = useState(false);
 
   /**
-   * 
+   *
    * description Voicebot properties
-   * 
-   * 
+   *
+   *
    */
 
   const voiceBotContextData: any = useContext(CreateVoiceBotContext);
@@ -321,46 +366,35 @@ const initialState = {
 
   const [voiceAssistantList, setVoiceAssistantList] = useState([]);
 
-
   /**
    * Handler goes heres
    */
 
-  const voiceBotActiveDeactiveHandler = (activeValue:boolean) => {
+  const voiceBotActiveDeactiveHandler = (activeValue: boolean) => {
     setIsVoiceBotActived(activeValue);
-  }
+  };
 
   const getAllVoiceAssistantData = async () => {
     setVoiceBotLoading(true);
-    try{
-      debugger;
+    try {
       const res = await fetch(
-       `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/assistant?userId=${cookies.userId}`,
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/assistant?userId=${cookies.userId}`,
         {
           method: "GET",
         }
       );
       const data = await res.json();
-  
-      debugger;
+
       setVoiceAssistantList(data?.assistants);
-    }
-    catch(error:any){
+    } catch (error: any) {
       console.log("Error in fetching voice assistant data", error);
       message.error("Error in fetching voice assistant data");
-
-    }
-    finally{
+    } finally {
       setVoiceBotLoading(false);
     }
-   
-    
-  }
+  };
 
   const selectedAssistantHandler = (assistantInfo: any) => {
-
-    debugger;
-
     voiceBotContextData.setAssistantInfo(assistantInfo);
 
     voiceBotContextData.setState(JSON.parse(JSON.stringify(initialState)));
@@ -370,28 +404,24 @@ const initialState = {
     // }
     voiceBotContextData.setCurrentAssistantPage(0);
     router.push("/voicebot/dashboard");
-  }
-
+  };
 
   /**
    * UseEffect goes here
    */
 
-useEffect(() => {
-  const fetchData = async () => {
-    await getAllVoiceAssistantData();
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      await getAllVoiceAssistantData();
+    };
 
-  fetchData();
-}, []);
-
-
-
+    fetchData();
+  }, []);
 
   /**
-   * 
+   *
    * voice bot property ended
-   * 
+   *
    */
 
   /// state for opening menu for the chabot list
@@ -430,6 +460,10 @@ useEffect(() => {
       `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/user?userId=${cookies.userId}`
     );
 
+    /// if user does not have any plan then redirect to create-first-bot page
+    if (!response.data.user.planId) {
+      router.push("/create-first-assistant");
+    }
     setUser(response.data.user);
   };
 
@@ -506,11 +540,10 @@ useEffect(() => {
     router.push("/home/pricing");
   };
 
-
   const createVoiceBotHandler = () => {
-    voiceBotContextData.reInitiateState();
+    // voiceBotContextData.reInitiateState();
     router.push("/voicebot");
-  }
+  };
 
   /// view chatbot
   function openChatbot(id: any) {
@@ -526,159 +559,154 @@ useEffect(() => {
         )
       )}&editChatbotSource=${isPlanNotification ? "history" : "chatbot"}`
     );
-    // window.location.href = `${
-    //   process.env.NEXT_PUBLIC_WEBSITE_URL
-    // }chatbot/dashboard?${encodeURIComponent("chatbot")}=${encodeURIComponent(
-    //   JSON.stringify(
-    //     chatbotData.filter((data: any) => {
-    //       return data.id == id;
-    //     })[0]
-    //   )
-    // )}`;
   }
 
   if (status === "authenticated" || cookies?.userId) {
     return (
-      <>
-        <div
-          className="chatbot-list-container"
-          onClick={() => openMenu && setOpenMenu(null)}
-        >
-          {/*------------------------------------------title----------------------------------------------*/}
-          <div className="title-container">
-            <div className="title-header-container">
-              <h1 className={!isVoiceBotActived ? "title activate-title" : "title"} onClick={ ()=> voiceBotActiveDeactiveHandler(false) }>My Chatbots</h1>
-              <h1 className={isVoiceBotActived ? "title activate-title" : "title"} onClick={()=> voiceBotActiveDeactiveHandler(true)}>My Voicebot</h1>
+      <div
+        className="chatbot-list-container"
+        onClick={() => openMenu && setOpenMenu(null)}
+      >
+        {/*------------------------------------------title----------------------------------------------*/}
+        <div className="title-container">
+          <div className="title-header-container">
+            <h1
+              className={!isVoiceBotActived ? "title activate-title" : "title"}
+              onClick={() => voiceBotActiveDeactiveHandler(false)}
+            >
+              My Chatbots
+            </h1>
+            <h1
+              className={isVoiceBotActived ? "title activate-title" : "title"}
+              onClick={() => voiceBotActiveDeactiveHandler(true)}
+            >
+              My Voicebot
+            </h1>
+          </div>
+
+          <div className="action-container">
+            <div className="chatbot-list-action">
+              <Icon
+                className={listType == "grid" ? "active" : ""}
+                Icon={GridIcon}
+                click={() => setListType("grid")}
+              />
+              <Icon
+                className={listType == "table" ? "active" : ""}
+                Icon={MenuIcon}
+                click={() => setListType("table")}
+              />
             </div>
-
-            <div className="action-container">
-              <div className="chatbot-list-action">
-                <Icon
-                  className={listType == "grid" ? "active" : ""}
-                  Icon={GridIcon}
-                  click={() => setListType("grid")}
-                />
-                <Icon
-                  className={listType == "table" ? "active" : ""}
-                  Icon={MenuIcon}
-                  click={() => setListType("table")}
-                />
-                
-              </div>
-              {/* <Link href={`${process.env.NEXT_PUBLIC_WEBSITE_URL}home`}> */}
-             { isVoiceBotActived ?
-             <button onClick={createVoiceBotHandler}>
-                New Voicebot
-             </button>
-             :
-                <button
-                  onClick={ () =>  {
-                    // showModal()
-                    /// check if user has exceeded the number of creation of bots
-                    if (
-                      userDetails?.noOfChatbotsUserCreated + 1 >
-                      userDetails?.plan?.numberOfChatbot
-                    ) {
-                      setOpenLimitModel(true);
-                      return;
-                    }
-
-                    setOpenNewChatbotNameModal(true);
-                  }}
-                  disabled={
-                    loading || (user && new Date(user?.endDate) < new Date())
+            {/* <Link href={`${process.env.NEXT_PUBLIC_WEBSITE_URL}home`}> */}
+            {isVoiceBotActived ? (
+              <button onClick={createVoiceBotHandler}>New Voicebot</button>
+            ) : (
+              <button
+                onClick={() => {
+                  // showModal()
+                  /// check if user has exceeded the number of creation of bots
+                  if (
+                    userDetails?.noOfChatbotsUserCreated + 1 >
+                    userDetails?.plan?.numberOfChatbot
+                  ) {
+                    setOpenLimitModel(true);
+                    return;
                   }
-                >
-                  New Chatbot
-                </button>
-             }
-            
-              {/* </Link> */}
-            </div>
 
-            {/* {openLimitModal ? (
+                  // setOpenNewChatbotNameModal(true);
+                  window.location.href =
+                    "/create-first-assistant?source=chatbot";
+                }}
+                disabled={
+                  loading || (user && new Date(user?.endDate) < new Date())
+                }
+              >
+                New Chatbot
+              </button>
+            )}
+
+            {/* </Link> */}
+          </div>
+
+          {/* {openLimitModal ? (
               <LimitReachedModal setOpenLimitModel={setOpenLimitModel} />
             ) : (
               <></>
             )} */}
-          </div>
+        </div>
 
+        {!isVoiceBotActived ? (
+          <>
+            {/*------------------------------------------chatbot-list-grid----------------------------------------------*/}
+            {listType === "grid" && (
+              <GridLayout
+                chatbotData={chatbotData}
+                changeMenu={changeMenu}
+                openMenu={openMenu}
+                openChatbot={openChatbot}
+                setOpenShareModal={setOpenShareModal}
+                chatbotId={chatbotId}
+                setChatbotId={setChatbotId}
+                setOpenDeleteModal={setOpenDeleteModal}
+                setOpenRenameModal={setOpenRenameModal}
+                // disabled={user && new Date(user?.endDate) < new Date()}
+              />
+            )}
 
-          {
-            !isVoiceBotActived ?
-              <>
-                {/*------------------------------------------chatbot-list-grid----------------------------------------------*/}
-                {listType === "grid" && (
-                  <>
-                    <GridLayout
-                      chatbotData={chatbotData}
-                      changeMenu={changeMenu}
-                      openMenu={openMenu}
-                      openChatbot={openChatbot}
-                      setOpenShareModal={setOpenShareModal}
-                      chatbotId={chatbotId}
-                      setChatbotId={setChatbotId}
-                      setOpenDeleteModal={setOpenDeleteModal}
-                      setOpenRenameModal={setOpenRenameModal}
-                    // disabled={user && new Date(user?.endDate) < new Date()}
-                    />
-                  </>
-                )}
+            {/*------------------------------------------chatbot-list-table----------------------------------------------*/}
+            {listType === "table" && (
+              <TableLayout
+                chatbotData={chatbotData}
+                changeMenu={changeMenu}
+                openMenu={openMenu}
+                openChatbot={openChatbot}
+                setOpenShareModal={setOpenShareModal}
+                chatbotId={chatbotId}
+                setChatbotId={setChatbotId}
+                setOpenDeleteModal={setOpenDeleteModal}
+                setOpenRenameModal={setOpenRenameModal}
+                // disabled={user && new Date(user?.endDate) < new Date()}
+              />
+            )}
+            <DeleteModal
+              open={openDeleteModal}
+              setOpen={setOpenDeleteModal}
+              chatbotId={chatbotId}
+              setChangeFlag={setChangeFlag}
+              changeFlag={changeFlag}
+            />
+            <ShareModal
+              open={openShareModal}
+              setOpen={setOpenShareModal}
+              chatbotId={chatbotId}
+            />
+            <RenameModal
+              open={openRenameModal}
+              setOpen={setOpenRenameModal}
+              chatbotId={chatbotId}
+              setChangeFlag={setChangeFlag}
+              changeFlag={changeFlag}
+            />
 
-                {/*------------------------------------------chatbot-list-table----------------------------------------------*/}
-                {listType === "table" && (
-                  <TableLayout
-                    chatbotData={chatbotData}
-                    changeMenu={changeMenu}
-                    openMenu={openMenu}
-                    openChatbot={openChatbot}
-                    setOpenShareModal={setOpenShareModal}
-                    chatbotId={chatbotId}
-                    setChatbotId={setChatbotId}
-                    setOpenDeleteModal={setOpenDeleteModal}
-                    setOpenRenameModal={setOpenRenameModal}
-                  // disabled={user && new Date(user?.endDate) < new Date()}
-                  />
-                )}
-                <DeleteModal
-                  open={openDeleteModal}
-                  setOpen={setOpenDeleteModal}
-                  chatbotId={chatbotId}
-                  setChangeFlag={setChangeFlag}
-                  changeFlag={changeFlag}
-                />
-                <ShareModal
-                  open={openShareModal}
-                  setOpen={setOpenShareModal}
-                  chatbotId={chatbotId}
-                />
-                <RenameModal
-                  open={openRenameModal}
-                  setOpen={setOpenRenameModal}
-                  chatbotId={chatbotId}
-                  setChangeFlag={setChangeFlag}
-                  changeFlag={changeFlag}
-                />
+            <NewChatbotNameModal
+              open={openNewChatbotNameModal}
+              setOpen={setOpenNewChatbotNameModal}
+              chatbotId={chatbotId}
+            />
 
-                <NewChatbotNameModal
-                  open={openNewChatbotNameModal}
-                  setOpen={setOpenNewChatbotNameModal}
-                  chatbotId={chatbotId}
-                />
+            {/*------------------------------------------loading/no-chatbots----------------------------------------------*/}
+            {!loading && chatbotData?.length == 0 && (
+              <div className="no-chatbots-container">
+                <Image src={noChatbotBg} alt="no-chatbot-bg" />
+                <p>
+                  You haven&apos;t created any Chatbots. Go ahead and create a
+                  New Chatbot!
+                </p>
+              </div>
+            )}
+            {loading && <Spin indicator={antIcon} />}
 
-                {/*------------------------------------------loading/no-chatbots----------------------------------------------*/}
-                {!loading && chatbotData?.length == 0 && (
-                  <div className="no-chatbots-container">
-                    <Image src={noChatbotBg} alt="no-chatbot-bg" />
-                    <p>
-                      You haven&apos;t created any Chatbots. Go ahead and create a New
-                      Chatbot!
-                    </p>
-                  </div>
-                )}
-                {loading && <Spin indicator={antIcon} />}
-
-                {/* {!loading && chatbotData?.length == 0 && (
+            {/* {!loading && chatbotData?.length == 0 && (
                   <Modal
                     title="Upgrade Now to create new Chatbots!"
                     open={isPlanNotification}
@@ -696,60 +724,61 @@ useEffect(() => {
                     <p>Upgrade now to access your chatbots!</p>
                   </Modal>
                 )} */}
-
-              </>
-              :
-              <>
-                {
-                  voiceBotLoading ?
-                    <Spin indicator={antIcon} />
-                    : voiceAssistantList?.length == 0 ?
-                      <div className="no-chatbots-container">
-                        <Image src={noChatbotBg} alt="no-chatbot-bg" />
-                        <p>
-                          You haven&apos;t created any Voicebot. Go ahead and create a New
-                          Voicebot!
-                        </p>
+          </>
+        ) : (
+          <>
+            {voiceBotLoading ? (
+              <Spin indicator={antIcon} />
+            ) : voiceAssistantList?.length == 0 ? (
+              <div className="no-chatbots-container">
+                <Image src={noChatbotBg} alt="no-chatbot-bg" />
+                <p>
+                  You haven&apos;t created any Voicebot. Go ahead and create a
+                  New Voicebot!
+                </p>
+              </div>
+            ) : (
+              <div className="voicebot-list-container">
+                {voiceAssistantList.map((assistant: any, index: number) => (
+                  <div
+                    key={index}
+                    className="voicebot-list-card"
+                    onClick={() => selectedAssistantHandler(assistant)}
+                  >
+                    <div className="assistant-image">
+                      <Image
+                        alt="assistant image"
+                        src={voiceAssistantPreview}
+                      ></Image>
+                    </div>
+                    <div className="assistant-title">
+                      {assistant.assistantName}
+                    </div>
+                    <div className="info-content">
+                      <div className="info">
+                        <div className="info-label">Total Minutes:</div>
+                        <div className="value">100</div>
                       </div>
-                      : 
-                      <div className="voicebot-list-container">
-                        {voiceAssistantList.map((assistant: any, index: number) => (
-                          <div key={index} className="voicebot-list-card" onClick={() => selectedAssistantHandler(assistant)}>
-                            <div className="assistant-image">
-                              <Image alt="assistant image" src={voiceAssistantPreview}></Image>
-                            </div>
-                            <div className="assistant-title">{assistant.assistantName}</div>
-                            <div className="info-content">
-                              <div className="info">
-                                <div className="info-label">Total Minutes:</div>
-                                <div className="value">100</div>
-                              </div>
-                              <div className="info">
-                                <div className="info-label">Call Count:</div>
-                                <div className="value">90</div>
-                              </div>
-                              <div className="info">
-                                <div className="info-label">Last Trained:</div>
-                                <div className="value">9</div>
-                              </div>
-                              <div className="info">
-                                <div className="info-label">Last Used:</div>
-                                <div className="value">Yesterday</div>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
+                      <div className="info">
+                        <div className="info-label">Call Count:</div>
+                        <div className="value">90</div>
                       </div>
-                }
-
-
-              </>
-             
-          }
-        </div>
-        
-      </>
-     
+                      <div className="info">
+                        <div className="info-label">Last Trained:</div>
+                        <div className="value">9</div>
+                      </div>
+                      <div className="info">
+                        <div className="info-label">Last Used:</div>
+                        <div className="value">Yesterday</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+      </div>
     );
   } else if (status === "unauthenticated") {
     redirect("/account/login");

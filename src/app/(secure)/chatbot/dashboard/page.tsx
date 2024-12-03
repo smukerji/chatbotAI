@@ -569,53 +569,46 @@ function Dashboard() {
           )}
           {/*------------------------------------------settings-component----------------------------------------------*/}
           {editChatbot == "settings" && (
-            <>
-              <Settings
-                chatbotId={chatbot.id}
-                chatbotName={botDetails?.chatbotName}
-                isPlanNotification={isPlanNotification}
-                setIsPlanNotification={setIsPlanNotification}
-              />
-            </>
+            <Settings
+              chatbotId={chatbot.id}
+              chatbotName={botDetails?.chatbotName}
+              isPlanNotification={isPlanNotification}
+              setIsPlanNotification={setIsPlanNotification}
+            />
           )}
 
           {/*------------------------------------------sources-component----------------------------------------------*/}
           {editChatbot == "sources" && !loading && (
-            <>
-              <Home
-                updateChatbot="true"
-                qaData={qaData}
-                textData={textData}
-                fileData={fileData}
-                crawlingData={crawlData}
-                chatbotId={chatbot.id}
-                chatbotName={chatbot.name}
-                isPlanNotification={isPlanNotification}
-                setIsPlanNotification={setIsPlanNotification}
-                botType={chatbot.botType}
-              />
-            </>
+            <Home
+              updateChatbot="true"
+              qaData={qaData}
+              textData={textData}
+              fileData={fileData}
+              crawlingData={crawlData}
+              chatbotId={chatbot.id}
+              chatbotName={chatbot.name}
+              isPlanNotification={isPlanNotification}
+              setIsPlanNotification={setIsPlanNotification}
+              botType={chatbot.botType}
+              assistantType={chatbot.assistantType}
+            />
           )}
 
           {/*------------------------------------------integrations-component----------------------------------------------*/}
           {editChatbot == "integrations" && !loading && (
-            <>
-              <Integration
-                isPlanNotification={isPlanNotification}
-                setIsPlanNotification={setIsPlanNotification}
-              />
-            </>
+            <Integration
+              isPlanNotification={isPlanNotification}
+              setIsPlanNotification={setIsPlanNotification}
+            />
           )}
 
           {/*------------------------------------------embed-on-site-component----------------------------------------------*/}
           {editChatbot == "embedSite" && !loading && (
-            <>
-              <EmbedSite
-                chatbotId={chatbot.id}
-                isPlanNotification={isPlanNotification}
-                setIsPlanNotification={setIsPlanNotification}
-              />
-            </>
+            <EmbedSite
+              chatbotId={chatbot.id}
+              isPlanNotification={isPlanNotification}
+              setIsPlanNotification={setIsPlanNotification}
+            />
           )}
 
           {/*------------------------------------------history-component----------------------------------------------*/}
@@ -625,74 +618,6 @@ function Dashboard() {
           {editChatbot == "leads" && <Leads chatbotId={chatbot.id} />}
         </div>
       </div>
-
-      //   <div className="dashboard-container">
-      //     <center>
-      //       <h1 className="title">{chatbot.name}</h1>
-      //       <Radio.Group onChange={onChange} value={source} disabled={loading}>
-      //         <Radio name="source" value={"chatbot"}>
-      //           Chatbot
-      //         </Radio>
-      //         <Radio name="source" value={"settings"}>
-      //           Settings
-      //         </Radio>
-      //         <Radio name="source" value={"sources"} onClick={fetchData}>
-      //           Sources
-      //         </Radio>
-      //         <Radio name="source" value={"delete"} onClick={showModal}>
-      //           Delete
-      //         </Radio>
-      //       </Radio.Group>
-
-      //       {/* managing the component rendering */}
-      //       {source == "chatbot" && (
-      //         <>
-      //           <Chat
-      //             chatbot={chatbot}
-      //             messages={messages}
-      //             setMessages={setMessages}
-      //             messagesTime={messagesTime}
-      //             setMessagesTime={setMessagesTime}
-      //             sessionID={sessionID}
-      //             sessionStartDate={sessionStartDate}
-      //           />{" "}
-      //           <DeleteModal
-      //             open={open}
-      //             setOpen={setOpen}
-      //             chatbotId={chatbot.id}
-      //           />
-      //         </>
-      //       )}
-      //       {source == "settings" && (
-      //         <>
-      //           <Settings chatbotId={chatbot.id} />
-      //           <DeleteModal
-      //             open={open}
-      //             setOpen={setOpen}
-      //             chatbotId={chatbot.id}
-      //           />
-      //         </>
-      //       )}
-      //       {source == "sources" && !loading && (
-      //         <>
-      //           <Home
-      //             updateChatbot="true"
-      //             qaData={qaData}
-      //             textData={textData}
-      //             fileData={fileData}
-      //             crawlingData={crawlData}
-      //             chatbotId={chatbot.id}
-      //             chatbotName={chatbot.name}
-      //           />
-      //           <DeleteModal
-      //             open={open}
-      //             setOpen={setOpen}
-      //             chatbotId={chatbot.id}
-      //           />
-      //         </>
-      //       )}
-      //     </center>
-      //   </div>
     );
   } else if (status === "unauthenticated") {
     redirect("/account/login");

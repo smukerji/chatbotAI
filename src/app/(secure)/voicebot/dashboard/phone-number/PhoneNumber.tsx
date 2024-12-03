@@ -4,7 +4,7 @@ import "./phone-number-design.scss";
 import PhoneInput from "react-phone-input-2";
 import { Input, Slider, Switch, Button, Select } from 'antd';
 import ImportNumber from './import-number/ImportNumber';
-import ImportNumberCustomModel from '../../_components/ImportNumberCustomModel/ImportNumberCustomModel';
+import ImportNumberCustomModel from '../../../create-first-assistant/_components/ImportNumberCustomModel/ImportNumberCustomModel';
 
 function PhoneNumber() {
   const contacts = [

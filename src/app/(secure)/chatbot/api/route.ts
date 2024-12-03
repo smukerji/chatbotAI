@@ -3,6 +3,7 @@ import clientPromise from "../../../../db";
 import { apiHandler } from "../../../_helpers/server/api/api-handler";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../api/auth/[...nextauth]/route";
+import { AssistantType } from "@/app/_helpers/assistant-creation-contants";
 
 module.exports = apiHandler({
   POST: fetchBots,
@@ -78,6 +79,7 @@ async function fetchCustomBots(userId: string) {
         chatbotId: { $first: "$chatbotId" },
         chatbotName: { $first: "$chatbotName" },
         botType: { $first: "$botType" },
+        assistantType: { $first: "$assistantType" },
         lastUsed: { $first: "$lastUsed" },
         noOfMessagesSent: { $first: "$noOfMessagesSent" },
         createdAt: { $first: "$createdAt" },
@@ -106,6 +108,7 @@ async function fetchCustomBots(userId: string) {
     lastTrained: doc.chatbotSettings[0][0]?.lastTrained,
     numberOfCharacterTrained:
       doc.chatbotSettings[0][0]?.numberOfCharacterTrained,
+    assistantType: doc?.assistantType,
   }));
 }
 
