@@ -18,7 +18,7 @@ const ChooseVoiceAssistantExpert: React.FC<IndustryExpertListProps> = ({
 
     const voiceBotContextData: any = useContext(CreateVoiceBotContext);
     const voiceBotContext = voiceBotContextData.voiceBotContext;
-    debugger;
+    
     console.log(voiceBotContext);
   return (
     <>

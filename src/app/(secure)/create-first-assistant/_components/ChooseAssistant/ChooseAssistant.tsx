@@ -83,6 +83,7 @@ function ChooseAssistant() {
                     alt=""
                     height={100}
                     width={100}
+                    unoptimized
                   ></Image>
                 </div>
                 <div className="header-information">

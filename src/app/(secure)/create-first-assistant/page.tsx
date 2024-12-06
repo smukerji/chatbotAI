@@ -103,7 +103,7 @@ export default function FirstAssistant() {
   };
 
   const continuesChangeHandler = async () => {
-    debugger;
+    
     // if (createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.CHAT) {
     /// change the steps according to the flow
     if (
@@ -179,7 +179,7 @@ export default function FirstAssistant() {
         message.warning("Please select an Industry Expert first!");
         return;
       }
-      debugger;
+      
       if (
         createAssistantFlowContextDetails?.creationFlow ===
         SelectedAssistantType.VOICE
@@ -193,7 +193,7 @@ export default function FirstAssistant() {
 
         if (acknowledgedData?.isAcknowledged) {
           //update the data
-          debugger;
+          
           try {
             const assistantUpdateResponse = await fetch(
               `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/voice`,
@@ -210,7 +210,7 @@ export default function FirstAssistant() {
 
             const assistantUpdateResponseParse =
               await assistantUpdateResponse.json();
-            debugger;
+            
 
             router.push(`/voicebot/dashboard?voicBotName=${assistantName}`);
           } catch (error: any) {
@@ -218,10 +218,10 @@ export default function FirstAssistant() {
             message.error(error.message);
           }
 
-          debugger;
+          
         } else {
           //create the data
-          debugger;
+          
           try {
             const assistantCreateResponse = await fetch(
               `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/voice`,
@@ -238,7 +238,7 @@ export default function FirstAssistant() {
 
             const assistantCreateResponseParse =
               await assistantCreateResponse.json();
-            debugger;
+            
             voiceBotContextData.setAssistantMongoId(
               assistantCreateResponseParse?.result?.insertedId
             );
@@ -329,7 +329,7 @@ export default function FirstAssistant() {
       let industryExpertDataList = data?.assistantTemplates.filter(
         (assistance: any) => assistance?.industryType === "Expert"
       );
-      debugger;
+      
       setAssistantList(assistantDataList);
       setIndustryExpertList(industryExpertDataList);
     } catch (error: any) {
@@ -342,7 +342,7 @@ export default function FirstAssistant() {
     index: number
   ) => {
     setSelectedAssistantIndex(index);
-    debugger;
+    
     setSelectedAssistant(choosenAssistant);
     let assistantTypeObj = {
       title: choosenAssistant?.assistantType,
@@ -356,7 +356,7 @@ export default function FirstAssistant() {
   const selectedExpertChangeHandler = (choosenExpert: any, index: number) => {
     setSelectedExpertIndex(index);
     setSelectedIndustryExpert(choosenExpert);
-    debugger;
+    
     let industryExpertTypeObj = {
       title: choosenExpert?.assistantType,
       description: choosenExpert?.dispcrtion,
@@ -427,7 +427,7 @@ export default function FirstAssistant() {
       message.info("Please select the type of assistant first");
       return;
     }
-    debugger;
+    
 
     if (
       createAssistantFlowContextDetails?.creationFlow ===
@@ -444,7 +444,7 @@ export default function FirstAssistant() {
 
     const selectedFile = e.target.files[0];
 
-    debugger;
+    
 
     // Check if a file is selected and it's an image
     if (selectedFile && isImageFile(selectedFile)) {
@@ -472,7 +472,7 @@ export default function FirstAssistant() {
         }
         const data = await res.json();
         // setIconImage(data?.uploadUrl);
-        debugger;
+        
         const assistantTemplateIDs = [
           selectedAssistant?._id,
           selectedIndustryExpert?._id,
@@ -520,7 +520,7 @@ export default function FirstAssistant() {
 
           const assistantCreateResponseParse =
             await assistantCreateResponse.json();
-          debugger;
+          
           voiceBotContextData.setAssistantMongoId(
             assistantCreateResponseParse?.result?.insertedId
           );
