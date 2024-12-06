@@ -15,11 +15,32 @@
     flex-direction: column;
     height: 100%;
     width: 100%;
+    overflow-y: auto;
 
-    .assistant-wrapper{
+    @media only screen and (max-width: 900px) {
+      .top {
+        .sources-header {
+          p {
+            padding-left: 15px;
+          }
+          .options-container {
+            flex-wrap: wrap;
+            padding-left: 0px;
+            gap: 4px;
+
+            li {
+              padding: 5px 15px;
+            }
+          }
+        }
+      }
+    }
+
+    .assistant-wrapper {
       display: flex;
       flex-wrap: wrap;
       gap: 40px;
+      justify-content: center;
 
       // display: flex;
       .assistant-card {
@@ -92,9 +113,7 @@
       .selected-assistant {
         background: #9fb5ff !important;
       }
-
     }
-
   }
 
   .stepper {
@@ -110,6 +129,20 @@
     border-radius: 16px;
     background: #fcfcfd;
     height: fit-content;
+
+    @media screen and (max-width: 1400px) {
+      margin-right: 40px;
+      width: 320px;
+      padding: 24px;
+      gap: 30px;
+    }
+
+    @media screen and (max-width: 900px) {
+      margin-right: 30px;
+      width: 300px;
+      padding: 20px;
+      gap: 20px;
+    }
 
     .title-container {
       .sub-title {
@@ -266,8 +299,8 @@
     .navigation-button {
       margin-top: auto;
       display: flex;
-      gap: 80px;
-      display: flex;
+      justify-content: space-between;
+      width: 100%;
       align-items: center;
 
       .previous-button {
@@ -287,6 +320,10 @@
           font-style: normal;
           font-weight: 500;
           line-height: 24px;
+
+          @media screen and (max-width: 900px) {
+            font-size: 14px;
+          }
         }
       }
 
@@ -309,6 +346,10 @@
         outline: none;
         border: none;
         cursor: pointer;
+
+        @media screen and (max-width: 900px) {
+          padding: 10px 20px;
+        }
       }
     }
   }
@@ -388,43 +429,7 @@
       }
     }
 
-    // @media screen and (max-width: 1120px) {
-    //   .img1 {
-    //     right: 250px;
-    //   }
-
-    //   .img2 {
-    //     left: 200px;
-    //   }
-
-    //   .img3 {
-    //     right: 200px;
-    //   }
-
-    //   .img4 {
-    //     left: 250px;
-    //   }
-    // }
-
-    // @media screen and (max-width: 991px) {
-    //   .img1 {
-    //     right: 150px;
-    //   }
-
-    //   .img2 {
-    //     left: 100px;
-    //   }
-
-    //   .img3 {
-    //     right: 100px;
-    //   }
-
-    //   .img4 {
-    //     left: 150px;
-    //   }
-    // }
-
-    @media screen and (max-width: 767px) {
+    @media screen and (max-width: 900px) {
       .img1 {
         display: none;
       }
@@ -439,6 +444,124 @@
 
       .img4 {
         display: none;
+      }
+    }
+
+    @media only screen and (max-width: 900px) {
+      .pricing-grid {
+        flex-direction: column;
+      }
+
+      .pricing-card {
+        width: 100%;
+      }
+
+      .price-header {
+        font-size: 34px !important;
+      }
+
+      .price-offer-container {
+        text-wrap: wrap;
+        word-break: break-word;
+        padding: 0 20px;
+        text-align: center !important;
+
+        .price-offer {
+          font-size: 18px !important;
+        }
+
+        .price-offer-normal {
+          font-size: 18px !important;
+        }
+      }
+
+      .annual-discount {
+        font-size: 18px !important;
+      }
+
+      .plan-container {
+        flex-direction: column;
+        align-items: center;
+        padding: 0 20px !important;
+
+        .plan-box {
+          max-width: 100% !important;
+          width: 100%;
+
+          .plan-container-list {
+            .plan-details {
+              .horizontal-line {
+                border-bottom: 1px solid #b1b5c3;
+                padding-bottom: 20px;
+              }
+            }
+          }
+
+          .plan-name-price {
+            .plan-placeholder {
+              width: 235px !important;
+            }
+          }
+        }
+      }
+
+      .add-ons-head {
+        margin: 50px 0 20px 20px;
+      }
+
+      .add-ons-container {
+        flex-direction: column;
+        padding: 0 30px;
+
+        .add-ons-left {
+          width: 100% !important;
+          border-right: 0px !important;
+
+          .add-ons-integration {
+            padding: 24px 24px 24px 0 !important;
+
+            .integration-list {
+              .app-integration-price.coming-soon {
+                padding-right: 0 !important;
+              }
+            }
+          }
+        }
+
+        .add-ons-right {
+          width: 100% !important;
+
+          .add-ons-integration {
+            padding: 0 24px 24px 0 !important;
+            .integration-list {
+              .app-integration {
+                .integration-name-container {
+                  width: 80%;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .price-footer-container {
+        flex-direction: column;
+
+        .footer-left {
+          width: 100% !important;
+          padding: 0 20px;
+
+          .left-head {
+            .left-head-text {
+              font-size: 34px;
+            }
+          }
+        }
+
+        .footer-right {
+          width: 100% !important;
+          // padding: 0 30px 30px 30px;
+        }
       }
     }
 
@@ -473,12 +596,30 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+
+    @media screen and (max-width: 1400px) {
+      gap: 12px;
+    }
+
+    @media screen and (max-width: 900px) {
+      gap: 8px;
+    }
     h1 {
       color: #141416;
       font-size: 36px;
       font-style: normal;
       font-weight: 600;
       line-height: 44px; /* 122.222% */
+
+      @media screen and (max-width: 1400px) {
+        font-size: 30px;
+        line-height: 38px;
+      }
+
+      @media screen and (max-width: 900px) {
+        font-size: 24px;
+        line-height: 32px;
+      }
     }
 
     span {
@@ -487,6 +628,16 @@
       font-style: normal;
       font-weight: 500;
       line-height: 24px; /* 150% */
+
+      @media screen and (max-width: 1400px) {
+        font-size: 14px;
+        line-height: 22px;
+      }
+
+      @media screen and (max-width: 900px) {
+        font-size: 12px;
+        line-height: 20px;
+      }
     }
   }
 

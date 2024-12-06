@@ -85,46 +85,6 @@ function ChooseIndustryExpert() {
               </button>
             );
           })}
-
-        {/* industryExpertList.map((assistant: any, index: number) => {
-                return (
-                  <div
-                    className={
-                      selecteExpertIndex === index
-                        ? "assistant-card selected-assistant"
-                        : "assistant-card "
-                    }
-                    key={index}
-                    onClick={() => {
-                      selectedExpertChangeHandler(assistant, index);
-                    }}
-                  >
-                    <div className="card-image">
-                      <Image
-                        src={assistant.imageUrl}
-                        alt=""
-                        height={100}
-                        width={100}
-                      ></Image>
-                    </div>
-                    <div className="header-information">
-                      <div className="header_container">
-                        <h2 className="card_header">{assistant.assistantType}</h2>
-                        <div className="image-info">
-                          <Image
-                            src={infoImage}
-                            alt=""
-                            height={100}
-                            width={100}
-                          ></Image>
-                        </div>
-                      </div>
-    
-                      <h3 className="card_sub-header">{assistant.dispcrtion}</h3>
-                    </div>
-                  </div>
-                );
-              }) */}
       </div>
     </div>
   );
