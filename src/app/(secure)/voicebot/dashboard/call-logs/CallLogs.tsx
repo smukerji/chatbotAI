@@ -259,10 +259,10 @@ const formatCallDuration = (createdAt: string, endedAt: string): string => {
           callLogsList.length >= 1 ?          
     <>
             <div className='top-container'>
-              <Button>Today</Button>
+              {/* <Button>Today</Button>
               <Button>Last 7 day</Button>
               <Button>Last month</Button>
-              <Button>Select date range</Button>
+              <Button>Select date range</Button> */}
 
             </div>
             <div className='bottom-container'>
