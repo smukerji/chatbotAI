@@ -7,6 +7,7 @@ import {
   Modal,
   Radio,
   RadioChangeEvent,
+  Flex, Spin
 } from "antd";
 import Model from "../dashboard/model/Model";
 import React, { useContext, useEffect, useState,useRef } from "react";
@@ -66,6 +67,8 @@ function Dashboard() {
   const voiceBotContextData: any = useContext(CreateVoiceBotContext);
   const voicebotDetails = voiceBotContextData.state;
 
+  const [loading, setLoading] = useState(false);
+
   const divRef = useRef<HTMLDivElement>(null);
 
 
@@ -80,7 +83,9 @@ function Dashboard() {
     ;
     if(voiceBotContextData.assistantInfo?.vapiAssistantId) {
 
+     
       getAssistantData(voiceBotContextData.assistantInfo?.vapiAssistantId);
+ 
 
     }
     else{
@@ -91,15 +96,23 @@ function Dashboard() {
     if(voiceBotContextData?.assistantInfo?.assistantName){
       voiceBotContextData.updateState("name",voiceBotContextData?.assistantInfo?.assistantName);
     }
+
+    console.log("voice bot context data deatils ***",voiceBotContextData)
   }, []);
 
   const duplicateAssistantHandler = async ()=>{
 
+    /**
+     *  console.log("Assistant delete id ",voiceBotContextData.assistantInfo?._id);
+     */
+    debugger;
     if(!voiceBotContextData?.assistantInfo["vapiAssistantId"]){
       message.error("Assistant is not published yet");
       return;
     }
     else {
+
+      let data = voiceBotContextData.assistantInfo;
       try {
         const assistantCreateResponse = await fetch(
           `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/vapi/duplicate`,
@@ -112,7 +125,7 @@ function Dashboard() {
         );
 
         const assistantCreateResponseParse = await assistantCreateResponse.json();
-        ;
+      
         if(assistantCreateResponseParse?.record){
           message.success(assistantCreateResponseParse?.result);
           voiceBotContextData.setAssistantInfo(
@@ -136,11 +149,41 @@ function Dashboard() {
  
   }
 
+  const deleteAssistantHandler = async ()=>{
+
+    let data = voiceBotContextData.assistantInfo;
+
+    debugger;
+    const deleteId:string = data._id;
+    try{
+
+      const assistantDataResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/assistant?assistanceId=${deleteId}`,
+        {///voicebot/dashboard/api/assistant?assistanceId
+          method: "DELETE",
+        }
+      );
+
+      const assistantDataResponseParse = await assistantDataResponse.json();
+      debugger;
+      message.success(assistantDataResponseParse?.message);
+      router.push("/chatbot");
+
+
+    }
+    catch(error:any){
+      console.log("error", error);
+      message.error("Error while deleting the assistant");
+    }
+
+  }
+
   const getAssistantData = async (vapiAssiId:string)=>{
 
         //get the assistant record from the vapi's side
         try{
 
+          setLoading(true);
           const assistantDataResponse = await fetch(
             `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/vapi/assistant/?assistantId=${vapiAssiId}`,
             {
@@ -154,13 +197,12 @@ function Dashboard() {
             message.error("Error while getting the assistant data");
             return;
           }
-          ;
 
           if(assistantDataResponseParse?.result){
 
             const vapiAssistanceData = assistantDataResponseParse?.result;
 
-            ;
+            
             let assistantData:any = voiceBotContextData.state ;
             assistantData.firstMessage = vapiAssistanceData.firstMessage;
             assistantData.transcriber = vapiAssistanceData.transcriber;
@@ -272,12 +314,15 @@ function Dashboard() {
             message.success("Assistant Fetch Successfully");
 
           }
-
+          setLoading(false);
         }
         catch(error:any){
-          ;
+        
           console.log("error", error);
           message.error("Error while getting the assistant data");
+        }
+        finally{
+          setLoading(false);
         }
   
   }
@@ -287,11 +332,11 @@ function Dashboard() {
 
   const makeVapiAssistantCall = async () => {
     let isIdAvaliable = voiceBotContextData.assistantInfo["vapiAssistantId"];
-    ;
+ 
     if(isIdAvaliable){
       //if vapi assistant id is present then make the call to the vapi
       vapi.start(isIdAvaliable); // assistance ID
-      // ;
+      
       setIsListening(CALLSTATUS.CONNECTING);
     }
     else{
@@ -301,7 +346,7 @@ function Dashboard() {
   }
 
   vapi.on("call-start", () => {
-    // ;
+   
     setIsListening(CALLSTATUS.CONNECTING);
     setShowMakeCallButton(false);
     console.log("Call has started.");
@@ -318,7 +363,7 @@ function Dashboard() {
   });
 
   vapi.on("speech-start", () => {
-    // ;
+    
     setIsListening(CALLSTATUS.SPEAKING);
     setShowMakeCallButton(false);
     // lottieRefs.current.play();
@@ -326,7 +371,7 @@ function Dashboard() {
   });
 
   vapi.on("error", (e) => {
-    // ;
+   
     // lottieRefs.current.pause();
     console.error(e);
     setShowMakeCallButton(true);
@@ -475,7 +520,7 @@ function Dashboard() {
               {/* <li className={tab == "tool" ? "active" : ""} onClick={() => changeHandler("tool")}>Tool</li> */}
               <li className={tab == "advance" ? "active" : ""} onClick={() => changeHandler("advance")}>Advance</li>
               <li className={tab == "analysis" ? "active" : ""} onClick={() => changeHandler("analysis")}>Analysis</li>
-              {/* <li className={tab == "phone-number" ? "active" : ""} onClick={() => changeHandler("phone-number")}>Phone Number</li> */}
+              <li className={tab == "phone-number" ? "active" : ""} onClick={() => changeHandler("phone-number")}>Phone Number</li>
               <li className={tab == "call-logs" ? "active" : ""} onClick={() => changeHandler("call-logs")}>Call Logs</li>
 
             </ul>
@@ -495,7 +540,7 @@ function Dashboard() {
                   <span className="duplicate-assistant-button-text">Duplicate</span>
                 </div>
               </Button>
-              <Button className="delete-assistant-button">
+              <Button className="delete-assistant-button" onClick={deleteAssistantHandler}>
                 <div className="delete-assistant-button-content">
                   <Image alt="" src={documentTrash} className="delete-assistant-button-icon"></Image>
                   <span className="delete-assistant-button-text">Delete</span>
@@ -545,87 +590,92 @@ function Dashboard() {
           
         </div>
       </div>
-      <div className="bottom">
-        
 
-        {
-          tab == "model" && (
-            <>
-              <Model />
-            </>
-          )
-        }
+      {
+        loading ? (
+          <Flex align="center" gap="middle" className="loader">
+            <Spin size="large" />
+          </Flex>
+        ) :
+        (
+          <div className="bottom">
 
-        {
-          tab == "transcriber" && (
-            <>
-              <Transcriber />
-            </>
-          )
-        }
+            {
+              tab == "model" && (
+                <>
+                  <Model />
+                </>
+              )
+            }
 
-        {
-          tab == "voice" && (
-            <>
-              <Voice/>
-            </>
-          )
-        }
+            {
+              tab == "transcriber" && (
+                <>
+                  <Transcriber />
+                </>
+              )
+            }
 
-        {
-          tab == "tool" && (
-            <>
-              <Functions/>
-            </>
-          )
-        }
+            {
+              tab == "voice" && (
+                <>
+                  <Voice />
+                </>
+              )
+            }
 
-        {
-          tab == "advance" && (
-            <>
-              <Advance />
-            </>
-          )
-        }
+            {
+              tab == "tool" && (
+                <>
+                  <Functions />
+                </>
+              )
+            }
 
-        {
-          tab == "analysis" && (
-            <>
-              <Analysis />
-            </>
-          )
-        }
+            {
+              tab == "advance" && (
+                <>
+                  <Advance />
+                </>
+              )
+            }
 
-        {
-          tab == "phone-number" && (
-            <>
-              <PhoneNumber />
-            </>
-          )
-        }
+            {
+              tab == "analysis" && (
+                <>
+                  <Analysis />
+                </>
+              )
+            }
 
-        {
-          tab == "call-logs" && (
-            <>
-              <CallLogs />
-            </>
-          )
-        }
+            {
+              tab == "phone-number" && (
+                <>
+                  <PhoneNumber />
+                </>
+              )
+            }
 
-      </div>
+            {
+              tab == "call-logs" && (
+                <>
+                  <CallLogs />
+                </>
+              )
+            }
+
+          </div>
+        )
+
+      }
+      
 
       {/* <div className={isMoreContentVisible ? "additional-circle-items-behinds" : "additional-circle-items-behinds-hide"} onClick={tatabyebyeHandler}>
               
         </div> */}
 
-    
-
-
     </div>
 
-
-   
-    
 
     )
 }

@@ -41,9 +41,9 @@ const antIcon = (
 const initialState = {
   firstMessage: "",
   transcriber: {
-    provider: "",
-    model: "",
-    language: "",
+    provider: "deepgram",
+    model: "nova-2",
+    language: "en-IN",
     // smartFormat: false,
     languageDetectionEnabled: false,
     // keywords: [""],
@@ -70,9 +70,9 @@ const initialState = {
     //     server: { timeoutSeconds: 20, url: "", secret: "" },
     //   },
     // ],
-    toolIds: [""], //we deleted this field in the backend
-    provider: "",
-    model: "",
+    toolIds: [""],//we deleted this field in the backend
+    provider: "openai",
+    model: "gpt-4o",
     temperature: 0,
     // knowledgeBase: { provider: "canonical", topK: 5.5, fileIds: [""] },
     maxTokens: 300,

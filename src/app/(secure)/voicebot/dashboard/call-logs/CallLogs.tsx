@@ -118,6 +118,7 @@ function CallLogs() {
     try {
       callLogResponse = await fetch(`https://api.vapi.ai/v2/call?limit=${pageLimit}&page=${pageNumber}&assistantId=${assId}`, options);
       const data = await callLogResponse.json();
+      debugger;
       setCallLogsList(data.results);
       setCallLogUrl(data.results[0]?.recordingUrl);
       const firstCallLog = data.results[0];
@@ -255,13 +256,13 @@ const formatCallDuration = (createdAt: string, endedAt: string): string => {
     <div className='call-log-container'>
       {
         !loading ? (
-          callLogsList.length > 1 ?          
+          callLogsList.length >= 1 ?          
     <>
             <div className='top-container'>
-              <Button>Today</Button>
+              {/* <Button>Today</Button>
               <Button>Last 7 day</Button>
               <Button>Last month</Button>
-              <Button>Select date range</Button>
+              <Button>Select date range</Button> */}
 
             </div>
             <div className='bottom-container'>
