@@ -499,6 +499,27 @@
       }
     }
 
+    .send-record-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+
+      button {
+        // width: 5%;
+        display: flex;
+        padding: 8px 16px;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+        border-radius: 12px;
+        background: #88bd41;
+        outline: none;
+        border: none;
+      }
+    }
+
     .powered-by {
       color: #777e90;
       text-align: end;
