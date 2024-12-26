@@ -18,7 +18,9 @@ module.exports = apiHandler({
     // GET: getAssistantList,//dashboard/api/assistant
     // DELETE:deleteSingleAssistant//dashboard/api/assistant
     POST: importNumberToTwilio,
-    GET: getImportedTwilioDataFromDB
+    GET: getImportedTwilioDataFromDB,
+    PUT: updateNumberWithAssistant,//dashboard/api/assistant
+    DELETE: deleteSingleAssistant//dashboard/api/assistant
 });
 // voicebot/dashboard/api/phone
 async function importNumberToTwilio(req: NextRequest) {
@@ -71,6 +73,51 @@ async function getImportedTwilioDataFromDB(req: NextRequest) {
         return { importedNumbers };
     } catch (error: any) {
         return { error: error.message };
+    }
+}
+
+async function updateNumberWithAssistant(req: NextRequest) {
+    try{
+
+    }
+    catch(error:any){
+        console.error('Error parsing request body:', error);
+        return { message  : error };
+    }
+}
+
+async function deleteSingleAssistant(req: NextRequest) {
+    try{
+        const phoneNumberId = req.nextUrl.searchParams.get("phoneNumberId") as string;
+
+        const db = (await clientPromise!).db();
+        const voiceAssistantCollection = db?.collection("voice-assistance-phone-numbers");
+        //find the record
+        const recordResult = await voiceAssistantCollection?.findOne({_id: new ObjectId(phoneNumberId)});
+
+        console.log('Record found:', recordResult);
+        //delete the record from twilio
+        if(recordResult.twilio){
+            const token = await generateAndGetToken();
+            const client = new VapiClient({ token });
+            const twilioResonse = await client.phoneNumbers.delete(recordResult.twilio.id);
+            console.log('Twilio response:', twilioResonse);
+            if(twilioResonse){
+                //delete the record from the database
+                await voiceAssistantCollection?.deleteOne({_id: new ObjectId(phoneNumberId)});
+                
+                return { message: "Record deleted successfully" ,data: recordResult};
+            }
+            else{
+                return { message: "Error deleting record from twilio" };
+            }
+        }
+        return { message: "Record not found" };
+        
+    }
+    catch(error:any){
+        console.error('Error parsing request body:', error);
+        return { message  : error };
     }
 }
 

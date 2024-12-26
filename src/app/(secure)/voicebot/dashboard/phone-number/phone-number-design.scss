@@ -143,6 +143,11 @@
 
     .top {
       .container {
+        .container-head-sec {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+          }
         .title{
           color: #23262F;
             /* Subtitle/Large */
