@@ -800,6 +800,8 @@ function Chat({
     let minutes = 0;
     let seconds = 0;
 
+    console.log("startt transcriptionnnnn");
+
     timer.current = setInterval(() => {
       seconds += 1;
       if (seconds == 60) {
@@ -857,6 +859,8 @@ function Chat({
       stopMicrophonePopup();
     }
   };
+
+  console.log("ooooooooooo", microphoneState, MicrophoneState.Open, isPopUp);
 
   return (
     <div className={`chat-container ${innerWidth && "embed-chat-container"}`}>
@@ -1469,7 +1473,7 @@ function Chat({
                 />
                 <span
                   style={{
-                    color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
+                    color: botSettings?.theme === "dark" ? "#FCFCFD" : "#fff",
                   }}
                 >
                   {recordingDuration}
