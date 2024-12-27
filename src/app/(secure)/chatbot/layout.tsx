@@ -22,11 +22,7 @@ export default function ChatbotsLayout({
   }
   return (
     <CreateBotDataProvider>
-      <DeepgramContextProvider>
-        <MicrophoneContextProvider>
-          <ChatbotSettingDataProvider>{children}</ChatbotSettingDataProvider>
-        </MicrophoneContextProvider>
-      </DeepgramContextProvider>
+      <ChatbotSettingDataProvider>{children}</ChatbotSettingDataProvider>
     </CreateBotDataProvider>
   );
 }
