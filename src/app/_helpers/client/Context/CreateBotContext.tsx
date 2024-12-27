@@ -44,7 +44,6 @@ export const CreateBotDataProvider = ({ children }: any) => {
     leadSessionsEmail: "",
 
     chatbotName: "",
-    assistantType: AssistantType.SALES_AGENT_SHOPIFY,
   };
   const [createBotInfo, setCreateBotInfo] = useState(initialCreateBotInfo);
 

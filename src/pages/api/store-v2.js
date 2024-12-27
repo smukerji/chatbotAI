@@ -133,6 +133,13 @@ export default async function handler(req, res) {
         /// deleting the QA list
         const deleteQAList = JSON.parse(fields?.deleteQAList[0]);
 
+        /// assistant type and secrets
+        const botType = fields?.botType[0];
+        let integrations = {};
+        if (!updateChatbot) {
+          integrations = JSON.parse(fields?.integrations[0]);
+        }
+
         /// Storing the images
         const areImagesStoredPromise = qaList.map((qa, i) => {
           return new Promise((resolve, reject) => {
@@ -588,13 +595,9 @@ export default async function handler(req, res) {
             lastUsed: currrentTime,
             createdAt: currrentTime,
             noOfMessagesSent: 0,
-            botType: "bot-v2",
-            integrations: {
-              shopify: {
-                store: process.env.SHOPIFY_TEMP_STORE,
-                token: process.env.SHOPIFY_TEMP_TOKEN,
-              },
-            },
+            botType: botType,
+            integrations: integrations,
+            assistantType: assistantType,
           });
           //send email once chatbot is created
           try {

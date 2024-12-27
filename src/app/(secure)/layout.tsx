@@ -1,6 +1,8 @@
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "../_helpers/server/auth";
+import { CreateAssistantFlowDataProvider } from "../_helpers/client/Context/CreateAssistantFlowContext";
+import { CreateBotDataProvider } from "../_helpers/client/Context/CreateBotContext";
 
 export default function HomeLayout({
   children,
@@ -15,5 +17,13 @@ export default function HomeLayout({
     const returnUrl = encodeURIComponent(headers().get("x-invoke-path") || "/");
     redirect(`/account/login?returnUrl=${returnUrl}`);
   }
-  return <>{children}</>;
+
+  return (
+    <>
+      <CreateAssistantFlowDataProvider>
+        <CreateBotDataProvider>
+          {children}</CreateBotDataProvider>
+      </CreateAssistantFlowDataProvider>
+    </>
+  );
 }

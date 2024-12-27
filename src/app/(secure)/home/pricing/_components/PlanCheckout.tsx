@@ -20,6 +20,9 @@ function PlanCheckout() {
   const source: any = searchParams ? searchParams.get("source") : null;
   const type: any = searchParams ? searchParams.get("type") : null;
   const isActive: any = searchParams ? searchParams.get("isActive") : false;
+  const firstPurchase: any = searchParams
+    ? searchParams.get("firstPurchase")
+    : false;
   const encryptedPriceId = decodeURIComponent(a);
   const [loader, setLoader] = useState(true);
   const [subscriptionDetail, setSubscriptionDetail]: any = useState();
@@ -79,6 +82,8 @@ function PlanCheckout() {
 
   // console.log(">>>>>>>", isActive);
 
+  console.log("first purchase from PlanCheckout", firstPurchase);
+
   return (
     <>
       <div>
@@ -105,6 +110,7 @@ function PlanCheckout() {
               source={source}
               type={type}
               isActive={isActive}
+              firstPurchase={firstPurchase}
             />
           )}
         </Elements>

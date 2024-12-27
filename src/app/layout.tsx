@@ -3,6 +3,7 @@ import LayoutWrapper from "./_components/LayoutWrapper";
 import { Metadata } from "next";
 import { Josefin_Sans, Quicksand, Poppins } from "next/font/google";
 import Script from "next/script";
+import { VoiceBotDataProvider } from "./_helpers/client/Context/VoiceBotContextApi";
 
 const josefinSans = Josefin_Sans({
   weight: ["400", "700"],
@@ -65,7 +66,9 @@ export default function RootLayout({
           <main
             className={`${josefinSans.variable} ${quickSand.variable} ${poppins.variable}`}
           >
+             <VoiceBotDataProvider>
             {children}
+          </VoiceBotDataProvider>
           </main>
         </LayoutWrapper>
         <Script

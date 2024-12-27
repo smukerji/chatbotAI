@@ -55,6 +55,7 @@ function DummyPaymentMethod({
   source,
   type,
   isActive,
+  firstPurchase,
 }: {
   price: string;
   interval: string;
@@ -63,6 +64,7 @@ function DummyPaymentMethod({
   source: string;
   type: string;
   isActive: boolean;
+  firstPurchase: boolean;
 }) {
   const [disabled, setDisabled] = useState(false);
   const [error, setError] = useState("");
@@ -440,6 +442,7 @@ function DummyPaymentMethod({
             <PaymentSucessmodal
               isModalOpen={isModalOpen}
               subscriptionDetail={subscriptionDetail}
+              firstPurchase={firstPurchase}
             />
           )}
           {/* ----------------------------Main card start----------------------------- */}
