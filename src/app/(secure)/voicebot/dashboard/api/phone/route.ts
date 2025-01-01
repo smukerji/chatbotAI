@@ -66,6 +66,7 @@ async function importNumberToTwilio(req: NextRequest) {
 
 async function getImportedTwilioDataFromDB(req: NextRequest) {
     try {
+
         const userId = req.nextUrl.searchParams.get("userId") as string;
         const db = (await clientPromise!).db();
         const collection = db?.collection("voice-assistance-phone-numbers");

@@ -706,24 +706,7 @@ function Chatbot() {
             )}
             {loading && <Spin indicator={antIcon} />}
 
-            {/* {!loading && chatbotData?.length == 0 && (
-                  <Modal
-                    title="Upgrade Now to create new Chatbots!"
-                    open={isPlanNotification}
-                    onCancel={() => { }}
-                    footer={[
-                      <Button key="submit" type="primary" onClick={handleUpgradePlan}>
-                        Upgrade Now
-                      </Button>,
-                    ]}
-                    closable={false}
-                    centered
-                    className="subscription-expire-popup"
-                    width={800}
-                  >
-                    <p>Upgrade now to access your chatbots!</p>
-                  </Modal>
-                )} */}
+
           </>
         ) : (
           <>
@@ -756,21 +739,21 @@ function Chatbot() {
                     </div>
                     <div className="info-content">
                       <div className="info">
-                        <div className="info-label">Total Minutes:</div>
+                        <div className="info-label">Num. Of Calls</div>
                         <div className="value">100</div>
                       </div>
                       <div className="info">
-                        <div className="info-label">Call Count:</div>
+                        <div className="info-label">Last Used</div>
                         <div className="value">90</div>
                       </div>
                       <div className="info">
-                        <div className="info-label">Last Trained:</div>
+                        <div className="info-label">Last Trained</div>
                         <div className="value">9</div>
                       </div>
-                      <div className="info">
+                      {/* <div className="info">
                         <div className="info-label">Last Used:</div>
                         <div className="value">Yesterday</div>
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 ))}

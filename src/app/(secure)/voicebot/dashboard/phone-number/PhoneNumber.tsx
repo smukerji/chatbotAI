@@ -3,7 +3,9 @@ import React, { useEffect, useState } from 'react';
 import "./phone-number-design.scss";
 import PhoneInput from "react-phone-input-2";
 import { Input, Slider, Switch, Button, Select ,  Flex, Spin} from 'antd';
+import Image from "next/image";
 import ImportNumber from './import-number/ImportNumber';
+import phoneNumberDelete from  "../../../../../../public/voiceBot/phone-number/trash.svg";
 
 import { useCookies } from "react-cookie";
 import ImportNumberCustomModel from '../../../create-first-assistant/_components/ImportNumberCustomModel/ImportNumberCustomModel';
@@ -200,7 +202,10 @@ function PhoneNumber() {
             <div className="container">
                 <div className='container-head-sec'>
                   <h3 className="title">Inbound Settings</h3>
-                  <button onClick={deletePhoneNumberHandler} className="edit-btn">Delete</button>
+                  {/* <Button className="previous" onClick={() => openHandleModel()}>Import Phone Number</Button> */}
+                  <Button onClick={deletePhoneNumberHandler} className="edit-btn">
+                    <Image src={phoneNumberDelete} alt='delete-number'></Image>
+                    </Button>
                 </div>
               <p className="description">You can assign an assistant to the Phone number so that whenever someone calls this phoneNumber the assistant will automatically be assigned to the call..</p>
               <div className="content-wrapper">
