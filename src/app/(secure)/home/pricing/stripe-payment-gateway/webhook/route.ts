@@ -450,6 +450,11 @@ export async function POST(req: any, res: any) {
 
         break;
 
+      //--------------------------------------- write code for voicebot payment-------------------------------
+      case "payment_intent.succeeded":
+        console.log("webhoooooookkkk", event.data);
+
+        break;
       default:
         console.warn("Unhandled event type:", event.type);
     }

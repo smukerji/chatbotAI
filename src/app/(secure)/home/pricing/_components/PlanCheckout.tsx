@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import DummyPaymentMethod from "./DummyPaymentMethod";
 import axios from "axios";
 import { message } from "antd";
 import { useCookies } from "react-cookie";
@@ -9,6 +8,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import Loader from "./Loader";
 import CryptoJS from "crypto-js";
+import PaymentMethod from "./PaymentMethod";
 
 const stripePromise = loadStripe(
   String(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY)
@@ -102,7 +102,7 @@ function PlanCheckout() {
             //   name={selectedPlan?.name}
             // />
 
-            <DummyPaymentMethod
+            <PaymentMethod
               price={subscriptionDetail?.price}
               interval={subscriptionDetail?.interval}
               customerId={customerId}
