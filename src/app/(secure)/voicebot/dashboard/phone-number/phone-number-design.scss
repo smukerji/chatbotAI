@@ -145,9 +145,11 @@
       .container {
         .container-head-sec {
             display: flex;
+            gap: 10px;
             align-items: center;
-            justify-content: space-between;
             .edit-btn{
+              display: flex;
+              align-items: center;
               margin: 0;
               padding: 0;
               border: 0;
