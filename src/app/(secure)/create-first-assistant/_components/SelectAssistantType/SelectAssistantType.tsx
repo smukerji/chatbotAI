@@ -20,10 +20,8 @@ function SelectAssistantType() {
   return (
     <div className="select-assistant-container">
       <div className="title">
-        <h1>AI Agent platforms. Lets try now !</h1>
-        <span>
-          Build your own customised AI chatbot and Voice Agent using Torri
-        </span>
+        <h1>AI Agent platform. Create your own AI Agent!</h1>
+        <span>Create your own AI chat agent or AI voice agent with Torri</span>
       </div>
       <div className="select-assistant-type">
         <div className="assistant-type">
@@ -42,7 +40,7 @@ function SelectAssistantType() {
           >
             <Image src={ChatbotImage} alt="assistant-type-1" unoptimized />
             <h2>Chatbot</h2>
-            <p>AI Custom Chat Agent</p>
+            <p>Customise your AI Chat Agent</p>
           </div>
           <div
             className={`assistant-type-item ${
@@ -59,7 +57,7 @@ function SelectAssistantType() {
           >
             <Image src={VoicebotImage} alt="assistant-type-2" unoptimized />
             <h2>Voicebot</h2>
-            <p>AI Custom Voice Agent</p>
+            <p>Customise your AI Voice Agent</p>
           </div>
         </div>
       </div>
