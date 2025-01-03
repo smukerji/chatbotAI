@@ -78,7 +78,7 @@ export default function VoiceBot() {
       let industryExpertDataList = data?.assistantTemplates.filter(
         (assistance: any) => assistance?.industryType === "Expert"
       );
-      debugger;
+      
       setAssistantList(assistantDataList);
       setIndustryExpertList(industryExpertDataList);
     } catch (error: any) {
@@ -146,7 +146,7 @@ export default function VoiceBot() {
 
         if (acknowledgedData?.isAcknowledged) {
           //update the data
-          debugger;
+          
           try {
             const assistantUpdateResponse = await fetch(
               `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/voice`,
@@ -163,7 +163,7 @@ export default function VoiceBot() {
 
             const assistantUpdateResponseParse =
               await assistantUpdateResponse.json();
-            debugger;
+            
 
             router.push(`/voicebot/dashboard?voicBotName=${assistantName}`);
           } catch (error: any) {
@@ -171,12 +171,11 @@ export default function VoiceBot() {
             message.error(error.message);
           }
 
-          debugger;
-        }
-        else{//create the data
-          debugger
-          try{
-
+          
+        } else {
+          //create the data
+          
+          try {
             const assistantCreateResponse = await fetch(
               `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/voice`,
               {
@@ -192,7 +191,7 @@ export default function VoiceBot() {
 
             const assistantCreateResponseParse =
               await assistantCreateResponse.json();
-            debugger;
+            
             voiceBotContextData.setAssistantMongoId(
               assistantCreateResponseParse?.result?.insertedId
             );
@@ -232,7 +231,7 @@ export default function VoiceBot() {
   const imageHandler = async (e: any) => {
     const selectedFile = e.target.files[0];
 
-    debugger;
+    
 
     // Check if a file is selected and it's an image
     if (selectedFile && isImageFile(selectedFile)) {
@@ -260,7 +259,7 @@ export default function VoiceBot() {
         }
         const data = await res.json();
         // setIconImage(data?.uploadUrl);
-        debugger;
+        
         const assistantTemplateIDs = [
           selectedAssistant?._id,
           selectedIndustryExpert?._id,
@@ -306,7 +305,7 @@ export default function VoiceBot() {
 
           const assistantCreateResponseParse =
             await assistantCreateResponse.json();
-          debugger;
+          
           voiceBotContextData.setAssistantMongoId(
             assistantCreateResponseParse?.result?.insertedId
           );
@@ -371,7 +370,7 @@ export default function VoiceBot() {
                   ? "assi-input-field invalid-input"
                   : "assi-input-field"
               }
-              placeholder="Your Assistant Name"
+              placeholder="Assistant Name"
               onChange={assistantNameChangeHandler}
               onBlur={handleInputBlur}
               id="assistantNameInput"

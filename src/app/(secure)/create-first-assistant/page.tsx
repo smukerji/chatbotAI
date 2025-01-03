@@ -12,7 +12,7 @@ import leftArrow from "../../../../public/voiceBot/SVG/arrow-left.svg";
 import { redirect, useRouter, useSearchParams } from "next/navigation";
 import { useCookies } from "react-cookie";
 
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useLayoutEffect } from "react";
 
 // import { CreateVoiceBotContext } from "../../../../_helpers/client/Context/VoiceBotContextApi"/
 import { CreateVoiceBotContext } from "../../_helpers/client/Context/VoiceBotContextApi";
@@ -33,6 +33,7 @@ import ChooseVoiceAssistantType from "./_components/ChooseVoiceAssistantType/Cho
 import ChooseVoiceAssistantExpert from "./_components/ChooseVoiceAssistantExpert/ChooseVoiceAssistantExpert";
 // import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import CreateAssitstantContainerItems from "./_components/CreateAssitstantContainerItems/CreateAssitstantContainerItems";
 
 export default function FirstAssistant() {
   const [cookies, setCookie] = useCookies(["userId"]);
@@ -103,7 +104,6 @@ export default function FirstAssistant() {
   };
 
   const continuesChangeHandler = async () => {
-    debugger;
     // if (createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.CHAT) {
     /// change the steps according to the flow
     if (
@@ -114,7 +114,7 @@ export default function FirstAssistant() {
       if (
         createAssistantFlowContextDetails?.assistantName.trim().length === 0
       ) {
-        setinputValidationMessage("Please, Provide Assistant Name!");
+        setinputValidationMessage("Enter assistant name");
         return;
       }
 
@@ -122,7 +122,7 @@ export default function FirstAssistant() {
         createAssistantFlowContextDetails?.creationFlow ===
         SelectedAssistantType.NULL
       ) {
-        message.warning("Please select the type of assistant!");
+        message.error("Choose an assistant type!");
         return;
       }
       /// check for the pricing plan only if user is first time user
@@ -179,7 +179,7 @@ export default function FirstAssistant() {
         message.warning("Please select an Industry Expert first!");
         return;
       }
-      debugger;
+
       if (
         createAssistantFlowContextDetails?.creationFlow ===
         SelectedAssistantType.VOICE
@@ -193,7 +193,7 @@ export default function FirstAssistant() {
 
         if (acknowledgedData?.isAcknowledged) {
           //update the data
-          debugger;
+
           try {
             const assistantUpdateResponse = await fetch(
               `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/voice`,
@@ -210,18 +210,15 @@ export default function FirstAssistant() {
 
             const assistantUpdateResponseParse =
               await assistantUpdateResponse.json();
-            debugger;
 
             router.push(`/voicebot/dashboard?voicBotName=${assistantName}`);
           } catch (error: any) {
             console.log(error);
             message.error(error.message);
           }
-
-          debugger;
         } else {
           //create the data
-          debugger;
+
           try {
             const assistantCreateResponse = await fetch(
               `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/voice`,
@@ -238,7 +235,7 @@ export default function FirstAssistant() {
 
             const assistantCreateResponseParse =
               await assistantCreateResponse.json();
-            debugger;
+
             voiceBotContextData.setAssistantMongoId(
               assistantCreateResponseParse?.result?.insertedId
             );
@@ -252,11 +249,11 @@ export default function FirstAssistant() {
           }
         }
       } else {
+        setIsModalVisible(true);
         createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(
           AssistantFlowStep.ADD_DATA_SOURCES
         );
       }
-    } else {
     }
 
     // }
@@ -283,12 +280,9 @@ export default function FirstAssistant() {
     }
   };
 
-  useEffect(() => {
-    getVoiceAssistantTemplateData();
-  }, []);
-
   /// call this on initial load as well as on every step change
   useEffect(() => {
+    getVoiceAssistantTemplateData();
     checkPlan();
   }, []);
 
@@ -309,10 +303,6 @@ export default function FirstAssistant() {
     return acceptedImageTypes.includes(file.type);
   };
 
-  const assistantSelectHandler = (
-    selectedAssistantValue: SelectedAssistantType
-  ) => {};
-
   async function getVoiceAssistantTemplateData() {
     try {
       const res = await fetch(
@@ -329,7 +319,7 @@ export default function FirstAssistant() {
       let industryExpertDataList = data?.assistantTemplates.filter(
         (assistance: any) => assistance?.industryType === "Expert"
       );
-      debugger;
+
       setAssistantList(assistantDataList);
       setIndustryExpertList(industryExpertDataList);
     } catch (error: any) {
@@ -342,7 +332,7 @@ export default function FirstAssistant() {
     index: number
   ) => {
     setSelectedAssistantIndex(index);
-    debugger;
+
     setSelectedAssistant(choosenAssistant);
     let assistantTypeObj = {
       title: choosenAssistant?.assistantType,
@@ -356,7 +346,7 @@ export default function FirstAssistant() {
   const selectedExpertChangeHandler = (choosenExpert: any, index: number) => {
     setSelectedExpertIndex(index);
     setSelectedIndustryExpert(choosenExpert);
-    debugger;
+
     let industryExpertTypeObj = {
       title: choosenExpert?.assistantType,
       description: choosenExpert?.dispcrtion,
@@ -427,7 +417,6 @@ export default function FirstAssistant() {
       message.info("Please select the type of assistant first");
       return;
     }
-    debugger;
 
     if (
       createAssistantFlowContextDetails?.creationFlow ===
@@ -443,8 +432,6 @@ export default function FirstAssistant() {
     }
 
     const selectedFile = e.target.files[0];
-
-    debugger;
 
     // Check if a file is selected and it's an image
     if (selectedFile && isImageFile(selectedFile)) {
@@ -472,7 +459,7 @@ export default function FirstAssistant() {
         }
         const data = await res.json();
         // setIconImage(data?.uploadUrl);
-        debugger;
+
         const assistantTemplateIDs = [
           selectedAssistant?._id,
           selectedIndustryExpert?._id,
@@ -520,7 +507,7 @@ export default function FirstAssistant() {
 
           const assistantCreateResponseParse =
             await assistantCreateResponse.json();
-          debugger;
+
           voiceBotContextData.setAssistantMongoId(
             assistantCreateResponseParse?.result?.insertedId
           );
@@ -553,350 +540,621 @@ export default function FirstAssistant() {
   if (status === "authenticated" || cookies?.userId) {
     return (
       <div className="create-assistant-container">
-        {/*------------------------------------------stepper----------------------------------------------*/}
-        <div className="stepper">
-          <div className="title-container">
-            <h2 className="title">Welcome to Torri AI</h2>
-            <span className="sub-title">
-              Let&apos;s create your own Bot just in 5 steps
-            </span>
-          </div>
-          <div className="voicebot-avatar">
-            <div
-              className="voicebot-avatar-img"
-              style={{ backgroundImage: `url(${assistantImagePath})` }}
-            >
-              <input
-                type="file"
-                id="profileImageId"
-                style={{ display: "none" }}
-                accept="image/*"
-                onChange={imageHandler}
-              />
-              <label htmlFor="profileImageId" className="file-label">
-                <Image alt="" src={galaryImg} className="galary_image"></Image>
-              </label>
-            </div>
-            <div className="voicebot-avatar-img__info">
-              {/* <div className="assistant-input-wrapper"> */}
-              <Input
-                // className={inputValidationMessage ? "input-field invalid-input" : "input-field"}
-                className={
-                  inputValidationMessage
-                    ? "assi-input-field invalid-input"
-                    : "assi-input-field"
+        {window.innerWidth >= 768 && (
+          <>
+            {/*------------------------------------------stepper----------------------------------------------*/}
+            <div className="stepper">
+              <div className="title-container">
+                <h2 className="title">Welcome to Torri AI</h2>
+                <span className="sub-title">
+                  Create your AI agent in 5 steps
+                </span>
+              </div>
+              <div className="voicebot-avatar">
+                <div
+                  className="voicebot-avatar-img"
+                  style={{ backgroundImage: `url(${assistantImagePath})` }}
+                >
+                  <input
+                    type="file"
+                    id="profileImageId"
+                    style={{ display: "none" }}
+                    accept="image/*"
+                    onChange={imageHandler}
+                  />
+                  <label htmlFor="profileImageId" className="file-label">
+                    <Image
+                      alt=""
+                      src={galaryImg}
+                      className="galary_image"
+                    ></Image>
+                  </label>
+                </div>
+                <div className="voicebot-avatar-img__info">
+                  {/* <div className="assistant-input-wrapper"> */}
+                  <div style={{ display: "flex", gap: "5px" }}>
+                    <Input
+                      // className={inputValidationMessage ? "input-field invalid-input" : "input-field"}
+                      className={
+                        inputValidationMessage
+                          ? "assi-input-field invalid-input"
+                          : "assi-input-field"
+                      }
+                      placeholder="Assistant Name"
+                      onChange={assistantNameChangeHandler}
+                      // onBlur={handleInputBlur}
+                      id="assistantNameInput"
+                      value={createAssistantFlowContextDetails?.assistantName}
+                      disabled={!isInputVisible}
+                    />
+
+                    <span style={{ color: "red", fontSize: "25px" }}>*</span>
+                  </div>
+
+                  {/* </div> */}
+
+                  <Button
+                    style={{
+                      border: "none",
+                      margin: 0,
+                      padding: 0,
+                      background: "transparent",
+                    }}
+                    icon={<Image src={editIcon} alt="edit name" />}
+                    onClick={() => {
+                      setIsInputVisible(true);
+                      const inputElement = document.getElementById(
+                        "assistantNameInput"
+                      ) as HTMLInputElement;
+                      if (inputElement) {
+                        inputElement.focus();
+                      }
+                    }}
+                  />
+                </div>
+                {inputValidationMessage && (
+                  <p className="invalidation-message">
+                    {inputValidationMessage}
+                  </p>
+                )}
+              </div>
+              <Steps
+                className="stepper-steps"
+                direction="vertical"
+                size="small"
+                current={
+                  createAssistantFlowContextDetails?.currentAssistantFlowStep
                 }
-                placeholder="Your Assistant Name"
-                onChange={assistantNameChangeHandler}
-                // onBlur={handleInputBlur}
-                id="assistantNameInput"
-                value={createAssistantFlowContextDetails?.assistantName}
-                disabled={!isInputVisible}
-              />
-
-              {/* </div> */}
-
-              <Button
-                style={{
-                  border: "none",
-                  margin: 0,
-                  padding: 0,
-                  background: "transparent",
-                }}
-                icon={<Image src={editIcon} alt="edit name" />}
-                onClick={() => {
-                  setIsInputVisible(true);
-                  const inputElement = document.getElementById(
-                    "assistantNameInput"
-                  ) as HTMLInputElement;
-                  if (inputElement) {
-                    inputElement.focus();
-                  }
-                }}
-              />
-            </div>
-            {inputValidationMessage && (
-              <p className="invalidation-message">{inputValidationMessage}</p>
-            )}
-          </div>
-          <Steps
-            className="stepper-steps"
-            direction="vertical"
-            size="small"
-            current={
-              createAssistantFlowContextDetails?.currentAssistantFlowStep
-            }
-            items={[
-              {
-                /// if this steps is processed mark status as finsihsed
-                status:
-                  createAssistantFlowContextDetails?.currentAssistantFlowStep ===
-                  AssistantFlowStep.CHOOSE_BOT_TYPE
-                    ? "process"
-                    : "finish",
-                title: (
-                  <div>
-                    <h3 className="steps-assistant-heading">Create your bot</h3>
-                  </div>
-                ),
-              },
-              // Only include the plan step if the user doesn't have a plan
-              ...(plan?.price && source == "chatbot"
-                ? []
-                : [
-                    {
-                      status:
-                        createAssistantFlowContextDetails?.currentAssistantFlowStep ===
-                        AssistantFlowStep.CHOOSE_PLAN
-                          ? ("process" as "process")
-                          : plan?.price
-                          ? ("finish" as "finish")
-                          : ("wait" as "wait"),
-                      title: (
-                        <div>
-                          <h3 className="steps-assistant-heading">
-                            Select plan
-                          </h3>
+                items={[
+                  {
+                    /// if this steps is processed mark status as finsihsed
+                    status:
+                      createAssistantFlowContextDetails?.currentAssistantFlowStep ===
+                      AssistantFlowStep.CHOOSE_BOT_TYPE
+                        ? "process"
+                        : "finish",
+                    title: (
+                      <div>
+                        <h3 className="steps-assistant-heading">
+                          Create your Assistant
+                        </h3>
+                      </div>
+                    ),
+                  },
+                  // Only include the plan step if the user doesn't have a plan
+                  ...(plan?.price && source == "chatbot"
+                    ? []
+                    : [
+                        {
+                          status:
+                            createAssistantFlowContextDetails?.currentAssistantFlowStep ===
+                            AssistantFlowStep.CHOOSE_PLAN
+                              ? ("process" as "process")
+                              : plan?.price
+                              ? ("finish" as "finish")
+                              : ("wait" as "wait"),
+                          title: (
+                            <div>
+                              <h3 className="steps-assistant-heading">
+                                Select plan
+                              </h3>
+                            </div>
+                          ),
+                        },
+                      ]),
+                  {
+                    status:
+                      createAssistantFlowContextDetails?.currentAssistantFlowStep ===
+                      AssistantFlowStep.CHOOSE_ASSISTANT_TYPE
+                        ? "process"
+                        : createAssistantFlowContextDetails?.assistantType
+                            ?.abbreviation
+                        ? "finish"
+                        : "wait",
+                    title: createAssistantFlowContextDetails?.assistantType
+                      ?.imageUrl ? (
+                      <div className="selected-assistant">
+                        <div className="mini-selected-assistant-image">
+                          <input
+                            type="file"
+                            id="profileImageId"
+                            style={{ display: "none" }}
+                            accept="image/*"
+                            // onChange={imageHandler}
+                          />
+                          <label
+                            htmlFor="profileImageId"
+                            className="file-label"
+                          >
+                            <Image
+                              alt={
+                                createAssistantFlowContextDetails?.assistantType
+                                  ?.title
+                              }
+                              src={
+                                createAssistantFlowContextDetails?.assistantType
+                                  ?.imageUrl
+                              }
+                              width={100}
+                              height={100}
+                            ></Image>
+                          </label>
                         </div>
-                      ),
-                    },
-                  ]),
-              {
-                status:
-                  createAssistantFlowContextDetails?.currentAssistantFlowStep ===
-                  AssistantFlowStep.CHOOSE_ASSISTANT_TYPE
-                    ? "process"
-                    : createAssistantFlowContextDetails?.assistantType
-                        ?.abbreviation
-                    ? "finish"
-                    : "wait",
-                title: createAssistantFlowContextDetails?.assistantType
-                  ?.imageUrl ? (
-                  <div className="selected-assistant">
-                    <div className="mini-selected-assistant-image">
-                      <input
-                        type="file"
-                        id="profileImageId"
-                        style={{ display: "none" }}
-                        accept="image/*"
-                        // onChange={imageHandler}
-                      />
-                      <label htmlFor="profileImageId" className="file-label">
-                        <Image
-                          alt={
-                            createAssistantFlowContextDetails?.assistantType
-                              ?.title
-                          }
-                          src={
-                            createAssistantFlowContextDetails?.assistantType
-                              ?.imageUrl
-                          }
-                          width={100}
-                          height={100}
-                        ></Image>
-                      </label>
-                    </div>
-                    <div className="selected-assistant-header">
-                      <h3 className="heading_title">
-                        {
-                          createAssistantFlowContextDetails?.assistantType
-                            ?.title
-                        }
-                      </h3>
-                      <h4 className="heading_description">
-                        {
-                          createAssistantFlowContextDetails?.assistantType
-                            ?.description
-                        }
-                      </h4>
-                    </div>
-                  </div>
-                ) : (
-                  <div>
-                    <h3 className="steps-assistant-heading">
-                      Choose your assistant
-                    </h3>
-                  </div>
-                ),
-              },
-              {
-                status:
-                  createAssistantFlowContextDetails?.currentAssistantFlowStep ===
-                  AssistantFlowStep.CHOOSE_INDUSTRY_EXPERT
-                    ? "process"
-                    : createAssistantFlowContextDetails?.industryExpertType
-                        ?.abbreviation
-                    ? "finish"
-                    : "wait",
-                title: createAssistantFlowContextDetails?.industryExpertType
-                  ?.imageUrl ? (
-                  <div className="selected-assistant">
-                    <div className="mini-selected-assistant-image">
-                      <input
-                        type="file"
-                        id="profileImageId"
-                        style={{ display: "none" }}
-                        accept="image/*"
-                        // onChange={imageHandler}
-                      />
-                      <label htmlFor="profileImageId" className="file-label">
-                        <Image
-                          alt={
-                            createAssistantFlowContextDetails
-                              ?.industryExpertType?.title
-                          }
-                          src={
-                            createAssistantFlowContextDetails
-                              ?.industryExpertType?.imageUrl
-                          }
-                          width={100}
-                          height={100}
-                        ></Image>
-                      </label>
-                    </div>
-                    <div className="selected-assistant-header">
-                      <h3 className="heading_title">
-                        {
-                          createAssistantFlowContextDetails?.industryExpertType
-                            ?.title
-                        }
-                      </h3>
-                      <h4 className="heading_description">
-                        {
-                          createAssistantFlowContextDetails?.industryExpertType
-                            ?.description
-                        }
-                      </h4>
-                    </div>
-                  </div>
-                ) : (
-                  <div>
-                    <h3 className="steps-assistant-heading">
-                      Choose your Industry
-                    </h3>
-                  </div>
-                ),
-              },
-              {
-                status:
-                  createAssistantFlowContextDetails?.currentAssistantFlowStep ===
-                  AssistantFlowStep.ADD_DATA_SOURCES
-                    ? "process"
-                    : "wait",
-                title: (
-                  <div>
-                    <h3 className="steps-assistant-heading">Customize more</h3>
-                  </div>
-                ),
-              },
-            ]}
-          />
-
-          <div className={"navigation-button"}>
-            {/* {voiceBotContextData.currentAssistantPage !== 0 && ( */}
-            <Button
-              className="previous-button"
-              onClick={previousChangeHandler}
-              style={{
-                visibility:
-                  createAssistantFlowContextDetails?.currentAssistantFlowStep ===
-                  AssistantFlowStep.CHOOSE_BOT_TYPE
-                    ? "hidden"
-                    : "visible",
-              }}
-            >
-              <Image
-                className="arrow-left"
-                alt="left arrow"
-                src={leftArrow}
-                width={100}
-                height={100}
+                        <div className="selected-assistant-header">
+                          <h3 className="heading_title">
+                            {
+                              createAssistantFlowContextDetails?.assistantType
+                                ?.title
+                            }
+                          </h3>
+                          <h4 className="heading_description">
+                            {
+                              createAssistantFlowContextDetails?.assistantType
+                                ?.description
+                            }
+                          </h4>
+                        </div>
+                      </div>
+                    ) : (
+                      <div>
+                        <h3 className="steps-assistant-heading">
+                          Choose your assistant
+                        </h3>
+                      </div>
+                    ),
+                  },
+                  {
+                    status:
+                      createAssistantFlowContextDetails?.currentAssistantFlowStep ===
+                      AssistantFlowStep.CHOOSE_INDUSTRY_EXPERT
+                        ? "process"
+                        : createAssistantFlowContextDetails?.industryExpertType
+                            ?.abbreviation
+                        ? "finish"
+                        : "wait",
+                    title: createAssistantFlowContextDetails?.industryExpertType
+                      ?.imageUrl ? (
+                      <div className="selected-assistant">
+                        <div className="mini-selected-assistant-image">
+                          <input
+                            type="file"
+                            id="profileImageId"
+                            style={{ display: "none" }}
+                            accept="image/*"
+                            // onChange={imageHandler}
+                          />
+                          <label
+                            htmlFor="profileImageId"
+                            className="file-label"
+                          >
+                            <Image
+                              alt={
+                                createAssistantFlowContextDetails
+                                  ?.industryExpertType?.title
+                              }
+                              src={
+                                createAssistantFlowContextDetails
+                                  ?.industryExpertType?.imageUrl
+                              }
+                              width={100}
+                              height={100}
+                            ></Image>
+                          </label>
+                        </div>
+                        <div className="selected-assistant-header">
+                          <h3 className="heading_title">
+                            {
+                              createAssistantFlowContextDetails
+                                ?.industryExpertType?.title
+                            }
+                          </h3>
+                          <h4 className="heading_description">
+                            {
+                              createAssistantFlowContextDetails
+                                ?.industryExpertType?.description
+                            }
+                          </h4>
+                        </div>
+                      </div>
+                    ) : (
+                      <div>
+                        <h3 className="steps-assistant-heading">
+                          Choose your Industry Expert
+                        </h3>
+                      </div>
+                    ),
+                  },
+                  {
+                    status:
+                      createAssistantFlowContextDetails?.currentAssistantFlowStep ===
+                      AssistantFlowStep.ADD_DATA_SOURCES
+                        ? "process"
+                        : "wait",
+                    title: (
+                      <div>
+                        <h3 className="steps-assistant-heading">
+                          Customize more
+                        </h3>
+                      </div>
+                    ),
+                  },
+                ]}
               />
-              <span className="previous-button-text">Previous</span>
-            </Button>
-            {/* // )} */}
-            <button
-              className="continue-button"
-              onClick={continuesChangeHandler}
-            >
-              Continue
-            </button>
-          </div>
-        </div>
-        {/*------------------------------------------stepper-end----------------------------------------------*/}
+
+              <div className={"navigation-button"}>
+                {/* {voiceBotContextData.currentAssistantPage !== 0 && ( */}
+                <Button
+                  className="previous-button"
+                  onClick={previousChangeHandler}
+                  style={{
+                    visibility:
+                      createAssistantFlowContextDetails?.currentAssistantFlowStep ===
+                      AssistantFlowStep.CHOOSE_BOT_TYPE
+                        ? "hidden"
+                        : "visible",
+                  }}
+                >
+                  <Image
+                    className="arrow-left"
+                    alt="left arrow"
+                    src={leftArrow}
+                    width={100}
+                    height={100}
+                  />
+                  <span className="previous-button-text">Previous</span>
+                </Button>
+                {/* // )} */}
+                <button
+                  className="continue-button"
+                  onClick={continuesChangeHandler}
+                >
+                  Continue
+                </button>
+              </div>
+            </div>
+            {/*------------------------------------------stepper-end----------------------------------------------*/}
+            <CreateAssitstantContainerItems
+              qaData={qaData}
+              textData={textData}
+              fileData={fileData}
+              crawlData={crawlData}
+              isModalVisible={isModalVisible}
+              setIsModalVisible={setIsModalVisible}
+              industryExpertList={industryExpertList}
+              selecteExpertIndex={selecteExpertIndex}
+              selectedExpertChangeHandler={selectedExpertChangeHandler}
+              assistantList={assistantList}
+              selectedAssistantIndex={selectedAssistantIndex}
+              selectedAssistantChangeHandler={selectedAssistantChangeHandler}
+            />
+          </>
+        )}
 
         {/*------------------------------------------main-voicebot----------------------------------------------*/}
-        <div className="create-assistant-containerp-items">
-          {createAssistantFlowContextDetails?.currentAssistantFlowStep ===
-            AssistantFlowStep.CHOOSE_BOT_TYPE && <SelectAssistantType />}
-          {createAssistantFlowContextDetails?.currentAssistantFlowStep ===
-            AssistantFlowStep.CHOOSE_PLAN &&
-            (createAssistantFlowContextDetails?.creationFlow ===
-            SelectedAssistantType.CHAT ? (
-              <PricingWrapperNew firstPurchase={true} />
-            ) : null)}
-          {createAssistantFlowContextDetails?.currentAssistantFlowStep ===
-            AssistantFlowStep.CHOOSE_ASSISTANT_TYPE &&
-            (createAssistantFlowContextDetails?.creationFlow ===
-            SelectedAssistantType.CHAT ? (
-              <ChooseAssistant />
-            ) : (
-              <div className="assistant-wrapper">
-                <ChooseVoiceAssistantType
-                  assistantList={assistantList}
-                  selectedAssistantIndex={selectedAssistantIndex}
-                  selectedAssistantChangeHandler={
-                    selectedAssistantChangeHandler
-                  }
-                />
+        {window.innerWidth < 768 && (
+          <div className="mobile-stepper">
+            <div className="title-container">
+              <h2 className="title">Welcome to Torri AI</h2>
+              <span className="sub-title">Create your AI agent in 5 steps</span>
+
+              <div className="voicebot-avatar">
+                <div
+                  className="voicebot-avatar-img"
+                  style={{ backgroundImage: `url(${assistantImagePath})` }}
+                >
+                  <input
+                    type="file"
+                    id="profileImageId"
+                    style={{ display: "none" }}
+                    accept="image/*"
+                    onChange={imageHandler}
+                  />
+                  <label htmlFor="profileImageId" className="file-label">
+                    <Image
+                      alt=""
+                      src={galaryImg}
+                      className="galary_image"
+                    ></Image>
+                  </label>
+                </div>
+                <div className="voicebot-avatar-img__info">
+                  {/* <div className="assistant-input-wrapper"> */}
+                  <Input
+                    // className={inputValidationMessage ? "input-field invalid-input" : "input-field"}
+                    className={
+                      inputValidationMessage
+                        ? "assi-input-field invalid-input"
+                        : "assi-input-field"
+                    }
+                    placeholder="Assistant Name"
+                    onChange={assistantNameChangeHandler}
+                    // onBlur={handleInputBlur}
+                    id="assistantNameInput"
+                    value={createAssistantFlowContextDetails?.assistantName}
+                    disabled={!isInputVisible}
+                  />
+
+                  {/* </div> */}
+
+                  <Button
+                    style={{
+                      border: "none",
+                      margin: 0,
+                      padding: 0,
+                      background: "transparent",
+                    }}
+                    icon={<Image src={editIcon} alt="edit name" />}
+                    onClick={() => {
+                      setIsInputVisible(true);
+                      const inputElement = document.getElementById(
+                        "assistantNameInput"
+                      ) as HTMLInputElement;
+                      if (inputElement) {
+                        inputElement.focus();
+                      }
+                    }}
+                  />
+                </div>
+                {inputValidationMessage && (
+                  <p className="invalidation-message">
+                    {inputValidationMessage}
+                  </p>
+                )}
               </div>
-            ))}
-          {createAssistantFlowContextDetails?.currentAssistantFlowStep ===
-            AssistantFlowStep.CHOOSE_INDUSTRY_EXPERT &&
-            (createAssistantFlowContextDetails?.creationFlow ===
-            SelectedAssistantType.CHAT ? (
-              <ChooseIndustryExpert />
-            ) : (
-              <div className="assistant-wrapper">
-                <ChooseVoiceAssistantExpert
-                  industryExpertList={industryExpertList}
-                  selecteExpertIndex={selecteExpertIndex}
-                  selectedExpertChangeHandler={selectedExpertChangeHandler}
-                />
-              </div>
-            ))}
-          {createAssistantFlowContextDetails?.currentAssistantFlowStep ===
-            AssistantFlowStep.ADD_DATA_SOURCES && (
-            <>
-              <div className="title">
-                <h1>Create your AI Assistant</h1>
-                <span>Add your data sources to train your chatbot</span>
-              </div>
-              <Home
-                qaData={qaData}
-                textData={textData}
-                fileData={fileData}
-                crawlingData={crawlData}
-                chatbotName={createAssistantFlowContextDetails?.assistantName}
-                botType={"bot-v2"}
-                assistantType={`${createAssistantFlowContextDetails?.assistantType?.abbreviation}-${createAssistantFlowContextDetails?.industryExpertType?.abbreviation}`}
-                integrations={createAssistantFlowContextDetails?.integrations}
-              />
-            </>
-          )}
-          {createAssistantFlowContextDetails?.currentAssistantFlowStep ===
-            AssistantFlowStep.ADD_DATA_SOURCES &&
-            createAssistantFlowContextDetails?.industryExpertType
-              ?.abbreviation === "shopify" && (
-              <ShopifySecretModal
-                imageUrl={
-                  createAssistantFlowContextDetails?.industryExpertType.imageUrl
+            </div>
+
+            <CreateAssitstantContainerItems
+              qaData={qaData}
+              textData={textData}
+              fileData={fileData}
+              crawlData={crawlData}
+              isModalVisible={isModalVisible}
+              setIsModalVisible={setIsModalVisible}
+              industryExpertList={industryExpertList}
+              selecteExpertIndex={selecteExpertIndex}
+              selectedExpertChangeHandler={selectedExpertChangeHandler}
+              assistantList={assistantList}
+              selectedAssistantIndex={selectedAssistantIndex}
+              selectedAssistantChangeHandler={selectedAssistantChangeHandler}
+            />
+
+            <div className="mobile-stepper-navigation">
+              <Steps
+                className="stepper-steps"
+                direction="horizontal"
+                // labelPlacement="vertical"
+                size="small"
+                current={
+                  createAssistantFlowContextDetails?.currentAssistantFlowStep
                 }
-                isOpen={isModalVisible}
-                setIsOpen={setIsModalVisible}
+                items={[
+                  {
+                    /// if this steps is processed mark status as finsihsed
+                    status:
+                      createAssistantFlowContextDetails?.currentAssistantFlowStep ===
+                      AssistantFlowStep.CHOOSE_BOT_TYPE
+                        ? "process"
+                        : "finish",
+                    title: (
+                      <div>
+                        <h3 className="steps-assistant-heading">
+                          Create your Assistant
+                        </h3>
+                      </div>
+                    ),
+                  },
+                  // Only include the plan step if the user doesn't have a plan
+                  ...(plan?.price && source == "chatbot"
+                    ? []
+                    : [
+                        {
+                          status:
+                            createAssistantFlowContextDetails?.currentAssistantFlowStep ===
+                            AssistantFlowStep.CHOOSE_PLAN
+                              ? ("process" as "process")
+                              : plan?.price
+                              ? ("finish" as "finish")
+                              : ("wait" as "wait"),
+                          title: (
+                            <div>
+                              <h3 className="steps-assistant-heading">
+                                Select plan
+                              </h3>
+                            </div>
+                          ),
+                        },
+                      ]),
+                  {
+                    status:
+                      createAssistantFlowContextDetails?.currentAssistantFlowStep ===
+                      AssistantFlowStep.CHOOSE_ASSISTANT_TYPE
+                        ? "process"
+                        : createAssistantFlowContextDetails?.assistantType
+                            ?.abbreviation
+                        ? "finish"
+                        : "wait",
+                    title: createAssistantFlowContextDetails?.assistantType
+                      ?.imageUrl ? (
+                      <div className="selected-assistant">
+                        <div className="mini-selected-assistant-image">
+                          <input
+                            type="file"
+                            id="profileImageId"
+                            style={{ display: "none" }}
+                            accept="image/*"
+                            // onChange={imageHandler}
+                          />
+                          <label
+                            htmlFor="profileImageId"
+                            className="file-label"
+                          >
+                            <Image
+                              alt={
+                                createAssistantFlowContextDetails?.assistantType
+                                  ?.title
+                              }
+                              src={
+                                createAssistantFlowContextDetails?.assistantType
+                                  ?.imageUrl
+                              }
+                              width={100}
+                              height={100}
+                            ></Image>
+                          </label>
+                        </div>
+                        <div className="selected-assistant-header">
+                          <h3 className="heading_title">
+                            {
+                              createAssistantFlowContextDetails?.assistantType
+                                ?.title
+                            }
+                          </h3>
+                          <h4 className="heading_description">
+                            {
+                              createAssistantFlowContextDetails?.assistantType
+                                ?.description
+                            }
+                          </h4>
+                        </div>
+                      </div>
+                    ) : (
+                      <div>
+                        <h3 className="steps-assistant-heading">
+                          Choose your assistant
+                        </h3>
+                      </div>
+                    ),
+                  },
+                  {
+                    status:
+                      createAssistantFlowContextDetails?.currentAssistantFlowStep ===
+                      AssistantFlowStep.CHOOSE_INDUSTRY_EXPERT
+                        ? "process"
+                        : createAssistantFlowContextDetails?.industryExpertType
+                            ?.abbreviation
+                        ? "finish"
+                        : "wait",
+                    title: createAssistantFlowContextDetails?.industryExpertType
+                      ?.imageUrl ? (
+                      <div className="selected-assistant">
+                        <div className="mini-selected-assistant-image">
+                          <input
+                            type="file"
+                            id="profileImageId"
+                            style={{ display: "none" }}
+                            accept="image/*"
+                            // onChange={imageHandler}
+                          />
+                          <label
+                            htmlFor="profileImageId"
+                            className="file-label"
+                          >
+                            <Image
+                              alt={
+                                createAssistantFlowContextDetails
+                                  ?.industryExpertType?.title
+                              }
+                              src={
+                                createAssistantFlowContextDetails
+                                  ?.industryExpertType?.imageUrl
+                              }
+                              width={100}
+                              height={100}
+                            ></Image>
+                          </label>
+                        </div>
+                        <div className="selected-assistant-header">
+                          <h3 className="heading_title">
+                            {
+                              createAssistantFlowContextDetails
+                                ?.industryExpertType?.title
+                            }
+                          </h3>
+                          <h4 className="heading_description">
+                            {
+                              createAssistantFlowContextDetails
+                                ?.industryExpertType?.description
+                            }
+                          </h4>
+                        </div>
+                      </div>
+                    ) : (
+                      <div>
+                        <h3 className="steps-assistant-heading">
+                          Choose your Industry Expert
+                        </h3>
+                      </div>
+                    ),
+                  },
+                  {
+                    status:
+                      createAssistantFlowContextDetails?.currentAssistantFlowStep ===
+                      AssistantFlowStep.ADD_DATA_SOURCES
+                        ? "process"
+                        : "wait",
+                    title: (
+                      <div>
+                        <h3 className="steps-assistant-heading">
+                          Customize more
+                        </h3>
+                      </div>
+                    ),
+                  },
+                ]}
               />
-            )}
-        </div>
+
+              <div className={"navigation-button"}>
+                {/* {voiceBotContextData.currentAssistantPage !== 0 && ( */}
+                <Button
+                  className="previous-button"
+                  onClick={previousChangeHandler}
+                  style={{
+                    visibility:
+                      createAssistantFlowContextDetails?.currentAssistantFlowStep ===
+                      AssistantFlowStep.CHOOSE_BOT_TYPE
+                        ? "hidden"
+                        : "visible",
+                  }}
+                >
+                  <Image
+                    className="arrow-left"
+                    alt="left arrow"
+                    src={leftArrow}
+                    width={100}
+                    height={100}
+                  />
+                </Button>
+                {/* // )} */}
+                <button
+                  className="continue-button"
+                  onClick={continuesChangeHandler}
+                >
+                  Continue
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
         {/*------------------------------------------main-voicebot-end----------------------------------------------*/}
       </div>
     );
