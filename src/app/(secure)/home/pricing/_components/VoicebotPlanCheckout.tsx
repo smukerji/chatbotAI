@@ -5,15 +5,34 @@ import { useCookies } from "react-cookie";
 import Loader from "./Loader";
 import { loadStripe } from "@stripe/stripe-js";
 import VoicePaymentCard from "./VoicePaymentCard";
+import { useSearchParams } from "next/navigation";
+import CryptoJS from "crypto-js";
 
 const stripePromise = loadStripe(
   String(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY)
 );
 
+const cryptoSecret: any = process.env.NEXT_PUBLIC_CRYPTO_SECRET;
+
 function VoicebotPlanCheckout() {
+  const searchParams = useSearchParams();
+  const a: any = searchParams ? searchParams.get("amount") : null;
+
+  const encryptedPriceId = decodeURIComponent(a);
+
   const [cookies, setCookie] = useCookies(["userId"]);
   const u_id: any = cookies.userId;
   const [loader, setLoader] = useState(false);
+
+  function decryptPriceId(encryptedPriceId: string) {
+    const bytes = CryptoJS.AES.decrypt(encryptedPriceId, cryptoSecret);
+
+    return bytes.toString(CryptoJS.enc.Utf8);
+  }
+
+  const amount: any = encryptedPriceId
+    ? decryptPriceId(encryptedPriceId)
+    : null;
 
   return (
     <>
@@ -23,14 +42,15 @@ function VoicebotPlanCheckout() {
             <Loader />
           ) : (
             <VoicePaymentCard
-            //   price={subscriptionDetail?.price}
-            //   interval={subscriptionDetail?.interval}
-            //   customerId={customerId}
-            //   priceId={priceId}
-            //   source={source}
-            //   type={type}
-            //   isActive={isActive}
-            //   firstPurchase={firstPurchase}
+              amount={amount}
+              //   price={subscriptionDetail?.price}
+              //   interval={subscriptionDetail?.interval}
+              //   customerId={customerId}
+              //   priceId={priceId}
+              //   source={source}
+              //   type={type}
+              //   isActive={isActive}
+              //   firstPurchase={firstPurchase}
             />
           )}
         </Elements>

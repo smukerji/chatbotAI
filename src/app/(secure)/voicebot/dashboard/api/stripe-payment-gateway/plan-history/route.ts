@@ -68,7 +68,7 @@ const getPaymentHistory = async (req: any, res: NextApiResponse) => {
   try {
     return {
       msg: "Payment history fetched successfully.",
-      payments: allCreditPayments,
+      paymentDetails: allCreditPayments,
     };
   } catch (error) {
     return {

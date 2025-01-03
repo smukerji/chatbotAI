@@ -82,8 +82,6 @@ function PlanCheckout() {
 
   // console.log(">>>>>>>", isActive);
 
-  console.log("first purchase from PlanCheckout", firstPurchase);
-
   return (
     <>
       <div>

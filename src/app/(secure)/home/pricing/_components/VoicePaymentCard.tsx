@@ -13,16 +13,19 @@ import { Button } from "antd";
 import DangerIcon from "../../../../../../public/svgs/danger.svg";
 import Image from "next/image";
 import axios from "axios";
+import PaymentSucessmodal from "./PaymentSucessmodal";
 
-function VoicePaymentCard() {
+function VoicePaymentCard({ amount }: any) {
   const stripe = useStripe();
   const elements = useElements();
   const [cookies, setCookie] = useCookies(["userId"]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const u_id: any = cookies.userId;
   const [disabled, setDisabled] = useState(false);
   const [loading, setLoading] = useState(false);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [error, setError] = useState("");
+  const [subscriptionDetail, setSubscriptionDetail] = useState({});
   const [cardErrors, setCardErrors] = useState({
     cardNumber: "",
     expiryDate: "",
@@ -110,7 +113,7 @@ function VoicePaymentCard() {
       response = await axios.post(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/stripe-payment-gateway/create-payment`,
         {
-          amount: 20,
+          amount: amount,
           u_id: u_id,
           paymentMethodId: paymentMethod?.id,
         }
@@ -134,6 +137,8 @@ function VoicePaymentCard() {
       }
 
       console.log("Payment successful:", paymentIntent);
+      setIsModalOpen(true);
+      setSubscriptionDetail(paymentIntent);
     } catch (error) {
       console.log("eeeeee", error);
 
@@ -144,29 +149,20 @@ function VoicePaymentCard() {
     }
   };
 
-  useEffect(() => {
-    const fetchInfo = async () => {
-      try {
-        const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/stripe-payment-gateway/plan-history`,
-          {
-            u_id: u_id,
-          }
-        );
-
-        console.log("dddddd", response.data);
-      } catch (error) {}
-    };
-
-    fetchInfo();
-  }, []);
-
   return (
     <>
       {loading ? (
         <Loader />
       ) : (
         <>
+          {isModalOpen && (
+            <PaymentSucessmodal
+              isModalOpen={isModalOpen}
+              subscriptionDetail={subscriptionDetail}
+              isVoiceInvoice={true}
+            />
+          )}
+
           <div className="card-main new-card">
             <div className="card-head">Billing Info</div>
             <form
@@ -180,7 +176,7 @@ function VoicePaymentCard() {
                   </label>
 
                   <div className="pricing">
-                    <p>$20</p>
+                    <p>${amount}</p>
                   </div>
                 </div>
 
@@ -190,7 +186,7 @@ function VoicePaymentCard() {
                   </label>
 
                   <div className="pricing">
-                    <p>$20</p>
+                    <p>${amount}</p>
                   </div>
                 </div>
               </div>
