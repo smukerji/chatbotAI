@@ -70,7 +70,7 @@ const initialState = {
     //     server: { timeoutSeconds: 20, url: "", secret: "" },
     //   },
     // ],
-    toolIds: [""],//we deleted this field in the backend
+    toolIds: [""], //we deleted this field in the backend
     provider: "openai",
     model: "gpt-4o",
     temperature: 0,
@@ -628,11 +628,9 @@ function Chatbot() {
             {/* </Link> */}
           </div>
 
-          {/* {openLimitModal ? (
-              <LimitReachedModal setOpenLimitModel={setOpenLimitModel} />
-            ) : (
-              <></>
-            )} */}
+          {openLimitModal && (
+            <LimitReachedModal setOpenLimitModel={setOpenLimitModel} />
+          )}
         </div>
 
         {!isVoiceBotActived ? (

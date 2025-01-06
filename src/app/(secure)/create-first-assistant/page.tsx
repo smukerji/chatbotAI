@@ -34,6 +34,7 @@ import ChooseVoiceAssistantExpert from "./_components/ChooseVoiceAssistantExpert
 // import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import CreateAssitstantContainerItems from "./_components/CreateAssitstantContainerItems/CreateAssitstantContainerItems";
+import { UserDetailsContext } from "@/app/_helpers/client/Context/UserDetailsContext";
 
 export default function FirstAssistant() {
   const [cookies, setCookie] = useCookies(["userId"]);
@@ -46,6 +47,9 @@ export default function FirstAssistant() {
   );
   const createAssistantFlowContextDetails =
     createAssistantFlowContext.createAssistantFlowInfo;
+
+  const userDetailContext: any = useContext(UserDetailsContext);
+  const userDetails = userDetailContext?.userDetails;
 
   const botContext: any = useContext(CreateBotContext);
 
@@ -280,10 +284,51 @@ export default function FirstAssistant() {
     }
   };
 
-  /// call this on initial load as well as on every step change
+  /// get the user and plan details
+
+  const fetchData = async () => {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/account/user/details?userId=${cookies?.userId}`,
+      {
+        method: "GET",
+        next: { revalidate: 0 },
+      }
+    );
+
+    const userDetails = await response.json();
+    const date2: any = new Date(userDetails?.planExpiry);
+    const date1: any = new Date(); // Current date
+
+    // Calculate the difference in milliseconds
+    const differenceMs = date2 - date1;
+    const differenceDays = Math.round(differenceMs / (1000 * 60 * 60 * 24));
+    /// set the expiry
+    userDetailContext?.handleChange("planExpiry")(differenceDays);
+    userDetailContext?.handleChange("totalMessageCount")(
+      userDetails?.userDetails?.totalMessageCount
+    );
+    /// set the username and email
+    userDetailContext?.handleChange("firstName")(userDetails?.firstName);
+    userDetailContext?.handleChange("lastName")(userDetails?.lastName);
+    userDetailContext?.handleChange("fullName")(userDetails?.fullName);
+    userDetailContext?.handleChange("email")(userDetails?.email);
+
+    userDetailContext?.handleChange("plan")(userDetails?.plan);
+    userDetailContext?.handleChange("noOfChatbotsUserCreated")(
+      userDetails?.noOfChatbotsUserCreated
+    );
+    const percent =
+      (userDetails?.userDetails?.totalMessageCount /
+        userDetails?.plan?.messageLimit) *
+      100;
+    /// store the percentage of message sent by user
+    userDetailContext?.handleChange("percent")(percent);
+  };
+
   useEffect(() => {
     getVoiceAssistantTemplateData();
     checkPlan();
+    fetchData();
   }, []);
 
   useEffect(() => {
