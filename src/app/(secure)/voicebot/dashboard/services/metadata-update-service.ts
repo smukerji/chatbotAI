@@ -2,6 +2,7 @@ import { CreateVoiceBotContext } from '@/app/_helpers/client/Context/VoiceBotCon
 import React, {
     useContext,
   } from 'react';
+import getUnixTime from "date-fns/getUnixTime";
 export const updateAssistantMetaDataService = async (assistantId:string)=>{
 
 }
@@ -43,4 +44,63 @@ export const updateAssistantNumberOfCallMetaDataService = async (assistantId:str
         return { message  : error };
     }
 
+}
+
+export const updateAssistantLastUsedMetaDataService = async (assistantMId:string)=>{
+
+  try{
+    if(!assistantMId){
+      return { error: "Assistant Id is required" };
+    }
+
+    const nowTs = getUnixTime(new Date());
+      //update the assistant metadata
+      const assistantUpdateMetadataResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/phone/meta?assistantMId=${assistantMId}`,
+        {
+          method: "PUT",
+          body: JSON.stringify({
+            lastUsed: nowTs,
+          })
+        }
+      );
+
+      const parseResponse = await assistantUpdateMetadataResponse.json();
+      console.log('assistantCreateData:', parseResponse);
+
+
+  }
+  catch(error:any){
+      console.error('Error parsing request body:', error);
+      return { message  : error };
+  }
+
+}
+
+export const updateAssistantLastTrainedMetaDataService = async (assistantMId: string) => {
+
+  try {
+    if (!assistantMId) {
+      return { error: "Assistant Id is required" };
+    }
+
+    const nowTs = getUnixTime(new Date());
+    //update the assistant metadata
+    const assistantUpdateMetadataResponse = await fetch(
+      `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/phone/meta?assistantMId=${assistantMId}`,
+      {
+        method: "PUT",
+        body: JSON.stringify({
+          lastTrained: nowTs,
+        })
+      }
+    );
+
+    const parseResponse = await assistantUpdateMetadataResponse.json();
+    console.log('assistantCreateData:', parseResponse);
+  }
+  catch (error: any) {
+    console.error('Error parsing request body:', error);
+    return { message: error };
+  }
 }
