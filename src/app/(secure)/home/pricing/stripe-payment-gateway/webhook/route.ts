@@ -355,7 +355,6 @@ export async function POST(req: any, res: any) {
           { userId: String(userData._id) },
           {
             $set: {
-              status: "cancel",
               nextIsWhatsapp: false,
               isWhatsapp: false,
             },
@@ -366,84 +365,89 @@ export async function POST(req: any, res: any) {
       case "customer.subscription.updated":
         // only runs if parent planid is updated. Cause for addon it is already written in addon route
 
-        if (planIds.some((planId: any) => parentPlanIds.includes(planId))) {
-          userData = await collection.findOne({
-            customerId: event.data.object.customer,
-          });
+        // only update information if user has not schedule cancel plan
+        if (event?.data?.object?.metadata?.cancellation_scheduled === "true") {
+          break; // do nothing
+        } else {
+          if (planIds.some((planId: any) => parentPlanIds.includes(planId))) {
+            userData = await collection.findOne({
+              customerId: event.data.object.customer,
+            });
 
-          if (!userData) {
-            console.error(
-              `User not found for customerId: ${event.data.object.customer}`
-            );
-            break;
-          }
+            if (!userData) {
+              console.error(
+                `User not found for customerId: ${event.data.object.customer}`
+              );
+              break;
+            }
 
-          Details = await collectionDetails.findOne({
-            userId: String(userData._id),
-          });
+            Details = await collectionDetails.findOne({
+              userId: String(userData._id),
+            });
 
-          if (!Details) {
-            console.error(`Details not found for userId: ${userData._id}`);
-            break;
-          }
+            if (!Details) {
+              console.error(`Details not found for userId: ${userData._id}`);
+              break;
+            }
 
-          let date = new Date(event.data.object.current_period_end * 1000);
+            let date = new Date(event.data.object.current_period_end * 1000);
 
-          for (let planId of planIds) {
-            if (
-              planId == starterPlanMonthly ||
-              planId == starterPlanYearly ||
-              planId == individualPlanMonthly ||
-              planId == individualPlanYearly ||
-              planId == businessPlanMonthly ||
-              planId == businessPlanYearly
-            ) {
-              const planData = await collectionPlan.findOne({
-                priceId: planId,
-              });
+            for (let planId of planIds) {
+              if (
+                planId == starterPlanMonthly ||
+                planId == starterPlanYearly ||
+                planId == individualPlanMonthly ||
+                planId == individualPlanYearly ||
+                planId == businessPlanMonthly ||
+                planId == businessPlanYearly
+              ) {
+                const planData = await collectionPlan.findOne({
+                  priceId: planId,
+                });
 
-              if (!planData) {
+                if (!planData) {
+                }
+
+                await collection.updateOne(
+                  { customerId: event.data.object.customer },
+                  {
+                    $set: {
+                      subId: event.data.object.id ?? null,
+                      endDate: date,
+                      plan: planData.name ?? "",
+                      planId: planData._id ?? null,
+                      status: "active",
+                      duration: event.data.object.items.data[0].plan.interval,
+                      stripePlanId: planData.priceId ?? null,
+                      isWhatsapp: planData.isWhatsapp ?? false,
+                      subIdWhatsapp: event.data.object.id ?? null,
+                      nextIsWhatsapp: planData.isWhatsapp ?? false,
+                      lastUpdatedAt: new Date(),
+                      planIds: planIds,
+                    },
+                  }
+                );
+
+                await collectionDetails.updateMany(
+                  { userId: String(userData?._id) },
+                  {
+                    $set: {
+                      trainingDataLimit: planData.trainingDataLimit ?? 1000000,
+                      totalMessageCount: 0,
+                      messageLimit: planData.messageLimit ?? 2000,
+                      chatbotLimit: planData.numberOfChatbot ?? 1,
+                      websiteCrawlingLimit: planData.websiteCrawlingLimit ?? 10,
+                      conversationHistory: planData.conversationHistory ?? "2",
+                      leads: planData.leads ?? "10",
+                      models: planData.models ?? "3.5&4o",
+                      // isWhatsapp: planData.isWhatsapp ?? false,
+                      isTelegram: planData.isTelegram ?? false,
+                      subIdTelegram: event.data.object.id ?? null,
+                      lastUpdatedAt: new Date(),
+                    },
+                  }
+                );
               }
-
-              await collection.updateOne(
-                { customerId: event.data.object.customer },
-                {
-                  $set: {
-                    subId: event.data.object.id ?? null,
-                    endDate: date,
-                    plan: planData.name ?? "",
-                    planId: planData._id ?? null,
-                    status: "active",
-                    duration: event.data.object.items.data[0].plan.interval,
-                    stripePlanId: planData.priceId ?? null,
-                    isWhatsapp: planData.isWhatsapp ?? false,
-                    subIdWhatsapp: event.data.object.id ?? null,
-                    nextIsWhatsapp: planData.isWhatsapp ?? false,
-                    lastUpdatedAt: new Date(),
-                    planIds: planIds,
-                  },
-                }
-              );
-
-              await collectionDetails.updateMany(
-                { userId: String(userData?._id) },
-                {
-                  $set: {
-                    trainingDataLimit: planData.trainingDataLimit ?? 1000000,
-                    totalMessageCount: 0,
-                    messageLimit: planData.messageLimit ?? 2000,
-                    chatbotLimit: planData.numberOfChatbot ?? 1,
-                    websiteCrawlingLimit: planData.websiteCrawlingLimit ?? 10,
-                    conversationHistory: planData.conversationHistory ?? "2",
-                    leads: planData.leads ?? "10",
-                    models: planData.models ?? "3.5&4o",
-                    // isWhatsapp: planData.isWhatsapp ?? false,
-                    isTelegram: planData.isTelegram ?? false,
-                    subIdTelegram: event.data.object.id ?? null,
-                    lastUpdatedAt: new Date(),
-                  },
-                }
-              );
             }
           }
         }
@@ -452,7 +456,51 @@ export async function POST(req: any, res: any) {
 
       //--------------------------------------- write code for voicebot payment-------------------------------
       case "payment_intent.succeeded":
-        console.log("webhoooooookkkk", event.data);
+        userData = await collection.findOne({
+          customerId: event.data.object.customer,
+        });
+
+        if (!userData) {
+          console.error(
+            `User not found for customerId: ${event.data.object.customer}`
+          );
+          break;
+        }
+
+        Details = await collectionDetails.findOne({
+          userId: String(userData._id),
+        });
+
+        if (!Details) {
+          console.error(`Details not found for userId: ${userData._id}`);
+          break;
+        }
+
+        // this only applies to voicebot updation
+        if (event.data.object.metadata.type === "credit") {
+          await collection.updateOne(
+            { customerId: event.data.object.customer },
+            {
+              $set: {
+                voicebotPlanId: event.data.object.id,
+                voicebotPlanStatus: event.data.object.status,
+              },
+            }
+          );
+
+          await collectionDetails.updateMany(
+            { userId: String(userData?._id) },
+            {
+              $set: {
+                voicebotDetails: {
+                  credits:
+                    Details.voicebotDetails.credits +
+                    event?.data?.object?.amount / 100,
+                },
+              },
+            }
+          );
+        }
 
         break;
       default:

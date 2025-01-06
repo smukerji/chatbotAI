@@ -17,8 +17,10 @@ const cryptoSecret: any = process.env.NEXT_PUBLIC_CRYPTO_SECRET;
 function VoicebotPlanCheckout() {
   const searchParams = useSearchParams();
   const a: any = searchParams ? searchParams.get("amount") : null;
+  const b: any = searchParams ? searchParams.get("credit") : null;
 
   const encryptedPriceId = decodeURIComponent(a);
+  const encryptedCredits = decodeURIComponent(b);
 
   const [cookies, setCookie] = useCookies(["userId"]);
   const u_id: any = cookies.userId;
@@ -34,6 +36,10 @@ function VoicebotPlanCheckout() {
     ? decryptPriceId(encryptedPriceId)
     : null;
 
+  const credits: any = encryptedCredits
+    ? decryptPriceId(encryptedCredits)
+    : null;
+
   return (
     <>
       <div>
@@ -43,6 +49,8 @@ function VoicebotPlanCheckout() {
           ) : (
             <VoicePaymentCard
               amount={amount}
+              credits={credits}
+
               //   price={subscriptionDetail?.price}
               //   interval={subscriptionDetail?.interval}
               //   customerId={customerId}

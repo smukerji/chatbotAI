@@ -44,8 +44,13 @@ async function delPlan(req: any, res: NextResponse) {
       subscriptionId,
       {
         cancel_at_period_end: true,
+        metadata: {
+          cancellation_scheduled: "true",
+        },
       }
     );
+
+    console.log("updated", updatedSubscription);
 
     // const deletePlan = await collectionUser.updateMany(
     //   { _id: new ObjectId(u_id) },

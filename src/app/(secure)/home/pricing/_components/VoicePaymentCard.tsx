@@ -15,7 +15,7 @@ import Image from "next/image";
 import axios from "axios";
 import PaymentSucessmodal from "./PaymentSucessmodal";
 
-function VoicePaymentCard({ amount }: any) {
+function VoicePaymentCard({ amount, credits }: any) {
   const stripe = useStripe();
   const elements = useElements();
   const [cookies, setCookie] = useCookies(["userId"]);
@@ -176,6 +176,16 @@ function VoicePaymentCard({ amount }: any) {
                   </label>
 
                   <div className="pricing">
+                    <p>${credits}</p>
+                  </div>
+                </div>
+
+                <div className="recharge-credit">
+                  <label htmlFor="rechargecredit" className="label">
+                    Amount to Recharge
+                  </label>
+
+                  <div className="pricing">
                     <p>${amount}</p>
                   </div>
                 </div>
@@ -186,7 +196,7 @@ function VoicePaymentCard({ amount }: any) {
                   </label>
 
                   <div className="pricing">
-                    <p>${amount}</p>
+                    <p>${Number(amount) + Number(credits)}</p>
                   </div>
                 </div>
               </div>

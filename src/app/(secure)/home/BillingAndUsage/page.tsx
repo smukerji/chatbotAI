@@ -92,6 +92,7 @@ function BillingAndUsage() {
   };
 
   //ANCHOR - API CALL FOR COLLECTING DATA FROM DATABASE
+  // FIXME - Handle already canceled plan scenario cause status will be canceled
   const myFunction = async () => {
     try {
       setLoading(true);

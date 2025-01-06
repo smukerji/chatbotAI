@@ -1,8 +1,10 @@
 import { Button, Form, Input, Switch } from "antd";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CryptoJS from "crypto-js";
 import { useCookies } from "react-cookie";
+import axios from "axios";
+import Loader from "../../pricing/_components/Loader";
 
 const cryptoSecret = process.env.NEXT_PUBLIC_CRYPTO_SECRET;
 
@@ -16,111 +18,119 @@ function encryptPriceId(priceId: string) {
 function VoicebotUsage() {
   const router = useRouter();
   const [cookies, setCookie] = useCookies(["userId"]);
+  const [walletCredits, setWalletCredits] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   const handleRedirect = (values: any) => {
     if (cookies?.userId) {
       const a = encryptPriceId(values.amountReload);
+      const b = encryptPriceId(walletCredits.toString());
       const encryptedAmount = encodeURIComponent(a);
-      router.push(`/home/pricing/voicebot/checkout?amount=${encryptedAmount}`);
+      const encryptedCredit = encodeURIComponent(b);
+      router.push(
+        `/home/pricing/voicebot/checkout?amount=${encryptedAmount}&credit=${encryptedCredit}`
+      );
     } else {
       router.push("/account/login");
     }
   };
+
+  const fetchVoicebotUsageDetail = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/BillingAndUsage/api/voicebot/usage`,
+        {
+          u_id: cookies.userId,
+        }
+      );
+
+      setWalletCredits(response.data.walletCredit.credits);
+    } catch (error) {
+      console.log("error", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchVoicebotUsageDetail();
+  }, []);
   return (
     <>
-      <div className="voicebot-usage-container">
-        <div className="left-right">
-          {/* Left Side */}
-          <div className="usage-info">
-            <div className="usage-card">
-              <div className="usage-headline">
-                <p className="usage-title">Daily Usage</p>
-                <p className="usage-value">$5</p>
+      {loading ? (
+        <Loader />
+      ) : (
+        <div className="voicebot-usage-container">
+          <div className="left-right">
+            {/* Left Side */}
+            <div className="usage-info">
+              <div className="usage-card">
+                <div className="usage-headline">
+                  <p className="usage-title">Daily Usage</p>
+                  <p className="usage-value">$5</p>
+                </div>
+                <p className="usage-subtitle">Today</p>
               </div>
-              <p className="usage-subtitle">Today</p>
-            </div>
-            <div className="usage-card">
-              <div className="usage-headline">
-                <p className="usage-title">Monthly Usage</p>
-                <p className="usage-value">$5</p>
+              <div className="usage-card">
+                <div className="usage-headline">
+                  <p className="usage-title">Monthly Usage</p>
+                  <p className="usage-value">$5</p>
+                </div>
+                <p className="usage-subtitle">Dec 01 - Dec 31</p>
               </div>
-              <p className="usage-subtitle">Dec 01 - Dec 31</p>
-            </div>
-            <div className="usage-card">
-              <div className="usage-headline">
-                <p className="usage-title">Wallet Credits</p>
-                <p className="usage-value">$100</p>
+              <div className="usage-card">
+                <div className="usage-headline">
+                  <p className="usage-title">Wallet Credits</p>
+                  <p className="usage-value">${walletCredits}</p>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Right Side */}
-          <div className="auto-reload">
-            {/* <div className="toggle-container">
-              <label>
-                <Switch defaultChecked /> Enable auto reload
-              </label>
-            </div> */}
-            {/* <div className="reload-settings">
-              <div className="input-group">
-                <label>Amount to reload</label>
-                <input
-                  type="number"
-                  placeholder="$ 20"
-                  onChange={(e) => {
-                    setAmountReload(e.target.value);
-                  }}
-                />
-              </div>
-              <div className="input-group">
-                <label>When balance reaches</label>
-                <input type="number" placeholder="$" />
-              </div>
-            </div>
-            <button className="buy-credits" onClick={handleRedirect}>
-              Buy Credits
-            </button> */}
-            <Form
-              className="reload-settings"
-              onFinish={handleRedirect}
-              initialValues={{ amountReload: "" }}
-              layout="vertical"
-            >
-              <Form.Item
-                label="Amount to reload"
-                name="amountReload"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please enter an amount to reload",
-                  },
-                  //   {
-                  //     type: "number",
-                  //     min: 5,
-                  //     message: "Amount must be atleast $5",
-                  //   },
-                ]}
+            {/* Right Side */}
+            <div className="auto-reload">
+              <Form
+                className="reload-settings"
+                onFinish={handleRedirect}
+                initialValues={{ amountReload: "" }}
+                layout="vertical"
               >
-                <Input type="number" placeholder="$ 20" />
-              </Form.Item>
-
-              <Form.Item label="When balance reaches">
-                <Input type="number" placeholder="$" />
-              </Form.Item>
-
-              <Form.Item>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  className="buy-credits"
+                <Form.Item
+                  label="Amount to reload"
+                  name="amountReload"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please enter an amount to reload",
+                    },
+                    //   {
+                    //     type: "number",
+                    //     min: 5,
+                    //     message: "Amount must be atleast $5",
+                    //   },
+                  ]}
                 >
-                  Buy Credits
-                </Button>
-              </Form.Item>
-            </Form>
+                  <Input type="number" placeholder="$ 20" />
+                </Form.Item>
+
+                <Form.Item label="When balance reaches">
+                  <Input type="number" placeholder="$" />
+                </Form.Item>
+
+                <Form.Item>
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    className="buy-credits"
+                  >
+                    Buy Credits
+                  </Button>
+                </Form.Item>
+              </Form>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </>
   );
 }
