@@ -617,23 +617,30 @@ export default function FirstAssistant() {
                 </div>
                 <div className="voicebot-avatar-img__info">
                   {/* <div className="assistant-input-wrapper"> */}
-                  <div style={{ display: "flex", gap: "5px" }}>
-                    <Input
-                      // className={inputValidationMessage ? "input-field invalid-input" : "input-field"}
-                      className={
-                        inputValidationMessage
-                          ? "assi-input-field invalid-input"
-                          : "assi-input-field"
-                      }
-                      placeholder="Assistant Name"
-                      onChange={assistantNameChangeHandler}
-                      // onBlur={handleInputBlur}
-                      id="assistantNameInput"
-                      value={createAssistantFlowContextDetails?.assistantName}
-                      disabled={!isInputVisible}
-                    />
+                  <div>
+                    <div style={{ display: "flex", gap: "5px" }}>
+                      <Input
+                        // className={inputValidationMessage ? "input-field invalid-input" : "input-field"}
+                        className={
+                          inputValidationMessage
+                            ? "assi-input-field invalid-input"
+                            : "assi-input-field"
+                        }
+                        placeholder="Assistant Name"
+                        onChange={assistantNameChangeHandler}
+                        // onBlur={handleInputBlur}
+                        id="assistantNameInput"
+                        value={createAssistantFlowContextDetails?.assistantName}
+                        disabled={!isInputVisible}
+                      />
 
-                    <span style={{ color: "red", fontSize: "25px" }}>*</span>
+                      <span style={{ color: "red", fontSize: "25px" }}>*</span>
+                    </div>
+                    {inputValidationMessage && (
+                      <p className="invalidation-message">
+                        {inputValidationMessage}
+                      </p>
+                    )}
                   </div>
 
                   {/* </div> */}
@@ -657,11 +664,6 @@ export default function FirstAssistant() {
                     }}
                   />
                 </div>
-                {inputValidationMessage && (
-                  <p className="invalidation-message">
-                    {inputValidationMessage}
-                  </p>
-                )}
               </div>
               <Steps
                 className="stepper-steps"
