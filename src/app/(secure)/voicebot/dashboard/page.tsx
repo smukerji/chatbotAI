@@ -37,6 +37,7 @@ import CallLogs from "./call-logs/CallLogs";
 import Vapi from '@vapi-ai/web';
 
 import { CreateVoiceBotContext } from "../../../_helpers/client/Context/VoiceBotContextApi";
+import { updateAssistantNumberOfCallMetaDataService } from "./services/metadata-update-service";
 
 const vapi = new Vapi(process.env.NEXT_PUBLIC_VAP_API as string); // Vapi public key
 
@@ -75,6 +76,7 @@ function Dashboard() {
   let tabValue = "model";
 
   useEffect(() => {
+    
 
     if (!voiceBotContextData?.assistantInfo) {
       router.push("/chatbot");
@@ -192,7 +194,7 @@ function Dashboard() {
           );
 
           const assistantDataResponseParse = await assistantDataResponse.json();
-          ;
+          debugger;
           if(assistantDataResponseParse?.error){
             message.error("Error while getting the assistant data");
             return;
@@ -315,6 +317,9 @@ function Dashboard() {
 
           }
           setLoading(false);
+
+          //update the call logs
+          updateAssistantNumberOfCallMetaDataService(assistantDataResponseParse?.assistantLocalData?.vapiAssistantId,assistantDataResponseParse?.assistantLocalData?._id );
         }
         catch(error:any){
         
@@ -326,6 +331,8 @@ function Dashboard() {
         }
   
   }
+
+
 
 
   console.log("isPublishEnabled", voiceBotContextData?.isPublishEnabled);
@@ -380,12 +387,22 @@ function Dashboard() {
     setIsListening(CALLSTATUS.CALLSTOP);
   });
 
+  
+
   const stopCallHandler = () => {
 
+    debugger;
     vapi.stop();
     setShowMakeCallButton(true);
     setIsMuted(false);
     setIsListening(CALLSTATUS.CALLSTOP);
+
+    const d = voiceBotContextData.assistantInfo
+    debugger;
+    console.log("assistant id",d._id);
+    updateAssistantNumberOfCallMetaDataService(
+      d?.vapiAssistantId
+      ,d?._id);
   };
 
   const muteCallHandler = () => {
