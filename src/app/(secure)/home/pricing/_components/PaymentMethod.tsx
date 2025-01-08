@@ -49,7 +49,7 @@ function findPrice(prices: any, envPriceId: string) {
   return priceObj ? priceObj.unit_amount / 100 : null;
 }
 
-function DummyPaymentMethod({
+function PaymentMethod({
   customerId,
   priceId,
   source,
@@ -1138,4 +1138,4 @@ function DummyPaymentMethod({
   );
 }
 
-export default DummyPaymentMethod;
+export default PaymentMethod;
