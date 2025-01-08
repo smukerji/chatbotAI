@@ -488,14 +488,14 @@ export async function POST(req: any, res: any) {
             }
           );
 
+          const previousCredits = Details?.voicebotDetails?.credits ?? 0;
+
           await collectionDetails.updateMany(
             { userId: String(userData?._id) },
             {
               $set: {
                 voicebotDetails: {
-                  credits:
-                    Details.voicebotDetails.credits +
-                    event?.data?.object?.amount / 100,
+                  credits: previousCredits + event?.data?.object?.amount / 100,
                 },
               },
             }
