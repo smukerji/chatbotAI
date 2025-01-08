@@ -25,10 +25,23 @@ const attachPaymentMethodToCustomer = async (
   paymentMethodId: string
 ) => {
   try {
-    // Attach the payment method to the customer
-    await stripe.paymentMethods.attach(paymentMethodId, {
+    // Retrieve the list of payment methods for the customer
+    const existingPaymentMethods = await stripe.paymentMethods.list({
       customer: customerId,
+      type: "card",
     });
+
+    // Check if the payment method is already attached
+    const isAlreadyAttached = existingPaymentMethods.data.some(
+      (pm) => pm.id === paymentMethodId
+    );
+
+    if (!isAlreadyAttached) {
+      // Attach the payment method to the customer
+      await stripe.paymentMethods.attach(paymentMethodId, {
+        customer: customerId,
+      });
+    }
 
     // Set the payment method as the default for future invoices
     await stripe.customers.update(customerId, {
@@ -112,30 +125,60 @@ const createSubscription = async (req: any, res: NextApiResponse) => {
           ],
           proration_behavior: prorationBehavior,
           expand: ["latest_invoice.payment_intent"],
+          cancel_at_period_end: false,
+          metadata: {
+            cancellation_scheduled: "false",
+          },
         });
       } else {
-        const schedule = await stripe.subscriptionSchedules.create({
-          // from_subscription: subId, // Link to the current active subscription
-          customer: customerId,
-          end_behavior: "release", // Keep the subscription active after the schedule ends
-          start_date: existingSubscription.current_period_end, // Schedule the downgrade for the next billing cycle
-          phases: [
-            {
-              items: [
-                {
-                  price: mainPlanId, // Downgrade plan ID
-                  quantity: 1,
-                },
-              ],
-              proration_behavior: "none", // No proration for downgrades
-            },
-          ],
+        const subscriptionSchedule = await stripe.subscriptionSchedules.create({
+          from_subscription: subId,
         });
+
+        const updateSchedule = await stripe.subscriptionSchedules.update(
+          subscriptionSchedule.id,
+
+          {
+            end_behavior: "release", // Keep the subscription active after the schedule ends
+
+            phases: [
+              {
+                items: [
+                  {
+                    price: currentPlanId, // existing plan id
+                    quantity: 1,
+                  },
+                ],
+                end_date: existingSubscription.current_period_end, // End of the current billing cycle
+                start_date: existingSubscription.current_period_start, // Start of the current billing cycle
+              },
+              {
+                items: [
+                  {
+                    price: mainPlanId, // Downgrade plan ID
+                    quantity: 1,
+                  },
+                ],
+                start_date: existingSubscription.current_period_end,
+                proration_behavior: "none", // No proration for downgrades
+              },
+            ],
+          }
+        );
+
+        await collection.updateMany(
+          { _id: new ObjectId(u_id) },
+          {
+            $set: {
+              isNextPlan: true,
+            },
+          }
+        );
 
         // Handle the response for deferred downgrades
         return {
           code: "downgrade_scheduled",
-          subscriptionId: schedule.id,
+          subscriptionId: updateSchedule.id,
           msg: "Downgrade scheduled for the next billing cycle.",
         };
       }
@@ -154,6 +197,15 @@ const createSubscription = async (req: any, res: NextApiResponse) => {
 
         // Finalize and pay the invoice immediately
         await stripe.invoices.pay(invoice.id);
+
+        await collection.updateMany(
+          { _id: new ObjectId(u_id) },
+          {
+            $set: {
+              isNextPlan: true,
+            },
+          }
+        );
 
         // Return success with proration details
         return {

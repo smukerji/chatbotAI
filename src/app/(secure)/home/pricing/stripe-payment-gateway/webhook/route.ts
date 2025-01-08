@@ -424,6 +424,7 @@ export async function POST(req: any, res: any) {
                       nextIsWhatsapp: planData.isWhatsapp ?? false,
                       lastUpdatedAt: new Date(),
                       planIds: planIds,
+                      isNextPlan: true,
                     },
                   }
                 );
