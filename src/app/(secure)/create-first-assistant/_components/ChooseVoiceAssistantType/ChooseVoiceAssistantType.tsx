@@ -1,5 +1,5 @@
-import React from 'react';
-import Image from 'next/image';
+import React from "react";
+import Image from "next/image";
 
 import infoImage from "../../../../../../public/voiceBot/SVG/info-circle.svg";
 
@@ -21,8 +21,8 @@ const ChooseVoiceAssistantType: React.FC<AssistantListProps> = ({
           <div
             className={
               selectedAssistantIndex === index
-                ? 'assistant-card selected-assistant'
-                : 'assistant-card '
+                ? "assistant-card selected-assistant"
+                : "assistant-card "
             }
             key={index}
             onClick={() => {

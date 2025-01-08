@@ -29,15 +29,41 @@ async function updateAssistantCallMetadata(req: NextRequest) {
         });
 
         if(voiceAssistantRecord){
-            const metaData = voiceAssistantRecord?.metadata || {};
-            metaData.totalCallLogs = data.totalCallLogs;
+            if(data.totalCallLogs){
+                const metaData = voiceAssistantRecord?.metadata || {};
+                metaData.totalCallLogs = data.totalCallLogs || 0;
+    
+                await voiceAssistantCollection?.updateOne(
+                    { _id: new ObjectId(assistantId) },
+                    { $set: { metadata: metaData } }
+                );
+    
+                return { message: 'Data received successfully' };
+            }
+            else if(data.lastUsed){
+                const metaData = voiceAssistantRecord?.metadata || {};
+                metaData.lastUsed = data.lastUsed || 0;
+    
+                await voiceAssistantCollection?.updateOne(
+                    { _id: new ObjectId(assistantId) },
+                    { $set: { metadata: metaData } }
+                );
+    
+                return { message: 'Data received successfully' };
 
-            await voiceAssistantCollection?.updateOne(
-                { _id: new ObjectId(assistantId) },
-                { $set: { metadata: metaData } }
-            );
-
-            return { message: 'Data received successfully' };
+            }
+            else if(data.lastTrained){//lastTrained
+                const metaData = voiceAssistantRecord?.metadata || {};
+                metaData.lastTrained = data.lastTrained || 0;
+    
+                await voiceAssistantCollection?.updateOne(
+                    { _id: new ObjectId(assistantId) },
+                    { $set: { metadata: metaData } }
+                );
+    
+                return { message: 'Data received successfully' };
+            }
+           
         }
 
     }

@@ -37,7 +37,7 @@ import CallLogs from "./call-logs/CallLogs";
 import Vapi from '@vapi-ai/web';
 
 import { CreateVoiceBotContext } from "../../../_helpers/client/Context/VoiceBotContextApi";
-import { updateAssistantNumberOfCallMetaDataService } from "./services/metadata-update-service";
+import { updateAssistantLastTrainedMetaDataService, updateAssistantLastUsedMetaDataService, updateAssistantNumberOfCallMetaDataService } from "./services/metadata-update-service";
 
 const vapi = new Vapi(process.env.NEXT_PUBLIC_VAP_API as string); // Vapi public key
 
@@ -93,21 +93,20 @@ function Dashboard() {
     else{
       //  the system prompt based on the mongo record
       message.info("Assistant is not published yet");
-
     }
     if(voiceBotContextData?.assistantInfo?.assistantName){
       voiceBotContextData.updateState("name",voiceBotContextData?.assistantInfo?.assistantName);
     }
 
-    console.log("voice bot context data deatils ***",voiceBotContextData)
+    console.log("assistant info init",voiceBotContextData.assistantInfo);
+
+     updateAssistantLastUsedMetaDataService(voiceBotContextData.assistantInfo?._id);
+
   }, []);
 
   const duplicateAssistantHandler = async ()=>{
 
-    /**
-     *  console.log("Assistant delete id ",voiceBotContextData.assistantInfo?._id);
-     */
-    debugger;
+
     if(!voiceBotContextData?.assistantInfo["vapiAssistantId"]){
       message.error("Assistant is not published yet");
       return;
@@ -155,7 +154,6 @@ function Dashboard() {
 
     let data = voiceBotContextData.assistantInfo;
 
-    debugger;
     const deleteId:string = data._id;
     try{
 
@@ -167,7 +165,7 @@ function Dashboard() {
       );
 
       const assistantDataResponseParse = await assistantDataResponse.json();
-      debugger;
+  
       message.success(assistantDataResponseParse?.message);
       router.push("/chatbot");
 
@@ -194,7 +192,7 @@ function Dashboard() {
           );
 
           const assistantDataResponseParse = await assistantDataResponse.json();
-          debugger;
+    
           if(assistantDataResponseParse?.error){
             message.error("Error while getting the assistant data");
             return;
@@ -389,18 +387,18 @@ function Dashboard() {
 
   
 
-  const stopCallHandler = () => {
+  const  stopCallHandler = async () => {
 
-    debugger;
+
     vapi.stop();
     setShowMakeCallButton(true);
     setIsMuted(false);
     setIsListening(CALLSTATUS.CALLSTOP);
 
     const d = voiceBotContextData.assistantInfo
-    debugger;
+
     console.log("assistant id",d._id);
-    updateAssistantNumberOfCallMetaDataService(
+    await updateAssistantNumberOfCallMetaDataService(
       d?.vapiAssistantId
       ,d?._id);
   };
@@ -455,7 +453,7 @@ function Dashboard() {
       );
 
       const assistantCreateResponseParse = await assistantCreateResponse.json();
-      ;
+      
       if(assistantCreateResponseParse?.error){
         message.error("Error while publishing the assistant");
         return;
@@ -474,7 +472,8 @@ function Dashboard() {
       // console.log("State after reset to empty object:", voiceBotContextData.state);
       // voiceBotContextData.setState(voiceBotContextData.state);
       // console.log("State after resetting to previous state:", voiceBotContextData.state);
-
+    
+        updateAssistantLastTrainedMetaDataService(voiceBotContextData.assistantInfo?._id);
       }
 
     }

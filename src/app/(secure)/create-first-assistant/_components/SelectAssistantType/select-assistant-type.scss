@@ -6,11 +6,24 @@
     @media screen and (max-width: 1400px) {
       margin-top: 30px;
     }
+
+    @media screen and (max-width: 900px) {
+      margin-top: 20px;
+    }
     .assistant-type {
       border-radius: 16px;
       display: flex;
       gap: 26px;
       flex-wrap: wrap;
+
+      @media screen and (max-width: 1400px) {
+        gap: 20px;
+      }
+
+      @media screen and (max-width: 900px) {
+        gap: 16px;
+        justify-content: center;
+      }
 
       .assistant-type-item {
         padding: 24px;
@@ -30,6 +43,14 @@
         img {
           max-width: 387px;
           border-radius: 12px;
+
+          @media screen and (max-width: 1400px) {
+            max-width: 300px;
+          }
+
+          @media screen and (max-width: 900px) {
+            max-width: 250px;
+          }
         }
         h2 {
           color: #000;
@@ -42,6 +63,10 @@
           @media screen and (max-width: 1400px) {
             font-size: 20px;
           }
+
+          @media screen and (max-width: 900px) {
+            font-size: 18px;
+          }
         }
         p {
           margin-top: 8px;
@@ -50,6 +75,10 @@
           font-style: normal;
           font-weight: 500;
           line-height: 24px; /* 150% */
+
+          @media screen and (max-width: 1400px) {
+            font-size: 14px;
+          }
         }
       }
     }
