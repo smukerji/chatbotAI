@@ -23,6 +23,7 @@ import { UserDetailsContext } from "../../_helpers/client/Context/UserDetailsCon
 import { formatNumber } from "../../_helpers/client/formatNumber";
 import LoaderModal from "../chatbot/dashboard/_components/Modal/LoaderModal";
 import CustomModal from "../chatbot/dashboard/_components/CustomModal/CustomModal";
+import { CreateAssistantFlowContext } from "@/app/_helpers/client/Context/CreateAssistantFlowContext";
 const crypto = require("crypto");
 
 function Home({
@@ -60,6 +61,13 @@ function Home({
   /// get userDetails context
   const userDetailContext: any = useContext(UserDetailsContext);
   const userDetails = userDetailContext?.userDetails;
+
+  /// get the context data
+  const createAssistantFlowContext: any = useContext(
+    CreateAssistantFlowContext
+  );
+  const createAssistantFlowContextDetails =
+    createAssistantFlowContext.createAssistantFlowInfo;
 
   /// check if chatbot is being updated
   const isUpdateChatbot = botDetails?.isUpdateChatbot;
@@ -640,11 +648,15 @@ function Home({
                       ? false
                       : true
                     : false
+                  : createAssistantFlowContextDetails?.industryExpertType
+                      ?.abbreviation === "shopify" &&
+                    !createAssistantFlowContextDetails?.integrationSecretVerified
+                  ? true
                   : false
               }
               onClick={createCustomBot}
             >
-              {(!updateChatbot && "Create") || "Retrain Bot"}
+              {(!updateChatbot && "Create Assistant") || "Retrain Assistant"}
             </button>
           </div>
         </div>

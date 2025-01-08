@@ -13,6 +13,7 @@ export const generateAndGetToken = async ()=>{
     };
     // Generate the token using a JWT library or built-in functionality
     const token = jwt.sign(payload, key , options);
+    console.log("token * ",token);
 
       return token;
 }
