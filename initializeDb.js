@@ -255,29 +255,29 @@ async function initializeDb() {
   // const assist = db.collection("assistant-types");
   // const records = [
   //   {
-  //     title: "Customer Support Agent",
-  //     description: "Role of customer support/service",
+  //     title: "Customer Support",
+  //     description: "AI Chatbot agent",
   //     imageUrl:
   //       "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/customer-support-fFTRRcF78qkxDuATozrYndnoX4Rzw4.png",
   //     abbreviation: "cs-agent",
   //   },
   //   {
   //     title: "IT Support Agent",
-  //     description: "Role of IT Support Staff",
+  //     description: "AI Chatbot agent",
   //     imageUrl:
   //       "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/it-support-agent-fPzn0Hl0Ts4VxkrZjUWyLptdlw2shQ.png",
   //     abbreviation: "it-agent",
   //   },
   //   {
   //     title: "Sales Agent",
-  //     description: "Role of a personal sales agent",
+  //     description: "AI Chatbot agent",
   //     imageUrl:
   //       "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/sales-agent-R7klshVKpa6amVVFeJHaH3c71JrLZl.png",
   //     abbreviation: "sales-agent",
   //   },
   //   {
-  //     title: "Real Estate Sales Agent",
-  //     description: "Role of a sales agent for Real Estate",
+  //     title: "Real Estate",
+  //     description: "AI Chatbot agent",
   //     imageUrl:
   //       "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/real-estate-agent-pXr5kwG6yG4BMqa2bgrrxJJPvshlcq.png",
   //     abbreviation: "re-agent",
@@ -309,7 +309,7 @@ async function initializeDb() {
   //   {
   //     title: "SME Business",
   //     description:
-  //       "Performing a wide range of roles as your personal concierge for your business needs.",
+  //       "Performing a wide range of tasks, seamlessly interacting with users across various domains,",
   //     imageUrl:
   //       "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/sme-industry-9ZtGYZ5vjxAMJheezCieOi5RdC8R9I.png",
   //     abbreviation: "sme-business",
@@ -317,7 +317,7 @@ async function initializeDb() {
   //   {
   //     title: "Real Estate",
   //     description:
-  //       "Expert in Real Estate enquiries and support for your customers.",
+  //       "Offering financial management, analysis, advice, task automation, and investment optimization.",
   //     imageUrl:
   //       "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/real-estate-industry-4pAW7bF28EMjuudwXQscWTBoQkqhHq.png",
   //     abbreviation: "real-estate",
@@ -325,7 +325,7 @@ async function initializeDb() {
   //   {
   //     title: "Hospitality Expert",
   //     description:
-  //       "Providing healthcare support by assisting with diagnostics, treatment planning, patient monitoring, and administrative tasks.",
+  //       "Providing healthcare support by assisting with diagnostics, treatment planning, patient monitoring, and administrative tasks",
   //     imageUrl:
   //       "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/hospital-industry-mWGGN7YU04UhXxHrpJoYmjGbJP8wMJ.png",
   //     abbreviation: "hospitality-expert",
@@ -333,7 +333,7 @@ async function initializeDb() {
   //   {
   //     title: "Shopify",
   //     description:
-  //       "Performing as your personal concierge agent on any product ecommerce store.",
+  //       "Performing a wide range of tasks, seamlessly interacting with users across various domains,",
   //     imageUrl:
   //       "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/shopify-industry-35hAHVsSw2zragWqAWlyXqv3UOYdSC.png",
   //     abbreviation: "shopify",

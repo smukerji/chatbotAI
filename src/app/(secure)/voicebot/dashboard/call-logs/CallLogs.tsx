@@ -256,10 +256,13 @@ const formatCallDuration = (createdAt: string, endedAt: string): string => {
     <div className='call-log-container'>
       {
         !loading ? (
-          callLogsList?.length >= 1 ?          
+          callLogsList.length >= 1 ?          
     <>
             <div className='top-container'>
-
+              {/* <Button>Today</Button>
+              <Button>Last 7 day</Button>
+              <Button>Last month</Button>
+              <Button>Select date range</Button> */}
 
             </div>
             <div className='bottom-container'>
@@ -340,8 +343,8 @@ const formatCallDuration = (createdAt: string, endedAt: string): string => {
             </>
             :
             <>
-              <div className='no-logs-container'>
-                No Call Logs available, Yet!
+              <div>
+                No Data available
               </div>
             </>
         ) : (

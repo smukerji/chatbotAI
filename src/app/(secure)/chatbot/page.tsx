@@ -4,11 +4,6 @@ import {
   MessageOutlined,
   MoreOutlined,
 } from "@ant-design/icons";
-import {
-  fromUnixTime,
-  format
-} from "date-fns";
-
 import { Modal, Spin, message, Button } from "antd";
 import React, { Suspense, useContext, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
@@ -390,7 +385,6 @@ function Chatbot() {
       );
       const data = await res.json();
 
-      
       setVoiceAssistantList(data?.assistants);
     } catch (error: any) {
       console.log("Error in fetching voice assistant data", error);
@@ -399,14 +393,6 @@ function Chatbot() {
       setVoiceBotLoading(false);
     }
   };
-
-  const getDate =(ts:number) => {
-    if (!ts) return "";
-
-    const date = fromUnixTime(ts);
-
-    return format(date, "PP");
-  }
 
   const selectedAssistantHandler = (assistantInfo: any) => {
     voiceBotContextData.setAssistantInfo(assistantInfo);
@@ -720,7 +706,24 @@ function Chatbot() {
             )}
             {loading && <Spin indicator={antIcon} />}
 
-
+            {/* {!loading && chatbotData?.length == 0 && (
+                  <Modal
+                    title="Upgrade Now to create new Chatbots!"
+                    open={isPlanNotification}
+                    onCancel={() => { }}
+                    footer={[
+                      <Button key="submit" type="primary" onClick={handleUpgradePlan}>
+                        Upgrade Now
+                      </Button>,
+                    ]}
+                    closable={false}
+                    centered
+                    className="subscription-expire-popup"
+                    width={800}
+                  >
+                    <p>Upgrade now to access your chatbots!</p>
+                  </Modal>
+                )} */}
           </>
         ) : (
           <>
@@ -753,21 +756,21 @@ function Chatbot() {
                     </div>
                     <div className="info-content">
                       <div className="info">
-                        <div className="info-label">Num. Of Calls</div>
-                        <div className="value">{assistant?.metadata?.totalCallLogs || 0}</div>
+                        <div className="info-label">Total Minutes:</div>
+                        <div className="value">100</div>
                       </div>
                       <div className="info">
-                        <div className="info-label">Last Used</div>
-                        <div className="value">{getDate(assistant?.metadata?.lastUsed) || 0}</div>
+                        <div className="info-label">Call Count:</div>
+                        <div className="value">90</div>
                       </div>
                       <div className="info">
-                        <div className="info-label">Last Trained</div>
-                        <div className="value">{getDate(assistant?.metadata?.lastTrained) || 0}</div>
+                        <div className="info-label">Last Trained:</div>
+                        <div className="value">9</div>
                       </div>
-                      {/* <div className="info">
+                      <div className="info">
                         <div className="info-label">Last Used:</div>
                         <div className="value">Yesterday</div>
-                      </div> */}
+                      </div>
                     </div>
                   </div>
                 ))}
