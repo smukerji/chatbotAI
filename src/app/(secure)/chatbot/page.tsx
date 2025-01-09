@@ -736,7 +736,7 @@ function Chatbot() {
               </div>
             ) : (
               <div className="voicebot-list-container">
-                {voiceAssistantList.map((assistant: any, index: number) => (
+                {voiceAssistantList?.map((assistant: any, index: number) => (
                   <div
                     key={index}
                     className="voicebot-list-card"
