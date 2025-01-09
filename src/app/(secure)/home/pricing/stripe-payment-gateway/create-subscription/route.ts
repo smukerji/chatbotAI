@@ -31,24 +31,40 @@ const attachPaymentMethodToCustomer = async (
       type: "card",
     });
 
-    // Check if the payment method is already attached
-    const isAlreadyAttached = existingPaymentMethods.data.some(
-      (pm) => pm.id === paymentMethodId
+    // Retrieve the new payment method details
+    const newPaymentMethod = await stripe.paymentMethods.retrieve(
+      paymentMethodId
     );
 
-    if (!isAlreadyAttached) {
-      // Attach the payment method to the customer
+    // Check if the card fingerprint already exists
+    const matchingPaymentMethod = existingPaymentMethods.data.find(
+      (pm) => pm.card?.fingerprint === newPaymentMethod.card?.fingerprint
+    );
+
+    if (matchingPaymentMethod) {
+      // Set the existing payment method as the default for future invoices
+      await stripe.customers.update(customerId, {
+        invoice_settings: {
+          default_payment_method: matchingPaymentMethod.id,
+        },
+      });
+
+      return matchingPaymentMethod.id;
+    } else {
+      // Attach the new payment method to the customer
       await stripe.paymentMethods.attach(paymentMethodId, {
         customer: customerId,
       });
-    }
 
-    // Set the payment method as the default for future invoices
-    await stripe.customers.update(customerId, {
-      invoice_settings: {
-        default_payment_method: paymentMethodId,
-      },
-    });
+      // Set the new payment method as the default for future invoices
+      await stripe.customers.update(customerId, {
+        invoice_settings: {
+          default_payment_method: paymentMethodId,
+        },
+      });
+
+      return paymentMethodId;
+    }
   } catch (error) {
     throw new Error(`Error attaching payment method: ${error}`);
   }
@@ -75,6 +91,14 @@ const createSubscription = async (req: any, res: NextApiResponse) => {
       if (priceId.length > 1) {
         return {
           msg: "While doing upgrade, you can only change main plan. Not addons.",
+        };
+      }
+
+      // if already a downgrade is scheduled then don't allow for another downgrade
+      if (existingSubscription.schedule) {
+        return {
+          code: "schedule_exists",
+          msg: "A subscription schedule is already in place. You cannot schedule another downgrade.",
         };
       }
 
@@ -111,7 +135,10 @@ const createSubscription = async (req: any, res: NextApiResponse) => {
         prorationBehavior = "none"; // No proration for downgrades
         updateNow = false; // We will update at the next cycle, not now
       }
-      await attachPaymentMethodToCustomer(customerId, paymentMethodId);
+      const defaultPaymentId = await attachPaymentMethodToCustomer(
+        customerId,
+        paymentMethodId
+      );
 
       // -----------------------------------Update the subscription with the new plan--------------------------------------------------
       let updatedSubscription: any;
@@ -192,7 +219,7 @@ const createSubscription = async (req: any, res: NextApiResponse) => {
           customer: customerId,
           subscription: updatedSubscription.id,
           auto_advance: true, // Automatically finalizes the invoice
-          default_payment_method: paymentMethodId,
+          default_payment_method: defaultPaymentId,
         });
 
         // Finalize and pay the invoice immediately
