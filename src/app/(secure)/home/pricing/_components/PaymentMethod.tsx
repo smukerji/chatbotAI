@@ -255,6 +255,15 @@ function PaymentMethod({
 
       paymentIntentStatus = subscription.data.paymentIntentStatus;
 
+      const codeStatus = subscription.data.code;
+
+      // Show message for downgrade scheduled
+      if (codeStatus === "downgrade_scheduled") {
+        message.success(subscription.data.msg);
+      } else if (codeStatus === "schedule_exists") {
+        message.error(subscription.data.msg);
+      }
+
       // Check if payment intent is already confirmed
       if (
         paymentIntentStatus === "requires_payment_method" ||

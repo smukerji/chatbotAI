@@ -50,8 +50,6 @@ export async function POST(req: any, res: any) {
     return res.status(400).end();
   }
 
-  console.log("eventtttttt", event.type);
-
   const planIds =
     event?.data?.object?.items?.data.map((item: any) => item?.plan?.id) || [];
 
@@ -213,13 +211,6 @@ export async function POST(req: any, res: any) {
           event?.data?.object?.lines?.data.map(
             (item: any) => item?.price?.id
           ) || [];
-        console.log(
-          "planidsss",
-          planIds,
-          event?.data?.object?.lines?.data.map(
-            (item: any) => item?.price?.id
-          ) || []
-        );
 
         userData = await collection.findOne({
           customerId: event.data.object.customer,
@@ -424,6 +415,7 @@ export async function POST(req: any, res: any) {
                       nextIsWhatsapp: planData.isWhatsapp ?? false,
                       lastUpdatedAt: new Date(),
                       planIds: planIds,
+                      isNextPlan: true,
                     },
                   }
                 );
