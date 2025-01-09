@@ -6,7 +6,6 @@ import {
   AssistantFlowStep,
   CreateAssistantFlowContext,
 } from "@/app/_helpers/client/Context/CreateAssistantFlowContext";
-import { InfoCircleOutlined } from "@ant-design/icons";
 
 function ShopifySecretModal({ imageUrl, isOpen, setIsOpen }: any) {
   /// get the context data
@@ -17,15 +16,15 @@ function ShopifySecretModal({ imageUrl, isOpen, setIsOpen }: any) {
     createAssistantFlowContext.createAssistantFlowInfo;
 
   /// if the user is on the last step, and has selected industry type that requires secret key
-  // if (
-  //   createAssistantFlowContextDetails?.currentAssistantFlowStep ===
-  //     AssistantFlowStep.ADD_DATA_SOURCES &&
-  //   createAssistantFlowContextDetails?.industryExpertType?.abbreviation ===
-  //     "shopify" &&
-  //   !createAssistantFlowContextDetails?.integrationSecretVerified
-  // ) {
-  //   setIsOpen(true);
-  // }
+  if (
+    createAssistantFlowContextDetails?.currentAssistantFlowStep ===
+      AssistantFlowStep.ADD_DATA_SOURCES &&
+    createAssistantFlowContextDetails?.industryExpertType?.abbreviation ===
+      "shopify" &&
+    !createAssistantFlowContextDetails?.integrationSecretVerified
+  ) {
+    setIsOpen(true);
+  }
 
   /// validate shopify store and token
   const validateShopifyStoreAndToken = async () => {
@@ -62,30 +61,24 @@ function ShopifySecretModal({ imageUrl, isOpen, setIsOpen }: any) {
     validateShopifyStoreAndToken();
   };
 
+  console.log(isOpen, setIsOpen);
+
   return (
     // modal with no cancel button
     <Modal
-      title="Set up your Shopify store"
+      title="Continue setup your AI Expert"
       open={isOpen}
       okText="Save"
       closeIcon={null}
       centered
       onOk={handleSave}
-      cancelText="Cancel"
-      onCancel={() => {
-        setIsOpen(false);
-        /// change the step to previous step if the user press cancel
-        createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(
-          AssistantFlowStep.CHOOSE_INDUSTRY_EXPERT
-        );
-      }}
-      cancelButtonProps={{ style: { backgroundColor: "#E6E8EC" } }}
+      cancelButtonProps={{ style: { display: "none" } }}
       okButtonProps={{ style: { backgroundColor: "#2e58ea", color: "white" } }}
     >
       <div className="modal-content-container">
         <div className="header">
-          <span>Your Shopify AI Assistant</span>
-          {/* <span>Select other AI Expert</span> */}
+          <span>Your Ai Expert</span>
+          <span>Select other AI Expert</span>
         </div>
 
         <div className="industry-expert-details-container">
@@ -110,12 +103,7 @@ function ShopifySecretModal({ imageUrl, isOpen, setIsOpen }: any) {
         <div className="shopify-secret-input-container">
           {/* shop store url */}
           <div>
-            <label htmlFor="shopify-store-url">
-              Shopify Store URL &nbsp;
-              <span>
-                <InfoCircleOutlined />
-              </span>
-            </label>
+            <label htmlFor="shopify-store-url">Shopify Store URL</label>
             <input
               id="shopify-store-url"
               type="text"
@@ -137,12 +125,7 @@ function ShopifySecretModal({ imageUrl, isOpen, setIsOpen }: any) {
           </div>
           {/* shopify access token */}
           <div>
-            <label htmlFor="shopify-secret-input">
-              Shopify Access Token &nbsp;
-              <span>
-                <InfoCircleOutlined />
-              </span>
-            </label>
+            <label htmlFor="shopify-secret-input">Shopify Access Token</label>
             <input
               id="shopify-secret-input"
               type="text"

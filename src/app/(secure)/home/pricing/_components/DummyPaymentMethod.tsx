@@ -49,7 +49,7 @@ function findPrice(prices: any, envPriceId: string) {
   return priceObj ? priceObj.unit_amount / 100 : null;
 }
 
-function PaymentMethod({
+function DummyPaymentMethod({
   customerId,
   priceId,
   source,
@@ -254,15 +254,6 @@ function PaymentMethod({
       }
 
       paymentIntentStatus = subscription.data.paymentIntentStatus;
-
-      const codeStatus = subscription.data.code;
-
-      // Show message for downgrade scheduled
-      if (codeStatus === "downgrade_scheduled") {
-        message.success(subscription.data.msg);
-      } else if (codeStatus === "schedule_exists") {
-        message.error(subscription.data.msg);
-      }
 
       // Check if payment intent is already confirmed
       if (
@@ -1147,4 +1138,4 @@ function PaymentMethod({
   );
 }
 
-export default PaymentMethod;
+export default DummyPaymentMethod;

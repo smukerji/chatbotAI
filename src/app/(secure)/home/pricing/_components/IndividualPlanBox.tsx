@@ -134,7 +134,7 @@ function IndividualPlanBox({
                   isYearlyPlan ? yearlyStarterPlanId : monthlyStarterPlanId
                 )
               }
-              disabled={isPlanActive}
+              disabled={isPlanActive || isNextPlan == false}
               title={isPlanActive ? "Active Plan" : undefined}
             >
               <span className="btn-text">

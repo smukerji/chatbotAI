@@ -1769,38 +1769,6 @@
       flex-shrink: 0;
       height: auto;
 
-      .wallet-credit,
-      .recharge-credit {
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-        color: #353945;
-        font-family: "General Sans";
-        font-size: 18px;
-        line-height: 24px; /* 150% */
-      }
-
-      .recharge-credit {
-        padding-bottom: 10px;
-        border-bottom: 1px solid #e6e8ec;
-      }
-
-      .total-credit {
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-
-        .label {
-          font-size: 22px;
-          color: #777e90;
-        }
-
-        .pricing {
-          font-size: 24px;
-          font-weight: bold;
-        }
-      }
-
       .social-integration {
         width: 100%;
         gap: 0;
