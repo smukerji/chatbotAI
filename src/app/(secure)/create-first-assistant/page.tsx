@@ -114,7 +114,7 @@ export default function FirstAssistant() {
       if (
         createAssistantFlowContextDetails?.assistantName.trim().length === 0
       ) {
-        setinputValidationMessage("Please, Provide Assistant Name!");
+        setinputValidationMessage("Enter assistant name");
         return;
       }
 
@@ -122,7 +122,7 @@ export default function FirstAssistant() {
         createAssistantFlowContextDetails?.creationFlow ===
         SelectedAssistantType.NULL
       ) {
-        message.warning("Please select the type of assistant!");
+        message.error("Choose an assistant type!");
         return;
       }
       /// check for the pricing plan only if user is first time user
@@ -249,6 +249,7 @@ export default function FirstAssistant() {
           }
         }
       } else {
+        setIsModalVisible(true);
         createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(
           AssistantFlowStep.ADD_DATA_SOURCES
         );
@@ -546,7 +547,7 @@ export default function FirstAssistant() {
               <div className="title-container">
                 <h2 className="title">Welcome to Torri AI</h2>
                 <span className="sub-title">
-                  Let&apos;s create your own Bot just in 5 steps
+                  Create your AI agent in 5 steps
                 </span>
               </div>
               <div className="voicebot-avatar">
@@ -571,20 +572,24 @@ export default function FirstAssistant() {
                 </div>
                 <div className="voicebot-avatar-img__info">
                   {/* <div className="assistant-input-wrapper"> */}
-                  <Input
-                    // className={inputValidationMessage ? "input-field invalid-input" : "input-field"}
-                    className={
-                      inputValidationMessage
-                        ? "assi-input-field invalid-input"
-                        : "assi-input-field"
-                    }
-                    placeholder="Your Assistant Name"
-                    onChange={assistantNameChangeHandler}
-                    // onBlur={handleInputBlur}
-                    id="assistantNameInput"
-                    value={createAssistantFlowContextDetails?.assistantName}
-                    disabled={!isInputVisible}
-                  />
+                  <div style={{ display: "flex", gap: "5px" }}>
+                    <Input
+                      // className={inputValidationMessage ? "input-field invalid-input" : "input-field"}
+                      className={
+                        inputValidationMessage
+                          ? "assi-input-field invalid-input"
+                          : "assi-input-field"
+                      }
+                      placeholder="Assistant Name"
+                      onChange={assistantNameChangeHandler}
+                      // onBlur={handleInputBlur}
+                      id="assistantNameInput"
+                      value={createAssistantFlowContextDetails?.assistantName}
+                      disabled={!isInputVisible}
+                    />
+
+                    <span style={{ color: "red", fontSize: "25px" }}>*</span>
+                  </div>
 
                   {/* </div> */}
 
@@ -631,7 +636,7 @@ export default function FirstAssistant() {
                     title: (
                       <div>
                         <h3 className="steps-assistant-heading">
-                          Create your bot
+                          Create your Assistant
                         </h3>
                       </div>
                     ),
@@ -774,7 +779,7 @@ export default function FirstAssistant() {
                     ) : (
                       <div>
                         <h3 className="steps-assistant-heading">
-                          Choose your Industry
+                          Choose your Industry Expert
                         </h3>
                       </div>
                     ),
@@ -850,9 +855,7 @@ export default function FirstAssistant() {
           <div className="mobile-stepper">
             <div className="title-container">
               <h2 className="title">Welcome to Torri AI</h2>
-              <span className="sub-title">
-                Let&apos;s create your own Bot just in 5 steps
-              </span>
+              <span className="sub-title">Create your AI agent in 5 steps</span>
 
               <div className="voicebot-avatar">
                 <div
@@ -883,7 +886,7 @@ export default function FirstAssistant() {
                         ? "assi-input-field invalid-input"
                         : "assi-input-field"
                     }
-                    placeholder="Your Assistant Name"
+                    placeholder="Assistant Name"
                     onChange={assistantNameChangeHandler}
                     // onBlur={handleInputBlur}
                     id="assistantNameInput"
@@ -955,7 +958,7 @@ export default function FirstAssistant() {
                     title: (
                       <div>
                         <h3 className="steps-assistant-heading">
-                          Create your bot
+                          Create your Assistant
                         </h3>
                       </div>
                     ),
@@ -1098,7 +1101,7 @@ export default function FirstAssistant() {
                     ) : (
                       <div>
                         <h3 className="steps-assistant-heading">
-                          Choose your Industry
+                          Choose your Industry Expert
                         </h3>
                       </div>
                     ),

@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from "react";
 import customTemplate from "../../../../../../public/voiceBot/SVG/profile-circle.svg";
 import Image from "next/image";
 import infoImage from "../../../../../../public/voiceBot/SVG/info-circle.svg";
-import { message } from "antd";
+import { message, Tooltip } from "antd";
 import { CreateAssistantFlowContext } from "@/app/_helpers/client/Context/CreateAssistantFlowContext";
 
 function ChooseAssistant() {
@@ -90,12 +90,20 @@ function ChooseAssistant() {
                   <div className="header_container">
                     <h2 className="card_header">{assistant.title}</h2>
                     <div className="image-info">
-                      <Image
-                        src={infoImage}
-                        alt=""
-                        height={100}
-                        width={100}
-                      ></Image>
+                      <Tooltip
+                        placement="bottom"
+                        title={
+                          "This template simplifies the process of setting appointments by providing a clear schedule, addressing frequently asked questions, and offering helpful service details for both patients and staff."
+                        }
+                        // arrow={mergedArrow}
+                      >
+                        <Image
+                          src={infoImage}
+                          alt=""
+                          height={100}
+                          width={100}
+                        ></Image>
+                      </Tooltip>
                     </div>
                   </div>
 
