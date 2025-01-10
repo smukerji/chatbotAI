@@ -430,6 +430,13 @@ export default function FirstAssistant() {
       createAssistantFlowContextDetails?.currentAssistantFlowStep ===
       AssistantFlowStep.CHOOSE_INDUSTRY_EXPERT
     ) {
+      /// empty the industry expert type
+      createAssistantFlowContext?.handleChange("industryExpertType")({
+        title: "",
+        description: "",
+        imageUrl: "",
+        abbreviation: "",
+      });
       createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(
         AssistantFlowStep.CHOOSE_ASSISTANT_TYPE
       );
