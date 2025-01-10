@@ -78,6 +78,11 @@ export const functionCallHandler = async (
         success: true,
         data: similaritySearchResults,
       });
+    } else {
+      return JSON.stringify({
+        success: false,
+        message: "This functionality will be available soon",
+      });
     }
   } catch (error) {
     console.log("Error while handling function call", error);

@@ -10,6 +10,7 @@ import { useCookies } from "react-cookie";
 import "./chatbot.scss";
 import Image from "next/image";
 import noChatbotBg from "../../../../public/sections-images/common/no-chatbot-icon.svg";
+import voiceBotComingSoom from "../../../../public/sections-images/common/voice-agent-coming-soon.png";
 // import gridIcon from "../../../../public/svgs/grid-icon.svg";
 import GridLayout from "./_components/GridLayout";
 import TableLayout from "./_components/TableLayout";
@@ -70,7 +71,7 @@ const initialState = {
     //     server: { timeoutSeconds: 20, url: "", secret: "" },
     //   },
     // ],
-    toolIds: [""],//we deleted this field in the backend
+    toolIds: [""], //we deleted this field in the backend
     provider: "openai",
     model: "gpt-4o",
     temperature: 0,
@@ -628,11 +629,9 @@ function Chatbot() {
             {/* </Link> */}
           </div>
 
-          {/* {openLimitModal ? (
-              <LimitReachedModal setOpenLimitModel={setOpenLimitModel} />
-            ) : (
-              <></>
-            )} */}
+          {openLimitModal && (
+            <LimitReachedModal setOpenLimitModel={setOpenLimitModel} />
+          )}
         </div>
 
         {!isVoiceBotActived ? (
@@ -705,37 +704,25 @@ function Chatbot() {
               </div>
             )}
             {loading && <Spin indicator={antIcon} />}
-
-            {/* {!loading && chatbotData?.length == 0 && (
-                  <Modal
-                    title="Upgrade Now to create new Chatbots!"
-                    open={isPlanNotification}
-                    onCancel={() => { }}
-                    footer={[
-                      <Button key="submit" type="primary" onClick={handleUpgradePlan}>
-                        Upgrade Now
-                      </Button>,
-                    ]}
-                    closable={false}
-                    centered
-                    className="subscription-expire-popup"
-                    width={800}
-                  >
-                    <p>Upgrade now to access your chatbots!</p>
-                  </Modal>
-                )} */}
           </>
         ) : (
           <>
             {voiceBotLoading ? (
               <Spin indicator={antIcon} />
             ) : voiceAssistantList?.length == 0 ? (
-              <div className="no-chatbots-container">
-                <Image src={noChatbotBg} alt="no-chatbot-bg" />
-                <p>
-                  You haven&apos;t created any Voicebot. Go ahead and create a
-                  New Voicebot!
-                </p>
+              // <div className="no-chatbots-container">
+              //   <Image src={noChatbotBg} alt="no-chatbot-bg" />
+              //   <p>
+              //     You haven&apos;t created any Voicebot. Go ahead and create a
+              //     New Voicebot!
+              //   </p>
+              // </div>
+
+              /// temporary adding comming soon message
+              <div className="no-chatbots-container" style={{ gap: "32px" }}>
+                <Image src={voiceBotComingSoom} alt="no-chatbot-bg" />
+                <h2>Coming Soon</h2>
+                <p>AI Voice Assistance: Coming to Life Soon!</p>
               </div>
             ) : (
               <div className="voicebot-list-container">

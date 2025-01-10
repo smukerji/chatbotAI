@@ -30,6 +30,37 @@ function ChooseIndustryExpert() {
   useEffect(() => {
     getIndustryList();
   }, []);
+
+  /// funciton to check if the industry expert should be selected based on the assistant type or not
+  function checkIfEnable(industryType?: string) {
+    if (
+      createAssistantFlowContextDetails.assistantType?.abbreviation ==
+        "ecommerce-agent" &&
+      industryType == "shopify"
+    ) {
+      /// if the assistant type is ecommerce-agent and industry type is shopify then only enable the shopify expert
+      return false;
+    } else if (
+      /// if the assistant type is re-agent i.e. that is real estate agent then only enable the real estate expert
+      createAssistantFlowContextDetails.assistantType?.abbreviation ==
+        "re-agent" &&
+      industryType == "real-estate"
+    ) {
+      return false;
+    } else if (
+      createAssistantFlowContextDetails.assistantType?.abbreviation !==
+        "ecommerce-agent" &&
+      industryType != "shopify" &&
+      createAssistantFlowContextDetails.assistantType?.abbreviation !==
+        "re-agent"
+    ) {
+      /// if the assistant type is not ecommerce-agent and industry type is not shopify then enable all the industry experts except shopify
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   return (
     <div>
       <div className="title">
@@ -45,11 +76,12 @@ function ChooseIndustryExpert() {
           industryTypes.map((assistant: any, index: number) => {
             return (
               <button
+                disabled={checkIfEnable(assistant?.abbreviation)}
                 className={
                   createAssistantFlowContextDetails.industryExpertType
                     .abbreviation === assistant.abbreviation
                     ? "assistant-card selected-assistant"
-                    : "assistant-card"
+                    : `assistant-card`
                 }
                 key={assistant._id}
                 onClick={() => {
