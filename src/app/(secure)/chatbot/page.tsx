@@ -10,6 +10,7 @@ import { useCookies } from "react-cookie";
 import "./chatbot.scss";
 import Image from "next/image";
 import noChatbotBg from "../../../../public/sections-images/common/no-chatbot-icon.svg";
+import voiceBotComingSoom from "../../../../public/sections-images/common/voice-agent-coming-soon.png";
 // import gridIcon from "../../../../public/svgs/grid-icon.svg";
 import GridLayout from "./_components/GridLayout";
 import TableLayout from "./_components/TableLayout";
@@ -703,20 +704,25 @@ function Chatbot() {
               </div>
             )}
             {loading && <Spin indicator={antIcon} />}
-
-
           </>
         ) : (
           <>
             {voiceBotLoading ? (
               <Spin indicator={antIcon} />
             ) : voiceAssistantList?.length == 0 ? (
-              <div className="no-chatbots-container">
-                <Image src={noChatbotBg} alt="no-chatbot-bg" />
-                <p>
-                  You haven&apos;t created any Voicebot. Go ahead and create a
-                  New Voicebot!
-                </p>
+              // <div className="no-chatbots-container">
+              //   <Image src={noChatbotBg} alt="no-chatbot-bg" />
+              //   <p>
+              //     You haven&apos;t created any Voicebot. Go ahead and create a
+              //     New Voicebot!
+              //   </p>
+              // </div>
+
+              /// temporary adding comming soon message
+              <div className="no-chatbots-container" style={{ gap: "32px" }}>
+                <Image src={voiceBotComingSoom} alt="no-chatbot-bg" />
+                <h2>Coming Soon</h2>
+                <p>AI Voice Assistance: Coming to Life Soon!</p>
               </div>
             ) : (
               <div className="voicebot-list-container">

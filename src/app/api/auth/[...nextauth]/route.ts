@@ -121,6 +121,8 @@ export const authOptions: NextAuthOptions = {
       if (user?.name) cookies().set("username", user?.name!);
       else if (user?.username) cookies().set("username", user?.username!);
       session.user.id = user.id;
+      /// set the plan to identify if the uaer is new or not
+      session.user.plan = user?.planId;
       return session;
     },
     // async signIn({ user, account, profile, email, credentials }) {

@@ -26,7 +26,7 @@ function LoginPage() {
   const [email, setEmail]: any = useState(null);
   const [password, setPassword]: any = useState(null);
 
-  const { data: session, status } = useSession();
+  const { data: session, status }: any = useSession();
 
   const [loading, setLoading] = useState(false);
   const antIcon = (
@@ -53,13 +53,19 @@ function LoginPage() {
     if (status === "authenticated") {
       const searchParams = new URLSearchParams(window.location.search);
       const key = searchParams.get("key");
-      message.success(`Welcome Back ${session.user?.name}`).then(() => {
-        if (!key) {
-          window.location.href = "/chatbot";
-        } else {
-          window.location.href = String(key);
-        }
-      });
+      if (!session.user?.plan) {
+        message.info(`Welcome ${session.user?.name}`).then(() => {
+          window.location.href = "/create-first-assistant";
+        });
+      } else {
+        message.info(`Welcome Back ${session.user?.name}`).then(() => {
+          if (!key) {
+            window.location.href = "/chatbot";
+          } else {
+            window.location.href = String(key);
+          }
+        });
+      }
     }
   }, [status]);
 

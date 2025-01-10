@@ -171,10 +171,11 @@
         align-self: stretch;
         background: #fcfcfd;
         border-radius: 16px;
+        cursor: pointer;
 
         .card-image {
           display: flex;
-          cursor: pointer;
+          // cursor: pointer;
 
           img {
             color: transparent;
@@ -192,7 +193,7 @@
 
         .header-information {
           width: 100%;
-          cursor: pointer;
+          // cursor: pointer;
 
           .header_container {
             display: flex;
@@ -230,6 +231,11 @@
       }
       .selected-assistant {
         background: #9fb5ff !important;
+      }
+
+      :disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
       }
     }
   }
@@ -726,10 +732,11 @@
       border-radius: 16px;
       outline: none;
       border: none;
+      cursor: pointer;
 
       .card-image {
         display: flex;
-        cursor: pointer;
+        // cursor: pointer;
 
         img {
           color: transparent;
@@ -747,7 +754,7 @@
 
       .header-information {
         width: 100%;
-        cursor: pointer;
+        // cursor: pointer;
 
         .header_container {
           display: flex;
@@ -785,10 +792,14 @@
         }
       }
     }
-
     .selected-assistant {
       background: #9fb5ff !important;
       border: 2px solid #2e58ea;
+    }
+
+    :disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
     }
 
     .custom_assistant-card {
