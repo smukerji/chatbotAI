@@ -439,6 +439,9 @@ export default function FirstAssistant() {
       });
       /// empty integration also if user hits previous button
       createAssistantFlowContext?.handleChange("integration")({});
+      createAssistantFlowContext?.handleChange("integrationSecretVerified")(
+        false
+      );
       createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(
         AssistantFlowStep.CHOOSE_ASSISTANT_TYPE
       );
