@@ -437,6 +437,8 @@ export default function FirstAssistant() {
         imageUrl: "",
         abbreviation: "",
       });
+      /// empty integration also if user hits previous button
+      createAssistantFlowContext?.handleChange("integration")({});
       createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(
         AssistantFlowStep.CHOOSE_ASSISTANT_TYPE
       );
