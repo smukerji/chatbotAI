@@ -399,7 +399,7 @@ async function whatsAppOperation(res: any) {
     // let similaritySearchResults = JSON.parse(respText).join("\n");
 
     step = 9;
-    const tools = getAssistantTools(AssistantType.SALES_AGENT_SHOPIFY);
+    const tools = getAssistantTools(AssistantType.ECOMMERCE_AGENT_SHOPIFY);
     const systemInstruction = `
         Greet customers warmly and engage in a brief conversation to understand their needs before assisting with product recommendations on Shopify, but modify responses to align with WhatsApp guidelines instead of HTML format.
 
