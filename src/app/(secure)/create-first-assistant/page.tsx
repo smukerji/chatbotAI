@@ -253,6 +253,13 @@ export default function FirstAssistant() {
           }
         }
       } else {
+        /// if shopify is selected open the modal
+        if (
+          createAssistantFlowContextDetails?.industryExpertType
+            ?.abbreviation === "shopify"
+        ) {
+          setIsModalVisible(true);
+        }
         createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(
           AssistantFlowStep.ADD_DATA_SOURCES
         );
