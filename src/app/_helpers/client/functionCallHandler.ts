@@ -1,4 +1,6 @@
 import { RequiredActionFunctionToolCall } from "openai/resources/beta/threads/runs/runs";
+import dotenv from "dotenv";
+dotenv.config();
 
 export const functionCallHandler = async (
   call: RequiredActionFunctionToolCall,
@@ -14,7 +16,7 @@ export const functionCallHandler = async (
     if (functionName === "find_product") {
       /// get the product name and return the product details
       const response = await fetch(
-        `${process.env.NEXTAUTH_URL}/api/integrations/shopify/products`,
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}/api/integrations/shopify/products`,
         {
           body: JSON.stringify({
             product_name: args.query,
@@ -30,7 +32,7 @@ export const functionCallHandler = async (
     } else if (functionName === "get_customer_orders") {
       /// get the customer orders and return the orders
       const response = await fetch(
-        `${process.env.NEXTAUTH_URL}/api/integrations/shopify/orders`,
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}/api/integrations/shopify/orders`,
         {
           body: JSON.stringify({
             email: args.email,
@@ -46,7 +48,7 @@ export const functionCallHandler = async (
     } else if (functionName === "get_products") {
       /// get product recommendation / suggestion
       const response = await fetch(
-        `${process.env.NEXTAUTH_URL}/api/integrations/shopify/products?chatbotId=${chatbotId}`,
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/integrations/shopify/products?chatbotId=${chatbotId}`,
         {
           method: "GET",
         }
