@@ -140,7 +140,7 @@ const createSubscription = async (req: any, res: NextApiResponse) => {
         };
       }
 
-      const paymentIntent = updatedSubscription?.latest_invoice?.payment_intent;
+    const paymentIntent = updatedSubscription?.latest_invoice?.payment_intent;
 
       // If the subscription is an upgrade, create and pay the proration invoice immediately
       if (isUpgrade) {

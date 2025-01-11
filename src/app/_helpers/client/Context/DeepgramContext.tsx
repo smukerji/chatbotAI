@@ -24,9 +24,7 @@ interface DeepgramContextType {
   connectionState: LiveConnectionState;
 }
 
-const DeepgramContext = createContext<DeepgramContextType | any>(
-  undefined
-);
+const DeepgramContext = createContext<DeepgramContextType | any>(undefined);
 
 interface DeepgramContextProviderProps {
   children: ReactNode;
@@ -36,7 +34,7 @@ const getApiKey = async (): Promise<string> => {
   const response = await fetch("/chatbot/deepgram-authenticate/api", {
     cache: "no-store",
   });
-  const result = await response.json();
+  const result = await response?.json();
   return result.key;
 };
 
@@ -95,7 +93,6 @@ const DeepgramContextProvider: FunctionComponent<
 function useDeepgram(): any {
   const context = useContext(DeepgramContext);
 
-
   if (context === undefined) {
     throw new Error(
       "useDeepgram must be used within a DeepgramContextProvider"
@@ -103,7 +100,6 @@ function useDeepgram(): any {
   }
   return context;
 }
-
 
 export {
   DeepgramContextProvider,
