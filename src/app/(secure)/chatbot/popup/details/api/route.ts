@@ -9,6 +9,17 @@ export async function GET(request: NextRequest) {
   const db = (await clientPromise!).db();
   const collection = db?.collection("user-chatbots");
 
+  // get user ip
+  const ip = request.headers.get("x-forwarded-for");
+
+  // get user location based on its ip
+
+  const location = await fetch(
+    `https://ipinfo.io/${ip}/json?token=${process.env.NEXT_PUBLIC_LOCATION_TOKEN}`
+  );
+  const data2 = await location.json();
+  const country = await data2?.country?.toLowerCase();
+
   const cursor = await collection.aggregate([
     {
       $match: { chatbotId: chatbotId },
@@ -36,7 +47,9 @@ export async function GET(request: NextRequest) {
               leadTitle: 1,
               userDetails: 1,
               userMessageColor: 1,
-              messagePlaceholder:1
+              messagePlaceholder: 1,
+              chatbotBubbleAlignment: 1,
+              botType: 1,
             },
           },
         ],
@@ -49,5 +62,5 @@ export async function GET(request: NextRequest) {
   /// close the cursor
   await cursor.close();
 
-  return NextResponse.json(result[0]);
+  return NextResponse.json({ ...result[0], country });
 }

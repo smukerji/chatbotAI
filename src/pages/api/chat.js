@@ -10,6 +10,8 @@ export const config = {
   runtime: "edge",
 };
 
+export const preferredRegion = ["iad1", "hnd1"];
+
 async function handler(req, res) {
   if (req.method === "POST") {
     /// parse the request object
@@ -51,7 +53,7 @@ async function handler(req, res) {
       `;
 
     const userContent = `
-    Answer only if it is available in context. Strictly write all the response in html format without html and body tag. Also add image link inside img tag and video inside iframe tag if available in the context. Give answer with no pre-amble.
+    Answer only if it is available in context. Strictly write all the response in html format without html and body tag. Also add image link inside img tag and video link inside anchor tag with target blank if available in the context. Give answer with no pre-amble.
       query: ${userQuery}`;
 
     //// count the token before sending to openai

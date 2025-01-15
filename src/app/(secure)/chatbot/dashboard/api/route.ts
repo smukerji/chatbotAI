@@ -11,6 +11,10 @@ module.exports = apiHandler({
 });
 
 async function dataSources(request: any) {
+  // get user ip
+  const ip =
+    request.headers.get("x-forwarded-for") || request.connection?.remoteAddress;
+
   /// get the session and then access the id
   const session: any = await getServerSession(authOptions);
   const userId = request?.headers.get("userId")
@@ -85,6 +89,14 @@ async function dataSources(request: any) {
     }
   });
 
+  // get user location based on its ip
+
+  const location = await fetch(
+    `https://ipinfo.io/${ip}/json?token=${process.env.NEXT_PUBLIC_LOCATION_TOKEN}`
+  );
+  const data2 = await location.json();
+  const country = await data2?.country?.toLowerCase();
+
   return {
     qaList,
     qaCount,
@@ -97,6 +109,7 @@ async function dataSources(request: any) {
     crawlDataLength,
     chatbotName: chatbotDetails?.chatbotName,
     chatbotSetting,
+    country,
   };
 }
 

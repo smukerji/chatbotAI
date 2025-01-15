@@ -42,7 +42,11 @@ async function login(request: any) {
       /// set the username
       cookies().set("username", user?.username?.toString());
 
-      return { message: "Login successfull...", username: user?.username };
+      return {
+        message: "Login successfull...",
+        username: user?.username,
+        plan: user?.plan,
+      };
     } else {
       throw "Invalid email or password.";
     }

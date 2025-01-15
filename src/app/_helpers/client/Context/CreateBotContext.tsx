@@ -1,5 +1,6 @@
 "use client";
 import { createContext, useState } from "react";
+import { AssistantType } from "../../assistant-creation-contants";
 
 export const CreateBotContext = createContext({});
 
@@ -8,6 +9,7 @@ export const CreateBotDataProvider = ({ children }: any) => {
     activeSource: "document",
     editChatbot: "chatbot",
     chabotSettings: "general",
+    userCountry: "",
 
     isLoading: false,
     totalCharCount: 0,

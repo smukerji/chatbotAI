@@ -21,7 +21,7 @@ async function getCustomer(req: any, res: NextResponse) {
 
       //ANCHOR - checking that user has customerId or not
       if (data?.customerId != null) {
-        return data.customerId;
+        return { customerId: data.customerId };
       } else {
         //ANCHOR - create user's customerId
         const customer = await stripe.customers.create({
@@ -36,7 +36,7 @@ async function getCustomer(req: any, res: NextResponse) {
             },
           }
         );
-        return { message: "success" };
+        return { message: "success", customerId: customer.id };
       }
     } catch (error) {
       console.error(error);

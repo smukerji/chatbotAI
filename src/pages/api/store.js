@@ -1,6 +1,7 @@
 import { readContent } from "../../app/_helpers/server/ReadContent";
 import {
   generateChunksNEmbedd,
+  generateChunksNEmbeddExcel,
   generateChunksNEmbeddForLinks,
 } from "../../app/_helpers/server/embeddings";
 import clientPromise from "../../db";
@@ -266,15 +267,32 @@ export default async function handler(req, res) {
                 // const content = await readContent(file.filepath, file.fileType);
                 // console.log("FileData >>>>>>>>>>", file);
                 const content = file.fileText;
-                /// generating chunks and embedding
-                const chunks = await generateChunksNEmbedd(
-                  content,
-                  "file",
-                  chatbotId,
-                  userId,
-                  file.name
-                );
-                resolve(chunks);
+                /// process the excel data differently
+                if (
+                  file.fileType ===
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+                  file.fileType === "text/csv"
+                ) {
+                  /// generating chunks and embedding
+                  const chunks = await generateChunksNEmbeddExcel(
+                    content,
+                    "file",
+                    chatbotId,
+                    userId,
+                    file.name
+                  );
+                  resolve(chunks);
+                } else {
+                  /// generating chunks and embedding
+                  const chunks = await generateChunksNEmbedd(
+                    content,
+                    "file",
+                    chatbotId,
+                    userId,
+                    file.name
+                  );
+                  resolve(chunks);
+                }
               } else {
                 reject();
               }
@@ -337,8 +355,13 @@ export default async function handler(req, res) {
             });
           }
         }
-        if (text.length > 0 && !updateChatbot) {
-          /// generating chunks and embedding
+
+        /// embed the text
+        if (
+          text.length > 0 &&
+          (!updateChatbot || (updateChatbot && isTextUpdated))
+        ) {
+          // Generating chunks and embedding
           const chunks = await generateChunksNEmbedd(
             text,
             "text",
@@ -346,31 +369,10 @@ export default async function handler(req, res) {
             ""
           );
 
-          /// store the emebeddings in pinecone database
+          // Store the embeddings in Pinecone database
           await upsert(chunks.data, userId);
 
-          /// store the details in database
-          /// iterate and store each user filename as per chatbot
-          collection.insertOne({
-            chatbotId,
-            dataID: chunks.dataIDs,
-            content: text,
-            source: "text",
-          });
-        } else if (text.length > 0 && updateChatbot && isTextUpdated) {
-          /// generating chunks and embedding
-          const chunks = await generateChunksNEmbedd(
-            text,
-            "text",
-            chatbotId,
-            ""
-          );
-
-          /// store the emebeddings in pinecone database
-          await upsert(chunks.data, userId);
-
-          /// store the details in database
-          /// iterate and store each user filename as per chatbot
+          // Store the details in the database
           collection.insertOne({
             chatbotId,
             dataID: chunks.dataIDs,
@@ -652,7 +654,7 @@ export default async function handler(req, res) {
             noOfMessagesSent: 0,
             leadFields: {
               name: { isChecked: false, value: "name" },
-              email: { isChecked: false, value: "email" },
+              email: { isChecked: true, value: "email" },
               number: { isChecked: false, value: "number" },
             },
             leadTitle: defaultLeadTitle,

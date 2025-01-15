@@ -45,8 +45,13 @@ import step6_5 from "../../../../../../../public/whataspp-guide-images/step6_5.p
 import step7_1 from "../../../../../../../public/whataspp-guide-images/step7_1.png";
 import Image from "next/image";
 import arrowIcon from "../../../../../../../public/svgs/Feather Icon.svg";
+import { whatsAppStepTitles } from "@/app/_helpers/constant";
+import IntegrationGuideControls from "./IntegrationGuideControls";
+import { useWindowSize } from "react-use";
 
-function WhatsappGuide() {
+function WhatsappGuide({ activeStep, setActiveStep, handleStep }: any) {
+  const { width } = useWindowSize();
+
   const [cookies, setCookies] = useCookies(["userId"]);
   const [selectedStep, setSelectedStep] = useState(1);
 
@@ -63,8 +68,6 @@ function WhatsappGuide() {
   };
 
   const handleScroll = () => {
-    console.log("goes uinder handle scroll");
-
     const rightDiv = rightRef.current;
     const stepElements = rightDiv.querySelectorAll('[class^="step-"]');
     let currentStep = 1;
@@ -73,9 +76,9 @@ function WhatsappGuide() {
       const rect = stepElement.getBoundingClientRect();
 
       if (
-        (rect.top <= 90 &&
+        (rect.top <= 130 &&
           (index === stepElements.length - 1 ||
-            stepElements[index + 1].getBoundingClientRect().top > 90)) ||
+            stepElements[index + 1].getBoundingClientRect().top > 130)) ||
         (index === stepElements.length - 1 && rect.bottom <= window.innerHeight)
       ) {
         // If the top of the stepElement is above the window top and the next stepElement is below the window top (or there's no next stepElement)
@@ -88,8 +91,6 @@ function WhatsappGuide() {
   };
 
   useEffect(() => {
-    console.log("use effect triggered");
-
     const sectionRight = document.querySelector(".right");
     sectionRight?.addEventListener("scroll", handleScroll);
     return () => {
@@ -116,20 +117,40 @@ function WhatsappGuide() {
             <span>back</span>
           </div> */}
           <ul className="step-list">
-            {[1, 2, 3, 4, 5, 6].map((step) => (
+            {whatsAppStepTitles.map((step) => (
               <li
-                key={step}
-                onClick={() => handleClick(step)}
-                className={selectedStep === step ? "selected" : ""}
+                key={step.id}
+                onClick={() => handleClick(step.id)}
+                className={selectedStep === step.id ? "selected" : ""}
               >
-                Step {step}
+                {step.id}. {step.title}
               </li>
             ))}
           </ul>
         </div>
+        {width < 768 && (
+          <ul className="step-list">
+            {whatsAppStepTitles.map((step) => (
+              <li
+                key={step.id}
+                onClick={() => handleClick(step.id)}
+                className={selectedStep === step.id ? "selected" : ""}
+              >
+                Step {step.id}
+              </li>
+            ))}
+          </ul>
+        )}
 
         <div className="right" ref={rightRef}>
-          <h1 className="guide-heading">WhatsApp Integration Guide</h1>
+          {width > 767 && (
+            <IntegrationGuideControls
+              activeStep={activeStep}
+              setActiveStep={setActiveStep}
+              handleStep={handleStep}
+            />
+          )}
+          {/* <h1 className="guide-heading">WhatsApp Integration Guide</h1> */}
 
           <div className="step-1">
             <h2 className="guide-step-title">

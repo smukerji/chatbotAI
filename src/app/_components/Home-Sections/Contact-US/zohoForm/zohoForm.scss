@@ -1,6 +1,6 @@
-
 .contact-form {
-  input,textarea {
+  input,
+  textarea {
     width: 100%;
     height: 56px !important;
     background-color: #f4f5f6 !important;
@@ -14,14 +14,14 @@
     border-radius: 12px !important;
     border: none !important;
   }
-  textarea{
+  textarea {
     height: 150px !important;
-    &:focus-visible{
+    &:focus-visible {
       outline: none;
     }
   }
   .contact-submit {
-    background-color: #0035f0 !important;
+    background-color: #ff6430 !important;
     color: #fff !important;
     width: 149px;
     cursor: pointer;
@@ -33,9 +33,9 @@
     height: 56px !important;
     margin: 20px 0;
   }
-  .require{
-    color:#eb0c0c;
-    padding:5px 0;
+  .require {
+    color: #eb0c0c;
+    padding: 5px 0;
     font-size: 12px;
   }
 }

@@ -21,8 +21,13 @@ import step1_14 from "../../../../../../../public/slack-guide-images/step1_14.pn
 import step2_1 from "../../../../../../../public/slack-guide-images/step2_1.png";
 import step2_2 from "../../../../../../../public/slack-guide-images/step2_2.png";
 import step3_1 from "../../../../../../../public/slack-guide-images/step3_1.png";
+import { slackStepTitles } from "@/app/_helpers/constant";
+import IntegrationGuideControls from "./IntegrationGuideControls";
+import { useWindowSize } from "react-use";
 
-function SlackGuide() {
+function SlackGuide({ activeStep, setActiveStep, handleStep }: any) {
+  const { width } = useWindowSize();
+
   const [selectedStep, setSelectedStep] = useState(1);
 
   const rightRef = useRef<any>(null);
@@ -44,9 +49,9 @@ function SlackGuide() {
       const rect = stepElement.getBoundingClientRect();
 
       if (
-        (rect.top <= 90 &&
+        (rect.top <= 130 &&
           (index === stepElements.length - 1 ||
-            stepElements[index + 1].getBoundingClientRect().top > 90)) ||
+            stepElements[index + 1].getBoundingClientRect().top > 130)) ||
         (index === stepElements.length - 1 && rect.bottom <= window.innerHeight)
       ) {
         // If the top of the stepElement is above the window top and the next stepElement is below the window top (or there's no next stepElement)
@@ -84,22 +89,41 @@ function SlackGuide() {
             <span>back</span>
           </div> */}
           <ul className="step-list">
-            {[1, 2, 3].map((step) => (
+            {slackStepTitles.map((step) => (
               <li
-                key={step}
-                onClick={() => handleClick(step)}
-                className={selectedStep === step ? "selected" : ""}
+                key={step.id}
+                onClick={() => handleClick(step.id)}
+                className={selectedStep === step.id ? "selected" : ""}
               >
-                Step {step}
+                {step.id}. {step.title}
               </li>
             ))}
           </ul>
         </div>
-
+        {width < 768 && (
+          <ul className="step-list">
+            {slackStepTitles.map((step) => (
+              <li
+                key={step.id}
+                onClick={() => handleClick(step.id)}
+                className={selectedStep === step.id ? "selected" : ""}
+              >
+                Step {step.id}
+              </li>
+            ))}
+          </ul>
+        )}
         <div className="right" ref={rightRef}>
-          <h1 className="guide-heading">Slack Integration Guide</h1>
+          {width > 767 && (
+            <IntegrationGuideControls
+              activeStep={activeStep}
+              setActiveStep={setActiveStep}
+              handleStep={handleStep}
+            />
+          )}
+          {/* <h1 className="guide-heading">Slack Integration Guide</h1> */}
 
-          <p className="intro-para">
+          {/* <p className="intro-para">
             Slack integration has become an essential part of modern workflows,
             allowing seamless communication and collaboration within teams.
             Leveraging Slack&apos;s API Events and Web API opens up a myriad of
@@ -107,7 +131,7 @@ function SlackGuide() {
             comprehensive guide will walk you through the process of integrating
             Slack into your applications, harnessing the power of API Events and
             Web API to enhance productivity and efficiency.
-          </p>
+          </p> */}
 
           <div className="step-1">
             <h2 className="guide-step-title">
@@ -207,8 +231,10 @@ function SlackGuide() {
 
                 <li>
                   Now inside the Event Subscription, add the following URL
-                  inside Request URL
-                  “https://b19c-125-20-216-178.ngrok-free.app/chatbot/dashboard/slack-botintegration/webhook”
+                  inside Request URL{" "}
+                  <span>
+                    {`${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard/slack-bot-integration/webhook`}
+                  </span>
                 </li>
 
                 <div className="steps-img">

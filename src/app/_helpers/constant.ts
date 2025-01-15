@@ -67,3 +67,30 @@ export const defaultBotVisibility = "Public";
 export const defaultRateLimit = 20;
 export const defaultRateLimitTime = 240;
 export const defaultRateLimitMessage = "Too many messages in a row";
+export const whatsAppStepTitles = [
+  {
+    id: 1,
+    title:
+      "Setting Up Meta (Facebook) Business Suite and Meta for Developers account",
+  },
+  {
+    id: 2,
+    title: "Setting Up WhatsApp Integration on Meta for Developers account",
+  },
+  { id: 3, title: "Generate WhatsApp Token" },
+  { id: 4, title: "Configure WhatsApp API Webhook settings" },
+  { id: 5, title: "Add WhatsApp Account to your Torri Chatbot" },
+  { id: 6, title: "Confirm Integration Completion" },
+];
+export const slackStepTitles = [
+  { id: 1, title: "Log in to your Slack account" },
+  {
+    id: 2,
+    title: "Go back to your slack and you will see your app in the left side",
+  },
+  {
+    id: 3,
+    title:
+      "Ask question to your bot and it will response as shown in the below",
+  },
+];

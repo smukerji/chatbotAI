@@ -32,9 +32,7 @@ export default function PlanTwo({
           JSON.stringify(fPrice),
           "xyz"
         ).toString();
-        console.log(a);
         const data = encodeURIComponent(a);
-        console.log(data, a);
         router.push(`/home/pricing/checkout/${2}?a=${data}`);
       } else {
         const fPrice = price - prePrice;

@@ -21,7 +21,7 @@ function CustomerQuestions() {
           style={{ color: "white", textDecoration: "none" }}
           href="/account/register"
         >
-          <button className="sign-up-btn">Join Beta!</button>
+          <button className="sign-up-btn">Register for Torri AI</button>
         </Link>
       </div>
       <div className="right">

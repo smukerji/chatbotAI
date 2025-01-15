@@ -130,6 +130,7 @@ async function getLeads(request: NextRequest) {
           chatbotId: chatbotId,
           timestamp,
         })
+        .sort({ timestamp: -1 })
         .project({
           chatbotId: 0,
           userId: 0,
@@ -142,6 +143,7 @@ async function getLeads(request: NextRequest) {
         .find({
           chatbotId: chatbotId,
         })
+        .sort({ timestamp: -1 })
         .project({
           chatbotId: 0,
           userId: 0,

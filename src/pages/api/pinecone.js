@@ -1,12 +1,16 @@
 import { Pinecone } from "@pinecone-database/pinecone";
 
-import { createEmbedding } from "../../app/_helpers/server/embeddings";
+// import { createEmbedding } from "../../app/_helpers/server/embeddings";
 import clientPromise from "../../db";
 import { deletevectors } from "../../app/_helpers/server/pinecone";
+import { PineconeStore } from "@langchain/pinecone";
+import { OpenAI, OpenAIEmbeddings } from "@langchain/openai";
+import { PromptTemplate } from "@langchain/core/prompts";
+import { MultiQueryRetriever } from "langchain/retrievers/multi_query";
+import { openai } from "@/app/openai";
 
 export default async function handler(req, res) {
   if (req.method === "POST") {
-    // console.log("fd");
     // await pinecone.init({
     //   environment: process.env.NEXT_PUBLIC_PINECONE_ENV,
     //   apiKey: process.env.NEXT_PUBLIC_PINECONE_KEY,
@@ -22,39 +26,94 @@ export default async function handler(req, res) {
     const userQuery = body?.userQuery;
     const chatbotId = body?.chatbotId;
     const userId = body?.userId;
+    const messages = body?.messages;
 
-    /// create the embedding of user query
-    const embed = await createEmbedding(userQuery);
+    // /// create the embedding of user query
+    // const embed = await createEmbedding(userQuery);
 
-    /// set the params of pinecone embeddings retrival
-    const queryRequest = {
-      vector: embed,
-      topK: 3,
-      includeMetadata: true,
-      filter: {
-        chatbotId: chatbotId,
-      },
-    };
+    // /// set the params of pinecone embeddings retrival
+    // const queryRequest = {
+    //   vector: embed,
+    //   topK: 3,
+    //   includeMetadata: true,
+    //   filter: {
+    //     chatbotId: chatbotId,
+    //   },
+    // };
 
     try {
+      // const pinecone = new Pinecone({
+      //   apiKey: process.env.NEXT_PUBLIC_PINECONE_KEY,
+      // });
+      // const index = pinecone.index(process.env.NEXT_PUBLIC_PINECONE_INDEX);
+      // try {
+      //   /// query embeddings
+      //   const ns = index.namespace(userId);
+      //   const response = await ns.query(queryRequest);
+      //   /// extract the content
+      //   const extractedContents = response?.matches?.map(
+      //     (item) => item.metadata["content"]
+      //   );
+      //   return res.status(200).send(extractedContents);
+      // } catch (error) {
+      //   console.error("Error during queryfetch:", error);
+      //   return res.status(200).send(error.message);
+      // }
+
       const pinecone = new Pinecone({
         apiKey: process.env.NEXT_PUBLIC_PINECONE_KEY,
       });
-      const index = pinecone.index(process.env.NEXT_PUBLIC_PINECONE_INDEX);
 
-      try {
-        /// query embeddings
-        const ns = index.namespace(userId);
-        const response = await ns.query(queryRequest);
-        /// extract the content
-        const extractedContents = response?.matches?.map(
-          (item) => item.metadata["content"]
-        );
-        return res.status(200).send(extractedContents);
-      } catch (error) {
-        console.error("Error during queryfetch:", error);
-        return res.status(200).send(error.message);
+      const pineconeIndex = pinecone.Index(
+        process.env.NEXT_PUBLIC_PINECONE_INDEX
+      );
+      const vectorStore = await PineconeStore.fromExistingIndex(
+        new OpenAIEmbeddings({ apiKey: process.env.NEXT_PUBLIC_OPENAI_KEY }),
+        { pineconeIndex, namespace: userId }
+      );
+
+      /// retrieve the similarity search results
+      const llm = new OpenAI({
+        apiKey: process.env.NEXT_PUBLIC_OPENAI_KEY,
+        model: "gpt-4o",
+      });
+      const retriever = MultiQueryRetriever.fromLLM({
+        llm: llm,
+        prompt: PromptTemplate.fromTemplate(
+          `You are an AI language model assistant. Your task is
+          to generate {queryCount} different versions of the given user
+          question corresponding to the Chat History to retrieve relevant documents from a vector database.
+          By generating multiple perspectives on the user question,
+          your goal is to help the user overcome some of the limitations
+          of distance-based similarity search.
+
+          Replace any number or words like it, that, etc according to the user's flow.
+
+          Provide these alternative questions separated by newlines between XML tags. For example:
+
+          <questions>
+          Question 1
+          Question 2
+          Question 3
+          </questions>
+
+          Chat History: {chatHistory}
+
+          Original question: {question}`,
+          { partialVariables: { chatHistory: JSON.stringify(messages) } }
+        ),
+        retriever: vectorStore.asRetriever({
+          filter: { chatbotId: chatbotId },
+        }),
+      });
+
+      /// getting the relveant similaritiy search
+      const retrievedDocs = (await retriever.invoke(userQuery)).slice(0, 3);
+      let similaritySearch = "";
+      for (const doc of retrievedDocs) {
+        similaritySearch += doc.metadata.content;
       }
+      return res.status(200).send(similaritySearch);
     } catch (error) {
       console.error("Error initializing Pinecone client:", error);
       throw new Error(
@@ -92,9 +151,16 @@ export default async function handler(req, res) {
     /// close the cursor
     await cursor.close();
 
+    /// delete the assistant from openai
+    try {
+      await openai.beta.assistants.del(chatbotId);
+    } catch (error) {
+      console.error("Error during assistant deletion:", error);
+    }
+
     vectorId = [].concat(...vectorId);
     /// delete the vectors
-    const deleteData = await collection.deleteMany({ chatbotId: chatbotId });
+    await collection.deleteMany({ chatbotId: chatbotId });
     /// delete the chatbot
     await userChatbots.deleteOne({ chatbotId: chatbotId });
     /// delete chatbot settings

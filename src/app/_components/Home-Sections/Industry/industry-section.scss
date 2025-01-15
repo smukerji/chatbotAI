@@ -1,7 +1,7 @@
 .industry-section-container {
   background-color: #2e58ea;
-  padding-left: 12.2vw;
-  padding-right: 12.2vw;
+  padding-left: 10vw;
+  padding-right: 10vw;
   display: flex;
   gap: 101px;
   // height: 56vw;
@@ -82,10 +82,10 @@
       // top: -6%;
       // left: 5%;
       flex: 1;
-      margin-top: -3%;
+      margin-top: -15vw;
 
       @media only screen and (min-width: 1497px) {
-        margin-top: -12% !important;
+        margin-top: -10vw !important;
       }
 
       .empty-box {
@@ -166,6 +166,30 @@
           height: 60px;
         }
       }
+
+      @media only screen and (max-width: 1440px) {
+        .filled-box {
+          gap: 15px;
+          padding: 25px;
+
+          img {
+            width: 40px;
+            height: 40px;
+          }
+        }
+      }
+
+      @media only screen and (max-width: 1284px) {
+        .filled-box {
+          gap: 10px;
+          padding: 25px;
+
+          img {
+            width: 30px;
+            height: 30px;
+          }
+        }
+      }
     }
 
     /* --------------------------right column------------------------------ */
@@ -177,18 +201,18 @@
       // top: -20%;
       // left: 55%;
       flex: 1;
-      margin-top: -17%;
+      margin-top: -28vw;
 
       @media only screen and (max-width: 430px) {
-        margin-top: 0% !important;
+        margin-top: 0vw !important;
       }
 
       @media only screen and (min-width: 1497px) {
-        margin-top: -43% !important;
+        margin-top: -18vw !important;
       }
 
       @media only screen and (min-width: 2097px) {
-        margin-top: -30% !important;
+        margin-top: -25vw !important;
       }
 
       .empty-box {
@@ -270,11 +294,39 @@
         }
       }
       @media only screen and (min-width: 1920px) {
-        margin-top: -10%;
+        margin-top: -8vw;
       }
 
       @media only screen and (max-width: 1440px) {
-        margin-top: -28%;
+        margin-top: -26vw;
+
+        .filled-box {
+          gap: 15px;
+          padding: 25px;
+
+          img {
+            width: 40px;
+            height: 40px;
+          }
+        }
+      }
+
+      @media only screen and (max-width: 1336px) {
+        margin-top: -31vw;
+      }
+
+      @media only screen and (max-width: 1284px) {
+        margin-top: -32vw;
+
+        .filled-box {
+          gap: 10px;
+          padding: 25px;
+
+          img {
+            width: 30px;
+            height: 30px;
+          }
+        }
       }
     }
   }

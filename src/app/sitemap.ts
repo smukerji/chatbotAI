@@ -1,16 +1,34 @@
 import { MetadataRoute } from "next";
-import { getAllBlogs } from "./_helpers/blogContent";
+import axios from "axios";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const blogs = await getAllBlogs();
-  const blogSiteMap = blogs?.map((blog) => {
+  const fetchBlogs = async () => {
+    try {
+      // Make the API request to fetch blog data
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}blog/api/allslugs`
+      );
+      return response.data.data.items || [];
+    } catch (error) {
+      console.error("Error fetching blog data:", error);
+      // Return an empty array or handle the error as needed
+      return [];
+    }
+  };
+
+  // Fetch blog data
+  const blogs = await fetchBlogs();
+
+  // Generate sitemap entries for blogs
+  const blogSiteMap = blogs.map((blog: any) => {
     return {
       url: `https://torri.ai/blog/${blog.slug}`,
       changeFrequency: "weekly",
-      lastModified: blog.date,
+      lastModified: blog.publishDate || new Date().toISOString(),
       priority: 0.7,
     };
   });
+
   return [
     {
       url: "https://torri.ai",

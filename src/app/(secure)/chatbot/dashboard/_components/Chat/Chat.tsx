@@ -37,6 +37,20 @@ import {
 } from "../../../../../_helpers/errorConstants";
 import { useRouter } from "next/navigation";
 import CustomModal from "../CustomModal/CustomModal";
+import { parsePhoneNumber } from "awesome-phonenumber";
+import CloseEmbedBotIcon from "@/assets/svg/CloseEmbedBotIcon";
+import CloseIcon from "@/assets/svg/CloseIcon";
+import MicIcon from "@/assets/svg/MicIcon";
+import {
+  LiveTranscriptionEvent,
+  LiveTranscriptionEvents,
+  useDeepgram,
+} from "@/app/_helpers/client/Context/DeepgramContext";
+import {
+  MicrophoneEvents,
+  MicrophoneState,
+  useMicrophone,
+} from "@/app/_helpers/client/Context/MicrophoneContext";
 
 function Chat({
   chatbot,
@@ -62,6 +76,20 @@ function Chat({
   setIsPlanNotification,
   userMessageColor,
   messagePlaceholder,
+  userLocation,
+
+  /* microphone handling states for popup */
+  setupMicrophonePopup,
+  stopMicrophonePopup,
+  startMicrophonePopup,
+  microphoneStatePopup,
+  microphonePopup,
+
+  /* deepgram handling states for popup */
+  connectToDeepgramPopup,
+  connectionStatePopup,
+  connectionPopup,
+  disconnectFromDeepgramPopup,
 }: any) {
   let tempRef: any = useRef<HTMLDivElement>();
   const router = useRouter();
@@ -108,6 +136,9 @@ function Chat({
 
   const chatWindowRef: any = useRef(null);
 
+  /// for apply css for embed bot on mobile screens
+  const [innerWidth, setInnerWidth] = useState(false);
+
   /// chatbot messages feedback pop up state
   const [open, setOpen] = useState(false);
   const [feedbackText, setfeedbackText] = useState("");
@@ -118,6 +149,7 @@ function Chat({
   const [emailError, setEmailError] = useState("");
   const [numberError, setNumberError] = useState("");
   const [nameError, setNameError] = useState("");
+  const [validNumberError, setValidNumberError] = useState("");
 
   /// chatbot lead section state
   const [leadDetails, setLeadDetails] = useState({
@@ -128,6 +160,33 @@ function Chat({
 
   /// to check if iframe is loaded or not
   const [iframeLoaded, setiFrameLoaded] = useState(false);
+
+  /// state for max phone number limit
+  const [mobileNumber, setMobileNumber] = useState("");
+  const [isNumberValid, setIsNumberValid] = useState(false);
+
+  // const deepgram: any = useDeepgram();
+  //// deepgram & mic context
+  const {
+    connection,
+    connectToDeepgram,
+    connectionState,
+    disconnectFromDeepgram,
+  } = useDeepgram();
+
+  // const Microphone= useMicrophone();
+  const {
+    setupMicrophone,
+    microphone,
+    startMicrophone,
+    microphoneState,
+    stopMicrophone,
+  }: any = useMicrophone();
+
+  /// deep gram action states
+  const [recordingDuration, setRecordingDuration] = useState("0:00");
+  let timer = useRef<any>(null);
+  const [language, setLanguage] = useState("en");
 
   /// handling the chatbot ok action
   const handleOk = async () => {
@@ -318,6 +377,7 @@ function Chat({
               body: JSON.stringify({
                 userQuery,
                 chatbotId: chatbot?.id,
+                messages,
                 // userId: cookies.userId,
                 //// default chatbot set
                 userId: !isPopUp ? cookies.userId : userId,
@@ -328,7 +388,7 @@ function Chat({
           /// parse the response and extract the similarity results
           const respText = await response.text();
 
-          const similaritySearchResults = JSON.parse(respText).join("\n");
+          const similaritySearchResults = respText;
 
           /// get response from backend in streaming
           const responseFromBackend: any = await fetch(
@@ -508,6 +568,20 @@ function Chat({
     }
   };
 
+  // To check if phone number is valid or not
+
+  function getPhoneNumberLength(value: any, country: any) {
+    const pn = parsePhoneNumber(value, {
+      regionCode: country.iso2,
+    });
+
+    console.log(pn);
+
+    // const numberInfo = pn.toJSON();
+    setIsNumberValid(pn.valid);
+    return pn.valid;
+  }
+
   /// function for submitting lead
   const submitLeadDetail = async () => {
     setLeadError("");
@@ -523,7 +597,18 @@ function Chat({
         return;
       }
 
-      if (nameError !== "" || emailError !== "" || numberError !== "") return;
+      // if (leadFields?.number.isChecked == true && !isNumberValid) {
+      //   setLeadError("Please, enter valid number.");
+      //   return;
+      // }
+
+      if (
+        nameError !== "" ||
+        emailError !== "" ||
+        numberError !== "" ||
+        validNumberError !== ""
+      )
+        return;
       // if (leadFields?.name.isChecked == true && leadDetails.name === "") {
       //   setNameError("Please enter your name");
       //   return;
@@ -594,12 +679,191 @@ function Chat({
 
     const iframeLoaded = guideValue == "web" ? true : false;
     setiFrameLoaded(iframeLoaded);
-
-    console.log("iframe loadedd", guideValue, iframeLoaded);
   }, []);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setInnerWidth(
+        isPopUp && window.innerWidth < 767 && window.innerWidth != 400
+      );
+    };
+
+    handleResize(); // Set initial window width
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setInnerWidth(
+        isPopUp && window.innerWidth < 767 && window.innerWidth != 400
+      );
+    };
+
+    /// setting the microphone
+    if (!isPopUp) {
+      setupMicrophone();
+    } else {
+      setupMicrophonePopup();
+    }
+
+    handleResize(); // Set initial window width
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  useEffect(() => {
+    /// when microphone is ready connect to deepgram
+    if (microphoneState === MicrophoneState.Ready && !isPopUp) {
+      connectToDeepgram({
+        model: "nova-2",
+        interim_results: true,
+        smart_format: true,
+        filler_words: true,
+        utterance_end_ms: 3000,
+        language: language,
+      });
+    } else if (microphoneStatePopup === MicrophoneState.Ready && isPopUp) {
+      connectToDeepgramPopup({
+        model: "nova-2",
+        interim_results: true,
+        smart_format: true,
+        filler_words: true,
+        utterance_end_ms: 3000,
+        language: language,
+      });
+    }
+  }, [
+    microphoneState == MicrophoneState.Ready && !isPopUp,
+    microphoneStatePopup == MicrophoneState.Ready && isPopUp,
+    language,
+  ]);
+
+  // Define onTranscript and onData outside the functions so they are accessible
+  const onTranscript = (data: LiveTranscriptionEvent) => {
+    const { is_final: isFinal, speech_final: speechFinal } = data;
+    let thisCaption = data.channel.alternatives[0].transcript;
+
+    if (isFinal && speechFinal && thisCaption !== "") {
+      setUserQuery((caption) => {
+        return caption + " " + thisCaption;
+      });
+    }
+  };
+
+  const onData = (e: BlobEvent) => {
+    if (e.data.size > 0) {
+      if (!isPopUp) {
+        connection?.send(e.data);
+      } else {
+        connectionPopup?.send(e.data);
+      }
+    }
+  };
+
+  /// keep the connection alive once it starts
+  useEffect(() => {
+    /// run the interval every 10 seconds to keep the connection alive
+    const interval = setInterval(() => {
+      if (!isPopUp) {
+        if (connection?.isConnected()) {
+          connection.keepAlive();
+        }
+      } else if (connectionPopup?.isConnected()) {
+        connectionPopup.keepAlive();
+      }
+    }, 8000);
+
+    return () => clearInterval(interval);
+  }, [connection, connectionPopup]);
+
+  const startTranscription = async () => {
+    if (!microphone && !isPopUp) return;
+    if (!microphonePopup && isPopUp) return;
+    if (!connection && !isPopUp) return;
+    if (!connectionPopup && isPopUp) return;
+
+    if (!isPopUp) {
+      startMicrophone();
+    } else {
+      startMicrophonePopup();
+    }
+
+    /// start the timer to display the time
+    /// format the time as minutes and seconds
+    let minutes = 0;
+    let seconds = 0;
+
+    console.log("startt transcriptionnnnn");
+
+    timer.current = setInterval(() => {
+      seconds += 1;
+      if (seconds == 60) {
+        minutes += 1;
+        seconds = 0;
+      }
+
+      setRecordingDuration(`${minutes}:${seconds}`);
+    }, 1000);
+
+    // if (connectionState === LiveConnectionState.OPEN) {
+
+    if (!isPopUp) {
+      microphone.addEventListener(MicrophoneEvents.DataAvailable, onData);
+      connection.addListener(LiveTranscriptionEvents.Transcript, onTranscript);
+    } else {
+      microphonePopup.addEventListener(MicrophoneEvents.DataAvailable, onData);
+      connectionPopup.addListener(
+        LiveTranscriptionEvents.Transcript,
+        onTranscript
+      );
+    }
+    // }
+  };
+
+  const stopTranscription = () => {
+    // if (connection && !isPopUp) {
+    //   connection.removeListener(
+    //     LiveTranscriptionEvents.Transcript,
+    //     onTranscript
+    //   );
+    // } else if (connectionPopup && isPopUp) {
+    //   connectionPopup.removeListener(
+    //     LiveTranscriptionEvents.Transcript,
+    //     onTranscript
+    //   );
+    // }
+
+    if (microphone && !isPopUp) {
+      microphone.removeEventListener(MicrophoneEvents.DataAvailable, onData);
+    } else if (microphonePopup && isPopUp) {
+      microphonePopup.removeEventListener(
+        MicrophoneEvents.DataAvailable,
+        onData
+      );
+    }
+
+    /// stop the timer and clear the interval
+    setRecordingDuration("0:00");
+    clearInterval(timer.current);
+
+    if (!isPopUp) {
+      stopMicrophone();
+    } else {
+      stopMicrophonePopup();
+    }
+  };
+
+  console.log("ooooooooooo", microphoneState, MicrophoneState.Open, isPopUp);
+
   return (
-    <div className="chat-container">
+    <div className={`chat-container ${innerWidth && "embed-chat-container"}`}>
       {!isPopUp && (
         <CustomModal
           open={isPlanNotification}
@@ -714,7 +978,9 @@ function Chat({
       )}
       {/*------------------------------------------right-section----------------------------------------------*/}
       <div
-        className={`messages-section ${iframeLoaded ? "iframe" : ""}`}
+        className={`messages-section ${iframeLoaded ? "iframe" : ""} ${
+          innerWidth && "embed-messages-section"
+        }`}
         style={{
           backgroundColor: botSettings?.theme === "dark" ? "black" : "",
         }}
@@ -759,26 +1025,47 @@ function Chat({
               messagesTime={messagesTime}
             />
 
-            <ReactToPrint
-              trigger={() => {
-                return (
-                  <button style={{ border: "none", background: "none" }}>
-                    <Icon
-                      Icon={ExportBtn}
-                      className={
-                        botSettings?.theme === "dark" ? "color-white" : ""
-                      }
-                    />
-                  </button>
-                );
-              }}
-              content={() => tempRef.current}
-            />
+            {/* If chatbot is opened from popup then add the close embed bot button */}
+            {isPopUp && (
+              <Icon
+                Icon={CloseEmbedBotIcon}
+                click={() => {
+                  const btn = document.getElementById("chat-frame-widget");
+                  // Send a message to the parent
+                  window.parent.postMessage("disable-iframe", "*");
+                }}
+                className={botSettings?.theme === "dark" ? "color-white" : ""}
+              />
+            )}
+
+            {/* If the chatbot is embeded remove the print chat button */}
+            {!isPopUp && (
+              <ReactToPrint
+                trigger={() => {
+                  return (
+                    <button style={{ border: "none", background: "none" }}>
+                      <Icon
+                        Icon={ExportBtn}
+                        className={
+                          botSettings?.theme === "dark" ? "color-white" : ""
+                        }
+                      />
+                    </button>
+                  );
+                }}
+                content={() => tempRef.current}
+              />
+            )}
           </div>
         </div>
 
         <hr />
-        <div className="conversation-container" ref={chatWindowRef}>
+        <div
+          className={`conversation-container ${
+            innerWidth && "embed-conversation-container"
+          }`}
+          ref={chatWindowRef}
+        >
           {messages.map((message: any, index: any) => {
             if (message.role == "assistant")
               return (
@@ -980,16 +1267,52 @@ function Chat({
                       /> */}
 
                       <PhoneInput
-                        country={"us"}
-                        value={leadDetails?.number}
+                        country={
+                          botDetails?.userCountry
+                            ? botDetails?.userCountry
+                            : userLocation
+                        }
+                        value={mobileNumber}
                         placeholder="Enter your phone number"
-                        onChange={(phone) => {
+                        onChange={(phone, country: any) => {
+                          // Process to format the phone number
+                          const phoneWithoutCode = phone.startsWith(
+                            `${country?.dialCode}`
+                          )
+                            ? phone.slice(`${country?.dialCode}`.length)
+                            : phone;
+                          const formattedPhone: any = `+${country?.dialCode}-${phoneWithoutCode}`;
+
+                          setMobileNumber(phone);
+
                           setLeadDetails({
                             ...leadDetails,
-                            number: phone,
+                            number: formattedPhone,
                           });
+                          setLeadError("");
+                          setValidNumberError("");
+                        }}
+                        // onChange={(phone, country) =>
+                        //   handlePhoneChange(phone, country)
+                        // }
+                        enableLongNumbers={true}
+                        isValid={(value: any, country: any) =>
+                          // isValidPhoneNumber(value, country)
+                          getPhoneNumberLength(value, country)
+                        }
+                        onBlur={() => {
+                          if (
+                            leadFields?.number.isChecked == true &&
+                            !isNumberValid
+                          ) {
+                            setValidNumberError("Please enter valid number");
+                            return;
+                          }
                         }}
                       />
+                      <div className="lead-error">
+                        <p>{validNumberError}</p>
+                      </div>
                     </div>
                   )}
                   {leadError && (
@@ -1050,7 +1373,9 @@ function Chat({
                     botSettings?.theme === "dark" ? "#353945" : "",
                   color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
                 }}
-                dangerouslySetInnerHTML={{ __html: response }}
+                dangerouslySetInnerHTML={{
+                  __html: response.concat("<b> |</b>"),
+                }}
               />
             </div>
           )}
@@ -1080,8 +1405,18 @@ function Chat({
             );
           })}
         </div>
-        <a className="powered-by" target="_blank" href="https://torri.ai">
-          Powered by Torri.AI
+        <a
+          className="powered-by"
+          target="_blank"
+          href={`${
+            chatbot?.id === "35910e5d-d751-4ba0-a52c-50d4c9302352"
+              ? "https://www.creolestudios.com/?utm_source=ASGTG+Website&utm_medium=referral&utm_campaign=ASGTG"
+              : "https://torri.ai"
+          }`}
+        >
+          {chatbot?.id === "35910e5d-d751-4ba0-a52c-50d4c9302352"
+            ? "Powered by Creole Studios"
+            : "Powered by Torri.AI"}
         </a>
         <div
           className="chat-question"
@@ -1113,18 +1448,63 @@ function Chat({
             value={userQuery}
             disabled={loading ? true : false}
           />
-          <button
-            className="icon"
-            onClick={() => getReply("click")}
+          <div
+            className="send-record-container"
             style={{
-              backgroundColor: botSettings?.userMessageColor
-                ? botSettings?.userMessageColor
-                : userMessageColor,
+              backgroundColor:
+                botSettings?.userMessageColor &&
+                microphoneState === MicrophoneState.Open
+                  ? botSettings?.userMessageColor
+                  : userMessageColor,
             }}
-            disabled={loading ? true : false}
           >
-            <Image src={sendChatIcon} alt="send-chat-icon" />
-          </button>
+            {(MicrophoneState.Open === microphoneState && !isPopUp) ||
+            (MicrophoneState.Open === microphoneStatePopup && isPopUp) ? (
+              <>
+                <Icon
+                  Icon={CloseIcon}
+                  click={() => {
+                    if (
+                      (microphoneState === MicrophoneState.Open && !isPopUp) ||
+                      (microphoneStatePopup === MicrophoneState.Open && isPopUp)
+                    )
+                      stopTranscription();
+                  }}
+                />
+                <span
+                  style={{
+                    color: botSettings?.theme === "dark" ? "#FCFCFD" : "#fff",
+                  }}
+                >
+                  {recordingDuration}
+                </span>
+              </>
+            ) : (
+              <Icon
+                Icon={MicIcon}
+                click={() => {
+                  if (
+                    (microphoneState === MicrophoneState.Ready && !isPopUp) ||
+                    (microphoneStatePopup === MicrophoneState.Ready && isPopUp)
+                  )
+                    startTranscription();
+                }}
+              />
+            )}
+
+            <button
+              className="icon"
+              onClick={() => getReply("click")}
+              style={{
+                backgroundColor: botSettings?.userMessageColor
+                  ? botSettings?.userMessageColor
+                  : userMessageColor,
+              }}
+              disabled={loading ? true : false}
+            >
+              <Image src={sendChatIcon} alt="send-chat-icon" />
+            </button>
+          </div>
         </div>
       </div>
     </div>

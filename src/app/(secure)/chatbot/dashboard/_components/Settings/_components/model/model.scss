@@ -37,6 +37,7 @@
   // -------------------------------- for model section -------------------------------------
 
   .model-parent {
+    margin-top: 32px;
     display: flex;
     // width: 1208px;
     padding: 24px;
@@ -90,6 +91,7 @@
           gap: 10px;
           align-self: stretch;
           //style
+          height: 100%;
           border-radius: 12px;
           border: 1px solid #e6e8ec;
           background: #fff;
@@ -104,7 +106,7 @@
             border: none;
             width: 100%;
             outline: none;
-            height: 100px;
+            height: 100%;
             resize: none;
           }
         }
@@ -119,37 +121,6 @@
           font-style: normal;
           font-weight: 500;
           line-height: 24px; /* 150% */
-        }
-
-        .antd-select {
-          // position: relative;
-          width: 100%;
-          height: 48px;
-          border-radius: 12px;
-          border: 1px solid #e6e8ec;
-          background: #fff;
-
-          // test
-          // border: 2px dotted green;
-
-          .ant-select-selection-item {
-            width: 100%;
-            border-radius: 12px;
-            height: 48px;
-            color: #23262f;
-            font-size: 16px;
-            font-style: normal;
-            font-weight: 500;
-            padding: 12px 16px;
-            line-height: 24px; /* 150% */
-          }
-
-          .ant-select-selector {
-            // border-color: #e6e8ec;
-            border-radius: 12px;
-            border: none;
-            box-shadow: none;
-          }
         }
 
         // .ant-select:hover {
@@ -190,129 +161,89 @@
         // }
       }
     }
-    .model-sub-heading {
-      color: #353945;
-      text-align: center;
-
-      /* Body/Medium */
-      font-size: 16px;
-      font-style: normal;
-      font-weight: 500;
-      line-height: 24px; /* 150% */
-    }
-    .model-sub-description {
-      align-self: stretch;
-      color: #777e90;
-
-      /* Body/Medium */
-      font-size: 16px;
-      font-style: normal;
-      font-weight: 500;
-      line-height: 24px; /* 150% */
-    }
 
     .temperature-container {
       display: flex;
       width: 50%;
       flex-direction: column;
       align-items: flex-start;
-      gap: 17px;
+      gap: 32px;
       padding-left: 68px;
       padding-top: 12px;
       padding-right: 19px;
       padding-bottom: 310px;
       //   border: 2px solid blue;
-
-      .temperature-top-section {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        align-self: stretch;
-        .temperature-title {
-          color: #353945;
-          text-align: center;
-
-          /* Body/Medium */
-          font-size: 16px;
-          font-style: normal;
-          font-weight: 500;
-          line-height: 24px; /* 150% */
-        }
-        span {
-          color: #353945;
-          text-align: center;
-
-          /* Body/Medium */
-          font-size: 16px;
-          font-style: normal;
-          font-weight: 500;
-          line-height: 24px; /* 150% */
-        }
-      }
-      .progress-bar {
+      .model-selection {
         display: flex;
         flex-direction: column;
         align-items: flex-start;
-        gap: 5px;
+        gap: var(--2, 8px);
+
         align-self: stretch;
-        .progress-bar-top-section {
+        .model-sub-heading {
+          color: #353945;
+          text-align: center;
+
+          /* Body/Medium */
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 24px; /* 150% */
+        }
+        .model-sub-description {
+          align-self: stretch;
+          color: #777e90;
+
+          /* Body/Medium */
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 24px; /* 150% */
+        }
+        .antd-select {
+          // position: relative;
           width: 100%;
-          height: 0px;
-          flex-shrink: 0;
+          height: 48px;
+          border-radius: 12px;
+          border: 1px solid #e6e8ec;
+          background: #fff;
 
-          //style
-          stroke-width: 9px;
-          stroke: var(--Neutral-3, #e6e8ec);
+          // test
+          // border: 2px dotted green;
 
-          // .ant-slider {
-          //   margin: 0;
-          //   &.ant-slider-track {
-          //     background-color: rgba(0, 0, 0, 0.04);
-          //   }
-          //   &:hover {
-          //     background-color: rgba(0, 0, 0, 0.04);
-          //   }
-          // }
-          // .ant-slider .ant-slider-handle {
-          //   top: -6px;
-          //   &::after {
-          //     background-color: #2e58ea;
-          //     box-shadow: none;
-          //     height: 24px;
-          //     width: 24px;
-          //   }
-          // }
-
-          .ant-slider {
-            margin: 0;
+          .ant-select-selection-item {
+            width: 100%;
+            border-radius: 12px;
+            height: 48px;
+            color: #23262f;
+            font-size: 16px;
+            font-style: normal;
+            font-weight: 500;
+            padding: 12px 16px;
+            line-height: 24px; /* 150% */
           }
 
-          .ant-slider .ant-slider-track {
-            background-color: rgba(0, 0, 0, 0.04);
-
-            &:hover {
-              background-color: rgba(0, 0, 0, 0.04);
-            }
-          }
-          .ant-slider .ant-slider-handle {
-            top: -6px;
-            &::after {
-              background-color: #2e58ea;
-              box-shadow: none;
-              height: 24px;
-              width: 24px;
-            }
+          .ant-select-selector {
+            // border-color: #e6e8ec;
+            border-radius: 12px;
+            border: none;
+            box-shadow: none;
           }
         }
-
-        .progress-bar-bottom-section {
+      }
+      .temperature-selection {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 17px;
+        align-self: stretch;
+        .temperature-top-section {
           display: flex;
           justify-content: space-between;
           align-items: center;
           align-self: stretch;
-          margin-top: 17px;
-          .reserved {
-            color: #777e90;
+          .temperature-title {
+            color: #353945;
             text-align: center;
 
             /* Body/Medium */
@@ -321,8 +252,8 @@
             font-weight: 500;
             line-height: 24px; /* 150% */
           }
-          .creative {
-            color: #777e90;
+          span {
+            color: #353945;
             text-align: center;
 
             /* Body/Medium */
@@ -330,6 +261,90 @@
             font-style: normal;
             font-weight: 500;
             line-height: 24px; /* 150% */
+          }
+        }
+        .progress-bar {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 5px;
+          align-self: stretch;
+          .progress-bar-top-section {
+            width: 100%;
+            height: 0px;
+            flex-shrink: 0;
+
+            //style
+            stroke-width: 9px;
+            stroke: var(--Neutral-3, #e6e8ec);
+
+            // .ant-slider {
+            //   margin: 0;
+            //   &.ant-slider-track {
+            //     background-color: rgba(0, 0, 0, 0.04);
+            //   }
+            //   &:hover {
+            //     background-color: rgba(0, 0, 0, 0.04);
+            //   }
+            // }
+            // .ant-slider .ant-slider-handle {
+            //   top: -6px;
+            //   &::after {
+            //     background-color: #2e58ea;
+            //     box-shadow: none;
+            //     height: 24px;
+            //     width: 24px;
+            //   }
+            // }
+
+            .ant-slider {
+              margin: 0;
+            }
+
+            .ant-slider .ant-slider-track {
+              background-color: rgba(0, 0, 0, 0.04);
+
+              &:hover {
+                background-color: rgba(0, 0, 0, 0.04);
+              }
+            }
+            .ant-slider .ant-slider-handle {
+              top: -6px;
+              &::after {
+                background-color: #2e58ea;
+                box-shadow: none;
+                height: 24px;
+                width: 24px;
+              }
+            }
+          }
+
+          .progress-bar-bottom-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            align-self: stretch;
+            margin-top: 17px;
+            .reserved {
+              color: #777e90;
+              text-align: center;
+
+              /* Body/Medium */
+              font-size: 16px;
+              font-style: normal;
+              font-weight: 500;
+              line-height: 24px; /* 150% */
+            }
+            .creative {
+              color: #777e90;
+              text-align: center;
+
+              /* Body/Medium */
+              font-size: 16px;
+              font-style: normal;
+              font-weight: 500;
+              line-height: 24px; /* 150% */
+            }
           }
         }
       }

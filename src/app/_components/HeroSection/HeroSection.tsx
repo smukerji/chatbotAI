@@ -2,9 +2,8 @@ import React from "react";
 import "./hero-section.scss";
 import Image from "next/image";
 // import LineImage from "../../../../public/sections-images/header-background/Lines.png";
-import HeaderImage from "../../../../public/sections-images/header-background/Group1.webp";
-import freeTrialIcon from "../../../../public/sections-images/header-background/discount-shape.webp";
-import creditCardIcon from "../../../../public/sections-images/header-background/card-pos.webp";
+import HeaderImage from "../../../../public/sections-images/header-background/Group1.svg";
+import messageIcon from "../../../../public/sections-images/header-background/message-text.svg";
 import cancelIcon from "../../../../public/sections-images/header-background/clipboard-close.webp";
 import Link from "next/link";
 
@@ -36,12 +35,12 @@ function HeroSection() {
             style={{ color: "white", textDecoration: "none" }}
             href="/account/register"
           >
-            <button className="request-demo-btn">Join Beta!</button>
+            <button className="request-demo-btn">Join with $1</button>
           </Link>
         </div>
         <div className="schemes-list">
           <ul>
-            <li>
+            {/* <li>
               <span>
                 <Image
                   src={freeTrialIcon}
@@ -52,18 +51,18 @@ function HeroSection() {
                 />
               </span>
               <span>Free 7-day trial</span>
-            </li>
+            </li> */}
             <li>
               <span>
                 <Image
-                  src={creditCardIcon}
-                  alt="credit-card-icon"
+                  src={messageIcon}
+                  alt="msg-icon"
                   loading="lazy"
                   width={23}
                   height={23}
                 />
               </span>
-              <span>No credit card required</span>
+              <span>Conversational Bot in 1 minute</span>
             </li>
             <li>
               <span>

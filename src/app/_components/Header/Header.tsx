@@ -159,7 +159,7 @@ function Header() {
                 {formatNumber(
                   userDetails?.plan?.messageLimit
                     ? userDetails?.plan?.messageLimit
-                    : 10000
+                    : 0
                 )}
               </span>
             </div>
@@ -181,9 +181,14 @@ function Header() {
             {/*------------------------------------------feedback-btn----------------------------------------------*/}
             <button
               className="feedback-btn"
-              onClick={() => setOpenSupport(true)}
+              // onClick={() => setOpenSupport(true)}
             >
-              Support
+              <a
+                href="https://torri-ai.canny.io/torri-agent-feedback"
+                target="_blank"
+              >
+                Support
+              </a>
             </button>
           </>
         )}

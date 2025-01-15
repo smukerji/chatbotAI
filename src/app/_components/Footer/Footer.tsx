@@ -35,7 +35,7 @@ function Footer() {
             <li>
               <Image src={bluePin} alt="blue-pin-img" loading="lazy" />
               <Link href="#">
-                Unit F, 18/F Wordtech centre. 95 How Ming Street, Kwun Tong,
+                Unit F, 18/F Worldtech centre, 95 How Ming Street, Kwun Tong,
                 Hong Kong
               </Link>
             </li>

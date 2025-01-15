@@ -11,7 +11,6 @@ import closeEyeIcon from "../../../../../../public/svgs/close-eye.svg";
 import "../login.scss";
 import { signIn, useSession } from "next-auth/react";
 import { LoadingOutlined } from "@ant-design/icons";
-import { redirect } from "next/navigation";
 import { useUserService } from "../../../../_services/useUserService";
 import { Spin, message } from "antd";
 import CaptchaErrorMessage from "@/app/_components/CaptchaErrorMessage";
@@ -27,7 +26,8 @@ function LoginPage() {
   const [email, setEmail]: any = useState(null);
   const [password, setPassword]: any = useState(null);
 
-  const { status } = useSession();
+  const { data: session, status }: any = useSession();
+
   const [loading, setLoading] = useState(false);
   const antIcon = (
     <LoadingOutlined
@@ -35,16 +35,39 @@ function LoginPage() {
       spin
     />
   );
-  if (status === "authenticated") {
-    const searchParams = new URLSearchParams(window.location.search);
-    const key = searchParams.get("key");
+  // if (status === "authenticated") {
+  //   const searchParams = new URLSearchParams(window.location.search);
+  //   const key = searchParams.get("key");
+  //   message.success(`Welcome Back ${session.user?.name}`).then(() => {
+  //     if (!key) {
+  //       console.log("redirected from here.....");
 
-    if (!key) {
-      window.location.href = "/chatbot";
-    } else {
-      window.location.href = String(key);
+  //       window.location.href = "/chatbot";
+  //     } else {
+  //       window.location.href = String(key);
+  //     }
+  //   });
+  // }
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      const searchParams = new URLSearchParams(window.location.search);
+      const key = searchParams.get("key");
+      if (!session.user?.plan) {
+        message.info(`Welcome ${session.user?.name}`).then(() => {
+          window.location.href = "/create-first-assistant";
+        });
+      } else {
+        message.info(`Welcome Back ${session.user?.name}`).then(() => {
+          if (!key) {
+            window.location.href = "/chatbot";
+          } else {
+            window.location.href = String(key);
+          }
+        });
+      }
     }
-  }
+  }, [status]);
 
   const userService = useUserService();
   /// when the form is submitted
@@ -68,11 +91,18 @@ function LoginPage() {
         } else {
           const searchParams = new URLSearchParams(window.location.search);
           const key = searchParams.get("key");
-          message.info(`Welcome back ${data?.username}!`);
-          if (key == null) {
-            window.location.href = "/chatbot";
+          /// if the user is new and doesm't have any plan
+          if (!data?.plan) {
+            message.info(`Welcome ${data?.username}`);
+            window.location.href = "/create-first-assistant";
+            return;
           } else {
-            window.location.href = String(key);
+            message.info("Welcome back " + data?.username + "!");
+            if (key == null) {
+              window.location.href = "/chatbot";
+            } else {
+              window.location.href = String(key);
+            }
           }
 
           // Replace the current history entry
@@ -130,7 +160,7 @@ function LoginPage() {
     try {
       await signIn(provider);
       // After successful sign-in, replace the current history entry
-      window.history.replaceState(null, "", window.location.href);
+      // window.history.replaceState(null, "", window.location.href);
     } catch (error) {
       console.error("Sign-in error:", error);
     }

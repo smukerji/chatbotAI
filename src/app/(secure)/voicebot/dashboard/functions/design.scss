@@ -1,0 +1,298 @@
+.function-container {
+  display: flex;
+  gap: 24px;
+
+  .left-column {
+    width: 50%;
+
+    .title {
+      margin-top: 1.3rem;
+      color: #23262F;
+      /* Subtitle/Large */
+      // font-family: "General Sans";
+      font-size: 20px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 28px;
+    }
+
+    .description {
+      color: #777E90;
+      /* Body/Small */
+      // font-family: "General Sans";
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 24px;
+    }
+
+    .wrapper {
+      margin-top: 1rem;
+      display: flex;
+      padding: 24px;
+      flex-direction: column;
+      border-radius: 16px;
+      border: 1px solid #E6E8EC;
+      background: #FCFCFD;
+
+      .provider {
+        color: #353945;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 24px;
+      }
+
+      .select-field {
+        width: 100%;
+
+        height: 49.45px;
+        margin-top: 8px;
+
+        input {
+          color: #23262F;
+
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 24px;
+
+        }
+
+        .ant-select-selection-placeholder {
+          // color: #23262F;
+
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 24px;
+        }
+
+        .ant-select-selection-search-input {
+          color: #23262F;
+
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 24px;
+        }
+
+        .ant-select-selection-item {
+          color: #23262F;
+
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 24px;
+        }
+      }
+
+            .create-tool{
+                border: none;
+                display: flex;
+                align-items: center;
+                width: 38%;
+                padding: 0;
+                gap: 5px;
+                margin-top: 20px;
+            }
+
+    }
+    .backdrope-container{
+      display: block;
+      background: rgba(31, 31, 31, 0.50);
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+    }
+
+  }
+
+  .right-column {
+    width: 50%;
+
+    .title {
+      color: #23262F;
+      /* Subtitle/Large */
+      // font-family: "General Sans";
+      font-size: 20px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 28px;
+    }
+
+    .description {
+      color: var(--Neutral-5, #777E90);
+      /* Body/Small */
+      font-family: "General Sans";
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 24px;
+    }
+
+
+    .wrapper {
+      margin-top: 15px;
+      display: flex;
+      padding: 24px;
+      flex-direction: column;
+      border-radius: 16px;
+      border: 1px solid #E6E8EC;
+      background: #FCFCFD;
+
+      .provider {
+        color: #353945;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 24px;
+      }
+
+      .select-field {
+        width: 100%;
+
+        height: 49.45px;
+        margin-top: 8px;
+
+        input {
+          color: #23262F;
+
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 24px;
+
+        }
+
+        .ant-select-selection-placeholder {
+          // color: #23262F;
+
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 24px;
+        }
+
+        .ant-select-selection-search-input {
+          color: #23262F;
+
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 24px;
+        }
+
+        .ant-select-selection-item {
+          color: #23262F;
+
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 24px;
+        }
+      }
+
+      .emotional-detect {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        margin-top: 2rem;
+
+        .emotional-header {
+
+          text-align: center;
+          /* Body/Medium */
+          // font-family: "General Sans";
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 24px;
+        }
+      }
+
+      .info {
+        color: #777E90;
+        /* Body/Small */
+        // font-family: "General Sans";
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 24px;
+      }
+
+      .dial-wrapper {
+        display: flex;
+        margin-top: 2rem;
+        gap: 12px;
+
+        .toggle {
+          width: 100%;
+
+          .split {
+            margin-top: 0;
+          }
+
+          .info {
+            margin-top: 8px;
+          }
+
+          .read-more {
+            text-decoration: none;
+            display: flex;
+            margin-top: 8px;
+          }
+        }
+      }
+
+      .phone-input-with-flag {
+        margin-top: 8px;
+
+        input {
+          height: 49px;
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 24px;
+          border-radius: 12px;
+          border: 1px solid #E6E8EC;
+          background: #FFF;
+          width: 80%;
+        }
+
+        .flag-dropdown {
+          border-radius: 12px;
+          border: 1px solid #E6E8EC;
+          background: #FFF;
+        }
+
+
+      }
+
+      .call-end-phrase{
+        margin-top: 32px;
+        color:  #353945;
+          /* Body/Medium */
+          // font-family: "General Sans";
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 24px;
+      }
+
+      .max-token-input{
+          font-size: 16px;
+          margin-top: 8px;
+            font-style: normal;
+            font-family: "General Sans";
+            font-weight: 500;
+            line-height: 24px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid #E6E8EC;
+            background: #FFF;
+      }
+
+    }
+  }
+}

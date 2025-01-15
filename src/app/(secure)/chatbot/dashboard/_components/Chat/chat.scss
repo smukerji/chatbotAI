@@ -6,6 +6,25 @@
   margin-top: 28px;
   position: relative;
 
+  &.embed-chat-container {
+    height: 100vh;
+    margin: 0;
+    display: block;
+  }
+
+  @media screen and (max-width: 1440px) {
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-top: 20px;
+    gap: 20px;
+  }
+  @media screen and (max-width: 1199px) {
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 20px;
+    gap: 10px;
+  }
+
   /*------------------------------------------left-section----------------------------------------------*/
   .chatbot-details {
     display: flex;
@@ -62,12 +81,14 @@
         font-style: normal;
         font-weight: 500;
         line-height: 24px;
+        width: 86%;
+        word-wrap: break-word;
         /* 150% */
       }
 
       .chatbot-id {
         display: flex;
-        align-items: center;
+        align-items: start;
         gap: 8px;
       }
 
@@ -111,6 +132,10 @@
     flex-direction: column;
     height: 650px;
     background: #fff;
+
+    &.embed-messages-section {
+      height: 100%;
+    }
 
     .header {
       display: flex;
@@ -200,6 +225,10 @@
       margin-top: 17px;
       margin-bottom: 17px;
 
+      &.embed-conversation-container {
+        height: 100%;
+      }
+
       &::-webkit-scrollbar {
         width: 0.5em;
       }
@@ -225,9 +254,18 @@
           max-width: 80%;
           border-radius: 16px;
           background: #e6e8ec;
-          text-align: justify;
+          text-align: left;
           word-break: break-word;
           white-space: pre-line;
+
+          img {
+            width: fit-content;
+            max-width: 100%;
+          }
+
+          > div:first-of-type {
+            display: contents;
+          }
 
           /// if there are any bullte points in the response
           ul,
@@ -235,8 +273,24 @@
             padding-left: 16px;
           }
 
-          img {
-            width: 100%;
+          ul {
+            display: contents;
+            padding: 0;
+            li {
+              display: flex;
+              padding-left: 15px;
+              position: relative;
+              &::before {
+                content: "";
+                position: absolute;
+                left: 0;
+                top: 6px;
+                width: 5px;
+                height: 5px;
+                border-radius: 50%;
+                background: #000;
+              }
+            }
           }
 
           iframe {
@@ -380,6 +434,15 @@
           width: 100%;
         }
 
+        .react-tel-input .form-control.invalid-number {
+          background-color: #fff;
+        }
+
+        // .react-tel-input .selected-flag:hover,
+        // .react-tel-input .selected-flag:focus {
+        //   background-color: unset;
+        // }
+
         .react-tel-input .flag-dropdown {
           border: none;
           border-radius: 10px 0 0 10px;
@@ -433,6 +496,32 @@
         border-radius: 16px;
         background: #e6e8ec;
         text-wrap: nowrap;
+      }
+    }
+
+    .send-record-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+
+      button {
+        // width: 5%;
+        display: flex;
+        padding: 8px 16px;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+        border-radius: 12px;
+        background: #335df3;
+        outline: none;
+        border: none;
+        cursor: pointer;
+      }
+
+      svg {
+        cursor: pointer;
       }
     }
 
@@ -524,17 +613,42 @@
       max-width: 80%;
       border-radius: 16px;
       background: #e6e8ec;
-      text-align: justify;
+      text-align: left;
       word-break: break-word;
       white-space: pre-line;
+
+      img {
+        width: fit-content;
+        max-width: 100%;
+      }
+
+      > div:first-of-type {
+        display: contents;
+      }
 
       ul,
       ol {
         padding-left: 16px;
       }
 
-      img {
-        width: 100%;
+      ul {
+        display: contents;
+        padding: 0;
+        li {
+          display: flex;
+          padding-left: 15px;
+          position: relative;
+          &::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 6px;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #000;
+          }
+        }
       }
 
       iframe {
