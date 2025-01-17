@@ -284,6 +284,18 @@ export default function FirstAssistant() {
 
       const planDetails = checkPlan.data;
 
+      /// check if the source is not the chatbot and the assistant flow is selected and the plan is purchased then move the step to choose assistant type
+      if (
+        planDetails?.price &&
+        source !== "chatbot" &&
+        createAssistantFlowContextDetails?.creationFlow !==
+          SelectedAssistantType.NULL
+      ) {
+        createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(
+          AssistantFlowStep.CHOOSE_ASSISTANT_TYPE
+        );
+      }
+
       setPlan(planDetails);
     } catch (error) {
       console.log("error", error);
