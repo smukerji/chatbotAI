@@ -244,6 +244,7 @@
       /*------------------------------------------assistant-message-container----------------------------------------------*/
       .assistant-message-container {
         position: relative;
+        margin-bottom: 20px;
 
         .assistant-message {
           display: inline-flex;
@@ -603,6 +604,7 @@
 
   .assistant-message-container {
     position: relative;
+    margin-bottom: 20px;
 
     .assistant-message {
       display: inline-flex;

@@ -241,6 +241,7 @@
         align-self: stretch;
         background: #fcfcfd;
         border-radius: 16px;
+        border: 2px solid transparent;
 
         .card-image {
           display: flex;
@@ -298,8 +299,11 @@
           }
         }
       }
-      .selected-assistant {
+      &.selected-assistant {
         background: #9fb5ff !important;
+        h3 {
+          color: #000 !important;
+        }
       }
 
       .custom_assistant-card {
@@ -312,6 +316,7 @@
         gap: 20px;
         border-radius: 12px;
         background: #fcfcfd;
+        border: 2px solid transparent;
         // margin-top: 35px;
 
         .blank-template {
