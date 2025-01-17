@@ -23,6 +23,7 @@ import { UserDetailsContext } from "../../_helpers/client/Context/UserDetailsCon
 import { formatNumber } from "../../_helpers/client/formatNumber";
 import LoaderModal from "../chatbot/dashboard/_components/Modal/LoaderModal";
 import CustomModal from "../chatbot/dashboard/_components/CustomModal/CustomModal";
+import { CreateAssistantFlowContext } from "@/app/_helpers/client/Context/CreateAssistantFlowContext";
 const crypto = require("crypto");
 
 function Home({
@@ -35,6 +36,9 @@ function Home({
   chatbotName,
   isPlanNotification,
   setIsPlanNotification,
+  botType,
+  assistantType,
+  integrations,
 }: any) {
   const { status } = useSession();
   const router = useRouter();
@@ -57,6 +61,13 @@ function Home({
   /// get userDetails context
   const userDetailContext: any = useContext(UserDetailsContext);
   const userDetails = userDetailContext?.userDetails;
+
+  /// get the context data
+  const createAssistantFlowContext: any = useContext(
+    CreateAssistantFlowContext
+  );
+  const createAssistantFlowContextDetails =
+    createAssistantFlowContext.createAssistantFlowInfo;
 
   /// check if chatbot is being updated
   const isUpdateChatbot = botDetails?.isUpdateChatbot;
@@ -100,7 +111,6 @@ function Home({
     .createHash("sha1")
     .update(JSON.stringify(initialQAData))
     .digest("hex");
-
   /// creating the hash of latest QA
   const currentQAHash = crypto
     .createHash("sha1")
@@ -152,6 +162,7 @@ function Home({
 
     /// return the use to chatbot screen if chatbot name is empty
     if ((paramValue == "" || !paramValue) && !chatbotName) {
+      alert(`Chatbot name is missing. Please try again ${chatbotName}`);
       router.push("/chatbot");
       return;
     }
@@ -233,25 +244,25 @@ function Home({
       return;
     }
 
-    if (
-      qaCount === 0 &&
-      textCharCount === 0 &&
-      defaultFileList.length === 0 &&
-      crawledList.length === 0
-    ) {
-      message.warning("Please add some content to create the bot").then(() => {
-        botContext?.handleChange("isLoading")(false);
-      });
-      return;
-    }
-    if (totalCharCount < 100) {
-      message
-        .warning("Minimum of 100 characters required to create the bot")
-        .then(() => {
-          botContext?.handleChange("isLoading")(false);
-        });
-      return;
-    }
+    // if (
+    //   qaCount === 0 &&
+    //   textCharCount === 0 &&
+    //   defaultFileList.length === 0 &&
+    //   crawledList.length === 0
+    // ) {
+    //   message.warning("Please add some content to create the bot").then(() => {
+    //     botContext?.handleChange("isLoading")(false);
+    //   });
+    //   return;
+    // }
+    // if (totalCharCount < 100) {
+    //   message
+    //     .warning("Minimum of 100 characters required to create the bot")
+    //     .then(() => {
+    //       botContext?.handleChange("isLoading")(false);
+    //     });
+    //   return;
+    // }
     for await (const item of botDetails?.qaList) {
       if (item.question.length < 10 || item.answer.length < 20) {
         message
@@ -298,30 +309,23 @@ function Home({
         JSON.stringify(botDetails?.deleteCrawlList)
       );
       //// default chatbot set
-      formData.append(
-        "userId",
-        // chatbotId === "123d148a-be02-4749-a612-65be9d96266c"
-        //   ? "651d111b8158397ebd0e65fb"
-        //   : chatbotId === "34cceb84-07b9-4b3e-ad6f-567a1c8f3557"
-        //   ? "65795294269d08529b8cd743"
-        //   : chatbotId === "f0893732-3302-46b2-922a-95e79ef3524c"
-        //   ? "651d111b8158397ebd0e65fb"
-        //   : chatbotId === "f8095ef4-6cd0-4373-a45e-8fe15cb6dd0f"
-        //   ? "6523fee523c290d75609a1fa"
-        cookies.userId
-      );
+
+      formData.append("userId", cookies.userId);
       formData.append("qaList", JSON.stringify(botDetails?.qaList));
       formData.append("text", text);
-      formData.append(
-        "chatbotText",
-        chatbotName ? chatbotName : botDetails?.chatbotName
-      );
+      formData.append("chatbotText", chatbotName || botDetails?.chatbotName);
+      formData.append("assistantType", assistantType);
+      formData.append("botType", botType);
+
+      if (!updateChatbot) {
+        formData.append("integrations", JSON.stringify(integrations));
+      }
 
       // botContext?.handleChange("isLoading")(true);
       setLoadingComponent(true);
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/store`,
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/store-v2`,
         {
           headers: {
             cache: "no-store",
@@ -365,6 +369,8 @@ function Home({
             JSON.stringify({
               id: chatbotId,
               name: chatbotName ? chatbotName : botDetails?.chatbotName,
+              botType: botType,
+              assistantType: assistantType,
             })
           )}`;
         });
@@ -378,6 +384,8 @@ function Home({
             JSON.stringify({
               id: chatbotId,
               name: chatbotName ? chatbotName : botDetails?.chatbotName,
+              botType: botType,
+              assistantType: assistantType,
             })
           )}`;
         });
@@ -640,11 +648,15 @@ function Home({
                       ? false
                       : true
                     : false
+                  : createAssistantFlowContextDetails?.industryExpertType
+                      ?.abbreviation === "shopify" &&
+                    !createAssistantFlowContextDetails?.integrationSecretVerified
+                  ? true
                   : false
               }
               onClick={createCustomBot}
             >
-              {(!updateChatbot && "Create") || "Retrain Bot"}
+              {(!updateChatbot && "Create Assistant") || "Retrain Assistant"}
             </button>
           </div>
         </div>

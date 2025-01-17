@@ -1,16 +1,28 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import "./chatbot.css"; // You can style it with CSS
 import { MessageOutlined, CloseOutlined } from "@ant-design/icons";
 import Chat from "@/app/(secure)/chatbot/dashboard/_components/Chat/Chat";
+import ChatV2 from "../../(secure)/chatbot/dashboard/_components/Chat-v2/ChatV2";
+import { functionCallHandler } from "@/app/_helpers/client/functionCallHandler";
 import { useSearchParams } from "next/navigation";
 import { getDate, getTime } from "../../_helpers/client/getTime";
 import { v4 as uuid } from "uuid";
 import { defaultChatBubbleIconColor } from "../../_helpers/constant";
 import chatbubble from "../../../../public/create-chatbot-svgs/message-2.svg";
-
 import Image from "next/image";
 import axios from "axios";
+import {
+  MicrophoneContextProvider,
+  MicrophoneState,
+} from "../../_helpers/client/Context/MicrophoneContext";
+import { DeepgramContextProvider } from "../../_helpers/client/Context/DeepgramContext";
+import {
+  createClient,
+  LiveClient,
+  LiveConnectionState,
+  LiveTranscriptionEvents,
+} from "@deepgram/sdk";
 
 function Chatbot() {
   const params = useSearchParams();
@@ -21,6 +33,7 @@ function Chatbot() {
   const [messagesTime, setMessagesTime] = useState([]);
 
   const [sessionID, setSessionID] = useState();
+  const [threadId, setThreadId] = useState("");
   const [sessionStartDate, setSessionStartDate] = useState();
 
   const [userId, setUserId] = useState();
@@ -47,6 +60,9 @@ function Chatbot() {
 
   /// state to keep the chatbot open or close
   const [state, setState] = useState(false);
+
+  const [botType, setBotType] = useState("bot-v1");
+
   function toggleChatbot() {
     setState(!state);
   }
@@ -67,6 +83,14 @@ function Chatbot() {
     setUser(response.data.user);
   };
 
+  const createThread = async () => {
+    const res = await fetch(`/api/assistants/threads`, {
+      method: "POST",
+    });
+    const data = await res.json();
+    setThreadId(data.threadId);
+  };
+
   useEffect(() => {
     const planEndTimer = setInterval(() => {
       if (user) {
@@ -82,9 +106,13 @@ function Chatbot() {
   }, [user]);
 
   useEffect(() => {
+    // create a new threadID when chat component created
+    createThread();
+  }, []);
+
+  useEffect(() => {
     setSessionID(uuid());
     setSessionStartDate(getDate());
-
     const fetchBotDetails = async () => {
       setIsBotDetailsFetched(true);
       const response = await axios.get(
@@ -110,6 +138,7 @@ function Chatbot() {
       setUserDetails(botDetails?.chatbotSettings[0]?.userDetails);
       setUserMessageColor(botDetails?.chatbotSettings[0]?.userMessageColor);
       setMessagePlaceholder(botDetails?.chatbotSettings[0]?.messagePlaceholder);
+      setBotType(botDetails?.botType);
       botDetails?.chatbotSettings[0]?.initialMessage?.map((message, index) => {
         // setMessages((prev): any => {
         //   [
@@ -143,46 +172,189 @@ function Chatbot() {
     if (!isBotDetailsFetched && chatbot.id) fetchBotDetails();
   }, [chatbot.id]);
 
+  /// state to manage microphone
+  const [microphoneState, setMicrophoneState] = useState(
+    MicrophoneState.NotSetup
+  );
+  const [microphone, setMicrophone] = useState(null);
+
+  const setupMicrophone = async () => {
+    setMicrophoneState(MicrophoneState.SettingUp);
+
+    try {
+      const userMedia = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          noiseSuppression: true,
+          echoCancellation: true,
+        },
+      });
+
+      const microphone = new MediaRecorder(userMedia);
+
+      setMicrophoneState(MicrophoneState.Ready);
+      setMicrophone(microphone);
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const stopMicrophone = useCallback(() => {
+    if (microphone?.state === "recording") {
+      microphone.stop();
+      setMicrophoneState(MicrophoneState.Ready);
+    }
+  }, [microphone]);
+
+  const startMicrophone = useCallback(() => {
+    setMicrophoneState(MicrophoneState.Opening);
+
+    if (microphone?.state === "paused") {
+      microphone.resume();
+    } else {
+      microphone?.start(250);
+      setMicrophoneState(MicrophoneState.Open);
+    }
+  }, [microphone]);
+
+  /// state to manage deepgram
+  const [connection, setConnection] = useState(null);
+  const [connectionState, setConnectionState] = useState(
+    LiveConnectionState.CLOSED
+  );
+
+  const getApiKey = async () => {
+    const response = await fetch("/chatbot/deepgram-authenticate/api", {
+      cache: "no-store",
+    });
+    const result = await response.json();
+    return result.key;
+  };
+
+  /**
+   * Connects to the Deepgram speech recognition service and sets up a live transcription session.
+   *
+   * @param options - The configuration options for the live transcription session.
+   * @param endpoint - The optional endpoint URL for the Deepgram service.
+   * @returns A Promise that resolves when the connection is established.
+   */
+  const connectToDeepgram = async (options, endpoint) => {
+    const key = await getApiKey();
+    const deepgram = createClient(key);
+
+    const conn = deepgram.listen.live(options, endpoint);
+
+    conn.addListener(LiveTranscriptionEvents.Open, () => {
+      setConnectionState(LiveConnectionState.OPEN);
+    });
+
+    conn.addListener(LiveTranscriptionEvents.Close, () => {
+      setConnectionState(LiveConnectionState.CLOSED);
+    });
+
+    setConnection(conn);
+  };
+
+  const disconnectFromDeepgram = async () => {
+    if (connection) {
+      connection.finish();
+      setConnection(null);
+    }
+  };
+
   return (
     <>
-      {/* {state && ( */}
-      <div className="embed-chatbot-container">
-        <Chat
-          chatbot={chatbot}
-          messages={messages}
-          setMessages={setMessages}
-          messagesTime={messagesTime}
-          setMessagesTime={setMessagesTime}
-          sessionID={sessionID}
-          sessionStartDate={sessionStartDate}
-          setSessionID={setSessionID}
-          setSessionStartDate={setSessionStartDate}
-          isPopUp={true}
-          userId={userId}
-          chatbotName={chatbotName}
-          chatbotDisplayName={displayName}
-          suggestedMessages={suggestedMessages}
-          initialMessage={initialMessage}
-          profilePictureUrl={profilePictureUrl}
-          leadFields={leadFields}
-          leadTitle={leadTitle}
-          userLeadDetails={userDetails}
-          isPlanNotification={isPlanNotification}
-          setIsPlanNotification={setIsPlanNotification}
-          userMessageColor={userMessageColor}
-          messagePlaceholder={messagePlaceholder}
-          userLocation={userLocation}
-        />
-      </div>
-      {/* )} */}
+      <MicrophoneContextProvider>
+        <DeepgramContextProvider>
+          {/* {state && ( */}
+          <div className="embed-chatbot-container">
+            {botType === "bot-v1" ? (
+              <Chat
+                chatbot={chatbot}
+                messages={messages}
+                setMessages={setMessages}
+                messagesTime={messagesTime}
+                setMessagesTime={setMessagesTime}
+                sessionID={sessionID}
+                sessionStartDate={sessionStartDate}
+                setSessionID={setSessionID}
+                setSessionStartDate={setSessionStartDate}
+                isPopUp={true}
+                userId={userId}
+                chatbotName={chatbotName}
+                chatbotDisplayName={displayName}
+                suggestedMessages={suggestedMessages}
+                initialMessage={initialMessage}
+                profilePictureUrl={profilePictureUrl}
+                leadFields={leadFields}
+                leadTitle={leadTitle}
+                userLeadDetails={userDetails}
+                isPlanNotification={isPlanNotification}
+                setIsPlanNotification={setIsPlanNotification}
+                userMessageColor={userMessageColor}
+                messagePlaceholder={messagePlaceholder}
+                userLocation={userLocation}
+                /* microphone states */
+                setupMicrophonePopup={setupMicrophone}
+                stopMicrophonePopup={stopMicrophone}
+                startMicrophonePopup={startMicrophone}
+                microphoneStatePopup={microphoneState}
+                microphonePopup={microphone}
+                /* deepgram states */
+                connectToDeepgramPopup={connectToDeepgram}
+                disconnectFromDeepgramPopup={disconnectFromDeepgram}
+                connectionPopup={connection}
+                connectionStatePopup={connectionState}
+              />
+            ) : (
+              <ChatV2
+                chatbot={chatbot}
+                messages={messages}
+                setMessages={setMessages}
+                messagesTime={messagesTime}
+                setMessagesTime={setMessagesTime}
+                threadID={threadId}
+                sessionStartDate={sessionStartDate}
+                setThreadId={createThread}
+                setSessionStartDate={setSessionStartDate}
+                isPopUp={true}
+                userId={userId}
+                chatbotName={chatbotName}
+                chatbotDisplayName={displayName}
+                suggestedMessages={suggestedMessages}
+                initialMessage={initialMessage}
+                profilePictureUrl={profilePictureUrl}
+                leadFields={leadFields}
+                leadTitle={leadTitle}
+                userLeadDetails={userDetails}
+                isPlanNotification={isPlanNotification}
+                setIsPlanNotification={setIsPlanNotification}
+                userMessageColor={userMessageColor}
+                messagePlaceholder={messagePlaceholder}
+                userLocation={userLocation}
+                functionCallHandler={functionCallHandler}
+                /* microphone states */
+                setupMicrophonePopup={setupMicrophone}
+                stopMicrophonePopup={stopMicrophone}
+                startMicrophonePopup={startMicrophone}
+                microphoneStatePopup={microphoneState}
+                microphonePopup={microphone}
+                /* deepgram states */
+                connectToDeepgramPopup={connectToDeepgram}
+                disconnectFromDeepgramPopup={disconnectFromDeepgram}
+                connectionPopup={connection}
+                connectionStatePopup={connectionState}
+              />
+            )}
+          </div>
+          {/* )} */}
 
-      {/* <div className="chatbot-icon" onClick={toggleChatbot}> */}
-      {/* {state ? (
+          {/* <div className="chatbot-icon" onClick={toggleChatbot}> */}
+          {/* {state ? (
           <CloseOutlined className="chat-icon" />
         ) : (
           <MessageOutlined className="chat-icon" />
         )} */}
-      {/* <div
+          {/* <div
         className="chatbot-icon"
         style={
           {
@@ -207,7 +379,9 @@ function Chatbot() {
           />
         </div>
       </div> */}
-      {/* </div> */}
+          {/* </div> */}
+        </DeepgramContextProvider>
+      </MicrophoneContextProvider>
     </>
   );
 }

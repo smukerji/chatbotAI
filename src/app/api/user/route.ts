@@ -8,9 +8,14 @@ export async function GET(req: NextRequest) {
   try {
     const db = (await clientPromise!).db();
     const userCollection = db.collection("users");
-    const user = await userCollection.findOne({
-      _id: new ObjectId(params.get("userId")),
-    });
+    /// get the user and remove the password
+
+    const user = await userCollection.findOne(
+      {
+        _id: new ObjectId(params.get("userId")),
+      },
+      { projection: { password: 0 } }
+    );
 
     return NextResponse.json({
       status: true,

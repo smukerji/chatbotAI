@@ -1,13 +1,13 @@
-import React from 'react'
+import React from "react";
 import { Spin } from "antd";
-import "../../pricing/stripe.scss"
+import "../../pricing/stripe.scss";
 
 function Loader() {
   return (
     <div className="example">
-        <Spin />
-  </div>
-  )
+      <Spin />
+    </div>
+  );
 }
 
-export default Loader
+export default Loader;

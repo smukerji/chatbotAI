@@ -49,6 +49,7 @@ export async function GET(request: NextRequest) {
               userMessageColor: 1,
               messagePlaceholder: 1,
               chatbotBubbleAlignment: 1,
+              botType: 1,
             },
           },
         ],

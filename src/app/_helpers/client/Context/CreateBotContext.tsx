@@ -1,5 +1,6 @@
 "use client";
 import { createContext, useState } from "react";
+import { AssistantType } from "../../assistant-creation-contants";
 
 export const CreateBotContext = createContext({});
 

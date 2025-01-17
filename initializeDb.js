@@ -1,5 +1,6 @@
 // const clientPromise  = require("./src/db.js");
 const { MongoClient } = require("mongodb");
+const { title } = require("process");
 require("dotenv").config({ path: ".env.local" });
 
 const uri = process.env.NEXT_PUBLIC_MONGO_URI;
@@ -192,6 +193,165 @@ async function initializeDb() {
   //     },
   //   }
   // );
+
+  // // Create voice-assistance-template collection
+  // const voiceAssistanceTemplateCollection = db.collection("voice-assistance-template");
+
+  // // Define records to be inserted
+  // const records = [
+  //   {
+  //     assistantType: "Customer Support",
+  //     industryType: "Assistant",
+  //     dispcrtion:"AI Chatbot agent",
+  //     systemPrompt: "Provide technical support for TechSolutions products.",
+  //     imageUrl: "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/voice-assistant-images/IT-Support-Agent-ch9EFzJktleXygVkY4HjvuqAyI8rmn.svg"
+  //   },
+  //   {
+  //     assistantType: "Sales",
+  //     industryType: "Assistant",
+  //     dispcrtion:"AI Chatbot agent",
+  //     systemPrompt: "Assist customers with product inquiries and purchases.",
+  //     imageUrl: "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/voice-assistant-images/sales-agent-LlKqKiq99GKxpaITxhr1NuZLxi4dLg.svg"
+  //   },
+  //   {
+  //     assistantType: "IT Support Agent",
+  //     industryType: "Assistant",
+  //     dispcrtion:"AI Chatbot agent",
+  //     systemPrompt: "Assist customers with product inquiries and purchases.",
+  //     imageUrl: "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/voice-assistant-images/IT-Support-Agent-ch9EFzJktleXygVkY4HjvuqAyI8rmn.svg"
+  //   },
+  //   {
+  //     assistantType: "Hospitality",
+  //     industryType: "Expert",
+  //     dispcrtion:"Your personal Concierge",
+  //     systemPrompt: "Provide information about medical services and appointments.",
+  //     imageUrl: "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/voice-assistant-images/expert-hospitality-FwXySwMiX21076xeplOJqoy3U7h1wX.svg"
+  //   },
+  //   {
+  //     assistantType: "Real Estate",
+  //     industryType: "Expert",
+  //     dispcrtion:"Our own Real Estate agent",
+  //     systemPrompt: "Assist students with course information and enrollment.",
+  //     imageUrl: "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/voice-assistant-images/expert-real-estate-sUoZig2KaPFJh2r028aXvIvZZUJkD9.svg"
+  //   },
+  //   {
+  //     assistantType: "Health & Fitness",
+  //     industryType: "Expert",
+  //     dispcrtion:"Personal gym assistant",
+  //     systemPrompt: "Assist students with course information and enrollment.",
+  //     imageUrl: "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/voice-assistant-images/expert-health-fitness-yEB6C0WD1xMDi7q9ImuYJEtSAq8bP6.svg"
+  //   },
+  //   {
+  //     assistantType: "IT and Software",
+  //     industryType: "Expert",
+  //     dispcrtion:"IT support assistant",
+  //     systemPrompt: "Assist students with course information and enrollment.",
+  //     imageUrl: "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/voice-assistant-images/expert-IT-Software-5xo0jGEu5m7rEEINLF3x7UBbgIuubk.svg"
+  //   }
+  // ];
+
+  // await voiceAssistanceTemplateCollection.insertMany(records);
+
+  // const assist = db.collection("assistant-types");
+  // const records = [
+  //   {
+  //     title: "Customer Support",
+  //     description: "AI Chatbot agent",
+  //     imageUrl:
+  //       "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/customer-support-fFTRRcF78qkxDuATozrYndnoX4Rzw4.png",
+  //     abbreviation: "cs-agent",
+  //   },
+  //   {
+  //     title: "IT Support Agent",
+  //     description: "AI Chatbot agent",
+  //     imageUrl:
+  //       "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/it-support-agent-fPzn0Hl0Ts4VxkrZjUWyLptdlw2shQ.png",
+  //     abbreviation: "it-agent",
+  //   },
+  //   {
+  //     title: "Sales Agent",
+  //     description: "AI Chatbot agent",
+  //     imageUrl:
+  //       "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/sales-agent-R7klshVKpa6amVVFeJHaH3c71JrLZl.png",
+  //     abbreviation: "sales-agent",
+  //   },
+  //   {
+  //     title: "Real Estate",
+  //     description: "AI Chatbot agent",
+  //     imageUrl:
+  //       "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/real-estate-agent-pXr5kwG6yG4BMqa2bgrrxJJPvshlcq.png",
+  //     abbreviation: "re-agent",
+  //   },
+  //   {
+  //     title: "Ecommerce Sales Agent",
+  //     description: "AI Chatbot agent",
+  //     imageUrl:
+  //       "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/ecommerce-sales-agent-U3Yl3DfiDKIOb38WS8FdLRUUablq07.png",
+  //     abbreviation: "ecommerce-agent",
+  //   },
+  // ];
+
+  // // Prepare the upsert operations
+  // const bulkOps = records.map((record) => ({
+  //   updateOne: {
+  //     filter: { title: record.title }, // Find by title
+  //     update: { $set: record }, // Set the new record values
+  //     upsert: true, // Create the record if it doesn't exist
+  //   },
+  // }));
+
+  // // Perform the upsert operations
+  // await assist.bulkWrite(bulkOps, { ordered: false });
+
+  // //// insdustry type
+  // const industry = db.collection("industry-types");
+  // const recordsIndustry = [
+  //   {
+  //     title: "SME Business",
+  //     description:
+  //       "Performing a wide range of tasks, seamlessly interacting with users across various domains,",
+  //     imageUrl:
+  //       "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/sme-industry-9ZtGYZ5vjxAMJheezCieOi5RdC8R9I.png",
+  //     abbreviation: "sme-business",
+  //   },
+  //   {
+  //     title: "Real Estate",
+  //     description:
+  //       "Offering financial management, analysis, advice, task automation, and investment optimization.",
+  //     imageUrl:
+  //       "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/real-estate-industry-4pAW7bF28EMjuudwXQscWTBoQkqhHq.png",
+  //     abbreviation: "real-estate",
+  //   },
+  //   {
+  //     title: "Hospitality Expert",
+  //     description:
+  //       "Providing healthcare support by assisting with diagnostics, treatment planning, patient monitoring, and administrative tasks",
+  //     imageUrl:
+  //       "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/hospital-industry-mWGGN7YU04UhXxHrpJoYmjGbJP8wMJ.png",
+  //     abbreviation: "hospitality-expert",
+  //   },
+  //   {
+  //     title: "Shopify",
+  //     description:
+  //       "Performing a wide range of tasks, seamlessly interacting with users across various domains,",
+  //     imageUrl:
+  //       "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/shopify-industry-35hAHVsSw2zragWqAWlyXqv3UOYdSC.png",
+  //     abbreviation: "shopify",
+  //   },
+  // ];
+
+  // // Prepare the upsert operations
+  // const bulkOpsIndustry = recordsIndustry.map((record) => ({
+  //   updateOne: {
+  //     filter: { title: record.title }, // Find by title
+  //     update: { $set: record }, // Set the new record values
+  //     upsert: true, // Create the record if it doesn't exist
+  //   },
+  // }));
+
+  // // Perform the upsert operations
+  // await industry.bulkWrite(bulkOpsIndustry, { ordered: false });
+
   console.log("Database initialized successfully");
   process.exit();
 }

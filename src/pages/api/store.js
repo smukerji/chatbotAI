@@ -355,8 +355,13 @@ export default async function handler(req, res) {
             });
           }
         }
-        if (text.length > 0 && !updateChatbot) {
-          /// generating chunks and embedding
+
+        /// embed the text
+        if (
+          text.length > 0 &&
+          (!updateChatbot || (updateChatbot && isTextUpdated))
+        ) {
+          // Generating chunks and embedding
           const chunks = await generateChunksNEmbedd(
             text,
             "text",
@@ -364,31 +369,10 @@ export default async function handler(req, res) {
             ""
           );
 
-          /// store the emebeddings in pinecone database
+          // Store the embeddings in Pinecone database
           await upsert(chunks.data, userId);
 
-          /// store the details in database
-          /// iterate and store each user filename as per chatbot
-          collection.insertOne({
-            chatbotId,
-            dataID: chunks.dataIDs,
-            content: text,
-            source: "text",
-          });
-        } else if (text.length > 0 && updateChatbot && isTextUpdated) {
-          /// generating chunks and embedding
-          const chunks = await generateChunksNEmbedd(
-            text,
-            "text",
-            chatbotId,
-            ""
-          );
-
-          /// store the emebeddings in pinecone database
-          await upsert(chunks.data, userId);
-
-          /// store the details in database
-          /// iterate and store each user filename as per chatbot
+          // Store the details in the database
           collection.insertOne({
             chatbotId,
             dataID: chunks.dataIDs,

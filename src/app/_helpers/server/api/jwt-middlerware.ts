@@ -24,8 +24,12 @@ export function isPublicPath(req: NextRequest) {
     "GET:/blog/api/allblogs",
     "GET:/blog/api/allslugs",
     "GET:/blog/api/previewblog",
+    "GET:/voicebot/dashboard/api/template",
+    "GET:/voicebot/dashboard/api/assistant",
+    "DELETE:/voicebot/dashboard/api/assistant",
     "POST:/blog/api/previewblog",
     "POST:/home/pricing/stripe-payment-gateway/get-plan-prices",
+    "POST:/voicebot/dashboard/api/assistant",
   ];
 
   return publicPaths.includes(`${req.method}:${req.nextUrl.pathname}`);

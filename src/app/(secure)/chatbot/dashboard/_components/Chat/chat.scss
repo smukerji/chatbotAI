@@ -81,12 +81,14 @@
         font-style: normal;
         font-weight: 500;
         line-height: 24px;
+        width: 86%;
+        word-wrap: break-word;
         /* 150% */
       }
 
       .chatbot-id {
         display: flex;
-        align-items: center;
+        align-items: start;
         gap: 8px;
       }
 
@@ -242,6 +244,7 @@
       /*------------------------------------------assistant-message-container----------------------------------------------*/
       .assistant-message-container {
         position: relative;
+        margin-bottom: 20px;
 
         .assistant-message {
           display: inline-flex;
@@ -497,6 +500,32 @@
       }
     }
 
+    .send-record-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+
+      button {
+        // width: 5%;
+        display: flex;
+        padding: 8px 16px;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+        border-radius: 12px;
+        background: #335df3;
+        outline: none;
+        border: none;
+        cursor: pointer;
+      }
+
+      svg {
+        cursor: pointer;
+      }
+    }
+
     .powered-by {
       color: #777e90;
       text-align: end;
@@ -575,6 +604,7 @@
 
   .assistant-message-container {
     position: relative;
+    margin-bottom: 20px;
 
     .assistant-message {
       display: inline-flex;
