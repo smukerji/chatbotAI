@@ -35,6 +35,9 @@
           background: #9fb5ff !important;
           border: 2px solid #2e58ea;
           border-radius: 12px;
+          p {
+            color: #000;
+          }
         }
 
         @media screen and (max-width: 1400px) {

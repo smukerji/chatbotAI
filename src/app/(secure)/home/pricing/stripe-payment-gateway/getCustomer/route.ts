@@ -19,10 +19,8 @@ async function getCustomer(req: any, res: NextResponse) {
       const collection = db.collection("users");
       const data = await collection.findOne({ _id: new ObjectId(u_id) });
 
-      console.log("data.customerId", data.customerId === "");
-
       //ANCHOR - checking that user has customerId or not
-      if (data?.customerId) {
+      if (data?.customerId != null) {
         return { customerId: data.customerId };
       } else {
         //ANCHOR - create user's customerId

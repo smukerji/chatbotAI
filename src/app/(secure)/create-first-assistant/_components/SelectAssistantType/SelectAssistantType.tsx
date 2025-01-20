@@ -20,8 +20,10 @@ function SelectAssistantType() {
   return (
     <div className="select-assistant-container">
       <div className="title">
-        <h1>AI Agent platform. Create your own AI Agent!</h1>
-        <span>Create your own AI chat agent or AI voice agent with Torri</span>
+        <h1>AI Agent platforms. Lets try now !</h1>
+        <span>
+          Build your own customised AI chatbot and Voice Agent using Torri
+        </span>
       </div>
       <div className="select-assistant-type">
         <div className="assistant-type">
@@ -40,7 +42,7 @@ function SelectAssistantType() {
           >
             <Image src={ChatbotImage} alt="assistant-type-1" unoptimized />
             <h2>Chatbot</h2>
-            <p>Customise your AI Chat Agent</p>
+            <p>AI Custom Chat Agent</p>
           </div>
           <div
             className={`assistant-type-item ${
@@ -49,14 +51,32 @@ function SelectAssistantType() {
                 ? "selected-assistant"
                 : ""
             }`}
-            onClick={() =>
-              createAssistantFlowContext.handleChange("creationFlow")(
-                SelectedAssistantType.VOICE
-              )
-            }
+            // onClick={() =>
+            //   createAssistantFlowContext.handleChange("creationFlow")(
+            //     SelectedAssistantType.VOICE
+            //   )
+            // }
           >
             <Image src={VoicebotImage} alt="assistant-type-2" unoptimized />
-            <h2>Voicebot</h2>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <h2>Voicebot</h2>
+              <span
+                style={{
+                  color: "#FE632F",
+                  fontSize: "16px",
+                  fontWeight: 500,
+                  lineHeight: "24px",
+                  textAlign: "center",
+                  fontFamily: "General Sans",
+                  padding: "8px 16px",
+                  borderRadius: "1000px",
+                  background: "#FFF2EE",
+                  marginTop: "24px",
+                }}
+              >
+                Coming Soon
+              </span>
+            </div>
             <p>Customise your AI Voice Agent</p>
           </div>
         </div>

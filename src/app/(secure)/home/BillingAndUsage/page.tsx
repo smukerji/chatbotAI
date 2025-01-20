@@ -8,15 +8,7 @@ import { useCookies } from "react-cookie";
 import { useSession } from "next-auth/react";
 // import { redirect } from "next/navigation";
 import { getDate } from "@/app/_helpers/client/getTime";
-import {
-  Table,
-  Modal,
-  message,
-  TableProps,
-  Button,
-  Tabs,
-  TabsProps,
-} from "antd";
+import { Table, Modal, message, TableProps, Button } from "antd";
 import { redirect, useRouter } from "next/navigation";
 import { UserDetailsContext } from "../../../_helpers/client/Context/UserDetailsContext";
 import { formatNumber } from "../../../_helpers/client/formatNumber";
@@ -31,8 +23,6 @@ import PaymentTable from "./_components/PaymentTable";
 import CancelPlanModal from "./_components/CancelPlanModal";
 import Loader from "../pricing/_components/Loader";
 import LimitReachedModal from "../../chatbot/dashboard/_components/Modal/LimitReachedModal";
-import VoicebotUsage from "./_components/VoicebotUsage";
-import VoicebotPaymentHistory from "./_components/VoicebotPaymentHistory";
 
 function BillingAndUsage() {
   const [cookies, setCookie] = useCookies(["userId"]);
@@ -45,25 +35,9 @@ function BillingAndUsage() {
   const [plan, setPlan] = useState<any>();
   const [isPlanNotification, setIsPlanNotification] = useState(false);
   const [user, setUser] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState("1");
 
   // const [columns, setColumns] = useState([])
 
-  // tabs items
-  const items: TabsProps["items"] = [
-    {
-      key: "1",
-      label: "Chatbot",
-    },
-    {
-      key: "2",
-      label: "Voicebot",
-    },
-  ];
-
-  const onChageTab = (key: string) => {
-    setActiveTab(key);
-  };
   //ANCHOR - API CALL TO CANCEL PLAN FOR NEXT BILLING CYCLE
   const handleOk = async () => {
     const response = await axios.put(
@@ -92,7 +66,6 @@ function BillingAndUsage() {
   };
 
   //ANCHOR - API CALL FOR COLLECTING DATA FROM DATABASE
-  // FIXME - Handle already canceled plan scenario cause status will be canceled
   const myFunction = async () => {
     try {
       setLoading(true);
@@ -105,6 +78,7 @@ function BillingAndUsage() {
 
       setPlanDetail(response?.data?.planDetail);
       setPlan(response.data);
+      console.log("response data", response.data);
 
       const newDate = new Date(response?.data?.nextRenewal);
       const options: any = { year: "numeric", month: "short", day: "2-digit" };
@@ -187,52 +161,40 @@ function BillingAndUsage() {
             </Modal>
 
             <div className="billing-main">
-              <div className="billing-head">
-                <p>Billing & Usage</p>
-                <Tabs
-                  defaultActiveKey="1"
-                  items={items}
-                  onChange={onChageTab}
-                />
-              </div>
-
-              {/* <div className="message-count">
+              <div className="billing-head">Billing & Usage</div>
+              <div className="message-count">
                 <div className="message-head"></div>
-              </div> */}
-              {activeTab === "1" && (
-                <>
-                  <div className="plan-head">My Plan</div>
-                  <div className="plan-details">
-                    <div className="name-features">
-                      <div className="plan-name-container">
-                        <span className="plan-name">
-                          {planDetail?.name ? planDetail.name : "No Plan Found"}
+              </div>
+              <div className="plan-head">My Plan</div>
+              <div className="plan-details">
+                <div className="name-features">
+                  <div className="plan-name-container">
+                    <span className="plan-name">
+                      {planDetail?.name ? planDetail.name : "No Plan Found"}
+                    </span>
+                    {plan.duration && plan.duration != "" && (
+                      <div className="plan-duration">
+                        <span className="plan-duration-text">
+                          Billed{" "}
+                          {plan?.duration === "month" ? "Monthly" : "Yearly"}
                         </span>
-                        {plan.duration && plan.duration != "" && (
-                          <div className="plan-duration">
-                            <span className="plan-duration-text">
-                              Billed{" "}
-                              {plan?.duration === "month"
-                                ? "Monthly"
-                                : "Yearly"}
-                            </span>
-                          </div>
-                        )}
                       </div>
-                      {date !== "Invalid Date" && (
-                        <div className="plan-feature">
-                          <div className="next-renewal-date">
-                            <div className="next-renewal-date-text">
-                              {plan?.isNextPlan === false
-                                ? "Expires on"
-                                : "Auto Renewal due on"}
-                            </div>
-                            <div className="next-renewal-date-date">{date}</div>
-                          </div>
+                    )}
+                  </div>
+                  {date !== "Invalid Date" && (
+                    <div className="plan-feature">
+                      <div className="next-renewal-date">
+                        <div className="next-renewal-date-text">
+                          {plan?.isNextPlan === false
+                            ? "Expires on"
+                            : "Auto Renewal due on"}
                         </div>
-                      )}
-                      <div className="plan-feature">
-                        {/* <div className="plan-message">
+                        <div className="next-renewal-date-date">{date}</div>
+                      </div>
+                    </div>
+                  )}
+                  <div className="plan-feature">
+                    {/* <div className="plan-message">
                   {" "}
                   {formatNumber(
                     userDetails?.plan?.messageLimit
@@ -241,13 +203,13 @@ function BillingAndUsage() {
                   )}{" "}
                   Messages
                 </div> */}
-                        {/* <Image className="dot-image" src={circle} alt="no image" /> */}
-                        {/* <div className="plan-chatbot">
+                    {/* <Image className="dot-image" src={circle} alt="no image" /> */}
+                    {/* <div className="plan-chatbot">
                   {userDetails?.plan?.numberOfChatbot} Chatbots
                 </div>
                 <Image className="dot-image" src={circle} alt="no image" /> */}
 
-                        {/* <div className="more-details">
+                    {/* <div className="more-details">
                       <p className="more-details-text">
                         More Details{" "}
                         <span>
@@ -255,50 +217,41 @@ function BillingAndUsage() {
                         </span>
                       </p>
                     </div> */}
-                      </div>
-                    </div>
-
-                    <div className="cancel-upgrade-btns">
-                      {plan?.isNextPlan === false ? (
-                        <p className="cancel-plan">Cancelled</p>
-                      ) : (
-                        <p
-                          className="cancel-plan"
-                          onClick={() => setIsModalOpen(true)}
-                        >
-                          Cancel My Plan
-                        </p>
-                      )}
-
-                      <button className="btn-upgrade" onClick={explorePlan}>
-                        <span
-                          className="btn-text"
-                          onClick={() => router.push("/home/pricing")}
-                        >
-                          Upgrade Plan
-                        </span>
-                      </button>
-                    </div>
                   </div>
+                </div>
 
-                  <AddOnsDetail
-                    date={date}
-                    isNextPlan={plan?.isNextPlan}
-                    planName={plan?.plan}
-                  />
-                  <div className="manage-plan">Payment history</div>
-                  <PaymentTable />
-                </>
-              )}
+                <div className="cancel-upgrade-btns">
+                  {plan?.isNextPlan === false ? (
+                    <p className="cancel-plan">Cancelled</p>
+                  ) : (
+                    <p
+                      className="cancel-plan"
+                      onClick={() => setIsModalOpen(true)}
+                    >
+                      Cancel My Plan
+                    </p>
+                  )}
 
-              {activeTab === "2" && (
-                <>
-                  <VoicebotUsage />
-                  <div className="manage-plan">Payment history</div>
-                  <VoicebotPaymentHistory />
-                </>
-              )}
+                  <button className="btn-upgrade" onClick={explorePlan}>
+                    <span
+                      className="btn-text"
+                      onClick={() => router.push("/home/pricing")}
+                    >
+                      Upgrade Plan
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              <AddOnsDetail
+                date={date}
+                isNextPlan={plan?.isNextPlan}
+                planName={plan?.plan}
+              />
+              <div className="manage-plan">Payment history</div>
             </div>
+
+            <PaymentTable />
           </>
         )}
       </>

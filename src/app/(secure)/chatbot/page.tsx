@@ -4,17 +4,13 @@ import {
   MessageOutlined,
   MoreOutlined,
 } from "@ant-design/icons";
-import {
-  fromUnixTime,
-  format
-} from "date-fns";
-
 import { Modal, Spin, message, Button } from "antd";
 import React, { Suspense, useContext, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import "./chatbot.scss";
 import Image from "next/image";
 import noChatbotBg from "../../../../public/sections-images/common/no-chatbot-icon.svg";
+import voiceBotComingSoom from "../../../../public/sections-images/common/voice-agent-coming-soon.png";
 // import gridIcon from "../../../../public/svgs/grid-icon.svg";
 import GridLayout from "./_components/GridLayout";
 import TableLayout from "./_components/TableLayout";
@@ -75,7 +71,7 @@ const initialState = {
     //     server: { timeoutSeconds: 20, url: "", secret: "" },
     //   },
     // ],
-    toolIds: [""],//we deleted this field in the backend
+    toolIds: [""], //we deleted this field in the backend
     provider: "openai",
     model: "gpt-4o",
     temperature: 0,
@@ -390,7 +386,6 @@ function Chatbot() {
       );
       const data = await res.json();
 
-      
       setVoiceAssistantList(data?.assistants);
     } catch (error: any) {
       console.log("Error in fetching voice assistant data", error);
@@ -399,14 +394,6 @@ function Chatbot() {
       setVoiceBotLoading(false);
     }
   };
-
-  const getDate =(ts:number) => {
-    if (!ts) return "";
-
-    const date = fromUnixTime(ts);
-
-    return format(date, "PP");
-  }
 
   const selectedAssistantHandler = (assistantInfo: any) => {
     voiceBotContextData.setAssistantInfo(assistantInfo);
@@ -642,11 +629,9 @@ function Chatbot() {
             {/* </Link> */}
           </div>
 
-          {/* {openLimitModal ? (
-              <LimitReachedModal setOpenLimitModel={setOpenLimitModel} />
-            ) : (
-              <></>
-            )} */}
+          {openLimitModal && (
+            <LimitReachedModal setOpenLimitModel={setOpenLimitModel} />
+          )}
         </div>
 
         {!isVoiceBotActived ? (
@@ -719,20 +704,25 @@ function Chatbot() {
               </div>
             )}
             {loading && <Spin indicator={antIcon} />}
-
-
           </>
         ) : (
           <>
             {voiceBotLoading ? (
               <Spin indicator={antIcon} />
             ) : voiceAssistantList?.length == 0 ? (
-              <div className="no-chatbots-container">
-                <Image src={noChatbotBg} alt="no-chatbot-bg" />
-                <p>
-                  You haven&apos;t created any Voicebot. Go ahead and create a
-                  New Voicebot!
-                </p>
+              // <div className="no-chatbots-container">
+              //   <Image src={noChatbotBg} alt="no-chatbot-bg" />
+              //   <p>
+              //     You haven&apos;t created any Voicebot. Go ahead and create a
+              //     New Voicebot!
+              //   </p>
+              // </div>
+
+              /// temporary adding comming soon message
+              <div className="no-chatbots-container" style={{ gap: "32px" }}>
+                <Image src={voiceBotComingSoom} alt="no-chatbot-bg" />
+                <h2>Coming Soon</h2>
+                <p>AI Voice Assistance: Coming to Life Soon!</p>
               </div>
             ) : (
               <div className="voicebot-list-container">
@@ -753,21 +743,21 @@ function Chatbot() {
                     </div>
                     <div className="info-content">
                       <div className="info">
-                        <div className="info-label">Num. Of Calls</div>
-                        <div className="value">{assistant?.metadata?.totalCallLogs || 0}</div>
+                        <div className="info-label">Total Minutes:</div>
+                        <div className="value">100</div>
                       </div>
                       <div className="info">
-                        <div className="info-label">Last Used</div>
-                        <div className="value">{getDate(assistant?.metadata?.lastUsed) || 0}</div>
+                        <div className="info-label">Call Count:</div>
+                        <div className="value">90</div>
                       </div>
                       <div className="info">
-                        <div className="info-label">Last Trained</div>
-                        <div className="value">{getDate(assistant?.metadata?.lastTrained) || 0}</div>
+                        <div className="info-label">Last Trained:</div>
+                        <div className="value">9</div>
                       </div>
-                      {/* <div className="info">
+                      <div className="info">
                         <div className="info-label">Last Used:</div>
                         <div className="value">Yesterday</div>
-                      </div> */}
+                      </div>
                     </div>
                   </div>
                 ))}

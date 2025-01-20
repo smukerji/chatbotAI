@@ -2,21 +2,16 @@ import React, { useState } from 'react';
 import Image from "next/image";
 import activeImg from "../../../../../../public/voiceBot/SVG/Ellipse 64.svg";
 import inActiveImg from "../../../../../../public/voiceBot/SVG/Ellipse 65.svg";
-import { Input, Button, message } from 'antd';
+import { Input, Button } from 'antd';
 import PhoneInput from "react-phone-input-2";
 import "./import-number-model.scss";
-import { useCookies } from "react-cookie";
-
 
 function ImportNumberCustomModel({ setOpen, title, content }: any) {
-  
-  const [cookies, setCookie] = useCookies(["userId"]);
   const [formData, setFormData] = useState({
-    phoneNumber: "",
+    phoneNumber: '',
     accountSid: '',
     authToken: '',
-    label: '',
-    userId:cookies.userId
+    label: ''
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,26 +33,17 @@ function ImportNumberCustomModel({ setOpen, title, content }: any) {
     console.log('formData:', formData);
     //  `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/phone`,
 
-    try{
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/phone`,
+      {
+        method: "POST",
+        body: JSON.stringify({ ...formData }),
+        next: { revalidate: 0 },
+      }
+    );
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/phone`,
-        {
-          method: "POST",
-          body: JSON.stringify({ ...formData }),
-          next: { revalidate: 0 },
-        }
-      );
-  
-      const data = await response.json();
-      console.log('twilio response Data:', data);
-      message.info(data.message);
-    }
-    catch(error:any){
-      console.error('Error parsing request body:', error);
-      message.error('Error parsing request body:', error);
-    }
-   
+    const data = await response.json();
+    console.log('twilio response Data:', data);
     
    
   };

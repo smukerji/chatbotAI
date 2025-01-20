@@ -34,6 +34,7 @@ import ChooseVoiceAssistantExpert from "./_components/ChooseVoiceAssistantExpert
 // import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import CreateAssitstantContainerItems from "./_components/CreateAssitstantContainerItems/CreateAssitstantContainerItems";
+import { UserDetailsContext } from "@/app/_helpers/client/Context/UserDetailsContext";
 
 export default function FirstAssistant() {
   const [cookies, setCookie] = useCookies(["userId"]);
@@ -46,6 +47,9 @@ export default function FirstAssistant() {
   );
   const createAssistantFlowContextDetails =
     createAssistantFlowContext.createAssistantFlowInfo;
+
+  const userDetailContext: any = useContext(UserDetailsContext);
+  const userDetails = userDetailContext?.userDetails;
 
   const botContext: any = useContext(CreateBotContext);
 
@@ -114,7 +118,7 @@ export default function FirstAssistant() {
       if (
         createAssistantFlowContextDetails?.assistantName.trim().length === 0
       ) {
-        setinputValidationMessage("Enter assistant name");
+        setinputValidationMessage("Please, Provide Assistant Name!");
         return;
       }
 
@@ -122,7 +126,7 @@ export default function FirstAssistant() {
         createAssistantFlowContextDetails?.creationFlow ===
         SelectedAssistantType.NULL
       ) {
-        message.error("Choose an assistant type!");
+        message.warning("Please select the type of assistant!");
         return;
       }
       /// check for the pricing plan only if user is first time user
@@ -249,7 +253,13 @@ export default function FirstAssistant() {
           }
         }
       } else {
-        setIsModalVisible(true);
+        /// if shopify is selected open the modal
+        if (
+          createAssistantFlowContextDetails?.industryExpertType
+            ?.abbreviation === "shopify"
+        ) {
+          setIsModalVisible(true);
+        }
         createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(
           AssistantFlowStep.ADD_DATA_SOURCES
         );
@@ -274,16 +284,69 @@ export default function FirstAssistant() {
 
       const planDetails = checkPlan.data;
 
+      /// check if the source is not the chatbot and the assistant flow is selected and the plan is purchased then move the step to choose assistant type
+      if (
+        planDetails?.price &&
+        source !== "chatbot" &&
+        createAssistantFlowContextDetails?.creationFlow !==
+          SelectedAssistantType.NULL
+      ) {
+        createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(
+          AssistantFlowStep.CHOOSE_ASSISTANT_TYPE
+        );
+      }
+
       setPlan(planDetails);
     } catch (error) {
       console.log("error", error);
     }
   };
 
-  /// call this on initial load as well as on every step change
+  /// get the user and plan details
+
+  const fetchData = async () => {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/account/user/details?userId=${cookies?.userId}`,
+      {
+        method: "GET",
+        next: { revalidate: 0 },
+      }
+    );
+
+    const userDetails = await response.json();
+    const date2: any = new Date(userDetails?.planExpiry);
+    const date1: any = new Date(); // Current date
+
+    // Calculate the difference in milliseconds
+    const differenceMs = date2 - date1;
+    const differenceDays = Math.round(differenceMs / (1000 * 60 * 60 * 24));
+    /// set the expiry
+    userDetailContext?.handleChange("planExpiry")(differenceDays);
+    userDetailContext?.handleChange("totalMessageCount")(
+      userDetails?.userDetails?.totalMessageCount
+    );
+    /// set the username and email
+    userDetailContext?.handleChange("firstName")(userDetails?.firstName);
+    userDetailContext?.handleChange("lastName")(userDetails?.lastName);
+    userDetailContext?.handleChange("fullName")(userDetails?.fullName);
+    userDetailContext?.handleChange("email")(userDetails?.email);
+
+    userDetailContext?.handleChange("plan")(userDetails?.plan);
+    userDetailContext?.handleChange("noOfChatbotsUserCreated")(
+      userDetails?.noOfChatbotsUserCreated
+    );
+    const percent =
+      (userDetails?.userDetails?.totalMessageCount /
+        userDetails?.plan?.messageLimit) *
+      100;
+    /// store the percentage of message sent by user
+    userDetailContext?.handleChange("percent")(percent);
+  };
+
   useEffect(() => {
     getVoiceAssistantTemplateData();
     checkPlan();
+    fetchData();
   }, []);
 
   useEffect(() => {
@@ -386,6 +449,18 @@ export default function FirstAssistant() {
       createAssistantFlowContextDetails?.currentAssistantFlowStep ===
       AssistantFlowStep.CHOOSE_INDUSTRY_EXPERT
     ) {
+      /// empty the industry expert type
+      createAssistantFlowContext?.handleChange("industryExpertType")({
+        title: "",
+        description: "",
+        imageUrl: "",
+        abbreviation: "",
+      });
+      /// empty integration also if user hits previous button
+      createAssistantFlowContext?.handleChange("integration")({});
+      createAssistantFlowContext?.handleChange("integrationSecretVerified")(
+        false
+      );
       createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(
         AssistantFlowStep.CHOOSE_ASSISTANT_TYPE
       );
@@ -547,7 +622,7 @@ export default function FirstAssistant() {
               <div className="title-container">
                 <h2 className="title">Welcome to Torri AI</h2>
                 <span className="sub-title">
-                  Create your AI agent in 5 steps
+                  Let&apos;s create your own Bot just in 5 steps
                 </span>
               </div>
               <div className="voicebot-avatar">
@@ -572,23 +647,30 @@ export default function FirstAssistant() {
                 </div>
                 <div className="voicebot-avatar-img__info">
                   {/* <div className="assistant-input-wrapper"> */}
-                  <div style={{ display: "flex", gap: "5px" }}>
-                    <Input
-                      // className={inputValidationMessage ? "input-field invalid-input" : "input-field"}
-                      className={
-                        inputValidationMessage
-                          ? "assi-input-field invalid-input"
-                          : "assi-input-field"
-                      }
-                      placeholder="Assistant Name"
-                      onChange={assistantNameChangeHandler}
-                      // onBlur={handleInputBlur}
-                      id="assistantNameInput"
-                      value={createAssistantFlowContextDetails?.assistantName}
-                      disabled={!isInputVisible}
-                    />
+                  <div>
+                    <div style={{ display: "flex", gap: "5px" }}>
+                      <Input
+                        // className={inputValidationMessage ? "input-field invalid-input" : "input-field"}
+                        className={
+                          inputValidationMessage
+                            ? "assi-input-field invalid-input"
+                            : "assi-input-field"
+                        }
+                        placeholder="Assistant Name"
+                        onChange={assistantNameChangeHandler}
+                        // onBlur={handleInputBlur}
+                        id="assistantNameInput"
+                        value={createAssistantFlowContextDetails?.assistantName}
+                        disabled={!isInputVisible}
+                      />
 
-                    <span style={{ color: "red", fontSize: "25px" }}>*</span>
+                      <span style={{ color: "red", fontSize: "25px" }}>*</span>
+                    </div>
+                    {inputValidationMessage && (
+                      <p className="invalidation-message">
+                        {inputValidationMessage}
+                      </p>
+                    )}
                   </div>
 
                   {/* </div> */}
@@ -612,11 +694,6 @@ export default function FirstAssistant() {
                     }}
                   />
                 </div>
-                {inputValidationMessage && (
-                  <p className="invalidation-message">
-                    {inputValidationMessage}
-                  </p>
-                )}
               </div>
               <Steps
                 className="stepper-steps"
@@ -636,7 +713,7 @@ export default function FirstAssistant() {
                     title: (
                       <div>
                         <h3 className="steps-assistant-heading">
-                          Create your Assistant
+                          Create your bot
                         </h3>
                       </div>
                     ),
@@ -779,7 +856,7 @@ export default function FirstAssistant() {
                     ) : (
                       <div>
                         <h3 className="steps-assistant-heading">
-                          Choose your Industry Expert
+                          Choose your Industry
                         </h3>
                       </div>
                     ),
@@ -855,7 +932,9 @@ export default function FirstAssistant() {
           <div className="mobile-stepper">
             <div className="title-container">
               <h2 className="title">Welcome to Torri AI</h2>
-              <span className="sub-title">Create your AI agent in 5 steps</span>
+              <span className="sub-title">
+                Let&apos;s create your own Bot just in 5 steps
+              </span>
 
               <div className="voicebot-avatar">
                 <div
@@ -886,7 +965,7 @@ export default function FirstAssistant() {
                         ? "assi-input-field invalid-input"
                         : "assi-input-field"
                     }
-                    placeholder="Assistant Name"
+                    placeholder="Your Assistant Name"
                     onChange={assistantNameChangeHandler}
                     // onBlur={handleInputBlur}
                     id="assistantNameInput"
@@ -958,7 +1037,7 @@ export default function FirstAssistant() {
                     title: (
                       <div>
                         <h3 className="steps-assistant-heading">
-                          Create your Assistant
+                          Create your bot
                         </h3>
                       </div>
                     ),
@@ -1101,7 +1180,7 @@ export default function FirstAssistant() {
                     ) : (
                       <div>
                         <h3 className="steps-assistant-heading">
-                          Choose your Industry Expert
+                          Choose your Industry
                         </h3>
                       </div>
                     ),

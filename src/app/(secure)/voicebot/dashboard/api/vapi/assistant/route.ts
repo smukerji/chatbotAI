@@ -162,7 +162,7 @@ async function getSingleAssistantDataFromVapi(req: NextRequest) {
       return { error: "Failed to get the assistant" };
     }
 
-    return { result: vapiResponseData, assistantLocalData: voiceBotRecordVapiExist };
+    return { result: vapiResponseData };
 
   }
   catch(error:any){
