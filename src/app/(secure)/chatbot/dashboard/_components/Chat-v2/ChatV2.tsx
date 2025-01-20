@@ -1567,7 +1567,7 @@ function ChatV2({
             value={userQuery}
             disabled={loading ? true : false}
           />
-          <div
+{/*           <div
             className="send-record-container"
             style={{
               backgroundColor:
@@ -1610,7 +1610,7 @@ function ChatV2({
                 }}
               />
             )}
-
+ */}
             <button
               className="icon"
               onClick={() => getReply("click")}
