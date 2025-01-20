@@ -423,16 +423,12 @@ function Dashboard() {
 
   }
 
-
-
   const vapiAssistantPublishHandler = async () => {
     // publish the assistant to the vapi
 
     //validate the assistant require field first,
 
     //call the post api to publish the assistant to the vapi
-
-    ;
     if(!voiceBotContextData?.isPublishEnabled){
       message.error("Please fill the required fields to publish the assistant");
       return;
