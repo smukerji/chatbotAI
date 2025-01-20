@@ -370,7 +370,7 @@ export default function VoiceBot() {
                   ? "assi-input-field invalid-input"
                   : "assi-input-field"
               }
-              placeholder="Your Assistant Name"
+              placeholder="Assistant Name"
               onChange={assistantNameChangeHandler}
               onBlur={handleInputBlur}
               id="assistantNameInput"

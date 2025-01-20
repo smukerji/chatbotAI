@@ -20,6 +20,7 @@ function PaymentSucessmodal({
   isModalOpen,
   subscriptionDetail,
   firstPurchase,
+  isVoiceInvoice = false,
 }: any) {
   const [countdown, setCountdown] = useState(5);
   const router = useRouter();
@@ -74,13 +75,21 @@ function PaymentSucessmodal({
         <div className="invoice-detail">
           <p className="title">Invoice</p>
           <p className="value">
-            {subscriptionDetail?.invoice ?? "Invoice#0098 - Sep 2024"}
+            {isVoiceInvoice
+              ? subscriptionDetail?.id
+              : subscriptionDetail?.invoice ?? "Invoice#0098 - Sep 2024"}
           </p>
         </div>
 
         <div className="order-date">
           <p className="title">Order date</p>
-          <p className="value">{formatDate(subscriptionDetail?.createDate)}</p>
+          <p className="value">
+            {formatDate(
+              isVoiceInvoice
+                ? subscriptionDetail?.created
+                : subscriptionDetail?.createDate
+            )}
+          </p>
         </div>
 
         <div className="redirection">

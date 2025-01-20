@@ -127,7 +127,7 @@ function PhoneNumber() {
       console.clear();
       console.log("Phone number details ", inboundNumberDetails);
   
-      if (!inboundNumberDetails || !inboundNumberDetails._id) {
+      if (!inboundNumberDetails || !inboundNumberDetails?._id) {
           console.error("No phone number selected or missing ID");
           return;
       }
@@ -183,12 +183,10 @@ function PhoneNumber() {
               <>
               <div className='list-item'>
                     <div className='number-details'>
-                      <h2> Your Phone number will be list out here </h2>
-                      <p>  Label Name will be print here </p>
+                      <h2> No Number Added, Yet!</h2>
+                      <p> Add new number here.</p>
                     </div>
-                    <div className='switch-input'>
-                      <Switch className="switch-btn" defaultChecked />
-                    </div>
+                    
                   </div>
               </>
             }
@@ -284,7 +282,9 @@ function PhoneNumber() {
           <ImportNumberCustomModel
             setOpen={setOpenModel}
             title={"Create a Tool"}
-            content={<ImportNumber />} />
+            content={<ImportNumber />} 
+            onClose={getImportedTwilioDataFromDB}
+            />
         }
 
       </div>}

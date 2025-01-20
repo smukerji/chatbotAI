@@ -37,25 +37,42 @@ async function delPlan(req: any, res: NextResponse) {
       return { msg: "Subscription not found", status: 0 };
     }
 
+    // Retrieve the subscription schedule
+    const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+    console.log(" subscriptttttt", subscription);
+
+    if (subscription.schedule) {
+      // If the subscription is managed by a schedule
+      const scheduleId: any = subscription.schedule;
+
+      // Update the subscription schedule to cancel at the end of the period
+      const updatedSchedule = await stripe.subscriptionSchedules.update(
+        scheduleId,
+        {
+          end_behavior: "cancel", // Ensures the subscription is canceled at the end of the current period
+          metadata: {
+            cancel_at_period_end: "true",
+          },
+        }
+      );
+
+      console.log("Updated subscription schedule:", updatedSchedule);
+    } else {
+      // Schedule cancellation at the end of the billing period
+      const updatedSubscription = await stripe.subscriptions.update(
+        subscriptionId,
+        {
+          cancel_at_period_end: true,
+          metadata: {
+            cancellation_scheduled: "true",
+          },
+        }
+      );
+
+      console.log("updated", updatedSubscription);
+    }
+
     //ANCHOR -  DELETE PLAN FROM USER DETAILS
-
-    // Schedule cancellation at the end of the billing period
-    const updatedSubscription = await stripe.subscriptions.update(
-      subscriptionId,
-      {
-        cancel_at_period_end: true,
-      }
-    );
-
-    // const deletePlan = await collectionUser.updateMany(
-    //   { _id: new ObjectId(u_id) },
-    //   {
-    //     $set: {
-    //       status: "cancel",
-    //       nextIsWhatsapp: false,
-    //     },
-    //   }
-    // );
 
     await collectionUser.updateMany(
       { _id: new ObjectId(u_id) },
@@ -80,6 +97,6 @@ async function delPlan(req: any, res: NextResponse) {
 
     return { msg: "Plan deleted successfully", status: true };
   } catch (error) {
-    return { msg: "finding error", status: 0 };
+    return { msg: "finding error", status: 0, error };
   }
 }

@@ -72,7 +72,7 @@ function LoaderModal({ isResponseOk, setIsResponseOk }: any) {
           ]}
         >
           <Image src={ChatbotReady} alt="chatbot-ready" />
-          <p className="chatbot-ready-text">Your AI Assistant is ready!</p>
+          <p className="chatbot-ready-text">Your Chatbot is ready!</p>
         </Modal>
       ) : (
         <Modal

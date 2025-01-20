@@ -91,6 +91,7 @@ function PricingWrapperNew({ firstPurchase = false }) {
     }
   }
 
+  // FIXME - Check status of plan before setting any active plan
   const checkPlan = async () => {
     try {
       setLoading(true);
