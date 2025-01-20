@@ -183,8 +183,11 @@ function PhoneNumber() {
               <>
               <div className='list-item'>
                     <div className='number-details'>
-                      <h2> No Number Available Yet!</h2>
-                      <p> Please add new number. </p>
+                      <h2> Your Phone number will be list out here </h2>
+                      <p>  Label Name will be print here </p>
+                    </div>
+                    <div className='switch-input'>
+                      <Switch className="switch-btn" defaultChecked />
                     </div>
                   </div>
               </>
