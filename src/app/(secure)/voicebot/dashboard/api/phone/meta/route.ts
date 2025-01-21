@@ -10,7 +10,7 @@ module.exports = apiHandler({
     // DELETE:deleteSingleAssistant//dashboard/api/assistant
     // POST: importNumberToTwilio,
     // GET: getImportedTwilioDataFromDB,
-    PUT: updateAssistantCallMetadata,//dashboard/api/assistant
+    PUT: updateAssistantCallMetadata,//
     // DELETE: deleteSingleAssistant//dashboard/api/assistant
 });
 

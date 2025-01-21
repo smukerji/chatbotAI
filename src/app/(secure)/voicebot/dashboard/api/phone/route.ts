@@ -80,6 +80,9 @@ async function getImportedTwilioDataFromDB(req: NextRequest) {
 async function updateNumberWithAssistant(req: NextRequest) {
     try{
 
+        const data: {assistantId:string, twilioId:string} = await req.json();
+
+        return {message:"data received successfully", data: data};
     }
     catch(error:any){
         console.error('Error parsing request body:', error);

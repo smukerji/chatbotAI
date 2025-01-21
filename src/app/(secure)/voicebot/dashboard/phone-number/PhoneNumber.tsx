@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import "./phone-number-design.scss";
 import PhoneInput from "react-phone-input-2";
-import { Input, Slider, Switch, Button, Select ,  Flex, Spin} from 'antd';
+import { Input, Slider, Switch, Button, Select ,  Flex, Spin, message} from 'antd';
 import Image from "next/image";
 import ImportNumber from './import-number/ImportNumber';
 import phoneNumberDelete from  "../../../../../../public/voiceBot/phone-number/trash.svg";
@@ -117,10 +117,32 @@ function PhoneNumber() {
     setInboundNumberDetails(contact);
   }
 
-  function assistantSelectOnPhoneNumberHandler(option:any,values:any){
+  async function  assistantSelectOnPhoneNumberHandler(option:any,values:any){
     console.clear();
     console.log('selected option:', option);
     console.log('selected values:', values);
+    if (inboundNumberDetails) {
+      const updateValue = {
+        twilioId: inboundNumberDetails.twilio.id,
+        assistantId: values?.assistantId
+      }
+
+      debugger;
+      const updatedRequest:any = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/phone?userId=${cookies?.userId}`,
+        {
+          method: "PUT",
+          body: JSON.stringify({ ...updateValue }),
+          next: { revalidate: 0 },
+        }
+      );
+
+      const updatedData = await updatedRequest.json();
+
+      message.info(updatedData.message);
+
+      console.log("updateValue", updateValue);
+    }
   }
 
   async function deletePhoneNumberHandler() {
@@ -172,9 +194,9 @@ function PhoneNumber() {
                       <h2> {contact.twilio.number} </h2>
                       <p>  {contact.label} </p>
                     </div>
-                    <div className='switch-input'>
+                    {/* <div className='switch-input'>
                       <Switch className="switch-btn" defaultChecked />
-                    </div>
+                    </div> */}
                   </div>
                 </>
 
