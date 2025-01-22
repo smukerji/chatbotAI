@@ -16,7 +16,7 @@ async function getAssistantList(req: NextRequest) {
         const userID:string = req.nextUrl.searchParams.get("userId") as string;
         const db = (await clientPromise!).db();
         const collection = db?.collection("voice-assistance");
-        const assistants = await collection?.find({ vapiAssistantId: { $exists: true } }).toArray();
+        const assistants = await collection?.find({ vapiAssistantId: { $exists: true }, userId: new ObjectId(userID) }).toArray();
 
         return { assistants } ;
 
