@@ -81,6 +81,29 @@ async function updateNumberWithAssistant(req: NextRequest) {
     try{
 
         const data: {assistantId:string, twilioId:string} = await req.json();
+ 
+        //read the twilio data from db
+        const db = (await clientPromise!).db();
+        const voiceAssistantCollection = db?.collection("voice-assistance-phone-numbers");
+        const recordResult = await voiceAssistantCollection?.findOne({ "twilio.id" : data.twilioId });
+
+        const token = await generateAndGetToken();
+        const client = new VapiClient({ token});
+        const callLogsResult = await client.logs.get({
+            assistantId: data.assistantId,
+            limit: 10,
+            type:"Call"
+        });
+
+        const callLogsList = await client.calls.list({
+            assistantId: data.assistantId,
+            limit:1
+        });
+
+        console.table(callLogsList);
+        const callCost = callLogsList[0].cost;
+        
+        console.table(callLogsResult);
 
         return {message:"data received successfully", data: data};
     }

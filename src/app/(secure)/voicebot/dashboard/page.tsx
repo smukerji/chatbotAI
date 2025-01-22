@@ -35,9 +35,13 @@ import Analysis from "./analysis/Analysis";
 import PhoneNumber from "./phone-number/PhoneNumber";
 import CallLogs from "./call-logs/CallLogs";
 import Vapi from '@vapi-ai/web';
+import { useCookies } from "react-cookie";
+
+
 
 import { CreateVoiceBotContext } from "../../../_helpers/client/Context/VoiceBotContextApi";
 import { updateAssistantLastTrainedMetaDataService, updateAssistantLastUsedMetaDataService, updateAssistantNumberOfCallMetaDataService } from "./services/metadata-update-service";
+
 
 const vapi = new Vapi(process.env.NEXT_PUBLIC_VAP_API as string); // Vapi public key
 
@@ -55,6 +59,8 @@ function Dashboard() {
   const params: any = useSearchParams();
 
   let [tab, setTab] = useState<string>("model");
+  
+    const [cookies, setCookie] = useCookies(["userId"]);
 
   const editChatbotSource = params.get("voicBotName") ?? "VoiceBot";
 
@@ -77,6 +83,7 @@ function Dashboard() {
 
   useEffect(() => {
     
+
 
     if (!voiceBotContextData?.assistantInfo) {
       router.push("/chatbot");
@@ -331,7 +338,28 @@ function Dashboard() {
   }
 
 
+async function costDeductionOnCallEndHandler(){
+  try{
 
+    const data = {assistantId:voiceBotContextData?.assistantInfo?.vapiAssistantId};
+    const costDeductionResponse:any = await fetch(
+      `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/costs-wallates?userId=${cookies.userId}`,
+      {
+        method: "PUT",
+        body: JSON.stringify(data)
+      }
+    );
+
+    const costDeductionResponseParse = costDeductionResponse.json();
+    if(costDeductionResponseParse?.message){
+      message.success("Call cost affect on your credits");
+    }
+
+  }
+  catch(error:any){
+    message.error("Error while deducting the cost",error);
+  }
+ }
 
   console.log("isPublishEnabled", voiceBotContextData?.isPublishEnabled);
 
@@ -357,14 +385,15 @@ function Dashboard() {
     console.log("Call has started.");
   });
 
-  vapi.on("call-end", () => {
+  vapi.on("call-end", async () => {
 
-    vapi.stop();
+    const result = await vapi.stop();
+    console.log("call end result", result);
+
     setIsMuted(false);
     setShowMakeCallButton(true);
     console.log("Call has ended.");
     setIsListening(CALLSTATUS.CALLSTOP);
-
   });
 
   vapi.on("speech-start", () => {
@@ -376,7 +405,6 @@ function Dashboard() {
   });
 
   vapi.on("error", (e) => {
-   
     // lottieRefs.current.pause();
     console.error(e);
     setShowMakeCallButton(true);
@@ -401,6 +429,8 @@ function Dashboard() {
     await updateAssistantNumberOfCallMetaDataService(
       d?.vapiAssistantId
       ,d?._id);
+
+      await costDeductionOnCallEndHandler();
   };
 
   const muteCallHandler = () => {
