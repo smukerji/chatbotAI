@@ -338,6 +338,8 @@ function Dashboard() {
   }
 
 
+
+
 async function costDeductionOnCallEndHandler(){
   try{
 
@@ -364,6 +366,31 @@ async function costDeductionOnCallEndHandler(){
   console.log("isPublishEnabled", voiceBotContextData?.isPublishEnabled);
 
   const makeVapiAssistantCall = async () => {
+
+    //check if the user has voicebot credits
+
+    try{
+      const response:any = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/costs-wallates?userId=${cookies.userId}`,
+        {
+          method: "GET",
+        }
+      );
+
+      const responseParse = await response.json();
+      if(responseParse?.isCreditExist){
+        if(!responseParse.isCreditExist){
+          message.error("Please buy more voice credits");
+          return;
+        }
+      }
+    }
+    catch(error){
+
+      message.error("Error while checking the credits");
+      
+    }
+
     let isIdAvaliable = voiceBotContextData.assistantInfo["vapiAssistantId"];
  
     if(isIdAvaliable){

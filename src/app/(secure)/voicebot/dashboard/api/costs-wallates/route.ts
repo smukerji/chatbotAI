@@ -7,7 +7,44 @@ import { ObjectId } from "mongodb";
 
 module.exports = apiHandler({
     PUT: updateUserVoicebotCostCredits,//dashboard/api/costs-wallates
+    GET: getUserVoiceBotCredits//dashboard/api/costs-wallates
 });
+
+//check user's voicebot credits return true or false
+async function getUserVoiceBotCredits(req: NextRequest) {
+    try{
+
+        
+        const userId = req.nextUrl.searchParams.get("userId") as string;
+
+        // prepare the db connections
+        const db = (await clientPromise!).db();
+
+        // get the user's voice credits
+        const usersDetailsCollection = db?.collection("user-details");
+        const userRecord = await usersDetailsCollection?.findOne({ userId: userId});
+         // if the user has credits
+         if(userRecord.voicebotDetails && userRecord.voicebotDetails.credits){
+           
+            //if credit is positibe return true
+            if(userRecord?.voicebotDetails?.credits > 0){
+                return { message: 'credits exist', isCreditExist: true };
+            }
+            else{
+                return { message: 'Please buy more voice credits', isCreditExist: false };
+            }
+           
+        }
+        else{
+            return { message: 'No credits found, Please purchase voice credits' , isCreditExist: false};
+        }
+
+    }
+    catch(error:any){
+        console.error('Error parsing request body:', error);
+        return { message  : error , isCreditExist: false};
+    }
+}
 
 async function updateUserVoicebotCostCredits(req: NextRequest) {
     try{
