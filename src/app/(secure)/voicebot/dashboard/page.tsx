@@ -384,6 +384,10 @@ async function costDeductionOnCallEndHandler(){
           return;
         }
       }
+      else{
+        message.error(responseParse?.message);
+        return;
+      }
     }
     catch(error){
 
@@ -556,6 +560,11 @@ async function costDeductionOnCallEndHandler(){
     }
   };
 
+  const truncateString = (str: string) => {
+    str = "rudresh-sisodiya"
+    return str.length > 6 ? str.substring(0, 4) + '..' : str;
+  };
+
 
   useEffect(() => {
     document.addEventListener('click', handleDocumentClick);
@@ -626,11 +635,11 @@ async function costDeductionOnCallEndHandler(){
                     <span className="button-text">
                       {
 
-                        isListening == CALLSTATUS.VOID ? "Demo Talk!" :
+                        isListening == CALLSTATUS.VOID ? `Talk with ${voicebotDetails?.name || voiceBotContextData?.assistantInfo?.assistantName || editChatbotSource}!` :
                           isListening == CALLSTATUS.CONNECTING ? "Calling..." :
                             isListening == CALLSTATUS.SPEAKING ? "speaking..." :
                               isListening == CALLSTATUS.LISTENING ? "listening..." :
-                                isListening == CALLSTATUS.CALLSTOP ? "Call Again" : "Demo Talk!"
+                                isListening == CALLSTATUS.CALLSTOP ? "Call Again" : `Talk with ${voicebotDetails?.name || voiceBotContextData?.assistantInfo?.assistantName || editChatbotSource}!`
                       }
 
                     </span>
