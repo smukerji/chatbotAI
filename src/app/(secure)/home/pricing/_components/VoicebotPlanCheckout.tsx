@@ -19,6 +19,8 @@ function VoicebotPlanCheckout() {
   const a: any = searchParams ? searchParams.get("amount") : null;
   const b: any = searchParams ? searchParams.get("credit") : null;
 
+  
+
   const encryptedPriceId = decodeURIComponent(a);
   const encryptedCredits = decodeURIComponent(b);
 

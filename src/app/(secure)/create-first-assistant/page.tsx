@@ -1,6 +1,6 @@
 "use client";
 import "./create-first-assistant.scss";
-import { Button, Input, message, Steps } from "antd";
+import { Button, Input, message, Steps, Modal } from "antd";
 import editIcon from "../../../../public/svgs/edit-2.svg";
 import Image from "next/image";
 
@@ -57,6 +57,19 @@ export default function FirstAssistant() {
   /// fetch the params
   const params: any = useSearchParams();
   const source = decodeURIComponent(params.get("source"));
+  const voicebotpurchase = decodeURIComponent(params.get("voicebotPurchase")) ;
+
+  const [isVoiceModalVisible, setVoiceModalVisible] = useState(false);
+
+  useEffect(() => {
+    // if (voicebotpurchase == "true") {
+    //   setVoiceModalVisible(true);
+    // }
+    console.clear();
+    console.log("voicebotpurchase value", voicebotpurchase);
+  }, [voicebotpurchase]);
+   
+  const [assistantData, setAssistantData] = useState<any>([]);
 
   /// data sources to train
   const [qaData, setQaData]: any = useState();
@@ -847,6 +860,15 @@ export default function FirstAssistant() {
               selectedAssistantIndex={selectedAssistantIndex}
               selectedAssistantChangeHandler={selectedAssistantChangeHandler}
             />
+            {/* <Modal
+              title="Purchase Successful"
+              visible={isModalVisible}
+              
+              onOk={handleOk}
+              onCancel={handleCancel}
+            >
+              <p>You've purchased the credits successfully!</p>
+            </Modal> */}
           </>
         )}
 

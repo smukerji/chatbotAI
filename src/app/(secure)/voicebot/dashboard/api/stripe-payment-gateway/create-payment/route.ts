@@ -71,6 +71,11 @@ const createPayment = async (req: any, res: NextApiResponse) => {
   const data = await collection.findOne({ _id: new ObjectId(u_id) });
   let customerId;
 
+  console.log('data', data);
+  console.log('amount', amount, paymentMethodId, u_id);
+  
+  
+
   if (amount <= 0) {
     return {
       msg: "Please, enter valid amount.",
@@ -98,12 +103,16 @@ const createPayment = async (req: any, res: NextApiResponse) => {
     customerId = customer.id;
   }
 
+  console.log('customer id', customerId, paymentMethodId);
+  
   try {
     const defaultPaymentId = await attachPaymentMethodToCustomer(
       customerId,
       paymentMethodId
     );
 
+    console.log('custoemer id', customerId);
+    
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(amount * 100), // Convert to cents
       currency: "usd", // Replace with your currency
@@ -116,6 +125,9 @@ const createPayment = async (req: any, res: NextApiResponse) => {
         type: "credit",
       },
     });
+
+    console.log('payment intenttttt', paymentIntent);
+    
 
     return {
       msg: "Payment created successfully.",

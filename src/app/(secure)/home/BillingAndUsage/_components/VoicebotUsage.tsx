@@ -15,7 +15,7 @@ function encryptPriceId(priceId: string) {
   return CryptoJS.AES.encrypt(priceId, cryptoSecret).toString();
 }
 
-function VoicebotUsage() {
+function VoicebotUsage({ firstPurchase = false }) {
   const router = useRouter();
   const [cookies, setCookie] = useCookies(["userId"]);
   const [walletCredits, setWalletCredits] = useState(0);
@@ -24,12 +24,19 @@ function VoicebotUsage() {
   const handleRedirect = (values: any) => {
     if (cookies?.userId) {
       const a = encryptPriceId(values.amountReload);
-      const b = encryptPriceId(walletCredits.toString());
+      const b = encryptPriceId(walletCredits.toString(  ));
       const encryptedAmount = encodeURIComponent(a);
       const encryptedCredit = encodeURIComponent(b);
-      router.push(
-        `/home/pricing/voicebot/checkout?amount=${encryptedAmount}&credit=${encryptedCredit}`
-      );
+      debugger;
+      // if(firstPurchase == true){
+      //   router.push(`/create-first-assistant?amount=${encryptedAmount}&credit=${encryptedCredit}&voicebotPurchase=true`);
+      // }
+      // else{
+        router.push(
+          `/home/pricing/voicebot/checkout?amount=${encryptedAmount}&credit=${encryptedCredit}`
+        );
+      // }
+
     } else {
       router.push("/account/login");
     }
@@ -58,9 +65,9 @@ function VoicebotUsage() {
   }, []);
   return (
     <>
-      {loading ? (
+      {/* {loading ? (
         <Loader />
-      ) : (
+      ) : ( */}
         <div className="voicebot-usage-container">
           <div className="left-right">
             {/* Left Side */}
@@ -130,7 +137,7 @@ function VoicebotUsage() {
             </div>
           </div>
         </div>
-      )}
+      {/* )} */}
     </>
   );
 }
