@@ -340,6 +340,25 @@ export default function FirstAssistant() {
     }
   }
 
+  async function giveFreeVoicebotCreditToUser(){
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/assistant?userId=${cookies.userId}`,
+        {
+          method: "POST",
+        }
+      );
+      
+      const data = await res.json();
+
+      debugger;
+      message.info(data?.message);
+     
+    } catch (error: any) {
+      console.log(error);
+    }
+  }
+
   const selectedAssistantChangeHandler = (
     choosenAssistant: any,
     index: number

@@ -70,6 +70,8 @@ async function updateUserVoicebotCostCredits(req: NextRequest) {
         // extract the cost of the call
         const callCost:number = callLogsList[0].cost || 0;
 
+        let callCostLogsDetails = callLogsList[0];
+
         // get the user's voice credits
         const usersDetailsCollection = db?.collection("user-details");
         const userRecord = await usersDetailsCollection?.findOne({ userId: userId});
@@ -84,6 +86,17 @@ async function updateUserVoicebotCostCredits(req: NextRequest) {
                 { userId: userId },
                 { $set: { voicebotDetails: userRecord.voicebotDetails } }
             );
+
+            //updated the call logs in the db
+            const voicCallCostLogsTable = db?.collection("voice-call-costs-logs");
+
+            const totalCallCostLogs = {...callCostLogsDetails, torriMarginCost: (callCost * 1.3), userId: userId};
+
+            //if the record exist already don't insert the record
+            const callCostRecord = await voicCallCostLogsTable?.findOne({id: callCostLogsDetails.id});
+            if(!callCostRecord){
+                await voicCallCostLogsTable?.insertOne(totalCallCostLogs);
+            }
 
             const updatedCreditsRecord = await usersDetailsCollection?.findOne({ userId: userId});
 

@@ -4,9 +4,41 @@ import clientPromise from "../../../../../../db";
 import { ObjectId } from "mongodb";
 
 module.exports = apiHandler({
-    GET: getAssistantList,//dashboard/api/assistant
-    DELETE:deleteSingleAssistant//dashboard/api/assistant
+    GET: getAssistantList, //dashboard/api/assistant
+    DELETE:deleteSingleAssistant, //dashboard/api/assistant
+    POST: giveFreeCreditsToUser //dashboard/api/assistant
 });
+
+async function giveFreeCreditsToUser(req: NextRequest) {
+    
+        try {
+            const userID:string = req.nextUrl.searchParams.get("userId") as string;
+            const db = (await clientPromise!).db();
+            const collection = db?.collection("user-details");
+            const user = await collection?.findOne({ userId: userID });
+            if(user){
+                //add voicebotDetails.credit to user's wallet if credit not exist
+                if(!user?.voicebotDetails?.credit){
+                    const result = await collection?.updateOne(
+                        { userId: userID },
+                        { $set: { "voicebotDetails.credits": 10 } }
+                    );
+                    if(result.modifiedCount){
+                        return {message: "Free credits added successfully"};
+                    } else {
+                        return {error: "Failed to add free credits"};
+                    }
+                }
+
+                return {message: "User already have free credits"};
+
+            }
+            return {error: "User not found"};
+            
+        } catch (error: any) {
+            return `{error: ${error.message}}`;
+        }
+}
 
 async function deleteSingleAssistant(req: NextRequest) {
 

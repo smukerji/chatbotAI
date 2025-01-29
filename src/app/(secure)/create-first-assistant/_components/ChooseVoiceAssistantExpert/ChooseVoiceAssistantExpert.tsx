@@ -3,6 +3,7 @@ import Image from 'next/image';
 // import infoImage from "../../../../public/voiceBot/SVG/info-circle.svg";
 import infoImage from "../../../../../../public/voiceBot/SVG/info-circle.svg";
 import { CreateVoiceBotContext } from '@/app/_helpers/client/Context/VoiceBotContextApi';
+import customTemplate from "../../../../../../public/voiceBot/SVG/profile-circle.svg";
 
 interface IndustryExpertListProps {
   industryExpertList: any[];
@@ -22,6 +23,19 @@ const ChooseVoiceAssistantExpert: React.FC<IndustryExpertListProps> = ({
     console.log(voiceBotContext);
   return (
     <>
+    <div className="custom_assistant-card">
+        <div className="blank-template">
+          <div className="image-card">
+            <Image
+              src={customTemplate}
+              alt=""
+              height={100}
+              width={100}
+            ></Image>
+          </div>
+          <h3 className="card_sub-header">Blank Template</h3>
+        </div>
+      </div>
       {industryExpertList.map((assistant, index) => (
         <div
           className={

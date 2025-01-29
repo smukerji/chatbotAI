@@ -539,7 +539,7 @@ export default function VoiceBot() {
         </h4>
 
         <div className="assistant-wrapper">
-          <div className="custom_assistant-card">
+          {/* <div className="custom_assistant-card">
             <div className="blank-template">
               <div className="image-card">
                 <Image
@@ -551,7 +551,7 @@ export default function VoiceBot() {
               </div>
               <h3 className="card_sub-header">Blank Template</h3>
             </div>
-          </div>
+          </div> */}
 
           {voiceBotContextData.currentAssistantPage === 0 ? (
             <ChooseVoiceAssistantType
