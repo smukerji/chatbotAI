@@ -66,7 +66,7 @@ export default function FirstAssistant() {
     // if (voicebotpurchase == "true") {
     //   setVoiceModalVisible(true);
     // }
-    console.clear();
+  
     console.log("voicebotpurchase value", voicebotpurchase);
   }, [voicebotpurchase]);
    
@@ -150,14 +150,9 @@ export default function FirstAssistant() {
       createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(
         AssistantFlowStep.CHOOSE_PLAN
       );
-    } else if (
-      createAssistantFlowContextDetails?.currentAssistantFlowStep ===
-      AssistantFlowStep.CHOOSE_PLAN
-    ) {
-      if (
-        createAssistantFlowContextDetails?.creationFlow ===
-        SelectedAssistantType.CHAT
-      ) {
+    } else if (createAssistantFlowContextDetails?.currentAssistantFlowStep ===
+      AssistantFlowStep.CHOOSE_PLAN) {
+      if (createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.CHAT) {
         if (!plan?.price) {
           message.warning("Please select a plan first!");
           return;
@@ -165,7 +160,13 @@ export default function FirstAssistant() {
         createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(
           AssistantFlowStep.CHOOSE_ASSISTANT_TYPE
         );
-      } else {
+      } 
+      else if(createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.VOICE){
+        createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(
+          AssistantFlowStep.CHOOSE_ASSISTANT_TYPE
+        );
+      }
+      else {
         createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(
           AssistantFlowStep.CHOOSE_ASSISTANT_TYPE
         );
@@ -685,7 +686,7 @@ export default function FirstAssistant() {
                             createAssistantFlowContextDetails?.currentAssistantFlowStep ===
                             AssistantFlowStep.CHOOSE_PLAN
                               ? ("process" as "process")
-                              : plan?.price
+                              : (plan?.price || createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.VOICE)
                               ? ("finish" as "finish")
                               : ("wait" as "wait"),
                           title: (

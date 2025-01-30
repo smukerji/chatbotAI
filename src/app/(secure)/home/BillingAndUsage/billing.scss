@@ -2,6 +2,8 @@
   width: 80%;
   margin: 20px auto;
 
+
+
   .billing-head {
     color: var(--Neutral-8, #141416);
     font-family: sans-serif;
@@ -955,6 +957,12 @@
     flex-direction: column;
     justify-content: center;
     gap: 1rem;
+
+    .usage-loader{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
     .usage-card {
       background: #fcfcfd;

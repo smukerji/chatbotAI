@@ -9,6 +9,7 @@ import {
   useStripe,
 } from "@stripe/react-stripe-js";
 import { useCookies } from "react-cookie";
+import { redirect, useSearchParams } from "next/navigation";
 import { Button } from "antd";
 import DangerIcon from "../../../../../../public/svgs/danger.svg";
 import Image from "next/image";
@@ -25,6 +26,9 @@ function VoicePaymentCard({ amount, credits }: any) {
   const [loading, setLoading] = useState(false);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [error, setError] = useState("");
+  const param: any = useSearchParams();
+  const firstVoicePurchase = param.get("firstVoicePurchase");
+
   const [subscriptionDetail, setSubscriptionDetail] = useState({});
   const [cardErrors, setCardErrors] = useState({
     cardNumber: "",
@@ -32,6 +36,8 @@ function VoicePaymentCard({ amount, credits }: any) {
     cvc: "",
     paymentFailed: false,
   });
+
+  console.log("voicebot purchase query params ", firstVoicePurchase);
 
   // card detail input change functionality
   function handleCardInputChange(event: any) {
@@ -160,6 +166,7 @@ function VoicePaymentCard({ amount, credits }: any) {
               isModalOpen={isModalOpen}
               subscriptionDetail={subscriptionDetail}
               isVoiceInvoice={true}
+              firstPurchase = {firstVoicePurchase}
             />
           )}
 

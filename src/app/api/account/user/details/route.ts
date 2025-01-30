@@ -24,6 +24,8 @@ async function userDetails(request: NextRequest) {
 
   /// get the plan name with the help of planId
 
+
+
   const planCollection = await db
     .collection("plans")
     .findOne({ _id: userCollection?.planId });

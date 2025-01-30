@@ -6,7 +6,7 @@ import { useCookies } from "react-cookie";
 import axios from "axios";
 import Loader from "../../pricing/_components/Loader";
 import moment from "moment";
-
+import { Flex, Modal, message, Spin } from 'antd';
 const cryptoSecret = process.env.NEXT_PUBLIC_CRYPTO_SECRET;
 
 function encryptPriceId(priceId: string) {
@@ -23,6 +23,7 @@ function VoicebotUsage({ firstPurchase = false }) {
   const [dailyUsage, setDailyUsage] = useState(0);
   const [monthlyUsage, setMonthlyUsage] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [usageLoad, setUsageLoad] = useState(false);
 
   const handleRedirect = (values: any) => {
     if (cookies?.userId) {
@@ -36,7 +37,7 @@ function VoicebotUsage({ firstPurchase = false }) {
       // }
       // else{
         router.push(
-          `/home/pricing/voicebot/checkout?amount=${encryptedAmount}&credit=${encryptedCredit}`
+          `/home/pricing/voicebot/checkout?amount=${encryptedAmount}&credit=${encryptedCredit}&firstVoicePurchase=true`
         );
       // }
 
@@ -49,6 +50,7 @@ function VoicebotUsage({ firstPurchase = false }) {
   const fetchVoicebotUsageDetail = async () => {
     try {
       setLoading(true);
+      setUsageLoad(true);
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/BillingAndUsage/api/voicebot/usage`,
         {
@@ -79,6 +81,7 @@ function VoicebotUsage({ firstPurchase = false }) {
       console.log("error", error);
     } finally {
       setLoading(false);
+      setUsageLoad(false);
     }
   };
 
@@ -93,28 +96,40 @@ function VoicebotUsage({ firstPurchase = false }) {
         <div className="voicebot-usage-container">
           <div className="left-right">
             {/* Left Side */}
-            <div className="usage-info">
-              <div className="usage-card">
-                <div className="usage-headline">
-                  <p className="usage-title">Daily Usage</p>
-                  <p className="usage-value">${dailyUsage.toFixed(2)}</p>
+          <div className="usage-info">
+            {
+              usageLoad ? (
+                <div className="usage-loader">
+                  <Flex align="center" gap="middle" className="loader">
+                    <Spin size="large" />
+                  </Flex>
                 </div>
-                <p className="usage-subtitle">Today</p>
-              </div>
-              <div className="usage-card">
-                <div className="usage-headline">
-                  <p className="usage-title">Monthly Usage</p>
-                  <p className="usage-value">${monthlyUsage.toFixed(2)}</p>
+                
+              ) : <>
+                <div className="usage-card">
+                  <div className="usage-headline">
+                    <p className="usage-title">Daily Usage</p>
+                    <p className="usage-value">${dailyUsage.toFixed(2)}</p>
+                  </div>
+                  <p className="usage-subtitle">Today</p>
                 </div>
-                <p className="usage-subtitle">Dec 01 - Dec 31</p>
-              </div>
-              <div className="usage-card">
-                <div className="usage-headline">
-                  <p className="usage-title">Wallet Credits</p>
-                  <p className="usage-value">${walletCredits}</p>
+                <div className="usage-card">
+                  <div className="usage-headline">
+                    <p className="usage-title">Monthly Usage</p>
+                    <p className="usage-value">${monthlyUsage.toFixed(2)}</p>
+                  </div>
+                  <p className="usage-subtitle">Dec 01 - Dec 31</p>
                 </div>
-              </div>
-            </div>
+                <div className="usage-card">
+                  <div className="usage-headline">
+                    <p className="usage-title">Wallet Credits</p>
+                    <p className="usage-value">${walletCredits}</p>
+                  </div>
+                </div>
+              </>
+            }
+
+          </div>
 
             {/* Right Side */}
             <div className="auto-reload">

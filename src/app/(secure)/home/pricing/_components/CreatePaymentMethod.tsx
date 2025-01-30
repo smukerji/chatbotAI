@@ -11,7 +11,7 @@ import '../../pricing/stripe.scss';
 import { useCookies } from 'react-cookie';
 import { message } from 'antd';
 
-export default function CreatePaymentMethod({ plan, price, duration, name }: any) {
+export default function CreatePaymentMethod({ plan, price, duration, name, firstVoicePurchase }: any) {
   const stripe = useStripe();
   const elements: any = useElements();
   const [error, setError] = useState(null);
@@ -102,10 +102,16 @@ export default function CreatePaymentMethod({ plan, price, duration, name }: any
           try {
             if (result.data) {
               if (result.data.status == 'active') {
-                message.success('success').then(() => {
-                  window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot`;
-                  return;
-                });
+                debugger;
+                if(firstVoicePurchase){
+                  router.push('/create-first-assistant');
+                }
+                else{
+                  message.success('success').then(() => {
+                    window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot`;
+                    return;
+                  });
+                }
               } else {
                 message.error(`failed`).then(() => {
                   window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/pricing`;
