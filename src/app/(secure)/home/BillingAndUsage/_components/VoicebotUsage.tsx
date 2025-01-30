@@ -123,7 +123,7 @@ function VoicebotUsage({ firstPurchase = false }) {
                 <div className="usage-card">
                   <div className="usage-headline">
                     <p className="usage-title">Wallet Credits</p>
-                    <p className="usage-value">${walletCredits}</p>
+                    <p className="usage-value">${walletCredits.toFixed(2)}</p>
                   </div>
                 </div>
               </>
