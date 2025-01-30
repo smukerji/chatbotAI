@@ -474,10 +474,6 @@ function Chatbot() {
       `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/user?userId=${cookies.userId}`
     );
 
-    //check if user has voicebot plan active at once.
-    debugger;
-
-
     /// if user does not have any plan then redirect to create-first-bot page
     if (!response.data.user.planId && response.data.user.voiceBotCount <= 0) {
 
