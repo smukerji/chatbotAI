@@ -457,11 +457,14 @@ async function costDeductionOnCallEndHandler(){
     const d = voiceBotContextData.assistantInfo
 
     console.log("assistant id",d._id);
+
     await updateAssistantNumberOfCallMetaDataService(
       d?.vapiAssistantId
       ,d?._id);
-
-      await costDeductionOnCallEndHandler();
+      
+      setTimeout(async () => {
+          await costDeductionOnCallEndHandler();
+      }, 3000);
   };
 
   const muteCallHandler = () => {
