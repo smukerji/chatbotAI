@@ -34,6 +34,7 @@ import ChooseVoiceAssistantExpert from "./_components/ChooseVoiceAssistantExpert
 // import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import CreateAssitstantContainerItems from "./_components/CreateAssitstantContainerItems/CreateAssitstantContainerItems";
+import { log } from "console";
 
 export default function FirstAssistant() {
   const [cookies, setCookie] = useCookies(["userId"]);
@@ -295,6 +296,7 @@ export default function FirstAssistant() {
 
   /// call this on initial load as well as on every step change
   useEffect(() => {
+    giveFreeVoicebotCreditToUser();
     getVoiceAssistantTemplateData();
     checkPlan();
   }, []);
@@ -342,6 +344,8 @@ export default function FirstAssistant() {
 
   async function giveFreeVoicebotCreditToUser(){
     try {
+      console.log("user id ",cookies.userId);
+      
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/assistant?userId=${cookies.userId}`,
         {
@@ -351,7 +355,6 @@ export default function FirstAssistant() {
       
       const data = await res.json();
 
-      debugger;
       message.info(data?.message);
      
     } catch (error: any) {

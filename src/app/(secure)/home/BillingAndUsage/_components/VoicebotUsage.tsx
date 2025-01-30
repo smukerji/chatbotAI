@@ -5,6 +5,7 @@ import CryptoJS from "crypto-js";
 import { useCookies } from "react-cookie";
 import axios from "axios";
 import Loader from "../../pricing/_components/Loader";
+import moment from "moment";
 
 const cryptoSecret = process.env.NEXT_PUBLIC_CRYPTO_SECRET;
 
@@ -19,6 +20,8 @@ function VoicebotUsage({ firstPurchase = false }) {
   const router = useRouter();
   const [cookies, setCookie] = useCookies(["userId"]);
   const [walletCredits, setWalletCredits] = useState(0);
+  const [dailyUsage, setDailyUsage] = useState(0);
+  const [monthlyUsage, setMonthlyUsage] = useState(0);
   const [loading, setLoading] = useState(false);
 
   const handleRedirect = (values: any) => {
@@ -41,6 +44,7 @@ function VoicebotUsage({ firstPurchase = false }) {
       router.push("/account/login");
     }
   };
+  
 
   const fetchVoicebotUsageDetail = async () => {
     try {
@@ -51,6 +55,24 @@ function VoicebotUsage({ firstPurchase = false }) {
           u_id: cookies.userId,
         }
       );
+
+      //get dailly and monthly usage
+
+      const usageResult = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/costs-wallates/usages?userId=${cookies.userId}&todayDate=${moment().format('YYYY-MM-DD')}&monthDate=${moment().format('YYYY-MM')}`,
+        {
+          method: "GET",
+        }
+      );
+
+      const parseUsageResult = await usageResult.json();
+      if("dayUsage" in parseUsageResult.data.usage){
+        setDailyUsage(parseUsageResult.data.usage.dayUsage);
+      }
+      if("monthUsage" in parseUsageResult.data.usage){
+        setMonthlyUsage(parseUsageResult.data.usage.monthUsage);
+      }
+     
 
       setWalletCredits(response.data.walletCredit.credits);
     } catch (error) {
@@ -75,14 +97,14 @@ function VoicebotUsage({ firstPurchase = false }) {
               <div className="usage-card">
                 <div className="usage-headline">
                   <p className="usage-title">Daily Usage</p>
-                  <p className="usage-value">$5</p>
+                  <p className="usage-value">${dailyUsage.toFixed(2)}</p>
                 </div>
                 <p className="usage-subtitle">Today</p>
               </div>
               <div className="usage-card">
                 <div className="usage-headline">
                   <p className="usage-title">Monthly Usage</p>
-                  <p className="usage-value">$5</p>
+                  <p className="usage-value">${monthlyUsage.toFixed(2)}</p>
                 </div>
                 <p className="usage-subtitle">Dec 01 - Dec 31</p>
               </div>

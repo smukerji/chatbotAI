@@ -18,7 +18,7 @@ async function giveFreeCreditsToUser(req: NextRequest) {
             const user = await collection?.findOne({ userId: userID });
             if(user){
                 //add voicebotDetails.credit to user's wallet if credit not exist
-                if(!user?.voicebotDetails?.credit){
+                if(!user?.voicebotDetails?.credits){
                     const result = await collection?.updateOne(
                         { userId: userID },
                         { $set: { "voicebotDetails.credits": 10 } }

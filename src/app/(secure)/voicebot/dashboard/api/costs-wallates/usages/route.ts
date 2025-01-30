@@ -82,12 +82,14 @@ async function callUsage(req: NextRequest) {
                     }
                 ]).toArray();
 
+                //sanitize the result
+                const usage = {dayUsage : dayCost[0]?.totalCost || 0, monthUsage : monthCost[0]?.totalCost || 0};
+
         return {
             data: {
                 todayDate,
                 monthDate,
-                todayCost: dayCost,
-                monthCost: monthCost
+                usage
             }
         }
 
