@@ -37,7 +37,7 @@ function VoicebotUsage({ firstPurchase = false }) {
       // }
       // else{
         router.push(
-          `/home/pricing/voicebot/checkout?amount=${encryptedAmount}&credit=${encryptedCredit}&firstVoicePurchase=true`
+          `/home/pricing/voicebot/checkout?amount=${encryptedAmount}&credit=${encryptedCredit}&firstVoicePurchase=${firstPurchase}`
         );
       // }
 
