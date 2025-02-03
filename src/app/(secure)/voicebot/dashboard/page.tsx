@@ -41,6 +41,7 @@ import { useCookies } from "react-cookie";
 
 import { CreateVoiceBotContext } from "../../../_helpers/client/Context/VoiceBotContextApi";
 import { updateAssistantLastTrainedMetaDataService, updateAssistantLastUsedMetaDataService, updateAssistantNumberOfCallMetaDataService } from "./services/metadata-update-service";
+import { log } from "console";
 
 
 const vapi = new Vapi(process.env.NEXT_PUBLIC_VAP_API as string); // Vapi public key
@@ -63,6 +64,8 @@ function Dashboard() {
     const [cookies, setCookie] = useCookies(["userId"]);
 
   const editChatbotSource = params.get("voicBotName") ?? "VoiceBot";
+
+  const isFirstTimeAssistantCreation = params.get("firstInit") === "true";
 
   const [isListening, setIsListening] = useState(CALLSTATUS.VOID);
   const [isMuted, setIsMuted] = useState(false);
@@ -99,15 +102,19 @@ function Dashboard() {
     }
     else{
       //  the system prompt based on the mongo record
+      if(isFirstTimeAssistantCreation){
+        //get the system prompts otherwise skip
+        //get the template prompt 
+        getTemplatePrompts(voiceBotContextData.assistantMongoId);
+        //assign the prompt to the 
+      }
       message.info("Assistant is not published yet");
     }
     if(voiceBotContextData?.assistantInfo?.assistantName){
       voiceBotContextData.updateState("name",voiceBotContextData?.assistantInfo?.assistantName);
     }
 
-    console.log("assistant info init",voiceBotContextData.assistantInfo);
-
-     updateAssistantLastUsedMetaDataService(voiceBotContextData.assistantInfo?._id);
+    updateAssistantLastUsedMetaDataService(voiceBotContextData.assistantInfo?._id);
 
   }, []);
 
@@ -185,12 +192,41 @@ function Dashboard() {
 
   }
 
+  const getTemplatePrompts = async (recordId: string) => {
+
+    setLoading(true);
+    try {
+      const assistantDataResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/template/prompts/?recordId=${recordId}`,
+        {
+          method: "GET",
+        }
+      );
+
+      const assistantDataResponseParse = await assistantDataResponse.json();
+
+      voicebotDetails["model"]["messages"][0]["content"] = assistantDataResponseParse?.prompts;
+    }
+    catch (error: any) {
+
+    }
+    finally {
+      setLoading(false);
+    }
+
+  }
+
   const getAssistantData = async (vapiAssiId:string)=>{
 
         //get the assistant record from the vapi's side
         try{
 
           setLoading(true);
+          if(isFirstTimeAssistantCreation){
+            //get the system prompts otherwise skip
+            console.log("assistant mongo id printing ",voiceBotContextData.assistantMongoId);
+            
+          }
           const assistantDataResponse = await fetch(
             `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/vapi/assistant/?assistantId=${vapiAssiId}`,
             {
@@ -585,7 +621,7 @@ async function costDeductionOnCallEndHandler(){
             <Image className="image" alt="back_arrow" src={leftArrow} onClick={()=>{
               router.push("/chatbot")
             }}></Image>
-            <h1 className="title">{voicebotDetails?.name || voiceBotContextData?.assistantInfo?.assistantName || editChatbotSource}</h1>
+            <h1 className="title">{voicebotDetails?.name || voiceBotContextData?.assistantInfo?.assistantName}</h1>
 
           </div>
           <div className="header-description">
@@ -638,11 +674,11 @@ async function costDeductionOnCallEndHandler(){
                     <span className="button-text">
                       {
 
-                        isListening == CALLSTATUS.VOID ? `Talk with ${voicebotDetails?.name || voiceBotContextData?.assistantInfo?.assistantName || editChatbotSource}!` :
+                        isListening == CALLSTATUS.VOID ? `Talk with ${voicebotDetails?.name || voiceBotContextData?.assistantInfo?.assistantName }!` :
                           isListening == CALLSTATUS.CONNECTING ? "Calling..." :
                             isListening == CALLSTATUS.SPEAKING ? "speaking..." :
                               isListening == CALLSTATUS.LISTENING ? "listening..." :
-                                isListening == CALLSTATUS.CALLSTOP ? "Call Again" : `Talk with ${voicebotDetails?.name || voiceBotContextData?.assistantInfo?.assistantName || editChatbotSource}!`
+                                isListening == CALLSTATUS.CALLSTOP ? "Call Again" : `Talk with ${voicebotDetails?.name || voiceBotContextData?.assistantInfo?.assistantName }!`
                       }
 
                     </span>

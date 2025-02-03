@@ -226,7 +226,7 @@ export default function FirstAssistant() {
             const assistantUpdateResponseParse =
               await assistantUpdateResponse.json();
 
-            router.push(`/voicebot/dashboard?voicBotName=${assistantName}`);
+            router.push(`/voicebot/dashboard?voicBotName=${assistantName}&firstInit=true`);
           } catch (error: any) {
             console.log(error);
             message.error(error.message);
@@ -257,7 +257,7 @@ export default function FirstAssistant() {
             let assistantData = assistantCreateResponseParse?.record;
             voiceBotContextData.setAssistantInfo(assistantData);
 
-            router.push(`/voicebot/dashboard?voicBotName=${assistantName}`);
+            router.push(`/voicebot/dashboard?voicBotName=${assistantName}&firstInit=true`);
           } catch (error: any) {
             console.log(error);
             message.error(error.message);

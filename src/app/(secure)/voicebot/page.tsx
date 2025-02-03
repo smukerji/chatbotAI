@@ -72,6 +72,7 @@ export default function VoiceBot() {
       );
       const data = await res.json();
 
+      debugger;
       let assistantDataList = data?.assistantTemplates.filter(
         (assistance: any) => assistance?.industryType === "Assistant"
       );
@@ -165,7 +166,7 @@ export default function VoiceBot() {
               await assistantUpdateResponse.json();
             
 
-            router.push(`/voicebot/dashboard?voicBotName=${assistantName}`);
+            router.push(`/voicebot/dashboard?voicBotName=${assistantName}&firstInit=true`);
           } catch (error: any) {
             console.log(error);
             message.error(error.message);
@@ -198,7 +199,7 @@ export default function VoiceBot() {
             let assistantData = assistantCreateResponseParse?.record;
             voiceBotContextData.setAssistantInfo(assistantData);
 
-            router.push(`/voicebot/dashboard?voicBotName=${assistantName}`);
+            router.push(`/voicebot/dashboard?voicBotName=${assistantName}&firstInit=true`);
           } catch (error: any) {
             console.log(error);
             message.error(error.message);
@@ -574,97 +575,3 @@ export default function VoiceBot() {
     </div>
   );
 }
-
-
-
-
-
-
-
-   //   assistantList.length > 0 ? (
-          //     assistantList.map((assistant: any, index: number) => {
-          //       return (
-          //         <div
-          //           className={
-          //             selectedAssistantIndex === index
-          //               ? "assistant-card selected-assistant"
-          //               : "assistant-card "
-          //           }
-          //           key={index}
-          //           onClick={() => {
-          //             selectedAssistantChangeHandler(assistant, index);
-          //           }}
-          //         >
-          //           <div className="card-image">
-          //             <Image
-          //               src={assistant.imageUrl}
-          //               alt=""
-          //               height={100}
-          //               width={100}
-          //             ></Image>
-          //           </div>
-          //           <div className="header-information">
-          //             <div className="header_container">
-          //               <h2 className="card_header">
-          //                 {assistant.assistantType}
-          //               </h2>
-          //               <div className="image-info">
-          //                 <Image
-          //                   src={infoImage}
-          //                   alt=""
-          //                   height={100}
-          //                   width={100}
-          //                 ></Image>
-          //               </div>
-          //             </div>
-
-          //             <h3 className="card_sub-header">
-          //               {assistant.dispcrtion}
-          //             </h3>
-          //           </div>
-          //         </div>
-          //       );
-          //     })
-          //   ) : (
-          //     <div>loadding....</div>
-          //   )
-          // ) : (
-          //   industryExpertList.map((assistant: any, index: number) => {
-          //     return (
-          //       <div
-          //         className={
-          //           selecteExpertIndex === index
-          //             ? "assistant-card selected-assistant"
-          //             : "assistant-card "
-          //         }
-          //         key={index}
-          //         onClick={() => {
-          //           selectedExpertChangeHandler(assistant, index);
-          //         }}
-          //       >
-          //         <div className="card-image">
-          //           <Image
-          //             src={assistant.imageUrl}
-          //             alt=""
-          //             height={100}
-          //             width={100}
-          //           ></Image>
-          //         </div>
-          //         <div className="header-information">
-          //           <div className="header_container">
-          //             <h2 className="card_header">{assistant.assistantType}</h2>
-          //             <div className="image-info">
-          //               <Image
-          //                 src={infoImage}
-          //                 alt=""
-          //                 height={100}
-          //                 width={100}
-          //               ></Image>
-          //             </div>
-          //           </div>
-
-          //           <h3 className="card_sub-header">{assistant.dispcrtion}</h3>
-          //         </div>
-          //       </div>
-          //     );
-          //   })

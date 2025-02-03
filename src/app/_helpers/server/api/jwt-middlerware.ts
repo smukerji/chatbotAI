@@ -35,6 +35,7 @@ export function isPublicPath(req: NextRequest) {
     "GET:/voicebot/dashboard/api/costs-wallates",
     "POST:/voicebot/dashboard/api/assistant",
     "GET:/voicebot/dashboard/api/costs-wallates/usages",
+    "GET:/voicebot/dashboard/api/template/prompts",
   ];
 
   return publicPaths.includes(`${req.method}:${req.nextUrl.pathname}`);
