@@ -59,8 +59,8 @@ export async function GET(request: NextRequest) {
 
 	const result = await cursor.toArray();
 
-	if (!result?.[0].botType) {
-		result?.[0].botType == 'bot-v1';
+	if (!result?.[0]?.botType) {
+		result[0]['botType'] = 'bot-v1';
 	}
 
 	/// close the cursor
