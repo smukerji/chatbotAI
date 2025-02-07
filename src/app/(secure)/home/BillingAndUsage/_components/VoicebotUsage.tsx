@@ -25,6 +25,9 @@ function VoicebotUsage({ firstPurchase = false }) {
   const [loading, setLoading] = useState(false);
   const [usageLoad, setUsageLoad] = useState(false);
 
+  const startOfMonth = moment().startOf('month').format('MMM DD');
+  const endOfMonth = moment().endOf('month').format('MMM DD');
+
   const handleRedirect = (values: any) => {
     if (cookies?.userId) {
       const a = encryptPriceId(values.amountReload);
@@ -118,7 +121,7 @@ function VoicebotUsage({ firstPurchase = false }) {
                     <p className="usage-title">Monthly Usage</p>
                     <p className="usage-value">${monthlyUsage.toFixed(2)}</p>
                   </div>
-                  <p className="usage-subtitle">Dec 01 - Dec 31</p>
+                  <p className="usage-subtitle">{`${startOfMonth} - ${endOfMonth}`}</p>
                 </div>
                 <div className="usage-card">
                   <div className="usage-headline">
