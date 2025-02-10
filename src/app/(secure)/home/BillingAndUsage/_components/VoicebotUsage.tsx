@@ -134,48 +134,53 @@ function VoicebotUsage({ firstPurchase = false }) {
 
           </div>
 
-            {/* Right Side */}
-            <div className="auto-reload">
-              <Form
-                className="reload-settings"
-                onFinish={handleRedirect}
-                initialValues={{ amountReload: "" }}
-                layout="vertical"
-              >
-                <Form.Item
-                  label="Amount to reload"
-                  name="amountReload"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please enter an amount to reload",
-                    },
-                    //   {
-                    //     type: "number",
-                    //     min: 5,
-                    //     message: "Amount must be atleast $5",
-                    //   },
-                  ]}
+          {/* Right Side */}
+          {
+            firstPurchase ?? <>
+              <div className="auto-reload">
+                <Form
+                  className="reload-settings"
+                  onFinish={handleRedirect}
+                  initialValues={{ amountReload: "" }}
+                  layout="vertical"
                 >
-                  <Input type="number" placeholder="$ 20" />
-                </Form.Item>
-
-                <Form.Item label="When balance reaches">
-                  <Input type="number" placeholder="$" />
-                </Form.Item>
-
-                <Form.Item>
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    className="buy-credits"
+                  <Form.Item
+                    label="Amount to reload"
+                    name="amountReload"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please enter an amount to reload",
+                      },
+                      //   {
+                      //     type: "number",
+                      //     min: 5,
+                      //     message: "Amount must be atleast $5",
+                      //   },
+                    ]}
                   >
-                    Buy Credits
-                  </Button>
-                </Form.Item>
-              </Form>
-            </div>
-          </div>
+                    <Input type="number" placeholder="$ 20" />
+                  </Form.Item>
+
+                  <Form.Item label="When balance reaches">
+                    <Input type="number" placeholder="$" />
+                  </Form.Item>
+
+                  <Form.Item>
+                    <Button
+                      type="primary"
+                      htmlType="submit"
+                      className="buy-credits"
+                    >
+                      Buy Credits
+                    </Button>
+                  </Form.Item>
+                </Form>
+              </div>
+            </>
+          }
+
+        </div>
         </div>
       {/* )} */}
     </>
