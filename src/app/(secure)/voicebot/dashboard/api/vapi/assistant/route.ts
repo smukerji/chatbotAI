@@ -91,6 +91,7 @@ async function createVapiAssistant(req: NextRequest) {
           }
           else { //if the record is not exist then create the record
             //send the data to the vapi server
+            delete vapiData.speed;
             const options = {
               method: 'POST',
               headers: { Authorization: `Bearer ${process.env.VAPI_PRIVATE_KEY}`, 'Content-Type': 'application/json' },
