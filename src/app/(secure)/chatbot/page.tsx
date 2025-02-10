@@ -789,7 +789,7 @@ function Chatbot() {
                       </div>
                       <div className="info-content">
                         <div className="info">
-                          <div className="info-label">Num. Of Calls</div>
+                          <div className="info-label">Number of Calls</div>
                           <div className="value">{assistant?.metadata?.totalCallLogs || 0}</div>
                         </div>
                         <div className="info">
