@@ -203,26 +203,6 @@ function TableLayout({
                       </div>
                     ) : null}
                   </td>
-
-                  {/* opening the menu for chatbot actions */}
-                  {/* <Image
-                  style={{
-                      visibility: `${
-                          data.id === currentChatbotId
-                          ? "visible"
-                        : openMenu?.[index]
-                        ? "visible"
-                        : "hidden"
-                    }`,
-                }}
-                className="menu-icon"
-                  src={chatbotMenuIcon}
-                  alt={"chatbot-menu-icon"}
-                  onClick={() => {
-                      changeMenu({ [index]: !openMenu?.[index] });
-                      setCurrentChatbotId(data.id);
-                    }}
-                /> */}
                 </tr>
               );
             })}

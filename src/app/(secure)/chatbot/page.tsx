@@ -37,6 +37,7 @@ import axios from "axios";
 import voiceAssistantPreview from "../../../../public/voiceBot/voice-bot-preview.svg";
 
 import { CreateVoiceBotContext } from "../../_helpers/client/Context/VoiceBotContextApi";
+import VoicebotTableLayout from "./_components/VoicebotTableLayout";
 // import GridIcon from "../../as";
 
 const antIcon = (
@@ -349,6 +350,9 @@ function Chatbot() {
   /// state for showing the chabot list
   const [listType, setListType]: any = useState("grid");
 
+  // state for showing the voicebot list
+  const [voiceListType, setVoiceListType]: any = useState("grid");
+
   const [chatbotId, setChatbotId] = useState("");
 
   /// managing share chatbot
@@ -602,14 +606,43 @@ function Chatbot() {
           <div className="action-container">
             <div className="chatbot-list-action">
               <Icon
-                className={listType == "grid" ? "active" : ""}
+                className={
+                  isVoiceBotActived
+                    ? voiceListType === "grid"
+                      ? "active"
+                      : ""
+                    : listType === "grid"
+                      ? "active"
+                      : ""
+                }
                 Icon={GridIcon}
-                click={() => setListType("grid")}
+                click={() => {
+                  if (isVoiceBotActived) {
+                    setVoiceListType("grid");
+                  } else {
+                    setListType("grid");
+                  }
+                }}
               />
+
               <Icon
-                className={listType == "table" ? "active" : ""}
+                className={
+                  isVoiceBotActived
+                    ? voiceListType === "table"
+                      ? "active"
+                      : ""
+                    : listType === "table"
+                      ? "active"
+                      : ""
+                }
                 Icon={MenuIcon}
-                click={() => setListType("table")}
+                click={() => {
+                  if (isVoiceBotActived) {
+                    setVoiceListType("table");
+                  } else {
+                    setListType("table");
+                  }
+                }}
               />
             </div>
             {/* <Link href={`${process.env.NEXT_PUBLIC_WEBSITE_URL}home`}> */}
@@ -736,43 +769,51 @@ function Chatbot() {
                 </p>
               </div>
             ) : (
-              <div className="voicebot-list-container">
-                {voiceAssistantList?.map((assistant: any, index: number) => (
-                  <div
-                    key={index}
-                    className="voicebot-list-card"
-                    onClick={() => selectedAssistantHandler(assistant)}
-                  >
-                    <div className="assistant-image">
-                      <Image
-                        alt="assistant image"
-                        src={voiceAssistantPreview}
-                      ></Image>
-                    </div>
-                    <div className="assistant-title">
-                      {assistant.assistantName}
-                    </div>
-                    <div className="info-content">
-                      <div className="info">
-                        <div className="info-label">Num. Of Calls</div>
-                        <div className="value">{assistant?.metadata?.totalCallLogs || 0}</div>
+              <>
+              {voiceListType === "grid" && (
+                <div className="voicebot-list-container">
+                  {voiceAssistantList?.map((assistant: any, index: number) => (
+                    <div
+                      key={index}
+                      className="voicebot-list-card"
+                      onClick={() => selectedAssistantHandler(assistant)}
+                    >
+                      <div className="assistant-image">
+                        <Image
+                          alt="assistant image"
+                          src={voiceAssistantPreview}
+                        ></Image>
                       </div>
-                      <div className="info">
-                        <div className="info-label">Last Used</div>
-                        <div className="value">{getDate(assistant?.metadata?.lastUsed) || 0}</div>
+                      <div className="assistant-title">
+                        {assistant.assistantName}
                       </div>
-                      <div className="info">
-                        <div className="info-label">Last Trained</div>
-                        <div className="value">{getDate(assistant?.metadata?.lastTrained) || 0}</div>
+                      <div className="info-content">
+                        <div className="info">
+                          <div className="info-label">Num. Of Calls</div>
+                          <div className="value">{assistant?.metadata?.totalCallLogs || 0}</div>
+                        </div>
+                        <div className="info">
+                          <div className="info-label">Last Used</div>
+                          <div className="value">{getDate(assistant?.metadata?.lastUsed) || 0}</div>
+                        </div>
+                        <div className="info">
+                          <div className="info-label">Last Trained</div>
+                          <div className="value">{getDate(assistant?.metadata?.lastTrained) || 0}</div>
+                        </div>
                       </div>
-                      {/* <div className="info">
-                        <div className="info-label">Last Used:</div>
-                        <div className="value">Yesterday</div>
-                      </div> */}
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
+
+              {voiceListType === "table" && (
+                <VoicebotTableLayout
+                  voiceAssistantList={voiceAssistantList}
+                  selectedAssistantHandler={selectedAssistantHandler}
+                  getDate={getDate}
+                />
+              )}
+            </>
             )}
           </>
         )}
