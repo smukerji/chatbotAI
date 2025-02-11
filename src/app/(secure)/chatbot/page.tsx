@@ -20,7 +20,7 @@ import GridLayout from "./_components/GridLayout";
 import TableLayout from "./_components/TableLayout";
 import DeleteModal from "./dashboard/_components/Modal/DeleteModal";
 import ShareModal from "./dashboard/_components/Modal/ShareModal";
-import { redirect, useRouter } from "next/navigation";
+import { redirect, useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
@@ -187,9 +187,9 @@ function Chatbot() {
   const initialState = {
     firstMessage: "",
     transcriber: {
-      provider: "",
-      model: "",
-      language: "",
+      provider: "deepgram",
+      model: "nova-2",
+      language: "en-IN",
       // smartFormat: false,
       languageDetectionEnabled: false,
       // keywords: [""],
@@ -217,8 +217,8 @@ function Chatbot() {
       //   },
       // ],
       toolIds: [""], //we deleted this field in the backend
-      provider: "",
-      model: "",
+      provider: "openai",
+      model: "gpt-4o",
       temperature: 0,
       // knowledgeBase: { provider: "canonical", topK: 5.5, fileIds: [""] },
       maxTokens: 300,
@@ -325,6 +325,9 @@ function Chatbot() {
 
   const { status } = useSession();
   const router = useRouter();
+  const params: any = useSearchParams();
+
+  const interactionFrom = params.get("interactionFrom") === "true";
 
   const botContext: any = useContext(CreateBotContext);
   const botDetails = botContext?.createBotInfo;
@@ -421,7 +424,7 @@ function Chatbot() {
     //   voiceBotContextData.setAssistantVapiId(assistantInfo.vapiId);
     // }
     voiceBotContextData.setCurrentAssistantPage(0);
-    router.push("/voicebot/dashboard");
+    router.push("/voicebot/dashboard?interaction=voicebot");
   };
 
   /**
@@ -493,6 +496,9 @@ function Chatbot() {
 
   /// retrive the chatbots details
   useEffect(() => {
+    if(interactionFrom){
+      setIsVoiceBotActived(true);
+    }
     getUser();
     const fetchData = async () => {
       try {

@@ -67,6 +67,8 @@ function Dashboard() {
 
   const isFirstTimeAssistantCreation = params.get("firstInit") === "true";
 
+  const interaction = params.get("interaction") == "voicebot";
+
   const [isListening, setIsListening] = useState(CALLSTATUS.VOID);
   const [isMuted, setIsMuted] = useState(false);
   
@@ -89,7 +91,7 @@ function Dashboard() {
 
 
     if (!voiceBotContextData?.assistantInfo) {
-      router.push("/chatbot");
+      router.push(`/chatbot?interactionFrom=${interaction}`)
     }
 
     ;
@@ -181,7 +183,7 @@ function Dashboard() {
       const assistantDataResponseParse = await assistantDataResponse.json();
   
       message.success(assistantDataResponseParse?.message);
-      router.push("/chatbot");
+      router.push(`/chatbot?interactionFrom=${interaction}`)
 
 
     }
@@ -619,7 +621,7 @@ async function costDeductionOnCallEndHandler(){
         <div className="headers">
           <div className="header-title">
             <Image className="image" alt="back_arrow" src={leftArrow} onClick={()=>{
-              router.push("/chatbot")
+              router.push(`/chatbot?interactionFrom=${interaction}`)
             }}></Image>
             <h1 className="title">{voicebotDetails?.name || voiceBotContextData?.assistantInfo?.assistantName}</h1>
 
