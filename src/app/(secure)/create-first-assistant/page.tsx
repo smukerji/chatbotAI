@@ -828,11 +828,7 @@ export default function FirstAssistant() {
 										}}
 									/>
 								</div>
-                {inputValidationMessage && (
-                  <p className="invalidation-message">
-                    {inputValidationMessage}
-                  </p>
-                )}
+              
 							</div>
 							<Steps
 								className='stepper-steps'
