@@ -1,23 +1,24 @@
 /// assistant type
 export enum AssistantType {
-  ECOMMERCE_AGENT_SHOPIFY = "ecommerce-agent-shopify",
-  SALES_AGENT_HOSPITALITY_EXPERT = "sales-agent-hospitality-expert",
-  SALES_AGENT_REAL_ESTATE = "sales-agent-real-estate",
-  SALES_AGENT_SME_BUSINESS = "sales-agent-sme-business",
-  CUSTOMER_SUPPORT_REAL_ESTATE = "cs-agent-real-estate",
-  CUSTOMER_SUPPORT_SME_BUSINESS = "cs-agent-sme-business",
-  CUSTOMER_SUPPORT_HOSPITALITY_EXPERT = "cs-agent-hospitality-expert",
-  IT_SUPPORT_SME_BUSINESS = "it-agent-sme-business",
-  IT_SUPPORT_REAL_ESTATE = "it-agent-real-estate",
-  IT_SUPPORT_HOSPITALITY_EXPERT = "it-agent-hospitality-expert",
-  REAL_ESTATE_AGENT = "re-agent-real-estate",
+	ECOMMERCE_AGENT_SHOPIFY = 'ecommerce-agent-shopify',
+	SALES_AGENT_HOSPITALITY_EXPERT = 'sales-agent-hospitality-expert',
+	SALES_AGENT_REAL_ESTATE = 'sales-agent-real-estate',
+	SALES_AGENT_SME_BUSINESS = 'sales-agent-sme-business',
+	CUSTOMER_SUPPORT_REAL_ESTATE = 'cs-agent-real-estate',
+	CUSTOMER_SUPPORT_SME_BUSINESS = 'cs-agent-sme-business',
+	CUSTOMER_SUPPORT_HOSPITALITY_EXPERT = 'cs-agent-hospitality-expert',
+	IT_SUPPORT_SME_BUSINESS = 'it-agent-sme-business',
+	IT_SUPPORT_REAL_ESTATE = 'it-agent-real-estate',
+	IT_SUPPORT_HOSPITALITY_EXPERT = 'it-agent-hospitality-expert',
+	REAL_ESTATE_AGENT = 're-agent-real-estate',
+	RESEARCH_WEB = 'research-agent-web-expert',
 }
 
 /// system prompts and tools for assistant
 export function getSystemInstruction(type: string) {
-  switch (type) {
-    case AssistantType.ECOMMERCE_AGENT_SHOPIFY:
-      return `
+	switch (type) {
+		case AssistantType.ECOMMERCE_AGENT_SHOPIFY:
+			return `
                 Greet customers warmly and engage in a brief conversation to understand their needs before assisting with product recommendations on Shopify. Use specific functions to provide an efficient and personalized shopping experience.
 
                 Utilize the following functions effectively:
@@ -66,8 +67,8 @@ export function getSystemInstruction(type: string) {
                 - Always include product images when available for a better shopping experience.
                 - Tailor recommendations based on user interactions and previous order history when possible to provide a personalized touch.
       `;
-    case AssistantType.SALES_AGENT_HOSPITALITY_EXPERT:
-      return `
+		case AssistantType.SALES_AGENT_HOSPITALITY_EXPERT:
+			return `
               Role: You are a proactive, knowledgeable, and persuasive AI Customer Sales Agent for a business in the hospitality industry, which may include gyms, cafés, wellness centers, studios, and other hospitality-focused enterprises. Your primary objective is to engage customers, understand their needs, and drive sales by promoting memberships, packages, services, and products. You aim to deliver a personalized experience, upsell or cross-sell services, and provide a seamless sales journey.
 
                 Tone of Voice:
@@ -151,8 +152,8 @@ export function getSystemInstruction(type: string) {
                 Closing Note:
                 This prompt equips a hospitality-focused customer sales agent to engage customers effectively, promote services, and drive sales using the specified functions. Its versatility ensures a seamless and personalized sales experience across hospitality businesses.
 `;
-    case AssistantType.SALES_AGENT_REAL_ESTATE:
-      return `
+		case AssistantType.SALES_AGENT_REAL_ESTATE:
+			return `
               Role:
               You are a highly knowledgeable, approachable, and results-driven AI Customer Sales Agent specializing in the real estate industry. Your primary objective is to assist customers with property inquiries, guide them through buying, selling, renting, or leasing processes, and provide personalized recommendations. You excel at understanding customer needs, offering tailored solutions, and driving sales while maintaining exceptional customer satisfaction.
 
@@ -275,8 +276,8 @@ export function getSystemInstruction(type: string) {
               - Adapt the tone to match the customer’s mood and communication style.
 
 `;
-    case AssistantType.SALES_AGENT_SME_BUSINESS:
-      return `
+		case AssistantType.SALES_AGENT_SME_BUSINESS:
+			return `
             Role:
             You are a versatile, knowledgeable, and persuasive AI Customer Sales Agent specializing in supporting Small to Medium-Sized Enterprises (SMEs). Your primary goal is to engage customers, understand their needs, and drive sales by promoting products, services, or solutions tailored to their specific business type. Whether working with retail shops, manufacturers, service providers, or other SMEs, you are equipped to handle a variety of sales scenarios with confidence and adaptability.
 
@@ -412,8 +413,8 @@ export function getSystemInstruction(type: string) {
             This template equips a customer sales agent to effectively support SMEs across diverse industries, ensuring a seamless and personalized sales experience. By addressing specific business needs, offering tailored solutions, and emphasizing value, the agent can drive sales and build long-term customer relationships.
 
           `;
-    case AssistantType.CUSTOMER_SUPPORT_REAL_ESTATE:
-      return `
+		case AssistantType.CUSTOMER_SUPPORT_REAL_ESTATE:
+			return `
               Role:
               You are a knowledgeable, approachable, and conversational AI assistant for Homely Horizons, a real estate agency specializing in buying, selling, and renting properties across Sydney, Australia. Your primary goal is to understand customer intent, provide property information, schedule property tours, assist with rental inquiries, and offer seamless customer service while cross-promoting other real estate services.
 
@@ -502,8 +503,8 @@ export function getSystemInstruction(type: string) {
               3.	Provide personalized responses or direct the customer to the next step (e.g., booking a viewing, connecting with an agent).
               4.	Upsell or cross-sell services when appropriate (e.g., property management or mortgage assistance).
               `;
-    case AssistantType.CUSTOMER_SUPPORT_SME_BUSINESS:
-      return `
+		case AssistantType.CUSTOMER_SUPPORT_SME_BUSINESS:
+			return `
             Role:
             You are a conversational, knowledgeable, and efficient AI assistant for an SME business. Your primary goal is to provide outstanding customer service by addressing inquiries about products, services, orders, support, and general business information. You aim to engage customers, clarify their needs, and ensure a smooth, positive experience while offering relevant upselling or cross-selling opportunities.
 
@@ -645,8 +646,8 @@ export function getSystemInstruction(type: string) {
             - Always confirm the customer's satisfaction before closing the conversation.
             - Ensure clean, structured HTML formatting for clarity.
       `;
-    case AssistantType.CUSTOMER_SUPPORT_HOSPITALITY_EXPERT:
-      return `
+		case AssistantType.CUSTOMER_SUPPORT_HOSPITALITY_EXPERT:
+			return `
               Role:
               You are a warm, approachable, and knowledgeable AI assistant for a hospitality business, such as a wellness center, café, or gym. Your primary goal is to assist customers with bookings, inquiries about services or products, memberships, events, and general support. Your responses should enhance the customer experience, foster engagement, and promote upselling or cross-selling opportunities where relevant.
 
@@ -791,8 +792,8 @@ export function getSystemInstruction(type: string) {
               - Adapt the tone to match the customer’s mood and communication style.
 
       `;
-    case AssistantType.IT_SUPPORT_SME_BUSINESS:
-      return `
+		case AssistantType.IT_SUPPORT_SME_BUSINESS:
+			return `
               Role:  
               You are an IT Support Agent specializing in providing technical assistance and solutions for Small to Medium-Sized Enterprises (SMEs). Your primary goal is to engage with customers, understand their IT issues, and offer efficient solutions that optimize their business technology needs. Whether troubleshooting technical issues, providing software updates, or offering maintenance plans, you are equipped to handle various IT challenges with expertise.
 
@@ -904,8 +905,8 @@ export function getSystemInstruction(type: string) {
               - Adapt your tone based on urgency (e.g., for urgent issues vs. general inquiries).
 
       `;
-    case AssistantType.IT_SUPPORT_REAL_ESTATE:
-      return `
+		case AssistantType.IT_SUPPORT_REAL_ESTATE:
+			return `
               Role:  
               You are an IT Support Agent specializing in providing technical support for the real estate industry. Your goal is to assist real estate agents, brokers, property managers, and other real estate professionals in resolving IT issues related to systems, software, networks, and customer-facing technologies. You will help ensure smooth operations by providing timely technical solutions for back-office operations, CRM systems, property listing platforms, and other industry-specific technologies.
 
@@ -1023,8 +1024,8 @@ export function getSystemInstruction(type: string) {
               - Always be mindful of the urgency of the issue and provide immediate solutions when needed.  
               - Customize responses based on the type of real estate business (e.g., residential, commercial, property management) and their specific IT needs.
         `;
-    case AssistantType.IT_SUPPORT_HOSPITALITY_EXPERT:
-      return `
+		case AssistantType.IT_SUPPORT_HOSPITALITY_EXPERT:
+			return `
             Role:  
             You are an IT Support Agent specializing in providing technical support to the hospitality industry. Your goal is to assist hotel staff, managers, and other hospitality professionals in resolving IT issues related to systems, software, networks, and customer-facing technologies. You will help maintain smooth operations by providing timely technical solutions for both back-office operations and guest-facing technologies like booking systems, Wi-Fi connectivity, and room management systems.
 
@@ -1141,8 +1142,8 @@ export function getSystemInstruction(type: string) {
             - Provide images or screenshots wherever applicable to enhance the support process.  
             - Always be mindful of the urgency of the issue and provide immediate solutions when needed.  
             - Customize responses based on the type of hospitality business (e.g., hotels, resorts, inns) and their specific IT needs.`;
-    case AssistantType.REAL_ESTATE_AGENT:
-      return `
+		case AssistantType.REAL_ESTATE_AGENT:
+			return `
             Role:  
             You are a Real Estate Agent assisting clients in buying, selling, and renting properties. Your goal is to engage with customers, understand their real estate needs, and provide solutions that help them make informed decisions. Whether helping them find the perfect property, providing information about market trends, or advising on investment opportunities, your expertise will guide them through the real estate process.
 
@@ -1256,1011 +1257,1330 @@ export function getSystemInstruction(type: string) {
             - Personalize responses based on the customer's preferences, needs, and the property’s features.  
             - Adapt your tone based on the customer's situation (e.g., serious buyers vs. casual inquiries).
       `;
-    default:
-      return "Hello! What can I help you with today?";
-  }
+		case AssistantType.RESEARCH_WEB:
+			return `
+	Role:
+You are an Intelligent Research Assistant Chatbot that specializes in retrieving relevant and well-structured information using the get_reference function and the get_search_results function when necessary. Your primary objective is to provide users with accurate, well-organized answers while dynamically handling insufficient queries by asking relevant follow-up questions.
+
+Tone of Voice:
+Professional & Structured: Responses are well-organized and clear.
+Conversational yet Efficient: You engage users naturally while staying goal-oriented.
+Curious & Proactive: You actively analyze responses and refine search queries.
+Key Features & Workflow:
+1. Query Handling & Context Retrieval
+For every user query, first call the get_reference function to retrieve information.
+
+If the retrieved information sufficiently answers the user's query, present it in an HTML-formatted response.
+
+If the retrieved context does not answer the user’s question or if the user is unsatisfied, ask:
+
+"It looks like I may not have enough information to fully answer your question. Would you like me to search the web for more details?"
+
+If the user agrees, proceed with get_search_results after refining the query through follow-ups (if necessary).
+
+2. Refining Insufficient Queries (Dynamic Questioning)
+If the user’s query lacks enough details for an optimized search, follow this approach:
+
+Ask one clarification at a time.
+Ensure each question narrows the search scope.
+If needed, provide examples of how the user can specify their request.
+Example:
+User: "Tell me about machine learning."
+
+Response:
+
+html
+Copy
+Edit
+<p>Machine learning is a vast field. Could you clarify what you need?</p>
+<ul>
+  <li>Are you looking for a beginner-friendly explanation or technical research?</li>
+  <li>Do you need real-world applications, industry trends, or research papers?</li>
+</ul>
+<p>Let me know so I can refine my search!</p>
+Once a well-defined query is formed, proceed with get_search_results.
+
+3. Structured Search Execution
+Once enough information is gathered:
+
+Refine the search query based on user responses.
+Call get_search_results with the optimized query.
+Format the response in HTML for clarity.
+Example:
+User: "Find me the latest research on AI ethics in hiring."
+
+Response:
+
+html
+Copy
+Edit
+<p>Understood! I'll fetch the latest research papers on AI ethics in hiring decisions.</p>
+<p>Here are the most recent findings:</p>
+<!-- Results from get_search_results -->
+4. HTML Formatting Guidelines for Responses
+All responses should be structured using HTML.
+
+Use:
+✅ <p> for paragraphs
+✅ <ul> and <li> for bullet points
+✅ <strong> for emphasis
+✅ <a> for links (if provided in search results)
+
+Example Response Format:
+
+html
+Copy
+Edit
+<p>Here’s what I found on AI bias in hiring:</p>
+<ul>
+  <li><strong>Study 1:</strong> <a href="URL">Bias in AI Hiring Algorithms</a></li>
+  <li><strong>Study 2:</strong> <a href="URL">How AI Impacts Workplace Diversity</a></li>
+</ul>
+<p>Would you like me to refine the search further?</p>
+Step-by-Step Execution
+1️⃣ Receive User Query
+→ Call get_reference(query)
+→ Format response in HTML
+→ If sufficient, provide results.
+
+2️⃣ Assess Completeness
+→ If context lacks an answer or the user is unsatisfied, ask if they want a web search.
+
+3️⃣ Refine Query (If Needed)
+→ If the user agrees to a web search, but the query is vague, ask one clarifying question at a time.
+
+4️⃣ Perform Search & Deliver Results
+→ Once the query is well-defined, call get_search_results(refined_query).
+→ Format response in HTML.
+
+Edge Cases & Special Instructions
+✔ If the user provides additional details: Adjust the query dynamically and proceed with a refined search.
+✔ If a query is too broad: Guide the user with examples of possible directions.
+✔ If the user asks for specific research papers: Ensure search results are from academic sources (if available).
+✔ If results are not helpful: Ask the user whether they’d like to refine their question further.
+
+Final Notes
+Always prioritize get_reference before get_search_results.
+Use HTML formatting for clarity and structured presentation.
+Do not ask all follow-ups at once; refine the query step by step.
+Ensure accurate and relevant search execution based on the user’s intent.
+Example Interaction Flow
+Scenario 1: Direct Answer Available
+User: "What is the impact of AI on cybersecurity?"
+
+Call get_reference("impact of AI on cybersecurity").
+If the response is relevant, format and display it in HTML.
+html
+Copy
+Edit
+<p>AI has significantly impacted cybersecurity by:</p>
+<ul>
+  <li><strong>Threat Detection:</strong> AI-driven algorithms detect threats in real time.</li>
+  <li><strong>Automated Response:</strong> AI helps automate security measures.</li>
+  <li><strong>Challenges:</strong> AI is also used by attackers to evade detection.</li>
+</ul>
+<p>Would you like me to find recent case studies on this?</p>
+Scenario 2: Reference Lacks Complete Answer
+User: "What are the latest advancements in quantum computing?"
+
+Call get_reference("latest advancements in quantum computing").
+If the reference lacks details, ask:
+html
+Copy
+Edit
+<p>The current information may not fully answer your question.</p>
+<p>Would you like me to search the web for the latest advancements in quantum computing?</p>
+If the user agrees, refine the query:
+html
+Copy
+Edit
+<p>Are you interested in:</p>
+<ul>
+  <li>Recent research papers?</li>
+  <li>Industry applications?</li>
+  <li>Government investments?</li>
+</ul>
+Once refined, call get_search_results(refined_query).
+Conclusion
+This prompt ensures that the research assistant chatbot:
+✔ Prioritizes contextual responses before external searches.
+✔ Dynamically refines vague queries with follow-ups.
+✔ Calls get_search_results only when necessary.
+✔ Delivers responses exclusively in HTML format for structured presentation.
+			`;
+		default:
+			return 'Hello! What can I help you with today?';
+	}
 }
 
 type FunctionParameter = {
-  type: "object";
-  properties: {
-    [key: string]: {
-      type: string;
-      description: string;
-      enum?: string[];
-    };
-  };
-  required: string[];
-  additionalProperties?: boolean;
+	type: 'object';
+	properties: {
+		[key: string]: {
+			type: string;
+			description: string;
+			enum?: string[];
+		};
+	};
+	required: string[];
+	additionalProperties?: boolean;
 };
 
 type FunctionDefinition = {
-  type: "function";
-  function: {
-    name: string;
-    description: string;
-    parameters: FunctionParameter;
-    strict?: boolean;
-  };
+	type: 'function';
+	function: {
+		name: string;
+		description: string;
+		parameters: FunctionParameter;
+		strict?: boolean;
+	};
 };
 
 type FunctionsArray = FunctionDefinition[];
 
 export function getAssistantTools(type: string): FunctionsArray {
-  switch (type) {
-    case AssistantType.ECOMMERCE_AGENT_SHOPIFY:
-      return [
-        {
-          type: "function",
-          function: {
-            name: "find_product",
-            description:
-              "This function will find the product with the given product details.",
-            strict: false,
-            parameters: {
-              type: "object",
-              properties: {
-                query: {
-                  type: "string",
-                  description: "The name of the product",
-                },
-              },
-              required: [],
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_customer_orders",
-            description:
-              "This function will get all the customer order based on the email id.",
-            strict: false,
-            parameters: {
-              type: "object",
-              properties: {
-                email: {
-                  type: "string",
-                  description: "The email of customer",
-                },
-              },
-              required: [],
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_products",
-            description:
-              "This function will get the product to suggest/recommed products to customers",
-            strict: false,
-            parameters: {
-              required: [],
-              type: "object",
-              properties: {},
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_reference",
-            description:
-              "This function will will help you get the context from which you can answer to user's query.",
-            strict: true,
-            parameters: {
-              type: "object",
-              properties: {
-                userQuery: {
-                  type: "string",
-                  description: "The user latest message",
-                },
-              },
-              additionalProperties: false,
-              required: ["userQuery"],
-            },
-          },
-        },
-      ];
-    case AssistantType.SALES_AGENT_HOSPITALITY_EXPERT:
-      return [
-        {
-          type: "function",
-          function: {
-            name: "find_service",
-            description:
-              "This function will find the service with the given service details.",
-            strict: false,
-            parameters: {
-              type: "object",
-              properties: {
-                query: {
-                  type: "string",
-                  description: "The name of the service",
-                },
-              },
-              required: [],
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_customer_history",
-            description:
-              "This function will get all the customer interaction history based on the email id.",
-            strict: false,
-            parameters: {
-              type: "object",
-              properties: {
-                email: {
-                  type: "string",
-                  description: "The email of customer",
-                },
-              },
-              required: [],
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_services",
-            description:
-              "This function will get the service to suggest/recommed services to customers",
-            strict: false,
-            parameters: {
-              required: [],
-              type: "object",
-              properties: {},
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_reference",
-            description:
-              "This function will will help you get the context from which you can answer to user's query.",
-            strict: true,
-            parameters: {
-              type: "object",
-              properties: {
-                userQuery: {
-                  type: "string",
-                  description: "The user latest message",
-                },
-              },
-              additionalProperties: false,
-              required: ["userQuery"],
-            },
-          },
-        },
-      ];
-    case AssistantType.SALES_AGENT_REAL_ESTATE:
-      return [
-        {
-          type: "function",
-          function: {
-            name: "find_property",
-            description:
-              "This function will find the property with the given property details.",
-            strict: false,
-            parameters: {
-              type: "object",
-              properties: {
-                query: {
-                  type: "string",
-                  description: "The name of the property",
-                },
-              },
-              required: [],
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_property_details",
-            description:
-              "This function will get the property details to suggest/recommed properties to customers",
-            strict: false,
-            parameters: {
-              type: "object",
-              properties: {
-                propertyType: {
-                  type: "string",
-                  description: "The type of property",
-                },
-              },
-              required: [],
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_property_valuation",
-            description:
-              "This function will get the property valuation details to suggest/recommed properties to customers",
-            strict: false,
-            parameters: {
-              type: "object",
-              properties: {
-                propertyId: {
-                  type: "string",
-                  description: "The property ID",
-                },
-              },
-              required: [],
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_rental_properties",
-            description:
-              "This function will get the rental properties to suggest/recommed properties to customers",
-            strict: false,
-            parameters: {
-              type: "object",
-              properties: {},
-              required: [],
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_investment_opportunities",
-            description:
-              "This function will get the investment opportunities to suggest/recommed properties to customers",
-            strict: false,
-            parameters: {
-              type: "object",
-              properties: {},
-              required: [],
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_financing_options",
-            description:
-              "This function will get the financing options to suggest/recommed properties to customers",
-            strict: false,
-            parameters: {
-              type: "object",
-              properties: {},
-              required: [],
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_property_management_services",
-            description:
-              "This function will get the property management services to suggest/recommed properties to customers",
-            strict: false,
-            parameters: {
-              type: "object",
-              properties: {},
-              required: [],
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_reference",
-            description:
-              "This function will will help you get the context from which you can answer to user's query.",
-            strict: true,
-            parameters: {
-              type: "object",
-              properties: {
-                userQuery: {
-                  type: "string",
-                  description: "The user latest message",
-                },
-              },
-              additionalProperties: false,
-              required: ["userQuery"],
-            },
-          },
-        },
-      ];
-    case AssistantType.SALES_AGENT_SME_BUSINESS:
-      return [
-        {
-          type: "function",
-          function: {
-            name: "find_product",
-            description:
-              "This function will find the product with the given product details.",
-            strict: false,
-            parameters: {
-              type: "object",
-              properties: {
-                query: {
-                  type: "string",
-                  description: "The name of the product",
-                },
-              },
-              required: [],
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_service_details",
-            description:
-              "This function will get the service details to suggest/recommed services to customers",
-            strict: false,
-            parameters: {
-              type: "object",
-              properties: {
-                serviceType: {
-                  type: "string",
-                  description: "The type of service",
-                },
-              },
-              required: [],
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_pricing_info",
-            description:
-              "This function will get the pricing information to suggest/recommed products/services to customers",
-            strict: false,
-            parameters: {
-              type: "object",
-              properties: {
-                productId: {
-                  type: "string",
-                  description: "The product ID",
-                },
-              },
-              required: [],
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "offer_customization",
-            description:
-              "This function will offer customized products or services based on business-specific needs.",
-            strict: false,
-            parameters: {
-              type: "object",
-              properties: {
-                businessType: {
-                  type: "string",
-                  description: "The type of business",
-                },
-              },
-              required: [],
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_subscription_plan",
-            description:
-              "This function will get the subscription plan to suggest/recommed services to customers",
-            strict: false,
-            parameters: {
-              type: "object",
-              properties: {},
-              required: [],
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_package_deal",
-            description:
-              "This function will get the package deal to suggest/recommed products/services to customers",
-            strict: false,
-            parameters: {
-              type: "object",
-              properties: {},
-              required: [],
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_reference",
-            description:
-              "This function will will help you get the context from which you can answer to user's query.",
-            strict: true,
-            parameters: {
-              type: "object",
-              properties: {
-                userQuery: {
-                  type: "string",
-                  description: "The user latest message",
-                },
-              },
-              additionalProperties: false,
-              required: ["userQuery"],
-            },
-          },
-        },
-      ];
-    case AssistantType.CUSTOMER_SUPPORT_REAL_ESTATE:
-      return [
-        {
-          type: "function",
-          function: {
-            name: "find_property",
-            description:
-              "This function will find the property with the given property details.",
-            strict: false,
-            parameters: {
-              type: "object",
-              properties: {
-                query: {
-                  type: "string",
-                  description: "The name of the property",
-                },
-              },
-              required: [],
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_customer_history",
-            description:
-              "This function will get all the customer interaction history based on the email id.",
-            strict: false,
-            parameters: {
-              type: "object",
-              properties: {
-                email: {
-                  type: "string",
-                  description: "The email of customer",
-                },
-              },
-              required: [],
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_properties",
-            description:
-              "This function will get the property to suggest/recommed properties to customers",
-            strict: false,
-            parameters: {
-              required: [],
-              type: "object",
-              properties: {},
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_reference",
-            description:
-              "This function will will help you get the context from which you can answer to user's query.",
-            strict: true,
-            parameters: {
-              type: "object",
-              properties: {
-                userQuery: {
-                  type: "string",
-                  description: "The user latest message",
-                },
-              },
-              additionalProperties: false,
-              required: ["userQuery"],
-            },
-          },
-        },
-      ];
-    case AssistantType.CUSTOMER_SUPPORT_SME_BUSINESS:
-      return [
-        {
-          type: "function",
-          function: {
-            name: "find_product",
-            description:
-              "This function will find the product with the given product details.",
-            strict: false,
-            parameters: {
-              type: "object",
-              properties: {
-                query: {
-                  type: "string",
-                  description: "The name of the product",
-                },
-              },
-              required: [],
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_customer_orders",
-            description:
-              "This function will get all the customer order based on the email id.",
-            strict: false,
-            parameters: {
-              type: "object",
-              properties: {
-                email: {
-                  type: "string",
-                  description: "The email of customer",
-                },
-              },
-              required: [],
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_services",
-            description:
-              "This function will get the service to suggest/recommed services to customers",
-            strict: false,
-            parameters: {
-              required: [],
-              type: "object",
-              properties: {},
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_reference",
-            description:
-              "This function will will help you get the context from which you can answer to user's query.",
-            strict: true,
-            parameters: {
-              type: "object",
-              properties: {
-                userQuery: {
-                  type: "string",
-                  description: "The user latest message",
-                },
-              },
-              additionalProperties: false,
-              required: ["userQuery"],
-            },
-          },
-        },
-      ];
-    case AssistantType.CUSTOMER_SUPPORT_HOSPITALITY_EXPERT:
-      return [
-        {
-          type: "function",
-          function: {
-            name: "find_booking_slot",
-            description:
-              "This function will find the available booking slots based on customer preferences.",
-            strict: false,
-            parameters: {
-              type: "object",
-              properties: {
-                preferences: {
-                  type: "string",
-                  description: "The customer preferences",
-                },
-              },
-              required: [],
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_membership_info",
-            description:
-              "This function will get the membership details, benefits, and pricing to assist with inquiries.",
-            strict: false,
-            parameters: {
-              type: "object",
-              properties: {
-                query: {
-                  type: "string",
-                  description: "The membership query",
-                },
-              },
-              required: [],
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_service_menu",
-            description:
-              "This function will get the service menu to suggest/recommed services to customers",
-            strict: false,
-            parameters: {
-              required: [],
-              type: "object",
-              properties: {},
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_event_schedule",
-            description:
-              "This function will provide information about upcoming events, workshops, and classes.",
-            strict: false,
-            parameters: {
-              required: [],
-              type: "object",
-              properties: {},
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_reference",
-            description:
-              "This function will help you get the context from which you can answer to user's query.",
-            strict: true,
-            parameters: {
-              type: "object",
-              properties: {
-                userQuery: {
-                  type: "string",
-                  description: "The user latest message",
-                },
-              },
-              additionalProperties: false,
-              required: ["userQuery"],
-            },
-          },
-        },
-      ];
-    case AssistantType.IT_SUPPORT_SME_BUSINESS:
-      return [
-        {
-          type: "function",
-          function: {
-            name: "find_issue_solution",
-            description:
-              "This function will find the solution to the specific technical issue based on the customer's inquiry.",
-            strict: false,
-            parameters: {
-              type: "object",
-              properties: {
-                query: {
-                  type: "string",
-                  description: "The technical issue query",
-                },
-              },
-              required: [],
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_maintenance_plan",
-            description:
-              "This function will get the available IT maintenance plans and support packages tailored for SMEs.",
-            strict: false,
-            parameters: {
-              type: "object",
-              properties: {
-                query: {
-                  type: "string",
-                  description: "The maintenance plan query",
-                },
-              },
-              required: [],
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_software_updates",
-            description:
-              "This function will provide information about software updates, security patches, or new features.",
-            strict: false,
-            parameters: {
-              type: "object",
-              properties: {
-                query: {
-                  type: "string",
-                  description: "The software update query",
-                },
-              },
-              required: [],
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_reference",
-            description:
-              "This function will help you get the context from which you can answer to user's query.",
-            strict: true,
-            parameters: {
-              type: "object",
-              properties: {
-                userQuery: {
-                  type: "string",
-                  description: "The user latest message",
-                },
-              },
-              additionalProperties: false,
-              required: ["userQuery"],
-            },
-          },
-        },
-      ];
-    case AssistantType.IT_SUPPORT_REAL_ESTATE:
-      return [
-        {
-          type: "function",
-          function: {
-            name: "find_issue_solution",
-            description:
-              "This function will find the solution to the specific technical issue based on the customer's inquiry.",
-            strict: false,
-            parameters: {
-              type: "object",
-              properties: {
-                query: {
-                  type: "string",
-                  description: "The technical issue query",
-                },
-              },
-              required: [],
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_maintenance_plan",
-            description:
-              "This function will get the available IT maintenance plans and support packages tailored for real estate businesses.",
-            strict: false,
-            parameters: {
-              type: "object",
-              properties: {
-                query: {
-                  type: "string",
-                  description: "The maintenance plan query",
-                },
-              },
-              required: [],
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_software_updates",
-            description:
-              "This function will provide information about software updates, security patches, or new features.",
-            strict: false,
-            parameters: {
-              type: "object",
-              properties: {
-                query: {
-                  type: "string",
-                  description: "The software update query",
-                },
-              },
-              required: [],
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_reference",
-            description:
-              "This function will help you get the context from which you can answer to user's query.",
-            strict: true,
-            parameters: {
-              type: "object",
-              properties: {
-                userQuery: {
-                  type: "string",
-                  description: "The user latest message",
-                },
-              },
-              additionalProperties: false,
-              required: ["userQuery"],
-            },
-          },
-        },
-      ];
-    case AssistantType.IT_SUPPORT_HOSPITALITY_EXPERT:
-      return [
-        {
-          type: "function",
-          function: {
-            name: "find_issue_solution",
-            description:
-              "This function will find the solution to the specific technical issue based on the customer's inquiry.",
-            strict: false,
-            parameters: {
-              type: "object",
-              properties: {
-                query: {
-                  type: "string",
-                  description: "The technical issue query",
-                },
-              },
-              required: [],
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_maintenance_plan",
-            description:
-              "This function will get the available IT maintenance plans and support packages tailored for the hospitality industry.",
-            strict: false,
-            parameters: {
-              type: "object",
-              properties: {
-                query: {
-                  type: "string",
-                  description: "The maintenance plan query",
-                },
-              },
-              required: [],
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_software_updates",
-            description:
-              "This function will provide information about software updates, security patches, or new features.",
-            strict: false,
-            parameters: {
-              type: "object",
-              properties: {
-                query: {
-                  type: "string",
-                  description: "The software update query",
-                },
-              },
-              required: [],
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_reference",
-            description:
-              "This function will help you get the context from which you can answer to user's query.",
-            strict: true,
-            parameters: {
-              type: "object",
-              properties: {
-                userQuery: {
-                  type: "string",
-                  description: "The user latest message",
-                },
-              },
-              additionalProperties: false,
-              required: ["userQuery"],
-            },
-          },
-        },
-      ];
-    case AssistantType.REAL_ESTATE_AGENT:
-      return [
-        {
-          type: "function",
-          function: {
-            name: "find_property_listing",
-            description:
-              "This function will find the property listing based on the customer's inquiry.",
-            strict: false,
-            parameters: {
-              type: "object",
-              properties: {
-                query: {
-                  type: "string",
-                  description: "The property query",
-                },
-              },
-              required: [],
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_property_details",
-            description:
-              "This function will get the property details to suggest/recommed properties to customers",
-            strict: false,
-            parameters: {
-              type: "object",
-              properties: {
-                propertyType: {
-                  type: "string",
-                  description: "The type of property",
-                },
-              },
-              required: [],
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_market_trends",
-            description:
-              "This function will provide insights on local market conditions or pricing trends in the customer's area of interest.",
-            strict: false,
-            parameters: {
-              type: "object",
-              properties: {
-                query: {
-                  type: "string",
-                  description: "The market trend query",
-                },
-              },
-              required: [],
-            },
-          },
-        },
-        {
-          type: "function",
-          function: {
-            name: "get_reference",
-            description:
-              "This function will help you get the context from which you can answer to user's query.",
-            strict: true,
-            parameters: {
-              type: "object",
-              properties: {
-                userQuery: {
-                  type: "string",
-                  description: "The user latest message",
-                },
-              },
-              additionalProperties: false,
-              required: ["userQuery"],
-            },
-          },
-        },
-      ];
-    default:
-      return [];
-  }
+	switch (type) {
+		case AssistantType.ECOMMERCE_AGENT_SHOPIFY:
+			return [
+				{
+					type: 'function',
+					function: {
+						name: 'find_product',
+						description:
+							'This function will find the product with the given product details.',
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {
+								query: {
+									type: 'string',
+									description:
+										'The name of the product',
+								},
+							},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_customer_orders',
+						description:
+							'This function will get all the customer order based on the email id.',
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {
+								email: {
+									type: 'string',
+									description:
+										'The email of customer',
+								},
+							},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_products',
+						description:
+							'This function will get the product to suggest/recommed products to customers',
+						strict: false,
+						parameters: {
+							required: [],
+							type: 'object',
+							properties: {},
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_reference',
+						description:
+							"This function will will help you get the context from which you can answer to user's query.",
+						strict: true,
+						parameters: {
+							type: 'object',
+							properties: {
+								userQuery: {
+									type: 'string',
+									description:
+										'The user latest message',
+								},
+							},
+							additionalProperties: false,
+							required: ['userQuery'],
+						},
+					},
+				},
+			];
+		case AssistantType.SALES_AGENT_HOSPITALITY_EXPERT:
+			return [
+				{
+					type: 'function',
+					function: {
+						name: 'find_service',
+						description:
+							'This function will find the service with the given service details.',
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {
+								query: {
+									type: 'string',
+									description:
+										'The name of the service',
+								},
+							},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_customer_history',
+						description:
+							'This function will get all the customer interaction history based on the email id.',
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {
+								email: {
+									type: 'string',
+									description:
+										'The email of customer',
+								},
+							},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_services',
+						description:
+							'This function will get the service to suggest/recommed services to customers',
+						strict: false,
+						parameters: {
+							required: [],
+							type: 'object',
+							properties: {},
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_reference',
+						description:
+							"This function will will help you get the context from which you can answer to user's query.",
+						strict: true,
+						parameters: {
+							type: 'object',
+							properties: {
+								userQuery: {
+									type: 'string',
+									description:
+										'The user latest message',
+								},
+							},
+							additionalProperties: false,
+							required: ['userQuery'],
+						},
+					},
+				},
+			];
+		case AssistantType.SALES_AGENT_REAL_ESTATE:
+			return [
+				{
+					type: 'function',
+					function: {
+						name: 'find_property',
+						description:
+							'This function will find the property with the given property details.',
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {
+								query: {
+									type: 'string',
+									description:
+										'The name of the property',
+								},
+							},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_property_details',
+						description:
+							'This function will get the property details to suggest/recommed properties to customers',
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {
+								propertyType: {
+									type: 'string',
+									description:
+										'The type of property',
+								},
+							},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_property_valuation',
+						description:
+							'This function will get the property valuation details to suggest/recommed properties to customers',
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {
+								propertyId: {
+									type: 'string',
+									description:
+										'The property ID',
+								},
+							},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_rental_properties',
+						description:
+							'This function will get the rental properties to suggest/recommed properties to customers',
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_investment_opportunities',
+						description:
+							'This function will get the investment opportunities to suggest/recommed properties to customers',
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_financing_options',
+						description:
+							'This function will get the financing options to suggest/recommed properties to customers',
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_property_management_services',
+						description:
+							'This function will get the property management services to suggest/recommed properties to customers',
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_reference',
+						description:
+							"This function will will help you get the context from which you can answer to user's query.",
+						strict: true,
+						parameters: {
+							type: 'object',
+							properties: {
+								userQuery: {
+									type: 'string',
+									description:
+										'The user latest message',
+								},
+							},
+							additionalProperties: false,
+							required: ['userQuery'],
+						},
+					},
+				},
+			];
+		case AssistantType.SALES_AGENT_SME_BUSINESS:
+			return [
+				{
+					type: 'function',
+					function: {
+						name: 'find_product',
+						description:
+							'This function will find the product with the given product details.',
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {
+								query: {
+									type: 'string',
+									description:
+										'The name of the product',
+								},
+							},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_service_details',
+						description:
+							'This function will get the service details to suggest/recommed services to customers',
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {
+								serviceType: {
+									type: 'string',
+									description:
+										'The type of service',
+								},
+							},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_pricing_info',
+						description:
+							'This function will get the pricing information to suggest/recommed products/services to customers',
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {
+								productId: {
+									type: 'string',
+									description:
+										'The product ID',
+								},
+							},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'offer_customization',
+						description:
+							'This function will offer customized products or services based on business-specific needs.',
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {
+								businessType: {
+									type: 'string',
+									description:
+										'The type of business',
+								},
+							},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_subscription_plan',
+						description:
+							'This function will get the subscription plan to suggest/recommed services to customers',
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_package_deal',
+						description:
+							'This function will get the package deal to suggest/recommed products/services to customers',
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_reference',
+						description:
+							"This function will will help you get the context from which you can answer to user's query.",
+						strict: true,
+						parameters: {
+							type: 'object',
+							properties: {
+								userQuery: {
+									type: 'string',
+									description:
+										'The user latest message',
+								},
+							},
+							additionalProperties: false,
+							required: ['userQuery'],
+						},
+					},
+				},
+			];
+		case AssistantType.CUSTOMER_SUPPORT_REAL_ESTATE:
+			return [
+				{
+					type: 'function',
+					function: {
+						name: 'find_property',
+						description:
+							'This function will find the property with the given property details.',
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {
+								query: {
+									type: 'string',
+									description:
+										'The name of the property',
+								},
+							},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_customer_history',
+						description:
+							'This function will get all the customer interaction history based on the email id.',
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {
+								email: {
+									type: 'string',
+									description:
+										'The email of customer',
+								},
+							},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_properties',
+						description:
+							'This function will get the property to suggest/recommed properties to customers',
+						strict: false,
+						parameters: {
+							required: [],
+							type: 'object',
+							properties: {},
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_reference',
+						description:
+							"This function will will help you get the context from which you can answer to user's query.",
+						strict: true,
+						parameters: {
+							type: 'object',
+							properties: {
+								userQuery: {
+									type: 'string',
+									description:
+										'The user latest message',
+								},
+							},
+							additionalProperties: false,
+							required: ['userQuery'],
+						},
+					},
+				},
+			];
+		case AssistantType.CUSTOMER_SUPPORT_SME_BUSINESS:
+			return [
+				{
+					type: 'function',
+					function: {
+						name: 'find_product',
+						description:
+							'This function will find the product with the given product details.',
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {
+								query: {
+									type: 'string',
+									description:
+										'The name of the product',
+								},
+							},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_customer_orders',
+						description:
+							'This function will get all the customer order based on the email id.',
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {
+								email: {
+									type: 'string',
+									description:
+										'The email of customer',
+								},
+							},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_services',
+						description:
+							'This function will get the service to suggest/recommed services to customers',
+						strict: false,
+						parameters: {
+							required: [],
+							type: 'object',
+							properties: {},
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_reference',
+						description:
+							"This function will will help you get the context from which you can answer to user's query.",
+						strict: true,
+						parameters: {
+							type: 'object',
+							properties: {
+								userQuery: {
+									type: 'string',
+									description:
+										'The user latest message',
+								},
+							},
+							additionalProperties: false,
+							required: ['userQuery'],
+						},
+					},
+				},
+			];
+		case AssistantType.CUSTOMER_SUPPORT_HOSPITALITY_EXPERT:
+			return [
+				{
+					type: 'function',
+					function: {
+						name: 'find_booking_slot',
+						description:
+							'This function will find the available booking slots based on customer preferences.',
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {
+								preferences: {
+									type: 'string',
+									description:
+										'The customer preferences',
+								},
+							},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_membership_info',
+						description:
+							'This function will get the membership details, benefits, and pricing to assist with inquiries.',
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {
+								query: {
+									type: 'string',
+									description:
+										'The membership query',
+								},
+							},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_service_menu',
+						description:
+							'This function will get the service menu to suggest/recommed services to customers',
+						strict: false,
+						parameters: {
+							required: [],
+							type: 'object',
+							properties: {},
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_event_schedule',
+						description:
+							'This function will provide information about upcoming events, workshops, and classes.',
+						strict: false,
+						parameters: {
+							required: [],
+							type: 'object',
+							properties: {},
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_reference',
+						description:
+							"This function will help you get the context from which you can answer to user's query.",
+						strict: true,
+						parameters: {
+							type: 'object',
+							properties: {
+								userQuery: {
+									type: 'string',
+									description:
+										'The user latest message',
+								},
+							},
+							additionalProperties: false,
+							required: ['userQuery'],
+						},
+					},
+				},
+			];
+		case AssistantType.IT_SUPPORT_SME_BUSINESS:
+			return [
+				{
+					type: 'function',
+					function: {
+						name: 'find_issue_solution',
+						description:
+							"This function will find the solution to the specific technical issue based on the customer's inquiry.",
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {
+								query: {
+									type: 'string',
+									description:
+										'The technical issue query',
+								},
+							},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_maintenance_plan',
+						description:
+							'This function will get the available IT maintenance plans and support packages tailored for SMEs.',
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {
+								query: {
+									type: 'string',
+									description:
+										'The maintenance plan query',
+								},
+							},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_software_updates',
+						description:
+							'This function will provide information about software updates, security patches, or new features.',
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {
+								query: {
+									type: 'string',
+									description:
+										'The software update query',
+								},
+							},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_reference',
+						description:
+							"This function will help you get the context from which you can answer to user's query.",
+						strict: true,
+						parameters: {
+							type: 'object',
+							properties: {
+								userQuery: {
+									type: 'string',
+									description:
+										'The user latest message',
+								},
+							},
+							additionalProperties: false,
+							required: ['userQuery'],
+						},
+					},
+				},
+			];
+		case AssistantType.IT_SUPPORT_REAL_ESTATE:
+			return [
+				{
+					type: 'function',
+					function: {
+						name: 'find_issue_solution',
+						description:
+							"This function will find the solution to the specific technical issue based on the customer's inquiry.",
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {
+								query: {
+									type: 'string',
+									description:
+										'The technical issue query',
+								},
+							},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_maintenance_plan',
+						description:
+							'This function will get the available IT maintenance plans and support packages tailored for real estate businesses.',
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {
+								query: {
+									type: 'string',
+									description:
+										'The maintenance plan query',
+								},
+							},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_software_updates',
+						description:
+							'This function will provide information about software updates, security patches, or new features.',
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {
+								query: {
+									type: 'string',
+									description:
+										'The software update query',
+								},
+							},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_reference',
+						description:
+							"This function will help you get the context from which you can answer to user's query.",
+						strict: true,
+						parameters: {
+							type: 'object',
+							properties: {
+								userQuery: {
+									type: 'string',
+									description:
+										'The user latest message',
+								},
+							},
+							additionalProperties: false,
+							required: ['userQuery'],
+						},
+					},
+				},
+			];
+		case AssistantType.IT_SUPPORT_HOSPITALITY_EXPERT:
+			return [
+				{
+					type: 'function',
+					function: {
+						name: 'find_issue_solution',
+						description:
+							"This function will find the solution to the specific technical issue based on the customer's inquiry.",
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {
+								query: {
+									type: 'string',
+									description:
+										'The technical issue query',
+								},
+							},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_maintenance_plan',
+						description:
+							'This function will get the available IT maintenance plans and support packages tailored for the hospitality industry.',
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {
+								query: {
+									type: 'string',
+									description:
+										'The maintenance plan query',
+								},
+							},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_software_updates',
+						description:
+							'This function will provide information about software updates, security patches, or new features.',
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {
+								query: {
+									type: 'string',
+									description:
+										'The software update query',
+								},
+							},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_reference',
+						description:
+							"This function will help you get the context from which you can answer to user's query.",
+						strict: true,
+						parameters: {
+							type: 'object',
+							properties: {
+								userQuery: {
+									type: 'string',
+									description:
+										'The user latest message',
+								},
+							},
+							additionalProperties: false,
+							required: ['userQuery'],
+						},
+					},
+				},
+			];
+		case AssistantType.REAL_ESTATE_AGENT:
+			return [
+				{
+					type: 'function',
+					function: {
+						name: 'find_property_listing',
+						description:
+							"This function will find the property listing based on the customer's inquiry.",
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {
+								query: {
+									type: 'string',
+									description:
+										'The property query',
+								},
+							},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_property_details',
+						description:
+							'This function will get the property details to suggest/recommed properties to customers',
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {
+								propertyType: {
+									type: 'string',
+									description:
+										'The type of property',
+								},
+							},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_market_trends',
+						description:
+							"This function will provide insights on local market conditions or pricing trends in the customer's area of interest.",
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {
+								query: {
+									type: 'string',
+									description:
+										'The market trend query',
+								},
+							},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_reference',
+						description:
+							"This function will help you get the context from which you can answer to user's query.",
+						strict: true,
+						parameters: {
+							type: 'object',
+							properties: {
+								userQuery: {
+									type: 'string',
+									description:
+										'The user latest message',
+								},
+							},
+							additionalProperties: false,
+							required: ['userQuery'],
+						},
+					},
+				},
+			];
+		case AssistantType.IT_SUPPORT_SME_BUSINESS:
+			return [
+				{
+					type: 'function',
+					function: {
+						name: 'find_issue_solution',
+						description:
+							"This function will find the solution to the specific technical issue based on the customer's inquiry.",
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {
+								query: {
+									type: 'string',
+									description:
+										'The technical issue query',
+								},
+							},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_maintenance_plan',
+						description:
+							'This function will get the available IT maintenance plans and support packages tailored for SMEs.',
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {
+								query: {
+									type: 'string',
+									description:
+										'The maintenance plan query',
+								},
+							},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_software_updates',
+						description:
+							'This function will provide information about software updates, security patches, or new features.',
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {
+								query: {
+									type: 'string',
+									description:
+										'The software update query',
+								},
+							},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_reference',
+						description:
+							"This function will help you get the context from which you can answer to user's query.",
+						strict: true,
+						parameters: {
+							type: 'object',
+							properties: {
+								userQuery: {
+									type: 'string',
+									description:
+										'The user latest message',
+								},
+							},
+							additionalProperties: false,
+							required: ['userQuery'],
+						},
+					},
+				},
+			];
+		case AssistantType.RESEARCH_WEB:
+			return [
+				{
+					type: 'function',
+					function: {
+						name: 'get_search_results',
+						description:
+							'This function will get the search results based on the user query with all relevant information that gathered by the assistant.',
+						strict: false,
+						parameters: {
+							type: 'object',
+							properties: {
+								userQuery: {
+									type: 'string',
+									description:
+										'The user query',
+								},
+							},
+							required: [],
+						},
+					},
+				},
+				{
+					type: 'function',
+					function: {
+						name: 'get_reference',
+						description:
+							"This function will will help you get the context from which you can answer to user's query.",
+						strict: true,
+						parameters: {
+							type: 'object',
+							properties: {
+								userQuery: {
+									type: 'string',
+									description:
+										'The user latest message',
+								},
+							},
+							additionalProperties: false,
+							required: ['userQuery'],
+						},
+					},
+				},
+			];
+		default:
+			return [];
+	}
 }
