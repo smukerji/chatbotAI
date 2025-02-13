@@ -13,7 +13,6 @@ import { v4 as uuid } from "uuid";
 import { CreateBotContext } from "../../../../../_helpers/client/Context/CreateBotContext";
 import { ChatbotSettingContext } from "../../../../../_helpers/client/Context/ChatbotSettingContext";
 import { formatTimestamp } from "../../../../../_helpers/client/formatTimestamp";
-import Icon from "../../../../../_components/Icon/Icon";
 import RefreshBtn from "../../../../../../assets/svg/RefreshBtn";
 import ExportBtn from "../../../../../../assets/svg/ExportBtn";
 import ChatBotIcon from "../../../../../../../public/create-chatbot-svgs/ChatBotIcon.svg";
@@ -32,6 +31,20 @@ import { parsePhoneNumber } from "awesome-phonenumber";
 import CloseEmbedBotIcon from "@/assets/svg/CloseEmbedBotIcon";
 import { AssistantStream } from "openai/lib/AssistantStream.mjs";
 import { AssistantStreamEvent } from "openai/resources/beta/assistants.mjs";
+import CloseIcon from "@/assets/svg/CloseIcon";
+import MicIcon from "@/assets/svg/MicIcon";
+import {
+  LiveTranscriptionEvent,
+  LiveTranscriptionEvents,
+  useDeepgram,
+} from "@/app/_helpers/client/Context/DeepgramContext";
+import {
+  MicrophoneEvents,
+  MicrophoneState,
+  useMicrophone,
+} from "@/app/_helpers/client/Context/MicrophoneContext";
+import Icon from "@/app/_components/Icon/Icon";
+import WebSearchIcon from "@/assets/svg/WebSearchIcon";
 
 function ChatV2({
   chatbot,
@@ -119,6 +132,9 @@ function ChatV2({
   const [numberError, setNumberError] = useState("");
   const [nameError, setNameError] = useState("");
   const [validNumberError, setValidNumberError] = useState("");
+
+  /// state to ensure if user has turned webSearch on or off
+  const [webSearch, setWebSearch] = useState(false);
 
   /// chatbot lead section state
   const [leadDetails, setLeadDetails] = useState({
@@ -277,8 +293,6 @@ function ChatV2({
       if (event.event === "thread.run.requires_action")
         handleRequiresAction(event);
       if (event.event === "thread.run.completed") {
-        console.log("Thread Run Completed >>>>>>");
-
         /// setting the response time when completed
         setMessagesTime((prev: any) => {
           storeHistory(prev);
@@ -305,7 +319,8 @@ function ChatV2({
           toolCall,
           chatbot.id,
           userID,
-          messages
+          messages,
+          webSearch
         );
         return { output: result, tool_call_id: toolCall.id };
       })
@@ -1375,18 +1390,70 @@ function ChatV2({
             value={userQuery}
             disabled={loading ? true : false}
           />
-          <button
-            className="icon"
-            onClick={() => getReply("click")}
-            style={{
-              backgroundColor: botSettings?.userMessageColor
-                ? botSettings?.userMessageColor
-                : userMessageColor,
-            }}
-            disabled={loading ? true : false}
-          >
-            <Image src={sendChatIcon} alt="send-chat-icon" />
-          </button>
+          <div className="action-btns">
+            <button className="web-search-button">
+              <Icon Icon={WebSearchIcon}></Icon>
+              Search
+            </button>
+            <div
+              className="send-record-container"
+              style={{
+                backgroundColor:
+                  botSettings?.userMessageColor &&
+                  microphoneState === MicrophoneState.Open
+                    ? botSettings?.userMessageColor
+                    : userMessageColor,
+              }}
+            >
+              {/*           
+            {(MicrophoneState.Open === microphoneState && !isPopUp) ||
+            (MicrophoneState.Open === microphoneStatePopup && isPopUp) ? (
+              <>
+                <Icon
+                  Icon={CloseIcon}
+                  click={() => {
+                    if (
+                      (microphoneState === MicrophoneState.Open && !isPopUp) ||
+                      (microphoneStatePopup === MicrophoneState.Open && isPopUp)
+                    )
+                      stopTranscription();
+                  }}
+                />
+                <span
+                  style={{
+                    color: botSettings?.theme === "dark" ? "#FCFCFD" : "#fff",
+                  }}
+                >
+                  {recordingDuration}
+                </span>
+              </>
+            ) : (
+              <Icon
+                Icon={MicIcon}
+                click={() => {
+                  if (
+                    (microphoneState === MicrophoneState.Ready && !isPopUp) ||
+                    (microphoneStatePopup === MicrophoneState.Ready && isPopUp)
+                  )
+                    startTranscription();
+                }}
+              />
+            )}
+ */}
+              <button
+                className="icon"
+                onClick={() => getReply("click")}
+                style={{
+                  backgroundColor: botSettings?.userMessageColor
+                    ? botSettings?.userMessageColor
+                    : userMessageColor,
+                }}
+                disabled={loading ? true : false}
+              >
+                <Image src={sendChatIcon} alt="send-chat-icon" />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -291,7 +291,7 @@ async function initializeDb() {
   //   },
   // ];
 
-  // // Prepare the upsert operations
+  // Prepare the upsert operations
   // const bulkOps = records.map((record) => ({
   //   updateOne: {
   //     filter: { title: record.title }, // Find by title
@@ -300,10 +300,10 @@ async function initializeDb() {
   //   },
   // }));
 
-  // // Perform the upsert operations
+  // Perform the upsert operations
   // await assist.bulkWrite(bulkOps, { ordered: false });
 
-  // //// insdustry type
+  //// insdustry type
   // const industry = db.collection("industry-types");
   // const recordsIndustry = [
   //   {

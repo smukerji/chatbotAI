@@ -4,12 +4,38 @@ export const functionCallHandler = async (
   call: RequiredActionFunctionToolCall,
   chatbotId: string,
   userID: string,
-  messages: any
+  messages: any,
+  WEB_SEARCH: boolean
 ): Promise<any> => {
   try {
     /// get the function name and arguments
+
+    WEB_SEARCH = true;
+
     const functionName = call?.function?.name;
     const args = JSON.parse(call.function.arguments);
+
+    console.log("Function Name: ", args.userQuery);
+
+    if (WEB_SEARCH === true) {
+      const sonarResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/integrations/perplexity/sonar`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            userQuery: args.userQuery,
+          }),
+        }
+      );
+      const webData = await sonarResponse.json();
+
+      return JSON.stringify({
+        success: true,
+        data: webData.message,
+        sources: webData.sources,
+      });
+    }
+
     /// shopify example
     if (functionName === "find_product") {
       /// get the product name and return the product details
@@ -22,7 +48,10 @@ export const functionCallHandler = async (
       });
 
       if (response.ok) {
-        return JSON.stringify({ success: true, data: await response.json() });
+        return JSON.stringify({
+          success: true,
+          data: await response.json(),
+        });
       }
     } else if (functionName === "get_customer_orders") {
       /// get the customer orders and return the orders
@@ -35,7 +64,10 @@ export const functionCallHandler = async (
       });
 
       if (response.ok) {
-        return JSON.stringify({ success: true, data: await response.json() });
+        return JSON.stringify({
+          success: true,
+          data: await response.json(),
+        });
       }
     } else if (functionName === "get_products") {
       /// get product recommendation / suggestion
@@ -47,7 +79,10 @@ export const functionCallHandler = async (
       );
 
       if (response.ok) {
-        return JSON.stringify({ success: true, data: await response.json() });
+        return JSON.stringify({
+          success: true,
+          data: await response.json(),
+        });
       }
     } else if (functionName === "get_reference") {
       /// answer user query based on the embedding data
