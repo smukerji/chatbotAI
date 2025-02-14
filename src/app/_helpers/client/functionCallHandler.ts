@@ -10,31 +10,33 @@ export const functionCallHandler = async (
   try {
     /// get the function name and arguments
 
-    WEB_SEARCH = true;
+    WEB_SEARCH = false;
 
     const functionName = call?.function?.name;
     const args = JSON.parse(call.function.arguments);
 
     console.log("Function Name: ", args.userQuery);
 
-    if (WEB_SEARCH === true) {
-      const sonarResponse = await fetch(
-        `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/integrations/perplexity/sonar`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            userQuery: args.userQuery,
-          }),
-        }
-      );
-      const webData = await sonarResponse.json();
+    // if (WEB_SEARCH === true) {
+    // 	console.log('webData>>>>>>>>>>>>>>>>>>>>>>>>>>', 'webData');
 
-      return JSON.stringify({
-        success: true,
-        data: webData.message,
-        sources: webData.sources,
-      });
-    }
+    // 	const sonarResponse = await fetch(
+    // 		`${process.env.NEXT_PUBLIC_WEBSITE_URL}api/integrations/perplexity/sonar`,
+    // 		{
+    // 			method: 'POST',
+    // 			body: JSON.stringify({
+    // 				userQuery: args.userQuery,
+    // 			}),
+    // 		}
+    // 	);
+    // 	const webData = await sonarResponse.json();
+
+    // 	return JSON.stringify({
+    // 		success: true,
+    // 		data: webData.message,
+    // 		sources: webData.sources,
+    // 	});
+    // }
 
     /// shopify example
     if (functionName === "find_product") {
@@ -87,6 +89,7 @@ export const functionCallHandler = async (
     } else if (functionName === "get_reference") {
       /// answer user query based on the embedding data
       /// get similarity search
+
       const response: any = await fetch(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/pinecone`,
         {
@@ -106,6 +109,32 @@ export const functionCallHandler = async (
       return JSON.stringify({
         success: true,
         data: similaritySearchResults,
+      });
+    } else if (functionName === "ask_relevant_followup_questions") {
+      return JSON.stringify({
+        success: true,
+      });
+    } else if (functionName === "get_search_results") {
+      const sonarResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/integrations/perplexity/sonar`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            userQuery: args.userQuery,
+          }),
+        }
+      );
+      const webData = await sonarResponse.json();
+
+      return JSON.stringify({
+        success: true,
+        data: webData.message,
+        sources: webData.sources,
+      });
+    } else {
+      return JSON.stringify({
+        success: false,
+        message: "This functionality will be available soon",
       });
     }
   } catch (error) {

@@ -16,7 +16,7 @@ export async function POST(_request: any) {
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify({
-				model: 'sonar',
+				model: 'sonar-pro',
 				messages: [
 					{
 						role: 'system',
