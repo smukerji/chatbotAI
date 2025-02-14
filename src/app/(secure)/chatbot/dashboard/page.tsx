@@ -37,6 +37,7 @@ import {
 } from "@ant-design/icons";
 import ChatV2 from "./_components/Chat-v2/ChatV2";
 import { functionCallHandler } from "@/app/_helpers/client/functionCallHandler";
+import { useRouter } from "next/navigation";
 
 function Dashboard() {
   const { status } = useSession();
@@ -44,6 +45,7 @@ function Dashboard() {
   /// get the bot context
   const botContext: any = useContext(CreateBotContext);
   const botDetails = botContext?.createBotInfo;
+  const router = useRouter();
 
   /// get the bot setting context
   const chatbotSettingContext: any = useContext(ChatbotSettingContext);
@@ -433,7 +435,8 @@ function Dashboard() {
                 onClick={() => {
                   botContext?.resetCreateBotInfo();
                   chatbotSettingContext?.resetChatbotSettings();
-                  window.history.back();
+                  // window.history.back();
+                  router.push(`/chatbot`);
                 }}
               />
               {/* <h1>{chatbot?.name}</h1> */}

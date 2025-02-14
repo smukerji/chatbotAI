@@ -4,19 +4,23 @@ import {
   MessageOutlined,
   MoreOutlined,
 } from "@ant-design/icons";
+import {
+  fromUnixTime,
+  format
+} from "date-fns";
+
 import { Modal, Spin, message, Button } from "antd";
 import React, { Suspense, useContext, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import "./chatbot.scss";
 import Image from "next/image";
 import noChatbotBg from "../../../../public/sections-images/common/no-chatbot-icon.svg";
-import voiceBotComingSoom from "../../../../public/sections-images/common/voice-agent-coming-soon.png";
 // import gridIcon from "../../../../public/svgs/grid-icon.svg";
 import GridLayout from "./_components/GridLayout";
 import TableLayout from "./_components/TableLayout";
 import DeleteModal from "./dashboard/_components/Modal/DeleteModal";
 import ShareModal from "./dashboard/_components/Modal/ShareModal";
-import { redirect, useRouter } from "next/navigation";
+import { redirect, useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
@@ -33,6 +37,7 @@ import axios from "axios";
 import voiceAssistantPreview from "../../../../public/voiceBot/voice-bot-preview.svg";
 
 import { CreateVoiceBotContext } from "../../_helpers/client/Context/VoiceBotContextApi";
+import VoicebotTableLayout from "./_components/VoicebotTableLayout";
 // import GridIcon from "../../as";
 
 const antIcon = (
@@ -71,7 +76,7 @@ const initialState = {
     //     server: { timeoutSeconds: 20, url: "", secret: "" },
     //   },
     // ],
-    toolIds: [""], //we deleted this field in the backend
+    toolIds: [""],//we deleted this field in the backend
     provider: "openai",
     model: "gpt-4o",
     temperature: 0,
@@ -182,9 +187,9 @@ function Chatbot() {
   const initialState = {
     firstMessage: "",
     transcriber: {
-      provider: "",
-      model: "",
-      language: "",
+      provider: "deepgram",
+      model: "nova-2",
+      language: "en-IN",
       // smartFormat: false,
       languageDetectionEnabled: false,
       // keywords: [""],
@@ -212,8 +217,8 @@ function Chatbot() {
       //   },
       // ],
       toolIds: [""], //we deleted this field in the backend
-      provider: "",
-      model: "",
+      provider: "openai",
+      model: "gpt-4o",
       temperature: 0,
       // knowledgeBase: { provider: "canonical", topK: 5.5, fileIds: [""] },
       maxTokens: 300,
@@ -320,6 +325,9 @@ function Chatbot() {
 
   const { status } = useSession();
   const router = useRouter();
+  const params: any = useSearchParams();
+
+  const interactionFrom = params.get("interactionFrom") === "true";
 
   const botContext: any = useContext(CreateBotContext);
   const botDetails = botContext?.createBotInfo;
@@ -344,6 +352,9 @@ function Chatbot() {
 
   /// state for showing the chabot list
   const [listType, setListType]: any = useState("grid");
+
+  // state for showing the voicebot list
+  const [voiceListType, setVoiceListType]: any = useState("grid");
 
   const [chatbotId, setChatbotId] = useState("");
 
@@ -386,6 +397,7 @@ function Chatbot() {
       );
       const data = await res.json();
 
+      
       setVoiceAssistantList(data?.assistants);
     } catch (error: any) {
       console.log("Error in fetching voice assistant data", error);
@@ -394,6 +406,14 @@ function Chatbot() {
       setVoiceBotLoading(false);
     }
   };
+
+  const getDate =(ts:number) => {
+    if (!ts) return "";
+
+    const date = fromUnixTime(ts);
+
+    return format(date, "PP");
+  }
 
   const selectedAssistantHandler = (assistantInfo: any) => {
     voiceBotContextData.setAssistantInfo(assistantInfo);
@@ -404,7 +424,7 @@ function Chatbot() {
     //   voiceBotContextData.setAssistantVapiId(assistantInfo.vapiId);
     // }
     voiceBotContextData.setCurrentAssistantPage(0);
-    router.push("/voicebot/dashboard");
+    router.push("/voicebot/dashboard?interaction=voicebot");
   };
 
   /**
@@ -462,7 +482,8 @@ function Chatbot() {
     );
 
     /// if user does not have any plan then redirect to create-first-bot page
-    if (!response.data.user.planId) {
+    if (!response.data.user.planId && response.data.user.voiceBotCount <= 0) {
+
       router.push("/create-first-assistant");
     }
     setUser(response.data.user);
@@ -475,6 +496,9 @@ function Chatbot() {
 
   /// retrive the chatbots details
   useEffect(() => {
+    if(interactionFrom){
+      setIsVoiceBotActived(true);
+    }
     getUser();
     const fetchData = async () => {
       try {
@@ -588,14 +612,43 @@ function Chatbot() {
           <div className="action-container">
             <div className="chatbot-list-action">
               <Icon
-                className={listType == "grid" ? "active" : ""}
+                className={
+                  isVoiceBotActived
+                    ? voiceListType === "grid"
+                      ? "active"
+                      : ""
+                    : listType === "grid"
+                      ? "active"
+                      : ""
+                }
                 Icon={GridIcon}
-                click={() => setListType("grid")}
+                click={() => {
+                  if (isVoiceBotActived) {
+                    setVoiceListType("grid");
+                  } else {
+                    setListType("grid");
+                  }
+                }}
               />
+
               <Icon
-                className={listType == "table" ? "active" : ""}
+                className={
+                  isVoiceBotActived
+                    ? voiceListType === "table"
+                      ? "active"
+                      : ""
+                    : listType === "table"
+                      ? "active"
+                      : ""
+                }
                 Icon={MenuIcon}
-                click={() => setListType("table")}
+                click={() => {
+                  if (isVoiceBotActived) {
+                    setVoiceListType("table");
+                  } else {
+                    setListType("table");
+                  }
+                }}
               />
             </div>
             {/* <Link href={`${process.env.NEXT_PUBLIC_WEBSITE_URL}home`}> */}
@@ -629,9 +682,11 @@ function Chatbot() {
             {/* </Link> */}
           </div>
 
-          {openLimitModal && (
-            <LimitReachedModal setOpenLimitModel={setOpenLimitModel} />
-          )}
+          {/* {openLimitModal ? (
+              <LimitReachedModal setOpenLimitModel={setOpenLimitModel} />
+            ) : (
+              <></>
+            )} */}
         </div>
 
         {!isVoiceBotActived ? (
@@ -704,64 +759,67 @@ function Chatbot() {
               </div>
             )}
             {loading && <Spin indicator={antIcon} />}
+
+
           </>
         ) : (
           <>
             {voiceBotLoading ? (
               <Spin indicator={antIcon} />
             ) : voiceAssistantList?.length == 0 ? (
-              // <div className="no-chatbots-container">
-              //   <Image src={noChatbotBg} alt="no-chatbot-bg" />
-              //   <p>
-              //     You haven&apos;t created any Voicebot. Go ahead and create a
-              //     New Voicebot!
-              //   </p>
-              // </div>
-
-              /// temporary adding comming soon message
-              <div className="no-chatbots-container" style={{ gap: "32px" }}>
-                <Image src={voiceBotComingSoom} alt="no-chatbot-bg" />
-                <h2>Coming Soon</h2>
-                <p>AI Voice Assistance: Coming to Life Soon!</p>
+              <div className="no-chatbots-container">
+                <Image src={noChatbotBg} alt="no-chatbot-bg" />
+                <p>
+                  You haven&apos;t created any Voicebot. Go ahead and create a
+                  New Voicebot!
+                </p>
               </div>
             ) : (
-              <div className="voicebot-list-container">
-                {voiceAssistantList.map((assistant: any, index: number) => (
-                  <div
-                    key={index}
-                    className="voicebot-list-card"
-                    onClick={() => selectedAssistantHandler(assistant)}
-                  >
-                    <div className="assistant-image">
-                      <Image
-                        alt="assistant image"
-                        src={voiceAssistantPreview}
-                      ></Image>
+              <>
+              {voiceListType === "grid" && (
+                <div className="voicebot-list-container">
+                  {voiceAssistantList?.map((assistant: any, index: number) => (
+                    <div
+                      key={index}
+                      className="voicebot-list-card"
+                      onClick={() => selectedAssistantHandler(assistant)}
+                    >
+                      <div className="assistant-image">
+                        <Image
+                          alt="assistant image"
+                          src={voiceAssistantPreview}
+                        ></Image>
+                      </div>
+                      <div className="assistant-title">
+                        {assistant.assistantName}
+                      </div>
+                      <div className="info-content">
+                        <div className="info">
+                          <div className="info-label">Number of Calls</div>
+                          <div className="value">{assistant?.metadata?.totalCallLogs || 0}</div>
+                        </div>
+                        <div className="info">
+                          <div className="info-label">Last Used</div>
+                          <div className="value">{getDate(assistant?.metadata?.lastUsed) || 0}</div>
+                        </div>
+                        <div className="info">
+                          <div className="info-label">Last Trained</div>
+                          <div className="value">{getDate(assistant?.metadata?.lastTrained) || 0}</div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="assistant-title">
-                      {assistant.assistantName}
-                    </div>
-                    <div className="info-content">
-                      <div className="info">
-                        <div className="info-label">Total Minutes:</div>
-                        <div className="value">100</div>
-                      </div>
-                      <div className="info">
-                        <div className="info-label">Call Count:</div>
-                        <div className="value">90</div>
-                      </div>
-                      <div className="info">
-                        <div className="info-label">Last Trained:</div>
-                        <div className="value">9</div>
-                      </div>
-                      <div className="info">
-                        <div className="info-label">Last Used:</div>
-                        <div className="value">Yesterday</div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
+
+              {voiceListType === "table" && (
+                <VoicebotTableLayout
+                  voiceAssistantList={voiceAssistantList}
+                  selectedAssistantHandler={selectedAssistantHandler}
+                  getDate={getDate}
+                />
+              )}
+            </>
             )}
           </>
         )}
