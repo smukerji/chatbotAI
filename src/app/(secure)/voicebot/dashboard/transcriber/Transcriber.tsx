@@ -464,7 +464,7 @@ function Transcriber() {
         />
         {modelValidationMessage && <p className="invalidation-message">{modelValidationMessage}</p>}
         
-        <p className="model-info">GPT-4 is more accurate but slower and costlier than GPT-3.5 Turbo (1 min = 1 credit for GPT-3.5 Turbo, 20 credits for GPT-4).</p>
+        {/* <p className="model-info">GPT-4 is more accurate but slower and costlier than GPT-3.5 Turbo (1 min = 1 credit for GPT-3.5 Turbo, 20 credits for GPT-4).</p> */}
 
       </div>
       <div className="right-column">

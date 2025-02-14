@@ -3,8 +3,6 @@ import { auth } from "../../_helpers/server/auth";
 import { redirect } from "next/navigation";
 import { CreateBotDataProvider } from "../../_helpers/client/Context/CreateBotContext";
 import { ChatbotSettingDataProvider } from "../../_helpers/client/Context/ChatbotSettingContext";
-import { DeepgramContextProvider } from "@/app/_helpers/client/Context/DeepgramContext";
-import { MicrophoneContextProvider } from "@/app/_helpers/client/Context/MicrophoneContext";
 
 export default function ChatbotsLayout({
   children,

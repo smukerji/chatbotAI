@@ -67,7 +67,7 @@ export default function AuthBtn() {
             // router.push("/chatbot");
           }}
         >
-          My Chatbots
+          My Assistants
         </div>
       ) : (
         <>

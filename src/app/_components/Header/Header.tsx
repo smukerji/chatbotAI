@@ -175,7 +175,7 @@ function Header() {
                       : "",
                 }}
               >
-                My Chatbots
+                My Assistants
               </button>
             </a>
             {/*------------------------------------------feedback-btn----------------------------------------------*/}
@@ -263,7 +263,7 @@ function Header() {
                                   : "",
                             }}
                           >
-                            My Chatbots
+                            My Assistants
                           </button>
                         </a>
                       </li>
