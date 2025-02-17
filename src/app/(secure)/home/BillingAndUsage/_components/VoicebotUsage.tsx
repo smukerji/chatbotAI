@@ -7,6 +7,7 @@ import axios from "axios";
 import Loader from "../../pricing/_components/Loader";
 import moment from "moment";
 import { Flex, Modal, message, Spin } from 'antd';
+import { log } from "console";
 const cryptoSecret = process.env.NEXT_PUBLIC_CRYPTO_SECRET;
 
 function encryptPriceId(priceId: string) {
@@ -24,6 +25,9 @@ function VoicebotUsage({ firstPurchase = false }) {
   const [monthlyUsage, setMonthlyUsage] = useState(0);
   const [loading, setLoading] = useState(false);
   const [usageLoad, setUsageLoad] = useState(false);
+
+  console.log("firstPurchase *&", firstPurchase);
+  
 
   const startOfMonth = moment().startOf('month').format('MMM DD');
   const endOfMonth = moment().endOf('month').format('MMM DD');
@@ -62,7 +66,7 @@ function VoicebotUsage({ firstPurchase = false }) {
       );
 
       //get dailly and monthly usage
-
+      debugger;
       const usageResult = await fetch(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/costs-wallates/usages?userId=${cookies.userId}&todayDate=${moment().format('YYYY-MM-DD')}&monthDate=${moment().format('YYYY-MM')}`,
         {
@@ -136,7 +140,7 @@ function VoicebotUsage({ firstPurchase = false }) {
 
           {/* Right Side */}
           {
-            firstPurchase ?? <>
+            firstPurchase && <>
               <div className="auto-reload">
                 <Form
                   className="reload-settings"

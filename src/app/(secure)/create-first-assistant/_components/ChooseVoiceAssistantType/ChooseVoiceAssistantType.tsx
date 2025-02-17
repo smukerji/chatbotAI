@@ -16,6 +16,7 @@ const ChooseVoiceAssistantType: React.FC<AssistantListProps> = ({
   selectedAssistantIndex,
   selectedAssistantChangeHandler,
 }) => {
+  console.log("assistantList &*", assistantList);
   return (
     <>
       <div className="custom_assistant-card">

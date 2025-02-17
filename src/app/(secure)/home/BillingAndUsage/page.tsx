@@ -293,7 +293,7 @@ function BillingAndUsage() {
 
               {activeTab === "2" && (
                 <>
-                  <VoicebotUsage />
+                  <VoicebotUsage firstPurchase={true}   />
                   <div className="manage-plan">Payment history</div>
                   <VoicebotPaymentHistory />
                 </>
