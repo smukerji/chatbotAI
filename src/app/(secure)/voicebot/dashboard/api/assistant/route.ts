@@ -30,7 +30,8 @@ async function giveFreeCreditsToUser(req: NextRequest) {
                     }
                 }
 
-                return {message: "User already have free credits"};
+                return {message: "User already have free credits",userCredits:user.voicebotDetails.credits
+                };
 
             }
             return {error: "User not found"};

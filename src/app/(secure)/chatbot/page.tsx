@@ -567,7 +567,8 @@ function Chatbot() {
 
   const createVoiceBotHandler = () => {
     // voiceBotContextData.reInitiateState();
-    router.push("/voicebot");
+    window.location.href =
+                    "/create-first-assistant?source=voicebot";
   };
 
   /// view chatbot
@@ -800,11 +801,11 @@ function Chatbot() {
                         </div>
                         <div className="info">
                           <div className="info-label">Last Used</div>
-                          <div className="value">{getDate(assistant?.metadata?.lastUsed) || 0}</div>
+                          <div className="value">{getDate(assistant?.metadata?.lastUsed) || "N.A"}</div>
                         </div>
                         <div className="info">
                           <div className="info-label">Last Trained</div>
-                          <div className="value">{getDate(assistant?.metadata?.lastTrained) || 0}</div>
+                          <div className="value">{getDate(assistant?.metadata?.lastTrained) || "N.A"}</div>
                         </div>
                       </div>
                     </div>

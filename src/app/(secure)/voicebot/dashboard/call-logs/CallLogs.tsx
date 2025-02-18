@@ -156,12 +156,12 @@ function CallLogs() {
 
       setTotalPages(totalPage);
 
-      setLoading(false);
+      // setLoading(false);
 
     }
     catch (error: any) {
 
-      setLoading(false);
+      // setLoading(false);
     }
 
     

@@ -42,6 +42,9 @@ export const CreateAssistantFlowDataProvider = ({ children }: any) => {
     initialCreateAssistantFlowInfo
   );
 
+  const [userChoosenAssistantValue, setUserChoosenAssistantValue] = useState<any>("");
+
+
   /// handle the changes
   const handleChange = (props: any) => (value: any) => {
     setCreateAssistantFlowInfo((prevCreateAssistantFlowInfo) => ({
@@ -61,6 +64,8 @@ export const CreateAssistantFlowDataProvider = ({ children }: any) => {
         createAssistantFlowInfo,
         handleChange,
         resetCreateAssistantFlowInfo,
+        userChoosenAssistantValue,
+        setUserChoosenAssistantValue
       }}
     >
       {children}

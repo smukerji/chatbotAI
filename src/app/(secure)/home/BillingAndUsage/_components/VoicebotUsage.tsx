@@ -7,7 +7,7 @@ import axios from "axios";
 import Loader from "../../pricing/_components/Loader";
 import moment from "moment";
 import { Flex, Modal, message, Spin } from 'antd';
-import { log } from "console";
+import "./voicebotusage.scss";
 const cryptoSecret = process.env.NEXT_PUBLIC_CRYPTO_SECRET;
 
 function encryptPriceId(priceId: string) {
@@ -166,9 +166,9 @@ function VoicebotUsage({ firstPurchase = false }) {
                     <Input type="number" placeholder="$ 20" />
                   </Form.Item>
 
-                  <Form.Item label="When balance reaches">
+                  {/* <Form.Item label="When balance reaches">
                     <Input type="number" placeholder="$" />
-                  </Form.Item>
+                  </Form.Item> */}
 
                   <Form.Item>
                     <Button

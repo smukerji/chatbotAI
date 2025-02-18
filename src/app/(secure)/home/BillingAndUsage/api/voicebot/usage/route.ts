@@ -21,11 +21,11 @@ async function getVoicebotUsageDetail(req: any, res: NextResponse) {
       return { msg: "Addon details not found." };
     }
 
-    const voicebotPlanId = userData.voicebotPlanId;
+    // const voicebotPlanId = userData.voicebotPlanId;
 
-    if (!voicebotPlanId) {
-      return { msg: "Voicebot Plan not found", status: 0 };
-    }
+    // if (!voicebotPlanId) {
+    //   return { msg: "Voicebot Plan not found", status: 0 };
+    // }
 
     const voiebotWalletCredit = details.voicebotDetails;
 

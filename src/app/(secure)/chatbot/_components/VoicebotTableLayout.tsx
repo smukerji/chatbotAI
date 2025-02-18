@@ -26,8 +26,8 @@ const VoicebotTableLayout = ({ voiceAssistantList, selectedAssistantHandler, get
                 </div>
               </td>
               <td>{assistant?.metadata?.totalCallLogs || 0}</td>
-              <td>{getDate(assistant?.metadata?.lastUsed) || 0}</td>
-              <td>{getDate(assistant?.metadata?.lastTrained) || 0}</td>
+              <td>{getDate(assistant?.metadata?.lastUsed) || "N.A"}</td>
+              <td>{getDate(assistant?.metadata?.lastTrained) || "N.A"}</td>
             </tr>
           ))}
         </tbody>

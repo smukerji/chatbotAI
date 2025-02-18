@@ -91,7 +91,7 @@ function Dashboard() {
 
 
     if (!voiceBotContextData?.assistantInfo) {
-      router.push(`/chatbot?interactionFrom=${interaction}`)
+      router.push(`/chatbot?interactionFrom=${true}`)
     }
 
     ;
@@ -183,7 +183,7 @@ function Dashboard() {
       const assistantDataResponseParse = await assistantDataResponse.json();
   
       message.success(assistantDataResponseParse?.message);
-      router.push(`/chatbot?interactionFrom=${interaction}`)
+      router.push(`/chatbot?interactionFrom=${true}`)
 
 
     }
@@ -621,7 +621,7 @@ async function costDeductionOnCallEndHandler(){
         <div className="headers">
           <div className="header-title">
             <Image className="image" alt="back_arrow" src={leftArrow} onClick={()=>{
-              router.push(`/chatbot?interactionFrom=${interaction}`)
+              router.push(`/chatbot?interactionFrom=${true}`)
             }}></Image>
             <h1 className="title">{voicebotDetails?.name || voiceBotContextData?.assistantInfo?.assistantName}</h1>
 

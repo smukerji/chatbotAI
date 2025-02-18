@@ -27,9 +27,13 @@ function SelectAssistantType() {
         <div className="assistant-type">
           <div
             onClick={() =>
+            {
               createAssistantFlowContext.handleChange("creationFlow")(
                 SelectedAssistantType.CHAT
-              )
+              );
+              createAssistantFlowContext.setUserChoosenAssistantValue("Chat");
+            }
+              
             }
             className={`assistant-type-item ${
               createAssistantFlowContextDetails.creationFlow ===
@@ -50,9 +54,16 @@ function SelectAssistantType() {
                 : ""
             }`}
             onClick={() =>
+            {
               createAssistantFlowContext.handleChange("creationFlow")(
                 SelectedAssistantType.VOICE
-              )
+              );
+
+              createAssistantFlowContext.setUserChoosenAssistantValue("Voice");
+              
+
+            }
+              
             }
           >
             <Image src={VoicebotImage} alt="assistant-type-2" unoptimized />
