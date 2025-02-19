@@ -115,6 +115,9 @@ function Model({ chatbotId }: any) {
                   { value: "gpt-3.5-turbo", label: "gpt-3.5-turbo" },
                   { value: "gpt-4", label: "gpt-4" },
                   { value: "gpt-4o", label: "gpt-4o" },
+                  { value: "gpt-4o-mini", label: "gpt-4o-mini" },
+                  { value: "o1", label: "o1" },
+                  { value: "o3-mini", label: "o3-mini" },
                 ]}
                 onChange={(e) => {
                   botSettingContext?.handleChange("model")(e);
