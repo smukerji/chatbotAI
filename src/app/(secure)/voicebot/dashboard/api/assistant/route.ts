@@ -18,10 +18,11 @@ async function giveFreeCreditsToUser(req: NextRequest) {
             const user = await collection?.findOne({ userId: userID });
             if(user){
                 //add voicebotDetails.credit to user's wallet if credit not exist
-                if(!user?.voicebotDetails?.credits){
+                if("voicebotDetails" in user && "credits" in user.voicebotDetails && user.voicebotDetails.credits > 0){
+                // if(!user?.voicebotDetails?.credits){
                     const result = await collection?.updateOne(
                         { userId: userID },
-                        { $set: { "voicebotDetails.credits": 10 } }
+                        { $set: { "voicebotDetails.credits": 10.00 } }
                     );
                     if(result.modifiedCount){
                         return {message: "Free credits added successfully"};
@@ -30,7 +31,7 @@ async function giveFreeCreditsToUser(req: NextRequest) {
                     }
                 }
 
-                return {message: "User already have free credits",userCredits:user.voicebotDetails.credits
+                return {userCredits:user.voicebotDetails.credits
                 };
 
             }
