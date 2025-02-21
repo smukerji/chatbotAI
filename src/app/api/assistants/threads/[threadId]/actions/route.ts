@@ -12,3 +12,5 @@ export async function POST(request: any, { params: { threadId } }: any) {
 
   return new Response(stream.toReadableStream());
 }
+
+export const maxDuration = 300;
