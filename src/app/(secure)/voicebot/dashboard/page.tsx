@@ -89,6 +89,7 @@ function Dashboard() {
   useEffect(() => {
     
 
+    console.log("your mongoID *&",voiceBotContextData.assistantMongoId, "&* ",voiceBotContextData.assistantInfo?._id)
 
     if (!voiceBotContextData?.assistantInfo) {
       router.push(`/chatbot?interactionFrom=${true}`)
@@ -110,6 +111,11 @@ function Dashboard() {
         getTemplatePrompts(voiceBotContextData.assistantMongoId);
         //assign the prompt to the 
       }
+      else{
+
+        getTemplatePrompts(voiceBotContextData.assistantInfo?._id);
+      }
+
       message.info("Assistant is not published yet");
     }
     if(voiceBotContextData?.assistantInfo?.assistantName){

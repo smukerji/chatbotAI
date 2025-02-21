@@ -46,6 +46,22 @@ async function createVapiAssistant(req: NextRequest) {
       delete vapiData.analysisPlan.stopSpeakingPlan;
       delete vapiData.analysisPlan.monitorPlan;
       delete vapiData.analysisPlan.credentialIds;
+
+      if(vapiData.transcriber.provider === "talkscriber"){
+
+        delete vapiData.transcriber.languageDetectionEnabled;
+        delete vapiData.transcriber.endpointing;
+        vapiData.transcriber.model = vapiData.transcriber.model.toLowerCase();
+
+      }
+
+      if(vapiData.transcriber.provider === "gladia"){
+
+        delete vapiData.transcriber.languageDetectionEnabled;
+        delete vapiData.transcriber.endpointing;
+        vapiData.transcriber.model = vapiData.transcriber.model.toLowerCase();
+
+      }
       
     //punctuation boundaries refactor
     vapiData.voice.chunkPlan.punctuationBoundaries = vapiData.voice.chunkPlan.punctuationBoundaries.map((item: any) => item.label);

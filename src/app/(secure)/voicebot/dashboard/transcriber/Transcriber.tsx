@@ -5,6 +5,7 @@ import { Select } from 'antd';
 
 import { useState, useContext, useEffect } from "react";
 import { CreateVoiceBotContext } from "../../../../_helpers/client/Context/VoiceBotContextApi"
+import { log } from "console";
 
 
 
@@ -25,6 +26,7 @@ function Transcriber() {
   const [providerValidationMessage, setProviderValidationMessage] = useState<string>("");
   const [modelValidationMessage, setModelValidationMessage] = useState<string>("");
   const [languageValidationMessage, setLanguageValidationMessage] = useState<string>("");
+  const [nova2ModelLanguage, setNova2ModelLanguage] = useState<boolean>(false);
 
 
   useEffect(() => {
@@ -71,14 +73,119 @@ function Transcriber() {
   }
 
 
+  const nova2Model = [
+    "nova-2-meeting",
+    "nova-2-phonecall",
+    "nova-2-finance",
+    "nova-2-conversationalai",
+    "nova-2-voicemail",
+    "nova-2-video",
+    "nova-2-medical",
+    "nova-2-drivethru",
+    "nova-2-automotive",
+  ];
+
+  const nov2AndNova2GeneralModelLanguage = [
+    "multi ",
+    "bg",
+    "ca",
+    "zh","zh-CN","zh-Hans",
+    "zh-TW","zh-Hant",
+    "zh-HK",
+     "cs",
+     "da", "da-DK",
+    "nl",
+     "en","en-US", "en-AU", "en-GB", "en-NZ", "en-IN",
+     "et",
+    "fi",
+     "nl-BE",
+     "fr", "fr-CA",
+    "de",
+     "de-CH",
+    "el",
+     "hi",
+    "hu",
+    "id",
+     "it",
+    "ja",
+     "ko", "ko-KR",
+    "lv",
+     "lt",
+     "ms",
+    "no",
+    "pl",
+     "pt", "pt-BR", "pt-PT",
+     "ro",
+    "ru",
+    'sk',
+     "es", "es-419",
+     "sv", "sv-SE",
+     "th","th-TH",
+     "tr",
+     "uk",
+     "vi"]
+
+
   const modelChangeHandler = (value: string, option: any) => {
     // ;
+    console.log("Option selected",value,option)
+    setLanguage([]);
+    setSelectedLanguage(undefined);
+    voiceBotContextData.updateState("transcriber.language", "");
+
+    debugger
+    //if user select nova2 model
+    const exist = nova2Model.some((element) => element == option.label);
+    if(exist){
+      // setNova2ModelLanguage(true);
+
+      setLanguage(["en","en-US"].map(language => ({ value: language+".", label: language })));
+    }
+
+    //if selected mode is nova-2 or nova-2-general
+    if(option.label === "nova-2" || option.label === "nova-2-general"){
+
+      setLanguage(nov2AndNova2GeneralModelLanguage.map(language => ({ value: language+".", label: language })));
+    }
+
+    if(option.label === "nova" || option.label === "nova-general"){
+      setLanguage([ "en", "en-US", "en-AU", "en-GB", "en-NZ", "en-IN", "es", "es-419" ,"hi-Latn"].map(language => ({ value: language+".", label: language })))
+    }
+
+    if(option.label === "nova-phonecall" || option.label === "nova-medical"){
+      setLanguage(["en","en-US"].map(language => ({ value: language+".", label: language })));
+    }
+
+    if(option.label === "enhanced-general" || option.label === "enhanced"){
+      setLanguage(["da","nl" , "en", "en-US",  "nl" , "fr" , "de" , "hi" , "it" , "ja"  ,"ko" , "no" , "pl"  ,"pt", "pt-BR", "pt-PT" , "es", "es-419", "es-LATAM" ,"sv",  "taq" , "ta"].map(language => ({ value: language+".", label: language })));
+    }
+
+    if(option.label === "enhanced-meeting" || option.label === "enhanced-phonecall" || option.label === "enhanced-finance"){
+      setLanguage(["en","en-US"].map(language => ({ value: language+".", label: language })));
+    }
+
+    if(option.label === "base-general" || option.label === "base"){
+      setLanguage([ "zh", "zh-CN", "zh-TW" , "da" , "nl" , "en", "en-US" , "nl", "fr", "fr-CA" , "de" , "hi", "hi-Latn" , "id" , "it" , "ja" , "ko" , "no" , "pl" , "pt", "pt-BR", "pt-PT" ,"ru" , "es", "es-419", "es-LATAM" , "sv" , "taq" , "tr" , "uk"].map(language => ({ value: language+".", label: language })));
+    }
+
+    if(option.label === "base-video" || option.label === "base-voicemail" || option.label === "base-conversationalai" || option.label === "base-finance" || option.label === "base-phonecall" || option.label === "base-meeting"){
+      setLanguage(["en","en-US"].map(language => ({ value: language+".", label: language })));
+    }
+
+
+    //if user select 
+
+
     setSelectedModel(option.label);
     setModelValidationMessage("");// Clear validation message on valid selection
     voiceBotContextData.updateState("transcriber.model", option.label);
   }
 
   const modelChangeHandlerListUpdate = () => {
+    console.log("Clicked");
+
+
+    
     // 
     if (models.length === 0 && selectedProvider) {
       console.log("selected model providers ", selectedProvider)
@@ -129,6 +236,8 @@ function Transcriber() {
 
 
   console.log("your voicebot details ", voicebotDetails["transcriber"]);
+
+
 
   const providerList = [
     {

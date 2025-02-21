@@ -35,6 +35,7 @@ import ChooseVoiceAssistantExpert from './_components/ChooseVoiceAssistantExpert
 import { useSession } from 'next-auth/react';
 import CreateAssitstantContainerItems from './_components/CreateAssitstantContainerItems/CreateAssitstantContainerItems';
 import { UserDetailsContext } from '@/app/_helpers/client/Context/UserDetailsContext';
+import { assertMessageExist } from "./assertionFunction/notification";
 
 export default function FirstAssistant() {
 	const [cookies, setCookie] = useCookies(['userId']);
@@ -88,7 +89,7 @@ export default function FirstAssistant() {
 
 	/// plan state to check if user purchased plan while onboarding
 	const [plan, setPlan]: any = useState();
-	const [voicePlan, setVoicePlan]: any = useState();
+	const [voicePlan, setVoicePlan] = useState<number>(0);
 	const { status } = useSession();
 
 	const [inputValidationMessage, setinputValidationMessage] =
@@ -121,35 +122,24 @@ export default function FirstAssistant() {
 	const continuesChangeHandler = async () => {
 		// if (createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.CHAT) {
 		/// change the steps according to the flow
-		if (
-			createAssistantFlowContextDetails?.currentAssistantFlowStep ===
-			AssistantFlowStep.CHOOSE_BOT_TYPE
-		) {
+		if (createAssistantFlowContextDetails?.currentAssistantFlowStep ===	AssistantFlowStep.CHOOSE_BOT_TYPE) {
 			/// validation for assistant name & creation flow
-			if (
-				createAssistantFlowContextDetails?.assistantName.trim()
-					.length === 0
-			) {
-				setinputValidationMessage(
-					'Please, Provide Assistant Name!'
-				);
+			if (createAssistantFlowContextDetails?.assistantName.trim().length === 0) {
+				setinputValidationMessage('Please, Provide Assistant Name!');
 				return;
 			}
-
-			if (
-				createAssistantFlowContextDetails?.creationFlow ===
-				SelectedAssistantType.NULL
-			) {
+			if (createAssistantFlowContextDetails?.creationFlow ===	SelectedAssistantType.NULL) {
 				message.warning('Please select the type of assistant!');
 				return;
 			}
-
 			/// check for the pricing plan only if user is first time user
-			if (plan?.price && createAssistantFlowContextDetails.creationFlow ===
-						  SelectedAssistantType.CHAT) {
-				createAssistantFlowContext?.handleChange(
-					'currentAssistantFlowStep'
-				)(AssistantFlowStep.CHOOSE_ASSISTANT_TYPE);
+			if (plan?.price && createAssistantFlowContextDetails.creationFlow === SelectedAssistantType.CHAT) {
+				createAssistantFlowContext?.handleChange('currentAssistantFlowStep')(AssistantFlowStep.CHOOSE_ASSISTANT_TYPE);
+				return;
+			}
+			await giveFreeVoicebotCreditToUser();
+			if(voicePlan > 0 && createAssistantFlowContextDetails.creationFlow === SelectedAssistantType.VOICE){
+				createAssistantFlowContext?.handleChange('currentAssistantFlowStep')(AssistantFlowStep.CHOOSE_ASSISTANT_TYPE);
 				return;
 			}
 
@@ -168,6 +158,12 @@ export default function FirstAssistant() {
 				);
 			}
 			else if (createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.VOICE) {
+				//get the voiceplan from the api and if not added don't go further
+				await giveFreeVoicebotCreditToUser();
+				if (voicePlan === 0) {
+					message.warning("Please add the voicebot credit first!");
+					return;
+				}
 				createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(
 					AssistantFlowStep.CHOOSE_ASSISTANT_TYPE
 				);
@@ -437,8 +433,11 @@ export default function FirstAssistant() {
 			);
 
 			const data = await res.json();
+			debugger;
+			setVoicePlan(data?.userCredits as number || 0);
 
-			message.info(data?.message);
+			assertMessageExist(data?.message, data?.message);
+
 
 		} catch (error: any) {
 			console.log(error);
