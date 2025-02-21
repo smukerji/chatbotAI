@@ -35,6 +35,7 @@ import ChooseVoiceAssistantExpert from './_components/ChooseVoiceAssistantExpert
 import { useSession } from 'next-auth/react';
 import CreateAssitstantContainerItems from './_components/CreateAssitstantContainerItems/CreateAssitstantContainerItems';
 import { UserDetailsContext } from '@/app/_helpers/client/Context/UserDetailsContext';
+import { assertMessageExist } from "./assertionFunction/notification";
 
 export default function FirstAssistant() {
 	const [cookies, setCookie] = useCookies(['userId']);
@@ -136,7 +137,7 @@ export default function FirstAssistant() {
 				createAssistantFlowContext?.handleChange('currentAssistantFlowStep')(AssistantFlowStep.CHOOSE_ASSISTANT_TYPE);
 				return;
 			}
-
+			await giveFreeVoicebotCreditToUser();
 			if(voicePlan > 0 && createAssistantFlowContextDetails.creationFlow === SelectedAssistantType.VOICE){
 				createAssistantFlowContext?.handleChange('currentAssistantFlowStep')(AssistantFlowStep.CHOOSE_ASSISTANT_TYPE);
 				return;
@@ -435,7 +436,8 @@ export default function FirstAssistant() {
 			debugger;
 			setVoicePlan(data?.userCredits as number || 0);
 
-			// message.info(data?.message);
+			assertMessageExist(data?.message, data?.message);
+
 
 		} catch (error: any) {
 			console.log(error);
