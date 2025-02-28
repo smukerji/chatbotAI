@@ -25,6 +25,7 @@ interface InboundNumberDetails {
   twilio: TwilioDetails;
   userId: string;
   _id: string;
+  assistantId: string;
 }
 function PhoneNumber() {
   const contacts = [
@@ -106,8 +107,9 @@ function PhoneNumber() {
   useEffect(() => {
 
     const fetchData = async () => {
-      await getImportedTwilioDataFromDB();
       await getPublishAssistantDataFromDB();
+      await getImportedTwilioDataFromDB();
+     
     }
     fetchData();
 
@@ -139,7 +141,7 @@ function PhoneNumber() {
 
       const updatedData = await updatedRequest.json();
 
-      message.info(updatedData.message);
+      message.success(updatedData.message);
 
       console.log("updateValue", updateValue);
     }
@@ -243,7 +245,7 @@ function PhoneNumber() {
                     placeholder="Select the assistant"
 
                     onSelect={assistantSelectOnPhoneNumberHandler}
-
+                    value={publishAssistantList.find((item) => item.assistantId === inboundNumberDetails?.assistantId)?.label}
                     options={publishAssistantList}
                   />
                 </div>
@@ -255,10 +257,13 @@ function PhoneNumber() {
                   <p className='description'>
                     Set a fallback destination for inbound calls when the assistant or squad is not available.
                   </p>
-                  <div className="phone-input-with-flag">
+                  <div className="phone-input-with-flag" style={{position: 'relative'}} >
                     <PhoneInput
                       country={'us'}
                     />
+                    <div style={{position: 'absolute', right: '0', top: '50%', transform: 'translateY(-50%)'}}>
+                      <button className="add-btn">apply</button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -266,7 +271,7 @@ function PhoneNumber() {
 
           </div>
 
-          <div className="bottom">
+          {/* <div className="bottom">
             <div className="container">
               <h3 className="title">Outbound Form</h3>
               <p className="description">You can assign an outbound phone number , set up a fallback and set up a squad to be called if the assistant is not available.</p>
@@ -296,7 +301,7 @@ function PhoneNumber() {
 
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
 
         {
