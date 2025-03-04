@@ -42,6 +42,7 @@ function PhoneNumber() {
   const [publishAssistantList, setPublishAssistantList] = useState([{ value: '', label: '' ,assistantId:''}]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [inboundNumberDetails, setInboundNumberDetails] = useState<InboundNumberDetails | null>(null);
+  const [fallbackDestinationNumber, setFallbackDestination] = useState<string>('');
 
   const [cookies, setCookie] = useCookies(["userId"]);
 
@@ -132,6 +133,42 @@ function PhoneNumber() {
       debugger;
       const updatedRequest:any = await fetch(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/phone?userId=${cookies?.userId}`,
+        {
+          method: "PUT",
+          body: JSON.stringify({ ...updateValue }),
+          next: { revalidate: 0 },
+        }
+      );
+
+      const updatedData = await updatedRequest.json();
+
+      message.success(updatedData.message);
+
+      console.log("updateValue", updateValue);
+    }
+  }
+
+  const updateFallbackDestinationInputHandler = (value:string)=>{
+    console.clear();
+    console.log("fallback input hndler printing the value ",value);
+    setFallbackDestination(value);
+  }
+
+  async function  fallbackDestinationUpdateHandler(){
+    console.clear();
+
+    if (inboundNumberDetails) {
+      const updateValue = {
+        twilioId: inboundNumberDetails.twilio.id,
+        fallbackDestination: {
+          type: "number",
+          number: "+".concat(fallbackDestinationNumber)
+        }
+      }
+
+      debugger;
+      const updatedRequest:any = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/phone/fallback`,
         {
           method: "PUT",
           body: JSON.stringify({ ...updateValue }),
@@ -260,9 +297,10 @@ function PhoneNumber() {
                   <div className="phone-input-with-flag" style={{position: 'relative'}} >
                     <PhoneInput
                       country={'us'}
+                      onChange={updateFallbackDestinationInputHandler}
                     />
-                    <div style={{position: 'absolute', right: '0', top: '50%', transform: 'translateY(-50%)'}}>
-                      <button className="add-btn">apply</button>
+                    <div style={{position: 'absolute', right: '0', top: '50%', transform: 'translateY(-50%)', height: '100%'}}>
+                      <Button className="add-btn" type="primary" ghost style={{display:'flex', justifyContent:'center', alignItems:'center', height:'100%'}}>Add</Button>
                     </div>
                   </div>
                 </div>
