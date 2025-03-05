@@ -58,7 +58,7 @@ async function updateAssistantPhoneFallback(req: NextRequest) {
         }
 
 
-        return { message: "data received successfully", data: data };
+        return { message: "Twilio record not found!" };
     }
     catch (error: any) {
         console.error('Error parsing request body:', error);

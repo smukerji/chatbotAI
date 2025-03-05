@@ -40,7 +40,7 @@ function PhoneNumber() {
 
   const [phoneNumbers, setPhoneNumbers] = useState([]);
   const [publishAssistantList, setPublishAssistantList] = useState([{ value: '', label: '' ,assistantId:''}]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [inboundNumberDetails, setInboundNumberDetails] = useState<InboundNumberDetails | null>(null);
   const [fallbackDestinationNumber, setFallbackDestination] = useState<string>('');
 
@@ -80,28 +80,29 @@ function PhoneNumber() {
     }
   }
 
- async function getImportedTwilioDataFromDB() {
+  async function getImportedTwilioDataFromDB() {
 
-  try{
-    setIsLoading(true);
-    
-  const phoneNumberData:any = await fetch(
-    `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/phone?userId=${cookies?.userId}`,
-    {
-      method: "GET",
-      next: { revalidate: 0 },
+    try {
+      setIsLoading(true);
+
+      const phoneNumberData: any = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/phone?userId=${cookies?.userId}`,
+        {
+          method: "GET",
+          next: { revalidate: 0 },
+        }
+      );
+      const twilioNumbers = await phoneNumberData.json();
+      setPhoneNumbers(twilioNumbers?.importedNumbers);
+      debugger
+      setInboundNumberDetails(twilioNumbers?.importedNumbers[0]);
+      setFallbackDestination(twilioNumbers?.importedNumbers[0]?.fallbackNumber?.number);
+      console.log('twilioNumbers:', twilioNumbers);
     }
-  );
-  const twilioNumbers = await phoneNumberData.json();
-  setPhoneNumbers(twilioNumbers?.importedNumbers);
-  debugger
-  setInboundNumberDetails(twilioNumbers?.importedNumbers[0]);
-  console.log('twilioNumbers:', twilioNumbers);
-  }
-  catch(error:any){
-    console.error('Error parsing request body:', error);
-  }
-  setIsLoading(false);
+    catch (error: any) {
+      console.error('Error parsing request body:', error);
+    }
+    setIsLoading(false);
 
   }
 
@@ -117,7 +118,9 @@ function PhoneNumber() {
   }, []);
 
   function changedTheInboundNumberHandler(contact:any){
+    debugger;
     setInboundNumberDetails(contact);
+    setFallbackDestination(contact?.fallbackNumber?.number);
   }
 
   async function  assistantSelectOnPhoneNumberHandler(option:any,values:any){
@@ -154,9 +157,10 @@ function PhoneNumber() {
     setFallbackDestination(value);
   }
 
-  async function  fallbackDestinationUpdateHandler(){
+  async function  fallbackDestinationNumberUpdateHandler(){
     console.clear();
 
+    debugger;
     if (inboundNumberDetails) {
       const updateValue = {
         twilioId: inboundNumberDetails.twilio.id,
@@ -298,9 +302,10 @@ function PhoneNumber() {
                     <PhoneInput
                       country={'us'}
                       onChange={updateFallbackDestinationInputHandler}
+                      value={fallbackDestinationNumber}
                     />
                     <div style={{position: 'absolute', right: '0', top: '50%', transform: 'translateY(-50%)', height: '100%'}}>
-                      <Button className="add-btn" type="primary" ghost style={{display:'flex', justifyContent:'center', alignItems:'center', height:'100%'}}>Add</Button>
+                      <Button onClick={fallbackDestinationNumberUpdateHandler} className="add-btn" type="primary" ghost style={{display:'flex', justifyContent:'center', alignItems:'center', height:'100%'}}>Add</Button>
                     </div>
                   </div>
                 </div>
