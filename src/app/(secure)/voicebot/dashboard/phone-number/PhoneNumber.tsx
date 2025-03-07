@@ -25,6 +25,7 @@ interface InboundNumberDetails {
   twilio: TwilioDetails;
   userId: string;
   _id: string;
+  assistantId: string;
 }
 function PhoneNumber() {
   const contacts = [
@@ -39,8 +40,9 @@ function PhoneNumber() {
 
   const [phoneNumbers, setPhoneNumbers] = useState([]);
   const [publishAssistantList, setPublishAssistantList] = useState([{ value: '', label: '' ,assistantId:''}]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [inboundNumberDetails, setInboundNumberDetails] = useState<InboundNumberDetails | null>(null);
+  const [fallbackDestinationNumber, setFallbackDestination] = useState<string>('');
 
   const [cookies, setCookie] = useCookies(["userId"]);
 
@@ -78,43 +80,47 @@ function PhoneNumber() {
     }
   }
 
- async function getImportedTwilioDataFromDB() {
+  async function getImportedTwilioDataFromDB() {
 
-  try{
-    setIsLoading(true);
-    
-  const phoneNumberData:any = await fetch(
-    `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/phone?userId=${cookies?.userId}`,
-    {
-      method: "GET",
-      next: { revalidate: 0 },
+    try {
+      setIsLoading(true);
+
+      const phoneNumberData: any = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/phone?userId=${cookies?.userId}`,
+        {
+          method: "GET",
+          next: { revalidate: 0 },
+        }
+      );
+      const twilioNumbers = await phoneNumberData.json();
+      setPhoneNumbers(twilioNumbers?.importedNumbers);
+      debugger
+      setInboundNumberDetails(twilioNumbers?.importedNumbers[0]);
+      setFallbackDestination(twilioNumbers?.importedNumbers[0]?.fallbackNumber?.number);
+      console.log('twilioNumbers:', twilioNumbers);
     }
-  );
-  const twilioNumbers = await phoneNumberData.json();
-  setPhoneNumbers(twilioNumbers?.importedNumbers);
-  debugger
-  setInboundNumberDetails(twilioNumbers?.importedNumbers[0]);
-  console.log('twilioNumbers:', twilioNumbers);
-  }
-  catch(error:any){
-    console.error('Error parsing request body:', error);
-  }
-  setIsLoading(false);
+    catch (error: any) {
+      console.error('Error parsing request body:', error);
+    }
+    setIsLoading(false);
 
   }
 
   useEffect(() => {
 
     const fetchData = async () => {
-      await getImportedTwilioDataFromDB();
       await getPublishAssistantDataFromDB();
+      await getImportedTwilioDataFromDB();
+     
     }
     fetchData();
 
   }, []);
 
   function changedTheInboundNumberHandler(contact:any){
+    debugger;
     setInboundNumberDetails(contact);
+    setFallbackDestination(contact?.fallbackNumber?.number);
   }
 
   async function  assistantSelectOnPhoneNumberHandler(option:any,values:any){
@@ -139,7 +145,44 @@ function PhoneNumber() {
 
       const updatedData = await updatedRequest.json();
 
-      message.info(updatedData.message);
+      message.success(updatedData.message);
+
+      console.log("updateValue", updateValue);
+    }
+  }
+
+  const updateFallbackDestinationInputHandler = (value:string)=>{
+    console.clear();
+    console.log("fallback input hndler printing the value ",value);
+    setFallbackDestination(value);
+  }
+
+  async function  fallbackDestinationNumberUpdateHandler(){
+    console.clear();
+
+    debugger;
+    if (inboundNumberDetails) {
+      const updateValue = {
+        twilioId: inboundNumberDetails.twilio.id,
+        fallbackDestination: {
+          type: "number",
+          number: "+".concat(fallbackDestinationNumber)
+        }
+      }
+
+      debugger;
+      const updatedRequest:any = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/phone/fallback`,
+        {
+          method: "PUT",
+          body: JSON.stringify({ ...updateValue }),
+          next: { revalidate: 0 },
+        }
+      );
+
+      const updatedData = await updatedRequest.json();
+
+      message.success(updatedData.message);
 
       console.log("updateValue", updateValue);
     }
@@ -243,7 +286,7 @@ function PhoneNumber() {
                     placeholder="Select the assistant"
 
                     onSelect={assistantSelectOnPhoneNumberHandler}
-
+                    value={publishAssistantList.find((item) => item.assistantId === inboundNumberDetails?.assistantId)?.label}
                     options={publishAssistantList}
                   />
                 </div>
@@ -255,10 +298,15 @@ function PhoneNumber() {
                   <p className='description'>
                     Set a fallback destination for inbound calls when the assistant or squad is not available.
                   </p>
-                  <div className="phone-input-with-flag">
+                  <div className="phone-input-with-flag" style={{position: 'relative'}} >
                     <PhoneInput
                       country={'us'}
+                      onChange={updateFallbackDestinationInputHandler}
+                      value={fallbackDestinationNumber}
                     />
+                    <div style={{position: 'absolute', right: '0', top: '50%', transform: 'translateY(-50%)', height: '100%'}}>
+                      <Button onClick={fallbackDestinationNumberUpdateHandler} className="add-btn" type="primary" ghost style={{display:'flex', justifyContent:'center', alignItems:'center', height:'100%'}}>Add</Button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -266,7 +314,7 @@ function PhoneNumber() {
 
           </div>
 
-          <div className="bottom">
+          {/* <div className="bottom">
             <div className="container">
               <h3 className="title">Outbound Form</h3>
               <p className="description">You can assign an outbound phone number , set up a fallback and set up a squad to be called if the assistant is not available.</p>
@@ -296,7 +344,7 @@ function PhoneNumber() {
 
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
 
         {
