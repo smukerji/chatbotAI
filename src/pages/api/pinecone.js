@@ -1,6 +1,6 @@
 import { Pinecone } from "@pinecone-database/pinecone";
 
-// import { createEmbedding } from "../../app/_helpers/server/embeddings";
+import { createEmbedding } from "../../app/_helpers/server/embeddings";
 import clientPromise from "../../db";
 import { deletevectors } from "../../app/_helpers/server/pinecone";
 import { PineconeStore } from "@langchain/pinecone";
@@ -27,7 +27,6 @@ export default async function handler(req, res) {
     const chatbotId = body?.chatbotId;
     const userId = body?.userId;
     const messages = body?.messages;
-
     // /// create the embedding of user query
     // const embed = await createEmbedding(userQuery);
 
@@ -153,14 +152,14 @@ export default async function handler(req, res) {
 
     /// delete the assistant from openai
     try {
-      await openai.beta.assistants.del(chatbotId);
+      const assistant = await openai.beta.assistants.del(chatbotId);
     } catch (error) {
       console.error("Error during assistant deletion:", error);
     }
 
     vectorId = [].concat(...vectorId);
     /// delete the vectors
-    await collection.deleteMany({ chatbotId: chatbotId });
+    const deleteData = await collection.deleteMany({ chatbotId: chatbotId });
     /// delete the chatbot
     await userChatbots.deleteOne({ chatbotId: chatbotId });
     /// delete chatbot settings

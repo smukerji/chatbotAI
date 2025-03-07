@@ -41,6 +41,13 @@ function ChooseIndustryExpert() {
       /// if the assistant type is ecommerce-agent and industry type is shopify then only enable the shopify expert
       return false;
     } else if (
+      createAssistantFlowContextDetails.assistantType?.abbreviation ==
+        "research-agent" &&
+      industryType == "web-expert"
+    ) {
+      /// if the assistant type is re-agent i.e. that is real estate agent then only enable the real estate expert
+      return false;
+    } else if (
       /// if the assistant type is re-agent i.e. that is real estate agent then only enable the real estate expert
       createAssistantFlowContextDetails.assistantType?.abbreviation ==
         "re-agent" &&

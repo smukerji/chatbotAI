@@ -6,9 +6,10 @@ export const runtime = "nodejs";
 export async function POST(request: any, { params: { threadId } }: any) {
   const { content, assistantId } = await request.json();
 
+  let userQuery = `{ userQuery: ${content} }`;
   await openai.beta.threads.messages.create(threadId, {
     role: "user",
-    content: content,
+    content: userQuery,
   });
 
   const stream = openai.beta.threads.runs.stream(threadId, {
@@ -17,3 +18,5 @@ export async function POST(request: any, { params: { threadId } }: any) {
 
   return new Response(stream.toReadableStream());
 }
+
+export const maxDuration = 300;

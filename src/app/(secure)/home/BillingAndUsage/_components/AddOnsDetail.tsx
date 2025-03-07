@@ -165,8 +165,6 @@ function AddOnsDetail({ date, isNextPlan, planName }: any) {
     fetchAddonDetail();
   }, []);
 
-  console.log("planNamee", planName);
-
   return (
     <>
       <Modal

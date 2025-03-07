@@ -1,0 +1,14 @@
+.loader{
+    position: fixed;
+    // 
+    transform: translate(-50%, -50%);
+    .ant-spin {
+      .ant-spin-dot {
+        height: 100%;
+        width: 100%;
+        i {
+          background: #2E58EA;
+        }
+      }
+    }
+  }

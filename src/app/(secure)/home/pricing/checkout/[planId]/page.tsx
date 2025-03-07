@@ -35,6 +35,9 @@ const CheckoutPage = ({ params }: any) => {
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
   const param: any = useSearchParams();
   const chatbot = decodeURIComponent(param.get("a"));
+
+  const firstVoicePurchase = param.get("firstVoicePurchase") === "true";
+  
   const [decryptedData, setDecryptedData] = useState("");
   const [loader, setLoader] = useState(true);
   const router = useRouter();
@@ -48,6 +51,7 @@ const CheckoutPage = ({ params }: any) => {
     setLoader(false);
   };
 
+  console.log("params on checkout page", chatbot);
   useEffect(() => {
     setLoader(true);
     setSelectedPlan(plans.find((plan: any) => plan.id === Number(planId)));
@@ -76,6 +80,7 @@ const CheckoutPage = ({ params }: any) => {
               }
               duration={selectedPlan?.days === 365 ? "year" : "month"}
               name={selectedPlan?.name}
+              firstVoicePurchase={firstVoicePurchase}
             />
           )}
         </Elements>

@@ -12,6 +12,8 @@ import ChooseIndustryExpert from "../ChooseIndustryExpert/ChooseIndustryExpert";
 import ChooseVoiceAssistantExpert from "../ChooseVoiceAssistantExpert/ChooseVoiceAssistantExpert";
 import Home from "@/app/(secure)/home/page";
 import ShopifySecretModal from "../Modals/ShopifySecretModal";
+import VoicebotUsage from "@/app/(secure)/home/BillingAndUsage/_components/VoicebotUsage";
+import "../../../home/BillingAndUsage/billing.scss"
 
 function CreateAssitstantContainerItems({
   assistantList,
@@ -42,7 +44,7 @@ function CreateAssitstantContainerItems({
         (createAssistantFlowContextDetails?.creationFlow ===
         SelectedAssistantType.CHAT ? (
           <PricingWrapperNew firstPurchase={true} />
-        ) : null)}
+        ) : <VoicebotUsage firstPurchase={true}/>)}
       {createAssistantFlowContextDetails?.currentAssistantFlowStep ===
         AssistantFlowStep.CHOOSE_ASSISTANT_TYPE &&
         (createAssistantFlowContextDetails?.creationFlow ===

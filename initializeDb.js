@@ -289,6 +289,13 @@ async function initializeDb() {
   //       "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/ecommerce-sales-agent-U3Yl3DfiDKIOb38WS8FdLRUUablq07.png",
   //     abbreviation: "ecommerce-agent",
   //   },
+  //   {
+  //     title: "Research Agent",
+  //     description: "AI assistant for conducting research and gathering data",
+  //     imageUrl:
+  //       "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/DALL%C2%B7E%202025-02-12%2014.01.33%20-%20A%20research%20agent%20working%20on%20a%20laptop%20in%20a%20modern%20office%20environment.%20The%20agent%20is%20analyzing%20data,%20taking%20notes,%20and%20wearing%20professional%20attire.%20The%20s-n7TJxb5CdEvET6uTHdKFK56gGNYeY8.webp",
+  //     abbreviation: "research-agent",
+  //   },
   // ];
 
   // // Prepare the upsert operations
@@ -337,6 +344,14 @@ async function initializeDb() {
   //     imageUrl:
   //       "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/shopify-industry-35hAHVsSw2zragWqAWlyXqv3UOYdSC.png",
   //     abbreviation: "shopify",
+  //   },
+  //   {
+  //     title: "Internet",
+  //     description:
+  //       "Retrieves user queries, searches the internet, and provides accurate answers",
+  //     imageUrl:
+  //       "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/DALL%C2%B7E%202025-02-12%2014.06.38%20-%20An%20internet%20surfing%20expert%20working%20on%20a%20laptop%20in%20a%20modern%20environment.%20The%20expert%20is%20browsing%20multiple%20tabs,%20researching%20information,%20and%20analyzing%20d-0KYTJRyIDaGOugKrOuZ9JW4IC9WK9p.webp",
+  //     abbreviation: "web-expert",
   //   },
   // ];
 

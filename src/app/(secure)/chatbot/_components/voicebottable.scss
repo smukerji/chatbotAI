@@ -1,0 +1,115 @@
+.voicebot-table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.voicebot-table {
+  width: 100%;
+  background-color: #fcfcfd;
+  border-collapse: collapse;
+  
+  .assistant-info{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+  }
+
+  thead > tr{
+    &:hover{
+      background: none;
+    }
+  }
+
+  tr {
+    &:hover {
+      background: #ecf0fe;
+      td {
+        &:first-child {
+          color: #2e58ea;
+          cursor: pointer;
+        }
+        &:last-child {
+          img {
+            opacity: 0.7;
+          }
+        }
+      }
+    }
+    th {
+      color: #777e90;
+      text-align: left;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 24px; /* 150% */
+      border: none;
+      padding: 16px;
+    }
+    td {
+      border: none;
+      padding: 16px;
+      &:first-child {
+        display: flex;
+        gap: 22px;
+        align-items: center;
+      }
+
+      &:nth-child(3) {
+        span:not(:first-child) {
+          color: #777e90;
+        }
+      }
+
+      &:last-child {
+        position: relative;
+        /*------------------------------------------menu animation----------------------------------------------*/
+        .menu {
+          position: absolute;
+          top: 20px;
+          right: 55px;
+          z-index: 999;
+          ul {
+            display: flex;
+            // width: 157px;
+            padding: 16px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 20px;
+            border-radius: 16px;
+            background: #fcfcfd;
+            box-shadow: 0px 4px 26px 0px rgba(0, 0, 0, 0.16);
+            list-style: none;
+            text-align: left;
+            li {
+              display: flex;
+              gap: 16px;
+              &:hover {
+                cursor: pointer;
+              }
+            }
+          }
+
+          * {
+            animation-name: show;
+            animation-duration: 0.5s;
+            animation-fill-mode: both;
+          }
+
+          @keyframes show {
+            0% {
+              left: 100%;
+              opacity: 0;
+            }
+
+            100% {
+              left: 110%;
+              opacity: 1;
+              transform: translateX(2px);
+            }
+          }
+        }
+      }
+    }
+  }
+}

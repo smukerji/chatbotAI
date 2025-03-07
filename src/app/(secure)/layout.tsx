@@ -3,8 +3,6 @@ import { redirect } from "next/navigation";
 import { auth } from "../_helpers/server/auth";
 import { CreateAssistantFlowDataProvider } from "../_helpers/client/Context/CreateAssistantFlowContext";
 import { CreateBotDataProvider } from "../_helpers/client/Context/CreateBotContext";
-import { DeepgramContextProvider } from "../_helpers/client/Context/DeepgramContext";
-import { MicrophoneContextProvider } from "../_helpers/client/Context/MicrophoneContext";
 
 export default function HomeLayout({
   children,
@@ -23,7 +21,8 @@ export default function HomeLayout({
   return (
     <>
       <CreateAssistantFlowDataProvider>
-        <CreateBotDataProvider>{children}</CreateBotDataProvider>
+        <CreateBotDataProvider>
+          {children}</CreateBotDataProvider>
       </CreateAssistantFlowDataProvider>
     </>
   );

@@ -203,7 +203,15 @@ async function updateChatbotSettings(request: NextRequest) {
       const assistant = await openai.beta.assistants.update(chatbotId, {
         instructions: updateFields.instruction,
         model: updateFields.model,
-        temperature: updateFields.temperature,
+        /// do not set temparature if model is o1 or o3-mini
+        ...(updateFields.model !== "o1" && updateFields.model !== "o3-mini"
+          ? {
+              temperature: updateFields.temperature,
+              reasoning_effort: null,
+            }
+          : { temperature: null, reasoning_effort: "medium" }),
+        // reasoning_effort: "medium",
+        // temperature: updateFields.temperature,
       });
     } catch (error) {
       console.log("Error while updating assistant configuration", error);

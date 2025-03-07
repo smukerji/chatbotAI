@@ -35,8 +35,14 @@ import Analysis from "./analysis/Analysis";
 import PhoneNumber from "./phone-number/PhoneNumber";
 import CallLogs from "./call-logs/CallLogs";
 import Vapi from '@vapi-ai/web';
+import { useCookies } from "react-cookie";
+
+
 
 import { CreateVoiceBotContext } from "../../../_helpers/client/Context/VoiceBotContextApi";
+import { updateAssistantLastTrainedMetaDataService, updateAssistantLastUsedMetaDataService, updateAssistantNumberOfCallMetaDataService } from "./services/metadata-update-service";
+import { log } from "console";
+
 
 const vapi = new Vapi(process.env.NEXT_PUBLIC_VAP_API as string); // Vapi public key
 
@@ -54,8 +60,14 @@ function Dashboard() {
   const params: any = useSearchParams();
 
   let [tab, setTab] = useState<string>("model");
+  
+    const [cookies, setCookie] = useCookies(["userId"]);
 
   const editChatbotSource = params.get("voicBotName") ?? "VoiceBot";
+
+  const isFirstTimeAssistantCreation = params.get("firstInit") === "true";
+
+  const interaction = params.get("interaction") == "voicebot";
 
   const [isListening, setIsListening] = useState(CALLSTATUS.VOID);
   const [isMuted, setIsMuted] = useState(false);
@@ -75,9 +87,12 @@ function Dashboard() {
   let tabValue = "model";
 
   useEffect(() => {
+    
+
+    console.log("your mongoID *&",voiceBotContextData.assistantMongoId, "&* ",voiceBotContextData.assistantInfo?._id)
 
     if (!voiceBotContextData?.assistantInfo) {
-      router.push("/chatbot");
+      router.push(`/chatbot?interactionFrom=${true}`)
     }
 
     ;
@@ -90,22 +105,30 @@ function Dashboard() {
     }
     else{
       //  the system prompt based on the mongo record
-      message.info("Assistant is not published yet");
+      if(isFirstTimeAssistantCreation){
+        //get the system prompts otherwise skip
+        //get the template prompt 
+        getTemplatePrompts(voiceBotContextData.assistantMongoId);
+        //assign the prompt to the 
+      }
+      else{
 
+        getTemplatePrompts(voiceBotContextData.assistantInfo?._id);
+      }
+
+      message.info("Assistant is not published yet");
     }
     if(voiceBotContextData?.assistantInfo?.assistantName){
       voiceBotContextData.updateState("name",voiceBotContextData?.assistantInfo?.assistantName);
     }
 
-    console.log("voice bot context data deatils ***",voiceBotContextData)
+    updateAssistantLastUsedMetaDataService(voiceBotContextData.assistantInfo?._id);
+
   }, []);
 
   const duplicateAssistantHandler = async ()=>{
 
-    /**
-     *  console.log("Assistant delete id ",voiceBotContextData.assistantInfo?._id);
-     */
-    debugger;
+
     if(!voiceBotContextData?.assistantInfo["vapiAssistantId"]){
       message.error("Assistant is not published yet");
       return;
@@ -153,7 +176,6 @@ function Dashboard() {
 
     let data = voiceBotContextData.assistantInfo;
 
-    debugger;
     const deleteId:string = data._id;
     try{
 
@@ -165,9 +187,9 @@ function Dashboard() {
       );
 
       const assistantDataResponseParse = await assistantDataResponse.json();
-      debugger;
+  
       message.success(assistantDataResponseParse?.message);
-      router.push("/chatbot");
+      router.push(`/chatbot?interactionFrom=${true}`)
 
 
     }
@@ -178,12 +200,41 @@ function Dashboard() {
 
   }
 
+  const getTemplatePrompts = async (recordId: string) => {
+
+    setLoading(true);
+    try {
+      const assistantDataResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/template/prompts/?recordId=${recordId}`,
+        {
+          method: "GET",
+        }
+      );
+
+      const assistantDataResponseParse = await assistantDataResponse.json();
+
+      voicebotDetails["model"]["messages"][0]["content"] = assistantDataResponseParse?.prompts;
+    }
+    catch (error: any) {
+
+    }
+    finally {
+      setLoading(false);
+    }
+
+  }
+
   const getAssistantData = async (vapiAssiId:string)=>{
 
         //get the assistant record from the vapi's side
         try{
 
           setLoading(true);
+          if(isFirstTimeAssistantCreation){
+            //get the system prompts otherwise skip
+            console.log("assistant mongo id printing ",voiceBotContextData.assistantMongoId);
+            
+          }
           const assistantDataResponse = await fetch(
             `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/vapi/assistant/?assistantId=${vapiAssiId}`,
             {
@@ -192,7 +243,7 @@ function Dashboard() {
           );
 
           const assistantDataResponseParse = await assistantDataResponse.json();
-          ;
+    
           if(assistantDataResponseParse?.error){
             message.error("Error while getting the assistant data");
             return;
@@ -315,6 +366,9 @@ function Dashboard() {
 
           }
           setLoading(false);
+
+          //update the call logs
+          updateAssistantNumberOfCallMetaDataService(assistantDataResponseParse?.assistantLocalData?.vapiAssistantId,assistantDataResponseParse?.assistantLocalData?._id );
         }
         catch(error:any){
         
@@ -328,9 +382,63 @@ function Dashboard() {
   }
 
 
+
+
+async function costDeductionOnCallEndHandler(){
+  try{
+
+    const data = {assistantId:voiceBotContextData?.assistantInfo?.vapiAssistantId};
+    const costDeductionResponse:any = await fetch(
+      `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/costs-wallates?userId=${cookies.userId}`,
+      {
+        method: "PUT",
+        body: JSON.stringify(data)
+      }
+    );
+
+    const costDeductionResponseParse = costDeductionResponse.json();
+    if(costDeductionResponseParse?.message){
+      message.success("Call cost affect on your credits");
+    }
+
+  }
+  catch(error:any){
+    message.error("Error while deducting the cost",error);
+  }
+ }
+
   console.log("isPublishEnabled", voiceBotContextData?.isPublishEnabled);
 
   const makeVapiAssistantCall = async () => {
+
+    //check if the user has voicebot credits
+
+    try{
+      const response:any = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/costs-wallates?userId=${cookies.userId}`,
+        {
+          method: "GET",
+        }
+      );
+
+      const responseParse = await response.json();
+      if(responseParse?.isCreditExist){
+        if(!responseParse.isCreditExist){
+          message.error("Please buy more voice credits");
+          return;
+        }
+      }
+      else{
+        message.error(responseParse?.message);
+        return;
+      }
+    }
+    catch(error){
+
+      message.error("Error while checking the credits");
+      
+    }
+
     let isIdAvaliable = voiceBotContextData.assistantInfo["vapiAssistantId"];
  
     if(isIdAvaliable){
@@ -352,14 +460,15 @@ function Dashboard() {
     console.log("Call has started.");
   });
 
-  vapi.on("call-end", () => {
+  vapi.on("call-end", async () => {
 
-    vapi.stop();
+    const result = await vapi.stop();
+    console.log("call end result", result);
+
     setIsMuted(false);
     setShowMakeCallButton(true);
     console.log("Call has ended.");
     setIsListening(CALLSTATUS.CALLSTOP);
-
   });
 
   vapi.on("speech-start", () => {
@@ -371,7 +480,6 @@ function Dashboard() {
   });
 
   vapi.on("error", (e) => {
-   
     // lottieRefs.current.pause();
     console.error(e);
     setShowMakeCallButton(true);
@@ -380,12 +488,27 @@ function Dashboard() {
     setIsListening(CALLSTATUS.CALLSTOP);
   });
 
-  const stopCallHandler = () => {
+  
+
+  const  stopCallHandler = async () => {
+
 
     vapi.stop();
     setShowMakeCallButton(true);
     setIsMuted(false);
     setIsListening(CALLSTATUS.CALLSTOP);
+
+    const d = voiceBotContextData.assistantInfo
+
+    console.log("assistant id",d._id);
+
+    await updateAssistantNumberOfCallMetaDataService(
+      d?.vapiAssistantId
+      ,d?._id);
+      
+      setTimeout(async () => {
+          await costDeductionOnCallEndHandler();
+      }, 3000);
   };
 
   const muteCallHandler = () => {
@@ -408,16 +531,12 @@ function Dashboard() {
 
   }
 
-
-
   const vapiAssistantPublishHandler = async () => {
     // publish the assistant to the vapi
 
     //validate the assistant require field first,
 
     //call the post api to publish the assistant to the vapi
-
-    ;
     if(!voiceBotContextData?.isPublishEnabled){
       message.error("Please fill the required fields to publish the assistant");
       return;
@@ -438,7 +557,7 @@ function Dashboard() {
       );
 
       const assistantCreateResponseParse = await assistantCreateResponse.json();
-      ;
+      
       if(assistantCreateResponseParse?.error){
         message.error("Error while publishing the assistant");
         return;
@@ -457,7 +576,8 @@ function Dashboard() {
       // console.log("State after reset to empty object:", voiceBotContextData.state);
       // voiceBotContextData.setState(voiceBotContextData.state);
       // console.log("State after resetting to previous state:", voiceBotContextData.state);
-
+    
+        updateAssistantLastTrainedMetaDataService(voiceBotContextData.assistantInfo?._id);
       }
 
     }
@@ -487,6 +607,11 @@ function Dashboard() {
     }
   };
 
+  const truncateString = (str: string) => {
+    str = "rudresh-sisodiya"
+    return str.length > 6 ? str.substring(0, 4) + '..' : str;
+  };
+
 
   useEffect(() => {
     document.addEventListener('click', handleDocumentClick);
@@ -502,9 +627,9 @@ function Dashboard() {
         <div className="headers">
           <div className="header-title">
             <Image className="image" alt="back_arrow" src={leftArrow} onClick={()=>{
-              router.push("/chatbot")
+              router.push(`/chatbot?interactionFrom=${true}`)
             }}></Image>
-            <h1 className="title">{voicebotDetails?.name || voiceBotContextData?.assistantInfo?.assistantName || editChatbotSource}</h1>
+            <h1 className="title">{voicebotDetails?.name || voiceBotContextData?.assistantInfo?.assistantName}</h1>
 
           </div>
           <div className="header-description">
@@ -557,11 +682,11 @@ function Dashboard() {
                     <span className="button-text">
                       {
 
-                        isListening == CALLSTATUS.VOID ? "Demo Talk!" :
+                        isListening == CALLSTATUS.VOID ? `Talk with ${voicebotDetails?.name || voiceBotContextData?.assistantInfo?.assistantName }!` :
                           isListening == CALLSTATUS.CONNECTING ? "Calling..." :
                             isListening == CALLSTATUS.SPEAKING ? "speaking..." :
                               isListening == CALLSTATUS.LISTENING ? "listening..." :
-                                isListening == CALLSTATUS.CALLSTOP ? "Call Again" : "Demo Talk!"
+                                isListening == CALLSTATUS.CALLSTOP ? "Call Again" : `Talk with ${voicebotDetails?.name || voiceBotContextData?.assistantInfo?.assistantName }!`
                       }
 
                     </span>

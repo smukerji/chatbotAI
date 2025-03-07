@@ -3,6 +3,8 @@ import Image from "next/image";
 
 import infoImage from "../../../../../../public/voiceBot/SVG/info-circle.svg";
 
+import customTemplate from "../../../../../../public/voiceBot/SVG/profile-circle.svg";
+
 interface AssistantListProps {
   assistantList: any[];
   selectedAssistantIndex: number;
@@ -14,8 +16,22 @@ const ChooseVoiceAssistantType: React.FC<AssistantListProps> = ({
   selectedAssistantIndex,
   selectedAssistantChangeHandler,
 }) => {
+  console.log("assistantList &*", assistantList);
   return (
     <>
+      <div className="custom_assistant-card">
+        <div className="blank-template">
+          <div className="image-card">
+            <Image
+              src={customTemplate}
+              alt=""
+              height={100}
+              width={100}
+            ></Image>
+          </div>
+          <h3 className="card_sub-header">Blank Template</h3>
+        </div>
+      </div>
       {assistantList.length > 0 ? (
         assistantList.map((assistant, index) => (
           <div

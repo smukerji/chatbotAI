@@ -46,6 +46,22 @@ async function createVapiAssistant(req: NextRequest) {
       delete vapiData.analysisPlan.stopSpeakingPlan;
       delete vapiData.analysisPlan.monitorPlan;
       delete vapiData.analysisPlan.credentialIds;
+
+      if(vapiData.transcriber.provider === "talkscriber"){
+
+        delete vapiData.transcriber.languageDetectionEnabled;
+        delete vapiData.transcriber.endpointing;
+        vapiData.transcriber.model = vapiData.transcriber.model.toLowerCase();
+
+      }
+
+      if(vapiData.transcriber.provider === "gladia"){
+
+        delete vapiData.transcriber.languageDetectionEnabled;
+        delete vapiData.transcriber.endpointing;
+        vapiData.transcriber.model = vapiData.transcriber.model.toLowerCase();
+
+      }
       
     //punctuation boundaries refactor
     vapiData.voice.chunkPlan.punctuationBoundaries = vapiData.voice.chunkPlan.punctuationBoundaries.map((item: any) => item.label);
@@ -91,6 +107,7 @@ async function createVapiAssistant(req: NextRequest) {
           }
           else { //if the record is not exist then create the record
             //send the data to the vapi server
+            delete vapiData.speed;
             const options = {
               method: 'POST',
               headers: { Authorization: `Bearer ${process.env.VAPI_PRIVATE_KEY}`, 'Content-Type': 'application/json' },
@@ -162,7 +179,7 @@ async function getSingleAssistantDataFromVapi(req: NextRequest) {
       return { error: "Failed to get the assistant" };
     }
 
-    return { result: vapiResponseData };
+    return { result: vapiResponseData, assistantLocalData: voiceBotRecordVapiExist };
 
   }
   catch(error:any){
