@@ -31,17 +31,18 @@ function Home() {
       <SecondaryHeader />
       <HeroSection />
       {/* <ServiceSection /> */}
-      <CustomerQuestions />
+      {/* <CustomerQuestions /> */}
       <FeaturesSection />
       {/* <FacilitiesSection /> */}
-      <IndustrySection />
-      <ServicesOffered />
+      {/* <IndustrySection /> */}
+
+      {/* <ServicesOffered /> */}
       <IndustryAbout />
       <Testimonials />
-      <CompatibilitySection />
+      {/* <CompatibilitySection /> */}
       {/* <PlansSection /> */}
       {/* <FAQ /> */}
-      <ContactSection />
+      {/* <ContactSection /> */}
       <Footer />
     </>
   );
