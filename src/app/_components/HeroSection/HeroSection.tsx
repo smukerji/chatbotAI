@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, { useState } from "react";
 import "./hero-section.scss";
 import Image from "next/image";
 import Link from "next/link";
@@ -10,8 +11,24 @@ import VoiceIcon from "../../../../public/sections-images/header-background/voic
 import ellipse1 from "../../../../public/sections-images/header-background/Ellipse 76.png";
 import ellipse2 from "../../../../public/sections-images/header-background/Ellipse 77.png";
 import ellipse3 from "../../../../public/sections-images/header-background/Ellipse 78.png";
+import sendIcon from "../../../../public/svgs/send.svg";
+import HeroSectionChatPopup from "../HeroSectionChatPopup/HeroSectionChatPopup";
 
 function HeroSection() {
+  const [message, setMessage] = useState("");
+  const [isChatOpen, setIsChatOpen] = useState(false);
+
+  const handleSendMessage = () => {
+    if (message.trim() !== "") {
+      setIsChatOpen(true);
+    }
+  };
+
+  const handleKeyPress = (e: any) => {
+    if (e.key === "Enter") {
+      handleSendMessage();
+    }
+  };
   return (
     <>
       {/* <div
@@ -77,9 +94,9 @@ function HeroSection() {
       <section className={"heroSection"}>
         <div className={"container"}>
           <div className="ellipses">
-            <Image src={ellipse1} alt="Ellipse 1" className="ellipse1" />
+            {/* <Image src={ellipse1} alt="Ellipse 1" className="ellipse1" /> */}
             <Image src={ellipse2} alt="Ellipse 2" className="ellipse2" />
-            <Image src={ellipse3} alt="Ellipse 3" className="ellipse3" />
+            {/* <Image src={ellipse3} alt="Ellipse 3" className="ellipse3" /> */}
           </div>
           <span className={"badge"}>Torri AI Agent</span>
           <h1>Hey, welcome!</h1>
@@ -90,7 +107,19 @@ function HeroSection() {
             </div>
           </div>
           <div className={"inputContainer"}>
-            <input type="text" placeholder="Ask Torri" />
+            {isChatOpen && (
+              <HeroSectionChatPopup onClose={() => setIsChatOpen(false)} />
+            )}
+            <input
+              type="text"
+              placeholder="Ask Torri"
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyDown={handleKeyPress}
+            />
+
+            <button className={"sendButton"} onClick={handleSendMessage}>
+              <Image src={sendIcon} alt="Send" />
+            </button>
           </div>
           <div className={"avatars"}>
             <Image src={User1} className="user1" alt="User 1" />

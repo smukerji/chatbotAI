@@ -279,7 +279,10 @@ h1 {
 }
 
 .inputContainer {
+  position: relative;
   margin-top: 60px;
+  display: flex;
+  justify-content: center;
   input {
     width: 100%;
     max-width: 400px;
@@ -287,6 +290,13 @@ h1 {
     border: 1px solid #ccc;
     border-radius: 1000px;
     font-size: 16px;
+  }
+
+  .sendButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-left: 10px;
   }
 }
 
