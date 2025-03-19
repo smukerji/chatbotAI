@@ -24,6 +24,7 @@ function HeroSectionChatPopup({ onClose }: any) {
   const [threadId, setThreadId] = useState();
   const chatWindowRef: any = useRef(null);
   const inputRef: any = useRef(null);
+  const messageLimit = process.env.NEXT_PUBLIC_MESSAGE_LIMIT;
 
   const createThread = async () => {
     const res = await fetch(`/api/assistants/threads`, {
@@ -206,6 +207,16 @@ function HeroSectionChatPopup({ onClose }: any) {
         message.error("Please enter the message");
         return;
       }
+      // Get the message count from localStorage
+      let messageCount = parseInt(
+        localStorage.getItem("messageCount") || "0",
+        10
+      );
+      if (Number(messageCount) >= Number(messageLimit)) {
+        message.error("Message limit reached. Upgrade to continue.");
+        return;
+      }
+
       setLoading(true);
       const tempUserMessageTime = getDate();
       /// clear the response
@@ -226,6 +237,9 @@ function HeroSectionChatPopup({ onClose }: any) {
 
       try {
         await sendMessage(userMessage);
+
+        // Increment and store the new count in localStorage
+        localStorage.setItem("messageCount", (messageCount + 1).toString());
       } catch (e: any) {
         console.log(
           "Error while getting completion from custom chatbot",

@@ -232,7 +232,7 @@
       position: absolute;
       top: -20vh;
       left: 50%;
-      z-index: 999;
+      z-index: 2;
       width: 80vw;
       height: 52vh;
       transform: translateX(-50%);
@@ -279,7 +279,7 @@ h1 {
   flex-shrink: 0;
   border-radius: 1000px;
   background: radial-gradient(50% 50% at 50% 50%, #0062ff 0%, #fff 100%);
-  z-index: 999;
+  z-index: 2;
 }
 
 .inputContainer {
@@ -312,13 +312,14 @@ h1 {
   .user1 {
     position: absolute;
     top: 4vw;
-    z-index: 999;
+    z-index: 2;
   }
 
   .user2 {
     position: absolute;
     top: 15vw;
     right: 0vw;
+    z-index: 2;
   }
 
   .msg-icon {
@@ -333,7 +334,7 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 999;
+    z-index: 2;
     background: #fff;
   }
 
@@ -341,6 +342,7 @@ h1 {
     position: absolute;
     left: 5vw;
     bottom: 5vw;
+    z-index: 2;
   }
 
   @media (max-width: 768px) {
