@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { message } from "antd";
 import Image from "next/image";
-import Vapi from '@vapi-ai/web';
+import Vapi from "@vapi-ai/web";
 import CallIcon from "../../../../../public/voiceBot/SVG/call-outgoing.svg";
 import "./style.scss";
 const vapi = new Vapi(process.env.NEXT_PUBLIC_VAP_API as string);
@@ -11,7 +11,7 @@ enum CALLSTATUS {
   CONNECTING,
   LISTENING,
   SPEAKING,
-  CALLSTOP
+  CALLSTOP,
 }
 
 const VapiAssistantCall = () => {
@@ -19,19 +19,16 @@ const VapiAssistantCall = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [showMakeCallButton, setShowMakeCallButton] = useState(true);
 
-
-    const makeVapiAssistantCall = async () => {
-        debugger;
-        message.success("Call has started.");
-        vapi.start("19ea8142-7910-4bc7-8521-e0caebaf62a6"); // assistance ID
-        setIsListening(CALLSTATUS.CONNECTING);
-    }
+  const makeVapiAssistantCall = async () => {
+    message.success("Call has started.");
+    vapi.start("19ea8142-7910-4bc7-8521-e0caebaf62a6"); // assistance ID
+    setIsListening(CALLSTATUS.CONNECTING);
+  };
 
   vapi.on("call-start", () => {
     setIsListening(CALLSTATUS.CONNECTING);
     setShowMakeCallButton(false);
     console.log("Call has started.");
-   
   });
 
   vapi.on("call-end", async () => {
@@ -67,7 +64,6 @@ const VapiAssistantCall = () => {
   };
 
   const muteCallHandler = () => {
-    debugger;
     if (isMuted) {
       vapi.setMuted(false);
       setIsMuted(false);
