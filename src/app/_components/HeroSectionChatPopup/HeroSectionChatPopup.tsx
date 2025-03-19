@@ -12,12 +12,7 @@ import { AssistantStream } from "openai/lib/AssistantStream.mjs";
 import { AssistantStreamEvent } from "openai/resources/beta/assistants.mjs";
 import { functionCallHandler } from "@/app/_helpers/client/functionCallHandler";
 
-function HeroSectionChatPopup({
-  onClose,
-  firstMessage,
-  threadId,
-  newThread,
-}: any) {
+function HeroSectionChatPopup({ onClose }: any) {
   const [messages, setMessages]: any = useState([]);
   const [userMessage, setUserMessage] = useState("");
   /// chat base response
@@ -26,7 +21,17 @@ function HeroSectionChatPopup({
   const [messagesTime, setMessagesTime]: any = useState([]);
   const [sessionStartDate, setSessionStartDate]: any = useState();
   const torriAssistantId: any = process.env.NEXT_PUBLIC_TORRI_ASSISTANT_ID;
+  const [threadId, setThreadId] = useState();
   const chatWindowRef: any = useRef(null);
+  const inputRef: any = useRef(null);
+
+  const createThread = async () => {
+    const res = await fetch(`/api/assistants/threads`, {
+      method: "POST",
+    });
+    const data = await res.json();
+    setThreadId(data.threadId);
+  };
 
   /// handle the user message stream
   const handleReadableStream = (stream: AssistantStream) => {
@@ -187,7 +192,7 @@ function HeroSectionChatPopup({
 
   /// refresh the chat window
   const refreshChat = () => {
-    newThread();
+    createThread();
     setMessages([]);
     setMessagesTime([]);
 
@@ -248,37 +253,46 @@ function HeroSectionChatPopup({
   }, [response, messages, loading]);
 
   useEffect(() => {
-    const handleFirstMessage = async () => {
-      if (firstMessage) {
-        setLoading(true);
-        const tempUserMessageTime = getDate();
-
-        setMessages((prev: any) => [
-          ...prev,
-          { role: "user", content: firstMessage },
-        ]);
-        setMessagesTime((prev: any) => [
-          ...prev,
-          {
-            role: "user",
-            content: firstMessage,
-            messageTime: tempUserMessageTime,
-          },
-        ]);
-
-        try {
-          await sendMessage(firstMessage);
-        } catch (e: any) {
-          console.log(
-            "Error while getting completion from custom chatbot",
-            e,
-            e.message
-          );
-        }
+    const createNewThread = async () => {
+      try {
+        await createThread();
+        inputRef.current.focus();
+      } catch (error) {
+        console.log("Error while creating new thread", error);
       }
     };
+    createNewThread();
+    // const handleFirstMessage = async () => {
+    //   if (firstMessage) {
+    //     setLoading(true);
+    //     const tempUserMessageTime = getDate();
 
-    handleFirstMessage();
+    //     setMessages((prev: any) => [
+    //       ...prev,
+    //       { role: "user", content: firstMessage },
+    //     ]);
+    //     setMessagesTime((prev: any) => [
+    //       ...prev,
+    //       {
+    //         role: "user",
+    //         content: firstMessage,
+    //         messageTime: tempUserMessageTime,
+    //       },
+    //     ]);
+
+    //     try {
+    //       await sendMessage(firstMessage);
+    //     } catch (e: any) {
+    //       console.log(
+    //         "Error while getting completion from custom chatbot",
+    //         e,
+    //         e.message
+    //       );
+    //     }
+    //   }
+    // };
+
+    // handleFirstMessage();
   }, []);
 
   return (
@@ -387,6 +401,7 @@ function HeroSectionChatPopup({
 
       <div className={"chatFooter"}>
         <input
+          ref={inputRef}
           type="text"
           placeholder="Enter your message"
           value={userMessage}
