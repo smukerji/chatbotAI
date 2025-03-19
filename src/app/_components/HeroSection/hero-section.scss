@@ -212,6 +212,10 @@
   padding: 5.3vw 12.2vw 2vw;
   background: #fff;
   position: relative;
+
+  @media only screen and (max-width: 768px) {
+    padding: 20px;
+  }
 }
 
 .container {

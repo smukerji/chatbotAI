@@ -17,6 +17,7 @@ import HeroSectionChatPopup from "../HeroSectionChatPopup/HeroSectionChatPopup";
 function HeroSection() {
   const [message, setMessage] = useState("");
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [threadId, setThreadId] = useState("");
 
   const handleSendMessage = () => {
     if (message.trim() !== "") {
@@ -29,6 +30,15 @@ function HeroSection() {
       handleSendMessage();
     }
   };
+
+  const createThread = async () => {
+    const res = await fetch(`/api/assistants/threads`, {
+      method: "POST",
+    });
+    const data = await res.json();
+    setThreadId(data.threadId);
+  };
+
   return (
     <>
       {/* <div
@@ -108,13 +118,22 @@ function HeroSection() {
           </div>
           <div className={"inputContainer"}>
             {isChatOpen && (
-              <HeroSectionChatPopup onClose={() => setIsChatOpen(false)} />
+              <HeroSectionChatPopup
+                onClose={() => {
+                  setIsChatOpen(false);
+                  setMessage("");
+                }}
+                firstMessage={message}
+                threadId={threadId}
+                newThread={createThread}
+              />
             )}
             <input
               type="text"
               placeholder="Ask Torri"
               onChange={(e) => setMessage(e.target.value)}
               onKeyDown={handleKeyPress}
+              value={message}
             />
 
             <button className={"sendButton"} onClick={handleSendMessage}>
