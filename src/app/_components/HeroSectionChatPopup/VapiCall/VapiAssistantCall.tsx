@@ -4,6 +4,7 @@ import Image from "next/image";
 import Vapi from "@vapi-ai/web";
 import CallIcon from "../../../../../public/voiceBot/SVG/call-outgoing.svg";
 import "./style.scss";
+import { getDate } from "@/app/_helpers/client/getTime";
 const vapi = new Vapi(process.env.NEXT_PUBLIC_VAP_API as string);
 
 enum CALLSTATUS {
@@ -14,16 +15,51 @@ enum CALLSTATUS {
   CALLSTOP,
 }
 
-const VapiAssistantCall = () => {
+const VapiAssistantCall = ({ setMessages, setMessagesTime }: { setMessages: (value: any) => void; setMessagesTime: (value: any) => void }) => {
   const [isListening, setIsListening] = useState(CALLSTATUS.VOID);
   const [isMuted, setIsMuted] = useState(false);
   const [showMakeCallButton, setShowMakeCallButton] = useState(true);
+  const [lastMessage, setLastMessage] = useState("");
 
   const makeVapiAssistantCall = async () => {
+    setMessages([]);
+    setMessagesTime([]);
     message.success("Call has started.");
-    vapi.start("19ea8142-7910-4bc7-8521-e0caebaf62a6"); // assistance ID
+    vapi.start(process.env.NEXT_PUBLIC_VAP_ASSISTANT_ID as string); // assistance ID
     setIsListening(CALLSTATUS.CONNECTING);
   };
+
+  vapi.on("message", (message: any) => {
+    console.log("your messages ", message);
+    if (
+      message["type"] === "transcript" &&
+      message.transcriptType === "final" &&
+      message.transcript !== lastMessage
+    ) {
+      setMessages((prev: any) => {
+        const exists = prev.some(
+          (msg: any) => msg.role === message["role"] && msg.content === message.transcript
+        );
+        if (!exists) {
+          return [
+            ...prev,
+            { role: message["role"], content: message.transcript },
+          ];
+        }
+        return prev;
+      });
+      setMessagesTime((prev: any) => [
+        ...prev,
+        {
+          role: message["role"],
+          content: message.transcript,
+          messageTime: getDate(),
+        },
+      ]);
+      setLastMessage(message.transcript);
+      console.log("Final transcript added: ", message.transcript);
+    }
+  });
 
   vapi.on("call-start", () => {
     setIsListening(CALLSTATUS.CONNECTING);
@@ -36,6 +72,9 @@ const VapiAssistantCall = () => {
 
     setIsMuted(false);
     setShowMakeCallButton(true);
+    setMessages([]);
+    setMessagesTime([]);
+    setLastMessage("");
     console.log("Call has ended.");
     setIsListening(CALLSTATUS.CALLSTOP);
   });
@@ -52,14 +91,20 @@ const VapiAssistantCall = () => {
     setIsMuted(false);
     vapi.stop();
     setIsListening(CALLSTATUS.CALLSTOP);
+    setMessages([]);
+    setMessagesTime([]);
+    setLastMessage("");
     message.error("Error in call");
   });
 
   const stopCallHandler = async () => {
+    setMessages([]);
+    setMessagesTime([]);
     vapi.stop();
     setShowMakeCallButton(true);
     setIsMuted(false);
     setIsListening(CALLSTATUS.CALLSTOP);
+    setLastMessage("");
     message.success("Call has ended.");
   };
 
