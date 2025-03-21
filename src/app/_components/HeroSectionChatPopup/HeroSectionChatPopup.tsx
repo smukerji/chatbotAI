@@ -12,7 +12,7 @@ import { AssistantStream } from "openai/lib/AssistantStream.mjs";
 import { AssistantStreamEvent } from "openai/resources/beta/assistants.mjs";
 import { functionCallHandler } from "@/app/_helpers/client/functionCallHandler";
 import VapiAssistantCall from "./VapiCall/VapiAssistantCall";
-import { log } from "console";
+
 
 function HeroSectionChatPopup({ onClose }: any) {
   const [messages, setMessages]: any = useState([]);
@@ -324,7 +324,8 @@ function HeroSectionChatPopup({ onClose }: any) {
           <button className={"refreshButton"} onClick={refreshChat}>
             <Image src={RefreshIcon} alt="Refresh" />
           </button>
-          <VapiAssistantCall setMessages={setMessages} setMessagesTime={setMessagesTime} />
+          <VapiAssistantCall setMessages={setMessages} setMessagesTime={setMessagesTime} timeoutSeconds={10} 
+          />
         </div>
       </div>
 

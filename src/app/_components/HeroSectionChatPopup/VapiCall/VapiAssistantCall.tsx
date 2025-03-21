@@ -18,9 +18,13 @@ enum CALLSTATUS {
 const VapiAssistantCall = ({
   setMessages,
   setMessagesTime,
+  timeoutSeconds = 30,
+  endCallMessage = "Sorry to Interupt, Our time's up, good to see you, good bye!",
 }: {
   setMessages: (value: any) => void;
   setMessagesTime: (value: any) => void;
+  timeoutSeconds?: number;
+  endCallMessage?: string;
 }) => {
   const [isListening, setIsListening] = useState(CALLSTATUS.VOID);
   const [isMuted, setIsMuted] = useState(false);
@@ -34,7 +38,7 @@ const VapiAssistantCall = ({
     setMessagesTime([]);
     vapi.start(process.env.NEXT_PUBLIC_VAP_ASSISTANT_ID as string); // assistance ID
     setIsListening(CALLSTATUS.CONNECTING);
-    message.success("Call has started.");
+    message.success("Calling to assistant...");
   };
 
   vapi.on("message", (message: any) => {
@@ -66,6 +70,12 @@ const VapiAssistantCall = ({
       ]);
       setLastMessage(message.transcript);
       console.log("Final transcript added: ", message.transcript);
+
+      // Invoke vapi.say at the specified timeoutSeconds
+      setTimeout(() => {
+        debugger;
+        vapi.say(endCallMessage, true);
+      }, timeoutSeconds * 1000);
     }
   });
 
@@ -95,7 +105,19 @@ const VapiAssistantCall = ({
   });
 
   vapi.on("error", (e) => {
-    console.error(e);
+    if(e.error.type == 'no-room')
+    {
+      vapiError();
+    }
+    else{
+      vapiError();
+      message.error("Error in call");
+
+    }
+
+  });
+
+  function vapiError(){
     setShowMakeCallButton(true);
     setIsMuted(false);
     vapi.stop();
@@ -103,8 +125,7 @@ const VapiAssistantCall = ({
     setMessages([]);
     setMessagesTime([]);
     setLastMessage("");
-    message.error("Error in call");
-  });
+  }
 
   const stopCallHandler = async () => {
     setMessages([]);
@@ -138,7 +159,7 @@ const VapiAssistantCall = ({
           loading={loading}
         >
           <Image src={CallIcon} alt="Call" />
-          Call
+          {isListening == CALLSTATUS.CONNECTING ?  "Calling...":"Call" }
         </Button>
       ) : (
         <div className="callButtonContainer">
