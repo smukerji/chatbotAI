@@ -73,7 +73,6 @@ const VapiAssistantCall = ({
 
       // Invoke vapi.say at the specified timeoutSeconds
       setTimeout(() => {
-        debugger;
         vapi.say(endCallMessage, true);
       }, timeoutSeconds * 1000);
     }
@@ -105,19 +104,15 @@ const VapiAssistantCall = ({
   });
 
   vapi.on("error", (e) => {
-    if(e.error.type == 'no-room')
-    {
+    if (e.error.type == "no-room") {
       vapiError();
-    }
-    else{
+    } else {
       vapiError();
       message.error("Error in call");
-
     }
-
   });
 
-  function vapiError(){
+  function vapiError() {
     setShowMakeCallButton(true);
     setIsMuted(false);
     vapi.stop();
@@ -159,7 +154,7 @@ const VapiAssistantCall = ({
           loading={loading}
         >
           <Image src={CallIcon} alt="Call" />
-          {isListening == CALLSTATUS.CONNECTING ?  "Calling...":"Call" }
+          {isListening == CALLSTATUS.CONNECTING ? "Calling..." : "Call"}
         </Button>
       ) : (
         <div className="callButtonContainer">
