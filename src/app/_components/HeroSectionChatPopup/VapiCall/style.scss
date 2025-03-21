@@ -1,43 +1,49 @@
 .callButton {
-    cursor: pointer;
-    border: none;
-    border-radius: 1000px;
-    background: #00de90;
-    display: flex;
-    padding: 12px 16px;
-    align-items: center;
-    gap: 10px;
-    color: #fff;
-  }
+  cursor: pointer;
+  border: none;
+  border-radius: 1000px;
+  background: #00de90;
+  display: flex;
+  padding: 12px 16px;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  height: auto;
 
-  .callButtonContainer{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-
+  &:hover {
+    background: #00de90 !important;
+    color: #fff !important;
+    border: none !important;
   }
+}
 
-  .muteButton {
-    background: #7766f6;
-    cursor: pointer;
-    border: none;
-    border-radius: 1000px;
-    display: flex;
-    padding: 12px 16px;
-    align-items: center;
-    gap: 10px;
-    color: #fff;
-  }
+.callButtonContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
 
-  .endCallButton {
-    background: red;
-    cursor: pointer;
-    border: none;
-    border-radius: 1000px;
-    display: flex;
-    padding: 12px 16px;
-    align-items: center;
-    gap: 10px;
-    color: #fff;
-  }
+.muteButton {
+  background: #335df3;
+  cursor: pointer;
+  border: none;
+  border-radius: 1000px;
+  display: flex;
+  padding: 12px 16px;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+}
+
+.endCallButton {
+  background: red;
+  cursor: pointer;
+  border: none;
+  border-radius: 1000px;
+  display: flex;
+  padding: 12px 16px;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+}

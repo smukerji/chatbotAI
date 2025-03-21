@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { message } from "antd";
+import { Button, message } from "antd";
 import Image from "next/image";
 import Vapi from "@vapi-ai/web";
 import CallIcon from "../../../../../public/voiceBot/SVG/call-outgoing.svg";
@@ -15,22 +15,29 @@ enum CALLSTATUS {
   CALLSTOP,
 }
 
-const VapiAssistantCall = ({ setMessages, setMessagesTime }: { setMessages: (value: any) => void; setMessagesTime: (value: any) => void }) => {
+const VapiAssistantCall = ({
+  setMessages,
+  setMessagesTime,
+}: {
+  setMessages: (value: any) => void;
+  setMessagesTime: (value: any) => void;
+}) => {
   const [isListening, setIsListening] = useState(CALLSTATUS.VOID);
   const [isMuted, setIsMuted] = useState(false);
   const [showMakeCallButton, setShowMakeCallButton] = useState(true);
   const [lastMessage, setLastMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const makeVapiAssistantCall = async () => {
+    setLoading(true);
     setMessages([]);
     setMessagesTime([]);
-    message.success("Call has started.");
     vapi.start(process.env.NEXT_PUBLIC_VAP_ASSISTANT_ID as string); // assistance ID
     setIsListening(CALLSTATUS.CONNECTING);
+    message.success("Call has started.");
   };
 
   vapi.on("message", (message: any) => {
-    console.log("your messages ", message);
     if (
       message["type"] === "transcript" &&
       message.transcriptType === "final" &&
@@ -38,7 +45,8 @@ const VapiAssistantCall = ({ setMessages, setMessagesTime }: { setMessages: (val
     ) {
       setMessages((prev: any) => {
         const exists = prev.some(
-          (msg: any) => msg.role === message["role"] && msg.content === message.transcript
+          (msg: any) =>
+            msg.role === message["role"] && msg.content === message.transcript
         );
         if (!exists) {
           return [
@@ -63,6 +71,7 @@ const VapiAssistantCall = ({ setMessages, setMessagesTime }: { setMessages: (val
 
   vapi.on("call-start", () => {
     setIsListening(CALLSTATUS.CONNECTING);
+    setLoading(false);
     setShowMakeCallButton(false);
     console.log("Call has started.");
   });
@@ -123,10 +132,14 @@ const VapiAssistantCall = ({ setMessages, setMessagesTime }: { setMessages: (val
   return (
     <div>
       {showMakeCallButton ? (
-        <button className="callButton" onClick={makeVapiAssistantCall}>
+        <Button
+          className="callButton"
+          onClick={makeVapiAssistantCall}
+          loading={loading}
+        >
           <Image src={CallIcon} alt="Call" />
           Call
-        </button>
+        </Button>
       ) : (
         <div className="callButtonContainer">
           <button className="muteButton" onClick={muteCallHandler}>

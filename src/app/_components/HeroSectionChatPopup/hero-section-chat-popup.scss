@@ -73,6 +73,7 @@
   /*------------------------------------------assistant-message-container----------------------------------------------*/
   .assistant-message-container {
     display: flex;
+    margin-bottom: 30px;
 
     .assistant-message {
       display: inline-flex;
@@ -299,6 +300,7 @@
       color: #fcfcfd;
       text-wrap: wrap;
       word-break: break-word;
+      text-align: left;
     }
 
     .time {
