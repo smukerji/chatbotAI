@@ -42,6 +42,7 @@ import { useCookies } from "react-cookie";
 import { CreateVoiceBotContext } from "../../../_helpers/client/Context/VoiceBotContextApi";
 import { updateAssistantLastTrainedMetaDataService, updateAssistantLastUsedMetaDataService, updateAssistantNumberOfCallMetaDataService } from "./services/metadata-update-service";
 import { log } from "console";
+import Embedding from "./embedding/Embedding";
 
 
 const vapi = new Vapi(process.env.NEXT_PUBLIC_VAP_API as string); // Vapi public key
@@ -647,7 +648,7 @@ async function costDeductionOnCallEndHandler(){
               <li className={tab == "analysis" ? "active" : ""} onClick={() => changeHandler("analysis")}>Analysis</li>
               <li className={tab == "phone-number" ? "active" : ""} onClick={() => changeHandler("phone-number")}>Phone Number</li>
               <li className={tab == "call-logs" ? "active" : ""} onClick={() => changeHandler("call-logs")}>Call Logs</li>
-
+              <li className={tab == "embedding" ? "active" : ""} onClick={() => changeHandler("embedding")}>Embed on site</li>
             </ul>
             <hr style={{ width: "830px" }} />
           </div>
@@ -785,6 +786,14 @@ async function costDeductionOnCallEndHandler(){
               tab == "call-logs" && (
                 <>
                   <CallLogs />
+                </>
+              )
+            }
+
+            {
+              tab == "embedding" && (
+                <>
+                  <Embedding assistantId={voiceBotContextData.assistantInfo?.vapiAssistantId} />
                 </>
               )
             }
