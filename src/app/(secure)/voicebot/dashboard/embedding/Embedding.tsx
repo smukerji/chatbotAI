@@ -16,7 +16,6 @@ function Embedding({assistantId}:{assistantId:string}) {
         const apiKey = "${process.env.NEXT_PUBLIC_VAP_ASSISTANT_ID}"; 
         // Substitute with your Public key from Vapi Dashboard.
         const buttonConfig = {}; // Modify this as required
-
         (function (d, t) {
             var g = document.createElement(t),
             s = d.getElementsByTagName(t)[0];
@@ -25,7 +24,6 @@ function Embedding({assistantId}:{assistantId:string}) {
             g.defer = true;
             g.async = true;
             s.parentNode.insertBefore(g, s);
-
             g.onload = function () {
             vapiInstance = window.vapiSDK.run({
                 apiKey: apiKey, // mandatory
@@ -34,7 +32,6 @@ function Embedding({assistantId}:{assistantId:string}) {
             });
             };
         })(document, "script");
-
     </script>
         `;
     const copyButtonConfig = {
@@ -84,8 +81,7 @@ function Embedding({assistantId}:{assistantId:string}) {
         <div className="embedding-container">
             <div className="script">
                 <p className="share-note">
-                    To add a chat bubble to the bottom right of your website add this
-                    script tag to your html
+                    Button's Styles config
                 </p>
                    
                 
@@ -108,8 +104,7 @@ function Embedding({assistantId}:{assistantId:string}) {
             </div>
             <div className="script">
                 <p className="share-note">
-                    To add a chat bubble to the bottom right of your website add this
-                    script tag to your html
+                    One click to call your Voice-Assistant after adding this script to your website.
                 </p>
                 <p className="script-container">
                     <pre>

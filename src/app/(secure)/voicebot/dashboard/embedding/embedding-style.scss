@@ -3,8 +3,9 @@
     justify-content: center;
     padding-top: 10px;
     gap: 25px;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
+    
     .script {
     width: 50%;
     display: flex;
@@ -48,5 +49,15 @@
       cursor: pointer;
       margin-top: 8px;
     }
+  }
+
+  @media (max-width: 1250px) {
+    flex-direction: column;
+    .script {
+      width: 80% !important;
+    }
+ 
+ 
+
   }
 }
