@@ -13,7 +13,7 @@ function Embedding({assistantId}:{assistantId:string}) {
         var vapiInstance = null;
         const assistant = "${assistantId}"; 
         // Substitute with your assistant ID
-        const apiKey = "${process.env.NEXT_PUBLIC_VAP_ASSISTANT_ID}"; 
+        const apiKey = "${process.env.NEXT_PUBLIC_VAP_API}"; 
         // Substitute with your Public key from Vapi Dashboard.
         const buttonConfig = {}; // Modify this as required
         (function (d, t) {
