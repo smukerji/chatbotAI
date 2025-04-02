@@ -81,7 +81,7 @@ function Embedding({assistantId}:{assistantId:string}) {
         <div className="embedding-container">
             <div className="script">
                 <p className="share-note">
-                    Button's Styles config
+                    Button&apos;s Styles config
                 </p>
                    
                 
