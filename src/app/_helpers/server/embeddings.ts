@@ -156,13 +156,23 @@ export async function generateChunksNEmbedd(
       dataIDs.push(id);
       /// storing in response data
       data.push({
-        metadata: { content: chunks[index], source, filename, chatbotId },
+        metadata: {
+          content: chunks[index],
+          source,
+          filename,
+          chatbotId,
+        },
         values: embeddingData.embedding,
         id: id,
       });
 
       tempData.push({
-        metadata: { content: chunks[index], source, filename, chatbotId },
+        metadata: {
+          content: chunks[index],
+          source,
+          filename,
+          chatbotId,
+        },
         values: embeddingData.embedding,
         id: id,
       });
@@ -175,6 +185,120 @@ export async function generateChunksNEmbedd(
   }
 
   return { data, dataIDs, contentLength };
+}
+
+export async function generateChunksNEmbeddViaDocling(
+  content: any,
+  source: string,
+  chatbotId: string,
+  userId: string,
+  filename: string = "none"
+) {
+  /// extract all the chunks of text / table / image
+  const { chunks, contentLength }: any = await extractChunks(content, 0);
+
+  /// creating chunks with batch size 2000
+  const batchSize = 250;
+  let data: any = [];
+  let dataIDs: any = [];
+  /// creating embeddings
+  for (let i = 0; i < chunks.length; i += batchSize) {
+    let tempData: any = [];
+    const batch = chunks.slice(i, i + batchSize);
+    const batchEmbedding: any = await openaiObj().embeddings.create({
+      model: "text-embedding-ada-002",
+      input: batch,
+    });
+    batchEmbedding.data.map((embeddingData: any, index: number) => {
+      const id = uuidv4();
+      dataIDs.push(id);
+      /// storing in response data
+      data.push({
+        metadata: {
+          content: chunks[index],
+          source,
+          filename,
+          chatbotId,
+        },
+        values: embeddingData.embedding,
+        id: id,
+      });
+
+      tempData.push({
+        metadata: {
+          content: chunks[index],
+          source,
+          filename,
+          chatbotId,
+        },
+        values: embeddingData.embedding,
+        id: id,
+      });
+    });
+
+    /// currently being used to upsert on files data
+    if (userId != "") {
+      await upsert(tempData, userId);
+    }
+  }
+
+  return { data, dataIDs, contentLength };
+}
+
+interface DocumentContent {
+  texts?: Array<{
+    id: number;
+    source: string;
+    content: string;
+  }>;
+  tables?: Array<{
+    id: number;
+    source: string;
+    content: string;
+  }>;
+  pictures?: Array<{
+    id: number;
+    source: string;
+    content: string;
+    image_path: string;
+  }>;
+}
+
+async function extractChunks(content: DocumentContent, contentLength: number) {
+  const chunks: string[] = [];
+
+  // Extract content from texts
+  if (content?.texts) {
+    content.texts.forEach((text) => {
+      if (text.content) {
+        chunks.push(text.content);
+        contentLength += text.content.length;
+      }
+    });
+  }
+
+  // Extract content from tables
+  if (content?.tables) {
+    content.tables.forEach((table) => {
+      if (table.content) {
+        chunks.push(table.content);
+        contentLength += table.content.length;
+      }
+    });
+  }
+
+  // Extract content from pictures
+  if (content?.pictures) {
+    content.pictures.forEach((picture) => {
+      if (picture.content) {
+        /// add picture content + image path
+        chunks.push(picture.content + " image: " + picture?.image_path);
+        contentLength += picture.content.length + picture?.image_path.length;
+      }
+    });
+  }
+
+  return { chunks, contentLength };
 }
 
 export async function createEmbedding(query: string) {

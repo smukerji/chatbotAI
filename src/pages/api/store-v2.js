@@ -3,6 +3,7 @@ import {
   generateChunksNEmbedd,
   generateChunksNEmbeddExcel,
   generateChunksNEmbeddForLinks,
+  generateChunksNEmbeddViaDocling,
 } from "../../app/_helpers/server/embeddings";
 import clientPromise from "../../db";
 import { v4 as uuid } from "uuid";
@@ -278,7 +279,7 @@ export default async function handler(req, res) {
                   resolve(chunks);
                 } else {
                   /// generating chunks and embedding
-                  const chunks = await generateChunksNEmbedd(
+                  const chunks = await generateChunksNEmbeddViaDocling(
                     content,
                     "file",
                     chatbotId,

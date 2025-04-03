@@ -7,6 +7,18 @@ import xlsToJson from "xls-to-json";
 
 export async function readContent(filePath, fileType) {
   if (fileType === "application/pdf") {
+    /// process the pdf file through https://torri-extraction-backend-108437277455.us-west3.run.app/process-doc api sending the file in file parameter
+    const response = await fetch(
+      "https://torri-extraction-backend-108437277455.us-west3.run.app/process-doc",
+      {
+        method: "POST",
+        body: JSON.stringify({ file: filePath }),
+      }
+    );
+    const data = await response.json();
+    console.log("data >>>>>>>>>>>>>>>>>", data);
+
+    // return data.text;
     // Read the PDF file
     const bufferData = fs.readFileSync(filePath);
 
