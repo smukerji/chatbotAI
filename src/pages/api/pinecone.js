@@ -111,7 +111,13 @@ export default async function handler(req, res) {
       let similaritySearch = "";
       for (const doc of retrievedDocs) {
         similaritySearch += doc.metadata.content;
+
+        /// if the meta data has image link add it as the reference in similaritysearch
+        if (doc?.metadata?.image_path) {
+          similaritySearch += `<img src=${doc.metadata.image_path} />`;
+        }
       }
+
       return res.status(200).send(similaritySearch);
     } catch (error) {
       console.error("Error initializing Pinecone client:", error);
