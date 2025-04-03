@@ -611,7 +611,7 @@ function Transcriber() {
       console.log("selected model providers ", selectedProvider)
       // ;
       const selectedProviderList = providerList.find(provider => provider.label === selectedProvider);
-      if (selectedProviderList) {
+      if (selectedProviderList && selectedProviderList.model) {
         setModels(selectedProviderList.model.map(model => ({ value: model+".", label: model })));
         // setLanguage(selectedProviderList.language.map(language => ({ value: language+".", label: language })));
       }
@@ -632,7 +632,7 @@ function Transcriber() {
   const languageChangeHandlerListUpdate = () => {
     if(language.length === 0 && selectedProvider){
       const selectedProviderList = providerList.find(provider => provider.label === selectedProvider);
-      if (selectedProviderList) {
+      if (selectedProviderList && selectedProviderList.language) {
         // setModels(selectedProviderList.model.map(model => ({ value: model+".", label: model })));
         setLanguage(selectedProviderList.language.map(language => ({ value: language+".", label: language })));
       }
