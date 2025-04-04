@@ -30,19 +30,19 @@ function Home() {
       {/* <HeroHeader /> */}
       <SecondaryHeader />
       <HeroSection />
+      <CustomerQuestions />
       {/* <ServiceSection /> */}
-      {/* <CustomerQuestions /> */}
       <FeaturesSection />
       {/* <FacilitiesSection /> */}
-      {/* <IndustrySection /> */}
+      <IndustrySection />
 
-      {/* <ServicesOffered /> */}
-      <IndustryAbout />
-      <Testimonials />
-      {/* <CompatibilitySection /> */}
+      <ServicesOffered />
+      {/* <IndustryAbout /> */}
+      {/* <Testimonials /> */}
+      <CompatibilitySection />
       {/* <PlansSection /> */}
       {/* <FAQ /> */}
-      {/* <ContactSection /> */}
+      <ContactSection />
       <Footer />
     </>
   );

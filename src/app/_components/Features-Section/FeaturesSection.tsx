@@ -14,7 +14,7 @@ function FeaturesSection() {
   const [activeKey, setActiveKey] = useState("1");
   return (
     <>
-      {/* <div className="feature-section-container" id="features">
+      <div className="feature-section-container" id="features">
         <div className="top">
           <h1 className="title">Features</h1>
 
@@ -87,9 +87,9 @@ function FeaturesSection() {
             )}
           </div>
         </div>
-      </div> */}
+      </div>
 
-      <section className="features-section">
+      {/* <section className="features-section">
         <div className="header">
           <span className="feature-badge">Features</span>
           <h2>Simplifying, Automating and Enriching Human Potential</h2>
@@ -129,7 +129,7 @@ function FeaturesSection() {
             </div>
           ))}
         </div>
-      </section>
+      </section> */}
     </>
   );
 }

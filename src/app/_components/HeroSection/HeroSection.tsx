@@ -3,6 +3,9 @@ import React, { useState } from "react";
 import "./hero-section.scss";
 import Image from "next/image";
 import Link from "next/link";
+import cancelIcon from "../../../../public/sections-images/header-background/clipboard-close.webp";
+import messageIcon from "../../../../public/sections-images/header-background/message-text.svg";
+import HeaderImage from "../../../../public/sections-images/header-background/Group1.svg";
 import Micicon from "../../../../public/sections-images/header-background/microphone-2.svg";
 import User1 from "../../../../public/sections-images/header-background/yellowbgimg.png";
 import User2 from "../../../../public/sections-images/header-background/greenbgimg.png";
@@ -32,9 +35,7 @@ function HeroSection() {
 
   return (
     <>
-      {/* <div
-        className="hero-section-container"
-      >
+      <div className="hero-section-container">
         <h1 className="title">
           Seamless Support Starts Here: AI Chatbot Solutions for Every Customer
           Query
@@ -49,7 +50,6 @@ function HeroSection() {
         </p>
 
         <div className="request-demo-email-container">
-         
           <Link
             style={{ color: "white", textDecoration: "none" }}
             href="/account/register"
@@ -59,7 +59,6 @@ function HeroSection() {
         </div>
         <div className="schemes-list">
           <ul>
-           
             <li>
               <span>
                 <Image
@@ -90,14 +89,14 @@ function HeroSection() {
         <div className="grp-img">
           <Image src={HeaderImage} alt="image" fill />
         </div>
-      </div> */}
+      </div>
 
-      <section className={"heroSection"}>
+      {/* <section className={"heroSection"}>
         <div className={"container"}>
           <div className="ellipses">
-            {/* <Image src={ellipse1} alt="Ellipse 1" className="ellipse1" /> */}
+            <Image src={ellipse1} alt="Ellipse 1" className="ellipse1" />
             <Image src={ellipse2} alt="Ellipse 2" className="ellipse2" />
-            {/* <Image src={ellipse3} alt="Ellipse 3" className="ellipse3" /> */}
+            <Image src={ellipse3} alt="Ellipse 3" className="ellipse3" />
           </div>
           <span className={"badge"}>Torri AI Agent</span>
           <h1>Hey, welcome!</h1>
@@ -114,17 +113,11 @@ function HeroSection() {
                   setIsChatOpen(false);
                   setMessage("");
                 }}
-                // firstMessage={message}
-                // threadId={threadId}
-                // newThread={createThread}
               />
             )}
             <input
               type="text"
               placeholder="Ask Torri"
-              // onChange={(e) => setMessage(e.target.value)}
-              // onKeyDown={handleKeyPress}
-              // value={message}
               onClick={() => {
                 setIsChatOpen(true);
               }}
@@ -141,7 +134,7 @@ function HeroSection() {
             <Image src={VoiceIcon} className="voice-icon" alt="Voice Icon" />
           </div>
         </div>
-      </section>
+      </section> */}
     </>
   );
 }
