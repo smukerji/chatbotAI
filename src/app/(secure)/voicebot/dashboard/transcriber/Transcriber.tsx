@@ -984,15 +984,15 @@ function Transcriber() {
     }
   }, [language]);
 
-  useEffect(() => {
+  // useEffect(() => {
 
-    if (models.length > 0) {
-      setModels(prevModels =>
-        [...prevModels].sort((a, b) => a.label.localeCompare(b.label))
-      );
-    }
+  //   if (models.length > 0) {
+  //     setModels(prevModels =>
+  //       [...prevModels].sort((a, b) => a.label.localeCompare(b.label))
+  //     );
+  //   }
 
-  }, [selectedProvider]);
+  // }, [selectedProvider]);
 
 
 
@@ -1005,10 +1005,12 @@ function Transcriber() {
     // Update models based on selected provider
     const selectedProvider = providerList.find(provider => provider.label === options.label);
     
-    if(selectedProvider?.label === 'azure'){
+    if(options.label === 'azure'){
       setModelDisable(true);
       setModelValidationMessage(""); // Clear validation message on valid selection
       setModels([]);
+      setLanguage(azureProviderLanguage
+        .map(language => ({ value: language[1], label: language[0] })));
     }
     else if (selectedProvider && selectedProvider.model) {
       setModelDisable(false)
