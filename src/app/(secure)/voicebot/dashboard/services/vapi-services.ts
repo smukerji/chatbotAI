@@ -5,6 +5,10 @@ export const generateAndGetToken = async ()=>{
     const payload = {
         orgId: process.env.VAPI_ORG_ID,
         // orgId: "6fda1e47-bd38-4ad9-83b0-7ef67caaca5f",
+        token: {
+            // This is the scope of the token
+            tag: "private",
+          },
 
     };
     // Get the private key from environment variables
