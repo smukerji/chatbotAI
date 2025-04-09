@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { apiHandler } from "../../../../../_helpers/server/api/api-handler";
-import { generateAndGetToken } from "../../../dashboard/services/vapi-services";
+import { generateAndGetToken } from "../../services/vapi-services";
 
 module.exports = apiHandler({
 

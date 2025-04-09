@@ -1,0 +1,64 @@
+.knowledge-container {
+    display: grid;
+    grid-template-columns: 70% 30%;
+    gap: 1rem;
+    min-height: 400px;
+
+    .knowledge-uploader {
+        display: flex;
+        flex-direction: column;
+        gap: 40px;
+        align-items: center;
+        .knowledge-uploader-button {
+            border: none;
+            width: 40px;
+            height: 40px;
+           
+        }
+        .knowledge-uploader-text{
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            justify-content: center;
+            align-items: center;
+            .header-text{
+                color: #000;
+
+                /* Subtitle/Large */
+                font-family: "General Sans";
+                font-size: 20px;
+                font-style: normal;
+             
+                line-height: 28px;
+            }
+            .description-text{
+                color:  #777E90;
+                text-align: center;
+                font-family: "General Sans";
+                font-size: 16px;
+                font-style: normal;
+                font-weight: 500;
+                line-height: 24px;
+
+            }
+        }
+    }
+
+    .knowledge-list {
+        display: flex;
+        flex-direction: column;
+
+        .knowledge-list-item {
+            display: flex;
+            margin-bottom: 1rem;
+            justify-content: space-between;
+            color: #F00000;
+            text-align: center;
+            font-family: "General Sans";
+            font-size: 16px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 24px;
+        }
+    }
+}
