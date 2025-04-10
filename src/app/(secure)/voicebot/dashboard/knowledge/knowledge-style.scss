@@ -1,8 +1,9 @@
 .knowledge-container {
     display: grid;
-    grid-template-columns: 70% 30%;
-    gap: 1rem;
+    grid-template-columns: 60% 25%;
+    gap: 40px;
     min-height: 400px;
+    justify-content: space-between;
 
     .knowledge-uploader {
         display: flex;
@@ -23,12 +24,10 @@
             align-items: center;
             .header-text{
                 color: #000;
-
                 /* Subtitle/Large */
                 font-family: "General Sans";
                 font-size: 20px;
                 font-style: normal;
-             
                 line-height: 28px;
             }
             .description-text{
@@ -47,12 +46,75 @@
     .knowledge-list {
         display: flex;
         flex-direction: column;
+        width: 100%;
+        gap: 12px;
+        .knowledge-list-header{
+            display: flex;
+            justify-content: space-between;
+            .description-text{
+                color:  #777E90;
+                text-align: center;
+                font-family: "General Sans";
+                font-size: 16px;
+                font-style: normal;
+                font-weight: 500;
+                line-height: 24px;
 
-        .knowledge-list-item {
+            }
+            .right-content{
+                color: #F00000;
+                text-align: center;
+                font-family: "General Sans";
+                font-size: 16px;
+                font-style: normal;
+                font-weight: 500;
+                line-height: 24px;
+            }
+        }
+
+        .knowledge-list-item{
+            .description-text{
+                color:  #777E90;
+                text-align: center;
+                font-family: "General Sans";
+                font-size: 16px;
+                font-style: normal;
+                font-weight: 500;
+                line-height: 24px;
+
+            }
+        }
+
+        .knowledge-list-right-content {
             display: flex;
             margin-bottom: 1rem;
             justify-content: space-between;
-            color: #F00000;
+
+            .description-text{
+                color:  #777E90;
+                text-align: center;
+                font-family: "General Sans";
+                font-size: 16px;
+                font-style: normal;
+                font-weight: 500;
+                line-height: 24px;
+
+            }
+           
+            .right-content{
+                color: #F00000;
+                text-align: center;
+                font-family: "General Sans";
+                font-size: 16px;
+                font-style: normal;
+                font-weight: 500;
+                line-height: 24px;
+            }
+        }
+
+
+        .knowledge-list-text{
+            color: #000;
             text-align: center;
             font-family: "General Sans";
             font-size: 16px;

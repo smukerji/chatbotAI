@@ -1,17 +1,43 @@
 import dynamic from "next/dynamic";
 import { UploadProps, message, Button } from "antd";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 // import documentUploadIcon from "../../../../public/create-chatbot-svgs/document-upload.svg";
 import documentUploadIcon from "../../../../../../public/create-chatbot-svgs/document-upload.svg";
 import "./knowledge-style.scss";
+// import documentTrash from "../../../../../public/voiceBot/documents-trash.svg"
+import docTrash from "../../../../../../public/voiceBot/documents-trash.svg"
+import { useCookies } from "react-cookie";
 
 function Knowledge() {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [cookies, setCookie] = useCookies(["userId"]);
+    const [fileUpdate, setFileUpdate] = useState("");
+    const [userFiles, setUserFiles] = useState<any[]>([]);
+
+    useEffect(() => {
+        getUsersFile();
+    }, [fileUpdate]);
+
+    async function getUsersFile(){
+        try {
+            debugger;
+            const response = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/knowledge-file?userId=${cookies.userId}`)
+            const data = await response.json();
+            console.table(data.data);
+            if(data.status === 200){
+                setUserFiles(data.data);
+            }
+        }
+        catch (error) {
+            console.error(error);
+        }
+       
+    }
 
     async function getValidToken(): Promise<string> {
         try {
-            const response = await fetch("http://localhost:3000/voicebot/dashboard/api/get-token");
+            const response = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/get-token`);
             if (!response.ok) {
                 throw new Error("Failed to fetch token.");
             }
@@ -25,6 +51,7 @@ function Knowledge() {
 
     async function handleFileUpload(file: File) {
         try {
+            debugger;
             const token = await getValidToken();
             const formData = new FormData();
             formData.append("file", file);
@@ -42,7 +69,25 @@ function Knowledge() {
             }
 
             const body = await response.json();
-            console.log(body);
+
+            //send the file data to the server
+            const serverResponse = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/knowledge-file`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    fileData: body,
+                    userId: cookies.userId,
+                }),
+            });
+
+            const serverBody = await serverResponse.json();
+            if(serverBody.status !== 200){
+                throw new Error("Failed to store file data.");
+            }
+            setFileUpdate(body.id);
+            console.log(body,serverBody);
             message.success("File uploaded successfully!");
         } catch (error) {
             console.error(error);
@@ -93,11 +138,33 @@ function Knowledge() {
                 />
             </div>
             <div className="knowledge-list">
-                <div className="knowledge-list-item">
-                    <span>Attached Files</span>
-                    <span>Delete all</span>
+                <div className="knowledge-list-header">
+                    <span className="description-text">Attached Files</span>
+                    <span className="right-content">Delete all</span>
                 </div>
-                <div className="knowledge-list-item"></div>
+                {/* <div className="knowledge-list-item"> */}
+                    {
+                        userFiles.map((file, index) => (
+                            <div className="knowledge-list-item" key={index}>
+                                <span className="description-text">{file.fileData.name}</span>
+                                <Button
+                                    className=""
+                                    style={{
+                                        backgroundImage: `url(${docTrash.src})`,
+                                        backgroundSize: "contain",
+                                        backgroundRepeat: "no-repeat",
+                                        backgroundPosition: "center",
+                                        width: "20px",
+                                        height: "20px",
+                                        border:"none"
+                                    }}
+                                    // onClick={() =>}
+                                >
+                                </Button>
+                            </div>
+                        ))
+                    }
+                {/* </div> */}
             </div>
         </div>
     );
