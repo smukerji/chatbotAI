@@ -269,14 +269,23 @@ export default async function handler(req, res) {
                   file.fileType === "text/csv"
                 ) {
                   /// generating chunks and embedding
-                  const chunks = await generateChunksNEmbeddExcel(
-                    content,
-                    "file",
+                  // const chunks = await generateChunksNEmbeddExcel(
+                  //   content,
+                  //   "file",
+                  //   chatbotId,
+                  //   userId,
+                  //   file.name
+                  // );
+                  /// store in the database schema info
+                  await collection.insertOne({
                     chatbotId,
-                    userId,
-                    file.name
-                  );
-                  resolve(chunks);
+                    fileName: file.name,
+                    schema_info: file.schema_info,
+                    contentLength: JSON.stringify(file.schema_info).length,
+                    source: "file",
+                  });
+
+                  resolve(1);
                 } else {
                   /// generating chunks and embedding
                   const chunks = await generateChunksNEmbeddViaDocling(
@@ -301,7 +310,10 @@ export default async function handler(req, res) {
           );
           /// get the filenames and vectors created ID
           const fileSource = valuesPromise.map((values) => {
-            if (values != undefined)
+            if (
+              values != undefined &&
+              values?.value.data?.[0]?.metadata?.filename
+            )
               return {
                 name: values?.value.data[0]?.metadata?.filename,
                 dataID: values?.value?.dataIDs,
@@ -321,13 +333,15 @@ export default async function handler(req, res) {
           /// store the details in database
           /// iterate and store each user filename as per chatbot
           fileSource.forEach((file) => {
-            collection.insertOne({
-              chatbotId,
-              fileName: file.name,
-              dataID: file.dataID,
-              contentLength: file.contentLength,
-              source: "file",
-            });
+            if (file?.name) {
+              collection.insertOne({
+                chatbotId,
+                fileName: file.name,
+                dataID: file.dataID,
+                contentLength: file.contentLength,
+                source: "file",
+              });
+            }
           });
           //   }
         }
