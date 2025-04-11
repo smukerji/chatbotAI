@@ -69,10 +69,13 @@
                 font-style: normal;
                 font-weight: 500;
                 line-height: 24px;
+                border: none;
             }
         }
 
         .knowledge-list-item{
+            display: flex;
+            justify-content: space-between;
             .description-text{
                 color:  #777E90;
                 text-align: center;

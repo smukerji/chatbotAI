@@ -220,7 +220,7 @@ function Chatbot() {
       provider: "openai",
       model: "gpt-4o",
       temperature: 0,
-      // knowledgeBase: { provider: "canonical", topK: 5.5, fileIds: [""] },
+      knowledgeBase: { provider: "google", fileIds: [] },
       maxTokens: 300,
       emotionRecognitionEnabled: false,
       numFastTurns: 1,

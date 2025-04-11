@@ -21,7 +21,7 @@ function Knowledge() {
 
     async function getUsersFile(){
         try {
-            debugger;
+            
             const response = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/knowledge-file?userId=${cookies.userId}`)
             const data = await response.json();
             console.table(data.data);
@@ -49,9 +49,45 @@ function Knowledge() {
         }
     }
 
+    async function deleteAssistantHandler(id:string){
+        try {
+          
+            const token = await getValidToken();
+            const response = await fetch(`https://api.vapi.ai/file/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                },
+            });
+            if (!response.ok) {
+                throw new Error("Failed to delete file.");
+            }
+            const body = await response.json();
+           
+            //delete file from the server
+            const serverResponse = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/knowledge-file?userId=${cookies.userId}&fileId=${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+            const serverBody = await serverResponse.json();
+            if(serverBody.status !== 200){
+                throw new Error("Failed to delete file from server.");
+            }
+            console.log("File deleted successfully:", body);
+            message.success("File deleted successfully!");
+
+            console.log(body);
+            await getUsersFile();
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     async function handleFileUpload(file: File) {
         try {
-            debugger;
+          
             const token = await getValidToken();
             const formData = new FormData();
             formData.append("file", file);
@@ -140,7 +176,7 @@ function Knowledge() {
             <div className="knowledge-list">
                 <div className="knowledge-list-header">
                     <span className="description-text">Attached Files</span>
-                    <span className="right-content">Delete all</span>
+                    <Button className="right-content">Delete all</Button>
                 </div>
                 {/* <div className="knowledge-list-item"> */}
                     {
@@ -158,7 +194,7 @@ function Knowledge() {
                                         height: "20px",
                                         border:"none"
                                     }}
-                                    // onClick={() =>}
+                                    onClick={ async () => await deleteAssistantHandler(file.fileData.id)}
                                 >
                                 </Button>
                             </div>
