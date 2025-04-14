@@ -43,7 +43,7 @@ function Model() {
     setSystemPrompt(voicebotDetails["model"]["messages"][0]["content"] || "");
     setSelectedProvider(voicebotDetails["model"]["provider"] || undefined);
     setSelectedModel(voicebotDetails["model"]["model"] || undefined);
-    setSelectedKnowledgeFile(voicebotDetails["model"]["knowledgeBase"]["fileIds"][0] || undefined);
+    setSelectedKnowledgeFile(voicebotDetails["model"]["knowledgeBaseId"] || undefined);
 
    
 
@@ -58,7 +58,8 @@ function Model() {
       voicebotDetails["model"]["model"],
       voicebotDetails["model"]["temperature"],
       voicebotDetails["model"]["maxTokens"],
-      voicebotDetails["model"]["emotionRecognitionEnabled"]
+      voicebotDetails["model"]["emotionRecognitionEnabled"],
+      voicebotDetails["model"]["knowledgeBaseId"],
     ]);
 
     useEffect(() => {
@@ -100,7 +101,7 @@ function Model() {
   const fileKnowledgeChangeHandler = (value: string, option: any) => {
     console.log("file knowledge ", value, option);
     debugger;
-    voiceBotContextData.updateState("knowledgeFile", value);
+    voiceBotContextData.updateState("model.knowledgeBase.fileIds.0", value);
   }
 
   const systemPromptEnterHandler = (e:React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -270,6 +271,7 @@ function Model() {
 
         <h4 className="provider knowledge-base">Knowledge Base</h4>
         <Select
+          value={selectedKnowledgeFile}
           className="select-field"
           placeholder="Select file"
           options={userFiles}

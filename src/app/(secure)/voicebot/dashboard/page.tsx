@@ -253,6 +253,7 @@ function Dashboard() {
 
           if(assistantDataResponseParse?.result){
 
+            debugger;
             const vapiAssistanceData = assistantDataResponseParse?.result;
 
             
@@ -260,6 +261,7 @@ function Dashboard() {
             assistantData.firstMessage = vapiAssistanceData.firstMessage;
             assistantData.transcriber = vapiAssistanceData.transcriber;
             assistantData.model = vapiAssistanceData.model;
+            
             assistantData.voice = vapiAssistanceData.voice;
             //piping the voice data
             let punctuationBoundaries = assistantData.voice.chunkPlan.punctuationBoundaries; 
@@ -285,6 +287,8 @@ function Dashboard() {
               punctuationBoundaries.includes(item.label)
             );
 
+            
+
             assistantData.voice.chunkPlan.punctuationBoundaries = punctuationBoundariesArray;
             assistantData.firstMessageMode = vapiAssistanceData.firstMessageMode;
             assistantData.llmRequestDelaySeconds = vapiAssistanceData.llmRequestDelaySeconds;
@@ -303,6 +307,7 @@ function Dashboard() {
             assistantData.endCallMessage = vapiAssistanceData.endCallMessage;
             // endCallPhrases= [""],
             assistantData.metadata = vapiAssistanceData.metadata;
+
 
 
             let analysysPlanPickData = vapiAssistanceData.analysisPlan;
@@ -546,7 +551,7 @@ async function costDeductionOnCallEndHandler(){
     
     try{
 
-      ;
+      debugger;
       const assistantCreateResponse = await fetch(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/vapi/assistant`,
         {
