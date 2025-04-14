@@ -90,7 +90,7 @@ function Chatbot() {
       fillerInjectionEnabled: false,
       provider: "azure",
       voiceId: "andrew",
-      speed: 1.25,
+      // speed: 1.25,
       chunkPlan: {
         enabled: true,
         minCharacters: 10,

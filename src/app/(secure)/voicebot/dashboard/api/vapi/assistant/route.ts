@@ -93,7 +93,7 @@ async function createVapiAssistant(req: NextRequest) {
           vapiData.model.knowledgeBaseId = vapiData.model.knowledgeBase.fileIds[0];
           delete vapiData.model.knowledgeBase;
           delete vapiData.knowledgeFile;
-
+          delete vapiData.voice.speed;
           if (voiceBotRecordVapiExist) { //check if the record is already exist then update the record
             const options = {
               method: 'PUT',
@@ -110,7 +110,7 @@ async function createVapiAssistant(req: NextRequest) {
           }
           else { //if the record is not exist then create the record
             //send the data to the vapi server
-            delete vapiData.speed;
+            // vapiData.voice.speed = 1;
             const options = {
               method: 'POST',
               headers: { Authorization: `Bearer ${process.env.VAPI_PRIVATE_KEY}`, 'Content-Type': 'application/json' },
