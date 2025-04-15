@@ -22,9 +22,9 @@ export async function POST(request: any, { params: { threadId } }: any) {
     .map((data: any) => data.schema_info)
     .filter((info: any) => info !== undefined);
 
-  console.log("Schema Info <>>>>>>>>>>>>>>>>", schemaInfo);
-
-  let userQuery = `{ userQuery: ${content} \n\n schema_info: ${JSON.stringify(schemaInfo)} }`;
+  let userQuery = `userQuery: ${content} \n\n schema_info: ${JSON.stringify(
+    schemaInfo
+  )} `;
   await openai.beta.threads.messages.create(threadId, {
     role: "user",
     content: userQuery,
@@ -32,6 +32,7 @@ export async function POST(request: any, { params: { threadId } }: any) {
 
   const stream = openai.beta.threads.runs.stream(threadId, {
     assistant_id: assistantId,
+    // instructions: "You are a helpful assistant.",
   });
 
   return new Response(stream.toReadableStream());

@@ -351,8 +351,6 @@ function ChatV2({
     // loop over tool calls and call function handler
     const toolCallOutputs = await Promise.all(
       toolCalls.map(async (toolCall: any) => {
-        console.log("toolCall >>>>>>>>>>>>>>>>>>>>", toolCall);
-
         const result = await functionCallHandler(
           toolCall,
           chatbot.id,

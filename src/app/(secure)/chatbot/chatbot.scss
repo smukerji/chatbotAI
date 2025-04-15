@@ -8,9 +8,9 @@
     display: flex;
     justify-content: space-between;
     position: relative;
-    .title-header-container{
+    .title-header-container {
       display: flex;
-      gap:3rem
+      gap: 3rem;
     }
 
     h1 {
@@ -23,7 +23,6 @@
         cursor: pointer;
       }
     }
-
 
     .action-container {
       display: flex;
@@ -78,8 +77,8 @@
       border: none;
     }
   }
-  .activate-title{
-    border-bottom: #2E58EA 3px solid;
+  .activate-title {
+    border-bottom: #2e58ea 3px solid;
     cursor: pointer;
   }
 
@@ -313,11 +312,11 @@
     }
   }
 
-  .voicebot-list-container{
+  .voicebot-list-container {
     display: flex;
     gap: 2rem;
     flex-wrap: wrap;
-    .voicebot-list-card{
+    .voicebot-list-card {
       display: flex;
       width: 286px;
       padding: 12px;
@@ -325,16 +324,16 @@
       cursor: pointer;
       gap: 20px;
       border-radius: 16px;
-      border: 1px solid  #FCFCFD;
-      background: #FCFCFD;
-      &:hover{
+      border: 1px solid #fcfcfd;
+      background: #fcfcfd;
+      &:hover {
         // border: 2px solid  #4D72F5;
-        background: #ECF0FE;
+        background: #ecf0fe;
       }
-      .assistant-image{
+      .assistant-image {
         text-align: center;
       }
-      .assistant-title{
+      .assistant-title {
         color: #141416;
         text-align: center;
 
@@ -343,22 +342,22 @@
         font-weight: 500;
         line-height: 28px; /* 140% */
       }
-      .info-content{
+      .info-content {
         display: flex;
         flex-direction: column;
         gap: 4px;
-        .info{
+        .info {
           display: flex;
           justify-content: space-between;
-          .info-label{
-            color:  #B1B5C3;
+          .info-label {
+            color: #b1b5c3;
             font-size: 14px;
             font-style: normal;
             font-weight: 500;
             line-height: 24px; /* 171.429% */
           }
-          .value{
-            color: #777E90;
+          .value {
+            color: #777e90;
             font-size: 14px;
             font-style: normal;
             font-weight: 500;
@@ -374,7 +373,6 @@
 
     .title-container {
       //   flex-direction: column;
-      
 
       h1 {
         font-size: 22px;

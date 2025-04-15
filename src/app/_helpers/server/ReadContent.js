@@ -16,7 +16,6 @@ export async function readContent(filePath, fileType) {
       }
     );
     const data = await response.json();
-    console.log("data >>>>>>>>>>>>>>>>>", data);
 
     // return data.text;
     // Read the PDF file

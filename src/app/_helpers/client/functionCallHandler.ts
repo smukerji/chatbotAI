@@ -15,12 +15,6 @@ export const functionCallHandler = async (
 
     const functionName = call?.function?.name;
     const args = JSON.parse(call.function.arguments);
-
-    console.log(
-      "Function Name: >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",
-      args.userQuery
-    );
-
     // if (WEB_SEARCH === true) {
     // 	console.log('webData>>>>>>>>>>>>>>>>>>>>>>>>>>', 'webData');
 
@@ -121,12 +115,12 @@ export const functionCallHandler = async (
           method: "POST",
           body: JSON.stringify({
             collection: args.collection,
-            filter: JSON.parse(args.filter),
-            projection: JSON.parse(args.projection),
+            filter: args.filter,
+            projection: args.projection,
           }),
         }
       );
-      const dbData = await response.json();
+      const dbData = await response.text();
       console.log("DB Data", dbData);
       return JSON.stringify({
         success: true,

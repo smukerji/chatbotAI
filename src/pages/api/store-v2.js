@@ -6,6 +6,7 @@ import {
   generateChunksNEmbeddViaDocling,
 } from "../../app/_helpers/server/embeddings";
 import clientPromise from "../../db";
+import userSchemaClientPromise from "../../userSchemaDb";
 import { v4 as uuid } from "uuid";
 // import { authorize, uploadFile } from "../../app/_services/googleFileUpload";
 import { put } from "@vercel/blob";
@@ -71,6 +72,7 @@ export default async function handler(req, res) {
 
         /// db connection
         const db = (await clientPromise).db();
+        const userSchemaClient = (await userSchemaClientPromise).db();
 
         /// first check if user can create the chatbot or not
         const noOfChatbotsUserCreated = await db
@@ -188,8 +190,27 @@ export default async function handler(req, res) {
             const dbFile = await collection.findOne({
               _id: objectId,
             });
-            /// deleting the files by id
-            await deleteFileVectorsById(userId, dbFile?.dataID);
+            /// if the file is xlsx or csv then delete the collection4
+            if (
+              file?.name?.toLowerCase()?.includes(".xlsx") ||
+              file?.name?.toLowerCase()?.includes(".csv")
+            ) {
+              /// delete the collection that is present in the schema_info
+              /// get all the object keys
+              const schemaInfo = dbFile?.schema_info;
+
+              const objectKeysCollection = Object.keys(schemaInfo);
+
+              /// iterate and delete the collection
+              for (let collection of objectKeysCollection) {
+                const collectionToDelete =
+                  userSchemaClient.collection(collection);
+                await collectionToDelete.drop();
+              }
+            } else {
+              /// deleting the files by id
+              await deleteFileVectorsById(userId, dbFile?.dataID);
+            }
             /// delete the id from db
             await collection.deleteOne({
               _id: objectId,

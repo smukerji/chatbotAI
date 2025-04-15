@@ -21,16 +21,16 @@ let clientPromise;
 if (process.env.NODE_ENV === "development") {
   // In development mode, use a global variable so that the value
   // is preserved across module reloads caused by HMR (Hot Module Replacement).
-  if (!global._mongoClientPromise) {
+  if (!global._mongoUserSchemaClientPromise) {
     client = new MongoClient(uri, options);
-    global._mongoClientPromise = client.connect();
+    global._mongoUserSchemaClientPromise = client.connect();
     console.log(
       "Connected to MongoDB user schema in ",
       process.env.NODE_ENV,
       " mode"
     );
   }
-  clientPromise = global._mongoClientPromise;
+  clientPromise = global._mongoUserSchemaClientPromise;
 } else {
   // In production mode, it's best to not use a global variable.
   client = new MongoClient(uri, options);
