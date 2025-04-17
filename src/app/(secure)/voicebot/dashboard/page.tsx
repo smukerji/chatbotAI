@@ -287,7 +287,7 @@ function Dashboard() {
               punctuationBoundaries.includes(item.label)
             );
 
-            
+            debugger;
 
             assistantData.voice.chunkPlan.punctuationBoundaries = punctuationBoundariesArray;
             assistantData.firstMessageMode = vapiAssistanceData.firstMessageMode;
@@ -308,7 +308,26 @@ function Dashboard() {
             // endCallPhrases= [""],
             assistantData.metadata = vapiAssistanceData.metadata;
 
+            //check if knowledgebase exist in the existing data
+            if (("knowledgeBase" in vapiAssistanceData.model) && "fileIds" in vapiAssistanceData.model.knowledgeBase && Array.isArray(vapiAssistanceData.model.knowledgeBase.fileIds)) {
+              
+              assistantData.model.tools = [
+                {
+                  type: "query",
+                  knowledgeBases: [
+                    {
+                      name: "",
+                      provider: "google",
+                      description: "file",
+                      fileIds: [
+                        vapiAssistanceData.model.knowledgeBase.fileIds[0]
+                      ]
+                    }
+                  ],
 
+                },
+              ]
+            }
 
             let analysysPlanPickData = vapiAssistanceData.analysisPlan;
 

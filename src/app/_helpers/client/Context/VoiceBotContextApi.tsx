@@ -17,21 +17,17 @@ const initialState = {
     messages: [{ content: "default", role: "system" }],
     // tools: [
     //   {
-    //     async: false,
-    //     messages: [
+    //     type: "query",
+    //     knowledgeBases: [
     //       {
-    //         type: "request-start",
-    //         content: "",
-    //         conditions: [{ value: "", operator: "eq", param: "" }],
-    //       },
+    //         name: "",
+    //         provider: "google",
+    //         description: "file",
+    //         fileIds: [
+    //         ]
+    //       }
     //     ],
-    //     type: "dtmf",
-    //     function: {
-    //       name: "",
-    //       description: "",
-    //       parameters: { type: "object", properties: {}, required: [""] },
-    //     },
-    //     server: { timeoutSeconds: 20, url: "", secret: "" },
+
     //   },
     // ],
     toolIds: [""],//we deleted this field in the backend
