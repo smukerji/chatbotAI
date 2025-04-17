@@ -90,9 +90,9 @@ async function createVapiAssistant(req: NextRequest) {
             vapiAssistantId: { $exists: true }
           });
 
-          vapiData.model.knowledgeBaseId = vapiData.model.knowledgeBase.fileIds[0];
-          delete vapiData.model.knowledgeBase;
-          delete vapiData.knowledgeFile;
+          // vapiData.model.knowledgeBaseId = vapiData.model.knowledgeBase.fileIds[0];
+          // delete vapiData.model.knowledgeBase;
+          // delete vapiData.knowledgeFile;
           delete vapiData.voice.speed;
           if (voiceBotRecordVapiExist) { //check if the record is already exist then update the record
             const options = {
