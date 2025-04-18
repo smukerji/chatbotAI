@@ -43,7 +43,11 @@ function Model() {
     setSystemPrompt(voicebotDetails["model"]["messages"][0]["content"] || "");
     setSelectedProvider(voicebotDetails["model"]["provider"] || undefined);
     setSelectedModel(voicebotDetails["model"]["model"] || undefined);
-    setSelectedKnowledgeFile(voicebotDetails["model"]["knowledgeBaseId"] || undefined);
+    // tools
+    if (("tools" in voicebotDetails.model) && "fileIds" in voicebotDetails.model.tools[0].knowledgeBases[0] && Array.isArray(voicebotDetails.model.tools[0].knowledgeBases[0].fileIds)) {
+
+      setSelectedKnowledgeFile(voicebotDetails.model.tools[0].knowledgeBases[0].fileIds || undefined);
+    }
 
    
 
@@ -72,7 +76,7 @@ function Model() {
           const response = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/knowledge-file?userId=${cookies.userId}`)
           const data = await response.json();
           console.table(data.data);
-          if(data.status === 200){
+          if(data.status === 200 && data.data.length > 0){
               //set the name as value and the id as label
               setUserFiles(data.data.map((file:any) => ({ value:file.fileData.id , label: file.fileData.name})));
           }
@@ -100,8 +104,8 @@ function Model() {
 
   const fileKnowledgeChangeHandler = (value: string, option: any) => {
     console.log("file knowledge ", value, option);
-    debugger;
-    voiceBotContextData.updateState("model.knowledgeBase.fileIds.0", value);
+    debugger;//voicebotDetails.model.tools[0].knowledgeBase[0].fileIds
+    voiceBotContextData.updateState("model.tools.0.knowledgeBases.0.fileIds.0", value); //model.tools.0.knowledgeBase.0.fileIds.0
   }
 
   const systemPromptEnterHandler = (e:React.ChangeEvent<HTMLTextAreaElement>) => {

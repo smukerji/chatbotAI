@@ -326,7 +326,8 @@ function Dashboard() {
                   ],
 
                 },
-              ]
+              ];
+              delete assistantData.model.knowledgeBase;
             }
 
             let analysysPlanPickData = vapiAssistanceData.analysisPlan;

@@ -58,27 +58,12 @@ function Chatbot() {
     },
     model: {
       messages: [{ content: "default", role: "system" }],
-      // tools: [
-      //   {
-      //     type: "query",
-      //     knowledgeBases: [
-      //       {
-      //         name: "",
-      //         provider: "google",
-      //         description: "file",
-      //         fileIds: [
-                
-      //         ]
-      //       }
-      //     ],
 
-      //   },
-      // ],
       toolIds: [""], //we deleted this field in the backend
       provider: "openai",
       model: "gpt-4o",
       temperature: 0,
-      knowledgeBase: { provider: "google", fileIds: [""] },
+
       maxTokens: 300,
       emotionRecognitionEnabled: false,
       numFastTurns: 1,
