@@ -80,6 +80,12 @@ function Model() {
               //set the name as value and the id as label
               setUserFiles(data.data.map((file:any) => ({ value:file.fileData.id , label: file.fileData.name})));
           }
+          else if(data.status === 200 && data.data.length === 0){
+            setUserFiles([]);
+            delete voiceBotContextData.state.model.tools;
+            setSelectedKnowledgeFile("");
+          }
+
       }
       catch (error) {
           console.error(error);
@@ -104,7 +110,32 @@ function Model() {
 
   const fileKnowledgeChangeHandler = (value: string, option: any) => {
     console.log("file knowledge ", value, option);
-    debugger;//voicebotDetails.model.tools[0].knowledgeBase[0].fileIds
+  
+    debugger;
+    //check if tools is in the model
+    if (!("tools" in voicebotDetails.model)) {
+      voiceBotContextData.updateState("model.tools", [
+                {
+                  type: "query",
+                  knowledgeBases: [
+                    {
+                      name: option.label,
+                      provider: "google",
+                      description: "file",
+                      fileIds: [
+                        value
+                      ]
+                    }
+                  ],
+                },
+              ]);
+              setSelectedKnowledgeFile(value);
+    } else {
+      voiceBotContextData.updateState("model.tools.0.knowledgeBases.0.fileIds", [value]);
+      voiceBotContextData.updateState("model.tools.0.knowledgeBases.0.name", [option.label]);
+      setSelectedKnowledgeFile(value);
+    }
+
     voiceBotContextData.updateState("model.tools.0.knowledgeBases.0.fileIds.0", value); //model.tools.0.knowledgeBase.0.fileIds.0
   }
 

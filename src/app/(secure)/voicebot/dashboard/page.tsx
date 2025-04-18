@@ -310,23 +310,35 @@ function Dashboard() {
 
             //check if knowledgebase exist in the existing data
             if (("knowledgeBase" in vapiAssistanceData.model) && "fileIds" in vapiAssistanceData.model.knowledgeBase && Array.isArray(vapiAssistanceData.model.knowledgeBase.fileIds)) {
-              
-              assistantData.model.tools = [
+              debugger;
+              //check if the fileid is exist in the db
+              const fileId = vapiAssistanceData.model.knowledgeBase.fileIds[0];
+              const fileCheckResponse = await fetch(
+                `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/knowledge-file/file-check?fileId=${fileId}&userId=${cookies.userId}`,
                 {
-                  type: "query",
-                  knowledgeBases: [
-                    {
-                      name: "",
-                      provider: "google",
-                      description: "file",
-                      fileIds: [
-                        vapiAssistanceData.model.knowledgeBase.fileIds[0]
-                      ]
-                    }
-                  ],
+                  method: "GET",
+                }
+              );
+              const fileCheckResponseParse = await fileCheckResponse.json();
+              if (fileCheckResponseParse?.message == "File exists") {
+                assistantData.model.tools = [
+                  {
+                    type: "query",
+                    knowledgeBases: [
+                      {
+                        name: "",
+                        provider: "google",
+                        description: "file",
+                        fileIds: [
+                          vapiAssistanceData.model.knowledgeBase.fileIds[0]
+                        ]
+                      }
+                    ],
 
-                },
-              ];
+                  },
+                ];
+              }
+           
               delete assistantData.model.knowledgeBase;
             }
 
