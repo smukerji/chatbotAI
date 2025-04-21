@@ -132,7 +132,7 @@ function Model() {
               setSelectedKnowledgeFile(value);
     } else {
       voiceBotContextData.updateState("model.tools.0.knowledgeBases.0.fileIds", [value]);
-      voiceBotContextData.updateState("model.tools.0.knowledgeBases.0.name", [option.label]);
+      voiceBotContextData.updateState("model.tools.0.knowledgeBases.0.name", option.label);
       setSelectedKnowledgeFile(value);
     }
 

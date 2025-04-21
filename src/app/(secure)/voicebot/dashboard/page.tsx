@@ -309,37 +309,29 @@ function Dashboard() {
             assistantData.metadata = vapiAssistanceData.metadata;
 
             //check if knowledgebase exist in the existing data
-            if (("knowledgeBase" in vapiAssistanceData.model) && "fileIds" in vapiAssistanceData.model.knowledgeBase && Array.isArray(vapiAssistanceData.model.knowledgeBase.fileIds)) {
-              debugger;
-              //check if the fileid is exist in the db
-              const fileId = vapiAssistanceData.model.knowledgeBase.fileIds[0];
+            if("tools" in vapiAssistanceData.model && Array.isArray(vapiAssistanceData.model.tools) && vapiAssistanceData.model.tools.length > 0 && ("type" in vapiAssistanceData.model.tools[0]) && "knowledgeBases" in vapiAssistanceData.model.tools[0] && (Array.isArray(vapiAssistanceData.model.tools[0].knowledgeBases)) && vapiAssistanceData.model.tools[0].knowledgeBases.length > 0 && ("fileIds" in vapiAssistanceData.model.tools[0].knowledgeBases[0]) && Array.isArray(vapiAssistanceData.model.tools[0].knowledgeBases[0].fileIds) && vapiAssistanceData.model.tools[0].knowledgeBases[0].fileIds.length > 0){
+              
+               //check if the fileid is exist in the db
+              const fileId = vapiAssistanceData.model.tools[0].knowledgeBases[0].fileIds[0];
               const fileCheckResponse = await fetch(
                 `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/knowledge-file/file-check?fileId=${fileId}&userId=${cookies.userId}`,
                 {
                   method: "GET",
                 }
               );
-              const fileCheckResponseParse = await fileCheckResponse.json();
-              if (fileCheckResponseParse?.message == "File exists") {
-                assistantData.model.tools = [
-                  {
-                    type: "query",
-                    knowledgeBases: [
-                      {
-                        name: "",
-                        provider: "google",
-                        description: "file",
-                        fileIds: [
-                          vapiAssistanceData.model.knowledgeBase.fileIds[0]
-                        ]
-                      }
-                    ],
 
-                  },
-                ];
+              const fileCheckResponseParse = await fileCheckResponse.json();
+              if (fileCheckResponseParse?.message != "File exists"){
+                //delete the knowledge base from the assistant data
+                delete assistantData.model.tools
               }
-           
+
+            }
+
+            if (("knowledgeBase" in vapiAssistanceData.model) && "fileIds" in vapiAssistanceData.model.knowledgeBase && Array.isArray(vapiAssistanceData.model.knowledgeBase.fileIds)) {
+
               delete assistantData.model.knowledgeBase;
+
             }
 
             let analysysPlanPickData = vapiAssistanceData.analysisPlan;
