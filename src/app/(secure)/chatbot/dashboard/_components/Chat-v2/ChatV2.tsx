@@ -1571,10 +1571,10 @@ function ChatV2({
             disabled={loading ? true : false}
           />
           <div className="action-btns">
-            <button className="web-search-button">
+            {/* <button className="web-search-button">
               <Icon Icon={WebSearchIcon}></Icon>
               Search
-            </button>
+            </button> */}
             <div
               className="send-record-container"
               style={{

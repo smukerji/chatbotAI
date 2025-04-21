@@ -1458,7 +1458,7 @@ function Chat({
                   : userMessageColor,
             }}
           >
-            {(MicrophoneState.Open === microphoneState && !isPopUp) ||
+            {/* {(MicrophoneState.Open === microphoneState && !isPopUp) ||
             (MicrophoneState.Open === microphoneStatePopup && isPopUp) ? (
               <>
                 <Icon
@@ -1490,7 +1490,7 @@ function Chat({
                     startTranscription();
                 }}
               />
-            )}
+            )} */}
 
             <button
               className="icon"
