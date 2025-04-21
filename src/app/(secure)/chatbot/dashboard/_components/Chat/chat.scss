@@ -559,7 +559,7 @@
 
     .chat-question {
       margin-top: 10px;
-      width: 90%;
+      width: 100%;
       display: flex;
       // flex-direction: column;
       border-radius: 16px;
@@ -573,6 +573,7 @@
         justify-content: space-between;
         align-items: center;
         // width: 95%;
+        width: 90%;
         font-size: 18px;
         border: none;
 
