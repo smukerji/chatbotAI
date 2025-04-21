@@ -1,3 +1,4 @@
+// import userSchemaClientPromise from "@/userSchemaDb";
 import { RequiredActionFunctionToolCall } from "openai/resources/beta/threads/runs/runs";
 
 export const functionCallHandler = async (
@@ -14,9 +15,6 @@ export const functionCallHandler = async (
 
     const functionName = call?.function?.name;
     const args = JSON.parse(call.function.arguments);
-
-    console.log("Function Name: ", args.userQuery);
-
     // if (WEB_SEARCH === true) {
     // 	console.log('webData>>>>>>>>>>>>>>>>>>>>>>>>>>', 'webData');
 
@@ -110,6 +108,35 @@ export const functionCallHandler = async (
         success: true,
         data: similaritySearchResults,
       });
+    } else if (functionName === "get_db_data") {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/get-db-data`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            collection: args.collection,
+            filter: args.filter,
+            projection: args.projection,
+          }),
+        }
+      );
+      const dbData = await response.text();
+      console.log("DB Data", dbData);
+      return JSON.stringify({
+        success: true,
+        data: dbData,
+      });
+      // {"collection":"FSI_2023_DOWNLOAD.xlsx_table_1","filter":{"S1: Demographic Pressures":{"$gt":"9"}}}
+      /// get the data from the database based on the filter
+      // const db = (await userSchemaClientPromise!).db();
+      // const collection = db.collection(args.collection);
+      // const filter = JSON.parse(args.filter);
+      // const projection = JSON.parse(args.projection);
+      // const data = await collection.find(filter, { projection }).toArray();
+      // return JSON.stringify({
+      //   success: true,
+      //   data: JSON.stringify(data),
+      // });
     } else if (functionName === "ask_relevant_followup_questions") {
       return JSON.stringify({
         success: true,

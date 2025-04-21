@@ -6,6 +6,7 @@ import documentUploadIcon from "../../../../public/create-chatbot-svgs/document-
 import "./source-upload.scss";
 import { CreateBotContext } from "../../_helpers/client/Context/CreateBotContext";
 import deleteIcon from "../../../../public/create-chatbot-svgs/delete-icon.svg";
+import { useCookies } from "react-cookie";
 
 function SourceUpload({
   totalCharCount,
@@ -14,6 +15,9 @@ function SourceUpload({
 }: any) {
   const botContext: any = useContext(CreateBotContext);
   const botDetails = botContext?.createBotInfo;
+
+  /// get the userID from cookies
+  const [cookies, setCookies]: any = useCookies(["userId"]);
 
   /// get default file to preview if any
   const defaultFileList = botDetails?.defaultFileList;
@@ -62,6 +66,9 @@ function SourceUpload({
           botContext?.handleChange("isLoading")(false);
         });
       }
+    },
+    data: (file: any) => {
+      return { userId: cookies?.userId };
     },
     onDrop(e) {
       console.log("Dropped files", e.dataTransfer.files);
