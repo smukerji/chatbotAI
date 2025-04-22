@@ -72,7 +72,7 @@ function Model() {
 
     async function getUsersFile(){
       try {
-        debugger;
+        // debugger;
           const response = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/knowledge-file?userId=${cookies.userId}`)
           const data = await response.json();
           console.table(data.data);
@@ -111,7 +111,7 @@ function Model() {
   const fileKnowledgeChangeHandler = (value: string, option: any) => {
     console.log("file knowledge ", value, option);
   
-    debugger;
+    // debugger;
     //check if tools is in the model
     if (!("tools" in voicebotDetails.model)) {
       voiceBotContextData.updateState("model.tools", [

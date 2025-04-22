@@ -253,7 +253,7 @@ function Dashboard() {
 
           if(assistantDataResponseParse?.result){
 
-            debugger;
+            // debugger;
             const vapiAssistanceData = assistantDataResponseParse?.result;
 
             
@@ -287,7 +287,7 @@ function Dashboard() {
               punctuationBoundaries.includes(item.label)
             );
 
-            debugger;
+            // debugger;
 
             assistantData.voice.chunkPlan.punctuationBoundaries = punctuationBoundariesArray;
             assistantData.firstMessageMode = vapiAssistanceData.firstMessageMode;
@@ -575,7 +575,7 @@ async function costDeductionOnCallEndHandler(){
     
     try{
 
-      debugger;
+      // debugger;
       const assistantCreateResponse = await fetch(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/vapi/assistant`,
         {
@@ -656,35 +656,23 @@ async function costDeductionOnCallEndHandler(){
     <div className="voice-bot-container">
       <div className="top">
         <div className="headers">
-          <div className="header-title">
-            <Image className="image" alt="back_arrow" src={leftArrow} onClick={()=>{
-              router.push(`/chatbot?interactionFrom=${true}`)
-            }}></Image>
-            <h1 className="title">{voicebotDetails?.name || voiceBotContextData?.assistantInfo?.assistantName}</h1>
+          <div>
 
+          
+            <div className="header-title">
+              <Image className="image" alt="back_arrow" src={leftArrow} onClick={()=>{
+                router.push(`/chatbot?interactionFrom=${true}`)
+              }}></Image>
+              <h1 className="title">{voicebotDetails?.name || voiceBotContextData?.assistantInfo?.assistantName}</h1>
+
+            </div>
+            <div className="header-description">
+              <h4 className="description">Add your data sources to train your Voice agent</h4>
+            </div>
           </div>
-          <div className="header-description">
-            <h4 className="description">Add your data sources to train your Voice agent</h4>
-          </div>
-        </div>
-        <div className="middle-container">
-          <div className="list-container">
-            <ul className="tool-list">
-              <li className={tab == "model" ? "active" : ""} onClick={()=> changeHandler("model")}>Model</li>
-              <li className={tab == "transcriber" ? "active" : ""} onClick={() => changeHandler("transcriber")}>Transcriber</li>
-              <li className={tab == "voice" ? "active" : ""} onClick={() => changeHandler("voice")}>Voice</li>
-              {/* <li className={tab == "tool" ? "active" : ""} onClick={() => changeHandler("tool")}>Tool</li> */}
-              <li className={tab == "advance" ? "active" : ""} onClick={() => changeHandler("advance")}>Advance</li>
-              <li className={tab == "analysis" ? "active" : ""} onClick={() => changeHandler("analysis")}>Analysis</li>
-              <li className={tab == "knowledge" ? "active" : ""} onClick={() => changeHandler("knowledge")}>Knowledge</li>
-              
-              <li className={tab == "phone-number" ? "active" : ""} onClick={() => changeHandler("phone-number")}>Phone Number</li>
-              <li className={tab == "call-logs" ? "active" : ""} onClick={() => changeHandler("call-logs")}>Call Logs</li>
-              <li className={tab == "embedding" ? "active" : ""} onClick={() => changeHandler("embedding")}>Embed on site</li>
-            </ul>
-            <hr style={{ width: "830px" }} />
-          </div>
-          <div className="button-container">
+          <div className="header-right">
+
+            <div className="button-container">
             <Button className="circle-button" onClick={showAdditionalContentItemHandler}>
               <div className="cirle-button-inner-wrapper">
               <Image width={24} height={24} alt="arrow" src={moreCircle}></Image>
@@ -745,6 +733,27 @@ async function costDeductionOnCallEndHandler(){
             }
             <Button className={!voiceBotContextData?.isPublishEnabled ? "publish-button publish-button-disabled" : "publish-button" } onClick={vapiAssistantPublishHandler}>Publish</Button>
           </div>
+
+          </div>
+        </div>
+        <div className="middle-container">
+          <div className="list-container">
+            <ul className="tool-list">
+              <li className={tab == "model" ? "active" : ""} onClick={()=> changeHandler("model")}>Model</li>
+              <li className={tab == "transcriber" ? "active" : ""} onClick={() => changeHandler("transcriber")}>Transcriber</li>
+              <li className={tab == "voice" ? "active" : ""} onClick={() => changeHandler("voice")}>Voice</li>
+              {/* <li className={tab == "tool" ? "active" : ""} onClick={() => changeHandler("tool")}>Tool</li> */}
+              <li className={tab == "advance" ? "active" : ""} onClick={() => changeHandler("advance")}>Advance</li>
+              <li className={tab == "analysis" ? "active" : ""} onClick={() => changeHandler("analysis")}>Analysis</li>
+              <li className={tab == "knowledge" ? "active" : ""} onClick={() => changeHandler("knowledge")}>Knowledge</li>
+              
+              <li className={tab == "phone-number" ? "active" : ""} onClick={() => changeHandler("phone-number")}>Phone Number</li>
+              <li className={tab == "call-logs" ? "active" : ""} onClick={() => changeHandler("call-logs")}>Call Logs</li>
+              <li className={tab == "embedding" ? "active" : ""} onClick={() => changeHandler("embedding")}>Embed on site</li>
+            </ul>
+            <hr />
+          </div>
+          
           
         </div>
       </div>
