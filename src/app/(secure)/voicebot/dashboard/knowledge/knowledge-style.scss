@@ -1,129 +1,143 @@
-.knowledge-container {
-    display: grid;
-    grid-template-columns: 60% 25%;
-    gap: 40px;
-    min-height: 400px;
-    justify-content: space-between;
-
-    .knowledge-uploader {
+.knowledge-wrapper {
+    .knowledge-container {
         display: flex;
         flex-direction: column;
         gap: 40px;
-        align-items: center;
-        .knowledge-uploader-button {
-            border: none;
-            width: 40px;
-            height: 40px;
-           
-        }
-        .knowledge-uploader-text{
+        min-height: 400px;
+        justify-content: space-between;
+        width: 793px;
+
+        .knowledge-uploader {
             display: flex;
             flex-direction: column;
-            gap: 16px;
-            justify-content: center;
+            gap: 40px;
             align-items: center;
-            .header-text{
-                color: #000;
-                /* Subtitle/Large */
-                font-family: "General Sans";
-                font-size: 20px;
-                font-style: normal;
-                line-height: 28px;
-            }
-            .description-text{
-                color:  #777E90;
-                text-align: center;
-                font-family: "General Sans";
-                font-size: 16px;
-                font-style: normal;
-                font-weight: 500;
-                line-height: 24px;
 
-            }
-        }
-    }
-
-    .knowledge-list {
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-        gap: 12px;
-        .knowledge-list-header{
-            display: flex;
-            justify-content: space-between;
-            .description-text{
-                color:  #777E90;
-                text-align: center;
-                font-family: "General Sans";
-                font-size: 16px;
-                font-style: normal;
-                font-weight: 500;
-                line-height: 24px;
-
-            }
-            .right-content{
-                color: #F00000;
-                text-align: center;
-                font-family: "General Sans";
-                font-size: 16px;
-                font-style: normal;
-                font-weight: 500;
-                line-height: 24px;
+            .knowledge-uploader-button {
                 border: none;
+                width: 40px;
+                height: 40px;
+
+            }
+
+            .knowledge-uploader-text {
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+                justify-content: center;
+                align-items: center;
+
+                .header-text {
+                    color: #000;
+                    /* Subtitle/Large */
+                    font-family: "General Sans";
+                    font-size: 20px;
+                    font-style: normal;
+                    line-height: 28px;
+                }
+
+                .description-text {
+                    color: #777E90;
+                    text-align: center;
+                    font-family: "General Sans";
+                    font-size: 16px;
+                    font-style: normal;
+                    font-weight: 500;
+                    line-height: 24px;
+
+                }
             }
         }
 
-        .knowledge-list-item{
+        .knowledge-list {
             display: flex;
-            justify-content: space-between;
-            .description-text{
-                color:  #777E90;
+            flex-direction: column;
+            width: 100%;
+            gap: 12px;
+            overflow-y: auto;
+            border-top: solid 1px #E6E8EC;
+            padding-top: 16px;
+
+            .knowledge-list-header {
+                display: flex;
+                justify-content: space-between;
+
+                .description-text {
+                    color: #777E90;
+                    text-align: center;
+                    font-family: "General Sans";
+                    font-size: 16px;
+                    font-style: normal;
+                    font-weight: 500;
+                    line-height: 24px;
+
+                }
+
+                .right-content {
+                    color: #F00000;
+                    text-align: center;
+                    font-family: "General Sans";
+                    font-size: 16px;
+                    font-style: normal;
+                    font-weight: 500;
+                    line-height: 24px;
+                    border: none;
+                }
+            }
+
+            .knowledge-list-item {
+                display: flex;
+                justify-content: space-between;
+
+                .description-text {
+                    color: #777E90;
+                    text-align: center;
+                    font-family: "General Sans";
+                    font-size: 16px;
+                    font-style: normal;
+                    font-weight: 500;
+                    line-height: 24px;
+
+                }
+            }
+
+            .knowledge-list-right-content {
+                display: flex;
+                margin-bottom: 1rem;
+                justify-content: space-between;
+
+                .description-text {
+                    color: #777E90;
+                    text-align: center;
+                    font-family: "General Sans";
+                    font-size: 16px;
+                    font-style: normal;
+                    font-weight: 500;
+                    line-height: 24px;
+
+                }
+
+                .right-content {
+                    color: #F00000;
+                    text-align: center;
+                    font-family: "General Sans";
+                    font-size: 16px;
+                    font-style: normal;
+                    font-weight: 500;
+                    line-height: 24px;
+                }
+            }
+
+
+            .knowledge-list-text {
+                color: #000;
                 text-align: center;
                 font-family: "General Sans";
                 font-size: 16px;
                 font-style: normal;
                 font-weight: 500;
                 line-height: 24px;
-
             }
-        }
-
-        .knowledge-list-right-content {
-            display: flex;
-            margin-bottom: 1rem;
-            justify-content: space-between;
-
-            .description-text{
-                color:  #777E90;
-                text-align: center;
-                font-family: "General Sans";
-                font-size: 16px;
-                font-style: normal;
-                font-weight: 500;
-                line-height: 24px;
-
-            }
-           
-            .right-content{
-                color: #F00000;
-                text-align: center;
-                font-family: "General Sans";
-                font-size: 16px;
-                font-style: normal;
-                font-weight: 500;
-                line-height: 24px;
-            }
-        }
-
-
-        .knowledge-list-text{
-            color: #000;
-            text-align: center;
-            font-family: "General Sans";
-            font-size: 16px;
-            font-style: normal;
-            font-weight: 500;
-            line-height: 24px;
         }
     }
 }

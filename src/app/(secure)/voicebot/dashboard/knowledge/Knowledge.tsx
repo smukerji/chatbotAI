@@ -140,7 +140,8 @@ function Knowledge() {
     };
 
     return (
-        <div className="knowledge-container">
+        <div className="knowledge-wrapper">
+            <div className="knowledge-container">
             <div className="knowledge-uploader">
                 <div className="knowledge-uploader-icon">
                     <Button
@@ -203,6 +204,8 @@ function Knowledge() {
                 {/* </div> */}
             </div>
         </div>
+        </div>
+        
     );
 }
 
