@@ -20,7 +20,8 @@ function Embedding({assistantId}:{assistantId:string}) {
             var g = document.createElement(t),
             s = d.getElementsByTagName(t)[0];
             g.src =
-            "https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";
+            "https://cdn.jsdelivr.net/gh/VapiAI/
+            html-script-tag@latest/dist/assets/index.js";
             g.defer = true;
             g.async = true;
             s.parentNode.insertBefore(g, s);
