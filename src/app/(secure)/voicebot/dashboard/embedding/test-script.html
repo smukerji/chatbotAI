@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <title>Voicebot Test</title>
+
+  <style>
+
+    body {
+
+      font-family: Arial, sans-serif;
+
+      text-align: center;
+
+      margin-top: 50px;
+
+    }
+
+    button {
+
+      padding: 10px 20px;
+
+      font-size: 18px;
+
+      margin-top: 20px;
+
+    }
+
+    #output {
+
+      margin-top: 30px;
+
+      font-size: 20px;
+
+      color: #333;
+
+    }
+
+  </style>
+
+  <script>
+
+    
+
+        var vapiInstance = null;
+
+        const assistant = "62981834-1d3d-4f17-a837-a56e84e97069"; 
+
+        // Substitute with your assistant ID
+
+        const apiKey = "8aff7b94-0a49-4909-8831-69876a7f7e24"; 
+
+        // Substitute with your Public key from Vapi Dashboard.
+
+        const buttonConfig = {}; // Modify this as required
+
+        (function (d, t) {
+
+            var g = document.createElement(t),
+
+            s = d.getElementsByTagName(t)[0];
+
+            g.src =
+
+            "https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";
+
+            g.defer = true;
+
+            g.async = true;
+
+            s.parentNode.insertBefore(g, s);
+
+            g.onload = function () {
+
+            vapiInstance = window.vapiSDK.run({
+
+                apiKey: apiKey, // mandatory
+
+                assistant: assistant, // mandatory
+
+                config: buttonConfig, // optional
+
+            });
+
+            };
+
+        })(document, "script");
+
+    </script>
+
+</head>
+
+<body>
+
+  <h1>Voicebot Test Page</h1>
+
+  <button onclick="startListening()">🎙️ Start Talking</button>
+
+  <div id="output">Say something to test...</div>
+
+        
+
+</body>
+
+</html>

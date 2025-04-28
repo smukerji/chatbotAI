@@ -203,6 +203,202 @@
   }
 }
 
+.heroSection {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+  padding: 5.3vw 12.2vw 2vw;
+  background: #fff;
+  position: relative;
+
+  @media only screen and (max-width: 768px) {
+    padding: 20px;
+  }
+}
+
+// .container {
+//   position: relative;
+//   width: 100%;
+
+//   .ellipses {
+//     .ellipse1 {
+//       position: absolute;
+//       left: 0;
+//     }
+
+//     .ellipse2 {
+//       position: absolute;
+//       top: -20vh;
+//       left: 50%;
+//       z-index: 2;
+//       width: 80vw;
+//       height: 52vh;
+//       transform: translateX(-50%);
+//     }
+
+//     .ellipse3 {
+//       position: absolute;
+//       right: 0;
+//     }
+//   }
+// }
+
+// .badge {
+//   background: #eaf5ff;
+//   color: #4d72f5;
+//   padding: 5px 10px;
+//   border-radius: 20px;
+//   font-size: 14px;
+// }
+
+// h1 {
+//   color: #23262f;
+//   text-align: center;
+//   font-size: 48px;
+//   font-weight: 500;
+//   line-height: 68px; /* 141.667% */
+// }
+
+// .micContainer {
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+//   margin-top: 70px;
+// }
+
+// .micButton {
+//   display: flex;
+//   width: 120px;
+//   height: 120px;
+//   padding: 16px;
+//   justify-content: center;
+//   align-items: center;
+//   gap: 10px;
+//   flex-shrink: 0;
+//   border-radius: 1000px;
+//   background: radial-gradient(50% 50% at 50% 50%, #0062ff 0%, #fff 100%);
+//   z-index: 2;
+// }
+
+// .inputContainer {
+//   position: relative;
+//   margin-top: 60px;
+//   display: flex;
+//   justify-content: center;
+//   input {
+//     width: 100%;
+//     max-width: 400px;
+//     padding: 16px 24px;
+//     border: 1px solid #ccc;
+//     border-radius: 1000px;
+//     font-size: 16px;
+//   }
+
+//   .sendButton {
+//     background: none;
+//     border: none;
+//     cursor: pointer;
+//     margin-left: 10px;
+//   }
+// }
+
+// .avatars {
+//   display: flex;
+//   justify-content: space-between;
+//   margin-top: 30px;
+
+//   .user1 {
+//     position: absolute;
+//     top: 4vw;
+//     z-index: 2;
+//   }
+
+//   .user2 {
+//     position: absolute;
+//     top: 15vw;
+//     right: 0vw;
+//     z-index: 2;
+//   }
+
+//   .msg-icon {
+//     position: absolute;
+//     width: 40px;
+//     height: 40px;
+//     top: 2vw;
+//     right: 4vw;
+//     border: 1px solid #ccc;
+//     border-radius: 50%;
+//     padding: 6px;
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+//     z-index: 2;
+//     background: #fff;
+//   }
+
+//   .voice-icon {
+//     position: absolute;
+//     left: 5vw;
+//     bottom: 5vw;
+//     z-index: 2;
+//   }
+
+//   @media (max-width: 768px) {
+//     .user1 {
+//       top: 4vw;
+//       height: 30px;
+//       width: auto;
+//     }
+
+//     .user2 {
+//       top: 35vw;
+//       right: 0vw;
+//       height: 30px;
+//       width: auto;
+//     }
+
+//     .msg-icon {
+//       top: 2vw;
+//       right: 4vw;
+//     }
+
+//     .voice-icon {
+//       left: 5vw;
+//       bottom: 25vw;
+//     }
+//   }
+// }
+
+@media (max-width: 768px) {
+  .avatarLeft {
+    left: -50px;
+  }
+
+  .avatarRight {
+    right: -50px;
+  }
+
+  h1 {
+    font-size: 28px;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+
+  .micButton {
+    width: 40px;
+    height: 40px;
+  }
+
+  .inputContainer input {
+    font-size: 14px;
+    padding: 8px;
+  }
+}
+
 @media only screen and (max-width: 452px) {
   .hero-section-container .grp-img {
     position: unset;

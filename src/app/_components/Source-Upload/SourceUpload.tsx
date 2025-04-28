@@ -6,6 +6,7 @@ import documentUploadIcon from "../../../../public/create-chatbot-svgs/document-
 import "./source-upload.scss";
 import { CreateBotContext } from "../../_helpers/client/Context/CreateBotContext";
 import deleteIcon from "../../../../public/create-chatbot-svgs/delete-icon.svg";
+import { useCookies } from "react-cookie";
 
 function SourceUpload({
   totalCharCount,
@@ -14,6 +15,9 @@ function SourceUpload({
 }: any) {
   const botContext: any = useContext(CreateBotContext);
   const botDetails = botContext?.createBotInfo;
+
+  /// get the userID from cookies
+  const [cookies, setCookies]: any = useCookies(["userId"]);
 
   /// get default file to preview if any
   const defaultFileList = botDetails?.defaultFileList;
@@ -25,7 +29,9 @@ function SourceUpload({
   const props: UploadProps = {
     name: "file",
     multiple: true,
-    action: `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/upload`,
+    // action: `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/upload`,
+    action:
+      "https://torri-extraction-backend-108437277455.us-west3.run.app/process-doc",
     onChange(info) {
       botContext?.handleChange("isLoading")(true);
       let { status, response } = info.file;
@@ -60,6 +66,9 @@ function SourceUpload({
           botContext?.handleChange("isLoading")(false);
         });
       }
+    },
+    data: (file: any) => {
+      return { userId: cookies?.userId };
     },
     onDrop(e) {
       console.log("Dropped files", e.dataTransfer.files);

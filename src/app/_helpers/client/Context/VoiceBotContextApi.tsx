@@ -15,30 +15,12 @@ const initialState = {
   },
   model: {
     messages: [{ content: "default", role: "system" }],
-    // tools: [
-    //   {
-    //     async: false,
-    //     messages: [
-    //       {
-    //         type: "request-start",
-    //         content: "",
-    //         conditions: [{ value: "", operator: "eq", param: "" }],
-    //       },
-    //     ],
-    //     type: "dtmf",
-    //     function: {
-    //       name: "",
-    //       description: "",
-    //       parameters: { type: "object", properties: {}, required: [""] },
-    //     },
-    //     server: { timeoutSeconds: 20, url: "", secret: "" },
-    //   },
-    // ],
+
     toolIds: [""],//we deleted this field in the backend
     provider: "openai",
     model: "gpt-4o",
     temperature: 0,
-    // knowledgeBase: { provider: "canonical", topK: 5.5, fileIds: [""] },
+
     maxTokens: 300,
     emotionRecognitionEnabled: false,
     numFastTurns: 1,

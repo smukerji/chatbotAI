@@ -1,19 +1,41 @@
-import React from "react";
+"use client";
+import React, { useState } from "react";
 import "./hero-section.scss";
 import Image from "next/image";
-// import LineImage from "../../../../public/sections-images/header-background/Lines.png";
-import HeaderImage from "../../../../public/sections-images/header-background/Group1.svg";
-import messageIcon from "../../../../public/sections-images/header-background/message-text.svg";
-import cancelIcon from "../../../../public/sections-images/header-background/clipboard-close.webp";
 import Link from "next/link";
+import cancelIcon from "../../../../public/sections-images/header-background/clipboard-close.webp";
+import messageIcon from "../../../../public/sections-images/header-background/message-text.svg";
+import HeaderImage from "../../../../public/sections-images/header-background/Group1.svg";
+import Micicon from "../../../../public/sections-images/header-background/microphone-2.svg";
+import User1 from "../../../../public/sections-images/header-background/yellowbgimg.png";
+import User2 from "../../../../public/sections-images/header-background/greenbgimg.png";
+import MSGIcon from "../../../../public/sections-images/header-background/messages-3.svg";
+import VoiceIcon from "../../../../public/sections-images/header-background/voice-cricle.svg";
+import ellipse1 from "../../../../public/sections-images/header-background/Ellipse 76.png";
+import ellipse2 from "../../../../public/sections-images/header-background/Ellipse 77.png";
+import ellipse3 from "../../../../public/sections-images/header-background/Ellipse 78.png";
+import sendIcon from "../../../../public/svgs/send.svg";
+import HeroSectionChatPopup from "../HeroSectionChatPopup/HeroSectionChatPopup";
 
 function HeroSection() {
+  const [message, setMessage] = useState("");
+  const [isChatOpen, setIsChatOpen] = useState(false);
+
+  const handleSendMessage = () => {
+    if (message.trim() !== "") {
+      setIsChatOpen(true);
+    }
+  };
+
+  const handleKeyPress = (e: any) => {
+    if (e.key === "Enter") {
+      handleSendMessage();
+    }
+  };
+
   return (
     <>
-      <div
-        className="hero-section-container"
-        // style={{ backgroundImage: `url(${LineImage.src})` }}
-      >
+      <div className="hero-section-container">
         <h1 className="title">
           Seamless Support Starts Here: AI Chatbot Solutions for Every Customer
           Query
@@ -28,9 +50,6 @@ function HeroSection() {
         </p>
 
         <div className="request-demo-email-container">
-          {/* <div className="email-input">
-            <input type="text" placeholder="Enter your email" />
-          </div> */}
           <Link
             style={{ color: "white", textDecoration: "none" }}
             href="/account/register"
@@ -40,18 +59,6 @@ function HeroSection() {
         </div>
         <div className="schemes-list">
           <ul>
-            {/* <li>
-              <span>
-                <Image
-                  src={freeTrialIcon}
-                  alt="free-trial-icon"
-                  loading="lazy"
-                  width={23}
-                  height={23}
-                />
-              </span>
-              <span>Free 7-day trial</span>
-            </li> */}
             <li>
               <span>
                 <Image
@@ -83,6 +90,51 @@ function HeroSection() {
           <Image src={HeaderImage} alt="image" fill />
         </div>
       </div>
+
+      {/* <section className={"heroSection"}>
+        <div className={"container"}>
+          <div className="ellipses">
+            <Image src={ellipse1} alt="Ellipse 1" className="ellipse1" />
+            <Image src={ellipse2} alt="Ellipse 2" className="ellipse2" />
+            <Image src={ellipse3} alt="Ellipse 3" className="ellipse3" />
+          </div>
+          <span className={"badge"}>Torri AI Agent</span>
+          <h1>Hey, welcome!</h1>
+          <h1>Looking for something?</h1>
+          <div className={"micContainer"}>
+            <div className={"micButton"}>
+              <Image src={Micicon} alt="Microphone" />
+            </div>
+          </div>
+          <div className={"inputContainer"}>
+            {isChatOpen && (
+              <HeroSectionChatPopup
+                onClose={() => {
+                  setIsChatOpen(false);
+                  setMessage("");
+                }}
+              />
+            )}
+            <input
+              type="text"
+              placeholder="Ask Torri"
+              onClick={() => {
+                setIsChatOpen(true);
+              }}
+            />
+
+            <button className={"sendButton"} onClick={handleSendMessage}>
+              <Image src={sendIcon} alt="Send" />
+            </button>
+          </div>
+          <div className={"avatars"}>
+            <Image src={User1} className="user1" alt="User 1" />
+            <Image src={User2} className="user2" alt="User 2" />
+            <Image src={MSGIcon} className="msg-icon" alt="Message Icon" />
+            <Image src={VoiceIcon} className="voice-icon" alt="Voice Icon" />
+          </div>
+        </div>
+      </section> */}
     </>
   );
 }

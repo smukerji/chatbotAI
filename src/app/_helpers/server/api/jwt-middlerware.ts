@@ -36,6 +36,11 @@ export function isPublicPath(req: NextRequest) {
     "POST:/voicebot/dashboard/api/assistant",
     "GET:/voicebot/dashboard/api/costs-wallates/usages",
     "GET:/voicebot/dashboard/api/template/prompts",
+    "GET:/voicebot/dashboard/api/get-token",
+    "POST:/voicebot/dashboard/api/knowledge-file",
+    "GET:/voicebot/dashboard/api/knowledge-file",
+    "DELETE:/voicebot/dashboard/api/knowledge-file",
+    "GET:/voicebot/dashboard/api/knowledge-file/file-check",
     "PUT:/voicebot/dashboard/api/phone/fallback", 
   ];
 

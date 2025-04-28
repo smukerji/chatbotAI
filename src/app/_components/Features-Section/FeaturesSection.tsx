@@ -16,7 +16,6 @@ function FeaturesSection() {
     <>
       <div className="feature-section-container" id="features">
         <div className="top">
-          {/* <Image src={LuciferLogo} alt="Torri logo" /> */}
           <h1 className="title">Features</h1>
 
           <p className="description">
@@ -89,6 +88,48 @@ function FeaturesSection() {
           </div>
         </div>
       </div>
+
+      {/* <section className="features-section">
+        <div className="header">
+          <span className="feature-badge">Features</span>
+          <h2>Simplifying, Automating and Enriching Human Potential</h2>
+        </div>
+        <div className="features-grid">
+          <div className="feature-card">
+            <h3>Sarah your AI Customer Service Assistant</h3>
+            <p>
+              Engage your website visitors, customers, and clients with natural,
+              intuitive conversations. Torri ensures every interaction is
+              personalized, relevant, and memorable.
+            </p>
+
+            <div className="image-div"></div>
+          </div>
+          <div className="feature-card">
+            <h3>Tob your AI Sales Assistant</h3>
+            <p>
+              Engage your website visitors, customers, and clients with natural,
+              intuitive conversations. Torri ensures every interaction is
+              personalized, relevant, and memorable.
+            </p>
+            <div className="image-div"></div>
+          </div>
+        </div>
+
+        <div className="features-grid">
+          {[1, 2, 3].map((_, index) => (
+            <div key={index} className="feature-card">
+              <h3>Seamless Conversations</h3>
+              <p>
+                Engage your website visitors, customers, and clients with
+                natural, intuitive conversations. Torri ensures every
+                interaction is personalized, relevant, and memorable.
+              </p>
+              <div className="image-div"></div>
+            </div>
+          ))}
+        </div>
+      </section> */}
     </>
   );
 }

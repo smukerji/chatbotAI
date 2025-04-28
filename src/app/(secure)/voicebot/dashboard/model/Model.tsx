@@ -3,9 +3,8 @@ import "./model-design.scss";
 import { Input, Slider, Switch } from 'antd';
 import { Select, ConfigProvider } from 'antd';
 import { CreateVoiceBotContext } from "../../../../_helpers/client/Context/VoiceBotContextApi"
-
-
 import { useState, useContext, useEffect } from "react";
+import { useCookies } from "react-cookie";
 
 
 const { TextArea } = Input;
@@ -30,6 +29,10 @@ function Model() {
   const [providerValidationMessage, setProviderValidationMessage] = useState<string>("");
   const [modelValidationMessage, setModelValidationMessage] = useState<string>("");
 
+  const [cookies, setCookie] = useCookies(["userId"]);
+  const [userFiles, setUserFiles] = useState<{ value: string; label: string }[]>([]);
+  const [selectedKnowledgeFile, setSelectedKnowledgeFile] = useState<string>("");
+
 
   const [emotionRecognitionEnabled, setEmotionRecognitionEnabled] = useState<boolean>(false);
 
@@ -40,10 +43,18 @@ function Model() {
     setSystemPrompt(voicebotDetails["model"]["messages"][0]["content"] || "");
     setSelectedProvider(voicebotDetails["model"]["provider"] || undefined);
     setSelectedModel(voicebotDetails["model"]["model"] || undefined);
+    // tools
+    if (("tools" in voicebotDetails.model) && "fileIds" in voicebotDetails.model.tools[0].knowledgeBases[0] && Array.isArray(voicebotDetails.model.tools[0].knowledgeBases[0].fileIds)) {
+
+      setSelectedKnowledgeFile(voicebotDetails.model.tools[0].knowledgeBases[0].fileIds || undefined);
+    }
+
+   
 
     setStepsCount(voicebotDetails["model"]["temperature"] || 0);
     setMaxToken(voicebotDetails["model"]["maxTokens"] || "");
     setEmotionRecognitionEnabled(voicebotDetails["model"]["emotionRecognitionEnabled"]);
+
 
   },[ voicebotDetails.firstMessage, 
       voicebotDetails["model"]["messages"][0]["content"],
@@ -51,12 +62,37 @@ function Model() {
       voicebotDetails["model"]["model"],
       voicebotDetails["model"]["temperature"],
       voicebotDetails["model"]["maxTokens"],
-      voicebotDetails["model"]["emotionRecognitionEnabled"]
+      voicebotDetails["model"]["emotionRecognitionEnabled"],
+      voicebotDetails["model"]["knowledgeBaseId"],
     ]);
 
-    // useEffect(() => {
+    useEffect(() => {
+      getUsersFile();
+    },[]);
 
-    // },[]);
+    async function getUsersFile(){
+      try {
+        // debugger;
+          const response = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/knowledge-file?userId=${cookies.userId}`)
+          const data = await response.json();
+          console.table(data.data);
+          if(data.status === 200 && data.data.length > 0){
+              //set the name as value and the id as label
+              setUserFiles(data.data.map((file:any) => ({ value:file.fileData.id , label: file.fileData.name})));
+          }
+          else if(data.status === 200 && data.data.length === 0){
+            setUserFiles([]);
+            delete voiceBotContextData.state.model.tools;
+            setSelectedKnowledgeFile("");
+          }
+
+      }
+      catch (error) {
+          console.error(error);
+      }
+     
+  }
+
 
 
   const firstMessageEnterHandler = (e:React.ChangeEvent<HTMLInputElement>) => {
@@ -70,6 +106,37 @@ function Model() {
       setinputValidationMessage("");
       voiceBotContextData.updateState("firstMessage",enteredValue);
     }
+  }
+
+  const fileKnowledgeChangeHandler = (value: string, option: any) => {
+    console.log("file knowledge ", value, option);
+  
+    // debugger;
+    //check if tools is in the model
+    if (!("tools" in voicebotDetails.model)) {
+      voiceBotContextData.updateState("model.tools", [
+                {
+                  type: "query",
+                  knowledgeBases: [
+                    {
+                      name: option.label,
+                      provider: "google",
+                      description: "file",
+                      fileIds: [
+                        value
+                      ]
+                    }
+                  ],
+                },
+              ]);
+              setSelectedKnowledgeFile(value);
+    } else {
+      voiceBotContextData.updateState("model.tools.0.knowledgeBases.0.fileIds", [value]);
+      voiceBotContextData.updateState("model.tools.0.knowledgeBases.0.name", option.label);
+      setSelectedKnowledgeFile(value);
+    }
+
+    voiceBotContextData.updateState("model.tools.0.knowledgeBases.0.fileIds.0", value); //model.tools.0.knowledgeBase.0.fileIds.0
   }
 
   const systemPromptEnterHandler = (e:React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -237,25 +304,14 @@ function Model() {
         {modelValidationMessage && <p className="invalidation-message">{modelValidationMessage}</p>}
         <p className="model-info">GPT-4o is more accurate but fast and cheaper</p>
 
-        {/* <h4 className="provider knowledge-base">Knowledge Base</h4>
+        <h4 className="provider knowledge-base">Knowledge Base</h4>
         <Select
+          value={selectedKnowledgeFile}
           className="select-field"
-          placeholder="Select the model"
-          options={[
-            {
-              value: '1',
-              label: 'deepgram',
-            },
-            {
-              value: '2',
-              label: 'talkscriber',
-            },
-            {
-              value: '3',
-              label: 'gladia',
-            }
-          ]}
-        /> */}
+          placeholder="Select file"
+          options={userFiles}
+          onChange={fileKnowledgeChangeHandler}
+        /> 
 
         <div className="temprature model">
           <h4 className="temprature_title">Temperatures</h4>

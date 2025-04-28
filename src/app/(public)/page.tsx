@@ -15,6 +15,7 @@ import HeroSection from "../_components/HeroSection/HeroSection";
 import SecondaryHeader from "../_components/Secondary-Header/SecondaryHeader";
 import FeaturesSection from "../_components/Features-Section/FeaturesSection";
 import { generateMetadata } from "../_helpers/pageSeo";
+import IndustryAbout from "../_components/IndustryAboutSection/IndustryAboutSection";
 
 export const metadata = generateMetadata({
   title: "Custom AI Chatbots | Elevate Customer Support with Torri.AI",
@@ -29,14 +30,16 @@ function Home() {
       {/* <HeroHeader /> */}
       <SecondaryHeader />
       <HeroSection />
-      {/* <ServiceSection /> */}
       <CustomerQuestions />
+      {/* <ServiceSection /> */}
       <FeaturesSection />
       {/* <FacilitiesSection /> */}
       <IndustrySection />
+
       <ServicesOffered />
-      <CompatibilitySection />
+      {/* <IndustryAbout /> */}
       {/* <Testimonials /> */}
+      <CompatibilitySection />
       {/* <PlansSection /> */}
       {/* <FAQ /> */}
       <ContactSection />

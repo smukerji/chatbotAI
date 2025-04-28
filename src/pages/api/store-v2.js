@@ -3,8 +3,10 @@ import {
   generateChunksNEmbedd,
   generateChunksNEmbeddExcel,
   generateChunksNEmbeddForLinks,
+  generateChunksNEmbeddViaDocling,
 } from "../../app/_helpers/server/embeddings";
 import clientPromise from "../../db";
+import userSchemaClientPromise from "../../userSchemaDb";
 import { v4 as uuid } from "uuid";
 // import { authorize, uploadFile } from "../../app/_services/googleFileUpload";
 import { put } from "@vercel/blob";
@@ -70,6 +72,7 @@ export default async function handler(req, res) {
 
         /// db connection
         const db = (await clientPromise).db();
+        const userSchemaClient = (await userSchemaClientPromise).db();
 
         /// first check if user can create the chatbot or not
         const noOfChatbotsUserCreated = await db
@@ -187,8 +190,27 @@ export default async function handler(req, res) {
             const dbFile = await collection.findOne({
               _id: objectId,
             });
-            /// deleting the files by id
-            await deleteFileVectorsById(userId, dbFile?.dataID);
+            /// if the file is xlsx or csv then delete the collection4
+            if (
+              file?.name?.toLowerCase()?.includes(".xlsx") ||
+              file?.name?.toLowerCase()?.includes(".csv")
+            ) {
+              /// delete the collection that is present in the schema_info
+              /// get all the object keys
+              const schemaInfo = dbFile?.schema_info;
+
+              const objectKeysCollection = Object.keys(schemaInfo);
+
+              /// iterate and delete the collection
+              for (let collection of objectKeysCollection) {
+                const collectionToDelete =
+                  userSchemaClient.collection(collection);
+                await collectionToDelete.drop();
+              }
+            } else {
+              /// deleting the files by id
+              await deleteFileVectorsById(userId, dbFile?.dataID);
+            }
             /// delete the id from db
             await collection.deleteOne({
               _id: objectId,
@@ -268,17 +290,26 @@ export default async function handler(req, res) {
                   file.fileType === "text/csv"
                 ) {
                   /// generating chunks and embedding
-                  const chunks = await generateChunksNEmbeddExcel(
-                    content,
-                    "file",
+                  // const chunks = await generateChunksNEmbeddExcel(
+                  //   content,
+                  //   "file",
+                  //   chatbotId,
+                  //   userId,
+                  //   file.name
+                  // );
+                  /// store in the database schema info
+                  await collection.insertOne({
                     chatbotId,
-                    userId,
-                    file.name
-                  );
-                  resolve(chunks);
+                    fileName: file.name,
+                    schema_info: file.schema_info,
+                    contentLength: JSON.stringify(file.schema_info).length,
+                    source: "file",
+                  });
+
+                  resolve(1);
                 } else {
                   /// generating chunks and embedding
-                  const chunks = await generateChunksNEmbedd(
+                  const chunks = await generateChunksNEmbeddViaDocling(
                     content,
                     "file",
                     chatbotId,
@@ -300,7 +331,10 @@ export default async function handler(req, res) {
           );
           /// get the filenames and vectors created ID
           const fileSource = valuesPromise.map((values) => {
-            if (values != undefined)
+            if (
+              values != undefined &&
+              values?.value.data?.[0]?.metadata?.filename
+            )
               return {
                 name: values?.value.data[0]?.metadata?.filename,
                 dataID: values?.value?.dataIDs,
@@ -320,13 +354,15 @@ export default async function handler(req, res) {
           /// store the details in database
           /// iterate and store each user filename as per chatbot
           fileSource.forEach((file) => {
-            collection.insertOne({
-              chatbotId,
-              fileName: file.name,
-              dataID: file.dataID,
-              contentLength: file.contentLength,
-              source: "file",
-            });
+            if (file?.name) {
+              collection.insertOne({
+                chatbotId,
+                fileName: file.name,
+                dataID: file.dataID,
+                contentLength: file.contentLength,
+                source: "file",
+              });
+            }
           });
           //   }
         }
