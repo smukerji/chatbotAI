@@ -87,7 +87,51 @@ async function updateNumberWithAssistant(req: NextRequest) {
         const voiceAssistantCollection = db?.collection("voice-assistance-phone-numbers");
         const recordResult = await voiceAssistantCollection?.findOne({ "twilio.id" : data.twilioId });
 
+
+        if("assistantId" in recordResult){
+
+            //update the record with assistantId
+            const result = await voiceAssistantCollection?.updateOne(
+                { "twilio.id" : data.twilioId },
+                { $set: { assistantId: data.assistantId } }
+            );
+            console.log('Record updated:', result);
+        }
+        else{
+            //insert the record with assistantId
+            const result = await voiceAssistantCollection?.updateOne(
+                { "twilio.id" : data.twilioId },
+                { $set: { assistantId: data.assistantId } }
+            );
+            console.log('Record updated:', result);
+        }
         const token = await generateAndGetToken();
+        
+        // Update Phone Number (PATCH /phone-number/:id)
+        const response = await fetch(`https://api.vapi.ai/phone-number/${data.twilioId}`, {
+        method: "PATCH",
+        headers: {
+            "Authorization": "Bearer "+token,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            "provider": "twilio",
+            "assistantId": data.assistantId,
+        }),
+        });
+
+        const responseBody = await response.json();
+
+        if("id" in responseBody && "assistantId" in responseBody){
+            //update the record with assistantId
+            const result = await voiceAssistantCollection?.updateOne(
+                { "twilio.id" : data.twilioId },
+                { $set: { assistantId: data.assistantId } }
+            );
+
+            
+        }
+
         const client = new VapiClient({ token});
         const callLogsResult = await client.logs.get({
             assistantId: data.assistantId,

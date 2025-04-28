@@ -27,14 +27,7 @@ interface InboundNumberDetails {
   _id: string;
 }
 function PhoneNumber() {
-  const contacts = [
-    { id: 1, phone: '+84 (353) 085 867', email: 'tuan@sapakh.ai', toggle: true },
-    { id: 2, phone: '+84 (353) 085 867', email: 'tuan@sapakh.ai', toggle: false },
-    { id: 3, phone: '+84 (353) 085 867', email: 'tuan@sapakh.ai', toggle: false },
-    { id: 4, phone: '+84 (353) 085 867', email: 'tuan@sapakh.ai', toggle: false },
-    { id: 5, phone: '+84 (353) 085 867', email: 'tuan@sapakh.ai', toggle: false }
 
-  ];
   // let phoneNumber:any = [];
 
   const [phoneNumbers, setPhoneNumbers] = useState([]);
