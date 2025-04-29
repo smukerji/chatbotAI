@@ -263,98 +263,98 @@ function Chatbot() {
 
   return (
     <>
-      {/* <MicrophoneContextProvider> */}
-      {/* <DeepgramContextProvider> */}
-      {/* {state && ( */}
-      <div className="embed-chatbot-container">
-        {botType === "bot-v1" ? (
-          <Chat
-            chatbot={chatbot}
-            messages={messages}
-            setMessages={setMessages}
-            messagesTime={messagesTime}
-            setMessagesTime={setMessagesTime}
-            sessionID={sessionID}
-            sessionStartDate={sessionStartDate}
-            setSessionID={setSessionID}
-            setSessionStartDate={setSessionStartDate}
-            isPopUp={true}
-            userId={userId}
-            chatbotName={chatbotName}
-            chatbotDisplayName={displayName}
-            suggestedMessages={suggestedMessages}
-            initialMessage={initialMessage}
-            profilePictureUrl={profilePictureUrl}
-            leadFields={leadFields}
-            leadTitle={leadTitle}
-            userLeadDetails={userDetails}
-            isPlanNotification={isPlanNotification}
-            setIsPlanNotification={setIsPlanNotification}
-            userMessageColor={userMessageColor}
-            messagePlaceholder={messagePlaceholder}
-            userLocation={userLocation}
-            /* microphone states */
-            setupMicrophonePopup={setupMicrophone}
-            stopMicrophonePopup={stopMicrophone}
-            // startMicrophonePopup={startMicrophone}
-            microphoneStatePopup={microphoneState}
-            microphonePopup={microphone}
-            /* deepgram states */
-            connectToDeepgramPopup={connectToDeepgram}
-            disconnectFromDeepgramPopup={disconnectFromDeepgram}
-            connectionPopup={connection}
-            connectionStatePopup={connectionState}
-          />
-        ) : (
-          <ChatV2
-            chatbot={chatbot}
-            messages={messages}
-            setMessages={setMessages}
-            messagesTime={messagesTime}
-            setMessagesTime={setMessagesTime}
-            threadID={threadId}
-            sessionStartDate={sessionStartDate}
-            setThreadId={createThread}
-            setSessionStartDate={setSessionStartDate}
-            isPopUp={true}
-            userId={userId}
-            chatbotName={chatbotName}
-            chatbotDisplayName={displayName}
-            suggestedMessages={suggestedMessages}
-            initialMessage={initialMessage}
-            profilePictureUrl={profilePictureUrl}
-            leadFields={leadFields}
-            leadTitle={leadTitle}
-            userLeadDetails={userDetails}
-            isPlanNotification={isPlanNotification}
-            setIsPlanNotification={setIsPlanNotification}
-            userMessageColor={userMessageColor}
-            messagePlaceholder={messagePlaceholder}
-            userLocation={userLocation}
-            functionCallHandler={functionCallHandler}
-            /* microphone states */
-            setupMicrophonePopup={setupMicrophone}
-            stopMicrophonePopup={stopMicrophone}
-            // startMicrophonePopup={startMicrophone}
-            microphoneStatePopup={microphoneState}
-            microphonePopup={microphone}
-            /* deepgram states */
-            connectToDeepgramPopup={connectToDeepgram}
-            disconnectFromDeepgramPopup={disconnectFromDeepgram}
-            connectionPopup={connection}
-            connectionStatePopup={connectionState}
-          />
-        )}
-      </div>
-      {/* )} */}
+      <MicrophoneContextProvider>
+        <DeepgramContextProvider>
+          {/* {state && ( */}
+          <div className="embed-chatbot-container">
+            {botType === "bot-v1" ? (
+              <Chat
+                chatbot={chatbot}
+                messages={messages}
+                setMessages={setMessages}
+                messagesTime={messagesTime}
+                setMessagesTime={setMessagesTime}
+                sessionID={sessionID}
+                sessionStartDate={sessionStartDate}
+                setSessionID={setSessionID}
+                setSessionStartDate={setSessionStartDate}
+                isPopUp={true}
+                userId={userId}
+                chatbotName={chatbotName}
+                chatbotDisplayName={displayName}
+                suggestedMessages={suggestedMessages}
+                initialMessage={initialMessage}
+                profilePictureUrl={profilePictureUrl}
+                leadFields={leadFields}
+                leadTitle={leadTitle}
+                userLeadDetails={userDetails}
+                isPlanNotification={isPlanNotification}
+                setIsPlanNotification={setIsPlanNotification}
+                userMessageColor={userMessageColor}
+                messagePlaceholder={messagePlaceholder}
+                userLocation={userLocation}
+                /* microphone states */
+                setupMicrophonePopup={setupMicrophone}
+                stopMicrophonePopup={stopMicrophone}
+                // startMicrophonePopup={startMicrophone}
+                microphoneStatePopup={microphoneState}
+                microphonePopup={microphone}
+                /* deepgram states */
+                connectToDeepgramPopup={connectToDeepgram}
+                disconnectFromDeepgramPopup={disconnectFromDeepgram}
+                connectionPopup={connection}
+                connectionStatePopup={connectionState}
+              />
+            ) : (
+              <ChatV2
+                chatbot={chatbot}
+                messages={messages}
+                setMessages={setMessages}
+                messagesTime={messagesTime}
+                setMessagesTime={setMessagesTime}
+                threadID={threadId}
+                sessionStartDate={sessionStartDate}
+                setThreadId={createThread}
+                setSessionStartDate={setSessionStartDate}
+                isPopUp={true}
+                userId={userId}
+                chatbotName={chatbotName}
+                chatbotDisplayName={displayName}
+                suggestedMessages={suggestedMessages}
+                initialMessage={initialMessage}
+                profilePictureUrl={profilePictureUrl}
+                leadFields={leadFields}
+                leadTitle={leadTitle}
+                userLeadDetails={userDetails}
+                isPlanNotification={isPlanNotification}
+                setIsPlanNotification={setIsPlanNotification}
+                userMessageColor={userMessageColor}
+                messagePlaceholder={messagePlaceholder}
+                userLocation={userLocation}
+                functionCallHandler={functionCallHandler}
+                /* microphone states */
+                setupMicrophonePopup={setupMicrophone}
+                stopMicrophonePopup={stopMicrophone}
+                // startMicrophonePopup={startMicrophone}
+                microphoneStatePopup={microphoneState}
+                microphonePopup={microphone}
+                /* deepgram states */
+                connectToDeepgramPopup={connectToDeepgram}
+                disconnectFromDeepgramPopup={disconnectFromDeepgram}
+                connectionPopup={connection}
+                connectionStatePopup={connectionState}
+              />
+            )}
+          </div>
+          {/* )} */}
 
-      {/* <div className="chatbot-icon" onClick={toggleChatbot}> */}
-      {/* {state ? (
+          {/* <div className="chatbot-icon" onClick={toggleChatbot}> */}
+          {/* {state ? (
           <CloseOutlined className="chat-icon" />
         ) : (
           <MessageOutlined className="chat-icon" />
         )} */}
-      {/* <div
+          {/* <div
         className="chatbot-icon"
         style={
           {
@@ -379,9 +379,9 @@ function Chatbot() {
           />
         </div>
       </div> */}
-      {/* </div> */}
-      {/* </DeepgramContextProvider> */}
-      {/* </MicrophoneContextProvider> */}
+          {/* </div> */}
+        </DeepgramContextProvider>
+      </MicrophoneContextProvider>
     </>
   );
 }
