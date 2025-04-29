@@ -87,24 +87,28 @@ async function updateNumberWithAssistant(req: NextRequest) {
         const voiceAssistantCollection = db?.collection("voice-assistance-phone-numbers");
         const recordResult = await voiceAssistantCollection?.findOne({ "twilio.id" : data.twilioId });
 
-
-        if("assistantId" in recordResult){
-
-            //update the record with assistantId
-            const result = await voiceAssistantCollection?.updateOne(
-                { "twilio.id" : data.twilioId },
-                { $set: { assistantId: data.assistantId } }
-            );
-            console.log('Record updated:', result);
+        if(!recordResult) {
+            return  { message: 'Twilio record not found!' }
         }
-        else{
-            //insert the record with assistantId
-            const result = await voiceAssistantCollection?.updateOne(
-                { "twilio.id" : data.twilioId },
-                { $set: { assistantId: data.assistantId } }
-            );
-            console.log('Record updated:', result);
-        }
+
+
+        // if("assistantId" in recordResult){
+
+        //     //update the record with assistantId
+        //     const result = await voiceAssistantCollection?.updateOne(
+        //         { "twilio.id" : data.twilioId },
+        //         { $set: { assistantId: data.assistantId } }
+        //     );
+        //     console.log('Record updated:', result);
+        // }
+        // else{
+        //     //insert the record with assistantId
+        //     const result = await voiceAssistantCollection?.updateOne(
+        //         { "twilio.id" : data.twilioId },
+        //         { $set: { assistantId: data.assistantId } }
+        //     );
+        //     console.log('Record updated:', result);
+        // }
         const token = await generateAndGetToken();
         
         // Update Phone Number (PATCH /phone-number/:id)
@@ -115,7 +119,7 @@ async function updateNumberWithAssistant(req: NextRequest) {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            "provider": "twilio",
+            // "provider": "twilio",
             "assistantId": data.assistantId,
         }),
         });
@@ -124,32 +128,19 @@ async function updateNumberWithAssistant(req: NextRequest) {
 
         if("id" in responseBody && "assistantId" in responseBody){
             //update the record with assistantId
-            const result = await voiceAssistantCollection?.updateOne(
+            await voiceAssistantCollection?.updateOne(
                 { "twilio.id" : data.twilioId },
                 { $set: { assistantId: data.assistantId } }
             );
 
+            return { message: 'Assistant bind with the number' };
             
         }
+        else{
+            return { message: 'Error binding assistant with the number' };
+        }
 
-        const client = new VapiClient({ token});
-        const callLogsResult = await client.logs.get({
-            assistantId: data.assistantId,
-            limit: 10,
-            type:"Call"
-        });
-
-        const callLogsList = await client.calls.list({
-            assistantId: data.assistantId,
-            limit:1
-        });
-
-        console.table(callLogsList);
-        const callCost = callLogsList[0].cost;
-        
-        console.table(callLogsResult);
-
-        return {message:"data received successfully", data: data};
+     
     }
     catch(error:any){
         console.error('Error parsing request body:', error);

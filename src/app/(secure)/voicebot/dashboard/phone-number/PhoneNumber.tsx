@@ -34,6 +34,7 @@ function PhoneNumber() {
   const [publishAssistantList, setPublishAssistantList] = useState([{ value: '', label: '' ,assistantId:''}]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [inboundNumberDetails, setInboundNumberDetails] = useState<InboundNumberDetails | null>(null);
+  const [selectedAssistant, setSelectedAssistant] = useState<string | null>(null);
 
   const [cookies, setCookie] = useCookies(["userId"]);
 
@@ -57,7 +58,7 @@ function PhoneNumber() {
       const assistantResult = await assistantListFromDb.json();
       const assistantDataMap = assistantResult?.assistants.map((assistant: any) => {
         return {
-          value: assistant.assistantName,
+          value: assistant.vapiAssistantId,
           label: assistant.assistantName,
           assistantId: assistant.vapiAssistantId
         }
@@ -76,18 +77,21 @@ function PhoneNumber() {
   try{
     setIsLoading(true);
     
-  const phoneNumberData:any = await fetch(
-    `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/phone?userId=${cookies?.userId}`,
-    {
-      method: "GET",
-      next: { revalidate: 0 },
+    const phoneNumberData:any = await fetch(
+      `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/phone?userId=${cookies?.userId}`,
+      {
+        method: "GET",
+        next: { revalidate: 0 },
+      }
+    );
+    const twilioNumbers = await phoneNumberData.json();
+    setPhoneNumbers(twilioNumbers?.importedNumbers);
+    debugger
+    setInboundNumberDetails(twilioNumbers?.importedNumbers[0]);
+    if(Array.isArray(twilioNumbers?.importedNumbers) && twilioNumbers?.importedNumbers.length > 0 && "assistantId"){
+      console.log('twilioNumbers:', twilioNumbers);
+      setSelectedAssistant(twilioNumbers?.importedNumbers[0]?.assistantId);
     }
-  );
-  const twilioNumbers = await phoneNumberData.json();
-  setPhoneNumbers(twilioNumbers?.importedNumbers);
-  debugger
-  setInboundNumberDetails(twilioNumbers?.importedNumbers[0]);
-  console.log('twilioNumbers:', twilioNumbers);
   }
   catch(error:any){
     console.error('Error parsing request body:', error);
@@ -107,18 +111,28 @@ function PhoneNumber() {
   }, []);
 
   function changedTheInboundNumberHandler(contact:any){
+    debugger;
     setInboundNumberDetails(contact);
+    if("assistantId" in contact){
+      setSelectedAssistant(contact?.assistantId);
+    }
+    else{
+      setSelectedAssistant(null);
+    }
   }
 
   async function  assistantSelectOnPhoneNumberHandler(option:any,values:any){
     console.clear();
     console.log('selected option:', option);
     console.log('selected values:', values);
+    debugger;
     if (inboundNumberDetails) {
       const updateValue = {
         twilioId: inboundNumberDetails.twilio.id,
         assistantId: values?.assistantId
       }
+
+      setSelectedAssistant(values?.assistantId);
 
       debugger;
       const updatedRequest:any = await fetch(
@@ -234,7 +248,7 @@ function PhoneNumber() {
                   <Select className="select-field"
 
                     placeholder="Select the assistant"
-
+                    value={selectedAssistant}
                     onSelect={assistantSelectOnPhoneNumberHandler}
 
                     options={publishAssistantList}
