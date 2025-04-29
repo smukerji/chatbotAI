@@ -67,9 +67,9 @@ export default function RootLayout({
           <main
             className={`${josefinSans.variable} ${quickSand.variable} ${poppins.variable}`}
           >
-            <DeepgramContextProvider>
-              <VoiceBotDataProvider>{children}</VoiceBotDataProvider>
-            </DeepgramContextProvider>
+            {/* <DeepgramContextProvider> */}
+            <VoiceBotDataProvider>{children}</VoiceBotDataProvider>
+            {/* </DeepgramContextProvider> */}
           </main>
         </LayoutWrapper>
         <Script
