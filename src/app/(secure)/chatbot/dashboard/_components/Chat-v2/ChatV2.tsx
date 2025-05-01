@@ -828,11 +828,11 @@ function ChatV2({
     };
 
     /// setting the microphone
-    if (!isPopUp) {
-      setupMicrophone();
-    } else {
-      setupMicrophonePopup();
-    }
+    // if (!isPopUp) {
+    //   setupMicrophone();
+    // } else {
+    //   setupMicrophonePopup();
+    // }
 
     handleResize(); // Set initial window width
     window.addEventListener("resize", handleResize);

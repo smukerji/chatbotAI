@@ -704,11 +704,11 @@ function Chat({
     };
 
     /// setting the microphone
-    if (!isPopUp) {
-      setupMicrophone();
-    } else {
-      setupMicrophonePopup();
-    }
+    // if (!isPopUp) {
+    //   setupMicrophone();
+    // } else {
+    //   setupMicrophonePopup();
+    // }
 
     handleResize(); // Set initial window width
     window.addEventListener("resize", handleResize);
@@ -859,8 +859,6 @@ function Chat({
       stopMicrophonePopup();
     }
   };
-
-  console.log("ooooooooooo", microphoneState, MicrophoneState.Open, isPopUp);
 
   return (
     <div className={`chat-container ${innerWidth && "embed-chat-container"}`}>
