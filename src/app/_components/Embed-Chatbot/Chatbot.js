@@ -296,7 +296,7 @@ function Chatbot() {
                 /* microphone states */
                 setupMicrophonePopup={setupMicrophone}
                 stopMicrophonePopup={stopMicrophone}
-                startMicrophonePopup={startMicrophone}
+                // startMicrophonePopup={startMicrophone}
                 microphoneStatePopup={microphoneState}
                 microphonePopup={microphone}
                 /* deepgram states */
@@ -335,7 +335,7 @@ function Chatbot() {
                 /* microphone states */
                 setupMicrophonePopup={setupMicrophone}
                 stopMicrophonePopup={stopMicrophone}
-                startMicrophonePopup={startMicrophone}
+                // startMicrophonePopup={startMicrophone}
                 microphoneStatePopup={microphoneState}
                 microphonePopup={microphone}
                 /* deepgram states */

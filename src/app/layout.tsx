@@ -4,7 +4,6 @@ import { Metadata } from "next";
 import { Josefin_Sans, Quicksand, Poppins } from "next/font/google";
 import Script from "next/script";
 import { VoiceBotDataProvider } from "./_helpers/client/Context/VoiceBotContextApi";
-import { DeepgramContextProvider } from "./_helpers/client/Context/DeepgramContext";
 
 const josefinSans = Josefin_Sans({
   weight: ["400", "700"],
@@ -67,9 +66,9 @@ export default function RootLayout({
           <main
             className={`${josefinSans.variable} ${quickSand.variable} ${poppins.variable}`}
           >
-            <DeepgramContextProvider>
-              <VoiceBotDataProvider>{children}</VoiceBotDataProvider>
-            </DeepgramContextProvider>
+            {/* <DeepgramContextProvider> */}
+            <VoiceBotDataProvider>{children}</VoiceBotDataProvider>
+            {/* </DeepgramContextProvider> */}
           </main>
         </LayoutWrapper>
         <Script
