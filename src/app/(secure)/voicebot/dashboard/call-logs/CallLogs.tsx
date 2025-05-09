@@ -7,10 +7,11 @@ import React, {
   useContext,
 } from 'react';
 import "./call-logs-design.scss";
-import { Input, Slider, Switch, Button, Pagination, Tabs } from 'antd';
+import { Input, Slider, Switch, Button, Pagination, Tabs, DatePicker } from 'antd';
 import Image from 'next/image';
 import { useWavesurfer } from '@wavesurfer/react';
 import Timeline from 'wavesurfer.js/dist/plugins/timeline.esm.js';
+import { ReloadOutlined } from '@ant-design/icons';
 
 // import microimg from "../../../../../../public/voiceBot/SVG/microphone-2.svg";
 
@@ -94,18 +95,18 @@ function CallLogs() {
 
  
 
-    const containerRef = useRef(null);
+  const containerRef = useRef(null);
 
   const [selectedLog, setSelectedLog] = useState<number>(0);
   const [activeKey, setActiveKey] = useState("");
 
   let callLogResponse:any;
 
-  async function getLogRecord(pageNumber:number = 1,pageLimit:number = 10) {
+  async function getLogRecord(pageNumber:number = 1,pageLimit:number = 10, queryParameter:string = "") {
 
     
     setLoading(true);
-    ;
+    debugger;;
 
     const options = {
       method: 'GET',
@@ -113,10 +114,15 @@ function CallLogs() {
     };
 
     let assId = voiceBotContextData.assistantInfo["vapiAssistantId"];
-    ;
+    debugger;
 
+    // let dateValue = "2025-04-02T05:44:48.741Z";
     try {
-      callLogResponse = await fetch(`https://api.vapi.ai/v2/call?limit=${pageLimit}&page=${pageNumber}&assistantId=${assId}`, options);
+      let vapiAPIString = `https://api.vapi.ai/v2/call?limit=${pageLimit}&page=${pageNumber}&assistantId=${assId}`;
+      if (queryParameter) {
+        vapiAPIString = vapiAPIString + queryParameter;
+      }
+      callLogResponse = await fetch(vapiAPIString, options);
       const data = await callLogResponse.json();
       debugger;
       setCallLogsList(data.results);
@@ -251,19 +257,94 @@ const formatCallDuration = (createdAt: string, endedAt: string): string => {
     getLogRecord(page,pageLimit);
   }
 
+  // Update activeFilter type to include "default"
+  const [activeFilter, setActiveFilter] = useState<'default' | 'today' | 'last7' | 'lastMonth' | 'range'>('default');
+  const [dateRange, setDateRange] = useState<[moment.Moment | null, moment.Moment | null] | null>(null);
+  const [queryParameter,setQueryParameter] = useState<string>("");
+
+  // Handler for filter buttons
+  const handleFilterChange = async (filter: 'today' | 'last7' | 'lastMonth' | 'range') => {
+    setActiveFilter(filter);
+    if (filter !== 'range') setDateRange(null);
+    //on today get the today date in 2025-04-02T05:44:48.741Z this format
+    if(filter === 'today'){
+      const today = new Date();
+      const todayDate = today.toISOString().split('T')[0];
+      console.log("today's Date ",todayDate);
+      setQueryParameter(`&createdAtGe=${todayDate}`);
+      await getLogRecord(1, 10, `&createdAtGe=${todayDate}`);
+      // setDateRange([moment(todayDate), moment(todayDate)]);
+    }
+    // For last 7 days
+    else if (filter === 'last7') {
+      const today = new Date();
+      const todayDate = today.toISOString().split('T')[0];
+      const sevenDaysAgo = new Date(today);
+      sevenDaysAgo.setDate(today.getDate() - 7);
+      const sevenDaysAgoDate = sevenDaysAgo.toISOString().split('T')[0];
+      const param = `&createdAtGe=${sevenDaysAgoDate}&createdAtLe=${todayDate}`;
+      setQueryParameter(param);
+      await getLogRecord(1, 10, param);
+    }
+    // TODO: Call API/filter data based on filter
+  };
+
+  // Handler for date range picker
+  const handleDateRangeChange = (dates: any) => {
+    console.clear();
+    console.log("Your date range ",dates)
+    setDateRange(dates);
+    setActiveFilter('range');
+    // TODO: Call API/filter data based on selected date range
+  };
 
   return (
     <div className='call-log-container'>
+      {/* Always show the top-container */}
+      <div className='top-container'>
+      <Button
+        className={activeFilter === 'default' ? 'filter-btn active' : 'filter-btn'}
+        icon={<ReloadOutlined />}
+        onClick={() => {
+          setActiveFilter('default');
+          getLogRecord();
+        }}
+        style={{ marginLeft: 8 }}
+        title="Refresh"
+      />
+        <Button
+          className={activeFilter === 'today' ? 'filter-btn active' : 'filter-btn'}
+          onClick={() => handleFilterChange('today')}
+        >
+          <span>Today</span>
+        </Button>
+        <Button
+          className={activeFilter === 'last7' ? 'filter-btn active' : 'filter-btn'}
+          onClick={() => handleFilterChange('last7')}
+        >
+          <span>Last 7 days</span>
+        </Button>
+        <Button
+          className={activeFilter === 'lastMonth' ? 'filter-btn active' : 'filter-btn'}
+          onClick={() => handleFilterChange('lastMonth')}
+        >
+          <span>Last month</span>
+        </Button>
+        <DatePicker.RangePicker
+          className={activeFilter === 'range' ? 'filter-btn active' : 'filter-btn'}
+          onChange={handleDateRangeChange}
+          value={dateRange as any}
+          allowClear={false}
+          placeholder={['Start date', 'End date']}
+        />
+      
+      </div>
       {
         !loading ? (
           callLogsList?.length >= 1 ?          
     <>
-            <div className='top-container'>
-
-
-            </div>
             <div className='bottom-container'>
-
+       
               <div className="left-container">
                 <div className='list-items'>
                   {
