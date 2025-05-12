@@ -21,6 +21,43 @@
       }
     }
 
+    .filter-btn {
+      border-radius: 1000px;
+      background: #F4F5F6;
+      height: 44px;
+      border: none;
+      box-shadow: none;
+      span {
+        color: #353945;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 24px;
+      }
+    }
+    .filter-btn.active,
+    .filter-btn.ant-picker-active {
+      border: 1px solid #2E58EA;
+      background: #fff;
+      span {
+        color: #2E58EA;
+      }
+    }
+    .ant-picker {
+      border-radius: 1000px;
+      background: #F4F5F6;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      .ant-picker-input > input {
+        font-size: 16px;
+        font-weight: 500;
+      }
+    }
+    .ant-picker-active {
+      border: 1px solid #2E58EA;
+      background: #fff;
+    }
   }
 
   .bottom-container {
@@ -36,6 +73,10 @@
       max-height: 890px;
       overflow: auto;
       width: 30%;
+      background: #FCFCFD;
+      border-radius: 16px;
+      border: 1px solid  #E6E8EC;
+      padding: 16px;
       .list-items {
         display: flex;
         flex-direction: column;
