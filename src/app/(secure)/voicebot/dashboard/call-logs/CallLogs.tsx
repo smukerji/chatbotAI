@@ -97,6 +97,9 @@ function CallLogs() {
 
   const containerRef = useRef(null);
 
+  // Add a key that changes with callLogUrl to force remount
+  const [waveKey, setWaveKey] = useState(0);
+
   const [selectedLog, setSelectedLog] = useState<number>(0);
   const [activeKey, setActiveKey] = useState("");
 
@@ -106,7 +109,7 @@ function CallLogs() {
 
     
     setLoading(true);
-    debugger;;
+
 
     const options = {
       method: 'GET',
@@ -114,7 +117,7 @@ function CallLogs() {
     };
 
     let assId = voiceBotContextData.assistantInfo["vapiAssistantId"];
-    debugger;
+
 
     // let dateValue = "2025-04-02T05:44:48.741Z";
     try {
@@ -124,11 +127,11 @@ function CallLogs() {
       }
       callLogResponse = await fetch(vapiAPIString, options);
       const data = await callLogResponse.json();
-      debugger;
+    
       setCallLogsList(data.results);
       setCallLogUrl(data.results[0]?.recordingUrl);
+      setWaveKey(prev => prev + 1); // <-- force remount of wavesurfer container
       const firstCallLog = data.results[0];
-      ;
 
       let resData: ListCallResponse = {
         id: firstCallLog.id,
@@ -151,8 +154,6 @@ function CallLogs() {
       //set the callListData
       setCallListData(resData);
 
-
-
       //manage the pagination data
       let totalPage = data.metadata.totalItems / data.metadata.itemsPerPage;
       if (totalPage % 1 !== 0) {
@@ -174,9 +175,7 @@ function CallLogs() {
   }
 
   useEffect( () => {
-  ;
     getLogRecord();
-
   }, []);
 
   console.log("your call logs ", callLogsList);
@@ -184,8 +183,8 @@ function CallLogs() {
   const activeLogChangeHandler = (index:number)=>{
     setSelectedLog(index);
     setCallLogUrl(callLogsList[index].recordingUrl);
+    setWaveKey(prev => prev + 1); // <-- force remount of wavesurfer container
     const data = callLogsList[index];
-    ;
 
     let resData: ListCallResponse = {
       id: data.id,
@@ -266,33 +265,69 @@ const formatCallDuration = (createdAt: string, endedAt: string): string => {
   const handleFilterChange = async (filter: 'today' | 'last7' | 'lastMonth' | 'range') => {
     setActiveFilter(filter);
     if (filter !== 'range') setDateRange(null);
-    //on today get the today date in 2025-04-02T05:44:48.741Z this format
-    if(filter === 'today'){
+
+   
+    // Helper for local date formatting
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    const formatLocalDate = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+    if (filter === 'today') {
       const today = new Date();
-      const todayDate = today.toISOString().split('T')[0];
-      console.log("today's Date ",todayDate);
+      const todayDate = formatLocalDate(today);
       setQueryParameter(`&createdAtGe=${todayDate}`);
       await getLogRecord(1, 10, `&createdAtGe=${todayDate}`);
-      // setDateRange([moment(todayDate), moment(todayDate)]);
     }
-    // For last 7 days
     else if (filter === 'last7') {
       const today = new Date();
-      const todayDate = today.toISOString().split('T')[0];
+      const todayDate = formatLocalDate(today);
       const sevenDaysAgo = new Date(today);
       sevenDaysAgo.setDate(today.getDate() - 7);
-      const sevenDaysAgoDate = sevenDaysAgo.toISOString().split('T')[0];
+      const sevenDaysAgoDate = formatLocalDate(sevenDaysAgo);
       const param = `&createdAtGe=${sevenDaysAgoDate}&createdAtLe=${todayDate}`;
       setQueryParameter(param);
       await getLogRecord(1, 10, param);
     }
+    else if (filter === 'lastMonth') {
+      const today = new Date();
+      const todayDate = formatLocalDate(today);
+      const lastMonth = new Date(today);
+      lastMonth.setMonth(today.getMonth() - 1);
+      const lastMonthDate = formatLocalDate(lastMonth);
+      const param = `&createdAtGe=${lastMonthDate}&createdAtLe=${todayDate}`;
+      setQueryParameter(param);
+      await getLogRecord(1, 10, param);
+    }
+    // for range
+    // else if (filter === 'range') {
+    //   debugger;
+    //   const today = new Date();
+    //   const todayDate = today.toISOString().split('T')[0];
+    //   const lastMonth = new Date(today);
+    //   lastMonth.setMonth(today.getMonth() - 1);
+    //   const lastMonthDate = lastMonth.toISOString().split('T')[0];
+    //   const param = `&createdAtGe=${lastMonthDate}&createdAtLe=${todayDate}`;
+    //   setQueryParameter(param);
+    //   await getLogRecord(1, 10, param);
+    // }
     // TODO: Call API/filter data based on filter
   };
 
   // Handler for date range picker
-  const handleDateRangeChange = (dates: any) => {
-    console.clear();
+  const handleDateRangeChange = async (dates: any) => {
+   
     console.log("Your date range ",dates)
+    if (dates && dates.length === 2) {
+      // Format as YYYY-MM-DD in local time
+      const pad = (n: number) => n.toString().padStart(2, '0');
+      const formatLocalDate = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+      const startDate = formatLocalDate(dates[0].toDate ? dates[0].toDate() : dates[0]);
+      const endDate = formatLocalDate(dates[1].toDate ? dates[1].toDate() : dates[1]);
+      const param = `&createdAtGe=${startDate}&createdAtLe=${endDate}`;
+      console.log("your param ",param);
+      setQueryParameter(param);
+      await getLogRecord(1, 10, param);
+    }
+
     setDateRange(dates);
     setActiveFilter('range');
     // TODO: Call API/filter data based on selected date range
@@ -377,7 +412,8 @@ const formatCallDuration = (createdAt: string, endedAt: string): string => {
                   <h3 className='title'>Call Logs</h3>
                   <p className='description'>This section allows you to configure the model for the assistant.</p>
                   <div className="recording-area">
-                    <div ref={containerRef}></div>
+                    {/* Add key to force remount */}
+                    <div ref={containerRef} key={waveKey}></div>
                   </div>
                   <div className='buttons-wrapper'>
                     <div className='play-pause'>
