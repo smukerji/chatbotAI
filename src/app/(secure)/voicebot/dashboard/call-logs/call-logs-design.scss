@@ -264,6 +264,13 @@
                   line-height: 24px;
                 }
               }
+
+              .ant-tabs{
+                .ant-tabs-content-holder{
+                  height: 500px;
+                  overflow-y: auto;
+                }
+              }
       
             }
             }
