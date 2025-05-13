@@ -1,5 +1,3 @@
-
-
 import { VapiClient } from "@vapi-ai/server-sdk";
 import clientPromise from "../../../../../../db";
 import { ObjectId } from "mongodb";
@@ -71,8 +69,45 @@ async function getUserKnowledgFilesByUserId(req:NextRequest){
         const userFileKnowledge = db?.collection("user-file-knowledge"); // Change to your collection name
 
         const userId = req.nextUrl.searchParams.get("userId") as string;
+        const route = req.nextUrl.searchParams.get("route") as string;
+        const assistantIdT = req.nextUrl.searchParams.get("assistantId") as string;
+        
         const userKnowledgeFiles = await userFileKnowledge?.find({ userId: new ObjectId(userId) }).toArray();
-        return ({ data: userKnowledgeFiles, status: 200 });
+        if(route == "model" && assistantIdT){
+            // Get all voice-assistant records for this user
+            const voiceAssistantCol = db?.collection("voice-assistant");
+            const voiceAssistants = await voiceAssistantCol?.find({ userId: new ObjectId(userId) }).toArray();
+
+            // Collect fileIds that are linked to this assistantIdT
+            const fileIdsWithAssistant = new Set(
+                voiceAssistants
+                    .filter((va: any) => va.vapiAssistantId === assistantIdT)
+                    .map((va: any) => va.fileId)
+            );
+
+            // Collect all fileIds in voice-assistant for this user (excluding those with assistantIdT)
+            const fileIdsInVoiceAssistant = new Set(
+                voiceAssistants
+                    .filter((va: any) => va.vapiAssistantId !== assistantIdT)
+                    .map((va: any) => va.fileId)
+            );
+
+            // Only include userKnowledgeFiles whose fileData.id is NOT in fileIdsInVoiceAssistant,
+            // OR if fileData.id is in fileIdsWithAssistant (exception case)
+            const filtered = userKnowledgeFiles?.filter((record: any) => {
+                const fileId = record.fileData?.id;
+                if (!fileId) return false;
+                if (fileIdsWithAssistant.has(fileId)) return true; // exception: keep if linked to assistantIdT
+                return !fileIdsInVoiceAssistant.has(fileId);
+            });
+
+            return ({ data: filtered, status: 200 });
+        }
+        else if(route == "knowledge"){
+            return ({ data: userKnowledgeFiles, status: 200 });
+
+        }
+
       
     }
     catch(error:any){

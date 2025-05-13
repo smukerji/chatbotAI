@@ -63,13 +63,13 @@ async function createVapiAssistant(req: NextRequest) {
 
       }
       
-    //punctuation boundaries refactor
-    vapiData.voice.chunkPlan.punctuationBoundaries = vapiData.voice.chunkPlan.punctuationBoundaries.map((item: any) => item.label);
+      //punctuation boundaries refactor
+      vapiData.voice.chunkPlan.punctuationBoundaries = vapiData.voice.chunkPlan.punctuationBoundaries.map((item: any) => item.label);
 
-    //check if punctuation boundaries is empty
-    let punctionBon = vapiData.voice.chunkPlan.punctuationBoundaries;
-    if(Array.isArray(punctionBon) && punctionBon.length === 0){
-      vapiData.voice.chunkPlan.punctuationBoundaries = ["，", "。"];
+      //check if punctuation boundaries is empty
+      let punctionBon = vapiData.voice.chunkPlan.punctuationBoundaries;
+      if(Array.isArray(punctionBon) && punctionBon.length === 0){
+        vapiData.voice.chunkPlan.punctuationBoundaries = ["，", "。"];
       }
       
 
@@ -94,6 +94,11 @@ async function createVapiAssistant(req: NextRequest) {
           // delete vapiData.model.knowledgeBase;
           // delete vapiData.knowledgeFile;
           delete vapiData.voice.speed;
+          let fileId = ""
+          if (("tools" in vapiData.model) && "fileIds" in vapiData.model.tools[0].knowledgeBases[0] && Array.isArray(vapiData.model.tools[0].knowledgeBases[0].fileIds)) {
+
+            fileId = vapiData.model.tools[0].knowledgeBases[0].fileIds[0];
+          }
           if (voiceBotRecordVapiExist) { //check if the record is already exist then update the record
             const options = {
               method: 'PUT',
@@ -105,6 +110,24 @@ async function createVapiAssistant(req: NextRequest) {
             let vapiResponseData = await vapiResponse.json();
             if (!vapiResponseData?.id) {
               return { error: "Failed to update the assistant" };
+            }
+            //update the voicebot record with the vapi assistant id
+            const updateFields: any = { vapiAssistantId: vapiResponseData.id };
+            if (fileId) {
+              updateFields.fileId = fileId;
+            }
+            const updateResult = await collection?.updateOne(
+              { _id: new ObjectId(localData._id) },
+              { $set: updateFields }
+            );
+
+            //if the record is not updated
+            if (updateResult?.modifiedCount !== 1) {
+              // delete the assistant from the vapi server
+              return { error: "Failed to update voicebot record" };
+            }
+            else {
+              return { result: "result", assistantVapiId: vapiResponseData?.id };
             }
             return { result: "result", assistantVapiId: vapiResponseData?.id };
           }
@@ -122,9 +145,17 @@ async function createVapiAssistant(req: NextRequest) {
             if (!vapiResponseData?.id) {
               return { error: "Failed to create assistant" };
             }
+            
 
             //update the voicebot record with the vapi assistant id
-            const updateResult = await collection?.updateOne({ _id: new ObjectId(localData._id) }, { $set: { vapiAssistantId: vapiResponseData.id } });
+            const updateFields: any = { vapiAssistantId: vapiResponseData.id };
+            if (fileId) {
+              updateFields.fileId = fileId;
+            }
+            const updateResult = await collection?.updateOne(
+              { _id: new ObjectId(localData._id) },
+              { $set: updateFields }
+            );
 
             //if the record is not updated
             if (updateResult?.modifiedCount !== 1) {
