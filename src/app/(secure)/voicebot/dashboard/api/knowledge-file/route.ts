@@ -72,10 +72,11 @@ async function getUserKnowledgFilesByUserId(req:NextRequest){
         const route = req.nextUrl.searchParams.get("route") as string;
         const assistantIdT = req.nextUrl.searchParams.get("assistantId") as string;
         
-        const userKnowledgeFiles = await userFileKnowledge?.find({ userId: new ObjectId(userId) }).toArray();
+        const userKnowledgeFiles =  await userFileKnowledge?.find({ userId: new ObjectId(userId) }).toArray();
         if(route == "model" && assistantIdT){
             // Get all voice-assistant records for this user
-            const voiceAssistantCol = db?.collection("voice-assistant");
+            const voiceAssistantCol = db?.collection("voice-assistance");//voice-assistance
+
             const voiceAssistants = await voiceAssistantCol?.find({ userId: new ObjectId(userId) }).toArray();
 
             // Collect fileIds that are linked to this assistantIdT
@@ -103,7 +104,8 @@ async function getUserKnowledgFilesByUserId(req:NextRequest){
 
             return ({ data: filtered, status: 200 });
         }
-        else if(route == "knowledge"){
+        // else if(route == "knowledge"){
+        else{
             return ({ data: userKnowledgeFiles, status: 200 });
 
         }
