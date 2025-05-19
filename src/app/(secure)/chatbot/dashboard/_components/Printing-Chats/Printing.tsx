@@ -1,6 +1,6 @@
 import React, { Ref, useContext, useRef } from "react";
 import { ChatbotSettingContext } from "../../../../../_helpers/client/Context/ChatbotSettingContext";
-
+import MarkdownPreview from "@uiw/react-markdown-preview";
 const PrintingChats = React.forwardRef(
   (props: any, ref: Ref<HTMLDivElement>) => {
     const { messages, messagesTime } = props;
@@ -28,7 +28,7 @@ const PrintingChats = React.forwardRef(
                         : "0",
                   }}
                 >
-                  <div
+                  {/* <div
                     className="assistant-message"
                     style={{
                       display: "flex",
@@ -37,10 +37,23 @@ const PrintingChats = React.forwardRef(
                         botSettings?.theme === "dark" ? "#353945" : "",
                       color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
                     }}
-                    dangerouslySetInnerHTML={{
-                      __html: message.content,
+                    // dangerouslySetInnerHTML={{
+                    //   __html: message.content,
+                    // }}
+                  > */}
+                  <MarkdownPreview
+                    source={message.content}
+                    // className="assistant-message"
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      backgroundColor:
+                        botSettings?.theme === "dark" ? "#353945" : "",
+                      color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
                     }}
-                  ></div>
+                    // style={{ padding: 16 }}
+                  />
+                  {/* </div> */}
                   {messagesTime?.[index]?.messageType
                     ? messagesTime?.[index]?.messageType !== "initial"
                     : message.messageType !== "initial" && (

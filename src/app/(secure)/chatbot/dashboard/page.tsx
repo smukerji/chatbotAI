@@ -38,6 +38,7 @@ import {
 import ChatV2 from "./_components/Chat-v2/ChatV2";
 import { functionCallHandler } from "@/app/_helpers/client/functionCallHandler";
 import { useRouter } from "next/navigation";
+import ChatV3 from "./_components/Chat-v3/ChatV3";
 
 function Dashboard() {
   const { status } = useSession();
@@ -539,7 +540,21 @@ function Dashboard() {
           {editChatbot == "chatbot" && (
             <>
               {chatbot?.botType == "bot-v2" ? (
-                <ChatV2
+                // <ChatV2
+                //   chatbot={chatbot}
+                //   messages={messages}
+                //   setMessages={setMessages}
+                //   messagesTime={messagesTime}
+                //   setMessagesTime={setMessagesTime}
+                //   threadID={threadId}
+                //   sessionStartDate={sessionStartDate}
+                //   setThreadId={createThread}
+                //   setSessionStartDate={setSessionStartDate}
+                //   isPlanNotification={isPlanNotification}
+                //   setIsPlanNotification={setIsPlanNotification}
+                //   functionCallHandler={functionCallHandler}
+                // />
+                <ChatV3
                   chatbot={chatbot}
                   messages={messages}
                   setMessages={setMessages}
@@ -552,6 +567,8 @@ function Dashboard() {
                   isPlanNotification={isPlanNotification}
                   setIsPlanNotification={setIsPlanNotification}
                   functionCallHandler={functionCallHandler}
+                  setSessionID={setSessionID}
+                  sessionID={sessionID}
                 />
               ) : (
                 <Chat
