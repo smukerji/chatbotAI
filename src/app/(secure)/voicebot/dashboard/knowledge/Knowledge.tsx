@@ -1,7 +1,8 @@
 import dynamic from "next/dynamic";
 import { UploadProps, message, Button, Spin, Upload } from "antd";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { CreateVoiceBotContext } from "../../../../_helpers/client/Context/VoiceBotContextApi"
 // import documentUploadIcon from "../../../../public/create-chatbot-svgs/document-upload.svg";
 import documentUploadIcon from "../../../../../../public/create-chatbot-svgs/document-upload.svg";
 import "./knowledge-style.scss";
@@ -24,13 +25,21 @@ function SpinnerLoader() {
     );
 }
 
-function Knowledge() {
+// Add triggerPublishMethod to props
+export type KnowledgeProps = {
+    triggerPublishMethod: (fromKnowledge:boolean) => Promise<void>;
+};
+
+function Knowledge({ triggerPublishMethod }: KnowledgeProps) {
     const [isUploading, setIsUploading] = useState(false);
     const [isFetchingFiles, setIsFetchingFiles] = useState(false); // New state for fetching files
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [cookies, setCookie] = useCookies(["userId"]);
     const [fileUpdate, setFileUpdate] = useState("");
     const [userFiles, setUserFiles] = useState<any[]>([]);
+
+    const voiceBotContextData: any = useContext(CreateVoiceBotContext);
+    const voicebotDetails = voiceBotContextData.state;
 
     useEffect(() => {
         getUsersFile();
@@ -123,6 +132,36 @@ function Knowledge() {
 
             const body = await response.json();
 
+                //check if tools is in the model
+                if (!("tools" in voicebotDetails.model)) {
+                voiceBotContextData.updateState("model.tools", [
+                            {
+                            type: "query",
+                            knowledgeBases: [
+                                {
+                                    name: body?.name,
+                                    provider: "google",
+                                    description: "file",
+                                    fileIds: [
+                                            body?.id
+                                        ]
+                                }
+                            ],
+                            },
+                        ]);
+                        
+                } else {
+                    const oldIds = voicebotDetails.model.tools[0].knowledgeBases[0].fileIds;
+                    const newIds = [...oldIds, body.id];
+                    voiceBotContextData.updateState("model.tools.0.knowledgeBases.0.fileIds", newIds);
+                    // voiceBotContextData.updateState("model.tools.0.knowledgeBases.0.name", "File names old is fine");
+
+                }
+                debugger;
+
+                 await triggerPublishMethod(true);
+                
+
             //send the file data to the server
             const serverResponse = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/knowledge-file`, {
                 method: "POST",
@@ -132,6 +171,7 @@ function Knowledge() {
                 body: JSON.stringify({
                     fileData: body,
                     userId: cookies.userId,
+                    assistantId: voiceBotContextData?.assistantInfo?.vapiAssistantId,
                 }),
             });
 
@@ -140,29 +180,31 @@ function Knowledge() {
                 throw new Error("Failed to store file data.");
             }
             setFileUpdate(body.id);
+         
+           
+           
             console.log(body, serverBody);
             // message.success("File uploaded successfully!");
-        } catch (error) {
+        } catch (error:any) {
             console.error(error);
-            // message.error("File upload failed.");
+            message.error(error.message || "File upload failed.");
         } finally {
             setIsUploading(false); // Hide spinner
         }
     }
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0] || null;
-        // setSelectedFile(file);
-        if (file) {
-            handleFileUpload(file);
-        }
-    };
 
     const draggerProps: UploadProps = {
         name: "file",
         multiple: false,
         customRequest: async ({ file, onSuccess, onError }) => {
             try {
+                const assistantId = voiceBotContextData?.assistantInfo?.vapiAssistantId;
+                if(!assistantId) {
+                    message.error("Assistant Need to Publish First");
+                    return;
+                 
+                }
                 await handleFileUpload(file as File);
                 onSuccess && onSuccess("File uploaded successfully.");
             } catch (error) {
@@ -259,4 +301,5 @@ function Knowledge() {
     );
 }
 
-export default dynamic((): any => Promise.resolve(Knowledge), { ssr: false });
+// Fix the dynamic export to accept props
+export default dynamic<KnowledgeProps>(() => Promise.resolve(Knowledge), { ssr: false });

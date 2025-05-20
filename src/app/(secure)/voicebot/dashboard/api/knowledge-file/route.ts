@@ -46,6 +46,7 @@ async function storeFileKnowledgeData(req: NextRequest) {
         await userFileKnowledge?.insertOne({
             fileData: data.fileData,
             userId: new ObjectId(data.userId),
+            assistantId: data.assistantId,
         });
 
         return { message: 'Knowledge data acknowledge successfully!' , status: 200 };

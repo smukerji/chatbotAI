@@ -309,24 +309,24 @@ function Dashboard() {
             assistantData.metadata = vapiAssistanceData.metadata;
 
             //check if knowledgebase exist in the existing data
-            if("tools" in vapiAssistanceData.model && Array.isArray(vapiAssistanceData.model.tools) && vapiAssistanceData.model.tools.length > 0 && ("type" in vapiAssistanceData.model.tools[0]) && "knowledgeBases" in vapiAssistanceData.model.tools[0] && (Array.isArray(vapiAssistanceData.model.tools[0].knowledgeBases)) && vapiAssistanceData.model.tools[0].knowledgeBases.length > 0 && ("fileIds" in vapiAssistanceData.model.tools[0].knowledgeBases[0]) && Array.isArray(vapiAssistanceData.model.tools[0].knowledgeBases[0].fileIds) && vapiAssistanceData.model.tools[0].knowledgeBases[0].fileIds.length > 0){
+            // if("tools" in vapiAssistanceData.model && Array.isArray(vapiAssistanceData.model.tools) && vapiAssistanceData.model.tools.length > 0 && ("type" in vapiAssistanceData.model.tools[0]) && "knowledgeBases" in vapiAssistanceData.model.tools[0] && (Array.isArray(vapiAssistanceData.model.tools[0].knowledgeBases)) && vapiAssistanceData.model.tools[0].knowledgeBases.length > 0 && ("fileIds" in vapiAssistanceData.model.tools[0].knowledgeBases[0]) && Array.isArray(vapiAssistanceData.model.tools[0].knowledgeBases[0].fileIds) && vapiAssistanceData.model.tools[0].knowledgeBases[0].fileIds.length > 0){
               
-               //check if the fileid is exist in the db
-              const fileId = vapiAssistanceData.model.tools[0].knowledgeBases[0].fileIds[0];
-              const fileCheckResponse = await fetch(
-                `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/knowledge-file/file-check?fileId=${fileId}&userId=${cookies.userId}`,
-                {
-                  method: "GET",
-                }
-              );
+            //    //check if the fileid is exist in the db
+            //   const fileId = vapiAssistanceData.model.tools[0].knowledgeBases[0].fileIds[0];
+            //   const fileCheckResponse = await fetch(
+            //     `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/knowledge-file/file-check?fileId=${fileId}&userId=${cookies.userId}`,
+            //     {
+            //       method: "GET",
+            //     }
+            //   );
 
-              const fileCheckResponseParse = await fileCheckResponse.json();
-              if (fileCheckResponseParse?.message != "File exists"){
-                //delete the knowledge base from the assistant data
-                delete assistantData.model.tools
-              }
+            //   const fileCheckResponseParse = await fileCheckResponse.json();
+            //   if (fileCheckResponseParse?.message != "File exists"){
+            //     //delete the knowledge base from the assistant data
+            //     delete assistantData.model.tools
+            //   }
 
-            }
+            // }
 
             if (("knowledgeBase" in vapiAssistanceData.model) && "fileIds" in vapiAssistanceData.model.knowledgeBase && Array.isArray(vapiAssistanceData.model.knowledgeBase.fileIds)) {
 
@@ -562,13 +562,13 @@ async function costDeductionOnCallEndHandler(){
 
   }
 
-  const vapiAssistantPublishHandler = async () => {
+  const vapiAssistantPublishHandler = async (fromKnowledge=false) => {
     // publish the assistant to the vapi
 
     //validate the assistant require field first,
-
+    debugger;
     //call the post api to publish the assistant to the vapi
-    if(!voiceBotContextData?.isPublishEnabled){
+    if(!voiceBotContextData?.isPublishEnabled && !fromKnowledge){
       message.error("Please fill the required fields to publish the assistant");
       return;
     }
@@ -731,7 +731,7 @@ async function costDeductionOnCallEndHandler(){
                   </Button>
                 </div>
             }
-            <Button className={!voiceBotContextData?.isPublishEnabled ? "publish-button publish-button-disabled" : "publish-button" } onClick={vapiAssistantPublishHandler}>Publish</Button>
+            <Button className={!voiceBotContextData?.isPublishEnabled ? "publish-button publish-button-disabled" : "publish-button" } onClick={ ()=> vapiAssistantPublishHandler(false)}>Publish</Button>
           </div>
 
           </div>
@@ -826,7 +826,7 @@ async function costDeductionOnCallEndHandler(){
             {
               tab == "knowledge" && (
                 <>
-                  <Knowledge />
+                  <Knowledge  triggerPublishMethod = {vapiAssistantPublishHandler}/>
                 </>
               )
             }
