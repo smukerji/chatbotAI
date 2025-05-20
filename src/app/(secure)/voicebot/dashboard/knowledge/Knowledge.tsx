@@ -40,6 +40,7 @@ function Knowledge({ triggerPublishMethod }: KnowledgeProps) {
 
     const voiceBotContextData: any = useContext(CreateVoiceBotContext);
     const voicebotDetails = voiceBotContextData.state;
+    console.log("voicebotDetails front row", voicebotDetails);
 
     useEffect(() => {
         getUsersFile();
@@ -48,7 +49,7 @@ function Knowledge({ triggerPublishMethod }: KnowledgeProps) {
     async function getUsersFile() {
         try {
             setIsFetchingFiles(true); // Show spinner while fetching files
-            const response = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/knowledge-file?userId=${cookies.userId}`);
+            const response = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/knowledge-file?userId=${cookies.userId}&assistantId=${voiceBotContextData?.assistantInfo?.vapiAssistantId}`);
             const data = await response.json();
             console.table(data.data);
             if (data.status === 200) {
@@ -78,6 +79,26 @@ function Knowledge({ triggerPublishMethod }: KnowledgeProps) {
     async function deleteAssistantHandler(id: string) {
         try {
 
+            console.log("asistant data ",voicebotDetails);
+            if (("tools" in voicebotDetails.model) && Array.isArray(voicebotDetails.model.tools) && "knowledgeBases" in voicebotDetails.model.tools[0] && Array.isArray(voicebotDetails.model.tools[0].knowledgeBases) && "fileIds" in voicebotDetails.model.tools[0].knowledgeBases[0] && Array.isArray(voicebotDetails.model.tools[0].knowledgeBases[0].fileIds)) {
+                //remove the file id from the fileIds array
+                const fileIds = voicebotDetails.model.tools[0].knowledgeBases[0].fileIds;
+                const newFileIds = fileIds.filter((fileId: string) => fileId !== id);
+                if( newFileIds.length === 0) {
+                    //delete tools field from the model
+                    const model = voicebotDetails.model;
+                    delete model.tools;
+                    voiceBotContextData.updateState("model", model);
+                }
+                else{
+                    voiceBotContextData.updateState("model.tools.0.knowledgeBases.0.fileIds", newFileIds);
+                }
+
+
+                await triggerPublishMethod(true);
+
+            }
+            debugger;
             const token = await getValidToken();
             const response = await fetch(`https://api.vapi.ai/file/${id}`, {
                 method: "DELETE",
@@ -159,7 +180,7 @@ function Knowledge({ triggerPublishMethod }: KnowledgeProps) {
                 }
                 debugger;
 
-                 await triggerPublishMethod(true);
+                await triggerPublishMethod(true);
                 
 
             //send the file data to the server
@@ -265,7 +286,7 @@ function Knowledge({ triggerPublishMethod }: KnowledgeProps) {
                 <div className="knowledge-list">
                     <div className="knowledge-list-header">
                         <span className="description-text">Attached Files</span>
-                        <span className="right-content">Delete all</span>
+                        <span className="right-content" onClick={() => deleteAssistantHandler("64c95015-10a5-4e20-b506-c8d20f507ab6")}>Delete all</span>
                     </div>
                     {isFetchingFiles ? (
                         <div className="user-file-loader">
