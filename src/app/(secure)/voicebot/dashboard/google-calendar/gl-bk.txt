@@ -1,0 +1,106 @@
+import React, { useState } from "react";
+import { Button } from "antd";
+import Image from "next/image";
+import googleCalendarAPI from "../../../../../../public/Google_Calendar.png";
+
+// Use Google Calendar logo from an online source
+
+
+const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID as string;
+const REDIRECT_URI = process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI as string;
+const SCOPE = [
+  "https://www.googleapis.com/auth/calendar.readonly",
+  "https://www.googleapis.com/auth/calendar.events",
+].join(" ");
+const RESPONSE_TYPE = "token";
+
+function GCalendar() {
+  const [authToken, setAuthToken] = useState<string | null>(null);
+
+  const handleGoogleAuth = () => {
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(
+      REDIRECT_URI
+    )}&response_type=${RESPONSE_TYPE}&scope=${encodeURIComponent(SCOPE)}&prompt=consent&access_type=online`;
+
+    const width = 500,
+      height = 600;
+    const left = window.screenX + (window.outerWidth - width) / 2;
+    const top = window.screenY + (window.outerHeight - height) / 2;
+
+    const popup = window.open(
+      authUrl,
+      "google_oauth",
+      `width=${width},height=${height},left=${left},top=${top}`
+    );
+
+    const interval = setInterval(() => {
+      try {
+        if (!popup || popup.closed) {
+          clearInterval(interval);
+          return;
+        }
+        const hash = popup.location.hash;
+        if (hash && hash.includes("access_token")) {
+          const params = new URLSearchParams(hash.substring(1));
+          const token = params.get("access_token");
+          if (token) {
+            setAuthToken(token);
+            popup.close();
+            clearInterval(interval);
+          }
+        }
+      } catch (e) {
+        // Ignore cross-origin errors until redirect happens
+      }
+    }, 500);
+  };
+
+  return (
+    <div
+      style={{
+        minHeight: 300,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        marginTop: 40,
+      }}
+    >
+      <Image
+        src={googleCalendarAPI}
+        alt="Google Calendar"
+        width={48}
+        height={48}
+        style={{ marginBottom: 8 }}
+      />
+      <h2>Google Calendar</h2>
+      <div style={{ marginTop: 24 }}>
+        <Button
+          type="primary"
+          size="large"
+          onClick={handleGoogleAuth}
+          style={{ minWidth: 160 }}
+          disabled={!!authToken}
+        >
+          Connect
+        </Button>
+      </div>
+      {authToken && (
+        <div
+          style={{
+            marginTop: 24,
+            wordBreak: "break-all",
+            textAlign: "center",
+          }}
+        >
+          <p>Authenticated with Google Calendar</p>
+          <p style={{ fontSize: 12, color: "#888" }}>
+            Access Token: {authToken}
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default GCalendar;
