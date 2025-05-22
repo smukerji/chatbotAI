@@ -293,7 +293,7 @@ function Knowledge({ triggerPublishMethod }: KnowledgeProps) {
                 <div className="knowledge-list">
                     <div className="knowledge-list-header">
                         <span className="description-text">Attached Files</span>
-                        <span className="right-content" onClick={() => deleteAssistantHandler("64c95015-10a5-4e20-b506-c8d20f507ab6")}>Delete all</span>
+                        <span className="right-content">Delete all</span>
                     </div>
                     {isFetchingFiles ? (
                         <div className="user-file-loader">
