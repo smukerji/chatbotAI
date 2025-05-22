@@ -112,23 +112,24 @@ async function createVapiAssistant(req: NextRequest) {
               return { error: "Failed to update the assistant" };
             }
             //update the voicebot record with the vapi assistant id
-            // const updateFields: any = { vapiAssistantId: vapiResponseData.id };
+            const updateFields: any = { vapiAssistantId: vapiResponseData.id };
             // if (fileId) {
             //   updateFields.fileId = fileId;
             // }
-            // const updateResult = await collection?.updateOne(
-            //   { _id: new ObjectId(localData._id) },
-            //   { $set: updateFields }
-            // );
+            const updateResult = await collection?.updateOne(
+              { _id: new ObjectId(localData._id) },
+              { $set: updateFields }
+            );
 
-            // //if the record is not updated
-            // if (updateResult?.modifiedCount !== 1) {
-            //   // delete the assistant from the vapi server
-            //   return { error: "Failed to update voicebot record" };
-            // }
-            // else {
-            //   return { result: "result", assistantVapiId: vapiResponseData?.id };
-            // }
+            //if the record is not updated
+
+            if (updateResult?.matchedCount !== 1) {
+              // delete the assistant from the vapi server
+              return { error: "Failed to update voicebot record" };
+            }
+            else {
+              return { result: "result", assistantVapiId: vapiResponseData?.id };
+            }
             return { result: "result", assistantVapiId: vapiResponseData?.id };
           }
           else { //if the record is not exist then create the record
@@ -148,23 +149,23 @@ async function createVapiAssistant(req: NextRequest) {
             
 
             //update the voicebot record with the vapi assistant id
-            // const updateFields: any = { vapiAssistantId: vapiResponseData.id };
+            const updateFields: any = { vapiAssistantId: vapiResponseData.id };
             // if (fileId) {
             //   updateFields.fileId = fileId;
             // }
-            // const updateResult = await collection?.updateOne(
-            //   { _id: new ObjectId(localData._id) },
-            //   { $set: updateFields }
-            // );
+            const updateResult = await collection?.updateOne(
+              { _id: new ObjectId(localData._id) },
+              { $set: updateFields }
+            );
 
-            // //if the record is not updated
-            // if (updateResult?.modifiedCount !== 1) {
-            //   // delete the assistant from the vapi server
-              // return { error: "Failed to update voicebot record" };
-            // }
-            // else {
-              // return { result: "result", assistantVapiId: vapiResponseData?.id };
-            // }
+            //if the record is not updated
+            if (updateResult?.modifiedCount !== 1) {
+              // delete the assistant from the vapi server
+              return { error: "Failed to update voicebot record" };
+            }
+            else {
+              return { result: "result", assistantVapiId: vapiResponseData?.id };
+            }
               return { result: "result", assistantVapiId: vapiResponseData?.id };
 
 

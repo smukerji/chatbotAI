@@ -100,7 +100,7 @@ function Dashboard() {
     ;
     if(voiceBotContextData.assistantInfo?.vapiAssistantId) {
 
-     
+      
       getAssistantData(voiceBotContextData.assistantInfo?.vapiAssistantId);
  
 
@@ -156,6 +156,10 @@ function Dashboard() {
           voiceBotContextData.setAssistantInfo(
           {  ...assistantCreateResponseParse.record}
           );
+                voiceBotContextData.setAssistantInfo((prev:any) => ({
+          ...prev,
+          vapiAssistantId: assistantCreateResponseParse.assistantVapiId
+        }));
 
           getAssistantData(assistantCreateResponseParse.record?.vapiAssistantId);
 
@@ -230,7 +234,7 @@ function Dashboard() {
 
         //get the assistant record from the vapi's side
         try{
-
+          debugger;
           setLoading(true);
           if(isFirstTimeAssistantCreation){
             //get the system prompts otherwise skip
@@ -246,6 +250,7 @@ function Dashboard() {
 
           const assistantDataResponseParse = await assistantDataResponse.json();
     
+          debugger;
           if(assistantDataResponseParse?.error){
             message.error("Error while getting the assistant data");
             return;
@@ -593,11 +598,12 @@ async function costDeductionOnCallEndHandler(){
         message.error("Error while publishing the assistant");
         return;
       }
+      debugger;
       if(assistantCreateResponseParse?.assistantVapiId){
-        voiceBotContextData.setAssistantInfo({
-          ...voiceBotContextData.assistantInfo,
-          vapiAssistantId:assistantCreateResponseParse.assistantVapiId
-        });
+        voiceBotContextData.setAssistantInfo((prev:any) => ({
+          ...prev,
+          vapiAssistantId: assistantCreateResponseParse.assistantVapiId
+        }));
         message.success("Assistant published successfully");
         // voiceBotContextData.setPublishLoading(true);
         voiceBotContextData.setAfterPublishLoading(true);

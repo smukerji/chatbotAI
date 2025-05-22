@@ -48,6 +48,8 @@ function Knowledge({ triggerPublishMethod }: KnowledgeProps) {
 
     async function getUsersFile() {
         try {
+            console.log("your assistant id", voiceBotContextData?.assistantInfo?.vapiAssistantId);
+            debugger;
             setIsFetchingFiles(true); // Show spinner while fetching files
             const response = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/knowledge-file?userId=${cookies.userId}&assistantId=${voiceBotContextData?.assistantInfo?.vapiAssistantId}`);
             const data = await response.json();
@@ -79,6 +81,7 @@ function Knowledge({ triggerPublishMethod }: KnowledgeProps) {
     async function deleteAssistantHandler(id: string) {
         try {
 
+             setIsFetchingFiles(true);
             console.log("asistant data ",voicebotDetails);
             if (("tools" in voicebotDetails.model) && Array.isArray(voicebotDetails.model.tools) && "knowledgeBases" in voicebotDetails.model.tools[0] && Array.isArray(voicebotDetails.model.tools[0].knowledgeBases) && "fileIds" in voicebotDetails.model.tools[0].knowledgeBases[0] && Array.isArray(voicebotDetails.model.tools[0].knowledgeBases[0].fileIds)) {
                 //remove the file id from the fileIds array
@@ -130,10 +133,15 @@ function Knowledge({ triggerPublishMethod }: KnowledgeProps) {
         } catch (error) {
             console.error(error);
         }
+        finally {
+            setIsFetchingFiles(false); // Hide spinner after deleting files
+        }
     }
 
     async function handleFileUpload(file: File) {
         try {
+            console.log("your voicebot context data", voiceBotContextData);
+            debugger;
             setIsUploading(true); // Show spinner
             const token = await getValidToken();
             const formData = new FormData();

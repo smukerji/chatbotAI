@@ -73,6 +73,8 @@ async function getUserKnowledgFilesByUserId(req:NextRequest){
         // const route = req.nextUrl.searchParams.get("route") as string;
         const assistantIdT = req.nextUrl.searchParams.get("assistantId") as string;
 
+        console.log("knowledge base your assistant id", assistantIdT);
+
         // Use $and for userId and assistantId
         const userKnowledgeFiles =  await userFileKnowledge?.find({
             $and: [
@@ -80,6 +82,7 @@ async function getUserKnowledgFilesByUserId(req:NextRequest){
                 { assistantId: assistantIdT }
             ]
         }).toArray();
+        console.log("knowledge base user knowledge files", userKnowledgeFiles);
         // if(route == "model" && assistantIdT){
         //     // Get all voice-assistant records for this user
         //     const voiceAssistantCol = db?.collection("voice-assistance");//voice-assistance
