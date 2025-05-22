@@ -49,7 +49,6 @@ function Knowledge({ triggerPublishMethod }: KnowledgeProps) {
     async function getUsersFile() {
         try {
             console.log("your assistant id", voiceBotContextData?.assistantInfo?.vapiAssistantId);
-            debugger;
             setIsFetchingFiles(true); // Show spinner while fetching files
             const response = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/knowledge-file?userId=${cookies.userId}&assistantId=${voiceBotContextData?.assistantInfo?.vapiAssistantId}`);
             const data = await response.json();
@@ -101,7 +100,7 @@ function Knowledge({ triggerPublishMethod }: KnowledgeProps) {
                 await triggerPublishMethod(true);
 
             }
-            debugger;
+           
             const token = await getValidToken();
             const response = await fetch(`https://api.vapi.ai/file/${id}`, {
                 method: "DELETE",
@@ -141,7 +140,7 @@ function Knowledge({ triggerPublishMethod }: KnowledgeProps) {
     async function handleFileUpload(file: File) {
         try {
             console.log("your voicebot context data", voiceBotContextData);
-            debugger;
+            
             setIsUploading(true); // Show spinner
             const token = await getValidToken();
             const formData = new FormData();
@@ -186,7 +185,7 @@ function Knowledge({ triggerPublishMethod }: KnowledgeProps) {
                     // voiceBotContextData.updateState("model.tools.0.knowledgeBases.0.name", "File names old is fine");
 
                 }
-                debugger;
+            
 
                 await triggerPublishMethod(true);
                 

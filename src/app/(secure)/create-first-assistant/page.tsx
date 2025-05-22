@@ -433,7 +433,6 @@ export default function FirstAssistant() {
 			);
 
 			const data = await res.json();
-			debugger;
 			setVoicePlan(data?.userCredits as number || 0);
 
 			assertMessageExist(data?.message, data?.message);

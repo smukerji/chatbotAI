@@ -234,7 +234,6 @@ function Dashboard() {
 
         //get the assistant record from the vapi's side
         try{
-          debugger;
           setLoading(true);
           if(isFirstTimeAssistantCreation){
             //get the system prompts otherwise skip
@@ -250,7 +249,6 @@ function Dashboard() {
 
           const assistantDataResponseParse = await assistantDataResponse.json();
     
-          debugger;
           if(assistantDataResponseParse?.error){
             message.error("Error while getting the assistant data");
             return;
@@ -571,7 +569,6 @@ async function costDeductionOnCallEndHandler(){
     // publish the assistant to the vapi
 
     //validate the assistant require field first,
-    debugger;
     //call the post api to publish the assistant to the vapi
     if(!voiceBotContextData?.isPublishEnabled && !fromKnowledge){
       message.error("Please fill the required fields to publish the assistant");
@@ -686,12 +683,12 @@ async function costDeductionOnCallEndHandler(){
             </Button>
             
            { isMoreContentVisible && (<div ref={divRef} className="content-holder"  onClick={(e) => e.stopPropagation()} >
-              <Button className="duplicate-assistant-button" onClick={duplicateAssistantHandler}>
+              {/* <Button className="duplicate-assistant-button" onClick={duplicateAssistantHandler}>
                 <div className="duplicate-assistant-button-content">
                   <Image alt="" src={documentCopy} className="duplicate-assistant-button-icon"></Image>
                   <span className="duplicate-assistant-button-text">Duplicate</span>
                 </div>
-              </Button>
+              </Button> */}
               <Button className="delete-assistant-button" onClick={deleteAssistantHandler}>
                 <div className="delete-assistant-button-content">
                   <Image alt="" src={documentTrash} className="delete-assistant-button-icon"></Image>

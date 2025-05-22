@@ -38,7 +38,6 @@ function VoicebotUsage({ firstPurchase = false }) {
       const b = encryptPriceId(walletCredits.toString(  ));
       const encryptedAmount = encodeURIComponent(a);
       const encryptedCredit = encodeURIComponent(b);
-      debugger;
       // if(firstPurchase == true){
       //   router.push(`/create-first-assistant?amount=${encryptedAmount}&credit=${encryptedCredit}&voicebotPurchase=true`);
       // }
@@ -66,7 +65,6 @@ function VoicebotUsage({ firstPurchase = false }) {
       );
 
       //get dailly and monthly usage
-      debugger;
       const usageResult = await fetch(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/costs-wallates/usages?userId=${cookies.userId}&todayDate=${moment().format('YYYY-MM-DD')}&monthDate=${moment().format('YYYY-MM')}`,
         {
