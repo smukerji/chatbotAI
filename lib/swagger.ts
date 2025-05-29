@@ -39,6 +39,9 @@ export const getApiDocs = async () => {
   const mainDocument: any = yaml.load(
     fs.readFileSync(`${yamlFilePath}/main.yaml`, "utf8")
   );
+  const voiceDocument: any = yaml.load(
+    fs.readFileSync(`${yamlFilePath}/voicebot-assistant.yaml`, "utf8")
+  );
   // Create Swagger Specification
   const spec = createSwaggerSpec({
     apiFolder: "src/app/server/api",
@@ -61,6 +64,7 @@ export const getApiDocs = async () => {
       ],
       // Add the paths from the YAML files
       paths: {
+        ...voiceDocument.paths,
         ...accountDocument.paths,
         ...authDocument.paths,
         ...contactMailDocument.paths,
@@ -76,6 +80,11 @@ export const getApiDocs = async () => {
 
       // Add the tags from the YAML files
       tags: [
+        {
+          name: "Voice Assistant",
+          description: "Operations related to voice assistant interactions",
+        },
+
         {
           name: "Account",
           description: "Operations related to user login and registration",

@@ -1,0 +1,507 @@
+paths:
+  /dashboard/api/assistant:
+    get:
+      tags:
+        - Voice Assistant
+      summary: Get list of voice assistants for a user
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: string
+          required: true
+          description: User's unique ID
+      responses:
+        '200':
+          description: List of assistants
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  assistants:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          description: Assistant ID
+                        assistantName:
+                          type: string
+                        assistantTemplateIDs:
+                          type: array
+                          items:
+                            type: string
+                        imageUrl:
+                          type: string
+                        userId:
+                          type: string
+                        isDeleted:
+                          type: boolean
+                        metadata:
+                          type: object
+                          properties:
+                            lastUsed:
+                              type: integer
+                            lastTrained:
+                              type: integer
+                            totalCallLogs:
+                              type: integer
+                        vapiAssistantId:
+                          type: string
+                        templateDetails:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              _id:
+                                type: string
+                              assistantType:
+                                type: string
+                              industryType:
+                                type: string
+                              dispcrtion:
+                                type: string
+                              systemPrompt:
+                                type: string
+                              imageUrl:
+                                type: string
+                              info:
+                                type: string
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
+
+    delete:
+      tags:
+        - Voice Assistant
+      summary: Soft delete a voice assistant by ID
+      parameters:
+        - in: query
+          name: assistanceId
+          schema:
+            type: string
+          required: true
+          description: Assistant's unique ID
+      responses:
+        '200':
+          description: Deletion result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  error:
+                    type: string
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
+
+    post:
+      tags:
+        - Voice Assistant
+      summary: Give free credits to a user for voicebot usage
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: string
+          required: true
+          description: User's unique ID
+      responses:
+        '200':
+          description: Credits added or current credits returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  userCredits:
+                    type: number
+                  error:
+                    type: string
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
+  /dashboard/api/costs-wallates:
+    get:
+      tags:
+        - Voice Assistant
+      summary: Check if user has voicebot credits
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: string
+          required: true
+          description: User's unique ID
+      responses:
+        '200':
+          description: Credit status for the user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  isCreditExist:
+                    type: boolean
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
+
+    put:
+      tags:
+        - Voice Assistant
+      summary: Deduct voicebot credits for a user after a call
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: string
+          required: true
+          description: User's unique ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                assistantId:
+                  type: string
+                  description: Vapi Assistant ID
+      responses:
+        '200':
+          description: Credits updated or error message
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: number
+                    description: Updated credits (if successful)
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
+  /dashboard/api/costs-wallates/usages:
+    get:
+      tags:
+        - Voice Assistant
+      summary: Get user's daily and monthly voicebot usage costs
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: string
+          required: true
+          description: User's unique ID
+        - in: query
+          name: todayDate
+          schema:
+            type: string
+            format: date
+          required: false
+          description: Date for daily usage in YYYY-MM-DD format (defaults to today)
+        - in: query
+          name: monthDate
+          schema:
+            type: string
+            pattern: '^\d{4}-\d{2}$'
+          required: false
+          description: Month for monthly usage in YYYY-MM format (defaults to current month)
+      responses:
+        '200':
+          description: Usage costs for the user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      todayDate:
+                        type: string
+                        format: date
+                      monthDate:
+                        type: string
+                        pattern: '^\d{4}-\d{2}$'
+                      usage:
+                        type: object
+                        properties:
+                          dayUsage:
+                            type: number
+                            description: Total cost for the specified day
+                          monthUsage:
+                            type: number
+                            description: Total cost for the specified month
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
+  /dashboard/api/get-token:
+    get:
+      tags:
+        - Voice Assistant
+      summary: Get a Vapi API token for the user
+      responses:
+        '200':
+          description: Successfully generated token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
+  /dashboard/api/knowledge-file:
+    get:
+      tags:
+        - Voice Assistant
+      summary: Get all knowledge files for a user and assistant
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: string
+          required: true
+          description: User's unique ID (MongoDB ObjectId)
+        - in: query
+          name: assistantId
+          schema:
+            type: string
+          required: true
+          description: Assistant's unique ID
+      responses:
+        '200':
+          description: List of knowledge files for the user and assistant
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          description: Knowledge file record ID
+                        fileData:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                            name:
+                              type: string
+                            orgId:
+                              type: string
+                            url:
+                              type: string
+                            bytes:
+                              type: string
+                            object:
+                              type: string
+                            purpose:
+                              type: string
+                            createdAt:
+                              type: string
+                              format: date-time
+                            updatedAt:
+                              type: string
+                              format: date-time
+                            mimetype:
+                              type: string
+                            bucket:
+                              type: string
+                            path:
+                              type: string
+                            status:
+                              type: string
+                        userId:
+                          type: string
+                          description: User's ObjectId
+                        assistantId:
+                          type: string
+                          description: Assistant's unique ID
+                  status:
+                    type: integer
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
+
+    post:
+      tags:
+        - Voice Assistant
+      summary: Store a new knowledge file for a user and assistant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fileData:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    name:
+                      type: string
+                    orgId:
+                      type: string
+                    url:
+                      type: string
+                    bytes:
+                      type: string
+                    object:
+                      type: string
+                    purpose:
+                      type: string
+                    createdAt:
+                      type: string
+                      format: date-time
+                    updatedAt:
+                      type: string
+                      format: date-time
+                    mimetype:
+                      type: string
+                    bucket:
+                      type: string
+                    path:
+                      type: string
+                    status:
+                      type: string
+                userId:
+                  type: string
+                  description: User's ObjectId
+                assistantId:
+                  type: string
+                  description: Assistant's unique ID
+      responses:
+        '200':
+          description: Knowledge data acknowledged successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  status:
+                    type: integer
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
+
+    delete:
+      tags:
+        - Voice Assistant
+      summary: Delete a knowledge file for a user by file ID
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: string
+          required: true
+          description: User's unique ID (MongoDB ObjectId)
+        - in: query
+          name: fileId
+          schema:
+            type: string
+          required: true
+          description: File's unique ID
+      responses:
+        '200':
+          description: Knowledge data deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  status:
+                    type: integer
+        '404':
+          description: No knowledge data found to delete
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  status:
+                    type: integer
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
+  /dashboard/api/knowledge-file/file-check:
+    get:
+      tags:
+        - Voice Assistant
+      summary: Check if a knowledge file exists for a user
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: string
+          required: true
+          description: User's unique ID (MongoDB ObjectId)
+        - in: query
+          name: fileId
+          schema:
+            type: string
+          required: true
+          description: File's unique ID
+      responses:
+        '200':
+          description: File exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  status:
+                    type: integer
+        '404':
+          description: File does not exist
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  status:
+                    type: integer
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
