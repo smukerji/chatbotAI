@@ -604,12 +604,7 @@ async function costDeductionOnCallEndHandler(){
         message.success("Assistant published successfully");
         // voiceBotContextData.setPublishLoading(true);
         voiceBotContextData.setAfterPublishLoading(true);
-        // Log the state before and after the state changes
-      // console.log("State before reset:", voiceBotContextData.state);
-      // voiceBotContextData.setState({});
-      // console.log("State after reset to empty object:", voiceBotContextData.state);
-      // voiceBotContextData.setState(voiceBotContextData.state);
-      // console.log("State after resetting to previous state:", voiceBotContextData.state);
+        
     
         updateAssistantLastTrainedMetaDataService(voiceBotContextData.assistantInfo?._id);
       }
