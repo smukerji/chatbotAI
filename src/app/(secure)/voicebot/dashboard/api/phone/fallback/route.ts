@@ -6,12 +6,7 @@ import clientPromise from "../../../../../../../db";
 import { ObjectId } from "mongodb";
 //-> api/phone/fallback
 module.exports = apiHandler({
-    // GET: getAssistantList,//dashboard/api/assistant
-    // DELETE:deleteSingleAssistant//dashboard/api/assistant
-    // POST: importNumberToTwilio,
-    // GET: getImportedTwilioDataFromDB,
     PUT: updateAssistantPhoneFallback,//
-    // DELETE: deleteSingleAssistant//dashboard/api/assistant
 });
 
 type BodyRequestInput = {

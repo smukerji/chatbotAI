@@ -83,47 +83,9 @@ async function getUserKnowledgFilesByUserId(req:NextRequest){
             ]
         }).toArray();
         console.log("knowledge base user knowledge files", userKnowledgeFiles);
-        // if(route == "model" && assistantIdT){
-        //     // Get all voice-assistant records for this user
-        //     const voiceAssistantCol = db?.collection("voice-assistance");//voice-assistance
-
-        //     const voiceAssistants = await voiceAssistantCol?.find({ userId: new ObjectId(userId) }).toArray();
-
-        //     // Collect fileIds that are linked to this assistantIdT
-        //     const fileIdsWithAssistant = new Set(
-        //         voiceAssistants
-        //             .filter((va: any) => va.vapiAssistantId === assistantIdT)
-        //             .map((va: any) => va.fileId)
-        //     );
-
-        //     // Collect all fileIds in voice-assistant for this user (excluding those with assistantIdT)
-        //     const fileIdsInVoiceAssistant = new Set(
-        //         voiceAssistants
-        //             .filter((va: any) => va.vapiAssistantId !== assistantIdT)
-        //             .map((va: any) => va.fileId)
-        //     );
-
-        //     // Only include userKnowledgeFiles whose fileData.id is NOT in fileIdsInVoiceAssistant,
-        //     // OR if fileData.id is in fileIdsWithAssistant (exception case)
-        //     const filtered = userKnowledgeFiles?.filter((record: any) => {
-        //         const fileId = record.fileData?.id;
-        //         if (!fileId) return false;
-        //         if (fileIdsWithAssistant.has(fileId)) return true; // exception: keep if linked to assistantIdT
-        //         return !fileIdsInVoiceAssistant.has(fileId);
-        //     });
-
-        //     return ({ data: filtered, status: 200 });
-        // }
-        // else if(route == "knowledge"){
-        // else{
-            // return ({ data: userKnowledgeFiles, status: 200 });
-
-        // }
-
 
         return ({ data: userKnowledgeFiles, status: 200 });
 
-      
     }
     catch(error:any){
         console.error('Error parsing request body:', error);

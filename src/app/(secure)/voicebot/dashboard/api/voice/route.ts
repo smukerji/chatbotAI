@@ -5,7 +5,7 @@ import { ObjectId } from "mongodb";
 import { VoiceBotData,VoiceData } from "./types";
 
 module.exports = apiHandler({
-    POST: createVoiceBot,
+    POST: createVoiceBot,// dashboard/api/voice
     PUT: updateVoiceBot,
   });
 

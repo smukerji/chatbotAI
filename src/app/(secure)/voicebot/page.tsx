@@ -33,7 +33,6 @@ export default function VoiceBot() {
     },
   ];
 
-  const [currentPage, setCurrentPage] = useState<number>(1);
 
   const [cookies, setCookie] = useCookies(["userId"]);
 
