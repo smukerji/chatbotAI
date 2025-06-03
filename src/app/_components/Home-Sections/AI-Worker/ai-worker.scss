@@ -1,6 +1,7 @@
 .digital-workers {
   display: flex;
   padding: 5.2vw 12.2vw;
+  margin-top: 50px;
 
   gap: 3rem;
 
@@ -10,33 +11,33 @@
     position: sticky;
     top: 100px;
 
-    .tag {
-      display: inline-block;
-      padding: 0.3rem 0.7rem;
-      background: #e0e7ff;
-      color: #3730a3;
-      font-size: 0.8rem;
-      font-weight: 600;
-      border-radius: 999px;
-      margin-bottom: 1rem;
+    .badge {
+      padding: 6px 12px;
+      border-radius: 1000px;
+      gap: 10px;
+      border: 1px solid #fff;
+      background: #eaf5ff;
+      color: #4d72f5;
+      font-size: 14px;
+      line-height: 20px; /* 142.857% */
     }
 
     h2 {
-      font-size: 1.8rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
+      font-size: 36px;
+      font-weight: 600;
+      margin: 17px 0;
     }
 
     p {
-      font-size: 0.95rem;
-      color: #555;
-      margin-bottom: 1.5rem;
+      font-size: 16px;
+      color: #777e90;
+      margin-bottom: 17px;
     }
 
     a {
-      color: #2d6cdf;
-      font-weight: 600;
-      font-size: 0.95rem;
+      color: #2e58ea;
+      font-weight: 500;
+      font-size: 16px;
       text-decoration: none;
 
       &:hover {
@@ -46,16 +47,26 @@
   }
 
   .right-pane {
-    flex: 1.5;
+    flex: 1;
     overflow-y: auto;
-    height: 80vh;
-    padding-right: 1rem;
+    // height: 80vh;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+
+    &::-webkit-scrollbar {
+      display: none; /* Hide scrollbar for WebKit browsers */
+    }
 
     .scroll-container {
       display: flex;
       flex-direction: column;
-      gap: 2rem;
-      padding-right: 1rem;
+
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* Internet Explorer 10+ */
+
+      &::-webkit-scrollbar {
+        display: none; /* Hide scrollbar for WebKit browsers */
+      }
     }
 
     .card {
@@ -67,38 +78,40 @@
       display: flex;
 
       img {
-        width: 100%;
+        width: 80%;
+        height: auto;
         border-radius: 8px;
-        object-fit: cover;
+        object-fit: contain;
         margin-bottom: 1rem;
       }
 
       h3 {
-        font-size: 1.1rem;
-        font-weight: 700;
+        font-size: 30px;
+        font-weight: 600;
         margin: 0.5rem 0;
+        display: flex;
+        align-items: center;
 
         span {
-          display: block;
-          font-size: 0.85rem;
-          font-weight: 400;
-          color: #666;
+          font-size: 16px;
+          font-weight: 500;
+          color: #777e90;
         }
       }
 
       p {
-        font-size: 0.9rem;
-        color: #555;
+        font-size: 16px;
+        color: #777e90;
         margin: 0.5rem 0 1rem 0;
       }
 
       button {
-        background-color: #2d6cdf;
+        background-color: #2e58ea;
         color: white;
         border: none;
-        padding: 0.5rem 1rem;
-        border-radius: 6px;
-        font-size: 0.9rem;
+        padding: 12px 24px;
+        border-radius: 12px;
+        font-size: 16px;
         margin-bottom: 1rem;
 
         &:hover {
@@ -112,23 +125,30 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        border-top: 1px solid #eee;
         margin-top: 1rem;
         padding-top: 1rem;
 
         li {
           text-align: center;
+          margin: 20px 0;
+
+          img {
+            width: 32px;
+            height: 32px;
+            margin-bottom: 10px;
+          }
 
           span {
             display: block;
-            font-size: 0.75rem;
-            color: #888;
+            font-size: 16px;
+            color: #777e90;
+            margin-bottom: 10px;
           }
 
           strong {
-            font-size: 0.95rem;
+            font-size: 30px;
             font-weight: 600;
-            color: #111;
+            color: #23262f;
           }
         }
       }

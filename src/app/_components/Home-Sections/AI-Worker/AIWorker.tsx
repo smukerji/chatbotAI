@@ -4,6 +4,9 @@ import Image from "next/image";
 import jacobImg from "../../../../../public/sections-images/digital-worker/1.png";
 import alinaImg from "../../../../../public/sections-images/digital-worker/2.png";
 import zaraImg from "../../../../../public/sections-images/digital-worker/3.png";
+import speedLead from "../../../../../public/sections-images/digital-worker/user-cirlce-add.svg";
+import inboundConversion from "../../../../../public/sections-images/digital-worker/message-add.svg";
+import winRate from "../../../../../public/sections-images/digital-worker/cup.svg";
 
 const workers = [
   {
@@ -33,7 +36,7 @@ function AIWorker() {
   return (
     <section className="digital-workers">
       <div className="left-pane">
-        <span className="tag">Digital Worker</span>
+        <span className="badge">Digital Worker</span>
         <h2>
           The Future is <br /> Lifelike: AI That <br /> Feels Natural
         </h2>
@@ -53,7 +56,7 @@ function AIWorker() {
               <div className="card-left">
                 <Image src={worker.img} alt={worker.name} />
                 <h3>
-                  {worker.name} <span>{worker.role}</span>
+                  {worker.name}&nbsp;<span>| {worker.role}</span>
                 </h3>
                 <p>{worker.description}</p>
                 <button>Try chat →</button>
@@ -61,14 +64,17 @@ function AIWorker() {
               <div className="card-right">
                 <ul className="stats">
                   <li>
+                    <Image src={speedLead} alt="Speed to lead" />
                     <span>Speed to lead</span>
                     <strong>&lt;20%</strong>
                   </li>
                   <li>
+                    <Image src={inboundConversion} alt="Inbound conversion" />
                     <span>Inbound conversion %</span>
                     <strong>+61%</strong>
                   </li>
                   <li>
+                    <Image src={winRate} alt="Win rate" />
                     <span>Win rate</span>
                     <strong>+3.5%</strong>
                   </li>
