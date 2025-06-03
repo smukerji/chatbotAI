@@ -28,13 +28,44 @@
   .bottom {
     display: flex;
     margin-top: 48px;
-    gap: 140px;
+    gap: 20px;
     margin-bottom: 140px;
+
     .left {
       flex: 1;
 
+      .badge {
+        padding: 6px 12px;
+        border-radius: 1000px;
+        gap: 10px;
+        border: 1px solid #fff;
+        background: #eaf5ff;
+        color: #4d72f5;
+        font-size: 14px;
+        line-height: 20px; /* 142.857% */
+      }
+
+      .heading {
+        color: #23262f;
+        font-size: 36px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 50px; /* 120% */
+        margin-top: 20px;
+      }
+
+      .intro-para {
+        color: var(--Neutral-5, #777e90);
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 500;
+        margin-top: 20px;
+        margin-bottom: 40px;
+        line-height: 28px; /* 140% */
+      }
+
       .feature {
-        padding: 16px;
+        padding: 20px;
         gap: 20px;
         cursor: pointer;
         .title {
@@ -78,7 +109,7 @@
       display: flex;
       justify-content: center;
       img {
-        width: 80%;
+        width: 100%;
         height: auto;
       }
     }
