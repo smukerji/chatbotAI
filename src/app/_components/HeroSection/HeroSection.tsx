@@ -229,40 +229,52 @@ function HeroSection() {
             </div>
           </div>
         </div>
+      </section>
 
-        <div className="metrics">
-          <p className="subheading">
-            While your team sleeps, your AI agents deliver.
-          </p>
-          <h2>
-            AI Workers That Feel Human. <br />
-            Perform Superhuman.
-          </h2>
-          <p className="description">
-            Torri blends emotional intelligence with business logic. Our agents
-            learn your products, adapt to your brand, and scale with your needs
-            — instantly.
-          </p>
-
-          <div className="metrics-grid">
-            <div className="metric-card">
-              <Image src={iconResponse} alt="Response Rate" />
-              <p className="label">Response Rate</p>
-              <h3>3x Faster</h3>
-            </div>
-            <div className="metric-card">
-              <Image src={iconConversion} alt="Ecommerce Conversion" />
-              <p className="label">Ecommerce Conversion</p>
-              <h3>62% Higher</h3>
-            </div>
-            <div className="metric-card">
-              <Image src={iconCost} alt="Operational Cost" />
-              <p className="label">Operational Cost</p>
-              <h3>35% Lower</h3>
-            </div>
+      <div className="metrics">
+        <div className="metrics-intro">
+          <div className="left-intro">
+            <p className="subheading">
+              While your team sleeps, your AI agents deliver.
+            </p>
+            <h2>
+              AI Workers That Feel Human. <br />
+              Perform Superhuman.
+            </h2>
+          </div>
+          <div className="right-intro">
+            <p className="description">
+              Torri blends emotional intelligence with business logic. Our
+              agents learn your products, adapt to your brand, and scale with
+              your needs — instantly.
+            </p>
           </div>
         </div>
-      </section>
+
+        <div className="metrics-grid">
+          <div className="metric-card">
+            <div className="metric-icon response-rate">
+              <Image src={iconResponse} alt="Response Rate" />
+            </div>
+            <p className="label">Response Rate</p>
+            <h3>3x Faster</h3>
+          </div>
+          <div className="metric-card">
+            <div className="metric-icon conversion-rate">
+              <Image src={iconConversion} alt="Ecommerce Conversion" />
+            </div>
+            <p className="label">Ecommerce Conversion</p>
+            <h3>62% Higher</h3>
+          </div>
+          <div className="metric-card">
+            <div className="metric-icon operational-rate">
+              <Image src={iconCost} alt="Operational Cost" />
+            </div>
+            <p className="label">Operational Cost</p>
+            <h3>35% Lower</h3>
+          </div>
+        </div>
+      </div>
     </>
   );
 }

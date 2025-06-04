@@ -1,15 +1,15 @@
 .digital-workers {
   display: flex;
   padding: 5.2vw 12.2vw;
-  margin-top: 50px;
+  margin-top: 100px;
 
   gap: 3rem;
 
   .left-pane {
     flex: 1;
-    max-width: 350px;
-    position: sticky;
-    top: 100px;
+    max-width: 300px;
+    // position: sticky;
+    // top: 100px;
 
     .badge {
       padding: 6px 12px;
@@ -91,6 +91,7 @@
         margin: 0.5rem 0;
         display: flex;
         align-items: center;
+        width: 80%;
 
         span {
           font-size: 16px;
@@ -103,6 +104,7 @@
         font-size: 16px;
         color: #777e90;
         margin: 0.5rem 0 1rem 0;
+        width: 80%;
       }
 
       button {
@@ -155,7 +157,7 @@
     }
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 991px) {
     flex-direction: column;
 
     .left-pane {
@@ -166,6 +168,32 @@
     .right-pane {
       height: auto;
       max-height: none;
+    }
+  }
+
+  @media (max-width: 475px) {
+    .right-pane {
+      .card {
+        flex-direction: column;
+
+        .card-left {
+          img {
+            width: 100%;
+            height: auto;
+          }
+          h3 {
+            width: 100%;
+          }
+          p {
+            width: 100%;
+          }
+        }
+
+        .stats {
+          flex-direction: row;
+          flex-wrap: wrap;
+        }
+      }
     }
   }
 }
