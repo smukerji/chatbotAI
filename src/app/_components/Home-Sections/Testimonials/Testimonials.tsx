@@ -67,7 +67,7 @@ function Testimonials() {
       slider.classList.remove("dragging");
     };
 
-    const handleMouseMove = (e) => {
+    const handleMouseMove = (e: any) => {
       if (!isDown) return;
       e.preventDefault();
       const x = e.pageX - slider.offsetLeft;
@@ -75,7 +75,7 @@ function Testimonials() {
       slider.scrollLeft = scrollLeft - walk;
     };
 
-    const handleWheel = (e) => {
+    const handleWheel = (e: any) => {
       e.preventDefault();
       slider.scrollLeft += e.deltaY;
     };
