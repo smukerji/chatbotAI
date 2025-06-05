@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { use, useState } from "react";
 import "./hero-section.scss";
 import Image from "next/image";
 import Link from "next/link";
@@ -24,10 +24,12 @@ import iconResponse from "../../../../public/sections-images/header-background/m
 import iconConversion from "../../../../public/sections-images/header-background/icon-cost.svg";
 import iconCost from "../../../../public/sections-images/header-background/favorite-chart.svg";
 import iconScroll from "../assets/icon-scroll.svg";
+import { useRouter } from "next/navigation";
 
 function HeroSection() {
   const [message, setMessage] = useState("");
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const router = useRouter();
 
   const handleSendMessage = () => {
     if (message.trim() !== "") {
@@ -175,11 +177,17 @@ function HeroSection() {
                   <h3>Jessica</h3>
                   <p>Torri&apos;s Customer Service Agent</p>
                   <div className="actions">
-                    <button className="call">
+                    <button
+                      className="call"
+                      // onClick={() => router.push("/home/call?agent=jessica")}
+                    >
                       <Image src={iconCall} alt="Call" />
                       Call
                     </button>
-                    <button className="message">
+                    <button
+                      className="message"
+                      // onClick={() => router.push("/home/chat?agent=jessica")}
+                    >
                       <Image src={iconMessage} alt="Message" />
                       Message
                     </button>
