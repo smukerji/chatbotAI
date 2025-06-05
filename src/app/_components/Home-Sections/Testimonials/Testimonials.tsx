@@ -49,7 +49,7 @@ function Testimonials() {
     let startX: any;
     let scrollLeft: any;
 
-    const handleMouseDown = (e) => {
+    const handleMouseDown = (e: any) => {
       if (e.button !== 0) return; // Only respond to left-click
       isDown = true;
       slider.classList.add("dragging");
