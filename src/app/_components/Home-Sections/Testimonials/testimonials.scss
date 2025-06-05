@@ -120,29 +120,64 @@
   background-position: center;
   background-repeat: no-repeat;
 
+  .badge {
+    padding: 6px 12px;
+    border-radius: 1000px;
+    gap: 10px;
+    border: 1px solid #fff;
+    background: #eaf5ff;
+    color: #4d72f5;
+    font-size: 14px;
+    line-height: 20px; /* 142.857% */
+  }
+
   h2 {
     color: #23262f;
     font-size: 36px;
     font-style: normal;
     font-weight: 500;
     line-height: 50px; /* 138.889% */
-    margin: 50px 0;
+    margin: 20px 0 50px 0;
   }
 
   .testimonials-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    display: flex;
+    // grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 20px;
-    max-width: 1200px;
+    // max-width: 1200px;
+    overflow-x: auto;
     margin: auto;
+    width: 100vw;
+    left: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    right: 50%;
+    position: relative;
+    padding: 0 2vw 20px 12.2vw;
+    user-select: none;
+
+    &::-webkit-scrollbar {
+      display: none; /* Hide scrollbar for WebKit browsers */
+    }
+    &::-moz-scrollbar {
+      display: none; /* Hide scrollbar for Firefox */
+    }
+    &::-ms-scrollbar {
+      display: none; /* Hide scrollbar for Internet Explorer */
+    }
+    &::-o-scrollbar {
+      display: none; /* Hide scrollbar for Opera */
+    }
 
     .testimonial-card {
-      background: #fff;
-      border-radius: 10px;
       padding: 20px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
       text-align: left;
       position: relative;
+      min-width: 390px;
+      max-width: 390px;
+      border-radius: 12px;
+      border: 1px solid var(--Neutral-3, #e6e8ec);
+      background: var(--Neutral-1, #fcfcfd);
 
       .testimonial-quote {
         font-size: 40px;

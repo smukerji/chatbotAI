@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { use, useState } from "react";
 import "./hero-section.scss";
 import Image from "next/image";
 import Link from "next/link";
@@ -16,10 +16,20 @@ import ellipse2 from "../../../../public/sections-images/header-background/Ellip
 import ellipse3 from "../../../../public/sections-images/header-background/Ellipse 78.png";
 import sendIcon from "../../../../public/svgs/send.svg";
 import HeroSectionChatPopup from "../HeroSectionChatPopup/HeroSectionChatPopup";
+import jessicaImg from "../../../../public/sections-images/header-background/jessica.png";
+import davidImg from "../../../../public/sections-images/header-background/david.png";
+import iconCall from "../../../../public/sections-images/header-background/call-outgoing.svg";
+import iconMessage from "../../../../public/sections-images/header-background/message-text-2.svg";
+import iconResponse from "../../../../public/sections-images/header-background/messages.svg";
+import iconConversion from "../../../../public/sections-images/header-background/icon-cost.svg";
+import iconCost from "../../../../public/sections-images/header-background/favorite-chart.svg";
+import iconScroll from "../assets/icon-scroll.svg";
+import { useRouter } from "next/navigation";
 
 function HeroSection() {
   const [message, setMessage] = useState("");
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const router = useRouter();
 
   const handleSendMessage = () => {
     if (message.trim() !== "") {
@@ -35,7 +45,7 @@ function HeroSection() {
 
   return (
     <>
-      <div className="hero-section-container">
+      {/* <div className="hero-section-container">
         <h1 className="title">
           Seamless Support Starts Here: AI Chatbot Solutions for Every Customer
           Query
@@ -89,7 +99,7 @@ function HeroSection() {
         <div className="grp-img">
           <Image src={HeaderImage} alt="image" fill />
         </div>
-      </div>
+      </div> */}
 
       {/* <section className={"heroSection"}>
         <div className={"container"}>
@@ -135,6 +145,144 @@ function HeroSection() {
           </div>
         </div>
       </section> */}
+
+      <section className="hero-section">
+        <div className="top-section">
+          <div className="left">
+            <h1>
+              Reimagine Your <br /> Team with AI-
+              <br />
+              Powered Digital <br />
+              Workers
+            </h1>
+            <p>
+              Always-on. Always-learning. Always-ready. Chat or talk to our
+              multimodal AI agents that think, respond, and grow with your
+              business.
+            </p>
+            <div className="buttons">
+              <button className="primary">Talk to an Agent Now</button>
+              <button className="secondary">Create Your Own AI Agent</button>
+            </div>
+          </div>
+          <div className="right">
+            {/* Left Card: Image Top */}
+            <div className="agent-card image-top">
+              <div
+                className="image-section"
+                style={{ backgroundColor: "#fef08a" }}
+              >
+                <Image src={jessicaImg} alt="Jessica" />
+                <div className="overlay-text">
+                  <h3>Jessica</h3>
+                  <p>Torri&apos;s Customer Service Agent</p>
+                  <div className="actions">
+                    <button
+                      className="call"
+                      // onClick={() => router.push("/home/call?agent=jessica")}
+                    >
+                      <Image src={iconCall} alt="Call" />
+                      Call
+                    </button>
+                    <button
+                      className="message"
+                      // onClick={() => router.push("/home/chat?agent=jessica")}
+                    >
+                      <Image src={iconMessage} alt="Message" />
+                      Message
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="info-section">
+                <div className="badge-group">
+                  <p className="badge-time">24h</p>
+                  <p className="badge-support">Support</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Card: Image Bottom */}
+            <div className="agent-card image-bottom">
+              <div className="badge-group-second">
+                <p className="badge-24">
+                  <span className="badge-time">24h</span>
+                  <span className="badge-support">Support</span>
+                </p>
+                <span className="badge-7">
+                  <span className="badge-time">7d</span>
+                  <span className="badge-support">Support</span>
+                </span>
+              </div>
+              <div
+                className="image-section"
+                style={{ backgroundColor: "#a7f3d0" }}
+              >
+                <Image src={davidImg} alt="David" />
+                <div className="overlay-text">
+                  <h3>David</h3>
+                  <p>Torri&apos;s Customer Service Agent</p>
+                  <div className="actions">
+                    <button className="call">
+                      <Image src={iconCall} alt="Call" />
+                      Call
+                    </button>
+                    <button className="message">
+                      <Image src={iconMessage} alt="Message" />
+                      Message
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="metrics">
+        <div className="metrics-intro">
+          <div className="left-intro">
+            <p className="subheading">
+              While your team sleeps, your AI agents deliver.
+            </p>
+            <h2>
+              AI Workers That Feel Human. <br />
+              Perform Superhuman.
+            </h2>
+          </div>
+          <div className="right-intro">
+            <p className="description">
+              Torri blends emotional intelligence with business logic. Our
+              agents learn your products, adapt to your brand, and scale with
+              your needs — instantly.
+            </p>
+          </div>
+        </div>
+
+        <div className="metrics-grid">
+          <div className="metric-card">
+            <div className="metric-icon response-rate">
+              <Image src={iconResponse} alt="Response Rate" />
+            </div>
+            <p className="label">Response Rate</p>
+            <h3>3x Faster</h3>
+          </div>
+          <div className="metric-card">
+            <div className="metric-icon conversion-rate">
+              <Image src={iconConversion} alt="Ecommerce Conversion" />
+            </div>
+            <p className="label">Ecommerce Conversion</p>
+            <h3>62% Higher</h3>
+          </div>
+          <div className="metric-card">
+            <div className="metric-icon operational-rate">
+              <Image src={iconCost} alt="Operational Cost" />
+            </div>
+            <p className="label">Operational Cost</p>
+            <h3>35% Lower</h3>
+          </div>
+        </div>
+      </div>
     </>
   );
 }

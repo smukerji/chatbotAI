@@ -18,7 +18,7 @@ const IndustryAbout = () => {
         <div className="industry-content">
           <div className="industry-left">
             <span className="badge">Industry</span>
-            <h2>Digital Workers supporting at every business landscape</h2>
+            <h2>AI That Speaks Your Industry&apos;s Language</h2>
             <div className="industry-images">
               <Image src={person1} alt="Person 1" className="person1" />
               <Image src={person2} alt="Person 2" className="person2" />
@@ -28,16 +28,8 @@ const IndustryAbout = () => {
           <div className="industry-right">
             <div className="industry-card">
               <div className="industry-item">
-                <Image src={icon1} alt="icon-1" className="icons" />
-                <h3>Education and Institutes</h3>
-                <p>
-                  Torri AI is intelligent to find answers for your for your
-                  research papers, and books. Upload a book and chat with it.
-                </p>
-              </div>
-              <div className="industry-item">
                 <Image src={icon2} alt="icon-2" className="icons" />
-                <h3>Healthcare and Wellness</h3>
+                <h3>Healthcare</h3>
                 <p>
                   Torri AI can provide intelligent support to your customers
                   needs based on their health records. Make it personalised and
@@ -45,8 +37,16 @@ const IndustryAbout = () => {
                 </p>
               </div>
               <div className="industry-item">
+                <Image src={icon1} alt="icon-1" className="icons" />
+                <h3>Education</h3>
+                <p>
+                  Torri AI is intelligent to find answers for your for your
+                  research papers, and books. Upload a book and chat with it.
+                </p>
+              </div>
+              <div className="industry-item">
                 <Image src={icon3} alt="icon-3" className="icons" />
-                <h3>Small Medium Business</h3>
+                <h3>Retail & DTC</h3>
                 <p>
                   Torri AI can transform your customer support experience with
                   swift query resolutions, available 24/7
@@ -54,7 +54,7 @@ const IndustryAbout = () => {
               </div>
               <div className="industry-item">
                 <Image src={icon4} alt="icon-4" className="icons" />
-                <h3>Hotels and Hospitality</h3>
+                <h3>Hospitality</h3>
                 <p>
                   Add an AI-chatbot to your website, whatsapp, telegram with a
                   simple embed code to provide personalised experience about
@@ -63,7 +63,7 @@ const IndustryAbout = () => {
               </div>
               <div className="industry-item">
                 <Image src={icon5} alt="icon-5" className="icons" />
-                <h3>Nonprofits or B2C</h3>
+                <h3>SMBs</h3>
                 <p>
                   Add Torri AI to your website, whatsapp, telegram for your
                   staff to find any projects and documents. Chat with your
@@ -76,7 +76,7 @@ const IndustryAbout = () => {
       </section>
 
       {/* About Us Section */}
-      <section className="about-section">
+      {/* <section className="about-section">
         <h2>About us</h2>
         <p>
           It&nbsp;s not just about reaching your users; it&nbsp;s about reaching
@@ -92,7 +92,7 @@ const IndustryAbout = () => {
             className="video"
           />
         </div>
-      </section>
+      </section> */}
     </div>
   );
 };
