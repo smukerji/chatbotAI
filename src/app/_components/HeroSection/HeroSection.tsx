@@ -179,14 +179,14 @@ function HeroSection() {
                   <div className="actions">
                     <button
                       className="call"
-                      // onClick={() => router.push("/home/call?agent=jessica")}
+                      onClick={() => router.push("/home/call?agent=jessica")}
                     >
                       <Image src={iconCall} alt="Call" />
                       Call
                     </button>
                     <button
                       className="message"
-                      // onClick={() => router.push("/home/chat?agent=jessica")}
+                      onClick={() => router.push("/home/chat?agent=jessica")}
                     >
                       <Image src={iconMessage} alt="Message" />
                       Message
@@ -223,11 +223,17 @@ function HeroSection() {
                   <h3>David</h3>
                   <p>Torri&apos;s Customer Service Agent</p>
                   <div className="actions">
-                    <button className="call">
+                    <button
+                      className="call"
+                      onClick={() => router.push("/home/call?agent=david")}
+                    >
                       <Image src={iconCall} alt="Call" />
                       Call
                     </button>
-                    <button className="message">
+                    <button
+                      className="message"
+                      onClick={() => router.push("/home/chat?agent=david")}
+                    >
                       <Image src={iconMessage} alt="Message" />
                       Message
                     </button>

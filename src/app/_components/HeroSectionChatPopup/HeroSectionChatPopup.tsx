@@ -4,7 +4,7 @@ import Image from "next/image";
 import RefreshIcon from "../../../../public/svgs/refreshbtn.svg";
 import CallIcon from "../../../../public/voiceBot/SVG/call-outgoing.svg";
 import CloseIcon from "../../../../public/svgs/close-circle.svg";
-import SendIcon from "../../../../public/svgs/send-2.svg";
+import SendIcon from "../../../../public/svgs/send-3.svg";
 import "./hero-section-chat-popup.scss";
 import { getDate } from "@/app/_helpers/client/getTime";
 import { message } from "antd";
@@ -12,9 +12,10 @@ import { AssistantStream } from "openai/lib/AssistantStream.mjs";
 import { AssistantStreamEvent } from "openai/resources/beta/assistants.mjs";
 import { functionCallHandler } from "@/app/_helpers/client/functionCallHandler";
 import VapiAssistantCall from "./VapiCall/VapiAssistantCall";
+import JessicaImg from "../../../../public/sections-images/header-background/jessica.png";
+import DavidImg from "../../../../public/sections-images/header-background/david.png";
 
-
-function HeroSectionChatPopup({ onClose }: any) {
+function HeroSectionChatPopup({ onClose, agent }: any) {
   const [messages, setMessages]: any = useState([]);
   const [userMessage, setUserMessage] = useState("");
   /// chat base response
@@ -313,7 +314,7 @@ function HeroSectionChatPopup({ onClose }: any) {
 
   return (
     <div className={"chatPopup"}>
-      <div className={"chatHeader"}>
+      {/* <div className={"chatHeader"}>
         <div>
           <button onClick={() => handleClose()} className={"closeButton"}>
             <Image src={CloseIcon} alt="Close" />
@@ -327,7 +328,7 @@ function HeroSectionChatPopup({ onClose }: any) {
           <VapiAssistantCall setMessages={setMessages} setMessagesTime={setMessagesTime} timeoutSeconds={10} 
           />
         </div>
-      </div>
+      </div> */}
 
       <div className={"conversation-container "} ref={chatWindowRef}>
         {messages.map((message: any, index: any) => {
@@ -358,11 +359,16 @@ function HeroSectionChatPopup({ onClose }: any) {
                       __html: message.content,
                     }}
                   ></div>
-                  {messagesTime[index]?.messageType !== "initial" && (
+                  {/* {messagesTime[index]?.messageType !== "initial" && (
                     <div className="time">
                       {messagesTime[index]?.messageTime}
                     </div>
-                  )}
+                  )} */}
+                  <Image
+                    src={agent === "jessica" ? JessicaImg : DavidImg}
+                    alt="user"
+                    className="user-icon"
+                  />
                 </div>
               </React.Fragment>
             );
@@ -380,7 +386,7 @@ function HeroSectionChatPopup({ onClose }: any) {
                 >
                   {message.content}
                 </div>
-                <div className="time">{messagesTime[index]?.messageTime}</div>
+                {/* <div className="time">{messagesTime[index]?.messageTime}</div> */}
               </div>
             );
         })}
