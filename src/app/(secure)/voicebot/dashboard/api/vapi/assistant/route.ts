@@ -20,13 +20,6 @@ async function createVapiAssistant(req: NextRequest) {
       const localData = voicBotData?.assistantLocalData;
       const vapiData = voicBotData?.assistantVapiData;
 
-      // Store localData and vapiData as JSON files
-      const dataDir = path.resolve(process.cwd(), "tmp");
-      if (!fs.existsSync(dataDir)) {
-        fs.mkdirSync(dataDir, { recursive: true });
-      }
-      fs.writeFileSync(path.join(dataDir, "localData.json"), JSON.stringify(localData, null, 2));
-      fs.writeFileSync(path.join(dataDir, "vapiData.json"), JSON.stringify(vapiData, null, 2));
 
       let propertyArrayData = vapiData.analysisPlan.structuredDataSchema.properties;
 

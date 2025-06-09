@@ -44,6 +44,10 @@
       gap: 1.5rem;
       justify-content: center;
 
+      .mute-btn{
+        background-color: orangered;
+      }
+
       .icon-btn {
         width: 50px;
         height: 50px;
@@ -63,12 +67,16 @@
 
         &.end-call {
           background-color: white;
-
-          img {
-            filter: invert(20%) sepia(80%) saturate(5000%) hue-rotate(-10deg);
-          }
         }
       }
     }
   }
+}
+
+.img-green {
+  filter: invert(40%) sepia(80%) saturate(3000%) hue-rotate(90deg);
+}
+
+.img-red {
+  filter: invert(40%) sepia(80%) saturate(5000%) hue-rotate(-10deg);
 }
