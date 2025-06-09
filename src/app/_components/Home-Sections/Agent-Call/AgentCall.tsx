@@ -13,7 +13,6 @@ function AgentCall() {
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
     const agentParam: any = searchParams.get("agent");
-    console.log("agent", agentParam);
     setAgent(agentParam);
   }, []);
   return (

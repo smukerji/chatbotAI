@@ -1,7 +1,17 @@
 .digital-workers {
   display: flex;
   padding: 5.2vw 12.2vw;
-  margin-top: 100px;
+  margin-top: 20px;
+
+  @media screen and (max-width: 1440px) {
+    padding: 5.2vw 9.2vw;
+  }
+  @media screen and (max-width: 1280px) {
+    padding: 5.2vw 5.2vw;
+  }
+  @media screen and (max-width: 1024px) {
+    padding: 5.2vw 3.2vw;
+  }
 
   gap: 3rem;
 

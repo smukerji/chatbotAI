@@ -247,21 +247,23 @@ function HeroSection() {
 
       <div className="metrics">
         <div className="metrics-intro">
-          <div className="left-intro">
-            <p className="subheading">
-              While your team sleeps, your AI agents deliver.
-            </p>
-            <h2>
-              AI Workers That Feel Human. <br />
-              Perform Superhuman.
-            </h2>
-          </div>
-          <div className="right-intro">
-            <p className="description">
-              Torri blends emotional intelligence with business logic. Our
-              agents learn your products, adapt to your brand, and scale with
-              your needs — instantly.
-            </p>
+          <p className="subheading">
+            While your team sleeps, your AI agents deliver.
+          </p>
+          <div className="intro-content">
+            <div className="left-intro">
+              <h2>
+                AI Workers That Feel Human. <br />
+                Perform Superhuman.
+              </h2>
+            </div>
+            <div className="right-intro">
+              <p className="description">
+                Torri blends emotional intelligence with business logic. Our
+                agents learn your products, adapt to your brand, and scale with
+                your needs — instantly.
+              </p>
+            </div>
           </div>
         </div>
 
