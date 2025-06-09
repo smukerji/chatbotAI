@@ -2,7 +2,7 @@
 
 import React, { useRef, useState, useEffect } from "react";
 import Image from "next/image";
-import LuciferLogo from "../../../../public/svgs/lucifer-ai-logo.svg";
+import LuciferLogo from "../../../../public/svgs/lucifer-ai-logo-white.svg";
 import dynamic from "next/dynamic";
 import "./secondary-header.scss";
 import { useRouter } from "next/navigation";
