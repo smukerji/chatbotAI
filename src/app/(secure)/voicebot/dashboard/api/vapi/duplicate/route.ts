@@ -63,8 +63,6 @@ async function createDuplicateVapiAssistant(req: NextRequest) {
             assistantParseDataForPost.voice.chunkPlan.punctuationBoundaries = ["，", "。"];
         }
 
-
-
         /**end */
 
         //executing the vapi post assistant request
@@ -96,23 +94,34 @@ async function createDuplicateVapiAssistant(req: NextRequest) {
             imageUrl: insertedRecord?.imageUrl,
             assistantTemplateIDs: insertedRecord.assistantTemplateIDs,
             assistantName: `${insertedRecord?.assistantName} (copy)`,
-            vapiAssistantId: postVapiResponseData.id
+            vapiAssistantId: postVapiResponseData.id,
+            isDeleted:false
         };
+        console.log("duplicate record entry ", newVoiceBotRecord);
+        //get the files from user-file-knowledge
+        const voiceAssistantFileKnowledge =  db?.collection("user-file-knowledge");
 
         const result = await voiceAssistantCollection?.insertOne(newVoiceBotRecord);
         if (result.insertedId) {
+
+            //reading the original assistant knowledge file and adding them to duplicate assistant
+            const userFiles = await voiceAssistantFileKnowledge.find({ assistantId: vapiAssiId }).toArray();
+
+            //prepared the data
+            userFiles.map((file: { _id?: string, fileData: any, userId: string, assistantId: string }) => {
+                delete file._id;
+                file.assistantId = postVapiResponseData.id;
+                return file;
+            });
+
+            //insert many
+            await voiceAssistantFileKnowledge.insertMany(userFiles);
+
             const insertedRecord = await voiceAssistantCollection?.findOne({ _id: result.insertedId });
             return { record: insertedRecord, result: "Duplicate Assistant Added!" };
         } else {
             return { error: "Failed to insert record" };
         }
-
-
-
-
-        return { result: "result", assistantVapiId: vapiResponseData?.id };
-        // return 
-
 
     }
     catch(error: any){

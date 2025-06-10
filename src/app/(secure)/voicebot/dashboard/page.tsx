@@ -156,10 +156,12 @@ function Dashboard() {
           voiceBotContextData.setAssistantInfo(
           {  ...assistantCreateResponseParse.record}
           );
-                voiceBotContextData.setAssistantInfo((prev:any) => ({
-          ...prev,
-          vapiAssistantId: assistantCreateResponseParse.assistantVapiId
-        }));
+        
+          //         voiceBotContextData.setAssistantInfo((prev:any) => ({
+        //   ...prev,
+        //           vapiAssistantId: assistantCreateResponseParse..assistantVapiId
+                 
+        // }));
 
           getAssistantData(assistantCreateResponseParse.record?.vapiAssistantId);
 
@@ -678,12 +680,12 @@ async function costDeductionOnCallEndHandler(){
             </Button>
             
            { isMoreContentVisible && (<div ref={divRef} className="content-holder"  onClick={(e) => e.stopPropagation()} >
-              {/* <Button className="duplicate-assistant-button" onClick={duplicateAssistantHandler}>
+              <Button className="duplicate-assistant-button" onClick={duplicateAssistantHandler}>
                 <div className="duplicate-assistant-button-content">
                   <Image alt="" src={documentCopy} className="duplicate-assistant-button-icon"></Image>
                   <span className="duplicate-assistant-button-text">Duplicate</span>
                 </div>
-              </Button> */}
+              </Button>
               <Button className="delete-assistant-button" onClick={deleteAssistantHandler}>
                 <div className="delete-assistant-button-content">
                   <Image alt="" src={documentTrash} className="delete-assistant-button-icon"></Image>
