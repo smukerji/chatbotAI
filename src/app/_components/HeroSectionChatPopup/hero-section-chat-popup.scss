@@ -330,6 +330,7 @@
 
 .chatFooter {
   display: flex;
+  position:relative;
   // padding: 16px;
   // background: rgba(0, 0, 0, 0.24);
   // border-bottom-left-radius: 10px;
@@ -358,8 +359,8 @@
     border: none;
     cursor: pointer;
     position: absolute;
-    right: 65px;
-    bottom: 70px;
+    right: 25px;
+    bottom: 12px;
   }
 
   @media (max-width: 768px) {
