@@ -593,7 +593,7 @@
                 &.message {
                   border-radius: 1000px;
                   background: rgba(255, 255, 255, 0.19);
-
+                  backdrop-filter: blur(15px);
                   color: #fff;
                 }
               }
@@ -714,19 +714,19 @@
   margin-top: 4rem;
   border-radius: 24px;
   padding: 100px;
-  margin: 0 10.2vw;
+  margin: 0 10.2vw 5.2vw;
   margin-top: -15%;
 
   @media screen and (max-width: 1440px) {
-    margin: 0 9.2vw;
+    margin: 0 9.2vw 5.2vw;
     margin-top: -15%;
   }
   @media screen and (max-width: 1280px) {
-    margin: 0 5.2vw;
+    margin: 0 5.2vw 5.2vw;
     margin-top: -15%;
   }
   @media screen and (max-width: 1024px) {
-    margin: 0 3.2vw;
+    margin: 0 3.2vw 5.2vw;
     margin-top: -15%;
   }
 
@@ -770,8 +770,8 @@
 
   .metrics-grid {
     display: flex;
-    justify-content: center;
-    gap: 2rem;
+    justify-content: space-between;
+    gap: 20px;
     flex-wrap: wrap;
     margin-top: 70px;
 
@@ -781,6 +781,7 @@
       padding: 30px;
       border-radius: 16px;
       border-radius: 20px;
+      width: 30%;
 
       .metric-icon {
         display: flex;
@@ -830,6 +831,10 @@
     .metrics-grid {
       flex-direction: column;
       align-items: center;
+
+      .metric-card {
+        width: 100%;
+      }
     }
 
     padding: 30px;

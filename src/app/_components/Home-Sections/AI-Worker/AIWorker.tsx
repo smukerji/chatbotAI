@@ -49,7 +49,7 @@ function AIWorker() {
         </p>
         <a href="#">Create Custom Agent →</a>
       </div>
-      <div className="right-pane">
+      <div className="middle-pane">
         <div className="scroll-container">
           {workers.map((worker, i) => (
             <div className="card" key={i}>
@@ -61,28 +61,29 @@ function AIWorker() {
                 <p>{worker.description}</p>
                 <button>Try chat →</button>
               </div>
-              <div className="card-right">
-                <ul className="stats">
-                  <li>
-                    <Image src={speedLead} alt="Speed to lead" />
-                    <span>Speed to lead</span>
-                    <strong>&lt;20%</strong>
-                  </li>
-                  <li>
-                    <Image src={inboundConversion} alt="Inbound conversion" />
-                    <span>Inbound conversion %</span>
-                    <strong>+61%</strong>
-                  </li>
-                  <li>
-                    <Image src={winRate} alt="Win rate" />
-                    <span>Win rate</span>
-                    <strong>+3.5%</strong>
-                  </li>
-                </ul>
-              </div>
             </div>
           ))}
         </div>
+      </div>
+
+      <div className="right-pane">
+        <ul className="stats">
+          <li>
+            <Image src={speedLead} alt="Speed to lead" />
+            <span>Speed to lead</span>
+            <strong>&lt;20%</strong>
+          </li>
+          <li>
+            <Image src={inboundConversion} alt="Inbound conversion" />
+            <span>Inbound conversion %</span>
+            <strong>+61%</strong>
+          </li>
+          <li>
+            <Image src={winRate} alt="Win rate" />
+            <span>Win rate</span>
+            <strong>+3.5%</strong>
+          </li>
+        </ul>
       </div>
     </section>
   );

@@ -221,7 +221,7 @@ function HeroSection() {
                 <Image src={davidImg} alt="David" />
                 <div className="overlay-text">
                   <h3>David</h3>
-                  <p>Torri&apos;s Customer Service Agent</p>
+                  <p>Torri&apos;s Sales Agent</p>
                   <div className="actions">
                     <button
                       className="call"
