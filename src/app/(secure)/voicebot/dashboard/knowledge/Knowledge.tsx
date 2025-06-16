@@ -77,7 +77,7 @@ function Knowledge({ triggerPublishMethod }: KnowledgeProps) {
         }
     }
 
-    async function deleteAssistantHandler(id: string) {
+    async function deleteAssistantHandler(id: string,recordId:string) {
         try {
 
              setIsFetchingFiles(true);
@@ -101,20 +101,32 @@ function Knowledge({ triggerPublishMethod }: KnowledgeProps) {
 
             }
            
-            const token = await getValidToken();
-            const response = await fetch(`https://api.vapi.ai/file/${id}`, {
-                method: "DELETE",
+            //check if the same file has attached to more than one assistant
+            const fileSharedResponse = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/knowledge-file/file-share?userId=${cookies.userId}&fileId=${id}`, {
+                method: "GET",
                 headers: {
-                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json",
                 },
             });
-            if (!response.ok) {
-                throw new Error("Failed to delete file.");
+
+            const fileShareCheck = await fileSharedResponse.json();
+            if (fileShareCheck.file === true) {
+                const token = await getValidToken();
+                const response = await fetch(`https://api.vapi.ai/file/${id}`, {
+                    method: "DELETE",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                    },
+                });
+                if (!response.ok) {
+                    throw new Error("Failed to delete file.");
+                }
+                const body = await response.json();
+                console.log("File deleted successfully:", body);
             }
-            const body = await response.json();
 
             //delete file from the server
-            const serverResponse = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/knowledge-file?userId=${cookies.userId}&fileId=${id}`, {
+            const serverResponse = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/knowledge-file?recordId=${recordId}&fileId=${id}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
@@ -124,10 +136,10 @@ function Knowledge({ triggerPublishMethod }: KnowledgeProps) {
             if (serverBody.status !== 200) {
                 throw new Error("Failed to delete file from server.");
             }
-            console.log("File deleted successfully:", body);
+         
             message.success("File deleted successfully!");
 
-            console.log(body);
+           
             await getUsersFile();
         } catch (error) {
             console.error(error);
@@ -190,6 +202,7 @@ function Knowledge({ triggerPublishMethod }: KnowledgeProps) {
                 await triggerPublishMethod(true);
                 
 
+            
             //send the file data to the server
             const serverResponse = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/knowledge-file`, {
                 method: "POST",
@@ -209,8 +222,6 @@ function Knowledge({ triggerPublishMethod }: KnowledgeProps) {
             }
             setFileUpdate(body.id);
          
-           
-           
             console.log(body, serverBody);
             // message.success("File uploaded successfully!");
         } catch (error:any) {
@@ -316,7 +327,7 @@ function Knowledge({ triggerPublishMethod }: KnowledgeProps) {
                                             border: "none",
                                             zIndex: isUploading ? -1 : "auto",
                                         }}
-                                        onClick={async () => await deleteAssistantHandler(file.fileData.id)}
+                                        onClick={async () => await deleteAssistantHandler(file.fileData.id,file._id)}
                                     >
                                     </Button>
                                 </div>

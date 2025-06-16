@@ -17,9 +17,9 @@ async function deleteUserFileKnowledgeData(req: NextRequest) {
         const db = (await clientPromise!).db();
         const userFileKnowledge = db?.collection("user-file-knowledge"); // Change to your collection name
 
-        const userId = req.nextUrl.searchParams.get("userId") as string;
+        const recordId = req.nextUrl.searchParams.get("recordId") as string;
         const fileId = req.nextUrl.searchParams.get("fileId") as string;
-        const result = await userFileKnowledge?.deleteOne({ userId: new ObjectId(userId), "fileData.id": fileId });
+        const result = await userFileKnowledge?.deleteOne({ _id: new ObjectId(recordId), "fileData.id": fileId });
 
         if (result?.deletedCount === 1) {
             return { message: 'Knowledge data deleted successfully!', status: 200 };
