@@ -44,11 +44,6 @@
   overflow-y: auto;
   height: 80%;
   margin: 17px;
-  
-  @media only screen and (max-width:1024px){
-    height: 60%;
-  }
-
 
   &.embed-conversation-container {
     height: 100%;

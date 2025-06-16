@@ -4,6 +4,7 @@ import { signOut, useSession } from "next-auth/react";
 import { useCookies } from "react-cookie";
 import jwt from "jsonwebtoken";
 import Header from "./Header/Header";
+import { usePathname } from "next/navigation";
 
 export default function AuthHeader() {
   const { data: session } = useSession();
@@ -12,6 +13,7 @@ export default function AuthHeader() {
     "userId",
     "authorization",
   ]); // Specify the cookie name here
+
 
   async function logout() {
     await userService.logout();
@@ -34,5 +36,10 @@ export default function AuthHeader() {
 
   const isLoggedIn = session?.user || userId !== undefined;
 
-  return <>{isLoggedIn ? <Header /> : <></>}</>;
+  const pathName = usePathname();//get the current path;
+
+  const shouldShowHeader = isLoggedIn && !pathName?.includes("/home/");
+
+
+  return <>{shouldShowHeader ? <Header /> : <></>}</>;
 }
