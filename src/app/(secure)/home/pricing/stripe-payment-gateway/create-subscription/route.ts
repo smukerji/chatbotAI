@@ -70,6 +70,66 @@ const attachPaymentMethodToCustomer = async (
   }
 };
 
+const createSubscriptionHandler = async (
+  customerId: string,
+  paymentMethodId: string,
+  priceId: string[]
+) => {
+  //---------------------------------- If no existing subscription, create a new one---------------------------------------
+
+  // Attach the payment method to the customer
+  await attachPaymentMethodToCustomer(customerId, paymentMethodId);
+
+  const pricePlans: any = priceId.map((price: string) => {
+    return {
+      price: price,
+    };
+  });
+
+  // Check if the business plan (monthly or yearly) is selected and add WhatsApp and Telegram as free add-ons
+  if (
+    priceId.includes(businessPlanMonthly!) ||
+    priceId.includes(businessPlanYearly!)
+  ) {
+    const whatsappPlan = priceId.includes(businessPlanMonthly!)
+      ? whatsappMonthly!
+      : whatsappYearly!;
+    const telegramPlan = priceId.includes(businessPlanMonthly!)
+      ? telegramMonthly!
+      : telegramYearly!;
+
+    // Add WhatsApp and Telegram as free add-ons by setting quantity to 0
+    pricePlans.push(
+      { price: whatsappPlan, quantity: 0 },
+      { price: telegramPlan, quantity: 0 }
+    );
+  }
+
+  const subscription: any = await stripe.subscriptions.create({
+    customer: customerId,
+    items: pricePlans,
+    payment_behavior: "default_incomplete",
+    expand: ["latest_invoice.payment_intent"],
+  });
+
+  // Get the PaymentIntent and its clientSecret
+  const paymentIntent = subscription?.latest_invoice?.payment_intent;
+
+  return {
+    code: "subscription_created",
+    subscriptionId: subscription.id,
+    price: subscription.items.data.reduce(
+      (acc: any, current: any) => acc + current?.plan?.amount,
+      0
+    ),
+    clientSecret: paymentIntent.client_secret,
+    invoice: subscription.latest_invoice.id,
+    createDate: subscription.start_date,
+    alreadyExist: false,
+    paymentIntentStatus: paymentIntent.status,
+  };
+};
+
 const createSubscription = async (req: any, res: NextApiResponse) => {
   try {
     const { customerId, priceId, u_id, paymentMethodId } = req.json();
@@ -82,6 +142,18 @@ const createSubscription = async (req: any, res: NextApiResponse) => {
 
     if (subId) {
       const existingSubscription = await stripe.subscriptions.retrieve(subId);
+      /// check if the subscription is active is already cancelled create a new subscription
+      if (
+        existingSubscription.status === "canceled" ||
+        existingSubscription.status === "incomplete_expired"
+      ) {
+        return await createSubscriptionHandler(
+          customerId,
+          paymentMethodId,
+          priceId
+        );
+      }
+
       const currentPlanId = existingSubscription.items.data[0].price.id;
 
       let isUpgrade = false;
@@ -276,59 +348,12 @@ const createSubscription = async (req: any, res: NextApiResponse) => {
       };
     }
 
-    //---------------------------------- If no existing subscription, create a new one---------------------------------------
-
-    // Attach the payment method to the customer
-    await attachPaymentMethodToCustomer(customerId, paymentMethodId);
-
-    const pricePlans = priceId.map((price: string) => {
-      return {
-        price: price,
-      };
-    });
-
-    // Check if the business plan (monthly or yearly) is selected and add WhatsApp and Telegram as free add-ons
-    if (
-      priceId.includes(businessPlanMonthly) ||
-      priceId.includes(businessPlanYearly)
-    ) {
-      const whatsappPlan = priceId.includes(businessPlanMonthly)
-        ? whatsappMonthly
-        : whatsappYearly;
-      const telegramPlan = priceId.includes(businessPlanMonthly)
-        ? telegramMonthly
-        : telegramYearly;
-
-      // Add WhatsApp and Telegram as free add-ons by setting quantity to 0
-      pricePlans.push(
-        { price: whatsappPlan, quantity: 0 },
-        { price: telegramPlan, quantity: 0 }
-      );
-    }
-
-    const subscription: any = await stripe.subscriptions.create({
-      customer: customerId,
-      items: pricePlans,
-      payment_behavior: "default_incomplete",
-      expand: ["latest_invoice.payment_intent"],
-    });
-
-    // Get the PaymentIntent and its clientSecret
-    const paymentIntent = subscription?.latest_invoice?.payment_intent;
-
-    return {
-      code: "subscription_created",
-      subscriptionId: subscription.id,
-      price: subscription.items.data.reduce(
-        (acc: any, current: any) => acc + current?.plan?.amount,
-        0
-      ),
-      clientSecret: paymentIntent.client_secret,
-      invoice: subscription.latest_invoice.id,
-      createDate: subscription.start_date,
-      alreadyExist: false,
-      paymentIntentStatus: paymentIntent.status,
-    };
+    // If no existing subscription, create a new one
+    return await createSubscriptionHandler(
+      customerId,
+      paymentMethodId,
+      priceId
+    );
   } catch (e) {
     console.error(e);
 
