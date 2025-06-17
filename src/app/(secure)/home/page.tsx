@@ -325,7 +325,7 @@ function Home({
       setLoadingComponent(true);
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/store-v2`,
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/store-v3`,
         {
           headers: {
             cache: "no-store",

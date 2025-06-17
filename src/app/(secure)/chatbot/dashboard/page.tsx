@@ -540,20 +540,21 @@ function Dashboard() {
           {editChatbot == "chatbot" && (
             <>
               {chatbot?.botType == "bot-v2" ? (
-                // <ChatV2
-                //   chatbot={chatbot}
-                //   messages={messages}
-                //   setMessages={setMessages}
-                //   messagesTime={messagesTime}
-                //   setMessagesTime={setMessagesTime}
-                //   threadID={threadId}
-                //   sessionStartDate={sessionStartDate}
-                //   setThreadId={createThread}
-                //   setSessionStartDate={setSessionStartDate}
-                //   isPlanNotification={isPlanNotification}
-                //   setIsPlanNotification={setIsPlanNotification}
-                //   functionCallHandler={functionCallHandler}
-                // />
+                <ChatV2
+                  chatbot={chatbot}
+                  messages={messages}
+                  setMessages={setMessages}
+                  messagesTime={messagesTime}
+                  setMessagesTime={setMessagesTime}
+                  threadID={threadId}
+                  sessionStartDate={sessionStartDate}
+                  setThreadId={createThread}
+                  setSessionStartDate={setSessionStartDate}
+                  isPlanNotification={isPlanNotification}
+                  setIsPlanNotification={setIsPlanNotification}
+                  functionCallHandler={functionCallHandler}
+                />
+              ) : chatbot?.botType == "bot-v3" ? (
                 <ChatV3
                   chatbot={chatbot}
                   messages={messages}

@@ -139,5 +139,44 @@ export default async function handler(req, res) {
     } catch (err) {
       console.log("Error while updating chat history", err);
     }
+  } else if (req.method === "GET") {
+    /// get history for a specific session
+    if (!req.query.chatbotId || !req.query.userId) {
+      return res
+        .status(400)
+        .send({ error: "chatbotId and userId are required" });
+    }
+    const chatbotId = req.query.chatbotId;
+    const sessionId = req.query.sessionId;
+    const userId = req.query.userId;
+    const historyCollectionName = req.query.historyCollectionName;
+    const db = (await clientPromise).db();
+    let collection = db.collection("chat-history");
+    if (historyCollectionName === "whatsapp") {
+      collection = db.collection("whatsapp-chat-history");
+    }
+    const history = await collection
+      .find({ chatbotId: chatbotId, userId: userId })
+      .toArray();
+
+    /// from the object of chats get the specific session on the current date
+    if (!history || history.length === 0) {
+      return res.status(404).send({ error: "No chat history found" });
+    }
+    /// get the object of chats for according to the today date
+    const todayDate = new Date().toISOString().split("T")[0].replace(/-/g, "/");
+
+    const todayHistory = history.find(
+      (item) => item.date === todayDate && item.chats[sessionId]
+    );
+
+    if (!todayHistory) {
+      return res.status(404).send({ error: "No chat history found for today" });
+    }
+    /// get the session history
+    const sessionHistory = todayHistory.chats[sessionId];
+    return res.status(200).send(sessionHistory);
   }
+
+  return res.status(405).send({ error: "Method not allowed" });
 }

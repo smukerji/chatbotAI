@@ -2,16 +2,30 @@ import userSchemaClientPromise from "../../userSchemaDb";
 export default async function handler(req, res) {
   if (req.method === "POST") {
     try {
-      const body = JSON.parse(req.body);
-      const collection = body?.collection;
-      const filter = body?.filter;
-      const projection = body?.projection;
+      // const body = JSON.parse(req.body);
+      // const collection = body?.collection;
+      // const filter = body?.filter;
+      // const projection = body?.projection;
+
+      // const db = (await userSchemaClientPromise).db();
+
+      // const dbCollection = db.collection(collection);
+
+      // const data = await dbCollection.find(filter, { projection }).toArray();
+
+      // return res.status(200).json(data);
+
+      const body = req.body;
+
+      const collection = body?.collectionName;
+      const query = JSON.parse(body?.query);
+
+      /// perfporm the aggregation
 
       const db = (await userSchemaClientPromise).db();
 
       const dbCollection = db.collection(collection);
-
-      const data = await dbCollection.find(filter, { projection }).toArray();
+      const data = await dbCollection.aggregate(query).toArray();
 
       return res.status(200).json(data);
     } catch (error) {

@@ -13,7 +13,7 @@ import ChooseVoiceAssistantExpert from "../ChooseVoiceAssistantExpert/ChooseVoic
 import Home from "@/app/(secure)/home/page";
 import ShopifySecretModal from "../Modals/ShopifySecretModal";
 import VoicebotUsage from "@/app/(secure)/home/BillingAndUsage/_components/VoicebotUsage";
-import "../../../home/BillingAndUsage/billing.scss"
+import "../../../home/BillingAndUsage/billing.scss";
 
 function CreateAssitstantContainerItems({
   assistantList,
@@ -44,7 +44,9 @@ function CreateAssitstantContainerItems({
         (createAssistantFlowContextDetails?.creationFlow ===
         SelectedAssistantType.CHAT ? (
           <PricingWrapperNew firstPurchase={true} />
-        ) : <VoicebotUsage firstPurchase={true}/>)}
+        ) : (
+          <VoicebotUsage firstPurchase={true} />
+        ))}
       {createAssistantFlowContextDetails?.currentAssistantFlowStep ===
         AssistantFlowStep.CHOOSE_ASSISTANT_TYPE &&
         (createAssistantFlowContextDetails?.creationFlow ===
@@ -86,8 +88,15 @@ function CreateAssitstantContainerItems({
             fileData={fileData}
             crawlingData={crawlData}
             chatbotName={createAssistantFlowContextDetails?.assistantName}
-            botType={"bot-v2"}
-            assistantType={`${createAssistantFlowContextDetails?.assistantType?.abbreviation}-${createAssistantFlowContextDetails?.industryExpertType?.abbreviation}`}
+            botType={"bot-v3"}
+            assistantType={`${
+              createAssistantFlowContextDetails?.assistantType?.abbreviation
+            }${
+              createAssistantFlowContextDetails?.industryExpertType
+                ?.abbreviation
+                ? `-${createAssistantFlowContextDetails?.industryExpertType?.abbreviation}`
+                : ""
+            }`}
             integrations={createAssistantFlowContextDetails?.integrations}
           />
         </>

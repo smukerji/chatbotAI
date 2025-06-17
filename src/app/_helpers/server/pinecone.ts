@@ -1,19 +1,8 @@
 import { Pinecone } from "@pinecone-database/pinecone";
-// import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { v4 as uuid } from "uuid";
 import { createEmbedding } from "./embeddings";
 import dotenv from "dotenv";
-dotenv.config();
-// import { encode } from 'gpt-3-encoder';
-// import {
-//   PINECONE_API_KEY,
-//   PINECONE_ENV,
-//   PINECONE_INDEX,
-// } from 'src/common/utilities/config.utility';
-// import { createEmbedding } from './openAI';
-const CHUNK_LIMIT = 200;
-const CHUNK_MINIMAL = 100;
-// import { PineconeClient } from '@pinecone-database/pinecone';
+
 
 export const upsert = async (vectors: any, userId: string) => {
   try {
@@ -22,6 +11,10 @@ export const upsert = async (vectors: any, userId: string) => {
     });
 
     try {
+      console.log(
+        await pinecone.listIndexes(),
+        "list indexes in pinecone"
+      );
       const index = pinecone.index(process.env.NEXT_PUBLIC_PINECONE_INDEX!);
       const upsertReq = await index.namespace(userId).upsert(vectors);
       return upsertReq;
@@ -40,6 +33,7 @@ export const deletevectors = async (vectorIDs: [], namespace: string) => {
     const pinecone = new Pinecone({
       apiKey: process.env.NEXT_PUBLIC_PINECONE_KEY!,
     });
+
     const index = pinecone.index(process.env.NEXT_PUBLIC_PINECONE_INDEX!);
     const np = index.namespace(namespace);
     await np.deleteMany(

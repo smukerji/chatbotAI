@@ -15,7 +15,7 @@
     "@langchain/openai": "^0.2.5",
     "@langchain/pinecone": "^0.0.8",
     "@nextui-org/react": "^2.2.9",
-    "@pinecone-database/pinecone": "^2.0.1",
+    "@pinecone-database/pinecone": "^6.0.1",
     "@slack/web-api": "^7.0.2",
     "@sparticuz/chromium-min": "^119.0.2",
     "@stripe/react-stripe-js": "^2.4.0",

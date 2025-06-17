@@ -1,5 +1,6 @@
 import { AssistantType } from "@/app/_helpers/assistant-creation-contants";
 import { getn8nInstruction } from "@/app/_helpers/n8n-workflow-constant";
+import clientPromise from "@/db";
 import axios from "axios";
 
 export async function POST(request: Request) {
@@ -8,7 +9,7 @@ export async function POST(request: Request) {
 
   let pineconeIndex = process.env.NEXT_PUBLIC_PINECONE_INDEX;
 
-  let payload = {
+  let payload: any = {
     chatbotId,
     chatInput,
     userId,
@@ -18,15 +19,50 @@ export async function POST(request: Request) {
 
   let n8nUrl = "";
 
+  /// get the schema_info if any from chatbots-data
+  const db = (await clientPromise!).db();
+  const collection = db.collection("chatbots-data");
+  /// all the data sources of this assistant id and it contains schema_info object
+  const assistantData = await collection
+    .find({
+      chatbotId: chatbotId,
+    })
+    .toArray();
+
+  /// extract all the schema_info who are not undefined from the assistantData
+  const schemaInfo = assistantData
+    .map((data: any) => data.schema_info)
+    .filter((info: any) => info !== undefined);
+
   // Set payload based on selection
   if (assistantType === AssistantType.ECOMMERCE_AGENT_SHOPIFY) {
+    const { instruction, ragAgentInstruction } = getn8nInstruction(
+      AssistantType.ECOMMERCE_AGENT_SHOPIFY
+    );
     payload = {
       ...payload,
-      ...getn8nInstruction(AssistantType.ECOMMERCE_AGENT_SHOPIFY),
+      systemPrompt: instruction,
+      ragAgentSystemPrompt: ragAgentInstruction,
     };
     n8nUrl = process.env.SHOPIFY_N8N_URL!;
+  } else if (assistantType === AssistantType.CUSTOMER_SUPPORT_AGENT) {
+    const { ragAgentInstruction } = getn8nInstruction(
+      AssistantType.CUSTOMER_SUPPORT_AGENT
+    );
+    payload = {
+      ...payload,
+      ragAgentSystemPrompt: ragAgentInstruction,
+      getChatHistoryURL:
+        process.env.NEXT_PUBLIC_WEBSITE_URL +
+        `api/chathistory?chatbotId=${chatbotId}&userId=${userId}&sessionId=${sessionId}`,
+    };
+    n8nUrl = process.env.CUSTOMER_SUPPORT_N8N_URL!;
   } else {
-    payload = { ...payload, ...getn8nInstruction() };
+    payload = {
+      ...payload,
+      systemPrompt: getn8nInstruction()?.instruction,
+      schemaInfo: JSON.stringify(schemaInfo),
+    };
     n8nUrl = process.env.RAG_N8N_URL!;
   }
 

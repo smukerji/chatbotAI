@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { CreateBotContext } from "../../../../../_helpers/client/Context/CreateBotContext";
 import Icon from "../../../../../_components/Icon/Icon";
 import DocumentIcon from "@/assets/svg/DocumentIcon";
@@ -15,7 +15,9 @@ import ChatInterface from "./_components/chatInterface/ChatInterface";
 import Security from "./_components/security/Security";
 import Lead from "./_components/lead/Lead";
 import CustomModal from "../CustomModal/CustomModal";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import OpenRouterModels from "./_components/model/OpenRouterModels";
+import { ChatbotSettingContext } from "@/app/_helpers/client/Context/ChatbotSettingContext";
 
 function Settings({
   chatbotId,
@@ -29,6 +31,24 @@ function Settings({
 
   /// check which setting tab is active
   const chabotSettings = botDetails?.chabotSettings;
+
+  /// get the bot settings context
+  const botSettingContext: any = useContext(ChatbotSettingContext);
+
+  /// fetch the params
+  const params: any = useSearchParams();
+  const chatbot = JSON.parse(decodeURIComponent(params.get("chatbot")));
+
+  /// if bot-v3 then change the default model to open router
+
+  useEffect(() => {
+    if (chatbot?.botType === "bot-v3") {
+      console.log("open router model");
+
+      botSettingContext?.handleChange("model")("openai/gpt-3.5-turbo");
+    }
+  }, []);
+
   return (
     <div className="settings-container">
       <CustomModal
@@ -123,7 +143,12 @@ function Settings({
           {chabotSettings === "general" && (
             <General chatbotId={chatbotId} chatbotName={chatbotName} />
           )}
-          {chabotSettings === "model" && <Model chatbotId={chatbotId} />}
+          {chabotSettings === "model" && chatbot?.botType === "bot-v3" && (
+            <OpenRouterModels chatbotId={chatbotId} />
+          )}
+          {chabotSettings === "model" && chatbot?.botType !== "bot-v3" && (
+            <Model chatbotId={chatbotId} />
+          )}
           {chabotSettings === "chatInterface" && (
             <ChatInterface chatbotId={chatbotId} />
           )}

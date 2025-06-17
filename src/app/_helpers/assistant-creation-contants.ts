@@ -12,6 +12,7 @@ export enum AssistantType {
   IT_SUPPORT_HOSPITALITY_EXPERT = "it-agent-hospitality-expert",
   REAL_ESTATE_AGENT = "re-agent-real-estate",
   RESEARCH_WEB = "research-agent-web-expert",
+  CUSTOMER_SUPPORT_AGENT = "cs-agent",
 }
 
 /// system prompts and tools for assistant

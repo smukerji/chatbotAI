@@ -1,17 +1,18 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "./../model/model.scss";
 import { Select, Slider, message } from "antd";
 import DocumentIcon from "@/assets/svg/DocumentIcon";
 import { useCookies } from "react-cookie";
 import { ChatbotSettingContext } from "../../../../../../../_helpers/client/Context/ChatbotSettingContext";
 
-function Model({ chatbotId }: any) {
+function OpenRouterModels({ chatbotId }: any) {
   const [cookies, setCookie] = useCookies(["userId"]);
+
+  const [openRouterModels, setOpenRouterModels] = useState<any>([]);
 
   /// get the bot settings context
   const botSettingContext: any = useContext(ChatbotSettingContext);
   const botSettings = botSettingContext?.chatbotSettings;
-
 
   const updateSettings = async () => {
     const res = await fetch(
@@ -34,9 +35,43 @@ function Model({ chatbotId }: any) {
     message.success(data?.message);
   };
 
+  /// fetch open router models
+  useEffect(() => {
+    const fetchOpenRouterModels = async () => {
+      try {
+        const res = await fetch(
+          `https://openrouter.ai/api/v1/models?supported_parameters=tools`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${cookies?.userId}`,
+            },
+          }
+        );
+        const data = await res.json();
+
+        // Convert model IDs into Select-compatible format
+        const modelOptions =
+          data?.data?.map((model: any) => ({
+            value: model.id,
+            label: model.id,
+          })) || [];
+
+        console.log("OpenRouter models", modelOptions.length);
+
+        // Store in state
+        setOpenRouterModels(modelOptions);
+      } catch (error) {
+        console.error("Failed to fetch OpenRouter models", error);
+      }
+    };
+
+    fetchOpenRouterModels();
+  }, []);
+
   return (
     <div className="model-settings-parent">
-
       {/* --------------------------------Model Section---------------------------------------------------------- */}
 
       <div className="model-parent">
@@ -67,14 +102,7 @@ function Model({ chatbotId }: any) {
               <Select
                 className="antd-select"
                 defaultValue={botSettings?.model}
-                options={[
-                  { value: "gpt-3.5-turbo", label: "gpt-3.5-turbo" },
-                  { value: "gpt-4", label: "gpt-4" },
-                  { value: "gpt-4o", label: "gpt-4o" },
-                  { value: "gpt-4o-mini", label: "gpt-4o-mini" },
-                  { value: "o1", label: "o1" },
-                  { value: "o3-mini", label: "o3-mini" },
-                ]}
+                options={openRouterModels}
                 onChange={(e) => {
                   botSettingContext?.handleChange("model")(e);
                 }}
@@ -143,4 +171,4 @@ function Model({ chatbotId }: any) {
   );
 }
 
-export default Model;
+export default OpenRouterModels;
