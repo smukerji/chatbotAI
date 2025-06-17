@@ -13,6 +13,7 @@ import micIcon from "../../../../../public/sections-images/how-it-works/micropho
 const { Title, Paragraph } = Typography;
 import "./how-it-works.scss";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 const features = [
   {
@@ -45,6 +46,7 @@ const features = [
 ];
 
 function HowItWorks() {
+  const router = useRouter();
   return (
     <>
       <div className="how-it-works">
@@ -57,7 +59,16 @@ function HowItWorks() {
             Power your store with 24/7 voice and chat agents that engage,
             convert, and care — even when you&apos;re offline.
           </Paragraph>
-          <Button type="primary" size="large" className="try-agent-button">
+          <Button
+            type="primary"
+            size="large"
+            className="try-agent-button"
+            onClick={() =>
+              router.push(
+                "/home/chat?agent=alina&assistantId=asst_hBQgfWqUb7ppxKa9K0bGYyjq"
+              )
+            }
+          >
             Try eCommerce Agent
           </Button>
         </div>

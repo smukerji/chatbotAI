@@ -25,11 +25,18 @@ import iconConversion from "../../../../public/sections-images/header-background
 import iconCost from "../../../../public/sections-images/header-background/favorite-chart.svg";
 import iconScroll from "../assets/icon-scroll.svg";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { useCookies } from "react-cookie";
 
 function HeroSection() {
   const [message, setMessage] = useState("");
   const [isChatOpen, setIsChatOpen] = useState(false);
   const router = useRouter();
+  const { data: session } = useSession();
+  const [cookies, setCookie, removeCookie] = useCookies([
+    "userId",
+    "authorization",
+  ]); // Specify the cookie name here
 
   const handleSendMessage = () => {
     if (message.trim() !== "") {
@@ -42,6 +49,9 @@ function HeroSection() {
       handleSendMessage();
     }
   };
+  const userId = cookies.userId;
+
+  const isLoggedIn = session?.user || userId !== undefined;
 
   return (
     <>
@@ -161,8 +171,26 @@ function HeroSection() {
               business.
             </p>
             <div className="buttons">
-              <button className="primary">Talk to an Agent Now</button>
-              <button className="secondary">Create Your Own AI Agent</button>
+              <button
+                className="primary"
+                onClick={() =>
+                  router.push(
+                    "/home/chat?agent=jessica&assistantId=asst_59SkpWUg4gE2swl9JW6g6slc"
+                  )
+                }
+              >
+                Talk to an Agent Now
+              </button>
+              <button
+                className="secondary"
+                onClick={() => {
+                  isLoggedIn
+                    ? (window.location.href = "/chatbot")
+                    : router.push("/account/login");
+                }}
+              >
+                Create Your Own AI Agent
+              </button>
             </div>
           </div>
           <div className="right">
@@ -186,7 +214,11 @@ function HeroSection() {
                     </button>
                     <button
                       className="message"
-                      onClick={() => router.push("/home/chat?agent=jessica")}
+                      onClick={() =>
+                        router.push(
+                          "/home/chat?agent=jessica&assistantId=asst_59SkpWUg4gE2swl9JW6g6slc"
+                        )
+                      }
                     >
                       <Image src={iconMessage} alt="Message" />
                       Message
@@ -232,7 +264,11 @@ function HeroSection() {
                     </button>
                     <button
                       className="message"
-                      onClick={() => router.push("/home/chat?agent=david")}
+                      onClick={() =>
+                        router.push(
+                          "/home/chat?agent=david&assistantId=asst_DH0W8G1wOWWMFPqicGCgAc5M"
+                        )
+                      }
                     >
                       <Image src={iconMessage} alt="Message" />
                       Message

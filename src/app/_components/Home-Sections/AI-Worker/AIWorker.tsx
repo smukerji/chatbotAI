@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import "./ai-worker.scss";
 import Image from "next/image";
@@ -7,6 +8,7 @@ import zaraImg from "../../../../../public/sections-images/digital-worker/3.png"
 import speedLead from "../../../../../public/sections-images/digital-worker/user-cirlce-add.svg";
 import inboundConversion from "../../../../../public/sections-images/digital-worker/message-add.svg";
 import winRate from "../../../../../public/sections-images/digital-worker/cup.svg";
+import { useRouter } from "next/navigation";
 
 const workers = [
   {
@@ -15,6 +17,7 @@ const workers = [
     img: jacobImg,
     description:
       "Automate sales conversations, qualify leads, and provide personalized recommendations—all with a human-like touch.",
+    id: "asst_g89halTvYCnumoMbDUSXuJc9",
   },
   {
     name: "Alina",
@@ -22,6 +25,7 @@ const workers = [
     img: alinaImg,
     description:
       "Automate eCommerce customer support, recommend products, and upsell — all powered by AI.",
+    id: "asst_hBQgfWqUb7ppxKa9K0bGYyjq",
   },
   {
     name: "Zara",
@@ -29,10 +33,12 @@ const workers = [
     img: zaraImg,
     description:
       "Streamline onboarding, answer HR FAQs, and assist employees with self-service support 24/7.",
+    id: "asst_FqlcmZ9YXJkyJQ1cN9060RTv",
   },
 ];
 
 function AIWorker() {
+  const router = useRouter();
   return (
     <section className="digital-workers">
       <div className="left-pane">
@@ -59,7 +65,17 @@ function AIWorker() {
                   {worker.name}&nbsp;<span>| {worker.role}</span>
                 </h3>
                 <p>{worker.description}</p>
-                <button>Try chat →</button>
+                <button
+                  onClick={() =>
+                    router.push(
+                      `/home/chat?agent=${worker.name.toLowerCase()}&assistantId=${
+                        worker.id
+                      }`
+                    )
+                  }
+                >
+                  Try chat →
+                </button>
               </div>
             </div>
           ))}

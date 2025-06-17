@@ -14,8 +14,11 @@ import { functionCallHandler } from "@/app/_helpers/client/functionCallHandler";
 import VapiAssistantCall from "./VapiCall/VapiAssistantCall";
 import JessicaImg from "../../../../public/sections-images/header-background/jessica.png";
 import DavidImg from "../../../../public/sections-images/header-background/david.png";
+import JacobImg from "../../../../public/sections-images/digital-worker/1.png";
+import AlinaImg from "../../../../public/sections-images/digital-worker/2.png";
+import ZaraImg from "../../../../public/sections-images/digital-worker/3.png";
 
-function HeroSectionChatPopup({ onClose, agent }: any) {
+function HeroSectionChatPopup({ onClose, agent, torriAssistantId }: any) {
   const [messages, setMessages]: any = useState([]);
   const [userMessage, setUserMessage] = useState("");
   /// chat base response
@@ -23,7 +26,6 @@ function HeroSectionChatPopup({ onClose, agent }: any) {
   const [loading, setLoading] = useState(false);
   const [messagesTime, setMessagesTime]: any = useState([]);
   const [sessionStartDate, setSessionStartDate]: any = useState();
-  const torriAssistantId: any = process.env.NEXT_PUBLIC_TORRI_ASSISTANT_ID;
   const [threadId, setThreadId] = useState();
   const chatWindowRef: any = useRef(null);
   const inputRef: any = useRef(null);
@@ -365,7 +367,17 @@ function HeroSectionChatPopup({ onClose, agent }: any) {
                     </div>
                   )} */}
                   <Image
-                    src={agent === "jessica" ? JessicaImg : DavidImg}
+                    src={
+                      agent === "jessica"
+                        ? JessicaImg
+                        : agent === "david"
+                        ? DavidImg
+                        : agent === "jacob"
+                        ? JacobImg
+                        : agent === "alina"
+                        ? AlinaImg
+                        : ZaraImg
+                    }
                     alt="user"
                     className="user-icon"
                   />
