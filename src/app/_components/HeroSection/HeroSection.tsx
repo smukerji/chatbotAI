@@ -166,9 +166,9 @@ function HeroSection() {
               Workers
             </h1>
             <p>
-              Always-on. Always-learning. Always-ready. Chat or talk to our
-              multimodal AI agents that think, respond, and grow with your
-              business.
+              Your next top performer isn&apos;t human — it&apos;s Torri. Meet
+              your 24/7 AI teammate that chats, speaks, learns, and scales with
+              you.
             </p>
             <div className="buttons">
               <button
@@ -179,7 +179,7 @@ function HeroSection() {
                   )
                 }
               >
-                Talk to an Agent Now
+                Talk to a Demo Agent
               </button>
               <button
                 className="secondary"
@@ -189,7 +189,7 @@ function HeroSection() {
                     : router.push("/account/login");
                 }}
               >
-                Create Your Own AI Agent
+                Create Your First AI Worker
               </button>
             </div>
           </div>
@@ -228,7 +228,7 @@ function HeroSection() {
               </div>
               <div className="info-section">
                 <div className="badge-group">
-                  <p className="badge-time">24h</p>
+                  <p className="badge-time">24 hours</p>
                   <p className="badge-support">Support</p>
                 </div>
               </div>
@@ -238,11 +238,11 @@ function HeroSection() {
             <div className="agent-card image-bottom">
               <div className="badge-group-second">
                 <p className="badge-24">
-                  <span className="badge-time">24h</span>
+                  <span className="badge-time">24 hours</span>
                   <span className="badge-support">Support</span>
                 </p>
                 <span className="badge-7">
-                  <span className="badge-time">7d</span>
+                  <span className="badge-time">7 days</span>
                   <span className="badge-support">Support</span>
                 </span>
               </div>
@@ -283,9 +283,7 @@ function HeroSection() {
 
       <div className="metrics">
         <div className="metrics-intro">
-          <p className="subheading">
-            While your team sleeps, your AI agents deliver.
-          </p>
+          <p className="subheading">Trusted. Tireless. Transformative.</p>
           <div className="intro-content">
             <div className="left-intro">
               <h2>
@@ -295,9 +293,9 @@ function HeroSection() {
             </div>
             <div className="right-intro">
               <p className="description">
-                Torri blends emotional intelligence with business logic. Our
-                agents learn your products, adapt to your brand, and scale with
-                your needs — instantly.
+                From onboarding to sales and support, Torri&apos;s digital
+                agents never sleep. They deliver faster replies, smarter
+                decisions, and happier customers — all while cutting costs.
               </p>
             </div>
           </div>
@@ -308,21 +306,21 @@ function HeroSection() {
             <div className="metric-icon response-rate">
               <Image src={iconResponse} alt="Response Rate" />
             </div>
-            <p className="label">Response Rate</p>
+            <p className="label">Response Times</p>
             <h3>3x Faster</h3>
           </div>
           <div className="metric-card">
             <div className="metric-icon conversion-rate">
               <Image src={iconConversion} alt="Ecommerce Conversion" />
             </div>
-            <p className="label">Ecommerce Conversion</p>
+            <p className="label">E-Commerce Higher Conversion Rates</p>
             <h3>62% Higher</h3>
           </div>
           <div className="metric-card">
             <div className="metric-icon operational-rate">
               <Image src={iconCost} alt="Operational Cost" />
             </div>
-            <p className="label">Operational Cost</p>
+            <p className="label">Operational Cost per interaction</p>
             <h3>35% Lower</h3>
           </div>
         </div>

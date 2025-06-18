@@ -628,7 +628,7 @@
         }
         .badge-group-second {
           display: flex;
-          gap: 15px;
+          gap: 10px;
 
           .badge-24,
           .badge-7 {
@@ -650,7 +650,7 @@
 
             .badge-time {
               color: #fff;
-              font-size: 48px;
+              font-size: 32px;
               font-weight: 500;
               line-height: 68px;
             }
@@ -714,11 +714,11 @@
   margin-top: 4rem;
   border-radius: 24px;
   padding: 100px;
-  margin: 0 10.2vw 5.2vw;
+  margin: 0 8.2vw 5.2vw;
   margin-top: -15%;
 
   @media screen and (max-width: 1440px) {
-    margin: 0 9.2vw 5.2vw;
+    margin: 0 6.2vw 5.2vw;
     margin-top: -15%;
   }
   @media screen and (max-width: 1280px) {

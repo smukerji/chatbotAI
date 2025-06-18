@@ -16,24 +16,27 @@ const workers = [
     role: "Research Assistant (AI Chat)",
     img: jacobImg,
     description:
-      "Automate sales conversations, qualify leads, and provide personalized recommendations—all with a human-like touch.",
+      "Jacob is your always-on research assistant, built to scan, summarize, and respond with speed and precision. Whether you're doing competitive analysis, preparing reports, or brainstorming content, Jacob connects the dots faster than any intern ever could.",
     id: "asst_g89halTvYCnumoMbDUSXuJc9",
+    btnText: "Chat with Jacob →",
   },
   {
     name: "Alina",
-    role: "eCommerce Assistant (AI Chat)",
+    role: "eCommerce Advisor (Voice AI + Shopify)",
     img: alinaImg,
     description:
-      "Automate eCommerce customer support, recommend products, and upsell — all powered by AI.",
+      "Alina is your eCommerce powerhouse — guiding shoppers with tailored product advice, handling queries, recovering carts, and even closing voice-based sales. She's fully integrated with Shopify and speaks like your best salesperson.",
     id: "asst_hBQgfWqUb7ppxKa9K0bGYyjq",
+    btnText: "Talk to Alina →",
   },
   {
     name: "Zara",
-    role: "Onboard & HR Assistant (AI Chat)",
+    role: "HR Copilot (Internal Knowledge Bot)",
     img: zaraImg,
     description:
-      "Streamline onboarding, answer HR FAQs, and assist employees with self-service support 24/7.",
+      "From “How many annual leaves do I have?” to “Where's the reimbursement form?” — Zara has the answers. She handles your team's everyday HR queries, policy explanations, and onboarding steps with empathy and clarity.",
     id: "asst_FqlcmZ9YXJkyJQ1cN9060RTv",
+    btnText: "Chat with Zara →",
   },
 ];
 
@@ -43,17 +46,12 @@ function AIWorker() {
     <section className="digital-workers">
       <div className="left-pane">
         <span className="badge">Digital Worker</span>
-        <h2>
-          The Future is <br /> Lifelike: AI That <br /> Feels Natural
-        </h2>
+        <h2>The Future is Lifelike: Meet Your Human-Smart AI Workers</h2>
         <p>
-          We believe in a world where AI seamlessly integrates into our daily
-          tasks—seeing, hearing, and collaborating just like humans. A natural
-          human voice is the key to making AI assistants truly effective,
-          ensuring smooth conversations, better engagement, and enhanced
-          productivity.
+          Seamless, scalable, and shockingly human. These AI agents don’t just
+          answer — they understand, adapt, and elevate how your business works.
         </p>
-        <a href="#">Create Custom Agent →</a>
+        <a href="#">Create Your First AI Worker →</a>
       </div>
       <div className="middle-pane">
         <div className="scroll-container">
@@ -66,6 +64,7 @@ function AIWorker() {
                 </h3>
                 <p>{worker.description}</p>
                 <button
+                  style={{ cursor: "pointer" }}
                   onClick={() =>
                     router.push(
                       `/home/chat?agent=${worker.name.toLowerCase()}&assistantId=${
@@ -74,7 +73,7 @@ function AIWorker() {
                     )
                   }
                 >
-                  Try chat →
+                  {worker.btnText}
                 </button>
               </div>
             </div>
