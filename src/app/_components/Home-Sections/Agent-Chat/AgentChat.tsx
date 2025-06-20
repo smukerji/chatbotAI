@@ -62,7 +62,17 @@ function AgentChat() {
                 ? "Alina"
                 : "Zara"}
             </h3>
-            <p>Torri&apos;s Customer Service Agent</p>
+            <p>
+              {agent === "jessica"
+                ? "Torri's Customer Service Agent"
+                : agent === "david"
+                ? "Torri's Sales Agent"
+                : agent === "jacob"
+                ? "Research Assistant (AI Chat)"
+                : agent === "alina"
+                ? "eCommerce Advisor"
+                : "HR Copilot"}
+            </p>
           </div>
         </div>
 

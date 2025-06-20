@@ -29,10 +29,15 @@ function FeaturesSection() {
         <div className="bottom">
           <div className="left">
             <span className="badge">How It Works</span>
-            <h1 className="heading">Chat. Talk. Listen. Learn. Repeat.</h1>
+            <h1 className="heading">
+              Chat. Talk. Listen. Learn. <br /> Repeat.
+            </h1>
 
             <p className="intro-para">
-              Let your team focus on strategy. Let Torri handle the busywork.
+              Your customers don&apos;t just type — they talk, they ask, they
+              expect answers. Torri listens, responds, and remembers — across
+              every channel. Let your team focus on strategy. Let your AI agents
+              handle the busywork.
             </p>
 
             <div
@@ -46,8 +51,9 @@ function FeaturesSection() {
                 </span> */}
               </h2>
               <p className="description">
-                Torri AI is intelligent to find answers for your research papers
-                and books. Upload a book and chat with it.
+                Give your customers a voice they&apos;ll actually enjoy talking
+                to. Torri&apos;s lifelike speech, tone, and understanding make
+                every interaction feel personal — not robotic.
               </p>
             </div>
             <div
@@ -61,8 +67,9 @@ function FeaturesSection() {
                 </span> */}
               </h2>
               <p className="description">
-                Torri AI is intelligent to find answers for your for your
-                research papers, and books. Upload a book and chat with it.
+                From website to WhatsApp to voice, Torri follows the
+                conversation wherever your users are — without ever losing
+                context or momentum.
               </p>
             </div>
             <div
@@ -76,8 +83,9 @@ function FeaturesSection() {
                 </span> */}
               </h2>
               <p className="description">
-                Torri AI is intelligent to find answers for your for your
-                research papers, and books. Upload a book and chat with it.
+                Soon, your customers will show instead of tell. Torri will see
+                what they see and respond — making the future of interaction
+                frictionless, intuitive, and visual.
               </p>
             </div>
           </div>

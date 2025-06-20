@@ -69,6 +69,21 @@
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
     }
 
+    &.row-1 {
+      width: 50%;
+    }
+
+    &.row-2 {
+      width: 33%;
+    }
+
+    @media (max-width: 768px) {
+      &.row-1,
+      &.row-2 {
+        width: 100%;
+      }
+    }
+
     .icon-wrapper {
       position: relative;
       max-width: 410px;
@@ -103,10 +118,10 @@
       font-size: 24px;
       font-weight: 600;
       color: #23262f;
-      margin-bottom: 12px;
     }
 
     .agent-desc {
+      margin-top: 12px;
       font-size: 16px;
       color: #777e90;
       line-height: 1.5;

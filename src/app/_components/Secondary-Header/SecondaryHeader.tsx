@@ -16,6 +16,7 @@ function SecondaryHeader() {
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement | null>(null); // Define the type of menuRef
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showLogo, setShowLogo] = useState(false);
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -42,17 +43,35 @@ function SecondaryHeader() {
     };
   }, [menuOpen]);
 
+  // I want to show the logo when the size is less than 991px, and hide it when the size is greater than 991px
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 991) {
+        setShowLogo(false); // Close the menu when resizing to larger screens
+      } else {
+        setShowLogo(true); // Show the logo when resizing to smaller screens
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   return (
     <div className="header-title-container">
-      <Image
-        className="logo"
-        src={LuciferLogo}
-        alt="img-logo"
-        onClick={() => {
-          router.push("/");
-        }}
-        style={{ cursor: "pointer" }}
-      />
+      {showLogo && (
+        <Image
+          className="logo"
+          src={LuciferLogo}
+          alt="img-logo"
+          onClick={() => {
+            router.push("/");
+          }}
+          style={{ cursor: "pointer" }}
+        />
+      )}
 
       <div className={`hamburger-menu-icon`} onClick={toggleMenu}>
         <div className="bar"></div>
@@ -61,6 +80,16 @@ function SecondaryHeader() {
       </div>
 
       <div ref={menuRef} className={`hamburger-menu ${menuOpen ? "open" : ""}`}>
+        <Image
+          className="logo"
+          src={LuciferLogo}
+          alt="img-logo"
+          onClick={() => {
+            router.push("/");
+          }}
+          style={{ cursor: "pointer" }}
+        />
+
         <div className={`navbar `}>
           <ul>
             <li
@@ -75,13 +104,13 @@ function SecondaryHeader() {
               <a href="/home/pricing">Pricing</a>
             </li>
 
-            <li
+            {/* <li
               onClick={() => {
                 toggleMenu();
               }}
             >
               <Link href="/#service-offerings">Service Offerings</Link>
-            </li>
+            </li> */}
 
             <li onClick={toggleMenu}>
               <a href="/blog">Blog</a>

@@ -21,27 +21,27 @@ const features = [
     icon2: userIcon,
     title: "Tailored Buying Journeys, Every Time",
     description:
-      "Let your AI agent guide shoppers through curated recommendations, personalized bundles, and style-matched picks — just like an in-store concierge.",
+      "No more guessing what your customers want. Torri guides each shopper with personalized picks, bundles, and expert-style recommendations — like a smart concierge in your store, but better.",
   },
   {
     icon1: questionIcon,
     icon2: heartIcon,
     title: "Instant Answers That Build Trust",
     description:
-      "Customers have questions — your AI has answers. From specs and sizes to shipping and stock, this agent replies instantly to remove hesitation and boost sales.",
+      "“What size fits me?” “Is this in stock?” Torri answers those questions in seconds — reducing doubts, removing friction, and helping your customers feel confident enough to click “buy.”",
   },
   {
     icon1: cartIcon,
     icon2: refreshIcon,
     title: "Bring Back Lost Carts — Automatically",
-    description: `Don't lose customers at checkout. This agent re-engages with timely messages, discounts, and gentle nudges — all through chat or voice.`,
+    description: `We've all abandoned a cart before. Torri gently follows up with the right nudge — whether it's a reminder, a discount, or a quick question — all done automatically through voice or chat.`,
   },
   {
     icon1: moneyIcon,
     icon2: micIcon,
     title: "Talk. Shop. Done.",
     description:
-      "Let customers shop with their voice — from product discovery to purchase confirmation. Frictionless buying experiences that feel futuristic and fun.",
+      "Shopping with voice is no longer science fiction. With Torri, customers can find products, ask about them, and even check out — all by talking. It's fast, easy, and surprisingly delightful.",
   },
 ];
 
@@ -56,8 +56,9 @@ function HowItWorks() {
             The AI Salesperson That Converts While You Sleep
           </Title>
           <Paragraph className="hero-subtitle">
-            Power your store with 24/7 voice and chat agents that engage,
-            convert, and care — even when you&apos;re offline.
+            Imagine having a sales expert on your team who never takes a break,
+            answers every question, and knows exactly what each customer needs.
+            That&apos;s what Torri does — in chat and voice — 24/7.
           </Paragraph>
           <Button
             type="primary"

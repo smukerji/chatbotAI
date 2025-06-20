@@ -141,13 +141,23 @@
     line-height: 20px; /* 142.857% */
   }
 
-  h2 {
+  .testimonials-title {
     color: #23262f;
     font-size: 36px;
     font-style: normal;
-    font-weight: 500;
+    font-weight: 600;
     line-height: 50px; /* 138.889% */
-    margin: 20px 0 50px 0;
+    margin: 20px 0 10px 0;
+  }
+
+  .sub-heading {
+    color: #777e90;
+    font-family: "General Sans";
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 28px; /* 140% */
+    margin-bottom: 20px;
   }
 
   .testimonials-grid {
@@ -199,12 +209,20 @@
         font-size: 20px;
         line-height: 28px; /* 140% */
         margin: 15px 0;
+        height: 50%;
+      }
+
+      .hr-line {
+        background-color: #e6e8ec;
+        border: none;
+        height: 1px;
       }
 
       .testimonial-user {
         display: flex;
         align-items: center;
         gap: 16px;
+        margin-top: 15px;
 
         .user-avatar {
           width: 48px;

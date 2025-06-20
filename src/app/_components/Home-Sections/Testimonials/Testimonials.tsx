@@ -140,7 +140,14 @@ function Testimonials() {
 
     <section className="testimonials-section">
       <span className="badge">What client say?</span>
-      <h2>Don&apos;t Take Our Word for It — Take Theirs</h2>
+      <h2 className="testimonials-title">
+        Don&apos;t Take Our Word for It — Take Theirs
+      </h2>
+      <p className="sub-heading">
+        Real teams. Real results. From retail to logistics, these leaders turned
+        AI into their secret weapon for faster growth, smoother ops, and better
+        customer experiences.
+      </p>
       <div className="testimonials-grid" ref={scrollRef}>
         {testimonialsData.map((testimonial, index) => (
           <div key={index} className="testimonial-card">
@@ -148,6 +155,7 @@ function Testimonials() {
               <Image src={quoteIcon} alt="quote-icon" />
             </div>
             <p>{testimonial.quote}</p>
+            <hr className="hr-line" />
             <div className="testimonial-user">
               <Image src={authorIcon} alt="User" className="user-avatar" />
               <div>
