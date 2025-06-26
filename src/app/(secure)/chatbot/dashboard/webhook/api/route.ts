@@ -272,7 +272,7 @@ async function whatsAppOperation(res: any) {
     );
 
     /// parse the response and extract the similarity results
-    const respText = await response.text();
+    const respText = (await response.text()) || "{}";
     let similaritySearchResults = JSON.parse(respText).join("\n");
 
     step = 8;

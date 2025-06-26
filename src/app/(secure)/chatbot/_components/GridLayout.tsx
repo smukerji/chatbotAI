@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import chatbotBg from "../../../../../public/sections-images/common/chatbot-bg-img.svg";
 import chatbotOpenIcon from "../../../../../public/sections-images/common/chatbot-open-icon.svg";
@@ -7,6 +7,7 @@ import shareIcon from "../../../../../public/sections-images/common/share.svg";
 import duplicateIcon from "../../../../../public/sections-images/common/document-copy.svg";
 import renameIcon from "../../../../../public/sections-images/common/edit.svg";
 import deleteIcon from "../../../../../public/sections-images/common/trash.svg";
+import { message } from "antd";
 
 function GridLayout({
   chatbotData,
@@ -19,9 +20,11 @@ function GridLayout({
   setOpenDeleteModal,
   setOpenRenameModal,
   disabled,
+  userId,
 }: any) {
   /// state to maintain the hovering over chatbots
   const [currentChatbotId, setCurrentChatbotId] = useState(null);
+  const chatbotIdRef = useRef(null);
 
   useEffect(() => {
     // Handle chatbot click event
@@ -50,6 +53,26 @@ function GridLayout({
       } else if (menuClick?.value == 3) {
         /// if delete is clicked
         setOpenDeleteModal(true);
+      } else if (menuClick?.value == 4) {
+        /// if migrate is clicked
+        message.info("Migrating your chatbot to v3. Please wait...");
+        console.log(chatbotIdRef.current);
+
+        /// call the migrate api
+        fetch("/chatbot/api/migrate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ chatbotId: chatbotIdRef.current, userId }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            message.success(data.message);
+          })
+          .catch((error) => {
+            message.error("Failed to migrate chatbot");
+          });
       }
     };
 
@@ -125,6 +148,7 @@ function GridLayout({
                   onClick={(event) => {
                     event.stopPropagation();
                     changeMenu({ [index]: !openMenu?.[index] });
+                    chatbotIdRef.current = data.id;
                     setChatbotId(data.id);
                   }}
                 />
@@ -148,6 +172,13 @@ function GridLayout({
                         <Image src={deleteIcon} alt={"delete-icon"} />
                         Delete
                       </li>
+                      {/* if the bottype is not v3 then show migrate option */}
+                      {data.botType !== "bot-v3" ? (
+                        <li className="chatbot-actions" value={4}>
+                          <Image src={duplicateIcon} alt={"migrate-icon"} />
+                          Migrate
+                        </li>
+                      ) : null}
                     </ul>
                   </div>
                 ) : null}

@@ -547,6 +547,7 @@ function Chatbot() {
                 setChatbotId={setChatbotId}
                 setOpenDeleteModal={setOpenDeleteModal}
                 setOpenRenameModal={setOpenRenameModal}
+                userId={cookies.userId}
                 // disabled={user && new Date(user?.endDate) < new Date()}
               />
             )}
