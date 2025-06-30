@@ -30,10 +30,11 @@ function HeroSectionChatPopup({ onClose, agent, torriAssistantId }: any) {
   const chatWindowRef: any = useRef(null);
   const inputRef: any = useRef(null);
   const messageLimit = process.env.NEXT_PUBLIC_MESSAGE_LIMIT;
+  const [firstMsgSent, setFirstMsgSent] = useState(false);
 
   const createThread = async () => {
     const res = await fetch(`/api/assistants/threads`, {
-      method: "POST",
+      method: "POST"
     });
     const data = await res.json();
     setThreadId(data.threadId);
@@ -96,12 +97,12 @@ function HeroSectionChatPopup({ onClose, agent, torriAssistantId }: any) {
       {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({
           runId: runId,
-          toolCallOutputs: toolCallOutputs,
-        }),
+          toolCallOutputs: toolCallOutputs
+        })
       }
     );
     const stream = AssistantStream.fromReadableStream(response.body);
@@ -127,7 +128,7 @@ function HeroSectionChatPopup({ onClose, agent, torriAssistantId }: any) {
   const appendMessage = (role: string, text: string) => {
     setMessages((prevMessages: [{ role: string; content: string }]) => [
       ...prevMessages,
-      { role, content: text },
+      { role, content: text }
     ]);
     /// setting the response time when completed
     setMessagesTime((prev: any) => [
@@ -135,8 +136,8 @@ function HeroSectionChatPopup({ onClose, agent, torriAssistantId }: any) {
       {
         role,
         content: text,
-        messageTime: getDate(),
-      },
+        messageTime: getDate()
+      }
     ]);
   };
 
@@ -145,7 +146,7 @@ function HeroSectionChatPopup({ onClose, agent, torriAssistantId }: any) {
       const lastMessage = prevMessages[prevMessages.length - 1];
       const updatedLastMessage = {
         ...lastMessage,
-        content: lastMessage.content + text,
+        content: lastMessage.content + text
       };
       return [...prevMessages.slice(0, -1), updatedLastMessage];
     });
@@ -156,7 +157,7 @@ function HeroSectionChatPopup({ onClose, agent, torriAssistantId }: any) {
       const lastMessage = prev[prev.length - 1];
       const updatedLastMessage = {
         ...lastMessage,
-        content: lastMessage.content + text,
+        content: lastMessage.content + text
       };
       return [...prev.slice(0, -1), updatedLastMessage];
     });
@@ -166,7 +167,7 @@ function HeroSectionChatPopup({ onClose, agent, torriAssistantId }: any) {
     setMessages((prevMessages: any) => {
       const lastMessage = prevMessages[prevMessages.length - 1];
       const updatedLastMessage = {
-        ...lastMessage,
+        ...lastMessage
       };
       annotations.forEach((annotation: any) => {
         if (annotation.type === "file_path") {
@@ -188,8 +189,8 @@ function HeroSectionChatPopup({ onClose, agent, torriAssistantId }: any) {
         method: "POST",
         body: JSON.stringify({
           content: text,
-          assistantId: torriAssistantId,
-        }),
+          assistantId: torriAssistantId
+        })
       }
     );
     const stream = AssistantStream.fromReadableStream(response.body);
@@ -229,15 +230,15 @@ function HeroSectionChatPopup({ onClose, agent, torriAssistantId }: any) {
       /// set the user query
       setMessages((prev: any) => [
         ...prev,
-        { role: "user", content: userMessage },
+        { role: "user", content: userMessage }
       ]);
       setMessagesTime((prev: any) => [
         ...prev,
         {
           role: "user",
           content: userMessage,
-          messageTime: tempUserMessageTime,
-        },
+          messageTime: tempUserMessageTime
+        }
       ]);
 
       try {
@@ -281,38 +282,71 @@ function HeroSectionChatPopup({ onClose, agent, torriAssistantId }: any) {
       }
     };
     createNewThread();
-    // const handleFirstMessage = async () => {
-    //   if (firstMessage) {
-    //     setLoading(true);
-    //     const tempUserMessageTime = getDate();
-
-    //     setMessages((prev: any) => [
-    //       ...prev,
-    //       { role: "user", content: firstMessage },
-    //     ]);
-    //     setMessagesTime((prev: any) => [
-    //       ...prev,
-    //       {
-    //         role: "user",
-    //         content: firstMessage,
-    //         messageTime: tempUserMessageTime,
-    //       },
-    //     ]);
-
-    //     try {
-    //       await sendMessage(firstMessage);
-    //     } catch (e: any) {
-    //       console.log(
-    //         "Error while getting completion from custom chatbot",
-    //         e,
-    //         e.message
-    //       );
-    //     }
-    //   }
-    // };
-
-    // handleFirstMessage();
   }, []);
+
+  useEffect(() => {
+
+
+    const handleFirstMessage = async () => {
+      const jessicaMsg =
+        "Hello, I am Jessica. Torri's customer service agent. How can I help you?";
+      const davidMsg =
+        "Hello, I am David. Torri's sales agent. How can I help you?";
+      const jacobMsg =
+        "Hello, I am Jacob. A Research assistant. How can I help you today?";
+      const alinaMsg =
+        "Hello, I am Alina. An ecommerce advisor. How may I help you?";
+      const zaraMsg =
+        "Hello, I am Zara. Your HR assistant. How can I help you today?";
+
+        console.log("agent",agent)
+
+      let firstMessage =
+        agent === "jessica"
+          ? jessicaMsg
+          : agent === "david"
+          ? davidMsg
+          : agent === "jacob"
+          ? jacobMsg
+          : agent === "alina"
+          ? alinaMsg
+          : zaraMsg;
+
+      if (!firstMsgSent) {
+        // setLoading(true);
+        const tempUserMessageTime = getDate();
+
+        setMessages((prev: any) => [
+          ...prev,
+          { role: "assistant", content: firstMessage }
+        ]);
+        setMessagesTime((prev: any) => [
+          ...prev,
+          {
+            role: "assistant",
+            content: firstMessage,
+            messageTime: tempUserMessageTime
+          }
+        ]);
+        setFirstMsgSent(true);
+
+        // try {
+        //   await sendMessage(firstMessage);
+        // } catch (e: any) {
+        //   console.log(
+        //     "Error while getting completion from custom chatbot",
+        //     e,
+        //     e.message
+        //   );
+        // }
+      }
+    };
+
+    if(agent){
+
+      handleFirstMessage();
+    }
+  }, [agent]);
 
   return (
     <div className={"chatPopup"}>
@@ -348,17 +382,17 @@ function HeroSectionChatPopup({ onClose, agent, torriAssistantId }: any) {
                     position:
                       messagesTime[index]?.messageType === "initial"
                         ? "unset"
-                        : "relative",
+                        : "relative"
                   }}
                 >
                   <div
                     className="assistant-message"
                     style={{
                       display: "flex",
-                      flexDirection: "column",
+                      flexDirection: "column"
                     }}
                     dangerouslySetInnerHTML={{
-                      __html: message.content,
+                      __html: message.content
                     }}
                   ></div>
                   {/* {messagesTime[index]?.messageType !== "initial" && (
@@ -410,10 +444,10 @@ function HeroSectionChatPopup({ onClose, agent, torriAssistantId }: any) {
                 display: "flex",
                 flexDirection: "column",
                 backgroundColor: "#353945",
-                color: "#FCFCFD",
+                color: "#FCFCFD"
               }}
               dangerouslySetInnerHTML={{
-                __html: response.concat("<b> |</b>"),
+                __html: response.concat("<b> |</b>")
               }}
             />
           </div>

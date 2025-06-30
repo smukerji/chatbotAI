@@ -175,7 +175,7 @@ function HeroSection() {
                 className="primary"
                 onClick={() =>
                   router.push(
-                    "/home/chat?agent=jessica&assistantId=asst_59SkpWUg4gE2swl9JW6g6slc"
+                    "/home/call?agent=jessica"
                   )
                 }
               >
