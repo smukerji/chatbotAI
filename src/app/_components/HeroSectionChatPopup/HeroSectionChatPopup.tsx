@@ -4,7 +4,7 @@ import Image from "next/image";
 import RefreshIcon from "../../../../public/svgs/refreshbtn.svg";
 import CallIcon from "../../../../public/voiceBot/SVG/call-outgoing.svg";
 import CloseIcon from "../../../../public/svgs/close-circle.svg";
-import SendIcon from "../../../../public/svgs/send-2.svg";
+import SendIcon from "../../../../public/svgs/send-3.svg";
 import "./hero-section-chat-popup.scss";
 import { getDate } from "@/app/_helpers/client/getTime";
 import { message } from "antd";
@@ -12,9 +12,13 @@ import { AssistantStream } from "openai/lib/AssistantStream.mjs";
 import { AssistantStreamEvent } from "openai/resources/beta/assistants.mjs";
 import { functionCallHandler } from "@/app/_helpers/client/functionCallHandler";
 import VapiAssistantCall from "./VapiCall/VapiAssistantCall";
+import JessicaImg from "../../../../public/sections-images/header-background/jessica.png";
+import DavidImg from "../../../../public/sections-images/header-background/david.png";
+import JacobImg from "../../../../public/sections-images/digital-worker/1.png";
+import AlinaImg from "../../../../public/sections-images/digital-worker/2.png";
+import ZaraImg from "../../../../public/sections-images/digital-worker/3.png";
 
-
-function HeroSectionChatPopup({ onClose }: any) {
+function HeroSectionChatPopup({ onClose, agent, torriAssistantId }: any) {
   const [messages, setMessages]: any = useState([]);
   const [userMessage, setUserMessage] = useState("");
   /// chat base response
@@ -22,11 +26,11 @@ function HeroSectionChatPopup({ onClose }: any) {
   const [loading, setLoading] = useState(false);
   const [messagesTime, setMessagesTime]: any = useState([]);
   const [sessionStartDate, setSessionStartDate]: any = useState();
-  const torriAssistantId: any = process.env.NEXT_PUBLIC_TORRI_ASSISTANT_ID;
   const [threadId, setThreadId] = useState();
   const chatWindowRef: any = useRef(null);
   const inputRef: any = useRef(null);
   const messageLimit = process.env.NEXT_PUBLIC_MESSAGE_LIMIT;
+  const [firstMsgSent, setFirstMsgSent] = useState(false);
 
   const createThread = async () => {
     const res = await fetch(`/api/assistants/threads`, {
@@ -278,42 +282,72 @@ function HeroSectionChatPopup({ onClose }: any) {
       }
     };
     createNewThread();
-    // const handleFirstMessage = async () => {
-    //   if (firstMessage) {
-    //     setLoading(true);
-    //     const tempUserMessageTime = getDate();
-
-    //     setMessages((prev: any) => [
-    //       ...prev,
-    //       { role: "user", content: firstMessage },
-    //     ]);
-    //     setMessagesTime((prev: any) => [
-    //       ...prev,
-    //       {
-    //         role: "user",
-    //         content: firstMessage,
-    //         messageTime: tempUserMessageTime,
-    //       },
-    //     ]);
-
-    //     try {
-    //       await sendMessage(firstMessage);
-    //     } catch (e: any) {
-    //       console.log(
-    //         "Error while getting completion from custom chatbot",
-    //         e,
-    //         e.message
-    //       );
-    //     }
-    //   }
-    // };
-
-    // handleFirstMessage();
   }, []);
+
+  useEffect(() => {
+    const handleFirstMessage = async () => {
+      const jessicaMsg =
+        "Hello, I am Jessica. Torri's customer service agent. How can I help you?";
+      const davidMsg =
+        "Hello, I am David. Torri's sales agent. How can I help you?";
+      const jacobMsg =
+        "Hello, I am Jacob. A Research assistant. How can I help you today?";
+      const alinaMsg =
+        "Hello, I am Alina. An ecommerce advisor. How may I help you?";
+      const zaraMsg =
+        "Hello, I am Zara. Your HR assistant. How can I help you today?";
+
+      console.log("agent", agent);
+
+      let firstMessage =
+        agent === "jessica"
+          ? jessicaMsg
+          : agent === "david"
+          ? davidMsg
+          : agent === "jacob"
+          ? jacobMsg
+          : agent === "alina"
+          ? alinaMsg
+          : zaraMsg;
+
+      if (!firstMsgSent) {
+        // setLoading(true);
+        const tempUserMessageTime = getDate();
+
+        setMessages((prev: any) => [
+          ...prev,
+          { role: "assistant", content: firstMessage },
+        ]);
+        setMessagesTime((prev: any) => [
+          ...prev,
+          {
+            role: "assistant",
+            content: firstMessage,
+            messageTime: tempUserMessageTime,
+          },
+        ]);
+        setFirstMsgSent(true);
+
+        // try {
+        //   await sendMessage(firstMessage);
+        // } catch (e: any) {
+        //   console.log(
+        //     "Error while getting completion from custom chatbot",
+        //     e,
+        //     e.message
+        //   );
+        // }
+      }
+    };
+
+    if (agent) {
+      handleFirstMessage();
+    }
+  }, [agent]);
 
   return (
     <div className={"chatPopup"}>
-      <div className={"chatHeader"}>
+      {/* <div className={"chatHeader"}>
         <div>
           <button onClick={() => handleClose()} className={"closeButton"}>
             <Image src={CloseIcon} alt="Close" />
@@ -327,7 +361,7 @@ function HeroSectionChatPopup({ onClose }: any) {
           <VapiAssistantCall setMessages={setMessages} setMessagesTime={setMessagesTime} timeoutSeconds={10} 
           />
         </div>
-      </div>
+      </div> */}
 
       <div className={"conversation-container "} ref={chatWindowRef}>
         {messages.map((message: any, index: any) => {
@@ -358,11 +392,26 @@ function HeroSectionChatPopup({ onClose }: any) {
                       __html: message.content,
                     }}
                   ></div>
-                  {messagesTime[index]?.messageType !== "initial" && (
+                  {/* {messagesTime[index]?.messageType !== "initial" && (
                     <div className="time">
                       {messagesTime[index]?.messageTime}
                     </div>
-                  )}
+                  )} */}
+                  <Image
+                    src={
+                      agent === "jessica"
+                        ? JessicaImg
+                        : agent === "david"
+                        ? DavidImg
+                        : agent === "jacob"
+                        ? JacobImg
+                        : agent === "alina"
+                        ? AlinaImg
+                        : ZaraImg
+                    }
+                    alt="user"
+                    className="user-icon"
+                  />
                 </div>
               </React.Fragment>
             );
@@ -380,7 +429,7 @@ function HeroSectionChatPopup({ onClose }: any) {
                 >
                   {message.content}
                 </div>
-                <div className="time">{messagesTime[index]?.messageTime}</div>
+                {/* <div className="time">{messagesTime[index]?.messageTime}</div> */}
               </div>
             );
         })}

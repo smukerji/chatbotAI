@@ -18,7 +18,7 @@ const IndustryAbout = () => {
         <div className="industry-content">
           <div className="industry-left">
             <span className="badge">Industry</span>
-            <h2>Digital Workers supporting at every business landscape</h2>
+            <h2>AI That Speaks Your Industry&apos;s Language</h2>
             <div className="industry-images">
               <Image src={person1} alt="Person 1" className="person1" />
               <Image src={person2} alt="Person 2" className="person2" />
@@ -28,46 +28,66 @@ const IndustryAbout = () => {
           <div className="industry-right">
             <div className="industry-card">
               <div className="industry-item">
-                <Image src={icon1} alt="icon-1" className="icons" />
-                <h3>Education and Institutes</h3>
+                <Image src={icon2} alt="icon-2" className="icons" />
+                <h3>
+                  Healthcare <br />
+                  Smarter support, healthier outcomes.
+                </h3>
                 <p>
-                  Torri AI is intelligent to find answers for your for your
-                  research papers, and books. Upload a book and chat with it.
+                  Torri helps patients get accurate, 24/7 answers based on their
+                  health records or service history — making every interaction
+                  more personal and timely.
                 </p>
               </div>
               <div className="industry-item">
-                <Image src={icon2} alt="icon-2" className="icons" />
-                <h3>Healthcare and Wellness</h3>
+                <Image src={icon1} alt="icon-1" className="icons" />
+                <h3>
+                  Education <br />
+                  Your AI-powered learning assistant.
+                </h3>
                 <p>
-                  Torri AI can provide intelligent support to your customers
-                  needs based on their health records. Make it personalised and
-                  available 24/7
+                  From helping students navigate coursework to assisting staff
+                  with admin queries, Torri makes learning support more
+                  scalable, accessible, and effective.
                 </p>
               </div>
               <div className="industry-item">
                 <Image src={icon3} alt="icon-3" className="icons" />
-                <h3>Small Medium Business</h3>
+                <h3>
+                  Retail & DTC
+                  <br />
+                  Sell more. Support better. On autopilot.
+                </h3>
                 <p>
-                  Torri AI can transform your customer support experience with
-                  swift query resolutions, available 24/7
+                  Boost customer satisfaction with AI agents that instantly
+                  resolve product queries, track orders, and upsell — 24/7
+                  across web, WhatsApp, and voice.
                 </p>
               </div>
               <div className="industry-item">
                 <Image src={icon4} alt="icon-4" className="icons" />
-                <h3>Hotels and Hospitality</h3>
+                <h3>
+                  Hospitality
+                  <br />
+                  Turn every guest into a loyal one.
+                </h3>
                 <p>
-                  Add an AI-chatbot to your website, whatsapp, telegram with a
-                  simple embed code to provide personalised experience about
-                  your hotel information.
+                  Answer bookings, requests, and FAQs instantly with Torri on
+                  your hotel website, WhatsApp, or kiosk — delivering a
+                  personalized stay experience at scale.
                 </p>
               </div>
               <div className="industry-item">
                 <Image src={icon5} alt="icon-5" className="icons" />
-                <h3>Nonprofits or B2C</h3>
+                <h3>
+                  SMBs
+                  <br />
+                  Big support for growing teams.
+                </h3>
                 <p>
-                  Add Torri AI to your website, whatsapp, telegram for your
-                  staff to find any projects and documents. Chat with your
-                  projects.
+                  From internal HR support to external customer service, Torri
+                  helps small teams automate big workloads without complexity —
+                  just plug, play, and grow
                 </p>
               </div>
             </div>
@@ -76,7 +96,7 @@ const IndustryAbout = () => {
       </section>
 
       {/* About Us Section */}
-      <section className="about-section">
+      {/* <section className="about-section">
         <h2>About us</h2>
         <p>
           It&nbsp;s not just about reaching your users; it&nbsp;s about reaching
@@ -92,7 +112,7 @@ const IndustryAbout = () => {
             className="video"
           />
         </div>
-      </section>
+      </section> */}
     </div>
   );
 };

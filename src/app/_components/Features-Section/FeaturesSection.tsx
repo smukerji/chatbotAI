@@ -7,6 +7,7 @@ import arrowImg from "../../../../public/sections-images/features-section/arrow-
 import img1 from "../../../../public/sections-images/features-section/Image.png";
 import img2 from "../../../../public/sections-images/features-section/Image1.png";
 import img3 from "../../../../public/sections-images/features-section/Image2.png";
+import img4 from "../../../../public/sections-images/features-section/VoiceInput.png";
 import Icon from "../Icon/Icon";
 import RightArrowIcon from "@/assets/svg/RightArrowIcon";
 
@@ -15,7 +16,7 @@ function FeaturesSection() {
   return (
     <>
       <div className="feature-section-container" id="features">
-        <div className="top">
+        {/* <div className="top">
           <h1 className="title">Features</h1>
 
           <p className="description">
@@ -23,24 +24,36 @@ function FeaturesSection() {
             sources, train the Torri bot, customize it to your liking, and add
             it to your website, whatsapp, and telegram.
           </p>
-        </div>
+        </div> */}
 
         <div className="bottom">
           <div className="left">
+            <span className="badge">How It Works</span>
+            <h1 className="heading">
+              Chat. Talk. Listen. Learn. <br /> Repeat.
+            </h1>
+
+            <p className="intro-para">
+              Your customers don&apos;t just type — they talk, they ask, they
+              expect answers. Torri listens, responds, and remembers — across
+              every channel. Let your team focus on strategy. Let your AI agents
+              handle the busywork.
+            </p>
+
             <div
               className={`feature ${activeKey == "1" && "active"}`}
               onClick={() => setActiveKey("1")}
             >
               <h2 className="title">
-                Seamless Conversations{" "}
-                <span>
+                Realistic Voice AI
+                {/* <span>
                   <Icon Icon={RightArrowIcon} />
-                </span>
+                </span> */}
               </h2>
               <p className="description">
-                Engage your website visitors, customers, and clients with
-                natural, intuitive conversations. Torri AI ensures every
-                interaction is personalised, relevant, and memorable.
+                Give your customers a voice they&apos;ll actually enjoy talking
+                to. Torri&apos;s lifelike speech, tone, and understanding make
+                every interaction feel personal — not robotic.
               </p>
             </div>
             <div
@@ -48,14 +61,15 @@ function FeaturesSection() {
               onClick={() => setActiveKey("2")}
             >
               <h2 className="title">
-                Integrations made easy{" "}
-                <span>
+                Seamless Channel Switching
+                {/* <span>
                   <Icon Icon={RightArrowIcon} />
-                </span>
+                </span> */}
               </h2>
               <p className="description">
-                Seamlessly integrate Torri AI with your website, WhatsApp, or
-                preferred tools for a unified experience.
+                From website to WhatsApp to voice, Torri follows the
+                conversation wherever your users are — without ever losing
+                context or momentum.
               </p>
             </div>
             <div
@@ -63,28 +77,30 @@ function FeaturesSection() {
               onClick={() => setActiveKey("3")}
             >
               <h2 className="title">
-                Data-Driven Insights{" "}
-                <span>
+                Visual Search & Voice Input
+                {/* <span>
                   <Icon Icon={RightArrowIcon} />
-                </span>
+                </span> */}
               </h2>
               <p className="description">
-                Torri AI is revolutionising how companies interact with their
-                data through an advanced AI chatbot that learns directly from
-                your organisation&apos;s knowledge base.
+                Soon, your customers will show instead of tell. Torri will see
+                what they see and respond — making the future of interaction
+                frictionless, intuitive, and visual.
               </p>
             </div>
           </div>
           <div className="right">
-            {activeKey == "1" ? (
-              <Image src={img1} alt="image" loading="lazy" />
+            <Image src={img4} alt="image" loading="lazy" />
+
+            {/* {activeKey == "1" ? (
+              <Image src={img4} alt="image" loading="lazy" />
             ) : activeKey == "2" ? (
               <Image src={img2} alt="image" loading="lazy" />
             ) : activeKey == "3" ? (
               <Image src={img3} alt="image" loading="lazy" />
             ) : (
               ""
-            )}
+            )} */}
           </div>
         </div>
       </div>
