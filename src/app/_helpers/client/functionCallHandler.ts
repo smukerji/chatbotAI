@@ -39,13 +39,16 @@ export const functionCallHandler = async (
     /// shopify example
     if (functionName === "find_product") {
       /// get the product name and return the product details
-      const response = await fetch("/api/integrations/shopify/products", {
-        body: JSON.stringify({
-          product_name: args.query,
-          chatbotId: chatbotId,
-        }),
-        method: "POST",
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/integrations/shopify/products`,
+        {
+          body: JSON.stringify({
+            product_name: args.query,
+            chatbotId: chatbotId,
+          }),
+          method: "POST",
+        }
+      );
 
       if (response.ok) {
         return JSON.stringify({
@@ -55,13 +58,16 @@ export const functionCallHandler = async (
       }
     } else if (functionName === "get_customer_orders") {
       /// get the customer orders and return the orders
-      const response = await fetch("/api/integrations/shopify/orders", {
-        body: JSON.stringify({
-          email: args.email,
-          chatbotId: chatbotId,
-        }),
-        method: "POST",
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/integrations/shopify/orders`,
+        {
+          body: JSON.stringify({
+            email: args.email,
+            chatbotId: chatbotId,
+          }),
+          method: "POST",
+        }
+      );
 
       if (response.ok) {
         return JSON.stringify({
@@ -72,7 +78,7 @@ export const functionCallHandler = async (
     } else if (functionName === "get_products") {
       /// get product recommendation / suggestion
       const response = await fetch(
-        `/api/integrations/shopify/products?chatbotId=${chatbotId}`,
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/integrations/shopify/products?chatbotId=${chatbotId}`,
         {
           method: "GET",
         }
