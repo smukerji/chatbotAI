@@ -10,6 +10,10 @@ import inboundConversion from "../../../../../public/sections-images/digital-wor
 import winRate from "../../../../../public/sections-images/digital-worker/cup.svg";
 import { useRouter } from "next/navigation";
 
+const JACOB_ASSISTANT_ID = process.env.NEXT_PUBLIC_JACOB_ASSISTANT_ID;
+const ALINA_ASSISTANT_ID = process.env.NEXT_PUBLIC_ALINA_ASSISTANT_ID;
+const ZARA_ASSISTANT_ID = process.env.NEXT_PUBLIC_ZARA_ASSISTANT_ID;
+
 const workers = [
   {
     name: "Jacob",
@@ -17,7 +21,7 @@ const workers = [
     img: jacobImg,
     description:
       "Jacob is your always-on research assistant, built to scan, summarize, and respond with speed and precision. Whether you're doing competitive analysis, preparing reports, or brainstorming content, Jacob connects the dots faster than any intern ever could.",
-    id: "asst_g89halTvYCnumoMbDUSXuJc9",
+    id: JACOB_ASSISTANT_ID,
     btnText: "Chat with Jacob →",
   },
   {
@@ -26,7 +30,7 @@ const workers = [
     img: alinaImg,
     description:
       "Alina is your eCommerce powerhouse — guiding shoppers with tailored product advice, handling queries, recovering carts, and even closing voice-based sales. She's fully integrated with Shopify and speaks like your best salesperson.",
-    id: "asst_hBQgfWqUb7ppxKa9K0bGYyjq",
+    id: ALINA_ASSISTANT_ID,
     btnText: "Talk to Alina →",
   },
   {
@@ -35,7 +39,7 @@ const workers = [
     img: zaraImg,
     description:
       "From “How many annual leaves do I have?” to “Where's the reimbursement form?” — Zara has the answers. She handles your team's everyday HR queries, policy explanations, and onboarding steps with empathy and clarity.",
-    id: "asst_FqlcmZ9YXJkyJQ1cN9060RTv",
+    id: ZARA_ASSISTANT_ID,
     btnText: "Chat with Zara →",
   },
 ];

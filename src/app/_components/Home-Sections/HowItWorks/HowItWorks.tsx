@@ -15,6 +15,8 @@ import "./how-it-works.scss";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
+const ALINA_ASSISTANT_ID = process.env.NEXT_PUBLIC_ALINA_ASSISTANT_ID;
+
 const features = [
   {
     icon1: bagHappy,
@@ -66,7 +68,7 @@ function HowItWorks() {
             className="try-agent-button"
             onClick={() =>
               router.push(
-                "/home/chat?agent=alina&assistantId=asst_hBQgfWqUb7ppxKa9K0bGYyjq"
+                `/home/chat?agent=alina&assistantId=${ALINA_ASSISTANT_ID}`
               )
             }
           >

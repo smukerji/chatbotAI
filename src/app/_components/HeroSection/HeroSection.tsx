@@ -28,6 +28,9 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useCookies } from "react-cookie";
 
+const DAVID_ASSISTANT_ID = process.env.NEXT_PUBLIC_DAVID_ASSISTANT_ID;
+const JESSICA_ASSISTANT_ID = process.env.NEXT_PUBLIC_JESSICA_ASSISTANT_ID;
+
 function HeroSection() {
   const [message, setMessage] = useState("");
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -173,11 +176,7 @@ function HeroSection() {
             <div className="buttons">
               <button
                 className="primary"
-                onClick={() =>
-                  router.push(
-                    "/home/call?agent=jessica"
-                  )
-                }
+                onClick={() => router.push("/home/call?agent=jessica")}
               >
                 Talk to a Demo Agent
               </button>
@@ -216,7 +215,7 @@ function HeroSection() {
                       className="message"
                       onClick={() =>
                         router.push(
-                          "/home/chat?agent=jessica&assistantId=asst_59SkpWUg4gE2swl9JW6g6slc"
+                          `/home/chat?agent=jessica&assistantId=${JESSICA_ASSISTANT_ID}`
                         )
                       }
                     >
@@ -266,7 +265,7 @@ function HeroSection() {
                       className="message"
                       onClick={() =>
                         router.push(
-                          "/home/chat?agent=david&assistantId=asst_DH0W8G1wOWWMFPqicGCgAc5M"
+                          `/home/chat?agent=david&assistantId=${DAVID_ASSISTANT_ID}`
                         )
                       }
                     >
