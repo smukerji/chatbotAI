@@ -3,6 +3,8 @@ import React from "react";
 import "./future-section.scss";
 import { useRouter } from "next/navigation";
 
+const ALINA_ASSISTANT_ID = process.env.NEXT_PUBLIC_ALINA_ASSISTANT_ID;
+
 function FutureSection() {
   const router = useRouter();
   return (
@@ -31,7 +33,7 @@ function FutureSection() {
               style={{ cursor: "pointer" }}
               onClick={() =>
                 router.push(
-                  "/home/chat?agent=alina&assistantId=asst_hBQgfWqUb7ppxKa9K0bGYyjq"
+                  `/home/chat?agent=alina&assistantId=${ALINA_ASSISTANT_ID}`
                 )
               }
             >
