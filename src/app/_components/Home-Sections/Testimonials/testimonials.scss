@@ -152,12 +152,14 @@
 
   .sub-heading {
     color: #777e90;
-    font-family: "General Sans";
+    // font-family: "General Sans";
     font-size: 20px;
     font-style: normal;
     font-weight: 500;
     line-height: 28px; /* 140% */
-    margin-bottom: 20px;
+    // margin-bottom: 20px;
+    max-width: 900px;
+    margin: 0 auto 20px;
   }
 
   .testimonials-grid {
@@ -175,6 +177,7 @@
     position: relative;
     padding: 0 2vw 20px 12.2vw;
     user-select: none;
+    margin-top: 58px;
 
     &::-webkit-scrollbar {
       display: none; /* Hide scrollbar for WebKit browsers */

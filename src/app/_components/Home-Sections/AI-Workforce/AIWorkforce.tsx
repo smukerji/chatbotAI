@@ -9,28 +9,33 @@ import img5 from "../../../../../public/sections-images/ai-workforce/5.png";
 
 const steps = [
   {
-    title:
-      "Pick a role: Sales, Support, HR, or Custom — choose the agent you need most.",
+    title: "Pick a role",
+    description:
+      "Sales, Support, HR, or Custom — choose the agent you need most.",
     image: img1,
   },
   {
-    title:
-      "Upload your content : Drop in docs, guides, FAQs, or web links. Torri learns instantly.",
+    title: "Upload your content",
+    description:
+      "Drop in docs, guides, FAQs, or web links. Torri learns instantly.",
     image: img2,
   },
   {
-    title:
-      "Customize tone & voice : Make it match your brand — from warm and friendly to sharp and expert.",
+    title: "Customize tone & voice",
+    description:
+      "Make it match your brand — from warm and friendly to sharp and expert.",
     image: img3,
   },
   {
-    title:
-      "Deploy anywhere :Add to your website, WhatsApp, app, or even your phone system.",
+    title: "Deploy anywhere",
+    description:
+      "Add to your website, WhatsApp, app, or even your phone system.",
     image: img4,
   },
   {
-    title:
-      "Track & improve : See performance metrics. Train with feedback. Scale effortlessly.",
+    title: "Track & improve",
+    description:
+      "See performance metrics. Train with feedback. Scale effortlessly.",
     image: img5,
   },
 ];
@@ -47,7 +52,8 @@ function AIWorkforce() {
               <div className="icon-wrapper">
                 <Image src={step.image} alt={`Step ${index + 1}`} />
               </div>
-              <p>{step.title}</p>
+              <p className="step-title">{step.title}</p>
+              <p className="step-description">{step.description}</p>
             </div>
           ))}
         </div>

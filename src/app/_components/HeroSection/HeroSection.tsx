@@ -245,9 +245,12 @@ function HeroSection() {
                   <span className="badge-support">Support</span>
                 </span>
               </div>
+
               <div
                 className="image-section"
-                style={{ backgroundColor: "#a7f3d0" }}
+                style={{
+                  borderRadius: "20px",
+                }}
               >
                 <Image src={davidImg} alt="David" />
                 <div className="overlay-text">

@@ -550,10 +550,11 @@
             right: 0;
             padding: 1rem;
             background: linear-gradient(
-              to top,
-              rgba(0, 0, 0, 0.6),
-              transparent
+              0deg,
+              #1d1d16 21.97%,
+              rgba(30, 30, 30, 0) 83.76%
             );
+            backdrop-filter: blur(1.0499999523162842px);
             color: white;
 
             h3 {

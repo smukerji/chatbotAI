@@ -60,11 +60,20 @@
         //   }
       }
 
-      p {
-        font-size: 20px;
+      .step-description {
+        font-size: 16px;
         font-weight: 500;
+        color: #777e90;
+        text-align: left;
+        margin-top: 5px;
+      }
+
+      .step-title {
+        font-size: 16px;
+        font-weight: 600;
         color: #23262f;
-        margin-top: 8px;
+        margin-top: 4px;
+        text-align: left;
       }
     }
   }
