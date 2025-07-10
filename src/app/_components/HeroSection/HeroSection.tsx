@@ -20,9 +20,9 @@ import jessicaImg from "../../../../public/sections-images/header-background/jes
 import davidImg from "../../../../public/sections-images/header-background/david.png";
 import iconCall from "../../../../public/sections-images/header-background/call-outgoing.svg";
 import iconMessage from "../../../../public/sections-images/header-background/message-text-2.svg";
-import iconResponse from "../../../../public/sections-images/header-background/messages.svg";
+import iconResponse from "../../../../public/sections-images/header-background/messages.png";
 import iconConversion from "../../../../public/sections-images/header-background/icon-cost.svg";
-import iconCost from "../../../../public/sections-images/header-background/favorite-chart.svg";
+import iconCost from "../../../../public/sections-images/header-background/favorite-chart.png";
 import iconScroll from "../assets/icon-scroll.svg";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";

@@ -3,6 +3,11 @@ import React, { useEffect, useRef } from "react";
 import Image from "next/image";
 import quoteIcon from "../../../../../public/sections-images/testimonials-section/Quote.svg";
 import authorIcon from "../../../../../public/sections-images/testimonials-section/user.png";
+import img1 from "../../../../../public/sections-images/testimonials-section/1.png";
+import img2 from "../../../../../public/sections-images/testimonials-section/2.png";
+import img3 from "../../../../../public/sections-images/testimonials-section/3.png";
+import img4 from "../../../../../public/sections-images/testimonials-section/4.png";
+import img5 from "../../../../../public/sections-images/testimonials-section/5.png";
 
 import "./testimonials.scss";
 
@@ -12,30 +17,35 @@ const testimonialsData = [
       "Torri helped us respond to 95% of support tickets in real time. Our customers love the instant help — and our team has cut workload in half.",
     author: "Rocky",
     position: "General Manager, iChef Hong Kong",
+    image: img1,
   },
   {
     quote:
       "In just 3 weeks, our AI agent recovered $6.2K in abandoned carts — with personalized product nudges via WhatsApp and voice. It's a game changer.",
     author: "Sarah",
     position: "Founder, Bloom & Blush",
+    image: img2,
   },
   {
     quote:
       "We use Torri for order tracking and invoice automation. It integrated with our ERP in a day, and reduced manual errors by over 70%.",
     author: "Amir",
     position: "CTO, FleetKart Logistics",
+    image: img3,
   },
   {
     quote:
       "Our voice agent demo converted 18% of visitors in a week. It's like having a sales team working 24/7 without lifting a finger.”",
     author: "Jenna",
     position: "Head of Growth, StashThreads",
+    image: img4,
   },
   {
     quote:
-      "Torri's AI agent handles 80% of our customer queries on WhatsApp. It's like having a personal assistant for every shopper.",
-    author: "Alex",
-    position: "Customer Experience Lead, ShopSmart",
+      "Torri handles internal policy queries, leave requests, and vendor FAQs — all in voice. Our HR and finance teams are finally free to focus on strategy.",
+    author: "Ravi",
+    position: "Operations Director, Everlite Electronics",
+    image: img5,
   },
 ];
 
@@ -71,7 +81,7 @@ function Testimonials() {
       if (!isDown) return;
       e.preventDefault();
       const x = e.pageX - slider.offsetLeft;
-      const walk = (x - startX) * 2;
+      const walk = (x - startX) * 8;
       slider.scrollLeft = scrollLeft - walk;
     };
 
@@ -157,7 +167,11 @@ function Testimonials() {
             <p>{testimonial.quote}</p>
             <hr className="hr-line" />
             <div className="testimonial-user">
-              <Image src={authorIcon} alt="User" className="user-avatar" />
+              <Image
+                src={testimonial.image}
+                alt="User"
+                className="user-avatar"
+              />
               <div>
                 <h4>{testimonial.author}</h4>
                 <span>{testimonial.position}</span>
