@@ -1,6 +1,6 @@
 .digital-workers {
   display: flex;
-  padding: 5.2vw 12.2vw;
+  padding: 0 12.2vw;
   margin-top: 20px;
   gap: 3rem;
   scrollbar-width: none;
@@ -16,7 +16,7 @@
     position: sticky;
     top: 0;
     align-self: flex-start;
-    height: 100vh;
+    height: 80vh;
 
     .badge {
       padding: 6px 12px;
@@ -157,7 +157,7 @@
     position: sticky;
     top: 0;
     align-self: flex-start;
-    height: 100vh;
+    height: 80vh;
 
     .stats {
       list-style: none;
