@@ -1,6 +1,6 @@
 .digital-workers {
   display: flex;
-  padding: 0 12.2vw;
+  padding: 0 12.2vw 80px;
   margin-top: 20px;
   gap: 3rem;
   scrollbar-width: none;
@@ -14,9 +14,9 @@
     flex: 1;
     max-width: 30%;
     position: sticky;
-    top: 0;
+    top: 20px;
     align-self: flex-start;
-    height: 80vh;
+    // height: 100vh;
 
     .badge {
       padding: 6px 12px;
@@ -55,7 +55,7 @@
 
   .middle-pane {
     flex: 1;
-    height: 80vh;
+    // height: 100vh;
     overflow: hidden;
 
     .scroll-container {
@@ -122,7 +122,7 @@
         }
 
         @media (max-width: 991px) {
-          justify-content: center;
+          // justify-content: center;
           img {
             width: 300px;
             height: 300px;
@@ -157,7 +157,7 @@
     position: sticky;
     top: 0;
     align-self: flex-start;
-    height: 80vh;
+    // height: 100vh;
 
     .stats {
       list-style: none;
@@ -165,7 +165,6 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      margin-top: 1rem;
       padding-top: 1rem;
 
       li {
@@ -204,9 +203,20 @@
     .middle-pane {
       height: auto;
       max-height: none;
+
+      .scroll-container {
+        flex-direction: row;
+        gap: 20px;
+      }
     }
     .right-pane {
       position: static;
+      width: 100%;
+
+      .stats {
+        flex-direction: row;
+        gap: 20px;
+      }
     }
   }
 

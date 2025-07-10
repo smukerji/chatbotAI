@@ -49,30 +49,30 @@ function AIWorker() {
   const digitalWorkersRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const digitalWorkers = digitalWorkersRef.current;
-    const scrollContainer = scrollContainerRef.current;
-    if (!digitalWorkers || !scrollContainer) return;
+  // useEffect(() => {
+  //   const digitalWorkers = digitalWorkersRef.current;
+  //   const scrollContainer = scrollContainerRef.current;
+  //   if (!digitalWorkers || !scrollContainer) return;
 
-    const onWheel = (e: WheelEvent) => {
-      if (!scrollContainer.contains(e.target as Node)) {
-        const { scrollTop, scrollHeight, clientHeight } = scrollContainer;
-        const isScrollingDown = e.deltaY > 0;
-        const isScrollingUp = e.deltaY < 0;
-        const atTop = scrollTop === 0;
-        const atBottom = scrollTop + clientHeight >= scrollHeight - 1;
+  //   const onWheel = (e: WheelEvent) => {
+  //     if (!scrollContainer.contains(e.target as Node)) {
+  //       const { scrollTop, scrollHeight, clientHeight } = scrollContainer;
+  //       const isScrollingDown = e.deltaY > 0;
+  //       const isScrollingUp = e.deltaY < 0;
+  //       const atTop = scrollTop === 0;
+  //       const atBottom = scrollTop + clientHeight >= scrollHeight - 1;
 
-        // Only prevent default if not at the edge in the scroll direction
-        if ((isScrollingDown && !atBottom) || (isScrollingUp && !atTop)) {
-          scrollContainer.scrollTop += e.deltaY * 4;
-          e.preventDefault();
-        }
-        // If at edge, let event bubble to allow main page scroll
-      }
-    };
-    digitalWorkers.addEventListener("wheel", onWheel, { passive: false });
-    return () => digitalWorkers.removeEventListener("wheel", onWheel);
-  }, []);
+  //       // Only prevent default if not at the edge in the scroll direction
+  //       if ((isScrollingDown && !atBottom) || (isScrollingUp && !atTop)) {
+  //         scrollContainer.scrollTop += e.deltaY * 4;
+  //         e.preventDefault();
+  //       }
+  //       // If at edge, let event bubble to allow main page scroll
+  //     }
+  //   };
+  //   digitalWorkers.addEventListener("wheel", onWheel, { passive: false });
+  //   return () => digitalWorkers.removeEventListener("wheel", onWheel);
+  // }, []);
 
   return (
     <section className="digital-workers" ref={digitalWorkersRef}>
