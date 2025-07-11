@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import "./ai-worker.scss";
 import Image from "next/image";
 import jacobImg from "../../../../../public/sections-images/digital-worker/1.png";
@@ -46,8 +46,36 @@ const workers = [
 
 function AIWorker() {
   const router = useRouter();
+  const digitalWorkersRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // useEffect(() => {
+  //   const digitalWorkers = digitalWorkersRef.current;
+  //   const scrollContainer = scrollContainerRef.current;
+  //   if (!digitalWorkers || !scrollContainer) return;
+
+  //   const onWheel = (e: WheelEvent) => {
+  //     if (!scrollContainer.contains(e.target as Node)) {
+  //       const { scrollTop, scrollHeight, clientHeight } = scrollContainer;
+  //       const isScrollingDown = e.deltaY > 0;
+  //       const isScrollingUp = e.deltaY < 0;
+  //       const atTop = scrollTop === 0;
+  //       const atBottom = scrollTop + clientHeight >= scrollHeight - 1;
+
+  //       // Only prevent default if not at the edge in the scroll direction
+  //       if ((isScrollingDown && !atBottom) || (isScrollingUp && !atTop)) {
+  //         scrollContainer.scrollTop += e.deltaY * 4;
+  //         e.preventDefault();
+  //       }
+  //       // If at edge, let event bubble to allow main page scroll
+  //     }
+  //   };
+  //   digitalWorkers.addEventListener("wheel", onWheel, { passive: false });
+  //   return () => digitalWorkers.removeEventListener("wheel", onWheel);
+  // }, []);
+
   return (
-    <section className="digital-workers">
+    <section className="digital-workers" ref={digitalWorkersRef}>
       <div className="left-pane">
         <span className="badge">Digital Worker</span>
         <h2>The Future is Lifelike: Meet Your Human-Smart AI Workers</h2>
@@ -58,7 +86,7 @@ function AIWorker() {
         <a href="#">Create Your First AI Worker →</a>
       </div>
       <div className="middle-pane">
-        <div className="scroll-container">
+        <div className="scroll-container" ref={scrollContainerRef}>
           {workers.map((worker, i) => (
             <div className="card" key={i}>
               <div className="card-left">

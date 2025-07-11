@@ -8,6 +8,8 @@ import img1 from "../../../../public/sections-images/features-section/Image.png"
 import img2 from "../../../../public/sections-images/features-section/Image1.png";
 import img3 from "../../../../public/sections-images/features-section/Image2.png";
 import img4 from "../../../../public/sections-images/features-section/VoiceInput.png";
+import img5 from "../../../../public/sections-images/features-section/channel.png";
+import img6 from "../../../../public/sections-images/features-section/visual.png";
 import Icon from "../Icon/Icon";
 import RightArrowIcon from "@/assets/svg/RightArrowIcon";
 
@@ -90,17 +92,17 @@ function FeaturesSection() {
             </div>
           </div>
           <div className="right">
-            <Image src={img4} alt="image" loading="lazy" />
+            {/* <Image src={img4} alt="image" loading="lazy" /> */}
 
-            {/* {activeKey == "1" ? (
+            {activeKey == "1" ? (
               <Image src={img4} alt="image" loading="lazy" />
             ) : activeKey == "2" ? (
-              <Image src={img2} alt="image" loading="lazy" />
+              <Image src={img5} alt="image" loading="lazy" />
             ) : activeKey == "3" ? (
-              <Image src={img3} alt="image" loading="lazy" />
+              <Image src={img6} alt="image" loading="lazy" />
             ) : (
               ""
-            )} */}
+            )}
           </div>
         </div>
       </div>

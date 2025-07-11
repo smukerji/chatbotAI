@@ -74,19 +74,25 @@
 
           .person1 {
             position: absolute;
-            right: -10%;
+            right: -2%;
+            width: 210px;
+            height: auto;
           }
 
           .person2 {
             position: absolute;
             left: 12%;
             top: 50%;
+            width: 73px;
+            height: auto;
           }
 
           .person3 {
             position: absolute;
             left: 20%;
             bottom: 20px;
+            width: 125px;
+            height: auto;
           }
         }
       }
@@ -119,6 +125,7 @@
             }
             p {
               font-size: 14px;
+              color: #ccd7fc;
             }
           }
         }
