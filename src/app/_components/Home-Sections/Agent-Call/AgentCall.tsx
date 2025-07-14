@@ -125,8 +125,12 @@ function AgentCall() {
     <>
       <div className="agent-call-wrapper">
         <div className="agent-details">
-          <h2>{agent === "jessica" ? callStatus +" Jessica" : callStatus +" David"}</h2>
-          <p>Torri&apos;s Customer Service Agent</p>
+          <div className="agent-text-header">
+            <h2>{agent === "jessica" ? callStatus +" Jessica" : callStatus +" David"}</h2>
+            <p>Torri&apos;s Customer Service Agent</p>
+            
+          </div>
+       
 
           <div className="avatar-container">
             <Image
