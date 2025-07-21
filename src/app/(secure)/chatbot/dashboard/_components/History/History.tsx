@@ -18,6 +18,7 @@ import { getTimeAgo } from "@/app/_helpers/client/getTime";
 import { CreateBotContext } from "@/app/_helpers/client/Context/CreateBotContext";
 import closeImage from "../../../../../../../public/svgs/close-icon.svg";
 import noHistory from "../../../../../../../public/svgs/empty-history.svg";
+import dayjs, { Dayjs } from "dayjs";
 
 const { RangePicker } = DatePicker;
 
@@ -36,13 +37,20 @@ function History({ chatbotId }: any) {
   const [leadsFilter, setLeadsFilter] = useState("");
   const [openDatePicker, setOpenDatePicker] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [displayDate, setDisplayDate] = useState(null);
+  // const [displayDate, setDisplayDate] = useState(null);
+  const [displayDate, setDisplayDate] = useState<[Dayjs | null, Dayjs | null] | null>(null);
   const selectedDate: any = useRef(null);
 
   const [chatClicked, setIsChatClicked] = useState<boolean>(false);
 
+  // const handleCancel = () => {
+  //   selectedDate.current = null;
+  //   setOpenDatePicker(false);
+  // };
+
   const handleCancel = () => {
     selectedDate.current = null;
+    setDisplayDate(null); // Clear picker value & placeholder
     setOpenDatePicker(false);
   };
 
@@ -289,7 +297,7 @@ function History({ chatbotId }: any) {
                 },
               }}
             >
-              <RangePicker
+              {/* <RangePicker
                 className={`${leadsFilter === "custom-date" && "active"}`}
                 onClick={() => {
                   setOpenDatePicker(true);
@@ -361,7 +369,67 @@ function History({ chatbotId }: any) {
                     </div>
                   </>
                 )}
-              />
+              /> */}
+
+<RangePicker
+  className={`${leadsFilter === "custom-date" && "active"}`}
+  onClick={() => {
+    setOpenDatePicker(true);
+    setLeadsFilter("custom-date");
+  }}
+  disabledDate={current => current && current > dayjs().endOf('day')}
+  onCalendarChange={(date) => {
+    setDisplayDate(date);
+    if (date) {
+      selectedDate.current = [
+        date[0]?.toDate().toLocaleDateString("en-CA"),
+        date[1]?.toDate().toLocaleDateString("en-CA"),
+      ];
+    } else {
+      selectedDate.current = null;
+    }
+  }}
+  format={"DD-MM-YYYY"}
+  open={openDatePicker}
+  value={displayDate}
+  renderExtraFooter={() => (
+    <div className="action-btns">
+      <button
+        className="cancel-date-btn"
+        onClick={handleCancel}
+      >
+        Cancel
+      </button>
+      <button
+        className="set-date-btn"
+        onClick={() => {
+          if (!selectedDate.current) {
+            message.error("Please select a date range");
+            return;
+          }
+          if (selectedDate.current[0] > selectedDate.current[1]) {
+            message.error("Start date cannot be greater than end date");
+            return;
+          }
+          setCurrentChatHistory([]);
+          setCurrentPage(1);
+          fetchHistoryCount(
+            true,
+            1,
+            10,
+            selectedDate.current[0],
+            selectedDate.current[1]
+          );
+          setOpenDatePicker(false);
+        }}
+      >
+        Set Date
+      </button>
+    </div>
+  )}
+/>
+
+
             </ConfigProvider>
           </div>
         </div>

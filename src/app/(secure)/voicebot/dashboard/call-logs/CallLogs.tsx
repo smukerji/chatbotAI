@@ -12,6 +12,7 @@ import Image from 'next/image';
 import { useWavesurfer } from '@wavesurfer/react';
 import Timeline from 'wavesurfer.js/dist/plugins/timeline.esm.js';
 import { ReloadOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
 
 // import microimg from "../../../../../../public/voiceBot/SVG/microphone-2.svg";
 
@@ -371,6 +372,7 @@ const formatCallDuration = (createdAt: string, endedAt: string): string => {
           value={dateRange as any}
           allowClear={false}
           placeholder={['Start date', 'End date']}
+          disabledDate={current => current && current > dayjs().endOf('day')}
         />
       
       </div>

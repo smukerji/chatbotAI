@@ -72,7 +72,6 @@ function Model() {
 
     async function getUsersFile(){
       try {
-        debugger;
           const assistantId = voiceBotContextData?.assistantInfo?.vapiAssistantId;
           const response = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/knowledge-file?userId=${cookies.userId}&route=model&assistantId=${assistantId}`)
           const data = await response.json();
