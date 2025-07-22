@@ -22,11 +22,21 @@ export default async function handler(req, res) {
     // });
     // return res.status(200).send(tr);
     /// parse the request object
-    const body = JSON.parse(req.body);
+
+    /// if req.body is not a string, parse it
+    if (typeof req.body === "string") {
+      try {
+        req.body = JSON.parse(req.body);
+      } catch (error) {
+        console.error("Error parsing request body:", error);
+        return res.status(400).send("Invalid JSON format in request body");
+      }
+    }
+    const body = req.body;
     const userQuery = body?.userQuery;
     const chatbotId = body?.chatbotId;
     const userId = body?.userId;
-    const messages = body?.messages;
+    const messages = body?.messages ? body?.messages : {};
     // /// create the embedding of user query
     // const embed = await createEmbedding(userQuery);
 
@@ -58,6 +68,11 @@ export default async function handler(req, res) {
       //   console.error("Error during queryfetch:", error);
       //   return res.status(200).send(error.message);
       // }
+
+      console.log("User Query:", userQuery);
+      console.log("Chatbot ID:", chatbotId);
+      console.log("User ID:", userId);
+      console.log("Messages:", messages);
 
       const pinecone = new Pinecone({
         apiKey: process.env.NEXT_PUBLIC_PINECONE_KEY,
@@ -117,6 +132,8 @@ export default async function handler(req, res) {
           similaritySearch += `<img src=${doc.metadata.image_path} />`;
         }
       }
+
+      console.log("Similarity Search Result:", similaritySearch);
 
       return res.status(200).send(similaritySearch);
     } catch (error) {

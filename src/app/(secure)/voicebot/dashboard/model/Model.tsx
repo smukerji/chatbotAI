@@ -44,10 +44,10 @@ function Model() {
     setSelectedProvider(voicebotDetails["model"]["provider"] || undefined);
     setSelectedModel(voicebotDetails["model"]["model"] || undefined);
     // tools
-    if (("tools" in voicebotDetails.model) && "fileIds" in voicebotDetails.model.tools[0].knowledgeBases[0] && Array.isArray(voicebotDetails.model.tools[0].knowledgeBases[0].fileIds)) {
+    // if (("tools" in voicebotDetails.model) && "fileIds" in voicebotDetails.model.tools[0].knowledgeBases[0] && Array.isArray(voicebotDetails.model.tools[0].knowledgeBases[0].fileIds)) {
 
-      setSelectedKnowledgeFile(voicebotDetails.model.tools[0].knowledgeBases[0].fileIds || undefined);
-    }
+    //   setSelectedKnowledgeFile(voicebotDetails.model.tools[0].knowledgeBases[0].fileIds || undefined);
+    // }
 
    
 
@@ -63,36 +63,33 @@ function Model() {
       voicebotDetails["model"]["temperature"],
       voicebotDetails["model"]["maxTokens"],
       voicebotDetails["model"]["emotionRecognitionEnabled"],
-      voicebotDetails["model"]["knowledgeBaseId"],
+      // voicebotDetails["model"]["knowledgeBaseId"],
     ]);
 
-    useEffect(() => {
-      getUsersFile();
-    },[]);
 
-    async function getUsersFile(){
-      try {
-        debugger;
-          const assistantId = voiceBotContextData?.assistantInfo?.vapiAssistantId;
-          const response = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/knowledge-file?userId=${cookies.userId}&route=model&assistantId=${assistantId}`)
-          const data = await response.json();
-          console.table(data.data);
-          if(data.status === 200 && data.data.length > 0){
-              //set the name as value and the id as label
-              setUserFiles(data.data.map((file:any) => ({ value:file.fileData.id , label: file.fileData.name})));
-          }
-          else if(data.status === 200 && data.data.length === 0){
-            setUserFiles([]);
-            delete voiceBotContextData.state.model.tools;
-            setSelectedKnowledgeFile("");
-          }
 
-      }
-      catch (error) {
-          console.error(error);
-      }
-     
-  }
+    // async function getUsersFile(){
+    //   try {
+    //     debugger;
+    //       const assistantId = voiceBotContextData?.assistantInfo?.vapiAssistantId;
+    //       const response = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/knowledge-file?userId=${cookies.userId}&route=model&assistantId=${assistantId}`)
+    //       const data = await response.json();
+    //       console.table(data.data);
+    //       if(data.status === 200 && data.data.length > 0){
+    //           //set the name as value and the id as label
+    //           setUserFiles(data.data.map((file:any) => ({ value:file.fileData.id , label: file.fileData.name})));
+    //       }
+    //       else if(data.status === 200 && data.data.length === 0){
+    //         setUserFiles([]);
+    //         delete voiceBotContextData.state.model.tools;
+    //         setSelectedKnowledgeFile("");
+    //       }
+
+    //   }
+    //   catch (error) {
+    //       console.error(error);
+    //   }
+    // }
 
 
 
@@ -305,14 +302,14 @@ function Model() {
         {modelValidationMessage && <p className="invalidation-message">{modelValidationMessage}</p>}
         <p className="model-info">GPT-4o is more accurate but fast and cheaper</p>
 
-        <h4 className="provider knowledge-base">Knowledge Base</h4>
+        {/* <h4 className="provider knowledge-base">Knowledge Base</h4>
         <Select
           value={selectedKnowledgeFile}
           className="select-field"
           placeholder="Select file"
           options={userFiles}
           onChange={fileKnowledgeChangeHandler}
-        /> 
+        />  */}
 
         <div className="temprature model">
           <h4 className="temprature_title">Temperatures</h4>

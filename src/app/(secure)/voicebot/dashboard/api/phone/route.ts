@@ -14,8 +14,7 @@ interface ImportNumberData {
 }
 
 module.exports = apiHandler({
-  // GET: getAssistantList,//dashboard/api/assistant
-  // DELETE:deleteSingleAssistant//dashboard/api/assistant
+
   POST: importNumberToTwilio,
   GET: getImportedTwilioDataFromDB,
   PUT: updateNumberWithAssistant, //dashboard/api/assistant

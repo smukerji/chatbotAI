@@ -6,12 +6,7 @@ import clientPromise from "../../../../../../../db";
 import { ObjectId } from "mongodb";
 
 module.exports = apiHandler({
-    // GET: getAssistantList,//dashboard/api/assistant
-    // DELETE:deleteSingleAssistant//dashboard/api/assistant
-    // POST: importNumberToTwilio,
-    // GET: getImportedTwilioDataFromDB,
     PUT: updateAssistantCallMetadata,//
-    // DELETE: deleteSingleAssistant//dashboard/api/assistant
 });
 
 async function updateAssistantCallMetadata(req: NextRequest) {

@@ -1,0 +1,1346 @@
+paths:
+  /dashboard/api/assistant:
+    get:
+      tags:
+        - Voice Assistant
+      summary: Get list of voice assistants for a user
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: string
+          required: true
+          description: User's unique ID (MongoDB ObjectId)
+      responses:
+        '200':
+          description: List of assistants
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  assistants:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          description: Assistant record ID (MongoDB ObjectId)
+                        assistantName:
+                          type: string
+                        assistantTemplateIDs:
+                          type: array
+                          items:
+                            type: string
+                          description: Array of template ObjectIds
+                        imageUrl:
+                          type: string
+                        userId:
+                          type: string
+                          description: User's ObjectId
+                        vapiAssistantId:
+                          type: string
+                        isDeleted:
+                          type: boolean
+                        metadata:
+                          type: object
+                          properties:
+                            lastUsed:
+                              type: integer
+                              description: Last used timestamp (Unix)
+                            totalCallLogs:
+                              type: integer
+                              description: Total number of call logs
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
+
+    delete:
+      tags:
+        - Voice Assistant
+      summary: Soft delete a voice assistant by ID
+      parameters:
+        - in: query
+          name: assistanceId
+          schema:
+            type: string
+          required: true
+          description: Assistant's unique ID
+      responses:
+        '200':
+          description: Deletion result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  error:
+                    type: string
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
+
+    post:
+      tags:
+        - Voice Assistant
+      summary: Give free credits to a user for voicebot usage
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: string
+          required: true
+          description: User's unique ID
+      responses:
+        '200':
+          description: Credits added or current credits returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  userCredits:
+                    type: number
+                  error:
+                    type: string
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
+  /dashboard/api/costs-wallates:
+    get:
+      tags:
+        - Voice Assistant
+      summary: Check if user has voicebot credits
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: string
+          required: true
+          description: User's unique ID
+      responses:
+        '200':
+          description: Credit status for the user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  isCreditExist:
+                    type: boolean
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
+
+    put:
+      tags:
+        - Voice Assistant
+      summary: Deduct voicebot credits for a user after a call
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: string
+          required: true
+          description: User's unique ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                assistantId:
+                  type: string
+                  description: Vapi Assistant ID
+      responses:
+        '200':
+          description: Credits updated or error message
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: number
+                    description: Updated credits (if successful)
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
+  /dashboard/api/costs-wallates/usages:
+    get:
+      tags:
+        - Voice Assistant
+      summary: Get user's daily and monthly voicebot usage costs
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: string
+          required: true
+          description: User's unique ID
+        - in: query
+          name: todayDate
+          schema:
+            type: string
+            format: date
+          required: false
+          description: Date for daily usage in YYYY-MM-DD format (defaults to today)
+        - in: query
+          name: monthDate
+          schema:
+            type: string
+            pattern: '^\d{4}-\d{2}$'
+          required: false
+          description: Month for monthly usage in YYYY-MM format (defaults to current month)
+      responses:
+        '200':
+          description: Usage costs for the user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      todayDate:
+                        type: string
+                        format: date
+                      monthDate:
+                        type: string
+                        pattern: '^\d{4}-\d{2}$'
+                      usage:
+                        type: object
+                        properties:
+                          dayUsage:
+                            type: number
+                            description: Total cost for the specified day
+                          monthUsage:
+                            type: number
+                            description: Total cost for the specified month
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
+  /dashboard/api/get-token:
+    get:
+      tags:
+        - Voice Assistant
+      summary: Get a Vapi API token for the user
+      responses:
+        '200':
+          description: Successfully generated token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
+  /dashboard/api/knowledge-file:
+    get:
+      tags:
+        - Voice Assistant
+      summary: Get all knowledge files for a user and assistant
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: string
+          required: true
+          description: User's unique ID (MongoDB ObjectId)
+        - in: query
+          name: assistantId
+          schema:
+            type: string
+          required: true
+          description: Assistant's unique ID
+      responses:
+        '200':
+          description: List of knowledge files for the user and assistant
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          description: Knowledge file record ID
+                        fileData:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                            name:
+                              type: string
+                            orgId:
+                              type: string
+                            url:
+                              type: string
+                            bytes:
+                              type: string
+                            object:
+                              type: string
+                            purpose:
+                              type: string
+                            createdAt:
+                              type: string
+                              format: date-time
+                            updatedAt:
+                              type: string
+                              format: date-time
+                            mimetype:
+                              type: string
+                            bucket:
+                              type: string
+                            path:
+                              type: string
+                            status:
+                              type: string
+                        userId:
+                          type: string
+                          description: User's ObjectId
+                        assistantId:
+                          type: string
+                          description: Assistant's unique ID
+                  status:
+                    type: integer
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
+
+    post:
+      tags:
+        - Voice Assistant
+      summary: Store a new knowledge file for a user and assistant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fileData:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    name:
+                      type: string
+                    orgId:
+                      type: string
+                    url:
+                      type: string
+                    bytes:
+                      type: string
+                    object:
+                      type: string
+                    purpose:
+                      type: string
+                    createdAt:
+                      type: string
+                      format: date-time
+                    updatedAt:
+                      type: string
+                      format: date-time
+                    mimetype:
+                      type: string
+                    bucket:
+                      type: string
+                    path:
+                      type: string
+                    status:
+                      type: string
+                userId:
+                  type: string
+                  description: User's ObjectId
+                assistantId:
+                  type: string
+                  description: Assistant's unique ID
+      responses:
+        '200':
+          description: Knowledge data acknowledged successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  status:
+                    type: integer
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
+
+    delete:
+      tags:
+        - Voice Assistant
+      summary: Delete a knowledge file for a user by file ID
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: string
+          required: true
+          description: User's unique ID (MongoDB ObjectId)
+        - in: query
+          name: fileId
+          schema:
+            type: string
+          required: true
+          description: File's unique ID
+      responses:
+        '200':
+          description: Knowledge data deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  status:
+                    type: integer
+        '404':
+          description: No knowledge data found to delete
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  status:
+                    type: integer
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
+  /dashboard/api/knowledge-file/file-check:
+    get:
+      tags:
+        - Voice Assistant
+      summary: Check if a knowledge file exists for a user
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: string
+          required: true
+          description: User's unique ID (MongoDB ObjectId)
+        - in: query
+          name: fileId
+          schema:
+            type: string
+          required: true
+          description: File's unique ID
+      responses:
+        '200':
+          description: File exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  status:
+                    type: integer
+        '404':
+          description: File does not exist
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  status:
+                    type: integer
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
+  /dashboard/api/phone:
+    get:
+      tags:
+        - Voice Assistant
+      summary: Get all imported Twilio phone numbers for a user
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: string
+          required: true
+          description: User's unique ID (MongoDB ObjectId)
+      responses:
+        '200':
+          description: List of imported phone numbers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  importedNumbers:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          description: Record ID
+                        twilio:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                            orgId:
+                              type: string
+                            number:
+                              type: string
+                            createdAt:
+                              type: string
+                              format: date-time
+                            updatedAt:
+                              type: string
+                              format: date-time
+                            twilioAccountSid:
+                              type: string
+                            twilioAuthToken:
+                              type: string
+                            provider:
+                              type: string
+                            status:
+                              type: string
+                        label:
+                          type: string
+                        userId:
+                          type: string
+                        assistantId:
+                          type: string
+                        fallbackNumber:
+                          type: object
+                          properties:
+                            type:
+                              type: string
+                            number:
+                              type: string
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
+
+    post:
+      tags:
+        - Voice Assistant
+      summary: Import a Twilio phone number for a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                phoneNumber:
+                  type: string
+                accountSid:
+                  type: string
+                authToken:
+                  type: string
+                label:
+                  type: string
+                userId:
+                  type: string
+      responses:
+        '200':
+          description: Phone number imported successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Invalid data
+        '500':
+          description: Server error
+
+    put:
+      tags:
+        - Voice Assistant
+      summary: Bind an assistant to a Twilio phone number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                assistantId:
+                  type: string
+                twilioId:
+                  type: string
+      responses:
+        '200':
+          description: Assistant bound to the number
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
+
+    delete:
+      tags:
+        - Voice Assistant
+      summary: Delete a Twilio phone number record for a user
+      parameters:
+        - in: query
+          name: phoneNumberId
+          schema:
+            type: string
+          required: true
+          description: Phone number record's unique ID (MongoDB ObjectId)
+      responses:
+        '200':
+          description: Record deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: object
+          # The deleted record is returned in 'data'
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
+  /dashboard/api/phone/vapi-connect-assistant:
+    get:
+      tags:
+        - Voice Assistant
+      summary: Get list of voice assistants with Vapi Assistant ID for a user
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: string
+          required: true
+          description: User's unique ID (MongoDB ObjectId)
+      responses:
+        '200':
+          description: List of assistants with Vapi Assistant ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  assistants:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          description: Assistant record ID
+                        assistantName:
+                          type: string
+                        assistantTemplateIDs:
+                          type: array
+                          items:
+                            type: string
+                        imageUrl:
+                          type: string
+                        userId:
+                          type: string
+                        vapiAssistantId:
+                          type: string
+                        isDeleted:
+                          type: boolean
+                        metadata:
+                          type: object
+                          properties:
+                            lastUsed:
+                              type: integer
+                            totalCallLogs:
+                              type: integer
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
+  /dashboard/api/phone/meta:
+    put:
+      tags:
+        - Voice Assistant
+      summary: Update assistant call metadata (totalCallLogs, lastUsed, lastTrained)
+      parameters:
+        - in: query
+          name: assistantMId
+          schema:
+            type: string
+          required: true
+          description: Assistant's unique ID (MongoDB ObjectId)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                totalCallLogs:
+                  type: integer
+                  description: Total number of call logs (optional)
+                lastUsed:
+                  type: integer
+                  description: Last used timestamp (optional)
+                lastTrained:
+                  type: integer
+                  description: Last trained timestamp (optional)
+      responses:
+        '200':
+          description: Metadata updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
+  /dashboard/api/phone/fallback:
+    put:
+      tags:
+        - Voice Assistant
+      summary: Update fallback number for a Twilio phone record
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fallbackDestination:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      description: Fallback type (e.g., "phone" or "number")
+                    number:
+                      type: string
+                      description: Fallback phone number
+                twilioId:
+                  type: string
+                  description: Twilio phone record ID
+      responses:
+        '200':
+          description: Fallback number updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        description: Record ID
+                      twilio:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          orgId:
+                            type: string
+                          number:
+                            type: string
+                          createdAt:
+                            type: string
+                            format: date-time
+                          updatedAt:
+                            type: string
+                            format: date-time
+                          twilioAccountSid:
+                            type: string
+                          twilioAuthToken:
+                            type: string
+                          provider:
+                            type: string
+                          status:
+                            type: string
+                      label:
+                        type: string
+                      userId:
+                        type: string
+                      assistantId:
+                        type: string
+                      fallbackNumber:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                          number:
+                            type: string
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
+  /dashboard/api/stripe-payment-gateway/plan-history:
+    post:
+      tags:
+        - Stripe Payment
+      summary: Get user's Stripe credit payment history
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                u_id:
+                  type: string
+                  description: User's unique ID (MongoDB ObjectId)
+      responses:
+        '200':
+          description: Payment history fetched successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                  paymentDetails:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        amount:
+                          type: number
+                        created:
+                          type: integer
+                        status:
+                          type: string
+        '400':
+          description: User ID missing or no record found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+        '500':
+          description: Error fetching billing info
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  error:
+                    type: string
+  /dashboard/api/stripe-payment-gateway/create-payment:
+    post:
+      tags:
+        - Stripe Payment
+      summary: Create a Stripe payment intent for credits
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+                  description: Amount to pay (USD)
+                paymentMethodId:
+                  type: string
+                  description: Stripe payment method ID
+                u_id:
+                  type: string
+                  description: User's unique ID (MongoDB ObjectId)
+      responses:
+        '200':
+          description: Payment intent created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                  clientSecret:
+                    type: string
+        '400':
+          description: Invalid amount or user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+        '500':
+          description: Payment creation failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  error:
+                    type: string
+  /dashboard/api/template:
+    get:
+      tags:
+        - Voice Assistant
+      summary: Get all voice assistant templates
+      responses:
+        '200':
+          description: List of assistant templates
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  assistantTemplates:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                        assistantType:
+                          type: string
+                        industryType:
+                          type: string
+                        dispcrtion:
+                          type: string
+                        systemPrompt:
+                          type: string
+                        imageUrl:
+                          type: string
+                        info:
+                          type: string
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
+  /dashboard/api/template/prompts:
+    get:
+      tags:
+        - Voice Assistant
+      summary: Get system prompts for an assistant's template
+      parameters:
+        - in: query
+          name: recordId
+          schema:
+            type: string
+          required: true
+          description: Assistant record's unique ID (MongoDB ObjectId)
+      responses:
+        '200':
+          description: System prompts for the assistant's template
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  prompts:
+                    type: string
+                    description: System prompt text for the assistant's template
+        '400':
+          description: Bad request or template not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Server error
+  /dashboard/api/voice:
+    post:
+      tags:
+        - Voice Assistant
+      summary: Create a new voice assistant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                assistantName:
+                  type: string
+                assistantTemplateIDs:
+                  type: array
+                  items:
+                    type: string
+                imageUrl:
+                  type: string
+                userId:
+                  type: string
+      responses:
+        '200':
+          description: Voice assistant created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  record:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        description: Assistant ID
+                      assistantName:
+                        type: string
+                      assistantTemplateIDs:
+                        type: array
+                        items:
+                          type: string
+                      imageUrl:
+                        type: string
+                      userId:
+                        type: string
+                      vapiAssistantId:
+                        type: string
+                      isDeleted:
+                        type: boolean
+                      metadata:
+                        type: object
+                        properties:
+                          lastUsed:
+                            type: integer
+                          totalCallLogs:
+                            type: integer
+                  result:
+                    type: object
+                    description: MongoDB insert result
+                  error:
+                    type: string
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
+    put:
+      tags:
+        - Voice Assistant
+      summary: Update an existing voice assistant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                assistantName:
+                  type: string
+                assistantTemplateIDs:
+                  type: array
+                  items:
+                    type: string
+                imageUrl:
+                  type: string
+                recordId:
+                  type: string
+                  description: Assistant record ID to update
+      responses:
+        '200':
+          description: Voice assistant updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+                    properties:
+                      acknowledged:
+                        type: boolean
+                      matchedCount:
+                        type: integer
+                      modifiedCount:
+                        type: integer
+                      upsertedId:
+                        type: string
+                        nullable: true
+                  error:
+                    type: string
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
+  /dashboard/api/vapi/assistant:
+    post:
+      tags:
+        - Voice Assistant
+      summary: Create or update a Vapi assistant
+      description: Create or update a Vapi assistant using local and Vapi data.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                assistantLocalData:
+                  type: object
+                  description: Local assistant data
+                  example:
+                    _id: "682ec94f30acf1961dca3522"
+                    assistantName: "creole-2"
+                    assistantTemplateIDs: ["66f54fd8a121d2ba64e559de", "66f54fd8a121d2ba64e559e2"]
+                    imageUrl: ""
+                    userId: "67b445f45c04bfd0ef8c1e4b"
+                    isDeleted: false
+                    metadata:
+                      lastUsed: 1747900668
+                      lastTrained: 1747900724
+                    vapiAssistantId: "68a29b01-fd3c-4fb2-b352-394e2fe5fdbc"
+                    templateDetails:
+                      - _id: "66f54fd8a121d2ba64e559e2"
+                        assistantType: "IT and Software"
+                        industryType: "Expert"
+                        dispcrtion: "IT support assistant"
+                        systemPrompt: "Assist students with course information and enrollment."
+                        imageUrl: "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/voice-assistant-images/expert-IT-Software-5xo0jGEu5m7rEEINLF3x7UBbgIuubk.svg"
+                        info: "Optimize IT support with an AI voice assistant that troubleshoots technical issues, provides step-by-step solutions, automates ticket creation, and ensures quick response times for tech-related inquiries."
+                      - _id: "66f54fd8a121d2ba64e559de"
+                        assistantType: "IT Support Agent"
+                        industryType: "Assistant"
+                        dispcrtion: "AI Voicebot Agent"
+                        systemPrompt: "Provide technical support for TechSolutions products."
+                        imageUrl: "https://xyhog03g93hzc0am.public.blob.vercel-storage.com/voice-assistant-images/IT-Support-Agent-ch9EFzJktleXygVkY4HjvuqAyI8rmn.svg"
+                        info: "Automate IT assistance with an AI voice assistant that helps troubleshoot issues, answer technical questions, and guide users through problem-solving steps efficiently."
+                assistantVapiData:
+                  type: object
+                  description: Vapi assistant data
+                  example:
+                    firstMessage: "I'm creole 2."
+                    transcriber:
+                      model: "nova-2"
+                      language: "en-IN"
+                      provider: "deepgram"
+                      endpointing: 255
+                      languageDetectionEnabled: false
+                    model:
+                      model: "gpt-4o"
+                      tools:
+                        - type: "query"
+                          knowledgeBases:
+                            - name: "(30) 28.pdf"
+                              fileIds: ["8ecedb42-c55d-4bee-8527-96aa5fc1a3f9", "e9f0a5f3-a968-49f3-b030-5edd878a8d01"]
+                              provider: "google"
+                              description: "file"
+                      messages:
+                        - role: "system"
+                          content: "Role: ... (truncated for brevity)"
+                      provider: "openai"
+                      maxTokens: 300
+                      temperature: 0
+                      numFastTurns: 1
+                      emotionRecognitionEnabled: false
+                    voice:
+                      voiceId: "andrew"
+                      provider: "azure"
+                      chunkPlan:
+                        enabled: true
+                        formatPlan:
+                          enabled: true
+                          numberToDigitsCutoff: 2025
+                        minCharacters: 10
+                        punctuationBoundaries:
+                          - value: "0"
+                            label: "。"
+                          - value: "1"
+                            label: "，"
+                      fillerInjectionEnabled: false
+                    firstMessageMode: "assistant-speaks-first"
+                    llmRequestDelaySeconds: 0.1
+                    responseDelaySeconds: 0.1
+                    hipaaEnabled: false
+                    silenceTimeoutSeconds: 30
+                    maxDurationSeconds: 600
+                    backgroundSound: "office"
+                    backchannelingEnabled: false
+                    backgroundDenoisingEnabled: false
+                    modelOutputInMessagesEnabled: false
+                    transportConfigurations:
+                      - provider: "twilio"
+                        timeout: 60
+                        record: false
+                        recordingChannels: "mono"
+                    name: "creole-2"
+                    numWordsToInterruptAssistant: 0
+                    voicemailDetection:
+                      enabled: true
+                      provider: "twilio"
+                      machineDetectionTimeout: 31
+                      voicemailDetectionTypes: ["machine_end_beep", "machine_end_silence"]
+                      machineDetectionSilenceTimeout: 6000
+                      machineDetectionSpeechThreshold: 3500
+                      machineDetectionSpeechEndThreshold: 2750
+                    voicemailMessage: ""
+                    endCallMessage: ""
+                    metadata: {}
+                    analysisPlan:
+                      summaryPrompt: ""
+                      summaryRequestTimeoutSeconds: 10.5
+                      successEvaluationPrompt: ""
+                      successEvaluationRubric: "NumericScale"
+                      successEvaluationRequestTimeoutSeconds: 10.5
+                      structuredDataPrompt: ""
+                      structuredDataSchema:
+                        type: "object"
+                        properties: [""]
+                      artifactPlan:
+                        recordingEnabled: true
+                        videoRecordingEnabled: false
+                        recordingS3PathPrefix: ""
+                      messagePlan:
+                        idleMessages: []
+                        idleMessageMaxSpokenCount: 5.5
+                        idleTimeoutSeconds: 17.5
+                      startSpeakingPlan:
+                        waitSeconds: 0.4
+                        smartEndpointingEnabled: false
+                        transcriptionEndpointingPlan:
+                          onPunctuationSeconds: 0.1
+                          onNoPunctuationSeconds: 1.5
+                          onNumberSeconds: 0.5
+                      stopSpeakingPlan:
+                        numWords: 0
+                        voiceSeconds: 0.2
+                        backoffSeconds: 1
+                      monitorPlan:
+                        listenEnabled: false
+                        controlEnabled: false
+                      credentialIds: [""]
+      responses:
+        '200':
+          description: Assistant created or updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                  assistantVapiId:
+                    type: string
+                  error:
+                    type: string
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
+  /dashboard/api/voice-assistance:
+    get:
+      tags:
+        - Voice Assistant
+      summary: Get a single voice assistant by ID
+      parameters:
+        - in: query
+          name: assistantId
+          schema:
+            type: string
+          required: true
+          description: Assistant's unique ID (MongoDB ObjectId)
+      responses:
+        '200':
+          description: Assistant record found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  assistant:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        description: Assistant record ID (MongoDB ObjectId)
+                      assistantName:
+                        type: string
+                      assistantTemplateIDs:
+                        type: array
+                        items:
+                          type: string
+                        description: Array of template ObjectIds
+                      imageUrl:
+                        type: string
+                      userId:
+                        type: string
+                        description: User's ObjectId
+                      vapiAssistantId:
+                        type: string
+                      isDeleted:
+                        type: boolean
+                      metadata:
+                        type: object
+                        properties:
+                          lastUsed:
+                            type: integer
+                            description: Last used timestamp (Unix)
+                          totalCallLogs:
+                            type: integer
+                            description: Total number of call logs
+        '400':
+          description: Bad request (missing or invalid assistantId)
+        '404':
+          description: Assistant not found
+        '500':
+          description: Server error

@@ -3,6 +3,7 @@ import { apiHandler } from "../../../../../../_helpers/server/api/api-handler";
 import clientPromise from "../../../../../../../db";
 import { ObjectId } from "mongodb";
 
+
 module.exports = apiHandler({
     POST: createVapiAssistant,
     GET: getSingleAssistantDataFromVapi
@@ -17,8 +18,8 @@ async function createVapiAssistant(req: NextRequest) {
 
       const localData = voicBotData?.assistantLocalData;
       const vapiData = voicBotData?.assistantVapiData;
-      // return {result:"done"}
 
+    
       let propertyArrayData = vapiData.analysisPlan.structuredDataSchema.properties;
 
     if (Array.isArray(propertyArrayData) && propertyArrayData[0] !== "") {
@@ -113,16 +114,17 @@ async function createVapiAssistant(req: NextRequest) {
             }
             //update the voicebot record with the vapi assistant id
             const updateFields: any = { vapiAssistantId: vapiResponseData.id };
-            if (fileId) {
-              updateFields.fileId = fileId;
-            }
+            // if (fileId) {
+            //   updateFields.fileId = fileId;
+            // }
             const updateResult = await collection?.updateOne(
               { _id: new ObjectId(localData._id) },
               { $set: updateFields }
             );
 
             //if the record is not updated
-            if (updateResult?.modifiedCount !== 1) {
+
+            if (updateResult?.matchedCount !== 1) {
               // delete the assistant from the vapi server
               return { error: "Failed to update voicebot record" };
             }
@@ -149,9 +151,9 @@ async function createVapiAssistant(req: NextRequest) {
 
             //update the voicebot record with the vapi assistant id
             const updateFields: any = { vapiAssistantId: vapiResponseData.id };
-            if (fileId) {
-              updateFields.fileId = fileId;
-            }
+            // if (fileId) {
+            //   updateFields.fileId = fileId;
+            // }
             const updateResult = await collection?.updateOne(
               { _id: new ObjectId(localData._id) },
               { $set: updateFields }
@@ -165,6 +167,8 @@ async function createVapiAssistant(req: NextRequest) {
             else {
               return { result: "result", assistantVapiId: vapiResponseData?.id };
             }
+              return { result: "result", assistantVapiId: vapiResponseData?.id };
+
 
           }
 

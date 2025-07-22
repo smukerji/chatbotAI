@@ -1,6 +1,16 @@
 .feature-section-container {
   // margin-top: 60px;
-  padding: 5.3vw 12.2vw 0;
+  padding: 5.2vw 12.2vw 0;
+
+  @media screen and (max-width: 1440px) {
+    padding: 5.2vw 9.2vw 0;
+  }
+  @media screen and (max-width: 1280px) {
+    padding: 5.2vw 5.2vw 0;
+  }
+  @media screen and (max-width: 1024px) {
+    padding: 5.2vw 3.2vw 0;
+  }
   .top {
     text-align: center;
     padding: 0 100px;
@@ -28,18 +38,49 @@
   .bottom {
     display: flex;
     margin-top: 48px;
-    gap: 140px;
-    margin-bottom: 140px;
+    gap: 50px;
+    margin-bottom: 100px;
+
     .left {
       flex: 1;
 
+      .badge {
+        padding: 6px 12px;
+        border-radius: 1000px;
+        gap: 10px;
+        border: 1px solid #fff;
+        background: #eaf5ff;
+        color: #4d72f5;
+        font-size: 14px;
+        line-height: 20px; /* 142.857% */
+      }
+
+      .heading {
+        color: #23262f;
+        font-size: 36px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 50px; /* 120% */
+        margin-top: 20px;
+      }
+
+      .intro-para {
+        color: var(--Neutral-5, #777e90);
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 500;
+        margin-top: 20px;
+        margin-bottom: 40px;
+        line-height: 28px; /* 140% */
+      }
+
       .feature {
-        padding: 16px;
+        padding: 20px;
         gap: 20px;
         cursor: pointer;
         .title {
           color: var(--systemGrey-900, #212121);
-          font-size: 30px;
+          font-size: 24px;
           font-style: normal;
           font-weight: 600;
           line-height: 40px; /* 133.333% */
@@ -49,7 +90,7 @@
 
         .description {
           color: var(--Neutral-5, #777e90);
-          font-size: 20px;
+          font-size: 16px;
           font-style: normal;
           font-weight: 500;
           line-height: 28px; /* 140% */
@@ -61,11 +102,11 @@
           background: var(--Neutral-2, #f4f5f6);
 
           .title {
-            color: var(--Primary-7, #2e58ea);
+            color: var(--Primary-7, #4d72f5);
 
             svg {
               path {
-                fill: #2e58ea;
+                fill: #4d72f5;
               }
             }
           }
@@ -77,9 +118,15 @@
       flex: 1;
       display: flex;
       justify-content: center;
+      align-items: center;
       img {
-        width: 80%;
+        width: 100%;
         height: auto;
+
+        @media (max-width: 1200px) {
+          width: 100%;
+          // max-width: 400px;
+        }
       }
     }
   }

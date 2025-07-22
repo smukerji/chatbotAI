@@ -1,0 +1,128 @@
+.how-it-works {
+  padding: 5.2vw 12.2vw;
+  background: #fff;
+  text-align: center;
+
+  .hero {
+    margin-bottom: 60px;
+
+    .hero-tag {
+      background-color: #e0f0ff;
+      color: #1890ff;
+      font-weight: 500;
+      font-size: 14px;
+      border: none;
+      margin-bottom: 16px;
+    }
+
+    .badge {
+      padding: 6px 12px;
+      border-radius: 1000px;
+      gap: 10px;
+      border: 1px solid #fff;
+      background: #eaf5ff;
+      color: #4d72f5;
+      font-size: 14px;
+      line-height: 20px; /* 142.857% */
+    }
+
+    .hero-title {
+      font-size: 36px;
+      font-weight: bold;
+      margin: 16px;
+    }
+
+    .hero-subtitle {
+      color: #777e90;
+      font-size: 20px;
+      margin-bottom: 50px;
+    }
+
+    .try-agent-button {
+      background-color: #2e58ea;
+      font-weight: 600;
+      font-size: 16px;
+
+      &:hover {
+        background-color: #2e58ea;
+      }
+    }
+  }
+
+  .feature-grid {
+    .feature-card {
+      background: #fcfcfd;
+      border: 1px solid #f0f0f0;
+      border-radius: 12px;
+      padding: 24px;
+      text-align: left;
+      transition: box-shadow 0.3s;
+      height: 100%;
+      position: relative;
+
+      &:hover {
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+      }
+
+      .feature-icon {
+        font-size: 32px;
+        color: #1890ff;
+        margin: 50px 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        // position: relative;
+
+        // .background-circle {
+        //   position: absolute;
+        //   width: 80%;
+        //   height: 80%;
+        //   border-radius: 296px;
+        //   background: linear-gradient(
+        //     180deg,
+        //     #eef5ff 0%,
+        //     rgba(255, 255, 255, 0) 100%
+        //   );
+        //   bottom: -50px;
+        //   z-index: 0;
+        // }
+
+        .icon-wrapper-1 {
+          background-color: rgba(255, 219, 157, 0.247);
+          border-radius: 50%;
+          // padding: 20px;
+          width: 100px;
+          height: 100px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-right: -10px;
+        }
+
+        .icon-wrapper-2 {
+          background-color: #e0f0ff8a;
+          border-radius: 50%;
+          // padding: 20px;
+          width: 100px;
+          height: 100px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-left: -10px;
+        }
+      }
+
+      h5 {
+        font-weight: 600;
+        font-size: 26px;
+        text-align: center;
+      }
+
+      p {
+        color: #777e90;
+        font-size: 16px;
+        text-align: center;
+      }
+    }
+  }
+}

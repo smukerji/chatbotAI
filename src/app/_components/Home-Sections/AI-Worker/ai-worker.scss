@@ -1,0 +1,250 @@
+.digital-workers {
+  display: flex;
+  padding: 0 12.2vw 80px;
+  margin-top: 20px;
+  gap: 3rem;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  .left-pane {
+    flex: 1;
+    max-width: 30%;
+    position: sticky;
+    top: 20px;
+    align-self: flex-start;
+    // height: 100vh;
+
+    .badge {
+      padding: 6px 12px;
+      border-radius: 1000px;
+      gap: 10px;
+      border: 1px solid #fff;
+      background: #eaf5ff;
+      color: #4d72f5;
+      font-size: 14px;
+      line-height: 20px; /* 142.857% */
+    }
+
+    h2 {
+      font-size: 36px;
+      font-weight: 600;
+      margin: 17px 0;
+    }
+
+    p {
+      font-size: 16px;
+      color: #777e90;
+      margin-bottom: 17px;
+    }
+
+    a {
+      color: #2e58ea;
+      font-weight: 500;
+      font-size: 16px;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .middle-pane {
+    flex: 1;
+    // height: 100vh;
+    overflow: hidden;
+
+    .scroll-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow-y: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+
+      .card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        padding: 1.5rem 0;
+        position: relative;
+        display: flex;
+
+        img {
+          width: 100%;
+          height: auto;
+          border-radius: 8px;
+          object-fit: contain;
+          margin-bottom: 1rem;
+        }
+
+        h3 {
+          font-size: 30px;
+          font-weight: 600;
+          margin: 0.5rem 0;
+          display: flex;
+          align-items: center;
+          // width: 80%;
+
+          span {
+            font-size: 16px;
+            font-weight: 500;
+            color: #777e90;
+          }
+        }
+
+        p {
+          font-size: 16px;
+          color: #777e90;
+          margin: 0.5rem 0 1rem 0;
+          // width: 80%;
+        }
+
+        @media (max-width: 1175px) {
+          p {
+            width: 90%;
+          }
+
+          h3 {
+            width: 90%;
+          }
+          img {
+            width: 90%;
+          }
+        }
+
+        @media (max-width: 991px) {
+          // justify-content: center;
+          img {
+            width: 300px;
+            height: 300px;
+          }
+
+          h3 {
+            width: 300px;
+          }
+          p {
+            width: 300px;
+          }
+        }
+
+        button {
+          background-color: #2e58ea;
+          color: white;
+          border: none;
+          padding: 12px 24px;
+          border-radius: 12px;
+          font-size: 16px;
+          margin-bottom: 1rem;
+
+          &:hover {
+            background-color: #1c4fb7;
+          }
+        }
+      }
+    }
+  }
+
+  .right-pane {
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    // height: 100vh;
+
+    .stats {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding-top: 1rem;
+
+      li {
+        text-align: center;
+        margin: 20px 0;
+
+        img {
+          width: 32px;
+          height: 32px;
+          margin-bottom: 10px;
+        }
+
+        span {
+          display: block;
+          font-size: 16px;
+          color: #777e90;
+          margin-bottom: 10px;
+        }
+
+        strong {
+          font-size: 30px;
+          font-weight: 600;
+          color: #23262f;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 991px) {
+    flex-direction: column;
+    height: auto;
+    .left-pane {
+      position: static;
+      max-width: 100%;
+    }
+    .middle-pane {
+      height: auto;
+      max-height: none;
+
+      .scroll-container {
+        flex-direction: row;
+        gap: 20px;
+      }
+    }
+    .right-pane {
+      position: static;
+      width: 100%;
+
+      .stats {
+        flex-direction: row;
+        gap: 20px;
+      }
+    }
+  }
+
+  @media (max-width: 475px) {
+    .middle-pane {
+      .card {
+        flex-direction: column;
+
+        .card-left {
+          img {
+            width: 100%;
+            height: auto;
+          }
+          h3 {
+            width: 100%;
+          }
+          p {
+            width: 100%;
+          }
+        }
+      }
+    }
+
+    .right-pane {
+      .stats {
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+    }
+  }
+}
