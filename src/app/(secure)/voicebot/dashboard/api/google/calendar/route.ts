@@ -24,7 +24,10 @@ export async function GET(req: NextRequest) {
     const scopes = [
         'https://www.googleapis.com/auth/calendar.events',
         'https://www.googleapis.com/auth/calendar.readonly',
-    ];
+        'openid',
+        'email',
+        'profile'
+      ];
 
     // Pass both userId and assistantId as state, joined by __ or other separator
     const state = {
