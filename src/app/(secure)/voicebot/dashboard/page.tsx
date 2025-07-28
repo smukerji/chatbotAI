@@ -36,7 +36,7 @@ import PhoneNumber from "./phone-number/PhoneNumber";
 import CallLogs from "./call-logs/CallLogs";
 import Vapi from '@vapi-ai/web';
 import { useCookies } from "react-cookie";
-import GCalendar from "./google-calendar/GCalendar";
+
 
 
 
@@ -45,6 +45,7 @@ import { updateAssistantLastTrainedMetaDataService, updateAssistantLastUsedMetaD
 import { log } from "console";
 import Embedding from "./embedding/Embedding";
 import Knowledge from "./knowledge/Knowledge";
+import GCalendar from "./google-calendar/GCalendar";
 
 
 const vapi = new Vapi(process.env.NEXT_PUBLIC_VAP_API as string); // Vapi public key
@@ -749,7 +750,7 @@ async function costDeductionOnCallEndHandler(){
               <li className={tab == "phone-number" ? "active" : ""} onClick={() => changeHandler("phone-number")}>Phone Number</li>
               <li className={tab == "call-logs" ? "active" : ""} onClick={() => changeHandler("call-logs")}>Call Logs</li>
               <li className={tab == "embedding" ? "active" : ""} onClick={() => changeHandler("embedding")}>Embed on site</li>
-              <li className={tab == "google-calendar" ? "active" : ""} onClick={() => changeHandler("google-calendar")}>Google Calendar</li>
+              <li className={tab == "tools" ? "active" : ""} onClick={() => changeHandler("tools")}>Tools</li>
 
             </ul>
             <hr />
@@ -849,11 +850,11 @@ async function costDeductionOnCallEndHandler(){
             }
 
             {
-              tab == "google-calendar" && (
+              tab == "tools" && (
                 <>
-                  <div className="google-calendar">
+                  <div className="tools">
                     {/* <h1>Google Calendar</h1> */}
-                    <GCalendar />
+                    <GCalendar userId={cookies.userId} assistantId={voiceBotContextData.assistantInfo?.vapiAssistantId} />
                   </div>
                 </>
               )
