@@ -10,19 +10,22 @@ export async function GET(req: NextRequest) {
     const code = searchParams.get("code");
     const state: string = searchParams.get("state") as string;
 
-    // Parse state (should contain userId and assistantId)
+    // Parse state (should contain userId, assistantId, and tool)
     let userInfo;
     try {
       userInfo = JSON.parse(state);
-    } catch {
+     
+    } catch (err) {
+     
       return new NextResponse(
         `<html><body><p>Invalid state parameter from Google OAuth.</p></body></html>`,
         { status: 400, headers: { "Content-Type": "text/html" } }
       );
     }
 
-    const { userId, assistantId } = userInfo || {};
+    const { userId, assistantId, tool } = userInfo || {};
     if (!userId || !assistantId) {
+      console.error("[Google OAuth Callback] Missing userId or assistantId:", userInfo);
       return new NextResponse(
         `<html><body><p>Invalid Request: User and Assistant must be provided.</p></body></html>`,
         { status: 400, headers: { "Content-Type": "text/html" } }
@@ -32,7 +35,8 @@ export async function GET(req: NextRequest) {
     let objectUserId: ObjectId;
     try {
       objectUserId = new ObjectId(userId);
-    } catch {
+    } catch (err) {
+      console.error("[Google OAuth Callback] Invalid UserId format:", userId, err);
       return new NextResponse(
         `<html><body><p>Invalid UserId format.</p></body></html>`,
         { status: 400, headers: { "Content-Type": "text/html" } }
@@ -49,7 +53,9 @@ export async function GET(req: NextRequest) {
       // 1. Exchange code for tokens
       const { tokens } = await oauth2Client.getToken(code!);
 
+
       if (!tokens?.access_token) {
+
         throw new Error("No access_token received from Google.");
       }
       oauth2Client.setCredentials(tokens);
@@ -57,25 +63,23 @@ export async function GET(req: NextRequest) {
       // 2. Fetch Google user info using Google API client
       const oauth2 = google.oauth2({ version: "v2", auth: oauth2Client });
       const { data: googleUser } = await oauth2.userinfo.get();
-      console.log("Google user info response:", googleUser);
-      
-      // googleUser.id (unique Google user id), googleUser.email
 
       const db = (await clientPromise!).db();
 
       // 3. Store in DB: upsert by googleUserId + assistantId
-      await db.collection("google-calendar-oauth-consent").updateOne(
+      const updateResult = await db.collection("google-calendar-oauth-consent").updateOne(
         { googleUserId: googleUser.id, assistantId },
         {
           $set: {
             code,
             tokens,
             updatedAt: new Date(),
+            tools: tool || null  
           },
           $setOnInsert: {
-             userId: objectUserId,
+            userId: objectUserId,
             assistantId,
-            google_user_info:googleUser,
+            google_user_info: googleUser,
             createdAt: new Date(),
           },
         },
@@ -95,6 +99,7 @@ export async function GET(req: NextRequest) {
         { status: 200, headers: { "Content-Type": "text/html" } }
       );
     } catch (error) {
+
       return new NextResponse(
         `<html><body><p>Authorization Failed.</p></body></html>`,
         { status: 500, headers: { "Content-Type": "text/html" } }

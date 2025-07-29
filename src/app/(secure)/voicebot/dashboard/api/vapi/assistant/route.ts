@@ -1,15 +1,15 @@
+
 import { NextRequest, NextResponse } from "next/server";
 import { apiHandler } from "../../../../../../_helpers/server/api/api-handler";
 import clientPromise from "../../../../../../../db";
 import { ObjectId } from "mongodb";
-
 
 module.exports = apiHandler({
     POST: createVapiAssistant,
     GET: getSingleAssistantDataFromVapi
   });
 
-  //  voicebot/dashboard/api/template
+//  voicebot/dashboard/api/template
 async function createVapiAssistant(req: NextRequest) {
 
     try {
@@ -113,7 +113,7 @@ async function createVapiAssistant(req: NextRequest) {
               return { error: "Failed to update the assistant" };
             }
             //update the voicebot record with the vapi assistant id
-            const updateFields: any = { vapiAssistantId: vapiResponseData.id };
+            const updateFields: any = { vapiAssistantId: vapiResponseData.id }; 
             // if (fileId) {
             //   updateFields.fileId = fileId;
             // }
@@ -150,7 +150,7 @@ async function createVapiAssistant(req: NextRequest) {
             
 
             //update the voicebot record with the vapi assistant id
-            const updateFields: any = { vapiAssistantId: vapiResponseData.id };
+            const updateFields: any = { vapiAssistantId: vapiResponseData.id }; 
             // if (fileId) {
             //   updateFields.fileId = fileId;
             // }

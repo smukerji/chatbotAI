@@ -3,13 +3,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { google } from "googleapis";
 
 export async function GET(req: NextRequest) {
-
-
-    // Get assistantId from query params
+    // Get assistantId, userId, and tool from query params
     const { searchParams } = new URL(req.url);
     const assistantId = searchParams.get("assistantId");
     const userId = searchParams.get("userId");
-
+    const tool = searchParams.get("tool");
 
     if (!userId || !assistantId) {
         return NextResponse.json({ error: "Invalid Request, User and Assistant should be varified!" }, { status: 400 });
@@ -27,19 +25,20 @@ export async function GET(req: NextRequest) {
         'openid',
         'email',
         'profile'
-      ];
+    ];
 
-    // Pass both userId and assistantId as state, joined by __ or other separator
+    // Pass userId, assistantId, and tool as state
     const state = {
-        userId:userId,
-        assistantId:assistantId
+        userId: userId,
+        assistantId: assistantId,
+        tool: tool, 
     };
 
     const authUrl = oauth2Client.generateAuthUrl({
         access_type: 'offline',
         prompt: 'consent',
         scope: scopes,
-        state:JSON.stringify(state)
+        state: JSON.stringify(state)
     });
 
     return NextResponse.redirect(authUrl, { status: 302 });
