@@ -513,7 +513,7 @@ const GCalendar: React.FC<GCalendarProps> = ({
         style={{
           width: 260,
           borderRight: "1px solid #f0f0f0",
-          padding: "24px 0",
+          padding: "24px 12px",
           height: "100%",
           background: "#fff",
           position: "relative",
