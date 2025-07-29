@@ -1,11 +1,12 @@
+
 import React, { useState, useEffect, useRef } from "react";
-import { Button, List, Typography, Spin, message } from "antd";
+import { Button, List, Typography, message } from "antd";
 import { CalendarOutlined, CheckCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { useCookies } from "react-cookie";
 import Image from "next/image";
 import googleCalendarAPI from "../../../../../../public/Google_Calendar.png";
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 interface GCalendarProps {
   userId: string;
@@ -22,6 +23,11 @@ interface GoogleConsentStatus {
   name?: string;
 }
 
+
+const SIDEBAR_BG_DEFAULT = "#fff";
+const SIDEBAR_BG_HOVER = "#e7eaf0";   // hover/grayish
+const SIDEBAR_BG_ACTIVE = "#a4c8fa";  // selected/blue
+
 const GCalendar: React.FC<GCalendarProps> = ({
   userId,
   assistantId,
@@ -31,16 +37,91 @@ const GCalendar: React.FC<GCalendarProps> = ({
   const userVerified = !!cookies.userId;
 
   const [selectedMenu, setSelectedMenu] = useState<ToolMenu>("none");
+  const [hoveredMenu, setHoveredMenu] = useState<ToolMenu>("none");
   const [gcalAction, setGcalAction] = useState<GCalAction>("none");
   const [gcalStatus, setGcalStatus] = useState<GoogleConsentStatus | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const calendarBtnRef = useRef<HTMLDivElement>(null);
+  const [popoverVisible, setPopoverVisible] = useState(false);
+  const [popoverPos, setPopoverPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
 
+  const calendarBtnRef = useRef<HTMLDivElement>(null);
+  const popoverRef = useRef<HTMLDivElement>(null);
+
+  // Mouse tracking for sidebar and popover
+  const popoverMouseOver = useRef(false);
+  const buttonMouseOver = useRef(false);
+
+  // Set popover position on hover
+  const handleBtnMouseEnter = () => {
+    buttonMouseOver.current = true;
+    setHoveredMenu("gcal");
+    if (calendarBtnRef.current) {
+      const rect = calendarBtnRef.current.getBoundingClientRect();
+      setPopoverPos({
+        top: rect.top + window.scrollY + rect.height / 2 - 32,
+        left: rect.right + 10 + window.scrollX,
+      });
+      setPopoverVisible(true);
+    }
+  };
+  const handleBtnMouseLeave = () => {
+    buttonMouseOver.current = false;
+    setHoveredMenu("none");
+    setTimeout(() => {
+      if (!popoverMouseOver.current) setPopoverVisible(false);
+    }, 50);
+  };
+  const handlePopoverMouseEnter = () => {
+    popoverMouseOver.current = true;
+  };
+  const handlePopoverMouseLeave = () => {
+    popoverMouseOver.current = false;
+    setTimeout(() => {
+      if (!buttonMouseOver.current) setPopoverVisible(false);
+    }, 50);
+  };
+
+  // Hide popover when clicking outside
+  useEffect(() => {
+    if (!popoverVisible) return;
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        popoverRef.current &&
+        !popoverRef.current.contains(event.target as Node) &&
+        calendarBtnRef.current &&
+        !calendarBtnRef.current.contains(event.target as Node)
+      ) {
+        setPopoverVisible(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [popoverVisible]);
+
+  // Always fetch GCal status when Google Calendar is selected
+  useEffect(() => {
+    if (selectedMenu === "gcal" && assistantPublished && userVerified) {
+      checkConnection();
+    }
+  }, [selectedMenu, assistantPublished, userVerified, assistantId, userId]);
+
+  const handleGCalAction = async (action: GCalAction) => {
+    setSelectedMenu("gcal");
+    setGcalAction(action);
+    setPopoverVisible(false);
+    if (assistantPublished && userVerified) {
+      await checkConnection();
+    }
+  };
+
+  // Only reset status; do NOT reset gcalAction if one is already selected
   const handleMenuSelect = (key: ToolMenu) => {
-    setSelectedMenu(key);
-    setGcalAction("none");
-    setGcalStatus(null);
+    if (selectedMenu !== key) {
+      setSelectedMenu(key);
+      setGcalStatus(null);
+    }
+    // If user re-clicks Google Calendar, do not reset gcalAction
   };
 
   const checkConnection = async () => {
@@ -62,14 +143,6 @@ const GCalendar: React.FC<GCalendarProps> = ({
     setLoading(false);
   };
 
-  const handleGCalAction = async (action: GCalAction) => {
-    setGcalAction(action);
-    if (assistantPublished && userVerified) {
-      await checkConnection();
-    }
-  };
-
-  // Updated: Accept tool parameter
   const openConsentWindow = (tool: "check-availability" | "create-event") => {
     if (!assistantId || !userId) {
       message.error("Invalid Request, User and Assistant should be verified!", 3);
@@ -151,7 +224,7 @@ const GCalendar: React.FC<GCalendarProps> = ({
               alt="Google Calendar"
               width={54}
               height={54}
-              style={{ opacity: 0.55, marginBottom: 14 }}
+              style={{ opacity: 0.55, marginBottom: 14}}
             />
             <br />
             You haven't published your assistant yet.<br />
@@ -212,25 +285,25 @@ const GCalendar: React.FC<GCalendarProps> = ({
   };
 
   const renderPopover = () => {
-    const rect = calendarBtnRef.current?.getBoundingClientRect();
-    const top = rect ? rect.top + rect.height / 2 - 32 : 80;
-    const left = rect ? rect.right + 10 : 280;
-
-    return (
+    return popoverVisible ? (
       <div
+        ref={popoverRef}
         className="gcal-popover"
         style={{
           position: "fixed",
-          top,
-          left,
+          top: popoverPos.top,
+          left: popoverPos.left,
           zIndex: 1000,
         }}
+        onMouseEnter={handlePopoverMouseEnter}
+        onMouseLeave={handlePopoverMouseLeave}
       >
         <div className="gcal-popover-arrow" />
         <div className="gcal-popover-inner">
           <div
             className={`gcal-popover-item${gcalAction === "check" ? " selected" : ""}`}
             onClick={() => handleGCalAction("check")}
+            style={{ cursor: "pointer" }}
           >
             <CheckCircleOutlined style={{ marginRight: 8 }} />
             Check Availability
@@ -238,6 +311,7 @@ const GCalendar: React.FC<GCalendarProps> = ({
           <div
             className={`gcal-popover-item${gcalAction === "create" ? " selected" : ""}`}
             onClick={() => handleGCalAction("create")}
+            style={{ cursor: "pointer" }}
           >
             <PlusOutlined style={{ marginRight: 8 }} />
             Create Event
@@ -287,33 +361,58 @@ const GCalendar: React.FC<GCalendarProps> = ({
           }
         `}</style>
       </div>
-    );
+    ) : null;
   };
 
   const renderRightPanel = () => {
-    if (selectedMenu === "none") return null;
+    if (selectedMenu === "gcal" || gcalAction !== "none") {
+      if (!gcalAction || gcalAction === "none") {
+        return (
+          <div style={{ position: "relative", height: "100%" }}>
+            {renderPopover()}
+          </div>
+        );
+      }
 
-    if (selectedMenu === "gcal" && (!gcalAction || gcalAction === "none")) {
-      return (
-        <div style={{ position: "relative", height: "100%" }}>
-          {renderPopover()}
-        </div>
-      );
-    }
+      let actionTitle = "";
+      let toolParam: "check-availability" | "create-event" = "check-availability";
+      if (gcalAction === "check") {
+        actionTitle = "Check Availability:";
+        toolParam = "check-availability";
+      }
+      if (gcalAction === "create") {
+        actionTitle = "Create Event:";
+        toolParam = "create-event";
+      }
 
-    let actionTitle = "";
-    let toolParam: "check-availability" | "create-event" = "check-availability";
-    if (gcalAction === "check") {
-      actionTitle = "Check Availability:";
-      toolParam = "check-availability";
-    }
-    if (gcalAction === "create") {
-      actionTitle = "Create Event:";
-      toolParam = "create-event";
-    }
-
-    if (gcalAction === "check" || gcalAction === "create") {
-      if (!assistantPublished) {
+      if (gcalAction === "check" || gcalAction === "create") {
+        if (!assistantPublished) {
+          return (
+            <div style={{ position: "relative", minHeight: 300 }}>
+              <div style={{
+                position: "absolute",
+                top: 10,
+                left: 25,
+                fontWeight: 600,
+                fontSize: 18,
+                fontFamily: attractiveFont,
+                color: "#222",
+                zIndex: 2
+              }}>
+                {actionTitle}
+              </div>
+              <div style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                height: "100%",
+              }}>
+                {renderStatusAlert()}
+              </div>
+            </div>
+          );
+        }
+        // Normal panel if assistant is published
         return (
           <div style={{ position: "relative", minHeight: 300 }}>
             <div style={{
@@ -329,107 +428,82 @@ const GCalendar: React.FC<GCalendarProps> = ({
               {actionTitle}
             </div>
             <div style={{
+              minHeight: 300,
               display: "flex",
+              flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              height: "100%",
+              padding: "32px 16px",
+              textAlign: "center",
             }}>
-              {renderStatusAlert()}
-            </div>
-          </div>
-        );
-      }
-      // Normal panel if assistant is published
-      return (
-        <div style={{ position: "relative", minHeight: 300 }}>
-          <div style={{
-            position: "absolute",
-            top: 10,
-            left: 25,
-            fontWeight: 600,
-            fontSize: 18,
-            fontFamily: attractiveFont,
-            color: "#222",
-            zIndex: 2
-          }}>
-            {actionTitle}
-          </div>
-          <div style={{
-            minHeight: 300,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "32px 16px",
-            textAlign: "center",
-          }}>
-            <Image
-              src={googleCalendarAPI}
-              alt="Google Calendar"
-              width={54}
-              height={54}
-              style={{ marginBottom: 14 }}
-            />
-            <h2 style={{
-              marginBottom: 20,
-              fontWeight: 600,
-              fontSize: 22,
-              fontFamily: attractiveFont
-            }}>
-              Google Calendar
-            </h2>
-            {gcalStatus?.connected ? (
-              <>
+              <Image
+                src={googleCalendarAPI}
+                alt="Google Calendar"
+                width={54}
+                height={54}
+                style={{ marginBottom: 14 }}
+              />
+              <h2 style={{
+                marginBottom: 20,
+                fontWeight: 600,
+                fontSize: 22,
+                fontFamily: attractiveFont
+              }}>
+                Google Calendar
+              </h2>
+              {gcalStatus?.connected ? (
+                <>
+                  <Button
+                    type="primary"
+                    size="large"
+                    style={{
+                      minWidth: 240,
+                      background: "#27ae60",
+                      borderColor: "#27ae60",
+                      color: "#fff",
+                      cursor: "default",
+                      fontFamily: attractiveFont,
+                      fontWeight: 600,
+                      fontSize: 18,
+                    }}
+                    disabled
+                  >
+                    {gcalStatus.name
+                      ? `${gcalStatus.name}'s Google Calendar Connected`
+                      : "Google Calendar Connected"}
+                  </Button>
+                  {gcalStatus.email && (
+                    <div style={{ marginTop: 16 }}>
+                      <Text type="secondary" style={{ fontFamily: attractiveFont }}>
+                        Authorized as:{" "}
+                        <span style={{ color: "#222", fontWeight: 500 }}>
+                          {gcalStatus.email}
+                        </span>
+                      </Text>
+                    </div>
+                  )}
+                </>
+              ) : (
                 <Button
                   type="primary"
                   size="large"
+                  onClick={() => openConsentWindow(toolParam)}
                   style={{
                     minWidth: 240,
-                    background: "#27ae60",
-                    borderColor: "#27ae60",
-                    color: "#fff",
-                    cursor: "default",
                     fontFamily: attractiveFont,
                     fontWeight: 600,
                     fontSize: 18,
                   }}
-                  disabled
                 >
-                  {gcalStatus.name
-                    ? `${gcalStatus.name}'s Google Calendar Connected`
-                    : "Google Calendar Connected"}
+                  Connect
                 </Button>
-                {gcalStatus.email && (
-                  <div style={{ marginTop: 16 }}>
-                    <Text type="secondary" style={{ fontFamily: attractiveFont }}>
-                      Authorized as:{" "}
-                      <span style={{ color: "#222", fontWeight: 500 }}>
-                        {gcalStatus.email}
-                      </span>
-                    </Text>
-                  </div>
-                )}
-              </>
-            ) : (
-              // Updated: Pass toolParam to openConsentWindow
-              <Button
-                type="primary"
-                size="large"
-                onClick={() => openConsentWindow(toolParam)}
-                style={{
-                  minWidth: 240,
-                  fontFamily: attractiveFont,
-                  fontWeight: 600,
-                  fontSize: 18,
-                }}
-              >
-                Connect
-              </Button>
-            )}
+              )}
+            </div>
           </div>
-        </div>
-      );
+        );
+      }
     }
+
     return null;
   };
 
@@ -448,46 +522,81 @@ const GCalendar: React.FC<GCalendarProps> = ({
         <List
           itemLayout="horizontal"
           dataSource={tools}
-          renderItem={tool => (
-            <List.Item
-              style={{
-                paddingLeft: 0,
-                paddingRight: 0,
-                background: selectedMenu === tool.key ? "#ededed" : undefined,
-                borderRadius: selectedMenu === tool.key ? 8 : 0,
-                marginBottom: 4,
-                position: "relative",
-                zIndex: 10,
-              }}
-            >
-              <div
-                ref={tool.key === "gcal" ? calendarBtnRef : undefined}
+          renderItem={tool => {
+            const isSelected = selectedMenu === tool.key;
+            const isHovered = hoveredMenu === tool.key;
+            let bgColor = SIDEBAR_BG_DEFAULT;
+            if (isSelected) bgColor = SIDEBAR_BG_ACTIVE;
+            else if (isHovered) bgColor = SIDEBAR_BG_HOVER;
+
+            return (
+              <List.Item
                 style={{
-                  width: "100%",
-                  padding: "0 24px",
-                  borderRadius: 8,
-                  background: selectedMenu === tool.key ? "#ededed" : undefined,
-                  display: "flex",
-                  alignItems: "center",
-                  height: 48,
-                  cursor: "pointer",
-                  fontWeight: selectedMenu === tool.key ? 600 : undefined,
-                  fontFamily: attractiveFont,
-                  fontSize: 17,
+                  paddingLeft: 0,
+                  paddingRight: 0,
+                  background: bgColor,
+                  borderRadius: 10,
+                  marginBottom: 4,
+                  position: "relative",
+                  zIndex: 10,
+                  border: isSelected ? "1px solid #a4c8fa" : "1px solid #dbdde4",
+                  transition: "background 0.15s, border 0.15s",
                 }}
-                onClick={() => handleMenuSelect(tool.key as ToolMenu)}
               >
-                <Image
-                  src={googleCalendarAPI}
-                  alt="Google Calendar"
-                  width={28}
-                  height={28}
-                  style={{ marginRight: 8, verticalAlign: "middle" }}
-                />
-                <span style={{ color: "#222" }}>{tool.label}</span>
-              </div>
-            </List.Item>
-          )}
+                <div
+                  ref={tool.key === "gcal" ? calendarBtnRef : undefined}
+                  style={{
+                    width: "100%",
+                    padding: "0 24px",
+                    borderRadius: 10,
+                    background: bgColor,
+                    display: "flex",
+                    alignItems: "center",
+                    height: 48,
+                    cursor: "pointer",
+                    fontWeight: isSelected ? 600 : undefined,
+                    fontFamily: attractiveFont,
+                    fontSize: 17,
+                    position: "relative",
+                    transition: "background 0.15s, border 0.15s",
+                  }}
+                  onClick={() => handleMenuSelect(tool.key as ToolMenu)}
+                  onMouseEnter={handleBtnMouseEnter}
+                  onMouseLeave={handleBtnMouseLeave}
+                >
+                  <Image
+                    src={googleCalendarAPI}
+                    alt="Google Calendar"
+                    width={28}
+                    height={28}
+                    style={{ marginRight: 8, verticalAlign: "middle" }}
+                  />
+                  <span style={{ color: "#222" }}>{tool.label}</span>
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 18 18"
+                    style={{
+                      marginLeft: "auto",
+                      display: "inline-block",
+                      verticalAlign: "middle"
+                    }}
+                  >
+                    <polyline
+                      points="6,4 12,9 6,14"
+                      fill="none"
+                      stroke="#222"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
+                {/* Only show popover if visible and this is google calendar */}
+                {popoverVisible && tool.key === "gcal" && renderPopover()}
+              </List.Item>
+            );
+          }}
         />
       </div>
       <div
