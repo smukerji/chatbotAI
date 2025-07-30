@@ -564,6 +564,8 @@ function Dashboard() {
 
     //validate the assistant require field first,
     //call the post api to publish the assistant to the vapi
+    console.log("publish state ", voiceBotContextData?.isPublishEnabled)
+    debugger;
     if (!voiceBotContextData?.isPublishEnabled && !fromKnowledge) {
       message.error("Please fill the required fields to publish the assistant");
       return;
@@ -916,6 +918,7 @@ function Dashboard() {
                   assistantPublished={
                     !!voiceBotContextData.assistantInfo?.vapiAssistantId
                   }
+                  triggerPublishMethod={vapiAssistantPublishHandler}
                 />
               </div>
             </>
