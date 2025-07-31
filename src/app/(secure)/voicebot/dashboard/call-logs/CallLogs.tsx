@@ -277,13 +277,31 @@ const formatCallDuration = (createdAt: string, endedAt: string): string => {
       setQueryParameter(`&createdAtGe=${todayDate}`);
       await getLogRecord(1, 10, `&createdAtGe=${todayDate}`);
     }
+    // else if (filter === 'last7') {
+    //   const today = new Date();
+    //   const todayDate = formatLocalDate(today);
+    //   const sevenDaysAgo = new Date(today);
+    //   sevenDaysAgo.setDate(today.getDate() - 7);
+    //   const sevenDaysAgoDate = formatLocalDate(sevenDaysAgo);
+    //   const param = `&createdAtGe=${sevenDaysAgoDate}&createdAtLe=${todayDate}`;
+    //   setQueryParameter(param);
+    //   await getLogRecord(1, 10, param);
+    // }
+
     else if (filter === 'last7') {
       const today = new Date();
-      const todayDate = formatLocalDate(today);
       const sevenDaysAgo = new Date(today);
       sevenDaysAgo.setDate(today.getDate() - 7);
+    
+      // Add one day to today to get tomorrow
+      const tomorrow = new Date(today);
+      tomorrow.setDate(today.getDate() + 1);
+    
       const sevenDaysAgoDate = formatLocalDate(sevenDaysAgo);
-      const param = `&createdAtGe=${sevenDaysAgoDate}&createdAtLe=${todayDate}`;
+      const tomorrowDate = formatLocalDate(tomorrow);
+    
+      // This will include calls up to the end of today
+      const param = `&createdAtGe=${sevenDaysAgoDate}&createdAtLe=${tomorrowDate}`;
       setQueryParameter(param);
       await getLogRecord(1, 10, param);
     }
@@ -313,25 +331,53 @@ const formatCallDuration = (createdAt: string, endedAt: string): string => {
   };
 
   // Handler for date range picker
-  const handleDateRangeChange = async (dates: any) => {
+  // const handleDateRangeChange = async (dates: any) => {
    
-    console.log("Your date range ",dates)
+  //   console.log("Your date range ",dates)
+  //   if (dates && dates.length === 2) {
+  //     // Format as YYYY-MM-DD in local time
+  //     const pad = (n: number) => n.toString().padStart(2, '0');
+  //     const formatLocalDate = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  //     const startDate = formatLocalDate(dates[0].toDate ? dates[0].toDate() : dates[0]);
+  //     const endDate = formatLocalDate(dates[1].toDate ? dates[1].toDate() : dates[1]);
+  //     console.log("startdate:",startDate);
+  //     console.log("enddate:",endDate);
+  //     const param = `&createdAtGe=${startDate}&createdAtLe=${endDate}`;
+  //     console.log("your param ",param);
+  //     setQueryParameter(param);
+  //     await getLogRecord(1, 10, param);
+  //   }
+
+  //   setDateRange(dates);
+  //   setActiveFilter('range');
+  //   // TODO: Call API/filter data based on selected date range
+  // };
+
+
+  const handleDateRangeChange = async (dates: any) => {
+    console.log("Your date range ", dates);
     if (dates && dates.length === 2) {
       // Format as YYYY-MM-DD in local time
       const pad = (n: number) => n.toString().padStart(2, '0');
       const formatLocalDate = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
       const startDate = formatLocalDate(dates[0].toDate ? dates[0].toDate() : dates[0]);
-      const endDate = formatLocalDate(dates[1].toDate ? dates[1].toDate() : dates[1]);
+      // Add one day to the end date to include entries for the whole last day
+      const endDateObj = new Date(dates[1].toDate ? dates[1].toDate() : dates[1]);
+      endDateObj.setDate(endDateObj.getDate() + 1);
+      const endDate = formatLocalDate(endDateObj);
+      console.log("startdate:", startDate);
+      console.log("enddate:", endDate);
       const param = `&createdAtGe=${startDate}&createdAtLe=${endDate}`;
-      console.log("your param ",param);
+      console.log("your param ", param);
       setQueryParameter(param);
       await getLogRecord(1, 10, param);
     }
-
+  
     setDateRange(dates);
     setActiveFilter('range');
     // TODO: Call API/filter data based on selected date range
   };
+ 
 
   return (
     <div className='call-log-container'>
@@ -476,3 +522,11 @@ const formatCallDuration = (createdAt: string, endedAt: string): string => {
 }
 
 export default CallLogs;
+
+
+
+
+
+
+
+
