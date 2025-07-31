@@ -72,8 +72,8 @@ export async function GET(req: NextRequest) {
        * @toolIds
        */
       const toolIds = [
-        "85b3b0ac-4330-42c2-bb2f-459c6b87b68a",
-        "82d7e7dc-c01e-4ffc-9a75-9049d8b22bd0"
+        "b29826a9-3941-498e-b6e7-3d083bb42bf0",
+        "aa5dd6b5-e511-4400-ab5b-cdcff7279488"
       ];
 
       // Count how many of the required tools the user has
@@ -92,12 +92,12 @@ export async function GET(req: NextRequest) {
           {
             userId: new ObjectId(userId),
             toolName: "google_calendar_tool_event_create",
-            vapiToolId: "85b3b0ac-4330-42c2-bb2f-459c6b87b68a"
+            vapiToolId: "b29826a9-3941-498e-b6e7-3d083bb42bf0"
           },
           {
             userId: new ObjectId(userId),
             toolName: "google_calendar_check_availability_tool",
-            vapiToolId: "82d7e7dc-c01e-4ffc-9a75-9049d8b22bd0"
+            vapiToolId: "aa5dd6b5-e511-4400-ab5b-cdcff7279488"
           }
         ]);
       }

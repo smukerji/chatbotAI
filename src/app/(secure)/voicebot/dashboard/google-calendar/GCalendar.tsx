@@ -165,8 +165,8 @@ const GCalendar: React.FC<GCalendarProps> = ({
 
       if ((Array.isArray(voicebotDetails.model.toolIds) && voicebotDetails.model.toolIds.length !== 2) || !("toolIds" in voicebotDetails.model) ) {
         
-        voiceBotContextData.updateState("model.toolIds", ["85b3b0ac-4330-42c2-bb2f-459c6b87b68a",
-        "82d7e7dc-c01e-4ffc-9a75-9049d8b22bd0"]);
+        voiceBotContextData.updateState("model.toolIds", ["aa5dd6b5-e511-4400-ab5b-cdcff7279488",
+        "b29826a9-3941-498e-b6e7-3d083bb42bf0"]);
         console.log("voice details on G-Calender ", voicebotDetails);
       }
 
