@@ -1,11 +1,18 @@
 
-import React, { useState, useEffect, useRef } from "react";
+
+import React, { useState, useEffect, useRef, useContext } from "react";
+
 import { Button, List, Spin, Typography, message } from "antd";
+
 import { CalendarOutlined, CheckCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { useCookies } from "react-cookie";
 import Image from "next/image";
 import googleCalendarAPI from "../../../../../../public/Google_Calendar.png";
+
+import { CreateVoiceBotContext } from "@/app/_helpers/client/Context/VoiceBotContextApi";
+
 import './g-calendar.scss'
+
 
 const { Text } = Typography;
 
@@ -13,6 +20,7 @@ interface GCalendarProps {
   userId: string;
   assistantId: string;
   assistantPublished: boolean;
+  triggerPublishMethod: () => Promise<void>;
 }
 
 type ToolMenu = "none" | "gcal";
@@ -33,6 +41,7 @@ const GCalendar: React.FC<GCalendarProps> = ({
   userId,
   assistantId,
   assistantPublished,
+  triggerPublishMethod
 }) => {
   const [cookies] = useCookies(["userId"]);
   const userVerified = !!cookies.userId;
@@ -42,6 +51,10 @@ const GCalendar: React.FC<GCalendarProps> = ({
   const [gcalAction, setGcalAction] = useState<GCalAction>("none");
   const [gcalStatus, setGcalStatus] = useState<GoogleConsentStatus | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [callPublishAssistant, setCallPublishAssistant] = useState<boolean>(false);
+
+  const voiceBotContextData: any = useContext(CreateVoiceBotContext);
+  const voicebotDetails = voiceBotContextData.state;
 
   const [popoverVisible, setPopoverVisible] = useState(false);
   const [popoverPos, setPopoverPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
@@ -138,11 +151,36 @@ const GCalendar: React.FC<GCalendarProps> = ({
         email: data.email,
         name: data.name,
       });
+ 
+      if (data.connected) {
+        setCallPublishAssistant(true);
+      
+       
+      }
+      
     } catch {
       setGcalStatus({ connected: false });
     }
     setLoading(false);
   };
+
+  useEffect(() => { 
+    async function _() {
+      await triggerPublishMethod();
+    }
+    if (callPublishAssistant) {
+
+      if ((Array.isArray(voicebotDetails.model.toolIds) && voicebotDetails.model.toolIds.length !== 2) || !("toolIds" in voicebotDetails.model) ) {
+        
+        voiceBotContextData.updateState("model.toolIds", ["85b3b0ac-4330-42c2-bb2f-459c6b87b68a",
+        "82d7e7dc-c01e-4ffc-9a75-9049d8b22bd0"]);
+        console.log("voice details on G-Calender ", voicebotDetails);
+      }
+
+      setCallPublishAssistant(false);
+    }
+
+  }, [callPublishAssistant])
 
   const openConsentWindow = (tool: "check-availability" | "create-event") => {
     if (!assistantId || !userId) {
@@ -161,8 +199,10 @@ const GCalendar: React.FC<GCalendarProps> = ({
     );
   };
 
+
+
   useEffect(() => {
-    const onMessage = (event: MessageEvent) => {
+    const onMessage = async (event: MessageEvent) => {
       if (
         event.data === "google-oauth-success" ||
         event.data === "google-oauth-error"
@@ -173,6 +213,7 @@ const GCalendar: React.FC<GCalendarProps> = ({
           userVerified
         )
           checkConnection();
+
       }
     };
     window.addEventListener("message", onMessage);

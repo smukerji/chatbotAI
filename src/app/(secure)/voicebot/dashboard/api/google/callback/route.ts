@@ -66,8 +66,47 @@ export async function GET(req: NextRequest) {
 
       const db = (await clientPromise!).db();
 
+
+      /**
+       * @DontTouchThis
+       * @toolIds
+       */
+      const toolIds = [
+        "85b3b0ac-4330-42c2-bb2f-459c6b87b68a",
+        "82d7e7dc-c01e-4ffc-9a75-9049d8b22bd0"
+      ];
+
+      // Count how many of the required tools the user has
+      const userToolCount = await db.collection("user-voice-tools").countDocuments({
+        userId: new ObjectId(userId),
+        vapiToolId: { $in: toolIds }
+      });
+
+      console.log("userToolCount ", userToolCount);
+    
+
+      // Check if user has ALL required tools (both tools)
+      if (userToolCount !== toolIds.length) {
+        // User doesn't have all required tools, insert them
+        await db.collection("user-voice-tools").insertMany([
+          {
+            userId: new ObjectId(userId),
+            toolName: "google_calendar_tool_event_create",
+            vapiToolId: "85b3b0ac-4330-42c2-bb2f-459c6b87b68a"
+          },
+          {
+            userId: new ObjectId(userId),
+            toolName: "google_calendar_check_availability_tool",
+            vapiToolId: "82d7e7dc-c01e-4ffc-9a75-9049d8b22bd0"
+          }
+        ]);
+      }
+
+      //find if gooogle calendar tool presents
+     
+
       // 3. Store in DB: upsert by googleUserId + assistantId
-      const updateResult = await db.collection("google-calendar-oauth-consent").updateOne(
+      await db.collection("google-calendar-oauth-consent").updateOne(
         { googleUserId: googleUser.id, assistantId },
         {
           $set: {

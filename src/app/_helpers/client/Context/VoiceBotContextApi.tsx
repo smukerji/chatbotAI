@@ -16,7 +16,7 @@ const initialState = {
   model: {
     messages: [{ content: "default", role: "system" }],
 
-    toolIds: [""],//we deleted this field in the backend
+    toolIds: [""],
     provider: "openai",
     model: "gpt-4o",
     temperature: 0,
@@ -161,25 +161,18 @@ export const VoiceBotDataProvider = ({ children }: { children: ReactNode }) => {
 
 
   useEffect(() => {
-    ;
     if(afterPublishLoading){
-      ;
       setAfterPublishLoading(false);
-
       setIsPublishEnabled(false);
       setPublishLoading(false);
     }
   },[afterPublishLoading]);
 
-
   useEffect(() => {
-    ;
     const { provider, model, language } = state.transcriber;
     const { messages: modelMessages, provider: modelProvider, model: modelsModel, maxTokens } = state.model;
     const {chunkPlan} = state.voice;
     const {punctuationBoundaries,minCharacters} = chunkPlan;
-   
-    ;
     if (provider && model && language && modelProvider && modelsModel && state.firstMessage && state.name && maxTokens && (typeof maxTokens === 'number') && punctuationBoundaries.length > 0 && minCharacters > 0 && modelMessages[0].content.length > 0) {
       
       setIsPublishEnabled(true);

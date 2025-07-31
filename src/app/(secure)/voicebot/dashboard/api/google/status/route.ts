@@ -15,6 +15,7 @@ export async function GET(req: NextRequest) {
 
     const db = (await clientPromise!).db();
     const data = await db.collection("google-calendar-oauth-consent").findOne({ userId, assistantId });
+    console.log("concent data ", data);
 
     if (data && data.tokens && data.code) {
         // Use email and name from google_user_info

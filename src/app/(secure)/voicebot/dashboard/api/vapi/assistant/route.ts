@@ -37,7 +37,9 @@ async function createVapiAssistant(req: NextRequest) {
       delete vapiData.analysisPlan.structuredDataSchema;
       }
 
-      delete vapiData.model.toolIds;
+      if (Array.isArray(vapiData.model.toolIds) && vapiData.model.toolIds.length === 0) {
+        delete vapiData.model.toolIds;
+      }
       // delete vapiData.voice.chunkPlan.punctuationBoundaries;
       delete vapiData.analysisPlan.artifactPlan;
       // if(vapiData.analysisPlan.messagePlan?.idleMessages.length <= 0){//not grether than 0
@@ -114,9 +116,12 @@ async function createVapiAssistant(req: NextRequest) {
             }
             //update the voicebot record with the vapi assistant id
             const updateFields: any = { vapiAssistantId: vapiResponseData.id }; 
-            // if (fileId) {
-            //   updateFields.fileId = fileId;
-            // }
+
+            if (Array.isArray(vapiData.model.toolIds) && vapiData.model.toolIds.length > 0) {
+              updateFields.tools = {
+                calendarTool: [...vapiData.model.toolIds]
+              };
+            }
             const updateResult = await collection?.updateOne(
               { _id: new ObjectId(localData._id) },
               { $set: updateFields }
@@ -131,7 +136,6 @@ async function createVapiAssistant(req: NextRequest) {
             else {
               return { result: "result", assistantVapiId: vapiResponseData?.id };
             }
-            return { result: "result", assistantVapiId: vapiResponseData?.id };
           }
           else { //if the record is not exist then create the record
             //send the data to the vapi server
@@ -151,9 +155,11 @@ async function createVapiAssistant(req: NextRequest) {
 
             //update the voicebot record with the vapi assistant id
             const updateFields: any = { vapiAssistantId: vapiResponseData.id }; 
-            // if (fileId) {
-            //   updateFields.fileId = fileId;
-            // }
+            if (Array.isArray(vapiData.model.toolIds) && vapiData.model.toolIds.length > 0) {
+              updateFields.tools = {
+                calendarTool: [...vapiData.model.toolIds]
+              };
+            }
             const updateResult = await collection?.updateOne(
               { _id: new ObjectId(localData._id) },
               { $set: updateFields }
