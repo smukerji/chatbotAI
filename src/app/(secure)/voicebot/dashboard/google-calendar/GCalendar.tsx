@@ -1,11 +1,18 @@
 
+
 import React, { useState, useEffect, useRef, useContext } from "react";
-import { Button, List, Typography, message } from "antd";
+
+import { Button, List, Spin, Typography, message } from "antd";
+
 import { CalendarOutlined, CheckCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { useCookies } from "react-cookie";
 import Image from "next/image";
 import googleCalendarAPI from "../../../../../../public/Google_Calendar.png";
+
 import { CreateVoiceBotContext } from "@/app/_helpers/client/Context/VoiceBotContextApi";
+
+import './g-calendar.scss'
+
 
 const { Text } = Typography;
 
@@ -241,18 +248,7 @@ const GCalendar: React.FC<GCalendarProps> = ({
             Assistant Not Published
           </div>
           <div
-            style={{
-              fontSize: "16px",
-              fontFamily: attractiveFont,
-              color: "#555",
-              background: "#fffbe6",
-              borderRadius: 8,
-              padding: "18px 20px",
-              boxShadow: "0 2px 8px rgba(250,173,20,0.10)",
-              textAlign: "center",
-              lineHeight: "1.65",
-              border: "1px solid #ffe58f",
-            }}
+            className="gcal-status-alert gcal-status-alert--not-published"
           >
             <Image
               src={googleCalendarAPI}
@@ -263,7 +259,7 @@ const GCalendar: React.FC<GCalendarProps> = ({
             />
             <br />
             You haven't published your assistant yet.<br />
-            <span style={{ color: "#d48806", fontWeight: 500 }}>
+            <span className="gcal-status-alert__highlight">
               Please Publish it first to use Google Calendar features.
             </span>
           </div>
@@ -287,18 +283,7 @@ const GCalendar: React.FC<GCalendarProps> = ({
             User Not Verified
           </div>
           <div
-            style={{
-              fontSize: "16px",
-              fontFamily: attractiveFont,
-              color: "#555",
-              background: "#fff1f0",
-              borderRadius: 8,
-              padding: "18px 20px",
-              boxShadow: "0 2px 8px rgba(245,34,45,0.10)",
-              textAlign: "center",
-              lineHeight: "1.65",
-              border: "1px solid #ffa39e",
-            }}
+            className="gcal-status-alert gcal-status-alert--not-verified"
           >
             <Image
               src={googleCalendarAPI}
@@ -309,7 +294,7 @@ const GCalendar: React.FC<GCalendarProps> = ({
             />
             <br />
             You are not logged in.<br />
-            <span style={{ color: "#cf1322", fontWeight: 500 }}>
+            <span className="gcal-status-alert__highlight">
               Please Login to continue.
             </span>
           </div>
@@ -352,63 +337,21 @@ const GCalendar: React.FC<GCalendarProps> = ({
             Create Event
           </div>
         </div>
-        <style jsx>{`
-          .gcal-popover-arrow {
-            position: absolute;
-            left: -10px;
-            top: 28px;
-            width: 20px;
-            height: 20px;
-            background: transparent;
-          }
-          .gcal-popover-arrow::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 20px;
-            height: 20px;
-            background: #fff;
-            box-shadow: -2px 2px 8px rgba(0,0,0,0.06);
-            transform: rotate(45deg);
-          }
-          .gcal-popover-inner {
-            min-width: 220px;
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 16px rgba(0,0,0,0.12);
-            padding: 8px 0;
-          }
-          .gcal-popover-item {
-            padding: 14px 24px 14px 18px;
-            cursor: pointer;
-            font-size: 17px;
-            display: flex;
-            align-items: center;
-            transition: background 0.12s;
-          }
-          .gcal-popover-item:hover, .gcal-popover-item.selected {
-            background: #f5faff;
-          }
-          .gcal-popover-item.selected {
-            font-weight: 600;
-            color: #1890ff;
-          }
-        `}</style>
       </div>
     ) : null;
   };
+
 
   const renderRightPanel = () => {
     if (selectedMenu === "gcal" || gcalAction !== "none") {
       if (!gcalAction || gcalAction === "none") {
         return (
           <div style={{ position: "relative", height: "100%" }}>
-            {renderPopover()}
+            {/* {renderPopover()} */}
           </div>
         );
       }
-
+  
       let actionTitle = "";
       let toolParam: "check-availability" | "create-event" = "check-availability";
       if (gcalAction === "check") {
@@ -419,21 +362,26 @@ const GCalendar: React.FC<GCalendarProps> = ({
         actionTitle = "Create Event:";
         toolParam = "create-event";
       }
-
+  
+      // Loader and only action title while loading
+      if (loading) {
+        return (
+          <div className="gcal-panel-loading">
+            <h2 className="gcal-panel-title">
+              {actionTitle}
+            </h2>
+            <div style={{ marginTop: 24 }}>
+              <Spin size="large" />
+            </div>
+          </div>
+        );
+      }
+  
       if (gcalAction === "check" || gcalAction === "create") {
         if (!assistantPublished) {
           return (
             <div style={{ position: "relative", minHeight: 300 }}>
-              <div style={{
-                position: "absolute",
-                top: 10,
-                left: 25,
-                fontWeight: 600,
-                fontSize: 18,
-                fontFamily: attractiveFont,
-                color: "#222",
-                zIndex: 2
-              }}>
+              <div className="gcal-panel-title" style={{ top: 10, left: 25, position: "absolute", zIndex: 2 }}>
                 {actionTitle}
               </div>
               <div style={{
@@ -447,30 +395,13 @@ const GCalendar: React.FC<GCalendarProps> = ({
             </div>
           );
         }
-        // Normal panel if assistant is published
+        // Normal panel if assistant is published and not loading
         return (
           <div style={{ position: "relative", minHeight: 300 }}>
-            <div style={{
-              position: "absolute",
-              top: 10,
-              left: 25,
-              fontWeight: 600,
-              fontSize: 18,
-              fontFamily: attractiveFont,
-              color: "#222",
-              zIndex: 2
-            }}>
+            <div className="gcal-panel-title" style={{ top: 10, left: 25, position: "absolute", zIndex: 2 }}>
               {actionTitle}
             </div>
-            <div style={{
-              minHeight: 300,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "32px 16px",
-              textAlign: "center",
-            }}>
+            <div className="gcal-panel-content">
               <Image
                 src={googleCalendarAPI}
                 alt="Google Calendar"
@@ -478,12 +409,7 @@ const GCalendar: React.FC<GCalendarProps> = ({
                 height={54}
                 style={{ marginBottom: 14 }}
               />
-              <h2 style={{
-                marginBottom: 20,
-                fontWeight: 600,
-                fontSize: 22,
-                fontFamily: attractiveFont
-              }}>
+              <h2 className="gcal-panel-title">
                 Google Calendar
               </h2>
               {gcalStatus?.connected ? (
@@ -491,16 +417,7 @@ const GCalendar: React.FC<GCalendarProps> = ({
                   <Button
                     type="primary"
                     size="large"
-                    style={{
-                      minWidth: 240,
-                      background: "#27ae60",
-                      borderColor: "#27ae60",
-                      color: "#fff",
-                      cursor: "default",
-                      fontFamily: attractiveFont,
-                      fontWeight: 600,
-                      fontSize: 18,
-                    }}
+                    className="gcal-panel-btn gcal-panel-btn--connected"
                     disabled
                   >
                     {gcalStatus.name
@@ -523,12 +440,7 @@ const GCalendar: React.FC<GCalendarProps> = ({
                   type="primary"
                   size="large"
                   onClick={() => openConsentWindow(toolParam)}
-                  style={{
-                    minWidth: 240,
-                    fontFamily: attractiveFont,
-                    fontWeight: 600,
-                    fontSize: 18,
-                  }}
+                  className="gcal-panel-btn"
                 >
                   Connect
                 </Button>
@@ -538,17 +450,16 @@ const GCalendar: React.FC<GCalendarProps> = ({
         );
       }
     }
-
+  
     return null;
   };
-
   return (
     <div style={{ display: "flex", height: "100%" }}>
       <div
         style={{
           width: 260,
           borderRight: "1px solid #f0f0f0",
-          padding: "24px 12px",
+          padding: "24px 8px",
           height: "100%",
           background: "#fff",
           position: "relative",
