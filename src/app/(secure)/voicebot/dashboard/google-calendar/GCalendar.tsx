@@ -44,6 +44,7 @@ const GCalendar: React.FC<GCalendarProps> = ({
   const [gcalAction, setGcalAction] = useState<GCalAction>("none");
   const [gcalStatus, setGcalStatus] = useState<GoogleConsentStatus | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [callPublishAssistant, setCallPublishAssistant] = useState<boolean>(false);
 
   const voiceBotContextData: any = useContext(CreateVoiceBotContext);
   const voicebotDetails = voiceBotContextData.state;
@@ -143,25 +144,36 @@ const GCalendar: React.FC<GCalendarProps> = ({
         email: data.email,
         name: data.name,
       });
-      /**
-       * @Pending
-       * @Need_Action_Here
-       * state should be change after the google concent allow and it should be 
-       * map with the mongodb database in the google-oauth-content collection
-       * 
-       */
-      voiceBotContextData.updateState("toolIds", ["85b3b0ac-4330-42c2-bb2f-459c6b87b68a",
-        "82d7e7dc-c01e-4ffc-9a75-9049d8b22bd0"]);
-      // voiceBotContextData.setIsPublishEnabled(true);
-      console.log("voice details on G-Calender ", voicebotDetails);
-      await triggerPublishMethod();
-
-
+ 
+      if (data.connected) {
+        setCallPublishAssistant(true);
+      
+       
+      }
+      
     } catch {
       setGcalStatus({ connected: false });
     }
     setLoading(false);
   };
+
+  useEffect(() => { 
+    async function _() {
+      await triggerPublishMethod();
+    }
+    if (callPublishAssistant) {
+
+      if ((Array.isArray(voicebotDetails.model.toolIds) && voicebotDetails.model.toolIds.length !== 2) || !("toolIds" in voicebotDetails.model) ) {
+        
+        voiceBotContextData.updateState("model.toolIds", ["85b3b0ac-4330-42c2-bb2f-459c6b87b68a",
+        "82d7e7dc-c01e-4ffc-9a75-9049d8b22bd0"]);
+        console.log("voice details on G-Calender ", voicebotDetails);
+      }
+
+      setCallPublishAssistant(false);
+    }
+
+  }, [callPublishAssistant])
 
   const openConsentWindow = (tool: "check-availability" | "create-event") => {
     if (!assistantId || !userId) {

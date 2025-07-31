@@ -16,7 +16,7 @@ const initialState = {
   model: {
     messages: [{ content: "default", role: "system" }],
 
-    toolIds: [""],//we deleted this field in the backend
+    toolIds: [""],
     provider: "openai",
     model: "gpt-4o",
     temperature: 0,
