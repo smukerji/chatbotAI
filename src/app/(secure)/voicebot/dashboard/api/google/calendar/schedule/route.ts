@@ -106,12 +106,6 @@ export async function POST(req: NextRequest) {
 
     const timeZone = "Asia/Kolkata";
 
-    // Log for debugging
-    console.log("Final extracted values - title:", title);
-    console.log("Final extracted values - toolCallId:", toolCallId);
-    console.log("Final extracted values - assistantId:", assistantId);
-    console.log("Final extracted values - startDateTime:", startDateTime);
-    console.log("Final extracted values - endDateTime:", endDateTime);
 
     if (!title || !toolCallId || !assistantId || !startDateTime || !endDateTime) {
       const responseBody = {
@@ -122,7 +116,7 @@ export async function POST(req: NextRequest) {
           }
         ]
       };
-      console.log("RESPONSE SENT:", JSON.stringify(responseBody, null, 2));
+
       return NextResponse.json(responseBody, { status: 200 });
     }
 
@@ -137,7 +131,7 @@ export async function POST(req: NextRequest) {
           }
         ]
       };
-      console.log("RESPONSE SENT:", JSON.stringify(responseBody, null, 2));
+ 
       return NextResponse.json(responseBody, { status: 200 });
     }
 
@@ -177,7 +171,7 @@ export async function POST(req: NextRequest) {
           }
         ]
       };
-      console.log("RESPONSE SENT:", JSON.stringify(responseBody, null, 2));
+
       return NextResponse.json(responseBody, { status: 200 });
     }
 
@@ -193,7 +187,7 @@ export async function POST(req: NextRequest) {
         }
       ]
     };
-    console.log("RESPONSE SENT:", JSON.stringify(responseBody, null, 2));
+
     return NextResponse.json(responseBody, { status: 200 });
   } catch (err: any) {
     const responseBody = {
@@ -204,7 +198,7 @@ export async function POST(req: NextRequest) {
         }
       ]
     };
-    console.log("RESPONSE SENT:", JSON.stringify(responseBody, null, 2));
+
     return NextResponse.json(responseBody, { status: 200 });
   }
 }

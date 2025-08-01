@@ -16,7 +16,7 @@ const initialState = {
   model: {
     messages: [{ content: "default", role: "system" }],
 
-    toolIds: [""],
+    toolIds: [],
     provider: "openai",
     model: "gpt-4o",
     temperature: 0,

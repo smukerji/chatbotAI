@@ -5,46 +5,90 @@ import clientPromise from "../../../../../../../../db";
 import * as chrono from "chrono-node";
 import { DateTime } from "luxon";
 
-// Utility: Parse date/time from event title using chrono-node, always future!
 function parseEventDetailsFromTitle(title: string) {
   const timeZone = "Asia/Kolkata";
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const results = chrono.parse(title, now, { forwardDate: true });
+  const now = DateTime.now().setZone(timeZone);
+
+  // Try to parse with chrono-node; always forwardDate=true
+  const results = chrono.parse(title, now.toJSDate(), { forwardDate: true });
   if (results.length === 0) return undefined;
 
   const result = results[0];
-  let startDate = result.start?.date();
-  let endDate = result.end?.date();
 
-  // If parsed year is not specified or is before currentYear, force currentYear
-  if (result.start && !result.start.isCertain('year') && startDate) {
-    startDate.setFullYear(currentYear);
-  }
-  if (result.end && !result.end.isCertain('year') && endDate) {
-    endDate.setFullYear(currentYear);
+  // Always get the next future occurrence for month/day-only dates
+  function nextFutureOccurrence(
+    month: number,
+    day: number,
+    hour: number = 9,
+    minute: number = 0
+  ): DateTime {
+    // Try current year first
+    let candidate = DateTime.fromObject(
+      { year: now.year, month, day, hour, minute },
+      { zone: timeZone }
+    );
+    if (candidate >= now) return candidate;
+    // Otherwise bump to next year
+    return candidate.plus({ years: 1 });
   }
 
-  // ---- Make sure the parsed date is in the future! ----
-  while (startDate && startDate < now) {
-    startDate.setFullYear(startDate.getFullYear() + 1);
-    if (endDate) endDate.setFullYear(endDate.getFullYear() + 1);
-  }
-  // ---------------------------------------------------------
+  let startDate: DateTime | undefined;
+  let endDate: DateTime | undefined;
 
-  // Debug chrono-node parsing
-  console.log("chrono-node parsing result:", {
-    input: title,
-    startDate: startDate?.toISOString(),
-    endDate: endDate?.toISOString(),
-    isStartYearCertain: result.start?.isCertain('year'),
-    isEndYearCertain: result.end?.isCertain('year'),
-  });
+  if (result.start) {
+    const s = result.start;
+    const month = s.get('month') ?? now.month;
+    const day = s.get('day') ?? now.day;
+    const hour = s.isCertain('hour') && typeof s.get('hour') === 'number' ? s.get('hour')! : 9;
+    const minute = s.isCertain('minute') && typeof s.get('minute') === 'number' ? s.get('minute')! : 0;
+
+    if (s.isCertain('year')) {
+      startDate = DateTime.fromJSDate(s.date()).setZone(timeZone);
+    } else if (typeof month === 'number' && typeof day === 'number') {
+      startDate = nextFutureOccurrence(month, day, hour, minute);
+    } else {
+      // Could not parse month/day
+      return undefined;
+    }
+  }
+
+  if (result.end) {
+    const e = result.end;
+    const month = e.get('month') ?? (startDate ? startDate.month : now.month);
+    const day = e.get('day') ?? (startDate ? startDate.day : now.day);
+    const hour = e.isCertain('hour') && typeof e.get('hour') === 'number'
+      ? e.get('hour')!
+      : (startDate ? startDate.hour + 1 : 10);
+    const minute = e.isCertain('minute') && typeof e.get('minute') === 'number' ? e.get('minute')! : 0;
+
+    if (e.isCertain('year')) {
+      endDate = DateTime.fromJSDate(e.date()).setZone(timeZone);
+    } else if (typeof month === 'number' && typeof day === 'number') {
+      endDate = nextFutureOccurrence(month, day, hour, minute);
+      // If end is before start, bump to next year
+      if (startDate && endDate < startDate) endDate = endDate.plus({ years: 1 });
+    } else {
+      // Could not parse month/day
+      return undefined;
+    }
+  } else if (startDate) {
+    // Default duration = 1 hour
+    endDate = startDate.plus({ hours: 1 });
+  }
+
+  // // Debug chrono-node parsing
+  // console.log("chrono-node parsing result:", {
+  //   input: title,
+  //   startDate: startDate?.toISO(),
+  //   endDate: endDate?.toISO(),
+  //   isStartYearCertain: result.start?.isCertain('year'),
+  //   isEndYearCertain: result.end?.isCertain('year'),
+  // });
 
   return {
     summary: title,
-    startDateTime: startDate?.toISOString(),
-    endDateTime: endDate?.toISOString(),
+    startDateTime: startDate?.toISO(),
+    endDateTime: endDate?.toISO(),
     timeZone,
   };
 }
@@ -60,6 +104,17 @@ function bumpDateToFutureIST(dateString: string | undefined): string | undefined
     date = date.plus({ years: 1 });
   }
   return date.toISO() ?? undefined;
+}
+
+function getDayBounds(dateISO: string): { timeMin: string; timeMax: string } {
+  const date = DateTime.fromISO(dateISO, { zone: "Asia/Kolkata" }).startOf("day");
+  const startOfDay = date.plus({ hours: 8 }).toISO();
+  const endOfDay = date.plus({ hours: 17 }).toISO();
+  if (!startOfDay || !endOfDay) throw new Error("Invalid dateISO");
+  return {
+    timeMin: startOfDay,
+    timeMax: endOfDay,
+  };
 }
 
 async function getConsentByAssistantId(assistantId: string) {
@@ -98,36 +153,68 @@ async function refreshTokensIfNeeded(oauth2Client: any, tokens: any, assistantId
 }
 
 // Helper to find the next 2 available 1-hour slots in the working day, after a busy slot
+// function suggestAvailableSlots(
+//   busySlots: { start: string; end: string }[],
+//   requestedStart: string,
+//   requestedEnd: string
+// ): { start: string; end: string }[] {
+//   // Working hours: 8 AM to 5 PM IST
+//   const WORK_START = 8;
+//   const WORK_END = 17;
+//   const SLOT_DURATION = 1; // hour
+
+//   // Use the day of the requested slot
+//   const requested = DateTime.fromISO(requestedStart, { zone: "Asia/Kolkata" });
+//   const date = requested.startOf("day");
+
+//   // Build all possible slots for the day
+//   let slots: { start: string; end: string }[] = [];
+//   for (let hour = WORK_START; hour <= WORK_END - SLOT_DURATION; hour++) {
+//     let slotStart = date.plus({ hours: hour });
+//     let slotEnd = slotStart.plus({ hours: SLOT_DURATION });
+//     // Check if slot overlaps any busy slot
+//     let overlaps = busySlots.some(b => {
+//       let bStart = DateTime.fromISO(b.start, { zone: "Asia/Kolkata" });
+//       let bEnd = DateTime.fromISO(b.end, { zone: "Asia/Kolkata" });
+//       return !(slotEnd <= bStart || slotStart >= bEnd);
+//     });
+//     // Don't suggest the originally requested slot
+//     if (
+//       !overlaps &&
+//       !(slotStart.toISO() === requestedStart && slotEnd.toISO() === requestedEnd)
+//     ) {
+//       slots.push({ start: slotStart.toISO()!, end: slotEnd.toISO()! });
+//     }
+//   }
+//   return slots.slice(0, 2);
+// }
+
 function suggestAvailableSlots(
   busySlots: { start: string; end: string }[],
   requestedStart: string,
   requestedEnd: string
 ): { start: string; end: string }[] {
-  // Working hours: 8 AM to 5 PM IST
   const WORK_START = 8;
   const WORK_END = 17;
   const SLOT_DURATION = 1; // hour
-
-  // Use the day of the requested slot
   const requested = DateTime.fromISO(requestedStart, { zone: "Asia/Kolkata" });
   const date = requested.startOf("day");
 
-  // Build all possible slots for the day
   let slots: { start: string; end: string }[] = [];
   for (let hour = WORK_START; hour <= WORK_END - SLOT_DURATION; hour++) {
     let slotStart = date.plus({ hours: hour });
     let slotEnd = slotStart.plus({ hours: SLOT_DURATION });
-    // Check if slot overlaps any busy slot
+    // Don't suggest the originally requested slot
+    if (slotStart.toISO() === requestedStart && slotEnd.toISO() === requestedEnd) continue;
+
+    // Check for overlap with all busy slots
     let overlaps = busySlots.some(b => {
       let bStart = DateTime.fromISO(b.start, { zone: "Asia/Kolkata" });
       let bEnd = DateTime.fromISO(b.end, { zone: "Asia/Kolkata" });
-      return !(slotEnd <= bStart || slotStart >= bEnd);
+      // Overlap if slotStart < bEnd && slotEnd > bStart
+      return slotStart < bEnd && slotEnd > bStart;
     });
-    // Don't suggest the originally requested slot
-    if (
-      !overlaps &&
-      !(slotStart.toISO() === requestedStart && slotEnd.toISO() === requestedEnd)
-    ) {
+    if (!overlaps) {
       slots.push({ start: slotStart.toISO()!, end: slotEnd.toISO()! });
     }
   }
@@ -151,9 +238,7 @@ async function checkAvailability(
     }
   });
   const busy = freeBusyRes.data?.calendars?.["primary"]?.busy ?? [];
-  console.log("freeBusy API response:", JSON.stringify(freeBusyRes.data, null, 2));
-  console.log("Busy slots returned:", busy);
-
+  
   return { isFree: busy.length === 0, freeBusyRes: freeBusyRes.data, busySlots: busy };
 }
 
@@ -161,7 +246,6 @@ export async function POST(req: NextRequest) {
   let toolCallId = "toolCallId";
   try {
     const body = await req.json();
-    // console.log("BODY RECEIVED:", JSON.stringify(body, null, 2));
 
     // Extract all possible assistantId fields for debugging
     const assistantId1 = body?.message?.assistantId;
@@ -204,13 +288,7 @@ export async function POST(req: NextRequest) {
     let summary = title;
     const timeZone = "Asia/Kolkata";
 
-    // Log the final extracted values
-    console.log("Final extracted values - title:", title);
-    console.log("Final extracted values - toolCallId:", toolCallId);
-    console.log("Final extracted values - assistantId:", assistantId);
-    console.log("Final extracted values - startDateTime:", startDateTime);
-    console.log("Final extracted values - endDateTime:", endDateTime);
-
+    
     if (!title || !toolCallId || !assistantId) {
       const responseBody = {
         results: [
@@ -220,14 +298,14 @@ export async function POST(req: NextRequest) {
           }
         ]
       };
-      console.log("RESPONSE SENT:", JSON.stringify(responseBody, null, 2));
+     
       return NextResponse.json(responseBody, { status: 200 });
     }
 
     // If explicit date/time not present, try parsing from title using chrono-node
     if (!startDateTime || !endDateTime) {
       const parsed = parseEventDetailsFromTitle(title);
-      console.log("Parsed with chrono-node:", parsed);
+      
       if (!parsed || !parsed.startDateTime || !parsed.endDateTime) {
         const responseBody = {
           results: [
@@ -237,7 +315,7 @@ export async function POST(req: NextRequest) {
             }
           ]
         };
-        console.log("RESPONSE SENT:", JSON.stringify(responseBody, null, 2));
+       
         return NextResponse.json(responseBody, { status: 200 });
       }
       summary = parsed.summary;
@@ -257,7 +335,7 @@ export async function POST(req: NextRequest) {
           }
         ]
       };
-      console.log("RESPONSE SENT:", JSON.stringify(responseBody, null, 2));
+
       return NextResponse.json(responseBody, { status: 200 });
     }
 
@@ -266,26 +344,59 @@ export async function POST(req: NextRequest) {
     const oauth2Client = getOAuthClient(tokens);
     tokens = await refreshTokensIfNeeded(oauth2Client, tokens, assistantId);
 
-    // Check availability (busyRef)
-    const { isFree, busySlots } = await checkAvailability(
-      oauth2Client,
-      startDateTime!,
-      endDateTime!,
-      timeZone
-    );
+    // // Check availability (busyRef)
+    // const { isFree, busySlots } = await checkAvailability(
+    //   oauth2Client,
+    //   startDateTime!,
+    //   endDateTime!,
+    //   timeZone
+    // );
 
-    // If slot is not free, suggest up to 2 available slots for that day
-    let suggestedSlots: { start: string; end: string }[] = [];
-    if (!isFree) {
-      suggestedSlots = suggestAvailableSlots(
-        busySlots.map(slot => ({
-          start: slot.start ?? "",
-          end: slot.end ?? ""
-        })),
-        startDateTime!,
-        endDateTime!
-      );
-    }
+    // // If slot is not free, suggest up to 2 available slots for that day
+    // let suggestedSlots: { start: string; end: string }[] = [];
+    // if (!isFree) {
+    //   suggestedSlots = suggestAvailableSlots(
+    //     busySlots.map(slot => ({
+    //       start: slot.start ?? "",
+    //       end: slot.end ?? ""
+    //     })),
+    //     startDateTime!,
+    //     endDateTime!
+    //   );
+    // }
+
+
+    // Check availability of requested slot
+const { isFree, busySlots } = await checkAvailability(
+  oauth2Client,
+  startDateTime!,
+  endDateTime!,
+  timeZone
+);
+
+let suggestedSlots: { start: string; end: string }[] = [];
+
+if (!isFree) {
+  // NEW: Query busy slots for full working day
+  const { timeMin, timeMax } = getDayBounds(startDateTime!);
+
+  const dailyBusyRef = await checkAvailability(
+    oauth2Client,
+    timeMin,
+    timeMax,
+    timeZone
+  );
+  const dailyBusySlots = dailyBusyRef.busySlots;
+
+  suggestedSlots = suggestAvailableSlots(
+    dailyBusySlots.map(slot => ({
+      start: slot.start ?? "",
+      end: slot.end ?? ""
+    })),
+    startDateTime!,
+    endDateTime!
+  );
+}
 
     // Format suggested slots as text
     let suggestedSlotsString = "";
@@ -320,7 +431,7 @@ export async function POST(req: NextRequest) {
         }
       ]
     };
-    console.log("RESPONSE SENT:", JSON.stringify(responseBody, null, 2));
+
     return NextResponse.json(responseBody, { status: 200 });
 
   } catch (err: any) {
@@ -332,7 +443,7 @@ export async function POST(req: NextRequest) {
         }
       ]
     };
-    console.log("RESPONSE SENT:", JSON.stringify(responseBody, null, 2));
+
     return NextResponse.json(responseBody, { status: 200 });
   }
 }
