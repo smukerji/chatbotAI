@@ -18,7 +18,13 @@ export async function GET(req: NextRequest) {
     } catch (err) {
       console.error("Failed to parse state:", err);
       return new NextResponse(
-        `<html><body><p>Invalid state parameter from Google OAuth.</p></body></html>`,
+        `<html><body>
+          <script>
+            window.opener?.postMessage('google-oauth-error', '*');
+            window.close();
+          </script>
+          <p>Invalid state parameter from Google OAuth.</p>
+        </body></html>`,
         { status: 400, headers: { "Content-Type": "text/html" } }
       );
     }
@@ -27,7 +33,13 @@ export async function GET(req: NextRequest) {
     if (!userId || !assistantId) {
       console.error("[Google OAuth Callback] Missing userId or assistantId:", userInfo);
       return new NextResponse(
-        `<html><body><p>Invalid Request: User and Assistant must be provided.</p></body></html>`,
+        `<html><body>
+          <script>
+            window.opener?.postMessage('google-oauth-error', '*');
+            window.close();
+          </script>
+          <p>Invalid Request: User and Assistant must be provided.</p>
+        </body></html>`,
         { status: 400, headers: { "Content-Type": "text/html" } }
       );
     }
@@ -38,7 +50,13 @@ export async function GET(req: NextRequest) {
     } catch (err) {
       console.error("[Google OAuth Callback] Invalid UserId format:", userId, err);
       return new NextResponse(
-        `<html><body><p>Invalid UserId format.</p></body></html>`,
+        `<html><body>
+          <script>
+            window.opener?.postMessage('google-oauth-error', '*');
+            window.close();
+          </script>
+          <p>Invalid UserId format.</p>
+        </body></html>`,
         { status: 400, headers: { "Content-Type": "text/html" } }
       );
     }
@@ -140,14 +158,26 @@ export async function GET(req: NextRequest) {
     } catch (error) {
       console.error("Google OAuth error:", error);
       return new NextResponse(
-        `<html><body><p>Authorization Failed.</p></body></html>`,
+        `<html><body>
+          <script>
+            window.opener?.postMessage('google-oauth-error', '*');
+            window.close();
+          </script>
+          <p>Authorization Failed.</p>
+        </body></html>`,
         { status: 500, headers: { "Content-Type": "text/html" } }
       );
     }
   } catch (error) {
     console.error("Internal server error:", error);
     return new NextResponse(
-      `<html><body><p>Internal server error.</p></body></html>`,
+      `<html><body>
+        <script>
+          window.opener?.postMessage('google-oauth-error', '*');
+          window.close();
+        </script>
+        <p>Internal server error.</p>
+      </body></html>`,
       { status: 500, headers: { "Content-Type": "text/html" } }
     );
   }

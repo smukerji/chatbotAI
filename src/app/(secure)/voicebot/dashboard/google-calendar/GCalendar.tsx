@@ -44,6 +44,9 @@ const GCalendar: React.FC<GCalendarProps> = ({
   const [callPublishAssistant, setCallPublishAssistant] =
     useState<boolean>(false);
 
+  // --- Add this state for popup reference
+  const [popupRef, setPopupRef] = useState<Window | null>(null);
+
   const voiceBotContextData: any = useContext(CreateVoiceBotContext);
   const voicebotDetails = voiceBotContextData.state;
 
@@ -56,6 +59,7 @@ const GCalendar: React.FC<GCalendarProps> = ({
   const checkConnection = async () => {
     setLoadingCheck(false);
     setLoadingCreate(false);
+
     try {
       const res = await fetch(
         `/voicebot/dashboard/api/google/status?assistantId=${assistantId}&userId=${userId}`,
@@ -130,6 +134,7 @@ const GCalendar: React.FC<GCalendarProps> = ({
     }
   }, [callPublishAssistant]);
 
+
   const openConsentWindow = (tool: string) => {
     if (!assistantId || !userId) {
       message.error(
@@ -143,12 +148,29 @@ const GCalendar: React.FC<GCalendarProps> = ({
       height = 600;
     const left = window.screenX + (window.outerWidth - width) / 2;
     const top = window.screenY + (window.outerHeight - height) / 2;
-    window.open(
+    const popup = window.open(
       authUrl,
       "google_oauth",
       `width=${width},height=${height},left=${left},top=${top}`
     );
+    setPopupRef(popup);
   };
+
+  // --- ADD THIS EFFECT: Poll for popup close ---
+  useEffect(() => {
+    if (!popupRef) return;
+    const poll = setInterval(() => {
+      if (popupRef.closed) {
+        setLoadingCheck(false);
+        setLoadingCreate(false);
+        setPopupRef(null);
+         message.warning("Google consent was not completed or was closed.");
+        clearInterval(poll);
+      }
+    }, 500);
+    return () => clearInterval(poll);
+  }, [popupRef]);
+
 
   useEffect(() => {
     const onMessage = async (event: MessageEvent) => {
@@ -156,7 +178,10 @@ const GCalendar: React.FC<GCalendarProps> = ({
         event.data === "google-oauth-success" ||
         event.data === "google-oauth-error"
       ) {
+        setPopupRef(null); // close polling
         if (assistantPublished && userVerified) await checkConnection();
+        setLoadingCheck(false);
+        setLoadingCreate(false);
       }
     };
     window.addEventListener("message", onMessage);
@@ -188,7 +213,7 @@ const GCalendar: React.FC<GCalendarProps> = ({
         <div className="gcal-tool-title">{title}</div>
         {loading ? (
           <div className="gcal-tool-loading">
-            <Spin size="large" />
+            <Spin size="small" />
           </div>
         ) : !isConnected ? (
           <Button
