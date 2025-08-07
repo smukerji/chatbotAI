@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from "next/server";
 import { google } from "googleapis";
 import { ObjectId } from "mongodb";
@@ -10,13 +9,14 @@ export async function GET(req: NextRequest) {
     const code = searchParams.get("code");
     const state: string = searchParams.get("state") as string;
 
-    // Parse state (should contain userId, assistantId, and tool)
+    console.log("OAuth callback received. code:", code, "state:", state);
+
+    // Step 1: Parse state
     let userInfo;
     try {
       userInfo = JSON.parse(state);
-     
     } catch (err) {
-     
+      console.error("Failed to parse state:", err);
       return new NextResponse(
         `<html><body><p>Invalid state parameter from Google OAuth.</p></body></html>`,
         { status: 400, headers: { "Content-Type": "text/html" } }
@@ -50,62 +50,60 @@ export async function GET(req: NextRequest) {
     );
 
     try {
-      // 1. Exchange code for tokens
+      // Step 2: Exchange code for tokens
       const { tokens } = await oauth2Client.getToken(code!);
-
-
       if (!tokens?.access_token) {
-
         throw new Error("No access_token received from Google.");
       }
       oauth2Client.setCredentials(tokens);
 
-      // 2. Fetch Google user info using Google API client
+      // Step 3: Fetch Google user info
       const oauth2 = google.oauth2({ version: "v2", auth: oauth2Client });
       const { data: googleUser } = await oauth2.userinfo.get();
 
       const db = (await clientPromise!).db();
 
-
-      /**
-       * @DontTouchThis
-       * @toolIds
-       */
+      // Step 4: Ensure user-voice-tools exist
       const toolIds = [
         "b29826a9-3941-498e-b6e7-3d083bb42bf0",
         "aa5dd6b5-e511-4400-ab5b-cdcff7279488"
       ];
 
-      // Count how many of the required tools the user has
       const userToolCount = await db.collection("user-voice-tools").countDocuments({
-        userId: new ObjectId(userId),
+        userId: objectUserId,
         vapiToolId: { $in: toolIds }
       });
 
-      console.log("userToolCount ", userToolCount);
-    
+      console.log("userToolCount", userToolCount);
 
-      // Check if user has ALL required tools (both tools)
       if (userToolCount !== toolIds.length) {
-        // User doesn't have all required tools, insert them
         await db.collection("user-voice-tools").insertMany([
           {
-            userId: new ObjectId(userId),
+            userId: objectUserId,
             toolName: "google_calendar_tool_event_create",
             vapiToolId: "b29826a9-3941-498e-b6e7-3d083bb42bf0"
           },
           {
-            userId: new ObjectId(userId),
+            userId: objectUserId,
             toolName: "google_calendar_check_availability_tool",
             vapiToolId: "aa5dd6b5-e511-4400-ab5b-cdcff7279488"
           }
         ]);
       }
 
-      //find if gooogle calendar tool presents
-     
+      // Step 5: Ensure tools is an array (for backward compatibility)
+      await db.collection("google-calendar-oauth-consent").updateMany(
+        {
+          googleUserId: googleUser.id,
+          assistantId,
+          tools: { $type: "string" }
+        },
+        [
+          { $set: { tools: ["$tools"] } }
+        ]
+      );
 
-      // 3. Store in DB: upsert by googleUserId + assistantId
+      // Step 6: Upsert the OAuth consent record (FIXED)
       await db.collection("google-calendar-oauth-consent").updateOne(
         { googleUserId: googleUser.id, assistantId },
         {
@@ -113,7 +111,6 @@ export async function GET(req: NextRequest) {
             code,
             tokens,
             updatedAt: new Date(),
-            tools: tool || null  
           },
           $setOnInsert: {
             userId: objectUserId,
@@ -121,6 +118,9 @@ export async function GET(req: NextRequest) {
             google_user_info: googleUser,
             createdAt: new Date(),
           },
+          $addToSet: {
+            tools: tool, // no conflict: add tool to array
+          }
         },
         { upsert: true }
       );
@@ -138,13 +138,14 @@ export async function GET(req: NextRequest) {
         { status: 200, headers: { "Content-Type": "text/html" } }
       );
     } catch (error) {
-
+      console.error("Google OAuth error:", error);
       return new NextResponse(
         `<html><body><p>Authorization Failed.</p></body></html>`,
         { status: 500, headers: { "Content-Type": "text/html" } }
       );
     }
   } catch (error) {
+    console.error("Internal server error:", error);
     return new NextResponse(
       `<html><body><p>Internal server error.</p></body></html>`,
       { status: 500, headers: { "Content-Type": "text/html" } }

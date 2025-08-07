@@ -1,125 +1,182 @@
-.gcal-popover {
-    position: fixed;
-    z-index: 1000;
-  
-    .gcal-popover-arrow {
-      position: absolute;
-      left: -10px;
-      top: 28px;
-      width: 20px;
-      height: 20px;
-      background: transparent;
-  
-      &::after {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 20px;
-        height: 20px;
-        background: #fff;
-        box-shadow: -2px 2px 8px rgba(0,0,0,0.06);
-        transform: rotate(45deg);
-      }
-    }
-  
-    .gcal-popover-inner {
-      min-width: 220px;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 2px 16px rgba(0,0,0,0.12);
-      padding: 8px 0;
-    }
-  
-    .gcal-popover-item {
-      padding: 14px 24px 14px 18px;
-      cursor: pointer;
-      font-size: 17px;
-      display: flex;
-      align-items: center;
-      transition: background 0.12s;
-  
-      &:hover,
-      &.selected {
-        background: #f5faff;
-      }
-  
-      &.selected {
-        font-weight: 600;
-        color: #1890ff;
-      }
+.gcal-main-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #fff;
+  align-items: flex-start;
+  box-sizing: border-box;
+}
+
+// SIDEBAR
+.gcal-sidebar-wrapper {
+  width: 313px; 
+  min-width: 313px;
+  height: 687px; 
+  background: #fcfcfd; 
+  border-radius: 16px; 
+  border: 1px solid #ededf2; 
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 16px; 
+  margin-right: 30px;
+  gap: 8px; 
+}
+
+.gcal-sidebar-card {
+  display: flex;
+  align-items: center;
+  gap: 8px; 
+  font-size: 20px;
+  font-weight: 600;
+  width: 100%;
+  padding: 16px; 
+  background-color: #e6e8ec;
+  border-radius: 8px;
+  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
+}
+
+.gcal-sidebar-label {
+  font-family: "Segoe UI", "Montserrat", "Roboto", "Poppins", "Arial",
+    sans-serif;
+  color: #222;
+  margin-left: 8px;
+}
+
+// TOOL CARDS AREA
+.gcal-tools-area {
+  display: flex;
+   gap: 30px; 
+  align-items: flex-start;
+  justify-content: flex-start;
+  height:auto; 
+  justify-content: space-between;
+  width:100%;
+
+}
+
+
+// INDIVIDUAL TOOL CARD
+.gcal-tool-card {
+  background: #fff;
+  border-radius: 12px; 
+  border: 1px solid #ededf2;
+  box-shadow: none;
+  padding: 20px;
+  // min-width: 366px;
+  // max-width: 406px;
+  // width: 366px; 
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 11px;
+  flex:1;
+}
+
+.gcal-tool-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: #222;
+  margin-bottom: 0;
+  width: 100%;
+  text-align: left;
+  font-family: "Segoe UI", "Montserrat", "Roboto", "Poppins", "Arial",
+    sans-serif;
+  line-height: 24px;
+}
+
+.gcal-connect-btn {
+  background: #3863f7 !important;
+  color: #fff !important;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 12px; 
+  border: none;
+  box-shadow: none;
+  width: 100%;
+  height: 52px; 
+  transition: background 0.18s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0;
+  &:hover,
+  &:focus {
+    background: #2751d7 !important;
+    color: #fff !important;
+  }
+}
+
+.gcal-connected-box {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.gcal-connected-pill {
+  background: #e8fded;
+  color: #0d9700; 
+  border-radius: 1000px; 
+  padding: 10px 16px; 
+  font-weight: 500;
+  font-size: 15px;
+  width: 317px; 
+  text-align: left;
+  line-height: 24px;
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0; // Prevent shrinking
+  white-space: nowrap; // Prevent wrapping
+}
+
+.gcal-connected-email {
+  font-size: 13px;
+  color: #666;
+  text-align: left;
+  line-height: 20px;
+  margin-top: 0;
+  margin-bottom: 0;
+  width: 317px;
+  font-family: "Segoe UI", "Montserrat", "Roboto", "Poppins", "Arial",
+    sans-serif;
+}
+
+.gcal-status-alert {
+  font-size: 16px;
+  font-family: "Segoe UI", "Montserrat", "Roboto", "Poppins", "Arial",
+    sans-serif;
+  color: #555;
+  border-radius: 8px;
+  padding: 18px 20px;
+  text-align: center;
+  line-height: 1.65;
+  margin-top: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-width: 420px;
+  margin:auto;
+
+  &--not-published {
+    background: #fffbe6;
+    border: 1px solid #ffe58f;
+    box-shadow: 0 2px 8px rgba(250, 173, 20, 0.1);
+  }
+
+  &--not-verified {
+    background: #fff1f0;
+    border: 1px solid #ffa39e;
+    box-shadow: 0 2px 8px rgba(245, 34, 45, 0.1);
+  }
+
+  &__highlight {
+    color: #d48806;
+    font-weight: 500;
+    &.gcal-status-alert--not-verified & {
+      color: #cf1322;
     }
   }
-  
-  .gcal-status-alert {
-    font-size: 16px;
-    font-family: 'Segoe UI', 'Montserrat', 'Roboto', 'Poppins', 'Arial', sans-serif;
-    color: #555;
-    border-radius: 8px;
-    padding: 18px 20px;
-    text-align: center;
-    line-height: 1.65;
-    margin-top: 0;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
-  
-    &--not-published {
-      background: #fffbe6;
-      border: 1px solid #ffe58f;
-      box-shadow: 0 2px 8px rgba(250,173,20,0.10);
-    }
-  
-    &--not-verified {
-      background: #fff1f0;
-      border: 1px solid #ffa39e;
-      box-shadow: 0 2px 8px rgba(245,34,45,0.10);
-    }
-  
-    &__highlight {
-      color: #d48806;
-      font-weight: 500;
-      &.gcal-status-alert--not-verified & {
-        color: #cf1322;
-      }
-    }
-  }
-  
-  .gcal-panel-title {
-    margin-bottom: 20px;
-    font-weight: 600;
-    font-size: 22px;
-    font-family: 'Segoe UI', 'Montserrat', 'Roboto', 'Poppins', 'Arial', sans-serif;
-  }
-  
-  .gcal-panel-loading {
-    position: relative;
-    min-height: 300px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 32px 16px;
-    text-align: center;
-  }
-  
-  .gcal-panel-content {
-    min-height: 300px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 32px 16px;
-    text-align: center;
-  }
-  
-  .gcal-panel-btn {
-    min-width: 240px;
-    font-family: 'Segoe UI', 'Montserrat', 'Roboto', 'Poppins', 'Arial', sans-serif;
-    font-weight: 600;
-    font-size: 18px;
-    &--connected {
-      background: #27ae60 !important;
-      border-color: #27ae60 !important;
-      color: #fff !important;
-      cursor: default !important;
-    }
-  }
+}

@@ -152,42 +152,6 @@ async function refreshTokensIfNeeded(oauth2Client: any, tokens: any, assistantId
   return tokens;
 }
 
-// Helper to find the next 2 available 1-hour slots in the working day, after a busy slot
-// function suggestAvailableSlots(
-//   busySlots: { start: string; end: string }[],
-//   requestedStart: string,
-//   requestedEnd: string
-// ): { start: string; end: string }[] {
-//   // Working hours: 8 AM to 5 PM IST
-//   const WORK_START = 8;
-//   const WORK_END = 17;
-//   const SLOT_DURATION = 1; // hour
-
-//   // Use the day of the requested slot
-//   const requested = DateTime.fromISO(requestedStart, { zone: "Asia/Kolkata" });
-//   const date = requested.startOf("day");
-
-//   // Build all possible slots for the day
-//   let slots: { start: string; end: string }[] = [];
-//   for (let hour = WORK_START; hour <= WORK_END - SLOT_DURATION; hour++) {
-//     let slotStart = date.plus({ hours: hour });
-//     let slotEnd = slotStart.plus({ hours: SLOT_DURATION });
-//     // Check if slot overlaps any busy slot
-//     let overlaps = busySlots.some(b => {
-//       let bStart = DateTime.fromISO(b.start, { zone: "Asia/Kolkata" });
-//       let bEnd = DateTime.fromISO(b.end, { zone: "Asia/Kolkata" });
-//       return !(slotEnd <= bStart || slotStart >= bEnd);
-//     });
-//     // Don't suggest the originally requested slot
-//     if (
-//       !overlaps &&
-//       !(slotStart.toISO() === requestedStart && slotEnd.toISO() === requestedEnd)
-//     ) {
-//       slots.push({ start: slotStart.toISO()!, end: slotEnd.toISO()! });
-//     }
-//   }
-//   return slots.slice(0, 2);
-// }
 
 function suggestAvailableSlots(
   busySlots: { start: string; end: string }[],
@@ -344,27 +308,7 @@ export async function POST(req: NextRequest) {
     const oauth2Client = getOAuthClient(tokens);
     tokens = await refreshTokensIfNeeded(oauth2Client, tokens, assistantId);
 
-    // // Check availability (busyRef)
-    // const { isFree, busySlots } = await checkAvailability(
-    //   oauth2Client,
-    //   startDateTime!,
-    //   endDateTime!,
-    //   timeZone
-    // );
-
-    // // If slot is not free, suggest up to 2 available slots for that day
-    // let suggestedSlots: { start: string; end: string }[] = [];
-    // if (!isFree) {
-    //   suggestedSlots = suggestAvailableSlots(
-    //     busySlots.map(slot => ({
-    //       start: slot.start ?? "",
-    //       end: slot.end ?? ""
-    //     })),
-    //     startDateTime!,
-    //     endDateTime!
-    //   );
-    // }
-
+    
 
     // Check availability of requested slot
 const { isFree, busySlots } = await checkAvailability(
