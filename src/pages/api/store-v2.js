@@ -199,14 +199,23 @@ export default async function handler(req, res) {
               /// get all the object keys
               const schemaInfo = dbFile?.schema_info;
 
-              const objectKeysCollection = Object.keys(schemaInfo);
-
-              /// iterate and delete the collection
-              for (let collection of objectKeysCollection) {
-                const collectionToDelete =
-                  userSchemaClient.collection(collection);
-                await collectionToDelete.drop();
+              if (schemaInfo && typeof schemaInfo === "object") {
+                const objectKeysCollection = Object.keys(schemaInfo);
+                // iterate and delete the collection
+                for (let collection of objectKeysCollection) {
+                  const collectionToDelete =
+                    userSchemaClient.collection(collection);
+                  await collectionToDelete.drop();
+                }
               }
+              // const objectKeysCollection = Object.keys(schemaInfo);
+
+              // /// iterate and delete the collection
+              // for (let collection of objectKeysCollection) {
+              //   const collectionToDelete =
+              //     userSchemaClient.collection(collection);
+              //   await collectionToDelete.drop();
+              // }
             } else {
               /// deleting the files by id
               await deleteFileVectorsById(userId, dbFile?.dataID);
