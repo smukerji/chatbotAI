@@ -53,7 +53,12 @@ export const functionCallHandler = async (
       if (response.ok) {
         return JSON.stringify({
           success: true,
-          data: await response.json(),
+          data: [
+            {
+              source: "shopify store",
+              content: await response.json(),
+            },
+          ],
         });
       }
     } else if (functionName === "get_customer_orders") {
@@ -72,7 +77,12 @@ export const functionCallHandler = async (
       if (response.ok) {
         return JSON.stringify({
           success: true,
-          data: await response.json(),
+          data: [
+            {
+              source: "shopify store",
+              content: await response.json(),
+            },
+          ],
         });
       }
     } else if (functionName === "get_products") {
@@ -87,7 +97,12 @@ export const functionCallHandler = async (
       if (response.ok) {
         return JSON.stringify({
           success: true,
-          data: await response.json(),
+          data: [
+            {
+              source: "shopify store",
+              content: await response.json(),
+            },
+          ],
         });
       }
     } else if (functionName === "get_reference") {
@@ -107,7 +122,8 @@ export const functionCallHandler = async (
         }
       );
       /// parse the response and extract the similarity results
-      const respText = await response.text();
+      const respText = await response.json();
+
       const similaritySearchResults = respText;
 
       return JSON.stringify({
