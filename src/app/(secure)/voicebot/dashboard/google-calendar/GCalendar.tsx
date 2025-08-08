@@ -13,6 +13,17 @@ interface GCalendarProps {
   triggerPublishMethod: () => Promise<void>;
 }
 
+// Add more tools here in the future as needed
+const TOOL_LIST = [
+  {
+    key: "google-calendar",
+    label: "Google Calendar",
+    icon: googleCalendarAPI,
+  },
+  // Example for future tools:
+  // { key: "other-tool", label: "Other Tool", icon: otherToolIcon }
+];
+
 type TabAction = "check" | "create";
 
 interface GoogleConsentStatus {
@@ -27,6 +38,11 @@ const TOOL_DB_MAP: Record<TabAction, string> = {
   create: "create-event",
 };
 
+const TOOL_LABEL_MAP: Record<TabAction, string> = {
+  check: "Tool name: google_calendar_check_availability_tool",
+  create: "Tool name: google_calendar_tool_event_create",
+};
+
 const GCalendar: React.FC<GCalendarProps> = ({
   userId,
   assistantId,
@@ -35,14 +51,15 @@ const GCalendar: React.FC<GCalendarProps> = ({
 }) => {
   const [cookies] = useCookies(["userId"]);
   const userVerified = !!cookies.userId;
-  const [gcalStatus, setGcalStatus] = useState<GoogleConsentStatus | null>(
-    null
-  );
+  const [gcalStatus, setGcalStatus] = useState<GoogleConsentStatus | null>(null);
   const [loadingCheck, setLoadingCheck] = useState<boolean>(false);
   const [loadingCreate, setLoadingCreate] = useState<boolean>(false);
   const [connectedTools, setConnectedTools] = useState<string[]>([]);
   const [callPublishAssistant, setCallPublishAssistant] =
     useState<boolean>(false);
+
+  // For future: selected tool in sidebar
+  const [selectedTool, setSelectedTool] = useState<string>(TOOL_LIST[0].key);
 
   // --- Add this state for popup reference
   const [popupRef, setPopupRef] = useState<Window | null>(null);
@@ -134,7 +151,6 @@ const GCalendar: React.FC<GCalendarProps> = ({
     }
   }, [callPublishAssistant]);
 
-
   const openConsentWindow = (tool: string) => {
     if (!assistantId || !userId) {
       message.error(
@@ -164,13 +180,14 @@ const GCalendar: React.FC<GCalendarProps> = ({
         setLoadingCheck(false);
         setLoadingCreate(false);
         setPopupRef(null);
-         message.warning("Google consent was not completed or was closed.");
+        message.warning(
+          "You haven’t connected your Google Calendar yet. Please verify your account to activate Google Calendar features."
+        );
         clearInterval(poll);
       }
     }, 500);
     return () => clearInterval(poll);
   }, [popupRef]);
-
 
   useEffect(() => {
     const onMessage = async (event: MessageEvent) => {
@@ -188,16 +205,24 @@ const GCalendar: React.FC<GCalendarProps> = ({
     return () => window.removeEventListener("message", onMessage);
   }, [userId, assistantId, assistantPublished, userVerified]);
 
-  // Sidebar Google Calendar Card
+  // Sidebar: list all tools (supports future tools)
   const renderSidebar = () => (
-    <div className="gcal-sidebar-card">
-      <Image
-        src={googleCalendarAPI}
-        alt="Google Calendar"
-        width={32}
-        height={32}
-      />
-      <span className="gcal-sidebar-label">Google Calendar</span>
+    <div className="gcal-sidebar-wrapper">
+      {TOOL_LIST.map((tool) => (
+        <button
+          key={tool.key}
+          type="button"
+          className={
+            "gcal-sidebar-card gcal-sidebar-card--clickable" +
+            (selectedTool === tool.key ? " gcal-sidebar-card--selected" : "")
+          }
+          onClick={() => setSelectedTool(tool.key)}
+          tabIndex={0}
+        >
+          <Image src={tool.icon} alt={tool.label} width={32} height={32} />
+          <span className="gcal-sidebar-label">{tool.label}</span>
+        </button>
+      ))}
     </div>
   );
 
@@ -211,6 +236,7 @@ const GCalendar: React.FC<GCalendarProps> = ({
     return (
       <div className="gcal-tool-card">
         <div className="gcal-tool-title">{title}</div>
+        <div className="gcal-tool-label">{TOOL_LABEL_MAP[action]}</div>
         {loading ? (
           <div className="gcal-tool-loading">
             <Spin size="small" />
@@ -241,6 +267,26 @@ const GCalendar: React.FC<GCalendarProps> = ({
       </div>
     );
   };
+
+  // Note card below tool cards
+  const renderNoteCard = () => (
+    <div className="gcal-note-card">
+      <div className="gcal-note-title">Note:</div>
+      <ul>
+        <li> To <b>check availability</b> using Google Calendar, include<code>google_calendar_check_availability_tool</code>in your system prompt.</li>
+        <li> To <b>create an event</b> using Google Calendar, include<code>google_calendar_tool_event_create</code>in your system prompt.</li>
+      </ul>
+      {/* <div>
+        To <b>check availability</b> using Google Calendar, include{" "}
+        <code>google_calendar_check_availability_tool</code> in your system
+        prompt.
+        <br />
+        <br />
+        To <b>create an event</b> using Google Calendar, include{" "}
+        <code>google_calendar_tool_event_create</code> in your system prompt.
+      </div> */}
+    </div>
+  );
 
   // Alerts for not published/not verified
   const renderStatusAlert = () => {
@@ -287,19 +333,29 @@ const GCalendar: React.FC<GCalendarProps> = ({
     return null;
   };
 
-  return (
-    <div className="gcal-main-layout">
-      <div className="gcal-sidebar-wrapper">{renderSidebar()}</div>
-      <div className="gcal-tools-area">
-        {!assistantPublished || !userVerified ? (
-          renderStatusAlert()
-        ) : (
-          <>
+  // Main content: switch by selectedTool (for future extensibility)
+  const renderMainContent = () => {
+    if (selectedTool === "google-calendar") {
+      return !assistantPublished || !userVerified ? (
+        renderStatusAlert()
+      ) : (
+        <>
+          <div className="gcal-tool-cards-row">
             {renderToolCard("check", "Check availability", loadingCheck)}
             {renderToolCard("create", "Create event", loadingCreate)}
-          </>
-        )}
-      </div>
+          </div>
+          {renderNoteCard()}
+        </>
+      );
+    }
+    // Future: handle other tools
+    return null;
+  };
+
+  return (
+    <div className="gcal-main-layout">
+      {renderSidebar()}
+      <div className="gcal-tools-area">{renderMainContent()}</div>
     </div>
   );
 };

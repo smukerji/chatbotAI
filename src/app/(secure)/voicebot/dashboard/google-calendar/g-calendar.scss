@@ -24,6 +24,7 @@
   gap: 8px; 
 }
 
+// Make sidebar card clickable and add hover/focus effect
 .gcal-sidebar-card {
   display: flex;
   align-items: center;
@@ -32,9 +33,33 @@
   font-weight: 600;
   width: 100%;
   padding: 16px; 
-  background-color: #e6e8ec;
+  background-color:#f2f3f3;
   border-radius: 8px;
   box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
+  border: none;
+  cursor: default;
+  transition: box-shadow 0.18s, background 0.18s, color 0.18s;
+}
+
+.gcal-sidebar-card--clickable {
+  cursor: pointer;
+  outline: none;
+  border: none;
+  background-color:#f2f3f3;
+  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
+  transition: box-shadow 0.18s, background 0.18s, color 0.18s;
+}
+.gcal-sidebar-card--clickable:hover,
+.gcal-sidebar-card--clickable:focus {
+  // background: linear-gradient(90deg, #e6e8ec 60%, #f6f8ff 100%);
+  background-color:#e6e8ec;
+  color: #3863f7;
+  // box-shadow: 0 6px 18px 0 rgba(80, 120, 250, 0.08);
+   box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
+  outline: none;
+}
+.gcal-sidebar-card--clickable:active {
+  background: #dde3f7;
 }
 
 .gcal-sidebar-label {
@@ -47,15 +72,22 @@
 // TOOL CARDS AREA
 .gcal-tools-area {
   display: flex;
-   gap: 30px; 
+  flex-direction: column;
+  gap: 0px; // no gap between tool cards and note for tight vertical fit
   align-items: flex-start;
   justify-content: flex-start;
-  height:auto; 
-  justify-content: space-between;
-  width:100%;
-
+  height: auto;
+  width: 100%;
 }
 
+// TOOL CARDS FLEX WRAP
+.gcal-tool-cards-row {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+  margin-bottom: 18px; // space between tool cards and note card
+  width: 100%;
+}
 
 // INDIVIDUAL TOOL CARD
 .gcal-tool-card {
@@ -64,14 +96,14 @@
   border: 1px solid #ededf2;
   box-shadow: none;
   padding: 20px;
-  // min-width: 366px;
-  // max-width: 406px;
-  // width: 366px; 
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 11px;
-  flex:1;
+  flex: 1;
+  // min-width: 340px;
+  // max-width: 410px;
+  margin-bottom: 0;
 }
 
 .gcal-tool-title {
@@ -84,6 +116,69 @@
   font-family: "Segoe UI", "Montserrat", "Roboto", "Poppins", "Arial",
     sans-serif;
   line-height: 24px;
+}
+
+.gcal-tool-label {
+  color: #888db2;
+  background: #f5f6fa;
+  display: inline-block;
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-size: 12px;
+  margin-bottom: 8px;
+  font-family: "Segoe UI", "Montserrat", "Roboto", "Poppins", "Arial",
+    sans-serif;
+}
+
+// NOTE CARD
+.gcal-note-card {
+  margin-top: 0;
+  margin-left: 0;
+  width: 100%;
+  // max-width: 860px;
+  background: linear-gradient(90deg, #f6f8ff 0%, #f9fafc 100%);
+  border: 1.5px solid #e0e7ff;
+  border-radius: 14px;
+  padding:25px;
+  font-size: 16px;
+  color: #283046;
+  box-shadow: 0 4px 18px 0 rgba(65, 70, 90, 0.04);
+  line-height: 1.7;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  ul {
+    padding-left: 30px;
+    li {
+      font-size: 16px;
+      line-height: 140%;
+      padding: 5px 0;
+      code {
+        font-size: 16px;
+        // color: green;
+      }
+    }
+  }
+}
+.gcal-note-title {
+  font-size: 16.5px;
+  font-weight: 700;
+  margin-bottom: 9px;
+  color: #5c6ac4;
+  letter-spacing: 0.01em;
+  font-family: "Segoe UI", "Montserrat", "Roboto", "Poppins", "Arial",
+    sans-serif;
+}
+.gcal-note-card code {
+  font-size: 13.5px;
+  color: #276ef1;
+  background: #f3f9ff;
+  border-radius: 6px;
+  padding: 2px 7px;
+  margin: 0 2px;
+}
+.gcal-note-card b {
+  color: #222;
 }
 
 .gcal-connect-btn {
