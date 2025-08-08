@@ -2,27 +2,16 @@ import React, { useState, useEffect, useContext } from "react";
 import { Button, Spin, message } from "antd";
 import { useCookies } from "react-cookie";
 import Image from "next/image";
-import googleCalendarAPI from "../../../../../../public/Google_Calendar.png";
+import googleCalendarAPI from "../../../../../../../public/Google_Calendar.png"
 import { CreateVoiceBotContext } from "@/app/_helpers/client/Context/VoiceBotContextApi";
 import "./g-calendar.scss";
 
 interface GCalendarProps {
-  userId: string;
-  assistantId: string;
-  assistantPublished: boolean;
-  triggerPublishMethod: () => Promise<void>;
+  userId?: string;
+  assistantId?: string;
+  assistantPublished?: boolean;
+  triggerPublishMethod?: () => Promise<void>;
 }
-
-// Add more tools here in the future as needed
-const TOOL_LIST = [
-  {
-    key: "google-calendar",
-    label: "Google Calendar",
-    icon: googleCalendarAPI,
-  },
-  // Example for future tools:
-  // { key: "other-tool", label: "Other Tool", icon: otherToolIcon }
-];
 
 type TabAction = "check" | "create";
 
@@ -50,27 +39,22 @@ const GCalendar: React.FC<GCalendarProps> = ({
   triggerPublishMethod,
 }) => {
   const [cookies] = useCookies(["userId"]);
-  const userVerified = !!cookies.userId;
+  const userVerified = !!(userId || cookies.userId);
   const [gcalStatus, setGcalStatus] = useState<GoogleConsentStatus | null>(null);
   const [loadingCheck, setLoadingCheck] = useState<boolean>(false);
   const [loadingCreate, setLoadingCreate] = useState<boolean>(false);
   const [connectedTools, setConnectedTools] = useState<string[]>([]);
-  const [callPublishAssistant, setCallPublishAssistant] =
-    useState<boolean>(false);
-
-  // For future: selected tool in sidebar
-  const [selectedTool, setSelectedTool] = useState<string>(TOOL_LIST[0].key);
-
-  // --- Add this state for popup reference
+  const [callPublishAssistant, setCallPublishAssistant] = useState<boolean>(false);
   const [popupRef, setPopupRef] = useState<Window | null>(null);
 
   const voiceBotContextData: any = useContext(CreateVoiceBotContext);
-  const voicebotDetails = voiceBotContextData.state;
+  const voicebotDetails = voiceBotContextData?.state ?? {};
 
   useEffect(() => {
     if (assistantPublished && userVerified) {
       checkConnection();
     }
+    // eslint-disable-next-line
   }, [assistantPublished, userVerified, assistantId, userId]);
 
   const checkConnection = async () => {
@@ -79,7 +63,7 @@ const GCalendar: React.FC<GCalendarProps> = ({
 
     try {
       const res = await fetch(
-        `/voicebot/dashboard/api/google/status?assistantId=${assistantId}&userId=${userId}`,
+        `/voicebot/dashboard/api/google/status?assistantId=${assistantId}&userId=${userId ?? cookies.userId}`,
         { cache: "no-store" }
       );
       const data = await res.json();
@@ -111,7 +95,7 @@ const GCalendar: React.FC<GCalendarProps> = ({
     if (!connectedTools.includes(tool)) {
       try {
         const res = await fetch(
-          `/voicebot/dashboard/api/google/add-tool?assistantId=${assistantId}&userId=${userId}&tool=${tool}`,
+          `/voicebot/dashboard/api/google/add-tool?assistantId=${assistantId}&userId=${userId ?? cookies.userId}&tool=${tool}`,
           { method: "POST" }
         );
         const data = await res.json();
@@ -134,32 +118,33 @@ const GCalendar: React.FC<GCalendarProps> = ({
 
   useEffect(() => {
     async function _() {
-      await triggerPublishMethod();
+      if (triggerPublishMethod) await triggerPublishMethod();
     }
     if (callPublishAssistant) {
       if (
-        (Array.isArray(voicebotDetails.model.toolIds) &&
+        (Array.isArray(voicebotDetails?.model?.toolIds) &&
           voicebotDetails.model.toolIds.length !== 2) ||
-        !("toolIds" in voicebotDetails.model)
+        !("toolIds" in (voicebotDetails.model || {}))
       ) {
-        voiceBotContextData.updateState("model.toolIds", [
+        voiceBotContextData?.updateState?.("model.toolIds", [
           "aa5dd6b5-e511-4400-ab5b-cdcff7279488",
           "b29826a9-3941-498e-b6e7-3d083bb42bf0",
         ]);
       }
       setCallPublishAssistant(false);
     }
+    // eslint-disable-next-line
   }, [callPublishAssistant]);
 
   const openConsentWindow = (tool: string) => {
-    if (!assistantId || !userId) {
+    if (!assistantId || !(userId ?? cookies.userId)) {
       message.error(
         "Invalid Request, User and Assistant should be verified!",
         3
       );
       return;
     }
-    const authUrl = `/voicebot/dashboard/api/google/calendar?assistantId=${assistantId}&userId=${userId}&tool=${tool}`;
+    const authUrl = `/voicebot/dashboard/api/google/calendar?assistantId=${assistantId}&userId=${userId ?? cookies.userId}&tool=${tool}`;
     const width = 500,
       height = 600;
     const left = window.screenX + (window.outerWidth - width) / 2;
@@ -172,7 +157,6 @@ const GCalendar: React.FC<GCalendarProps> = ({
     setPopupRef(popup);
   };
 
-  // --- ADD THIS EFFECT: Poll for popup close ---
   useEffect(() => {
     if (!popupRef) return;
     const poll = setInterval(() => {
@@ -203,30 +187,10 @@ const GCalendar: React.FC<GCalendarProps> = ({
     };
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
+    // eslint-disable-next-line
   }, [userId, assistantId, assistantPublished, userVerified]);
 
-  // Sidebar: list all tools (supports future tools)
-  const renderSidebar = () => (
-    <div className="gcal-sidebar-wrapper">
-      {TOOL_LIST.map((tool) => (
-        <button
-          key={tool.key}
-          type="button"
-          className={
-            "gcal-sidebar-card gcal-sidebar-card--clickable" +
-            (selectedTool === tool.key ? " gcal-sidebar-card--selected" : "")
-          }
-          onClick={() => setSelectedTool(tool.key)}
-          tabIndex={0}
-        >
-          <Image src={tool.icon} alt={tool.label} width={32} height={32} />
-          <span className="gcal-sidebar-label">{tool.label}</span>
-        </button>
-      ))}
-    </div>
-  );
-
-  // Card for each tool
+  // UI rendering
   const renderToolCard = (
     action: TabAction,
     title: string,
@@ -268,27 +232,20 @@ const GCalendar: React.FC<GCalendarProps> = ({
     );
   };
 
-  // Note card below tool cards
   const renderNoteCard = () => (
     <div className="gcal-note-card">
       <div className="gcal-note-title">Note:</div>
       <ul>
-        <li> To <b>check availability</b> using Google Calendar, include<code>google_calendar_check_availability_tool</code>in your system prompt.</li>
-        <li> To <b>create an event</b> using Google Calendar, include<code>google_calendar_tool_event_create</code>in your system prompt.</li>
+        <li>
+          To <b>check availability</b> using Google Calendar, include <code>google_calendar_check_availability_tool</code> in your system prompt.
+        </li>
+        <li>
+          To <b>create an event</b> using Google Calendar, include <code>google_calendar_tool_event_create</code> in your system prompt.
+        </li>
       </ul>
-      {/* <div>
-        To <b>check availability</b> using Google Calendar, include{" "}
-        <code>google_calendar_check_availability_tool</code> in your system
-        prompt.
-        <br />
-        <br />
-        To <b>create an event</b> using Google Calendar, include{" "}
-        <code>google_calendar_tool_event_create</code> in your system prompt.
-      </div> */}
     </div>
   );
 
-  // Alerts for not published/not verified
   const renderStatusAlert = () => {
     if (!assistantPublished) {
       return (
@@ -333,29 +290,21 @@ const GCalendar: React.FC<GCalendarProps> = ({
     return null;
   };
 
-  // Main content: switch by selectedTool (for future extensibility)
-  const renderMainContent = () => {
-    if (selectedTool === "google-calendar") {
-      return !assistantPublished || !userVerified ? (
-        renderStatusAlert()
-      ) : (
-        <>
-          <div className="gcal-tool-cards-row">
-            {renderToolCard("check", "Check availability", loadingCheck)}
-            {renderToolCard("create", "Create event", loadingCreate)}
-          </div>
-          {renderNoteCard()}
-        </>
-      );
-    }
-    // Future: handle other tools
-    return null;
-  };
-
   return (
     <div className="gcal-main-layout">
-      {renderSidebar()}
-      <div className="gcal-tools-area">{renderMainContent()}</div>
+      <div className="gcal-tools-area">
+        {!assistantPublished || !userVerified ? (
+          renderStatusAlert()
+        ) : (
+          <>
+            <div className="gcal-tool-cards-row">
+              {renderToolCard("check", "Check availability", loadingCheck)}
+              {renderToolCard("create", "Create event", loadingCreate)}
+            </div>
+            {renderNoteCard()}
+          </>
+        )}
+      </div>
     </div>
   );
 };

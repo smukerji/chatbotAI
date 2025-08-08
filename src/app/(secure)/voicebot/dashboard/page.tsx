@@ -45,7 +45,8 @@ import {
 import { log } from "console";
 import Embedding from "./embedding/Embedding";
 import Knowledge from "./knowledge/Knowledge";
-import GCalendar from "./google-calendar/GCalendar";
+import GCalendar from "./tools/Tools";
+import Tools from "./tools/Tools";
 
 const vapi = new Vapi(process.env.NEXT_PUBLIC_VAP_API as string); // Vapi public key
 
@@ -564,7 +565,7 @@ function Dashboard() {
 
     //validate the assistant require field first,
     //call the post api to publish the assistant to the vapi
-    console.log("publish state ", voiceBotContextData?.isPublishEnabled)
+    console.log("publish state ", voiceBotContextData?.isPublishEnabled);
     debugger;
     if (!voiceBotContextData?.isPublishEnabled && !fromKnowledge) {
       message.error("Please fill the required fields to publish the assistant");
@@ -907,21 +908,16 @@ function Dashboard() {
           )}
 
           {tab == "tools" && (
-            <>
-              <div className="tools">
-                {/* <h1>Google Calendar</h1> */}
-                <GCalendar
-                  userId={cookies.userId}
-                  assistantId={
-                    voiceBotContextData.assistantInfo?.vapiAssistantId
-                  }
-                  assistantPublished={
-                    !!voiceBotContextData.assistantInfo?.vapiAssistantId
-                  }
-                  triggerPublishMethod={vapiAssistantPublishHandler}
-                />
-              </div>
-            </>
+            <div className="tools">
+              <Tools
+                userId={cookies.userId}
+                assistantId={voiceBotContextData.assistantInfo?.vapiAssistantId}
+                assistantPublished={
+                  !!voiceBotContextData.assistantInfo?.vapiAssistantId
+                }
+                triggerPublishMethod={vapiAssistantPublishHandler}
+              />
+            </div>
           )}
         </div>
       )}
