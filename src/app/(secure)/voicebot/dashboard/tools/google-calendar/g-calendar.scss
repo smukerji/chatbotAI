@@ -1,3 +1,4 @@
+
 .gcal-main-layout {
   display: flex;
   flex-direction: column;
@@ -33,6 +34,7 @@
   gap: 11px;
   flex: 1;
   margin-bottom: 0;
+
 }
 
 .gcal-tool-title {
@@ -309,25 +311,57 @@
   }
 }
 
+// ...existing code...
+.title-wrapper {
+  display: flex;
+  align-items: center;
+  /* vertically center */
+  flex-wrap: nowrap;
+  /* don't allow wrap */
+  justify-content: space-between;
+  width: 100%;
+}
 
+/* Override the 100% width set on .gcal-tool-title */
+.title-wrapper .gcal-tool-title {
+  width: auto;
+  /* was 100% */
+  flex: 1 1 auto;
+  /* take remaining space, leave room for button */
+  margin-bottom: 0;
+}
 
+/* Keep only ONE definition of .gcal-disconnect-btn.
+   Ensure it doesn't push down by margin-top. */
 .gcal-disconnect-btn {
   background: #fff !important;
-  color: #f5222d !important;
+  color: #f00000 !important;
   border: 1.5px solid #f5222d !important;
   border-radius: 8px !important;
   font-size: 15px !important;
+  font-weight: 500;
   box-shadow: none;
   transition: background 0.16s, color 0.16s, border 0.16s;
-  margin-left: 0;
-  margin-top: 8px;
-  font-weight: 500;
-  &:hover, &:focus {
+  margin-top: 0;
+  /* was 8px */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  cursor: pointer;
+  user-select: none;
+
+  &:hover,
+  &:focus {
     background: #fff1f0 !important;
     color: #cf1322 !important;
     border-color: #cf1322 !important;
   }
+
+  &:focus-visible {
+    outline: 3px solid rgba(245, 34, 45, 0.35);
+    outline-offset: 2px;
+  }
 }
-
-
 
