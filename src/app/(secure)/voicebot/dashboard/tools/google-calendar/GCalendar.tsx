@@ -6,6 +6,7 @@ import googleCalendarAPI from "../../../../../../../public/Google_Calendar.png"
 import { CreateVoiceBotContext } from "@/app/_helpers/client/Context/VoiceBotContextApi";
 import "./g-calendar.scss";
 
+
 interface GCalendarProps {
   userId?: string;
   assistantId?: string;
@@ -67,6 +68,8 @@ const GCalendar: React.FC<GCalendarProps> = ({
         { cache: "no-store" }
       );
       const data = await res.json();
+      console.log("your response data ", data);
+      
       setGcalStatus({
         connected: !!data.connected,
         email: data.email,

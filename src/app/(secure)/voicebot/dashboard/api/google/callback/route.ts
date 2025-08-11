@@ -87,27 +87,27 @@ export async function GET(req: NextRequest) {
         "aa5dd6b5-e511-4400-ab5b-cdcff7279488"
       ];
 
-      const userToolCount = await db.collection("user-voice-tools").countDocuments({
-        userId: objectUserId,
-        vapiToolId: { $in: toolIds }
-      });
+      // const userToolCount = await db.collection("user-voice-tools").countDocuments({
+      //   userId: objectUserId,
+      //   vapiToolId: { $in: toolIds }
+      // });
 
-      console.log("userToolCount", userToolCount);
+      // console.log("userToolCount", userToolCount);
 
-      if (userToolCount !== toolIds.length) {
-        await db.collection("user-voice-tools").insertMany([
-          {
-            userId: objectUserId,
-            toolName: "google_calendar_tool_event_create",
-            vapiToolId: "b29826a9-3941-498e-b6e7-3d083bb42bf0"
-          },
-          {
-            userId: objectUserId,
-            toolName: "google_calendar_check_availability_tool",
-            vapiToolId: "aa5dd6b5-e511-4400-ab5b-cdcff7279488"
-          }
-        ]);
-      }
+      // if (userToolCount !== toolIds.length) {
+      //   await db.collection("user-voice-tools").insertMany([
+      //     {
+      //       userId: objectUserId,
+      //       toolName: "google_calendar_tool_event_create",
+      //       vapiToolId: "b29826a9-3941-498e-b6e7-3d083bb42bf0"
+      //     },
+      //     {
+      //       userId: objectUserId,
+      //       toolName: "google_calendar_check_availability_tool",
+      //       vapiToolId: "aa5dd6b5-e511-4400-ab5b-cdcff7279488"
+      //     }
+      //   ]);
+      // }
 
       // Step 5: Ensure tools is an array (for backward compatibility)
       await db.collection("google-calendar-oauth-consent").updateMany(
@@ -137,7 +137,7 @@ export async function GET(req: NextRequest) {
             createdAt: new Date(),
           },
           $addToSet: {
-            tools: tool, // no conflict: add tool to array
+            tools: { tool , publish:false }, // no conflict: add tool to array
           }
         },
         { upsert: true }
