@@ -192,7 +192,142 @@
   }
 }
 
+.gcal-note-card {
+  width: 100%;
+  max-width: 850px;
+  margin: 26px auto 0;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 18px;
+  padding: 36px 42px;
+  font-size: 17px;
+  color: #1f2937;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  line-height: 1.85;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+  }
+
+  .gcal-note-title {
+    font-weight: 700;
+    font-size: 24px;
+    color: #2563eb;
+    margin-bottom: 24px;
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    &::before {
+      content: "📅";
+      font-size: 26px;
+    }
+  }
+
+  ol {
+    margin: 0;
+    padding-left: 28px;
+    counter-reset: gcal-counter;
+
+    li {
+      counter-increment: gcal-counter;
+      margin-bottom: 14px;
+      font-size: 17px;
+      line-height: 1.7;
+      position: relative;
+      padding-left: 6px;
+
+      &::marker {
+        font-weight: bold;
+        color: #2563eb;
+        font-size: 18px;
+      }
+
+      b {
+        color: #111827;
+      }
+
+      a,
+      code {
+        color: #2563eb;
+        background: #f0f6ff;
+        border-radius: 6px;
+        padding: 3px 8px;
+        font-size: 15px;
+        font-family: "Fira Mono", monospace;
+        text-decoration: none;
+      }
+
+      .gcal-note-subtle {
+        display: block;
+        font-size: 14.5px;
+        color: #6b7280;
+        margin-top: 4px;
+      }
+    }
+  }
+
+  .gcal-note-tip {
+    background: linear-gradient(96deg, #eaf3ff, #f7fbff);
+    border: 1.5px solid #cbdafc;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-top: 20px;
+    color: #1d4ed8;
+    font-size: 16px;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+
+    &::before {
+      content: "💡 ";
+    }
+  }
+
+  .gcal-note-example {
+    margin-top: 16px;
+    font-size: 15.5px;
+    color: #6b7280;
+
+    b {
+      color: #111827;
+    }
+
+    .gcal-note-example-flow {
+      display: block;
+      color: #4b5563;
+      font-size: 14.5px;
+      margin-top: 4px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 24px 18px;
+  }
+}
+
+
+
+.gcal-disconnect-btn {
+  background: #fff !important;
+  color: #f5222d !important;
+  border: 1.5px solid #f5222d !important;
+  border-radius: 8px !important;
+  font-size: 15px !important;
+  box-shadow: none;
+  transition: background 0.16s, color 0.16s, border 0.16s;
+  margin-left: 0;
+  margin-top: 8px;
+  font-weight: 500;
+  &:hover, &:focus {
+    background: #fff1f0 !important;
+    color: #cf1322 !important;
+    border-color: #cf1322 !important;
+  }
+}
 
 
 
