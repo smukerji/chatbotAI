@@ -11,7 +11,7 @@ interface GCalendarProps {
   userId?: string;
   assistantId?: string;
   assistantPublished?: boolean;
-  triggerPublishMethod?: () => Promise<void>;
+  triggerPublishMethod?: (value:boolean) => Promise<void>;
 }
 
 type TabAction = "check" | "create";
@@ -20,7 +20,12 @@ interface GoogleConsentStatus {
   connected: boolean;
   email?: string;
   name?: string;
-  tools?: string[];
+  tools?: ToolsType[];
+}
+
+type ToolsType = {
+  tool:string;
+  publish:boolean;
 }
 
 const TOOL_DB_MAP: Record<TabAction, string> = {
@@ -44,12 +49,13 @@ const GCalendar: React.FC<GCalendarProps> = ({
   const [gcalStatus, setGcalStatus] = useState<GoogleConsentStatus | null>(null);
   const [loadingCheck, setLoadingCheck] = useState<boolean>(false);
   const [loadingCreate, setLoadingCreate] = useState<boolean>(false);
-  const [connectedTools, setConnectedTools] = useState<string[]>([]);
+  const [connectedTools, setConnectedTools] = useState<ToolsType[]>([]);
   const [callPublishAssistant, setCallPublishAssistant] = useState<boolean>(false);
   const [popupRef, setPopupRef] = useState<Window | null>(null);
 
   const voiceBotContextData: any = useContext(CreateVoiceBotContext);
   const voicebotDetails = voiceBotContextData?.state ?? {};
+  console.log("your voicebot details gCalendar ",voicebotDetails);
 
   useEffect(() => {
     if (assistantPublished && userVerified) {
@@ -69,6 +75,7 @@ const GCalendar: React.FC<GCalendarProps> = ({
       );
       const data = await res.json();
       console.log("your response data ", data);
+
       
       setGcalStatus({
         connected: !!data.connected,
@@ -94,8 +101,9 @@ const GCalendar: React.FC<GCalendarProps> = ({
       openConsentWindow(tool);
       return;
     }
+    const inBlockConnectedTools = connectedTools.map(x=> x.tool);
 
-    if (!connectedTools.includes(tool)) {
+    if (!inBlockConnectedTools.includes(tool)) {
       try {
         const res = await fetch(
           `/voicebot/dashboard/api/google/add-tool?assistantId=${assistantId}&userId=${userId ?? cookies.userId}&tool=${tool}`,
@@ -120,24 +128,62 @@ const GCalendar: React.FC<GCalendarProps> = ({
   };
 
   useEffect(() => {
-    async function _() {
-      if (triggerPublishMethod) await triggerPublishMethod();
+    async function _triggerFromParent() {
+      if (triggerPublishMethod) await triggerPublishMethod(true);
     }
     if (callPublishAssistant) {
       if (
         (Array.isArray(voicebotDetails?.model?.toolIds) &&
           voicebotDetails.model.toolIds.length !== 2) ||
-        !("toolIds" in (voicebotDetails.model || {}))
+        !("toolIds" in (voicebotDetails.model))
       ) {
-        voiceBotContextData?.updateState?.("model.toolIds", [
-          "aa5dd6b5-e511-4400-ab5b-cdcff7279488",
-          "b29826a9-3941-498e-b6e7-3d083bb42bf0",
-        ]);
+
+        debugger;
+        if(gcalStatus !== null && "tools" in gcalStatus){
+          for(const elements of gcalStatus?.tools!){
+            const previousToolsId = voicebotDetails.model.toolIds || [];
+            if(elements.tool == TOOL_DB_MAP.check && !elements.publish){
+              previousToolsId.push("aa5dd6b5-e511-4400-ab5b-cdcff7279488");
+              voiceBotContextData?.updateState?.("model.toolIds", [
+                ...previousToolsId
+              ]);
+     
+              debugger;
+              _triggerFromParent();
+              executeAfterToolPublish(TOOL_DB_MAP.check,true);
+
+            }
+            else if(elements.tool == TOOL_DB_MAP.create && !elements.publish){
+              previousToolsId.push("b29826a9-3941-498e-b6e7-3d083bb42bf0");
+               voiceBotContextData?.updateState?.("model.toolIds", [
+                ...previousToolsId
+              ]);
+              _triggerFromParent();
+              executeAfterToolPublish(TOOL_DB_MAP.check,true);
+            }
+            else{
+              // no-universe exist here.
+            }
+          }
+
+        }
       }
       setCallPublishAssistant(false);
     }
     // eslint-disable-next-line
   }, [callPublishAssistant]);
+
+  async function executeAfterToolPublish(tool:string,publishValue:boolean){
+    const res = await fetch(
+          `/voicebot/dashboard/api/google/calendar/tools?assistantId=${assistantId}&userId=${userId ?? cookies.userId}&tool=${tool}`,
+        
+          { method: "PUT",body:JSON.stringify({toolName:tool,publishValue:publishValue}) }
+        );
+
+    const responseData = await res.json();
+    console.log("executeAfterToolPublish your response data ",responseData);
+
+  }
 
   const openConsentWindow = (tool: string) => {
     if (!assistantId || !(userId ?? cookies.userId)) {
@@ -199,7 +245,8 @@ const GCalendar: React.FC<GCalendarProps> = ({
     title: string,
     loading: boolean
   ) => {
-    const isConnected = connectedTools.includes(TOOL_DB_MAP[action]);
+    const inBlockConnectedTools = connectedTools.map(x=> x.tool);
+    const isConnected = inBlockConnectedTools.includes(TOOL_DB_MAP[action]);
     return (
       <div className="gcal-tool-card">
         <div className="title-wrapper">

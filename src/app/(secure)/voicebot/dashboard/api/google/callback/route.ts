@@ -110,16 +110,16 @@ export async function GET(req: NextRequest) {
       // }
 
       // Step 5: Ensure tools is an array (for backward compatibility)
-      await db.collection("google-calendar-oauth-consent").updateMany(
-        {
-          googleUserId: googleUser.id,
-          assistantId,
-          tools: { $type: "string" }
-        },
-        [
-          { $set: { tools: ["$tools"] } }
-        ]
-      );
+      // await db.collection("google-calendar-oauth-consent").updateMany(
+      //   {
+      //     googleUserId: googleUser.id,
+      //     assistantId,
+      //     tools: { $type: "string" }
+      //   },
+      //   [
+      //     { $set: { tools: ["$tools"] } }
+      //   ]
+      // );
 
       // Step 6: Upsert the OAuth consent record (FIXED)
       await db.collection("google-calendar-oauth-consent").updateOne(
