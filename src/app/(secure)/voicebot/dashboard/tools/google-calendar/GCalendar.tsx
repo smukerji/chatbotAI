@@ -249,7 +249,21 @@ const GCalendar: React.FC<GCalendarProps> = ({
     const isConnected = inBlockConnectedTools.includes(TOOL_DB_MAP[action]);
     return (
       <div className="gcal-tool-card">
-        <div className="gcal-tool-title">{title}</div>
+        <div className="title-wrapper">
+          <div className="gcal-tool-title">{title}</div>
+          {isConnected && (
+            <Button
+              className="gcal-disconnect-btn"
+              type="text"
+              size="small"
+              danger
+              onClick={() => message.info("Disconnect action coming soon")}
+            >
+              Disconnect
+            </Button>
+          )}
+        </div>
+         
         <div className="gcal-tool-label">{TOOL_LABEL_MAP[action]}</div>
         {loading ? (
           <div className="gcal-tool-loading">
@@ -384,7 +398,6 @@ const GCalendar: React.FC<GCalendarProps> = ({
 };
 
 export default GCalendar;
-
 
 
 
