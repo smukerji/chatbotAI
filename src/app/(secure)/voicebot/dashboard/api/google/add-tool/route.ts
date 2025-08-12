@@ -26,16 +26,14 @@ export async function POST(req: NextRequest) {
 
     await db.collection("google-calendar-oauth-consent").updateOne(
         { userId, assistantId },
-        { $addToSet: { tools: tool } }
+        { $addToSet: { tools: {tool,publish:true} } }
     );
 
     // Fetch updated tools array
     const updated = await db.collection("google-calendar-oauth-consent").findOne({ userId, assistantId });
     const tools = Array.isArray(updated?.tools)
         ? updated.tools
-        : updated?.tools
-            ? [updated.tools]
-            : [];
+        : [];
 
     return NextResponse.json({ success: true, tools });
 }

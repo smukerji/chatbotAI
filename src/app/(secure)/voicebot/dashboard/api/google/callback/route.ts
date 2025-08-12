@@ -88,7 +88,7 @@ export async function GET(req: NextRequest) {
       ];
 
       // Step 6: Upsert the OAuth consent record (FIXED)
-      await db.collection("google-calendar-oauth-consent").updateOne(
+      const callbackinsertresult = await db.collection("google-calendar-oauth-consent").updateOne(
         { googleUserId: googleUser.id, assistantId },
         {
           $set: {
@@ -108,6 +108,7 @@ export async function GET(req: NextRequest) {
         },
         { upsert: true }
       );
+      console.log("callbackinsertresult ",callbackinsertresult);
 
       return new NextResponse(
         `
