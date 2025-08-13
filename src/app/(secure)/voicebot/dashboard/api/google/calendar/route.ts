@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
     const tool = searchParams.get("tool");
 
     if (!userId || !assistantId) {
-        return NextResponse.json({ error: "Invalid Request, User and Assistant should be varified!" }, { status: 400 });
+        return NextResponse.json({ error: "Invalid Request, User and Assistant should be verified!" }, { status: 400 });
     }
 
     const oauth2Client = new google.auth.OAuth2(

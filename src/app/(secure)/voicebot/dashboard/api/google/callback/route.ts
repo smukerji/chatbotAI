@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { google } from "googleapis";
 import { ObjectId } from "mongodb";
-import clientPromise from "../../../../../../../db";
+import clientPromise from "@/db";
 
 export async function GET(req: NextRequest) {
   try {
@@ -9,14 +9,11 @@ export async function GET(req: NextRequest) {
     const code = searchParams.get("code");
     const state: string = searchParams.get("state") as string;
 
-    console.log("OAuth callback received. code:", code, "state:", state);
-
-    // Step 1: Parse state
+    // Parse state
     let userInfo;
     try {
       userInfo = JSON.parse(state);
     } catch (err) {
-      console.error("Failed to parse state:", err);
       return new NextResponse(
         `<html><body>
           <script>
@@ -31,7 +28,6 @@ export async function GET(req: NextRequest) {
 
     const { userId, assistantId, tool } = userInfo || {};
     if (!userId || !assistantId) {
-      console.error("[Google OAuth Callback] Missing userId or assistantId:", userInfo);
       return new NextResponse(
         `<html><body>
           <script>
@@ -48,7 +44,6 @@ export async function GET(req: NextRequest) {
     try {
       objectUserId = new ObjectId(userId);
     } catch (err) {
-      console.error("[Google OAuth Callback] Invalid UserId format:", userId, err);
       return new NextResponse(
         `<html><body>
           <script>
@@ -68,62 +63,50 @@ export async function GET(req: NextRequest) {
     );
 
     try {
-      // Step 2: Exchange code for tokens
+      // Exchange code for tokens
       const { tokens } = await oauth2Client.getToken(code!);
-      if (!tokens?.access_token) {
-        throw new Error("No access_token received from Google.");
-      }
+      if (!tokens?.access_token) throw new Error("No access_token received from Google.");
       oauth2Client.setCredentials(tokens);
 
-      // Step 3: Fetch Google user info
+      // Fetch Google user info
       const oauth2 = google.oauth2({ version: "v2", auth: oauth2Client });
       const { data: googleUser } = await oauth2.userinfo.get();
 
       const db = (await clientPromise!).db();
 
-      // Step 4: Ensure user-voice-tools exist
-      const toolIds = [
-        "b29826a9-3941-498e-b6e7-3d083bb42bf0",
-        "aa5dd6b5-e511-4400-ab5b-cdcff7279488"
-      ];
-
-      // Step 6: Upsert the OAuth consent record (FIXED)
-      const callbackinsertresult = await db.collection("google-calendar-oauth-consent").updateOne(
+      // Upsert the OAuth consent record and add tool with publish:true
+      await db.collection("google-calendar-oauth-consent").updateOne(
         { googleUserId: googleUser.id, assistantId },
         {
           $set: {
             code,
             tokens,
             updatedAt: new Date(),
+            google_user_info: googleUser,
           },
           $setOnInsert: {
             userId: objectUserId,
             assistantId,
-            google_user_info: googleUser,
             createdAt: new Date(),
           },
           $addToSet: {
-            tools: { tool , publish:false }, // no conflict: add tool to array
+            tools: { tool, publish: true },
           }
         },
         { upsert: true }
       );
-      console.log("callbackinsertresult ",callbackinsertresult);
 
       return new NextResponse(
-        `
-        <html><body>
+        `<html><body>
           <script>
             window.opener?.postMessage('google-oauth-success', '*');
             window.close();
           </script>
           <p>Google Calendar connected! You may close this window.</p>
-        </body></html>
-        `,
+        </body></html>`,
         { status: 200, headers: { "Content-Type": "text/html" } }
       );
     } catch (error) {
-      console.error("Google OAuth error:", error);
       return new NextResponse(
         `<html><body>
           <script>
@@ -136,7 +119,6 @@ export async function GET(req: NextRequest) {
       );
     }
   } catch (error) {
-    console.error("Internal server error:", error);
     return new NextResponse(
       `<html><body>
         <script>

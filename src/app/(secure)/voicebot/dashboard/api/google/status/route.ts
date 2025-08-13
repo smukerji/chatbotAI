@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "../../../../../../../db";
 import { cookies } from "next/headers";
@@ -17,6 +16,7 @@ export async function GET(req: NextRequest) {
     const db = (await clientPromise!).db();
     const data = await db.collection("google-calendar-oauth-consent").findOne({ userId, assistantId });
 
+    // tools: always array
     const tools = Array.isArray(data?.tools)
         ? data.tools
         : data?.tools
