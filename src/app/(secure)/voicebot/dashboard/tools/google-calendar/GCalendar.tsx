@@ -2315,78 +2315,80 @@ useEffect(() => {
     );
   };
 
+  // --- UPDATED NOTE CARD STARTS HERE ---
+  // const renderNoteCard = () => (
+  //   <div className="gcal-note-card">
+  //     <div className="gcal-note-title">How does Google Calendar integration work?</div>
+  //     <ol style={{marginBottom: 8}}>
+  //       <li style={{marginBottom: 8}}>
+  //         <b>Connect your Google Calendar for <span style={{color:'#3863f7'}}>each tool separately</span>:</b><br/>
+  //         - Click <b>Connect to Google Calendar</b> under <b>Check availability</b>.<br/>
+  //         - Click <b>Connect to Google Calendar</b> under <b>Create event</b>.<br/>
+  //         <span style={{color: '#7b7b9d', fontSize: 14}}>Both connections are required for full functionality.</span>
+  //       </li>
+  //       <li style={{marginBottom: 8}}>
+  //         <b>Check if your time slot is free:</b><br/>
+  //         - Add <code>google_calendar_check_availability_tool</code> in your system prompt.<br/>
+  //         - The assistant first checks your calendar for availability.<br/>
+  //         <span style={{color: '#7b7b9d', fontSize: 14}}>If busy, you’ll get suggestions for other slots.</span>
+  //       </li>
+  //       <li style={{marginBottom: 8}}>
+  //         <b>Book your appointment:</b><br/>
+  //         - Add <code>google_calendar_tool_event_create</code> in your system prompt.<br/>
+  //         - Once you confirm a free slot, the assistant books it in your calendar.<br/>
+  //       </li>
+  //     </ol>
+  //     <div style={{
+  //       background: '#f5f8ff', border: '1.5px solid #dde3f7', borderRadius: 8,
+  //       padding: '14px 18px', marginTop: 12, width: '100%', color: '#4956a4', fontSize: 15
+  //     }}>
+  //       <b>Tip:</b> Always connect both tools and check availability before booking. 
+  //       <span style={{color: '#276ef1', fontWeight: 500}}> No event will be created unless both tools are connected and the slot is confirmed.</span>
+  //     </div>
+  //     <div style={{marginTop:18, color:'#888db2', fontSize:14}}>
+  //       <b>Example:</b> <span style={{color:'#222'}}>“Book me a dentist appointment for September 1st at 10am.”</span><br/>
+  //       <span style={{color:'#888db2'}}>Assistant: Checks availability → Confirms with you → Books the event if free.</span>
+  //     </div>
+  //   </div>
+  // );
+  // --- UPDATED NOTE CARD ENDS HERE ---
+
+  // ...existing code...
   const renderNoteCard = () => (
-    <div className="gcal-note-card">
-      <div className="gcal-note-title">
-        How does Google Calendar integration work?
+    <>
+      <div className="gcal-note-card">
+        <div className="gcal-note-title">Scenario 1 — Check availability only</div>
+        <ul>
+          <li>Objective: Answer “am I free?” questions; do not create/edit events.</li>
+          <li>Tool required: <code>google_calendar_check_availability_tool</code></li>
+        </ul>
+        <p>Sample system prompt:</p>
+        <pre className="gcal-sample-prompt">{`Calendar policy:
+- For availability queries, always call google_calendar_check_availability_tool.
+- Never create, update, or delete events in this scenario.
+- If date/time/duration/timezone are missing or ambiguous, ask clarifying questions first.
+- When parameters are clear, call google_calendar_check_availability_tool with { start, end, timezone }.
+- If the requested time is busy, propose 2–3 alternative free slots with exact dates/times in the user's timezone.`}</pre>
       </div>
-      <ol style={{ marginBottom: 8 }}>
-        <li style={{ marginBottom: 8 }}>
-          <b>
-            Connect your Google Calendar for{" "}
-            <span style={{ color: "#3863f7" }}>each tool separately</span>:
-          </b>
-          <br />- Click <b>Connect to Google Calendar</b> under{" "}
-          <b>Check availability</b>.<br />- Click{" "}
-          <b>Connect to Google Calendar</b> under <b>Create event</b>.<br />
-          <span style={{ color: "#7b7b9d", fontSize: 14 }}>
-            Both connections are required for full functionality.
-          </span>
-        </li>
-        <li style={{ marginBottom: 8 }}>
-          <b>Check if your time slot is free:</b>
-          <br />- Add <code>google_calendar_check_availability_tool</code> in
-          your system prompt.
-          <br />
-          - The assistant first checks your calendar for availability.
-          <br />
-          <span style={{ color: "#7b7b9d", fontSize: 14 }}>
-            If busy, you’ll get suggestions for other slots.
-          </span>
-        </li>
-        <li style={{ marginBottom: 8 }}>
-          <b>Book your appointment:</b>
-          <br />- Add <code>google_calendar_tool_event_create</code> in your
-          system prompt.
-          <br />
-          - Once you confirm a free slot, the assistant books it in your
-          calendar.
-          <br />
-        </li>
-      </ol>
-      <div
-        style={{
-          background: "#f5f8ff",
-          border: "1.5px solid #dde3f7",
-          borderRadius: 8,
-          padding: "14px 18px",
-          marginTop: 12,
-          width: "100%",
-          color: "#4956a4",
-          fontSize: 15,
-        }}
-      >
-        <b>Tip:</b> Always connect both tools and check availability before
-        booking.
-        <span style={{ color: "#276ef1", fontWeight: 500 }}>
-          {" "}
-          No event will be created unless both tools are connected and the slot
-          is confirmed.
-        </span>
+
+      <div className="gcal-note-card">
+        <div className="gcal-note-title">Scenario 2 — Create an event</div>
+        <ul>
+          <li>Objective: Book events only after verifying and confirming details.</li>
+          <li>Tools required: <code>google_calendar_check_availability_tool</code> and <code>google_calendar_tool_event_create</code></li>
+        </ul>
+        <p>Sample system prompt:</p>
+        <pre className="gcal-sample-prompt">{`Calendar policy:
+- First verify the requested time using google_calendar_check_availability_tool.
+- If free, confirm the final details with the user: title, start, end or duration, timezone, attendees[], description/location.
+- Only after explicit user confirmation, create the event via google_calendar_tool_event_create.
+- If any required detail is missing or unclear, ask for it before creating.
+- After creation, summarize the booking (title, date/time, timezone, attendees) and share the calendar link if available.`}</pre>
       </div>
-      <div style={{ marginTop: 18, color: "#888db2", fontSize: 14 }}>
-        <b>Example:</b>{" "}
-        <span style={{ color: "#222" }}>
-          “Book me a dentist appointment for September 1st at 10am.”
-        </span>
-        <br />
-        <span style={{ color: "#888db2" }}>
-          Assistant: Checks availability → Confirms with you → Books the event
-          if free.
-        </span>
-      </div>
-    </div>
+    </>
   );
+  // ...existing code...
+
 
   const renderStatusAlert = () => {
     if (!assistantPublished) {
