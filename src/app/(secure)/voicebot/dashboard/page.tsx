@@ -88,6 +88,7 @@ function Dashboard() {
   const divRef = useRef<HTMLDivElement>(null);
 
   let tabValue = "model";
+  const isPublished = !!voiceBotContextData?.assistantInfo?.vapiAssistantId;
 
   useEffect(() => {
     console.log(
@@ -684,7 +685,6 @@ function Dashboard() {
                   ></Image>
                 </div>
               </Button>
-
               {isMoreContentVisible && (
                 <div
                   ref={divRef}
@@ -755,12 +755,24 @@ function Dashboard() {
                   </Button>
                 </div>
               )}
+              {/* <Button
+                className={
+                  !voiceBotContextData?.isPublishEnabled
+                    ? "publish-button publish-button-disabled"
+                    : "publish-button"
+                }
+                onClick={() => vapiAssistantPublishHandler(false)}
+              >
+                Publish
+              </Button> */}
+
               <Button
                 className={
                   !voiceBotContextData?.isPublishEnabled
                     ? "publish-button publish-button-disabled"
                     : "publish-button"
                 }
+                disabled={!voiceBotContextData?.isPublishEnabled}
                 onClick={() => vapiAssistantPublishHandler(false)}
               >
                 Publish
