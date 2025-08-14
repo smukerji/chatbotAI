@@ -1001,78 +1001,173 @@ const normalizeTools = (tools: ToolsType[]) =>
     .sort()
     .join(",");
 
+// const publishingRef = useRef(false);
+
 // useEffect(() => {
-//   if (!assistantPublished || !userVerified) return;
-//   if (!connectedTools || connectedTools.length === 0) return; // wait until loaded
+//   console.log("[GCalendar] useEffect triggered", { connectedTools, assistantPublished, userVerified, storageKey });
 
-//   const publishedToolsString = normalizeTools(connectedTools);
-//   const lastPublished = localStorage.getItem(storageKey);
-
-//   // If no baseline exists yet → set it and skip publishing
-//   if (!lastPublished) {
-//     localStorage.setItem(storageKey, publishedToolsString);
+//   if (!assistantPublished || !userVerified) {
+//     console.log("[GCalendar] Skipping publish effect: assistantPublished or userVerified is false");
 //     return;
 //   }
 
-//   // Compare with baseline
-//   if (publishedToolsString !== lastPublished) {
-//     localStorage.setItem(storageKey, publishedToolsString);
+//   const publishedToolsString = normalizeTools(connectedTools);
+//   const lastPublished = localStorage.getItem(storageKey);
+//   console.log("[GCalendar] State before publish logic", { connectedTools, publishedToolsString, lastPublished, storageKey });
 
-//     (async () => {
-//       if (triggerPublishMethod) await triggerPublishMethod(true);
-
-//       for (const t of connectedTools) {
-//         if (t.publish) {
-//           try {
-//             await fetch(
-//               `/voicebot/dashboard/api/google/calendar/tools?assistantId=${assistantId}&userId=${userId ?? cookies.userId}&tool=${t.tool}`,
-//               {
-//                 method: "PUT",
-//                 body: JSON.stringify({ toolName: t.tool, publishValue: true }),
-//               }
-//             );
-//           } catch {}
-//         }
-//       }
-//     })();
+//   if (publishingRef.current) {
+//     console.log("[GCalendar] Already publishing, skipping duplicate publish.");
+//     return;
 //   }
+
+//   (async () => {
+//     // Debounced guard: set publishing flag
+//     publishingRef.current = true;
+//     try {
+//       if (lastPublished === null) {
+//         console.log("[GCalendar] Baseline missing, setting baseline and publishing", { publishedToolsString, storageKey });
+//         localStorage.setItem(storageKey, publishedToolsString);
+//         if (triggerPublishMethod) {
+//           console.log("[GCalendar] Triggering publish method (first tool connect)");
+//           await triggerPublishMethod(true);
+//         }
+//         return;
+//       }
+
+//       if (publishedToolsString !== lastPublished) {
+//         console.log("[GCalendar] Tools changed, updating baseline and publishing", { oldBaseline: lastPublished, newBaseline: publishedToolsString });
+//         localStorage.setItem(storageKey, publishedToolsString);
+//         if (triggerPublishMethod) {
+//           console.log("[GCalendar] Triggering publish method (tools changed)");
+//           await triggerPublishMethod(true);
+//         }
+//         for (const t of connectedTools) {
+//           if (t.publish) {
+//             try {
+//               console.log(`[GCalendar] Publishing tool to backend: ${t.tool}`);
+//               await fetch(
+//                 `/voicebot/dashboard/api/google/calendar/tools?assistantId=${assistantId}&userId=${userId ?? cookies.userId}&tool=${t.tool}`,
+//                 {
+//                   method: "PUT",
+//                   body: JSON.stringify({ toolName: t.tool, publishValue: true }),
+//                 }
+//               );
+//             } catch (err) {
+//               console.error(`[GCalendar] Failed to publish tool: ${t.tool}`, err);
+//             }
+//           }
+//         }
+//       } else {
+//         console.log("[GCalendar] No tool change detected, not publishing", { publishedToolsString, lastPublished });
+//       }
+//     } finally {
+//       setTimeout(() => {
+//         publishingRef.current = false;
+//       }, 500); // debounce window
+//     }
+//   })();
 // }, [connectedTools, assistantPublished, userVerified]);
+
+
+
+const publishingRef = useRef(false);
+const sessionKey = `${storageKey}-published-this-session`;
+
+// Track last known tools to detect changes
+const prevToolsRef = useRef(normalizeTools(connectedTools));
+
 useEffect(() => {
-  if (!assistantPublished || !userVerified) return;
+  const currentTools = normalizeTools(connectedTools);
+
+  // If tools have actually changed since last render, allow publish again
+  if (currentTools !== prevToolsRef.current) {
+    console.log("[GCalendar] Tools changed, clearing session guard");
+    sessionStorage.removeItem(sessionKey);
+    prevToolsRef.current = currentTools;
+  }
+}, [connectedTools]);
+
+useEffect(() => {
+  console.log("[GCalendar] useEffect triggered", {
+    connectedTools,
+    assistantPublished,
+    userVerified,
+    storageKey
+  });
+
+  if (!assistantPublished || !userVerified) {
+    console.log("[GCalendar] Skipping publish effect: assistant not published or user not verified");
+    return;
+  }
 
   const publishedToolsString = normalizeTools(connectedTools);
   const lastPublished = localStorage.getItem(storageKey);
+  const hasPublishedThisSession = sessionStorage.getItem(sessionKey) === "true";
+
+  console.log("[GCalendar] State before publish logic", {
+    connectedTools,
+    publishedToolsString,
+    lastPublished,
+    hasPublishedThisSession
+  });
+
+  if (publishingRef.current) {
+    console.log("[GCalendar] Already publishing, skipping duplicate publish.");
+    return;
+  }
+
+  if (hasPublishedThisSession) {
+    console.log("[GCalendar] Already published this session, skipping publish.");
+    return;
+  }
 
   (async () => {
-    // Always update baseline and publish if changed, even if publishedToolsString is empty!
-    if (lastPublished === null) {
-      localStorage.setItem(storageKey, publishedToolsString);
-      // Auto-publish on first tool connect!
-      if (triggerPublishMethod) await triggerPublishMethod(true);
-      return;
-    }
-
-    if (publishedToolsString !== lastPublished) {
-      localStorage.setItem(storageKey, publishedToolsString);
-      if (triggerPublishMethod) await triggerPublishMethod(true);
-
-      // Update tool publish state in backend
-      for (const t of connectedTools) {
-        if (t.publish) {
-          try {
-            await fetch(
-              `/voicebot/dashboard/api/google/calendar/tools?assistantId=${assistantId}&userId=${userId ?? cookies.userId}&tool=${t.tool}`,
-              {
-                method: "PUT",
-                body: JSON.stringify({ toolName: t.tool, publishValue: true }),
-              }
-            );
-          } catch {}
-        }
+    publishingRef.current = true;
+    try {
+      if (lastPublished === null) {
+        console.log("[GCalendar] First-time publish");
+        localStorage.setItem(storageKey, publishedToolsString);
+        sessionStorage.setItem(sessionKey, "true");
+        if (triggerPublishMethod) await triggerPublishMethod(true);
+        return;
       }
+
+      if (publishedToolsString !== lastPublished) {
+        console.log("[GCalendar] Tools changed, publishing");
+        localStorage.setItem(storageKey, publishedToolsString);
+        sessionStorage.setItem(sessionKey, "true");
+        if (triggerPublishMethod) await triggerPublishMethod(true);
+
+        for (const t of connectedTools) {
+          if (t.publish) {
+            try {
+              await fetch(
+                `/voicebot/dashboard/api/google/calendar/tools?assistantId=${assistantId}&userId=${userId ?? cookies.userId}&tool=${t.tool}`,
+                {
+                  method: "PUT",
+                  body: JSON.stringify({
+                    toolName: t.tool,
+                    publishValue: true
+                  }),
+                }
+              );
+            } catch (err) {
+              console.error(`[GCalendar] Failed to publish tool: ${t.tool}`, err);
+            }
+          }
+        }
+      } else {
+        console.log("[GCalendar] No change in tools");
+      }
+    } finally {
+      setTimeout(() => {
+        publishingRef.current = false;
+      }, 500); // debounce
     }
   })();
 }, [connectedTools, assistantPublished, userVerified]);
+
+
   const handleConnect = async (action: TabAction) => {
     const tool = TOOL_DB_MAP[action];
     if (!assistantPublished || !userVerified) return;
