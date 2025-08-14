@@ -10,7 +10,7 @@ interface GCalendarProps {
   userId?: string;
   assistantId?: string;
   assistantPublished?: boolean;
-  triggerPublishMethod?: (value: boolean) => Promise<void>;
+  triggerPublishMethod: (value: boolean) => Promise<void>;
 }
 
 type TabAction = "check" | "create";
@@ -105,67 +105,31 @@ const handleConnect = async (action: TabAction) => {
     return;
   }
 
-  const toolObj = connectedTools.find(x => x.tool === tool);
-
-  if (!toolObj) {
-    // If not present, check if another tool is published
-    const anotherPublished = connectedTools.some(x => x.publish && x.tool !== tool);
-    if (anotherPublished) {
-      // Add this tool via API
-      const res = await fetch(
-        `/voicebot/dashboard/api/google/calendar/tools?assistantId=${assistantId}&userId=${userId ?? cookies.userId}&tool=${tool}`,
-        { method: "PUT", body: JSON.stringify({ toolName: tool, publishValue: true }) }
-      );
-      const data = await res.json();
-      if (data.result) {
-        message.success(data.message);
-        await checkConnection();
-      } else {
-        message.error(data.message || "Failed to connect tool. Try again.");
-      }
-      setLoadingCheck(false);
-      setLoadingCreate(false);
-      return;
-    } else {
-      // Need OAuth
-      openConsentWindow(tool);
-      setLoadingCheck(false);
-      setLoadingCreate(false);
-      return;
+  //check request tool is exist, then update the publisher to true, before that publish the assistant
+  if (gcalStatus && ("tools" in gcalStatus) && Array.isArray(gcalStatus.tools) && gcalStatus.tools.length == 2) {
+    //get the publish false result
+    const assistantPreviousToolsId = voicebotDetails.model?.toolIds || [];
+    const foundedTool = connectedTools.find(x => x.tool === tool && x.publish === false);
+    if (foundedTool!.tool == TOOL_DB_MAP.check) {
+      assistantPreviousToolsId.push("aa5dd6b5-e511-4400-ab5b-cdcff7279488");
+      voiceBotContextData?.updateState?.("model.toolIds", [
+        ...assistantPreviousToolsId
+      ]);
+      await triggerPublishMethod(true);
+      executeAfterToolPublish(TOOL_DB_MAP.check, true);
     }
-  }
-
-  if (toolObj.publish) {
-    // Already connected
-    setLoadingCheck(false);
-    setLoadingCreate(false);
-    return;
-  }
-
-  // If tool exists with publish: false, reconnect via API if another tool is still published
-  const anotherPublished = connectedTools.some(x => x.publish && x.tool !== tool);
-  if (anotherPublished) {
-    const res = await fetch(
-      `/voicebot/dashboard/api/google/calendar/tools?assistantId=${assistantId}&userId=${userId ?? cookies.userId}&tool=${tool}`,
-      { method: "PUT", body: JSON.stringify({ toolName: tool, publishValue: true }) }
-    );
-    const data = await res.json();
-    if (data.result) {
-      message.success(data.message);
-      await checkConnection();
-    } else {
-      message.error(data.message || "Failed to reconnect tool. Try again.");
+    else if (foundedTool!.tool == TOOL_DB_MAP.create) {
+      assistantPreviousToolsId.push("b29826a9-3941-498e-b6e7-3d083bb42bf0");
+      voiceBotContextData?.updateState?.("model.toolIds", [
+        ...assistantPreviousToolsId
+      ]);
+      await triggerPublishMethod(true);
+      executeAfterToolPublish(TOOL_DB_MAP.create, true);
     }
-    setLoadingCheck(false);
-    setLoadingCreate(false);
-    return;
-  } else {
-    // Need OAuth
-    openConsentWindow(tool);
-    setLoadingCheck(false);
-    setLoadingCreate(false);
-    return;
+
   }
+ 
+
 };
 
 // ...rest of your component code...
@@ -174,68 +138,68 @@ const handleConnect = async (action: TabAction) => {
   const handleDisconnect = async (action: TabAction) => {
     const tool = TOOL_DB_MAP[action];
     setDisconnecting(action);
-    try {
-      // Remove toolId from model.toolIds and update context
-      const toolIdToRemove = TOOL_ID_MAP[tool];
-      const previousToolsId: string[] = Array.isArray(voicebotDetails?.model?.toolIds)
-        ? [...voicebotDetails.model.toolIds]
-        : [];
-      const updatedToolIds = previousToolsId.filter((id) => id !== toolIdToRemove);
-      voiceBotContextData?.updateState?.("model.toolIds", updatedToolIds);
-
-      if (triggerPublishMethod) {
-        await triggerPublishMethod(true);
-      }
-
-      const res = await fetch(
-        `/voicebot/dashboard/api/google/calendar/tools?assistantId=${assistantId}&userId=${userId ?? cookies.userId}&tool=${tool}`,
-        {
-          method: "PUT",
-          body: JSON.stringify({ toolName: tool })
+    if (gcalStatus && ("tools" in gcalStatus) && Array.isArray(gcalStatus.tools) && gcalStatus.tools.length == 1) {//on single entry remove it from db, before that update the toolsid on vapi server
+      const assistantPreviousToolsId = voicebotDetails.model?.toolIds || [];
+      const foundedTool = connectedTools.find(x => x.tool === tool && x.publish === false);
+      if (foundedTool!.tool == TOOL_DB_MAP.check) {
+        const removedToolIdFilter: [] = assistantPreviousToolsId.filter((x: string) => x !== "aa5dd6b5-e511-4400-ab5b-cdcff7279488")
+        if (removedToolIdFilter.length == 0) {
+          const model = voicebotDetails.model;
+          delete model.toolIds;
+          voiceBotContextData.updateState("model", model);
         }
-      );
-      const data = await res.json();
-      if (data.result) {
-        await checkConnection();
-        message.success(data.message);
-      } else {
-        message.error("Failed to disconnect tool. Try again.");
+        else {
+          voiceBotContextData?.updateState?.("model.toolIds", [
+            ...removedToolIdFilter
+          ]);
+        }
+
+        await triggerPublishMethod(true);
+        executeAfterToolPublish(TOOL_DB_MAP.check, false);
       }
-    } catch (e) {
-      message.error("Failed to disconnect tool. Try again.");
+      else if (foundedTool!.tool == TOOL_DB_MAP.create) {
+        const removedToolIdFilter = assistantPreviousToolsId.filter((x: string) => x !== "b29826a9-3941-498e-b6e7-3d083bb42bf0")
+        if (removedToolIdFilter.length == 0) {
+          const model = voicebotDetails.model;
+          delete model.toolIds;
+          voiceBotContextData.updateState("model", model);
+        }
+        else {
+          voiceBotContextData?.updateState?.("model.toolIds", [
+            ...removedToolIdFilter
+          ]);
+        }
+        await triggerPublishMethod(true);
+        executeAfterToolPublish(TOOL_DB_MAP.create, false);
+      }
     }
     setDisconnecting(null);
   };
 
   useEffect(() => {
     async function _triggerFromParent() {
-      if (triggerPublishMethod) await triggerPublishMethod(true);
+      await triggerPublishMethod(true);
     }
+
     if (callPublishAssistant) {
-      if (
-        (Array.isArray(voicebotDetails?.model?.toolIds) &&
-          voicebotDetails.model.toolIds.length !== 2) ||
-        !("toolIds" in (voicebotDetails.model))
-      ) {
-        if (gcalStatus !== null && "tools" in gcalStatus) {
-          for (const elements of gcalStatus?.tools!) {
-            const previousToolsId = voicebotDetails.model.toolIds || [];
-            if (elements.tool == TOOL_DB_MAP.check && !elements.publish) {
-              previousToolsId.push("aa5dd6b5-e511-4400-ab5b-cdcff7279488");
-              voiceBotContextData?.updateState?.("model.toolIds", [
-                ...previousToolsId
-              ]);
-              _triggerFromParent();
-              executeAfterToolPublish(TOOL_DB_MAP.check, true);
-            }
-            else if (elements.tool == TOOL_DB_MAP.create && !elements.publish) {
-              previousToolsId.push("b29826a9-3941-498e-b6e7-3d083bb42bf0");
-              voiceBotContextData?.updateState?.("model.toolIds", [
-                ...previousToolsId
-              ]);
-              _triggerFromParent();
-              executeAfterToolPublish(TOOL_DB_MAP.create, true);
-            }
+      if (gcalStatus && ("tools" in gcalStatus) && Array.isArray(gcalStatus.tools) && gcalStatus.tools.length == 1) {
+        for (const elements of gcalStatus?.tools!) {
+          const previousToolsId = voicebotDetails.model?.toolIds || [];
+          if (elements.tool == TOOL_DB_MAP.check && !elements.publish) {
+            previousToolsId.push("aa5dd6b5-e511-4400-ab5b-cdcff7279488");
+            voiceBotContextData?.updateState?.("model.toolIds", [
+              ...previousToolsId
+            ]);
+            _triggerFromParent();
+            executeAfterToolPublish(TOOL_DB_MAP.check, true);
+          }
+          else if (elements.tool == TOOL_DB_MAP.create && !elements.publish) {
+            previousToolsId.push("b29826a9-3941-498e-b6e7-3d083bb42bf0");
+            voiceBotContextData?.updateState?.("model.toolIds", [
+              ...previousToolsId
+            ]);
+            _triggerFromParent();
+            executeAfterToolPublish(TOOL_DB_MAP.create, true);
           }
         }
       }
