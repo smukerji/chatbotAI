@@ -233,7 +233,7 @@ function Dashboard() {
       );
 
       const assistantDataResponseParse = await assistantDataResponse.json();
-
+      debugger;
       if (assistantDataResponseParse?.error) {
         message.error("Error while getting the assistant data");
         return;
@@ -357,23 +357,23 @@ function Dashboard() {
               propertyArrayData;
           } else {
             assistantData.analysisPlan.structuredDataRequestTimeoutSeconds =
-              vapiAssistanceData.analysisPlan.tructuredDataRequestTimeoutSeconds;
+              vapiAssistanceData.analysisPlan?.tructuredDataRequestTimeoutSeconds;
             assistantData.analysisPlan.successEvaluationRequestTimeoutSeconds =
-              vapiAssistanceData.analysisPlan.successEvaluationRequestTimeoutSeconds;
+              vapiAssistanceData.analysisPlan?.successEvaluationRequestTimeoutSeconds;
             assistantData.analysisPlan.successEvaluationRubric =
-              vapiAssistanceData.analysisPlan.successEvaluationRubric;
+              vapiAssistanceData.analysisPlan?.successEvaluationRubric;
             assistantData.analysisPlan.summaryRequestTimeoutSeconds =
-              vapiAssistanceData.analysisPlan.summaryRequestTimeoutSeconds;
+              vapiAssistanceData.analysisPlan?.summaryRequestTimeoutSeconds;
           }
         } else {
           assistantData.analysisPlan.structuredDataRequestTimeoutSeconds =
-            vapiAssistanceData.analysisPlan.tructuredDataRequestTimeoutSeconds;
+            vapiAssistanceData.analysisPlan?.tructuredDataRequestTimeoutSeconds;
           assistantData.analysisPlan.successEvaluationRequestTimeoutSeconds =
-            vapiAssistanceData.analysisPlan.successEvaluationRequestTimeoutSeconds;
+            vapiAssistanceData.analysisPlan?.successEvaluationRequestTimeoutSeconds;
           assistantData.analysisPlan.successEvaluationRubric =
-            vapiAssistanceData.analysisPlan.successEvaluationRubric;
+            vapiAssistanceData.analysisPlan?.successEvaluationRubric;
           assistantData.analysisPlan.summaryRequestTimeoutSeconds =
-            vapiAssistanceData.analysisPlan.summaryRequestTimeoutSeconds;
+            vapiAssistanceData.analysisPlan?.summaryRequestTimeoutSeconds;
         }
 
         if (
