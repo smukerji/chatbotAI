@@ -15,7 +15,7 @@ function useUserService(): IUserService {
           { username, password }
         );
 
-        debugger;
+        // debugger;
 
         // get return url from query parameters or default to '/home'
         const returnUrl = searchParams?.get("returnUrl") || "/chatbot";

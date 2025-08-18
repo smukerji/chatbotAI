@@ -1,0 +1,393 @@
+
+.gcal-main-layout {
+  display: flex;
+  flex-direction: column;
+}
+
+.gcal-tools-area {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  align-items: flex-start;
+  justify-content: flex-start;
+  height: auto;
+  width: 100%;
+}
+
+.gcal-tool-cards-row {
+  display: flex;
+  gap: 25px;
+  flex-wrap: wrap;
+  margin-bottom: 25px;
+  width: 100%;
+}
+
+.gcal-tool-card {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #ededf2;
+  box-shadow: none;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 11px;
+  flex: 1;
+  margin-bottom: 0;
+
+}
+
+.gcal-tool-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: #222;
+  margin-bottom: 0;
+  width: 100%;
+  text-align: left;
+  font-family: "Segoe UI", "Montserrat", "Roboto", "Poppins", "Arial", sans-serif;
+  line-height: 24px;
+}
+
+.gcal-tool-label {
+  color: #888db2;
+  background: #f5f6fa;
+  display: inline-block;
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-size: 12px;
+  margin-bottom: 8px;
+  font-family: "Segoe UI", "Montserrat", "Roboto", "Poppins", "Arial", sans-serif;
+}
+
+.gcal-note-card {
+  width: 100%;
+  background: linear-gradient(90deg, #f6f8ff 0%, #f9fafc 100%);
+  border: 1.5px solid #e0e7ff;
+  border-radius: 14px;
+  padding: 25px;
+  font-size: 16px;
+  color: #283046;
+  box-shadow: 0 4px 18px 0 rgba(65, 70, 90, 0.04);
+  line-height: 1.7;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  ul {
+    padding-left: 30px;
+    li {
+      font-size: 16px;
+      line-height: 140%;
+      padding: 5px 0;
+      code {
+        font-size: 16px;
+      }
+    }
+  }
+}
+
+.gcal-note-title {
+  font-size: 16.5px;
+  font-weight: 700;
+  margin-bottom: 9px;
+  color: #5c6ac4;
+  letter-spacing: 0.01em;
+  font-family: "Segoe UI", "Montserrat", "Roboto", "Poppins", "Arial", sans-serif;
+}
+.gcal-note-card code {
+  font-size: 13.5px;
+  color: #276ef1;
+  background: #f3f9ff;
+  border-radius: 6px;
+  padding: 2px 7px;
+  margin: 0 2px;
+}
+.gcal-note-card b {
+  color: #222;
+}
+
+.gcal-connect-btn {
+  background: #3863f7 !important;
+  color: #fff !important;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 12px;
+  border: none;
+  width: 100%;
+  height: 52px;
+  transition: background 0.18s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0;
+  &:hover,
+  &:focus {
+    background: #2751d7 !important;
+    color: #fff !important;
+  }
+}
+
+.gcal-connected-box {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.gcal-connected-pill {
+  background: #e8fded;
+  color: #0d9700;
+  border-radius: 1000px;
+  padding: 10px 16px;
+  font-weight: 500;
+  font-size: 15px;
+  width: 317px;
+  text-align: left;
+  line-height: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.gcal-connected-email {
+  font-size: 13px;
+  color: #666;
+  text-align: left;
+  line-height: 20px;
+  width: 317px;
+  font-family: "Segoe UI", "Montserrat", "Roboto", "Poppins", "Arial", sans-serif;
+}
+
+.gcal-status-alert {
+  font-size: 16px;
+  font-family: "Segoe UI", "Montserrat", "Roboto", "Poppins", "Arial", sans-serif;
+  color: #555;
+  border-radius: 8px;
+  padding: 18px 20px;
+  text-align: center;
+  line-height: 1.65;
+  margin-top: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-width: 420px;
+  margin: auto;
+
+  &--not-published {
+    background: #fffbe6;
+    border: 1px solid #ffe58f;
+    box-shadow: 0 2px 8px rgba(250, 173, 20, 0.1);
+  }
+
+  &--not-verified {
+    background: #fff1f0;
+    border: 1px solid #ffa39e;
+    box-shadow: 0 2px 8px rgba(245, 34, 45, 0.1);
+  }
+
+  &__highlight {
+    color: #d48806;
+    font-weight: 500;
+    &.gcal-status-alert--not-verified & {
+      color: #cf1322;
+    }
+  }
+}
+
+.gcal-note-card {
+  width: 100%;
+  max-width: 850px;
+  margin: 26px auto 0;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 18px;
+  padding: 36px 42px;
+  font-size: 17px;
+  color: #1f2937;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  line-height: 1.85;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+  }
+
+  .gcal-note-title {
+    font-weight: 700;
+    font-size: 24px;
+    color: #2563eb;
+    margin-bottom: 24px;
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    &::before {
+      content: "📅";
+      font-size: 26px;
+    }
+  }
+
+  ol {
+    margin: 0;
+    padding-left: 28px;
+    counter-reset: gcal-counter;
+
+    li {
+      counter-increment: gcal-counter;
+      margin-bottom: 14px;
+      font-size: 17px;
+      line-height: 1.7;
+      position: relative;
+      padding-left: 6px;
+
+      &::marker {
+        font-weight: bold;
+        color: #2563eb;
+        font-size: 18px;
+      }
+
+      b {
+        color: #111827;
+      }
+
+      a,
+      code {
+        color: #2563eb;
+        background: #f0f6ff;
+        border-radius: 6px;
+        padding: 3px 8px;
+        font-size: 15px;
+        font-family: "Fira Mono", monospace;
+        text-decoration: none;
+      }
+
+      .gcal-note-subtle {
+        display: block;
+        font-size: 14.5px;
+        color: #6b7280;
+        margin-top: 4px;
+      }
+    }
+  }
+
+  .gcal-note-tip {
+    background: linear-gradient(96deg, #eaf3ff, #f7fbff);
+    border: 1.5px solid #cbdafc;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-top: 20px;
+    color: #1d4ed8;
+    font-size: 16px;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+
+    &::before {
+      content: "💡 ";
+    }
+  }
+
+  .gcal-note-example {
+    margin-top: 16px;
+    font-size: 15.5px;
+    color: #6b7280;
+
+    b {
+      color: #111827;
+    }
+
+    .gcal-note-example-flow {
+      display: block;
+      color: #4b5563;
+      font-size: 14.5px;
+      margin-top: 4px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 24px 18px;
+  }
+}
+
+// ...existing code...
+.title-wrapper {
+  display: flex;
+  align-items: center;
+  /* vertically center */
+  flex-wrap: nowrap;
+  /* don't allow wrap */
+  justify-content: space-between;
+  width: 100%;
+}
+
+/* Override the 100% width set on .gcal-tool-title */
+.title-wrapper .gcal-tool-title {
+  width: auto;
+  /* was 100% */
+  flex: 1 1 auto;
+  /* take remaining space, leave room for button */
+  margin-bottom: 0;
+}
+
+/* Keep only ONE definition of .gcal-disconnect-btn.
+   Ensure it doesn't push down by margin-top. */
+.gcal-disconnect-btn {
+  background: #fff !important;
+  color: #f00000 !important;
+  border: 1.5px solid #f5222d !important;
+  border-radius: 8px !important;
+  font-size: 15px !important;
+  font-weight: 500;
+  box-shadow: none;
+  transition: background 0.16s, color 0.16s, border 0.16s;
+  margin-top: 0;
+  /* was 8px */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  cursor: pointer;
+  user-select: none;
+
+  &:hover,
+  &:focus {
+    background: #fff1f0 !important;
+    color: #cf1322 !important;
+    border-color: #cf1322 !important;
+  }
+
+  &:focus-visible {
+    outline: 3px solid rgba(245, 34, 45, 0.35);
+    outline-offset: 2px;
+  }
+}
+
+
+// ...existing code...
+.gcal-sample-prompt {
+  background: #f6f8ff;
+  border: 1.5px solid #e0e7ff;
+  color: #283046;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
+  border-radius: 8px;
+  padding: 12px 14px;
+  white-space: pre-wrap;
+  font-size: 13.5px;
+  line-height: 1.6;
+  margin: 8px 0 12px;
+}
+
+.gcal-note-hint {
+  color: #4956a4;
+  background: #f5f8ff;
+  border: 1.5px solid #dde3f7;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-top: 8px;
+  font-size: 14px;
+}
+
+
