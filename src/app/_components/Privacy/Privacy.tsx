@@ -174,7 +174,7 @@ function Privacy() {
         </ul>
         <p>
           <strong>For Google OAuth Verification:</strong><br />
-          If you grant our Service permission to access your Google Calendar, we will only use your Google Calendar data for the purpose of providing you with calendar-based features, such as scheduling, managing, and displaying your events. We do not use Google Calendar data for advertising or share it with third parties except as described in this Privacy Policy. You may revoke access to your Google Calendar at any time through your Google account settings.
+          If you grant our Service permission to access your Google Calendar, we will only use your Google Calendar data for the purpose of providing you with calendar-based features, such as check availability, managing, and displaying your events. We do not use Google Calendar data for advertising or share it with third parties except as described in this Privacy Policy. You may revoke access to your Google Calendar at any time through your Google account settings.
         </p>
       </div>
 
