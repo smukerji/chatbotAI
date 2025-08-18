@@ -28,6 +28,11 @@ function Privacy() {
           this Privacy Policy have the same meanings as in our Terms &
           Conditions.
         </p>
+        <p>
+          <strong>For Google OAuth Verification:</strong><br />
+          If you sign in or authorize our Service using your Google account, you will be asked to grant specific permissions (scopes) as described in the consent screen provided by Google. The requested access includes the ability to view and manage your Google Calendar events, which is necessary to provide core functionalities of our Service (such as scheduling, event creation, and event management). The Service will only use the information authorized by you for the purposes described in this Privacy Policy and will not share your Google data with third parties except as described herein.<br /><br />
+          You may revoke our access to your Google account at any time via your Google account settings. We do not store your Google password. You may request deletion of your account and associated data at any time by contacting us at info@sapahk.ai.
+        </p>
       </div>
       <div className="term-container">
         <p>2. Types of Data Collected</p>
@@ -167,6 +172,10 @@ function Privacy() {
             to which you are a party;
           </li>
         </ul>
+        <p>
+          <strong>For Google OAuth Verification:</strong><br />
+          If you grant our Service permission to access your Google Calendar, we will only use your Google Calendar data for the purpose of providing you with calendar-based features, such as scheduling, managing, and displaying your events. We do not use Google Calendar data for advertising or share it with third parties except as described in this Privacy Policy. You may revoke access to your Google Calendar at any time through your Google account settings.
+        </p>
       </div>
 
       <div className="term-container">
@@ -248,7 +257,6 @@ function Privacy() {
           Discover. PCI-DSS requirements help ensure the secure handling of
           payment information. The payment processors we work with are:
         </p>
-
         <ul>
           <li>
             Stripe - Privacy Policy of Stripe Inc. can be viewed at:
