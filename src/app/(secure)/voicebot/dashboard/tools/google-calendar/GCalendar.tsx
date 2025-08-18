@@ -106,7 +106,6 @@ const GCalendar: React.FC<GCalendarProps> = ({
       setLoadingCreate(false);
       return;
     }
-    debugger;
     //check request tool is exist, then update the publisher to true, before that publish the assistant
     if (gcalStatus && ("tools" in gcalStatus) && Array.isArray(gcalStatus.tools)) {
       //get the publish false result
@@ -134,14 +133,11 @@ const GCalendar: React.FC<GCalendarProps> = ({
       
       }
     }
-    else {
-     
-    }
+
   }
 
   // Disconnect handler
   const handleDisconnect = async (action: TabAction) => {
-    debugger;
     const tool = TOOL_DB_MAP[action];
     setDisconnecting(action);
     if (gcalStatus && ("tools" in gcalStatus) && Array.isArray(gcalStatus.tools)) {//on single entry remove it from db, before that update the toolsid on vapi server
