@@ -4,9 +4,17 @@ import exportBtn from "../../../../../../../public/svgs/export-btn.svg";
 import { useCookies } from "react-cookie";
 import likeIcon from "../../../../../../../public/svgs/like.svg";
 import dislikeIcon from "../../../../../../../public/svgs/dislike.svg";
+import SourcesDots from "../../../../../../../public/sources-dots.png";
 import "./history.scss";
 import ChatbotNameModal from "../../../../../_components/Modal/ChatbotNameModal";
-import { ConfigProvider, DatePicker, Pagination, message } from "antd";
+import {
+  ConfigProvider,
+  DatePicker,
+  Pagination,
+  message,
+  Modal,
+  Button,
+} from "antd";
 import { ChatbotSettingContext } from "../../../../../_helpers/client/Context/ChatbotSettingContext";
 import { PrintingChats } from "../Printing-Chats/Printing";
 import ReactToPrint from "react-to-print";
@@ -18,6 +26,7 @@ import { getTimeAgo } from "@/app/_helpers/client/getTime";
 import { CreateBotContext } from "@/app/_helpers/client/Context/CreateBotContext";
 import closeImage from "../../../../../../../public/svgs/close-icon.svg";
 import noHistory from "../../../../../../../public/svgs/empty-history.svg";
+import Sources from "../Sources/Sources";
 
 const { RangePicker } = DatePicker;
 
@@ -164,6 +173,10 @@ function History({ chatbotId }: any) {
   const [feedbackIndex, setFeedbackIndex] = useState(0);
   const [feedbackStatus, setfeedbackStatus] = useState("");
 
+  /// sources modal state
+  const [sourcesModal, setSourcesModal] = useState(false);
+  const [selectedSources, setSelectedSources] = useState<any[]>([]);
+
   /// Messages feedback opener
   async function openChatbotModal(index: number, status: string) {
     /// set the like/dislike btn check and the index to store the message history
@@ -172,6 +185,12 @@ function History({ chatbotId }: any) {
     /// open the chatbot naming dialog box when creating bot
     setOpen(true);
   }
+
+  /// Handle sources display
+  const handleShowSources = (sources: any[]) => {
+    setSelectedSources(sources);
+    setSourcesModal(true);
+  };
 
   /// handling the chatbot ok action
   const handleOk = async () => {
@@ -209,6 +228,123 @@ function History({ chatbotId }: any) {
   console.log("->>>>>>>>>>>>>>>>", chatClicked);
   return (
     <div className="history-chat-container">
+      {/* Sources Modal */}
+      {/* <Modal
+        title="References"
+        open={sourcesModal}
+        onCancel={() => setSourcesModal(false)}
+        footer={[
+          <Button key="close" onClick={() => setSourcesModal(false)}>
+            Close
+          </Button>,
+        ]}
+        width={800}
+        bodyStyle={{ background: "#f8f9fa" }}
+      >
+        <div style={{ maxHeight: 500, overflowY: "auto" }}>
+          {selectedSources.length === 0 ? (
+            <div style={{ textAlign: "center", color: "#888", padding: "2rem" }}>
+              No references found.
+            </div>
+          ) : (
+            selectedSources.map((src: any, idx: number) => {
+              // Extract score if present in source string
+              let score = null;
+              let sourceLabel = src.source || src.title || "Source";
+              const scoreMatch = sourceLabel.match(/\(score: ([0-9.]+)\)/);
+              if (scoreMatch) {
+                score = scoreMatch[1];
+                sourceLabel = sourceLabel.replace(scoreMatch[0], "").trim();
+              }
+              // Capitalize first letter
+              if (sourceLabel.length > 0) {
+                sourceLabel = sourceLabel.charAt(0).toUpperCase() + sourceLabel.slice(1);
+              }
+              return (
+                <div
+                  key={idx}
+                  style={{
+                    background: "#fff",
+                    borderRadius: 8,
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+                    marginBottom: 20,
+                    padding: 20,
+                    border: "1px solid #e3e3e3",
+                    position: "relative",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      marginBottom: 8,
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontWeight: 600,
+                        color: "#2a4d8f",
+                        fontSize: 16,
+                        marginRight: 12,
+                        background: "#eaf1fb",
+                        padding: "2px 10px",
+                        borderRadius: 6,
+                      }}
+                    >
+                      {sourceLabel}
+                    </span>
+                    {score && (
+                      <span
+                        style={{
+                          fontWeight: 500,
+                          color: "#fff",
+                          background: "#4caf50",
+                          borderRadius: 6,
+                          padding: "2px 10px",
+                          fontSize: 14,
+                          marginLeft: 8,
+                          letterSpacing: 1,
+                          boxShadow: "0 1px 4px rgba(76,175,80,0.12)",
+                        }}
+                      >
+                        Score: {score}
+                      </span>
+                    )}
+                  </div>
+                  <div style={{ color: "#222", fontSize: 15, lineHeight: 1.7 }}>
+                    {Array.isArray(src.content)
+                      ? src.content.map((item: any, i: number) => (
+                          <div key={i} style={{ marginBottom: 8, maxHeight: 200, overflowY: 'auto', background: '#f5f5f5', borderRadius: 6, padding: 8 }}>
+                            {typeof item === 'string'
+                              ? item
+                              : typeof item === 'object'
+                              ? <div style={{ maxHeight: 180, overflowY: 'auto' }}>
+                                  {Object.entries(item).map(([k, v]) => (
+                                    <div key={k}>
+                                      <strong>{k.charAt(0).toUpperCase() + k.slice(1)}:</strong> {String(v)}
+                                    </div>
+                                  ))}
+                                </div>
+                              : String(item)}
+                          </div>
+                        ))
+                      : typeof src.content === 'object' && src.content !== null
+                      ? <div style={{ maxHeight: 200, overflowY: 'auto', background: '#f5f5f5', borderRadius: 6, padding: 8 }}>
+                          {Object.entries(src.content).map(([k, v]) => (
+                            <div key={k}>
+                              <strong>{k.charAt(0).toUpperCase() + k.slice(1)}:</strong> {String(v)}
+                            </div>
+                          ))}
+                        </div>
+                      : src.content}
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      </Modal> */}
+
       <div className="action-container">
         <div className="date-picker-container">
           {/* custom date buttons */}
@@ -663,6 +799,7 @@ function History({ chatbotId }: any) {
 
               <div className="history-conversation-container">
                 {currentChatHistory.map((message: any, index: any) => {
+                  console.log("📜 History message:", message); // Debug log to see message structure
                   if (message.role == "assistant")
                     return (
                       <React.Fragment key={index}>
@@ -705,6 +842,46 @@ function History({ chatbotId }: any) {
                                   openChatbotModal(index, "dislike")
                                 }
                               />
+                              {/* Only show sources button if sources are available */}
+                              {message.sources &&
+                                message.sources?.length > 0 && (
+                                  <button
+                                    className="sources-btn"
+                                    onClick={() =>
+                                      handleShowSources(message.sources)
+                                    }
+                                    aria-label="Sources"
+                                    // style={{
+                                    //   background: "none",
+                                    //   border: "none",
+                                    //   cursor: "pointer",
+                                    //   display: "flex",
+                                    //   alignItems: "center",
+                                    //   gap: "4px",
+                                    //   padding: "4px 8px",
+                                    //   borderRadius: "4px",
+                                    //   fontSize: "12px",
+                                    //   color: "#666",
+                                    //   transition: "all 0.2s ease",
+                                    // }}
+                                    // onMouseEnter={(e) => {
+                                    //   e.currentTarget.style.backgroundColor =
+                                    //     "#f0f0f0";
+                                    // }}
+                                    // onMouseLeave={(e) => {
+                                    //   e.currentTarget.style.backgroundColor =
+                                    //     "transparent";
+                                    // }}
+                                  >
+                                    <Image
+                                      src={SourcesDots}
+                                      alt="sources-icon"
+                                      width={16}
+                                      height={16}
+                                    />
+                                    Sources
+                                  </button>
+                                )}
                             </div>
                           )}
                           {/* <div className="like-dislike-container">
@@ -759,6 +936,53 @@ function History({ chatbotId }: any) {
               </div>
             </div>
           </div>
+
+          {/* sources div */}
+          {sourcesModal && selectedSources.length > 0 && (
+            <div
+              className="sources-container"
+              style={{
+                padding: "10px",
+                backgroundColor: "#f8f9fa",
+                borderRadius: "8px",
+                border: "1px solid #e3e3e3",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "15px",
+                }}
+              >
+                <h3
+                  style={{
+                    margin: 0,
+                    // color: "#2a4d8f",
+                    fontSize: "18px",
+                    fontWeight: 300,
+                  }}
+                >
+                  Referenced Sources
+                </h3>
+                <button
+                  onClick={() => setSourcesModal(false)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "#666",
+                    fontSize: "18px",
+                    cursor: "pointer",
+                    padding: "5px",
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+              <Sources data={selectedSources} />
+            </div>
+          )}
         </div>
       )}
       {chatHistoryList?.length == 0 && (

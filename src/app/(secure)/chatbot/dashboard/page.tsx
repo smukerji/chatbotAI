@@ -38,6 +38,7 @@ import {
 import ChatV2 from "./_components/Chat-v2/ChatV2";
 import { functionCallHandler } from "@/app/_helpers/client/functionCallHandler";
 import { useRouter } from "next/navigation";
+import Sources from "./_components/Sources/Sources";
 
 function Dashboard() {
   const { status } = useSession();

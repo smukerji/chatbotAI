@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import { useCookies } from "react-cookie";
 import "../Chat/chat.scss";
 import Image from "next/image";
-import { Button, Slider, message } from "antd";
+import { Button, Slider, message, Modal } from "antd";
 import ChatbotNameModal from "../../../../../_components/Modal/ChatbotNameModal";
 import { getDate } from "../../../../../_helpers/client/getTime";
 import copyIcon from "../../../../../../../public/svgs/copy-icon.svg";
@@ -16,6 +16,7 @@ import { formatTimestamp } from "../../../../../_helpers/client/formatTimestamp"
 import RefreshBtn from "../../../../../../assets/svg/RefreshBtn";
 import ExportBtn from "../../../../../../assets/svg/ExportBtn";
 import ChatBotIcon from "../../../../../../../public/create-chatbot-svgs/ChatBotIcon.svg";
+import SourcesDots from "../../../../../../../public/sources-dots.png";
 import { UserDetailsContext } from "../../../../../_helpers/client/Context/UserDetailsContext";
 import ReactToPrint from "react-to-print";
 import { PrintingChats } from "../Printing-Chats/Printing";
@@ -37,6 +38,7 @@ import {
   LiveTranscriptionEvent,
   LiveTranscriptionEvents,
   useDeepgram,
+  LiveConnectionState,
 } from "@/app/_helpers/client/Context/DeepgramContext";
 import {
   MicrophoneEvents,
@@ -45,6 +47,7 @@ import {
 } from "@/app/_helpers/client/Context/MicrophoneContext";
 import Icon from "@/app/_components/Icon/Icon";
 import WebSearchIcon from "@/assets/svg/WebSearchIcon";
+import Sources from "../Sources/Sources";
 
 function ChatV2({
   chatbot,
@@ -149,6 +152,12 @@ function ChatV2({
   /// state to ensure if user has turned webSearch on or off
   const [webSearch, setWebSearch] = useState(false);
 
+  /// sources modal state (removed - now using inline sources component)
+  const [selectedSources, setSelectedSources] = useState<any[]>([]);
+
+  /// tool call sources state
+  const currentToolSources = useRef<any[]>([]);
+
   /// chatbot lead section state
   const [leadDetails, setLeadDetails] = useState({
     name: "",
@@ -162,6 +171,9 @@ function ChatV2({
   /// state for max phone number limit
   const [mobileNumber, setMobileNumber] = useState("");
   const [isNumberValid, setIsNumberValid] = useState(false);
+
+  /// sources data and if the source will be visible or not
+  const [sourceVisible, setSourceVisible] = useState(false);
 
   // const deepgram: any = useDeepgram();
   //// deepgram & mic context
@@ -234,6 +246,12 @@ function ChatV2({
     setOpen(true);
   }
 
+  /// Handle sources display
+  const handleShowSources = (sources: any[]) => {
+    setSelectedSources(sources);
+    setSourceVisible(true);
+  };
+
   useEffect(() => {
     if (chatWindowRef.current) {
       // Scroll to the bottom of the chat window
@@ -257,6 +275,21 @@ function ChatV2({
       /// store the percentage of message sent by user
       userDetailContext?.handleChange("percent")(percent);
     }
+
+    // Combine messages with sources from both arrays
+    const messagesWithSources = prevMessages.map(
+      (timeMsg: any, index: number) => {
+        const correspondingMessage = messages[index];
+        return {
+          ...timeMsg,
+          // Include sources if they exist in the messages array
+          ...(correspondingMessage?.sources && {
+            sources: correspondingMessage.sources,
+          }),
+        };
+      }
+    );
+
     /// store/update the chathistory
     const store = await fetch(
       `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/chathistory`,
@@ -264,7 +297,7 @@ function ChatV2({
         method: "POST",
         body: JSON.stringify({
           chatbotId: chatbot.id,
-          messages: [...prevMessages],
+          messages: messagesWithSources,
           userId: !isPopUp ? cookies.userId : userId,
           sessionID: threadID,
           sessionStartDate,
@@ -299,7 +332,6 @@ function ChatV2({
         );
         if (res.ok) {
           const data = await res.json();
-          console.log("Lead details stored", data);
         }
       } catch (error) {
         console.log("Error while storing lead details", error);
@@ -331,9 +363,59 @@ function ChatV2({
       if (event.event === "thread.run.completed") {
         /// setting the response time when completed
         setMessagesTime((prev: any) => {
-          storeHistory(prev);
-          return [...prev];
+          const updatedPrev = [...prev];
+          return updatedPrev;
         });
+
+        // Add tool sources to the actual messages array and store history after
+        if (currentToolSources.current.length > 0) {
+          const toolSourcesToAdd = [...currentToolSources.current]; // Create a copy before clearing
+
+          setMessages((prevMessages: any) => {
+            const updatedMessages = [...prevMessages];
+
+            // Find the last assistant message
+            for (let i = updatedMessages.length - 1; i >= 0; i--) {
+              if (updatedMessages[i].role === "assistant") {
+                updatedMessages[i] = {
+                  ...updatedMessages[i],
+                  sources: toolSourcesToAdd, // Use the copy
+                };
+                break;
+              }
+            }
+            return updatedMessages;
+          });
+
+          // Update messagesTime with sources and store history immediately
+          setMessagesTime((prevTime: any) => {
+            const updatedTime = [...prevTime];
+
+            // Find the last assistant message in messagesTime and add sources
+            for (let i = updatedTime.length - 1; i >= 0; i--) {
+              if (updatedTime[i].role === "assistant") {
+                updatedTime[i] = {
+                  ...updatedTime[i],
+                  sources: toolSourcesToAdd,
+                };
+                break;
+              }
+            }
+
+            // Store history immediately with the updated messagesTime that includes sources
+            storeHistory(updatedTime);
+            return updatedTime;
+          });
+
+          // Clear tool sources after copying them
+          currentToolSources.current = [];
+        } else {
+          // Store history immediately if no sources to add
+          setMessagesTime((prevTime: any) => {
+            storeHistory(prevTime);
+            return prevTime;
+          });
+        }
       }
     });
   };
@@ -348,6 +430,10 @@ function ChatV2({
 
     const userID = !isPopUp ? cookies.userId : userId;
 
+    // Create sources array from tool calls
+
+    const toolSources: any[] = [];
+
     // loop over tool calls and call function handler
     const toolCallOutputs = await Promise.all(
       toolCalls.map(async (toolCall: any) => {
@@ -358,9 +444,57 @@ function ChatV2({
           messages,
           webSearch
         );
+
+        // Try to parse result if it's a JSON string
+        let parsedResult = result;
+        if (typeof result === "string") {
+          try {
+            parsedResult = JSON.parse(result);
+          } catch (e) {
+            // Not JSON, leave as is
+          }
+        }
+
+        // If parsedResult has data array, process each item
+        if (
+          parsedResult &&
+          parsedResult.data &&
+          Array.isArray(parsedResult.data)
+        ) {
+          parsedResult.data.forEach((item: any) => {
+            let sourceName = item.source;
+            if (item.source === "file" && item.filename) {
+              sourceName = `file - ${item.filename}`;
+            }
+            // If score is available, append it to the source name
+            if (typeof item.score !== "undefined") {
+              sourceName += ` (score: ${
+                item.score.toFixed ? item.score.toFixed(3) : item.score
+              })`;
+            }
+            toolSources.push({
+              source: sourceName,
+              content: item.content,
+            });
+          });
+        } else {
+          // Fallback: just push the tool call output as before
+          toolSources.push({
+            source: toolCall.function?.name || "Function Call",
+            content:
+              typeof result === "string"
+                ? result
+                : JSON.stringify(result, null, 2),
+          });
+        }
+
         return { output: result, tool_call_id: toolCall.id };
       })
     );
+
+    // Store tool sources for adding to the assistant's response
+    currentToolSources.current = toolSources;
+
     // setInputDisabled(true);
     submitActionResult(runId, toolCallOutputs);
   };
@@ -418,7 +552,7 @@ function ChatV2({
   // };
 
   /// append the message
-  const appendMessage = (role: string, text: string) => {
+  const appendMessage = (role: string, text: string, sources?: any[]) => {
     setMessages((prevMessages: [{ role: string; content: string }]) => [
       ...prevMessages,
       { role, content: text },
@@ -430,11 +564,17 @@ function ChatV2({
         role,
         content: text,
         messageTime: getDate(),
+        sources: sources || undefined,
       },
     ]);
   };
 
-  const appendToLastMessage = (text: string) => {
+  const appendToLastMessage = (text: string, sources?: any[]) => {
+    // console.log("📝 appendToLastMessage called:", {
+    //   text: text.substring(0, 50),
+    //   sources,
+    // });
+
     setMessages((prevMessages: [{ role: string; content: string }]) => {
       const lastMessage = prevMessages[prevMessages.length - 1];
       const updatedLastMessage = {
@@ -443,7 +583,6 @@ function ChatV2({
       };
       return [...prevMessages.slice(0, -1), updatedLastMessage];
     });
-    0;
 
     /// setting the response time when completed
     setMessagesTime((prev: any) => {
@@ -451,7 +590,13 @@ function ChatV2({
       const updatedLastMessage = {
         ...lastMessage,
         content: lastMessage.content + text,
+        // Update sources if provided
+        ...(sources && { sources: sources }),
       };
+      // console.log(
+      //   "📝 appendToLastMessage updated messagesTime:",
+      //   updatedLastMessage
+      // );
       return [...prev.slice(0, -1), updatedLastMessage];
     });
   };
@@ -651,6 +796,8 @@ function ChatV2({
   const refreshChat = () => {
     setMessages([]);
     setMessagesTime([]);
+    setSelectedSources([]);
+    setSourceVisible(false);
     setLeadDetails({
       name: "",
       email: "",
@@ -881,7 +1028,7 @@ function ChatV2({
     }
   };
 
-  const onData = (e: BlobEvent) => {
+  const onData = (e: any) => {
     if (e.data.size > 0) {
       if (!isPopUp) {
         connection?.send(e.data);
@@ -923,8 +1070,6 @@ function ChatV2({
     /// format the time as minutes and seconds
     let minutes = 0;
     let seconds = 0;
-
-    console.log("startt transcriptionnnnn");
 
     timer.current = setInterval(() => {
       seconds += 1;
@@ -1237,6 +1382,22 @@ function ChatV2({
                           alt="dislike-icon"
                           onClick={() => openChatbotModal(index, "dislike")}
                         />
+                        {/* Only show sources button if sources are available */}
+                        {message.sources && message.sources?.length > 0 && (
+                          <button
+                            className="sources-btn"
+                            onClick={() => handleShowSources(message.sources)}
+                            aria-label="Sources"
+                          >
+                            <Image
+                              src={SourcesDots}
+                              alt="sources-icon"
+                              width={32}
+                              height={32}
+                            />
+                            Sources
+                          </button>
+                        )}
                       </div>
                     )}
                   </div>
@@ -1636,6 +1797,52 @@ function ChatV2({
           </div>
         </div>
       </div>
+      {/* sources div */}
+      {sourceVisible && selectedSources.length > 0 && (
+        <div
+          className="sources-container"
+          style={{
+            padding: "10px",
+            backgroundColor: "#f8f9fa",
+            borderRadius: "8px",
+            border: "1px solid #e3e3e3",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "15px",
+            }}
+          >
+            <h3
+              style={{
+                margin: 0,
+                // color: "#2a4d8f",
+                fontSize: "18px",
+                fontWeight: 300,
+              }}
+            >
+              Referenced Sources
+            </h3>
+            <button
+              onClick={() => setSourceVisible(false)}
+              style={{
+                background: "none",
+                border: "none",
+                color: "#666",
+                fontSize: "18px",
+                cursor: "pointer",
+                padding: "5px",
+              }}
+            >
+              ×
+            </button>
+          </div>
+          <Sources data={selectedSources} />
+        </div>
+      )}
     </div>
   );
 }

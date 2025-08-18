@@ -69,11 +69,6 @@ export default async function handler(req, res) {
       //   return res.status(200).send(error.message);
       // }
 
-      console.log("User Query:", userQuery);
-      console.log("Chatbot ID:", chatbotId);
-      console.log("User ID:", userId);
-      console.log("Messages:", messages);
-
       const pinecone = new Pinecone({
         apiKey: process.env.NEXT_PUBLIC_PINECONE_KEY,
       });
@@ -86,54 +81,133 @@ export default async function handler(req, res) {
         { pineconeIndex, namespace: userId }
       );
 
-      /// retrieve the similarity search results
+      /// Custom Multi-Query Retriever with Scores
       const llm = new OpenAI({
         apiKey: process.env.NEXT_PUBLIC_OPENAI_KEY,
         model: "gpt-4o",
       });
-      const retriever = MultiQueryRetriever.fromLLM({
-        llm: llm,
-        prompt: PromptTemplate.fromTemplate(
-          `You are an AI language model assistant. Your task is
-          to generate {queryCount} different versions of the given user
-          question corresponding to the Chat History to retrieve relevant documents from a vector database.
-          By generating multiple perspectives on the user question,
-          your goal is to help the user overcome some of the limitations
-          of distance-based similarity search.
 
-          Replace any number or words like it, that, etc according to the user's flow.
+      // Generate multiple query variations
+      const multiQueryPrompt = PromptTemplate.fromTemplate(
+        `You are an AI language model assistant. Your task is
+        to generate {queryCount} different versions of the given user
+        question corresponding to the Chat History to retrieve relevant documents from a vector database.
+        By generating multiple perspectives on the user question,
+        your goal is to help the user overcome some of the limitations
+        of distance-based similarity search.
 
-          Provide these alternative questions separated by newlines between XML tags. For example:
+        Replace any number or words like it, that, etc according to the user's flow.
 
-          <questions>
-          Question 1
-          Question 2
-          Question 3
-          </questions>
+        Provide these alternative questions separated by newlines between XML tags. For example:
 
-          Chat History: {chatHistory}
+        <questions>
+        Question 1
+        Question 2
+        Question 3
+        </questions>
 
-          Original question: {question}`,
-          { partialVariables: { chatHistory: JSON.stringify(messages) } }
-        ),
-        retriever: vectorStore.asRetriever({
-          filter: { chatbotId: chatbotId },
-        }),
-      });
+        Chat History: {chatHistory}
 
-      /// getting the relveant similaritiy search
-      const retrievedDocs = (await retriever.invoke(userQuery)).slice(0, 3);
-      let similaritySearch = "";
-      for (const doc of retrievedDocs) {
-        similaritySearch += doc.metadata.content;
+        Original question: {question}`,
+        { partialVariables: { chatHistory: JSON.stringify(messages) } }
+      );
 
-        /// if the meta data has image link add it as the reference in similaritysearch
-        if (doc?.metadata?.image_path) {
-          similaritySearch += `<img src=${doc.metadata.image_path} />`;
+      // Generate query variations
+      const queryVariations = await llm.invoke(
+        await multiQueryPrompt.format({
+          question: userQuery,
+          queryCount: 3,
+        })
+      );
+
+      // Extract queries from the response
+      const extractQueries = (response) => {
+        const questionsMatch = response.match(/<questions>(.*?)<\/questions>/s);
+        if (questionsMatch) {
+          const queries = questionsMatch[1]
+            .trim()
+            .split("\n")
+            .map((q) => q.trim())
+            .filter((q) => q.length > 0);
+
+          // Always include the original query as the first query
+          const uniqueQueries = [
+            userQuery,
+            ...queries.filter((q) => q !== userQuery),
+          ];
+          return uniqueQueries.slice(0, 3); // Limit to 3 queries max
+        }
+        return [userQuery]; // Fallback to original query
+      };
+
+      const queries = extractQueries(queryVariations);
+
+      // Custom multi-query retrieval with scores
+      const allResultsWithScores = [];
+
+      // Search with each query variation
+      for (const query of queries) {
+        try {
+          const results = await vectorStore.similaritySearchWithScore(
+            query,
+            3,
+            {
+              chatbotId: chatbotId,
+            }
+          );
+
+          // Add query source to each result
+          results.forEach(([doc, score]) => {
+            allResultsWithScores.push([doc, score, query]);
+          });
+        } catch (error) {
+          console.error(`Error searching with query "${query}":`, error);
         }
       }
 
-      console.log("Similarity Search Result:", similaritySearch);
+      // Remove duplicates and sort by score
+      const uniqueResults = new Map();
+      allResultsWithScores.forEach(([doc, score, sourceQuery]) => {
+        // Create a unique key based on content and source
+        const contentKey =
+          (doc.metadata.content || doc.pageContent || "") +
+          (doc.metadata.source || "") +
+          (doc.metadata.filename || "");
+
+        if (
+          !uniqueResults.has(contentKey) ||
+          uniqueResults.get(contentKey)[1] > score
+        ) {
+          uniqueResults.set(contentKey, [doc, score, sourceQuery]);
+        }
+      });
+
+      // Sort by score (highest scores first) and take top 3
+      const retrievedDocsWithScores = Array.from(uniqueResults.values())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([doc, score]) => [doc, score]); // Remove sourceQuery for consistency
+
+      /// extract only needed field from the retrieved documents with scores
+      let similaritySearch = retrievedDocsWithScores.map(([doc, score]) => {
+        let content = doc.metadata.content || "";
+        /// if the meta data has image link add it as the reference in similaritysearch
+        if (doc?.metadata?.image_path) {
+          content += `<img src=${doc.metadata.image_path} />`;
+        }
+
+        let source = "";
+        if (doc?.metadata?.source) {
+          source = doc.metadata.source;
+        }
+
+        let filename = "";
+        if (doc?.metadata?.filename) {
+          filename = doc.metadata.filename;
+        }
+
+        return { content, source, filename, score };
+      });
 
       return res.status(200).send(similaritySearch);
     } catch (error) {

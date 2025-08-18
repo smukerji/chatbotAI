@@ -337,6 +337,28 @@
           display: flex;
           margin-top: 4px;
           gap: 8px;
+
+          .sources-btn {
+            display: flex;
+            padding: 4px;
+            align-items: center;
+            gap: 4px;
+            border-radius: 1000px;
+            background: #f4f5f6;
+            color: #777e90;
+            font-family: "General Sans";
+            font-size: 12px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 16px; /* 133.333% */
+            border: none;
+            cursor: pointer;
+
+            img {
+              width: 28px;
+              height: 14px;
+            }
+          }
         }
       }
 
@@ -597,6 +619,21 @@
         outline: none;
         border: none;
       }
+    }
+  }
+
+  .sources-container {
+    width: 40%;
+    display: flex;
+    padding: 8px 16px 8px 16px;
+    border-radius: 16px;
+    border: 1px solid #e6e8ec;
+    flex-direction: column;
+    height: 650px;
+    background: #fff;
+
+    .sources {
+      overflow-y: auto;
     }
   }
 
