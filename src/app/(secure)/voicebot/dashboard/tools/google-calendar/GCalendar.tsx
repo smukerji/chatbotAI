@@ -421,7 +421,7 @@ const GCalendar: React.FC<GCalendarProps> = ({
               style={{ opacity: 0.55, marginBottom: 14 }}
             />
             <br />
-            You haven't published your assistant yet.
+            You haven&apos;t published your assistant yet.
             <br />
             <span className="gcal-status-alert__highlight">
               Please Publish it first to use Google Calendar features.
