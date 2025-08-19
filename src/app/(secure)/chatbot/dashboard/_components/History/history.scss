@@ -85,6 +85,7 @@
   .chatbot-history-parts {
     gap: 40px;
     display: flex;
+    height: 608px;
     margin-top: 28px;
     @media screen and (max-width: 1440px) {
       gap: 20px;
@@ -106,7 +107,6 @@
       background: #fcfcfd;
       // overflow-y: auto;
       position: relative;
-      height: 608px;
       padding-bottom: 8px;
       padding-top: 8px;
       width: 25%;
@@ -434,8 +434,17 @@
       border-radius: 16px;
       border: 1px solid #e6e8ec;
       flex-direction: column;
-      height: 650px;
-      background: #fff;
+      background: #fcfcfd;
+      max-width: 30%;
+      min-width: 30%;
+
+      h3 {
+        text-transform: capitalize;
+        align-items: center;
+        justify-content: center;
+        display: flex;
+        gap: 10px;
+      }
 
       .sources {
         overflow-y: auto;

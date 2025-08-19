@@ -285,24 +285,24 @@ async function fetchLinks(request: NextRequest) {
       };
     }
 
-    const browser = await puppeteer.launch({
-      /// this code only run for vercel dvelopment
-      args: [...chromium.args, "--hide-scrollbars", "--disable-web-security"],
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(
-        // `https://github.com/Sparticuz/chromium/releases/download/v119.0.2/chromium-v119.0.2-pack.tar`
-        `https://github.com/Sparticuz/chromium/releases/download/v122.0.0/chromium-v122.0.0-pack.tar`
-      ),
-      // @ts-ignore
-      headless: chromium.headless,
-      ignoreHTTPSErrors: true,
-
-      /// to run puppeteer on local
-      // headless: true,
-    });
     // const browser = await puppeteer.launch({
-    //  headless:false
+    //   /// this code only run for vercel dvelopment
+    //   args: [...chromium.args, "--hide-scrollbars", "--disable-web-security"],
+    //   defaultViewport: chromium.defaultViewport,
+    //   executablePath: await chromium.executablePath(
+    //     // `https://github.com/Sparticuz/chromium/releases/download/v119.0.2/chromium-v119.0.2-pack.tar`
+    //     `https://github.com/Sparticuz/chromium/releases/download/v122.0.0/chromium-v122.0.0-pack.tar`
+    //   ),
+    //   // @ts-ignore
+    //   headless: chromium.headless,
+    //   ignoreHTTPSErrors: true,
+
+    //   /// to run puppeteer on local
+    //   // headless: true,
     // });
+    const browser = await puppeteer.launch({
+      headless: false,
+    });
     // const context = await browser.newContext();
 
     console.log("browser launched !");

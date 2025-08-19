@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import { useCookies } from "react-cookie";
 import "../Chat/chat.scss";
 import Image from "next/image";
-import { Button, Slider, message, Modal } from "antd";
+import { Button, Slider, message, Modal, Typography } from "antd";
 import ChatbotNameModal from "../../../../../_components/Modal/ChatbotNameModal";
 import { getDate } from "../../../../../_helpers/client/getTime";
 import copyIcon from "../../../../../../../public/svgs/copy-icon.svg";
@@ -22,6 +22,17 @@ import ReactToPrint from "react-to-print";
 import { PrintingChats } from "../Printing-Chats/Printing";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
+import dynamic from "next/dynamic";
+
+// import HighlightedInfoPage from "../Highlighted-Info/highlighted-info";
+
+const HighlightedInfoPage = dynamic(
+  () => import("../Highlighted-Info/highlighted-info"),
+  {
+    ssr: false,
+  }
+);
+
 import {
   AUTHORIZATION_FAILED,
   JWT_EXPIRED,
@@ -33,6 +44,7 @@ import CloseEmbedBotIcon from "@/assets/svg/CloseEmbedBotIcon";
 import { AssistantStream } from "openai/lib/AssistantStream.mjs";
 import { AssistantStreamEvent } from "openai/resources/beta/assistants.mjs";
 import CloseIcon from "@/assets/svg/CloseIcon";
+import CloseBtn from "../../../../../../../public/close-circle.png";
 import MicIcon from "@/assets/svg/MicIcon";
 import {
   LiveTranscriptionEvent,
@@ -165,6 +177,9 @@ function ChatV2({
     number: "",
   });
 
+  /// sources container title
+  const [sourcesContainerTitle, setSourcesContainerTitle] = useState("sources");
+
   /// to check if iframe is loaded or not
   const [iframeLoaded, setiFrameLoaded] = useState(false);
 
@@ -174,6 +189,49 @@ function ChatV2({
 
   /// sources data and if the source will be visible or not
   const [sourceVisible, setSourceVisible] = useState(false);
+  const relevanceLevels = [
+    { label: "Most relevant", color: "#E0EDFF" },
+    { label: "Relevant", color: "#D3F8DE" },
+    { label: "Good", color: "#FFF3B2" },
+    { label: "Low", color: "#FFD0B2" },
+    { label: "Very low", color: "#FDD" },
+  ];
+
+  const RelevanceBar = () => (
+    <div
+      style={{
+        display: "flex",
+        gap: "12px",
+        marginBottom: "12px",
+        overflowX: "auto",
+        whiteSpace: "nowrap",
+        paddingBottom: "4px",
+        scrollbarWidth: "thin",
+        paddingTop: "4px",
+        alignItems: "center",
+      }}
+    >
+      {relevanceLevels.map((item) => (
+        <div
+          key={item.label}
+          style={{
+            background: item.color,
+            borderRadius: "20px",
+            padding: "6px 18px",
+            fontWeight: 500,
+            fontSize: "14px",
+            color: "#222",
+            display: "inline-block",
+            textAlign: "center",
+            whiteSpace: "nowrap",
+            cursor: "pointer",
+          }}
+        >
+          {item.label}
+        </div>
+      ))}
+    </div>
+  );
 
   // const deepgram: any = useDeepgram();
   //// deepgram & mic context
@@ -376,6 +434,8 @@ function ChatV2({
 
             // Find the last assistant message
             for (let i = updatedMessages.length - 1; i >= 0; i--) {
+              console.log(toolSourcesToAdd);
+
               if (updatedMessages[i].role === "assistant") {
                 updatedMessages[i] = {
                   ...updatedMessages[i],
@@ -454,7 +514,7 @@ function ChatV2({
             // Not JSON, leave as is
           }
         }
-
+        console.log(parsedResult);
         // If parsedResult has data array, process each item
         if (
           parsedResult &&
@@ -472,9 +532,13 @@ function ChatV2({
                 item.score.toFixed ? item.score.toFixed(3) : item.score
               })`;
             }
+
             toolSources.push({
               source: sourceName,
               content: item.content,
+              metadata: item.dimensions || {},
+              source_url: item.source_url || "",
+              score: item.score || 0,
             });
           });
         } else {
@@ -486,6 +550,16 @@ function ChatV2({
                 ? result
                 : JSON.stringify(result, null, 2),
           });
+        }
+
+        // pass only the content in output
+        if (parsedResult.data && Array.isArray(parsedResult.data)) {
+          return {
+            output: parsedResult.data
+              .map((item: any) => item.content)
+              .join("\n"),
+            tool_call_id: toolCall.id,
+          };
         }
 
         return { output: result, tool_call_id: toolCall.id };
@@ -1799,15 +1873,7 @@ function ChatV2({
       </div>
       {/* sources div */}
       {sourceVisible && selectedSources.length > 0 && (
-        <div
-          className="sources-container"
-          style={{
-            padding: "10px",
-            backgroundColor: "#f8f9fa",
-            borderRadius: "8px",
-            border: "1px solid #e3e3e3",
-          }}
-        >
+        <div className="sources-container">
           <div
             style={{
               display: "flex",
@@ -1817,15 +1883,38 @@ function ChatV2({
             }}
           >
             <h3
+              onClick={() => {
+                // If the title has a leading chevron (e.g., " < Selected"), treat it as Back
+                if (/^\s*<\s*/.test(String(sourcesContainerTitle))) {
+                  setSourcesContainerTitle("sources");
+                }
+              }}
               style={{
                 margin: 0,
                 // color: "#2a4d8f",
                 fontSize: "18px",
                 fontWeight: 300,
+                cursor: /^\s*<\s*/.test(String(sourcesContainerTitle))
+                  ? "pointer"
+                  : "default",
+                userSelect: "none",
               }}
+              title={
+                /^\s*<\s*/.test(String(sourcesContainerTitle))
+                  ? "Back"
+                  : undefined
+              }
             >
-              Referenced Sources
+              <Typography.Text
+                strong
+                ellipsis
+                title={sourcesContainerTitle}
+                style={{ maxWidth: 150 }}
+              >
+                {sourcesContainerTitle}
+              </Typography.Text>
             </h3>
+
             <button
               onClick={() => setSourceVisible(false)}
               style={{
@@ -1835,12 +1924,23 @@ function ChatV2({
                 fontSize: "18px",
                 cursor: "pointer",
                 padding: "5px",
+                justifyContent: "center",
+                alignItems: "center",
+                display: "flex",
               }}
             >
-              ×
+              <Image src={CloseBtn} alt="close-icon" />
             </button>
           </div>
-          <Sources data={selectedSources} />
+          {/* <Sources data={selectedSources} /> */}
+
+          <RelevanceBar />
+
+          <HighlightedInfoPage
+            data={selectedSources}
+            sourcesContainerTitle={sourcesContainerTitle}
+            setSourcesContainerTitle={setSourcesContainerTitle}
+          />
         </div>
       )}
     </div>

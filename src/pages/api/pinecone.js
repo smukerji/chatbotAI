@@ -135,7 +135,7 @@ export default async function handler(req, res) {
             userQuery,
             ...queries.filter((q) => q !== userQuery),
           ];
-          return uniqueQueries.slice(0, 3); // Limit to 3 queries max
+          return uniqueQueries.slice(0, 10); // Limit to 3 queries max
         }
         return [userQuery]; // Fallback to original query
       };
@@ -150,7 +150,7 @@ export default async function handler(req, res) {
         try {
           const results = await vectorStore.similaritySearchWithScore(
             query,
-            3,
+            10,
             {
               chatbotId: chatbotId,
             }
@@ -185,7 +185,7 @@ export default async function handler(req, res) {
       // Sort by score (highest scores first) and take top 3
       const retrievedDocsWithScores = Array.from(uniqueResults.values())
         .sort((a, b) => b[1] - a[1])
-        .slice(0, 3)
+        .slice(0, 10)
         .map(([doc, score]) => [doc, score]); // Remove sourceQuery for consistency
 
       /// extract only needed field from the retrieved documents with scores
@@ -204,9 +204,19 @@ export default async function handler(req, res) {
         let filename = "";
         if (doc?.metadata?.filename) {
           filename = doc.metadata.filename;
+        } 
+
+        let source_url = "";
+        if (doc?.metadata?.source_url || doc?.metadata?.link) {
+          source_url = doc.metadata.source_url || doc.metadata.link;
         }
 
-        return { content, source, filename, score };
+        let dimensions = {};
+        if (doc?.metadata?.dimensions) {
+          dimensions = JSON.stringify(doc.metadata.dimensions);
+        }
+
+        return { content, source, filename, score, source_url, dimensions };
       });
 
       return res.status(200).send(similaritySearch);

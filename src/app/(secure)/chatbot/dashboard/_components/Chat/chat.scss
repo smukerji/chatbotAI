@@ -623,14 +623,24 @@
   }
 
   .sources-container {
-    width: 40%;
+    width: 30%;
     display: flex;
     padding: 8px 16px 8px 16px;
     border-radius: 16px;
     border: 1px solid #e6e8ec;
     flex-direction: column;
     height: 650px;
-    background: #fff;
+    background: #fcfcfd;
+    max-width: 30%;
+    min-width: 30%;
+
+    h3 {
+      text-transform: capitalize;
+      align-items: center;
+      justify-content: center;
+      display: flex;
+      gap: 10px;
+    }
 
     .sources {
       overflow-y: auto;

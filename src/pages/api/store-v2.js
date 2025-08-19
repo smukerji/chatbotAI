@@ -535,7 +535,7 @@ export default async function handler(req, res) {
             obj.cleanedText?.forEach((element) => {
               const id = uuid();
               /// map the chunks to id
-              tempData.push({ element, id });
+              tempData.push({ element, id, link: obj?.crawlLink });
               tempIds.push(id);
             });
 
@@ -568,13 +568,15 @@ export default async function handler(req, res) {
         } else if (crawledList.length > 0 && updateChatbot) {
           /// geenrated the ID's for each chunks and storing in DB before upserting in pinecone
           const dbCrawlSource = [];
+
           let crwaledLinkUpsertData = crawledList.map((obj) => {
             const tempIds = [];
             const tempData = [];
+            console.log("Link >>>>>>>", obj?.crawlLink);
             obj.cleanedText?.forEach((element) => {
               const id = uuid();
               /// map the chunks to id
-              tempData.push({ element, id });
+              tempData.push({ element, id, link: obj?.crawlLink });
               tempIds.push(id);
             });
 
@@ -598,12 +600,10 @@ export default async function handler(req, res) {
               userId
             ).then(async () => {
               /// get the previous content
-
               const previousLinksContent = await collection.findOne({
                 chatbotId: chatbotId,
                 source: "crawling",
               });
-
               collection.findOneAndUpdate(
                 { chatbotId: chatbotId, source: "crawling" },
                 {

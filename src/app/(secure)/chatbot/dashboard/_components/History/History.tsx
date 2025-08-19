@@ -5,6 +5,8 @@ import { useCookies } from "react-cookie";
 import likeIcon from "../../../../../../../public/svgs/like.svg";
 import dislikeIcon from "../../../../../../../public/svgs/dislike.svg";
 import SourcesDots from "../../../../../../../public/sources-dots.png";
+import CloseBtn from "../../../../../../../public/close-circle.png";
+import BackIcon from "../../../../../../../public/source-reference/arrow-left.png";
 import "./history.scss";
 import ChatbotNameModal from "../../../../../_components/Modal/ChatbotNameModal";
 import {
@@ -14,6 +16,7 @@ import {
   message,
   Modal,
   Button,
+  Typography,
 } from "antd";
 import { ChatbotSettingContext } from "../../../../../_helpers/client/Context/ChatbotSettingContext";
 import { PrintingChats } from "../Printing-Chats/Printing";
@@ -27,6 +30,13 @@ import { CreateBotContext } from "@/app/_helpers/client/Context/CreateBotContext
 import closeImage from "../../../../../../../public/svgs/close-icon.svg";
 import noHistory from "../../../../../../../public/svgs/empty-history.svg";
 import Sources from "../Sources/Sources";
+import dynamic from "next/dynamic";
+const HighlightedInfoPage = dynamic(
+  () => import("../Highlighted-Info/highlighted-info"),
+  {
+    ssr: false,
+  }
+);
 
 const { RangePicker } = DatePicker;
 
@@ -69,6 +79,53 @@ function History({ chatbotId }: any) {
   const botSettings = botSettingContext?.chatbotSettings;
 
   const [displayEmail, setDisplayEmail] = useState("");
+
+  /// sources container title
+  const [sourcesContainerTitle, setSourcesContainerTitle] = useState("sources");
+
+  const relevanceLevels = [
+    { label: "Most relevant", color: "#E0EDFF" },
+    { label: "Relevant", color: "#D3F8DE" },
+    { label: "Good", color: "#FFF3B2" },
+    { label: "Low", color: "#FFD0B2" },
+    { label: "Very low", color: "#FDD" },
+  ];
+
+  const RelevanceBar = () => (
+    <div
+      style={{
+        display: "flex",
+        gap: "12px",
+        marginBottom: "12px",
+        overflowX: "auto",
+        whiteSpace: "nowrap",
+        paddingBottom: "4px",
+        scrollbarWidth: "thin",
+        paddingTop: "4px",
+        alignItems: "center",
+      }}
+    >
+      {relevanceLevels.map((item) => (
+        <div
+          key={item.label}
+          style={{
+            background: item.color,
+            borderRadius: "20px",
+            padding: "6px 18px",
+            fontWeight: 500,
+            fontSize: "14px",
+            color: "#222",
+            display: "inline-block",
+            textAlign: "center",
+            whiteSpace: "nowrap",
+            cursor: "pointer",
+          }}
+        >
+          {item.label}
+        </div>
+      ))}
+    </div>
+  );
 
   /// update the chat history data
   const fetchHistoryCount = async (
@@ -558,6 +615,8 @@ function History({ chatbotId }: any) {
                             setCurrentChatHistory(data[1]?.messages);
                             setDisplayEmail(data[1]?.email);
                             setActiveCurrentChatHistory("today" + index);
+                            setSelectedSources([]);
+                            setSourcesContainerTitle("sources");
                           }}
                         >
                           <div
@@ -939,15 +998,7 @@ function History({ chatbotId }: any) {
 
           {/* sources div */}
           {sourcesModal && selectedSources.length > 0 && (
-            <div
-              className="sources-container"
-              style={{
-                padding: "10px",
-                backgroundColor: "#f8f9fa",
-                borderRadius: "8px",
-                border: "1px solid #e3e3e3",
-              }}
-            >
+            <div className="sources-container">
               <div
                 style={{
                   display: "flex",
@@ -963,9 +1014,33 @@ function History({ chatbotId }: any) {
                     fontSize: "18px",
                     fontWeight: 300,
                   }}
+                  title={
+                    /^\s*<\s*/.test(String(sourcesContainerTitle))
+                      ? "Back"
+                      : undefined
+                  }
                 >
-                  Referenced Sources
+                  {sourcesContainerTitle.toLowerCase() !== "sources" && (
+                    <Image
+                      src={BackIcon}
+                      alt="back-icon"
+                      onClick={() => setSourcesContainerTitle("sources")}
+                      style={{
+                        cursor: "pointer",
+                        userSelect: "none",
+                      }}
+                    />
+                  )}
+                  <Typography.Text
+                    strong
+                    ellipsis
+                    title={sourcesContainerTitle}
+                    style={{ maxWidth: 150 }}
+                  >
+                    {sourcesContainerTitle}
+                  </Typography.Text>
                 </h3>
+
                 <button
                   onClick={() => setSourcesModal(false)}
                   style={{
@@ -975,12 +1050,22 @@ function History({ chatbotId }: any) {
                     fontSize: "18px",
                     cursor: "pointer",
                     padding: "5px",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    display: "flex",
                   }}
                 >
-                  ×
+                  <Image src={CloseBtn} alt="close-icon" />
                 </button>
               </div>
-              <Sources data={selectedSources} />
+              <RelevanceBar />
+              {/* <Sources data={selectedSources} />
+               */}
+              <HighlightedInfoPage
+                data={selectedSources}
+                sourcesContainerTitle={sourcesContainerTitle}
+                setSourcesContainerTitle={setSourcesContainerTitle}
+              />
             </div>
           )}
         </div>
