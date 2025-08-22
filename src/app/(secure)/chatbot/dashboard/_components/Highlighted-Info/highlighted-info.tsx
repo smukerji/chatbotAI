@@ -1,7 +1,7 @@
 "use client";
 import { Document, Page, pdfjs } from "react-pdf";
 import { useState, useCallback, useEffect, useMemo, useRef, memo } from "react";
-import { Typography, Space, Empty, Spin } from "antd";
+import { Typography, Space, Empty, Spin, Tooltip } from "antd";
 import Image from "next/image";
 import RightArrowIcon from "../../../../../../../public/source-reference/arrow-right.png";
 import DocIcon from "../../../../../../../public/source-reference/document.png";
@@ -10,6 +10,7 @@ import QAIcon from "../../../../../../../public/source-reference/message-questio
 
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
+import "./highlighted-info.scss";
 
 // Fix worker setup
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@5.3.31/build/pdf.worker.mjs`;
@@ -33,7 +34,7 @@ The combined use of AI and biometric systems offers a powerful framework for mod
 
 // Utilities to highlight snippets within full text (whitespace-tolerant)
 const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-type Range = { start: number; end: number };
+type Range = { start: number; end: number; score?: number };
 
 const normalizeWhitespace = (s: string) => s.replace(/\s+/g, " ").trim();
 const buildFlexiblePattern = (s: string) =>
@@ -51,31 +52,39 @@ const getSnippetCandidates = (snip: string): string[] => {
   return Array.from(new Set(candidates));
 };
 
+// Text snippet with optional score
+type TextSnippet = { text: string; score?: number };
+
+// Collect ranges for snippets and attach optional score metadata to each range
 const collectRangesForSnippets = (
   text: string,
-  snippets: string[]
+  snippets: Array<string | TextSnippet>
 ): Range[] => {
   const ranges: Range[] = [];
-  const addMatches = (pattern: string) => {
+  const addMatches = (pattern: string, score?: number) => {
     try {
       const re = new RegExp(pattern, "gi");
       let m: RegExpExecArray | null;
       while ((m = re.exec(text)) !== null) {
         const start = m.index;
         const end = start + m[0].length;
-        if (end > start) ranges.push({ start, end });
+        if (end > start) ranges.push({ start, end, score });
         if (re.lastIndex === m.index) re.lastIndex++;
       }
     } catch {
       // ignore invalid regex
     }
   };
-  const uniqueSnips = Array.from(
-    new Set((snippets || []).map((s) => (s ?? "").toString()))
-  );
-  uniqueSnips.forEach((snip) => {
-    getSnippetCandidates(snip).forEach((cand) =>
-      addMatches(buildFlexiblePattern(cand))
+
+  const seen = new Set<string>();
+  (snippets || []).forEach((s) => {
+    const snippetText = typeof s === "string" ? s : s?.text || "";
+    if (!snippetText) return;
+    if (seen.has(snippetText)) return;
+    seen.add(snippetText);
+    const score = typeof s === "object" ? (s as TextSnippet).score : undefined;
+    getSnippetCandidates(snippetText).forEach((cand) =>
+      addMatches(buildFlexiblePattern(cand), score)
     );
   });
   return ranges;
@@ -88,10 +97,55 @@ const mergeRanges = (ranges: Range[]): Range[] => {
   for (const r of sorted) {
     const last = merged[merged.length - 1];
     if (!last || r.start > last.end) merged.push({ ...r });
-    else last.end = Math.max(last.end, r.end);
+    else {
+      // extend end and conservatively keep the highest score present
+      last.end = Math.max(last.end, r.end);
+      last.score = Math.max(last.score ?? 0, r.score ?? 0);
+    }
   }
   return merged;
 };
+
+// Convert #RRGGBB or #RGB to rgba string with given alpha
+const hexToRgba = (hex: string, alpha = 1) => {
+  const h = hex.replace("#", "");
+  const to255 = (s: string) => parseInt(s, 16);
+  let r = 0,
+    g = 0,
+    b = 0;
+  if (h.length === 3) {
+    r = to255(h[0] + h[0]);
+    g = to255(h[1] + h[1]);
+    b = to255(h[2] + h[2]);
+  } else if (h.length === 6) {
+    r = to255(h.slice(0, 2));
+    g = to255(h.slice(2, 4));
+    b = to255(h.slice(4, 6));
+  }
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
+// Given a score, return label/background/border based on thresholds
+function getRelevancePalette(score?: number) {
+  let label: "Most relevant" | "Relevant" | "Good" | "Low" | "Very low" =
+    "Very low";
+  if (typeof score === "number") {
+    if (score >= 0.85) label = "Most relevant";
+    else if (score >= 0.8) label = "Relevant";
+    else if (score >= 0.7) label = "Good";
+    else if (score >= 0.6) label = "Low";
+    else label = "Very low";
+  }
+  const palettes: Record<typeof label, { bg: string; border: string }> = {
+    "Most relevant": { bg: "#E0EDFF", border: "#8CB3FF" },
+    Relevant: { bg: "#D3F8DE", border: "#7BD89C" },
+    Good: { bg: "#FFF3B2", border: "#E5C85C" },
+    Low: { bg: "#FFD0B2", border: "#FF9C66" },
+    "Very low": { bg: "#FDD", border: "#F99" },
+  } as const;
+  const { bg, border } = palettes[label];
+  return { label, bg: hexToRgba(bg, 0.45), border };
+}
 
 const renderNodesFromRanges = (
   text: string,
@@ -107,13 +161,29 @@ const renderNodesFromRanges = (
           {text.slice(cursor, r.start)}
         </span>
       );
+
+    const palette = getRelevancePalette(r.score);
+    const title = `${palette.label}${
+      typeof r.score === "number" ? ` (${r.score.toFixed(3)})` : ""
+    }`;
     out.push(
-      <span
+      <Tooltip
         key={`h-${r.start}-${r.end}`}
-        style={{ backgroundColor: "rgba(255, 255, 0, 0.6)" }}
+        title={title}
+        mouseEnterDelay={0.12}
+        placement="top"
       >
-        {text.slice(r.start, r.end)}
-      </span>
+        <span
+          className="highlighted-snippet"
+          style={{
+            backgroundColor: palette.bg,
+            borderBottom: `2px solid ${palette.border}`,
+            fontSize: "14px",
+          }}
+        >
+          {text.slice(r.start, r.end)}
+        </span>
+      </Tooltip>
     );
     cursor = r.end;
   });
@@ -126,7 +196,7 @@ const renderNodesFromRanges = (
 
 function renderHighlightedText(
   fullText: string,
-  snippets: string[]
+  snippets: Array<string | TextSnippet>
 ): React.ReactNode[] {
   const text = String(fullText ?? "");
   const ranges = collectRangesForSnippets(text, snippets);
@@ -287,52 +357,7 @@ function PDFViewer(props: PDFViewerProps) {
     setError(error.message);
   };
 
-  // Convert #RRGGBB or #RGB to rgba string with given alpha
-  const hexToRgba = (hex: string, alpha = 1) => {
-    const h = hex.replace("#", "");
-    const to255 = (s: string) => parseInt(s, 16);
-    let r = 0,
-      g = 0,
-      b = 0;
-    if (h.length === 3) {
-      r = to255(h[0] + h[0]);
-      g = to255(h[1] + h[1]);
-      b = to255(h[2] + h[2]);
-    } else if (h.length === 6) {
-      r = to255(h.slice(0, 2));
-      g = to255(h.slice(2, 4));
-      b = to255(h.slice(4, 6));
-    }
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-  };
-
-  // Given a score, return label/background/border based on thresholds
-  const getRelevancePalette = useCallback((score?: number) => {
-    // Thresholds:
-    // >= 0.8: Most relevant
-    // >= 0.7: Relevant
-    // >= 0.6: Good
-    // >= 0.5: Low
-    // else: Very low
-    let label: "Most relevant" | "Relevant" | "Good" | "Low" | "Very low" =
-      "Very low";
-    if (typeof score === "number") {
-      if (score >= 0.85) label = "Most relevant";
-      else if (score >= 0.8) label = "Relevant";
-      else if (score >= 0.7) label = "Good";
-      else if (score >= 0.6) label = "Low";
-      else label = "Very low";
-    }
-    const palettes: Record<typeof label, { bg: string; border: string }> = {
-      "Most relevant": { bg: "#E0EDFF", border: "#8CB3FF" },
-      Relevant: { bg: "#D3F8DE", border: "#7BD89C" },
-      Good: { bg: "#FFF3B2", border: "#E5C85C" },
-      Low: { bg: "#FFD0B2", border: "#FF9C66" },
-      "Very low": { bg: "#FDD", border: "#F99" },
-    } as const;
-    const { bg, border } = palettes[label];
-    return { label, bg: hexToRgba(bg, 0.45), border };
-  }, []);
+  // reuse top-level helpers: hexToRgba & getRelevancePalette
 
   // Extract numeric score from highlight or its source label
   const extractScore = (h: Highlight): number | undefined => {
@@ -452,32 +477,34 @@ function PDFViewer(props: PDFViewerProps) {
               return;
             }
 
+            const tooltip = `${
+              typeof score === "number"
+                ? `${palette.label} (${score.toFixed(3)})`
+                : palette.label
+            }: ${highlight.content.substring(0, 50)}...`;
             highlightElements.push(
-              <div
+              <Tooltip
                 key={`highlight-${index}-${pageNumber}-box-${boxIndex}`}
-                className="pointer-events-none"
-                style={{
-                  position: "absolute",
-                  left: 0,
-                  top: 0,
-                  width: `${width}px`,
-                  height: `${height}px`,
-                  backgroundColor: palette.bg,
-                  border: `1px solid ${palette.border}`,
-                  borderRadius: "3px",
-                  zIndex: 10,
-                  mixBlendMode: "multiply",
-                  opacity: 0.85,
-                  transform: `translate(${left}px, ${top}px)`,
-                  willChange: "transform",
-                  boxShadow: `inset 0 0 0 1px ${palette.border}, 0 0 3px rgba(0,0,0,0.1)`,
-                }}
-                title={`Highlight ${index + 1} — ${
-                  typeof score === "number"
-                    ? `${palette.label} (${score.toFixed(3)})`
-                    : palette.label
-                }: ${highlight.content.substring(0, 50)}...`}
-              />
+                title={tooltip}
+                mouseEnterDelay={0.12}
+                placement="top"
+              >
+                <div
+                  className="highlight-overlay"
+                  style={
+                    {
+                      width: `${width}px`,
+                      height: `${height}px`,
+                      transform: `translate(${left}px, ${top}px)`,
+                      pointerEvents: "auto",
+                      zIndex: 5,
+                      // theme colors via CSS vars
+                      ["--highlight-bg" as any]: palette.bg,
+                      ["--highlight-border" as any]: palette.border,
+                    } as React.CSSProperties
+                  }
+                />
+              </Tooltip>
             );
           });
 
@@ -493,15 +520,9 @@ function PDFViewer(props: PDFViewerProps) {
 
   if (error) {
     return (
-      <div
-        style={{
-          color: "#dc2626",
-          border: "1px solid #fca5a5",
-          borderRadius: "4px",
-        }}
-      >
+      <div className="pdf-error-box">
         Error loading PDF: {error}
-        <div style={{ marginTop: "8px", fontSize: "14px" }}>
+        <div className="pdf-error-box__desc">
           Make sure the PDF worker is properly configured and the PDF URL is
           accessible.
         </div>
@@ -510,20 +531,13 @@ function PDFViewer(props: PDFViewerProps) {
   }
 
   return (
-    <div
-      ref={containerRef}
-      style={{
-        width: "100%",
-        height: "100%",
-        overflow: "auto",
-      }}
-    >
+    <div ref={containerRef} className="highlighted-info-root">
       <Document
         file={pdfUrl}
         onLoadSuccess={onDocumentLoadSuccess}
         onLoadError={onDocumentLoadError}
         loading={
-          <div style={{ textAlign: "center", padding: "16px" }}>
+          <div className="pdf-loading">
             <Space>
               <Spin size="small" />
               <span>Loading PDF...</span>
@@ -531,87 +545,30 @@ function PDFViewer(props: PDFViewerProps) {
           </div>
         }
         error={
-          <div
-            style={{
-              color: "#dc2626",
-              border: "1px solid #fca5a5",
-              borderRadius: "4px",
-              padding: "16px",
-              margin: "16px",
-            }}
-          >
+          <div className="pdf-failed">
             Failed to load PDF. Please check the file URL and try again.
           </div>
         }
       >
         {/* Pagination Controls */}
         {numPages && totalAvailablePages > 0 && (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              padding: "12px",
-              // borderBottom: "1px solid #e5e7eb",
-              backgroundColor: "#f9fafb",
-              gap: "12px",
-            }}
-          >
+          <div className="pdf-pagination">
             <button
               onClick={goToPreviousPage}
               disabled={currentPageIndex === 0}
-              style={{
-                padding: "4px 8px",
-                backgroundColor: "transparent",
-                color: currentPageIndex === 0 ? "#9ca3af" : "#374151",
-                border: "1px solid #d1d5db",
-                borderRadius: "4px",
-                cursor: currentPageIndex === 0 ? "not-allowed" : "pointer",
-                fontSize: "14px",
-                minWidth: "28px",
-                height: "28px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              className="pdf-btn"
             >
               &lt;
             </button>
 
-            <span
-              style={{
-                fontSize: "14px",
-                color: "#374151",
-                minWidth: "120px",
-                textAlign: "center",
-              }}
-            >
+            <span className="pdf-page-count">
               {currentPageIndex + 1} of {totalAvailablePages}
             </span>
 
             <button
               onClick={goToNextPage}
               disabled={currentPageIndex === totalAvailablePages - 1}
-              style={{
-                padding: "4px 8px",
-                backgroundColor: "transparent",
-                color:
-                  currentPageIndex === totalAvailablePages - 1
-                    ? "#9ca3af"
-                    : "#374151",
-                border: "1px solid #d1d5db",
-                borderRadius: "4px",
-                cursor:
-                  currentPageIndex === totalAvailablePages - 1
-                    ? "not-allowed"
-                    : "pointer",
-                fontSize: "14px",
-                minWidth: "28px",
-                height: "28px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              className="pdf-btn"
             >
               &gt;
             </button>
@@ -619,40 +576,27 @@ function PDFViewer(props: PDFViewerProps) {
         )}
 
         {/* Single Page Display */}
-        <div style={{ padding: "12px", minHeight: "300px" }}>
+        <div className="single-page-container">
           {Boolean(
             numPages && totalAvailablePages > 0 && currentPageNumber
           ) && (
-            <div
-              style={{
-                position: "relative",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-              }}
-            >
+            <div className="pdf-wrap">
               {/* PDF Page Content */}
-              <div
-                style={{
-                  position: "relative",
-                  // border: "1px solid #d1d5db",
-                  // borderTop: "none",
-                  // borderRadius: "0 0 6px 6px",
-                  overflow: "hidden",
-                  // boxShadow: "0 2px 4px 0 rgba(0, 0, 0, 0.1)",
-                }}
-              >
+              <div className="pdf-page-container">
                 {(() => {
                   const { width, height } = getOverlaySize(currentPageNumber);
                   return (
-                    <div style={{ position: "relative", width, height }}>
+                    <div
+                      className="pdf-page-inner"
+                      style={{ position: "relative", width, height }}
+                    >
                       <Page
                         pageNumber={currentPageNumber}
                         width={pageRenderWidth}
                         renderTextLayer={true}
                         renderAnnotationLayer={false}
                         loading={
-                          <div style={{ textAlign: "center", padding: "32px" }}>
+                          <div className="pdf-page-loading">
                             <Space>
                               <Spin size="small" />
                               <span>Loading page {currentPageNumber}...</span>
@@ -660,18 +604,13 @@ function PDFViewer(props: PDFViewerProps) {
                           </div>
                         }
                         error={
-                          <div
-                            style={{
-                              color: "#dc2626",
-                              padding: "32px",
-                              textAlign: "center",
-                            }}
-                          >
+                          <div className="pdf-page-error">
                             Failed to load page {currentPageNumber}
                           </div>
                         }
                       />
                       <div
+                        className="pdf-overlay"
                         style={{
                           position: "absolute",
                           top: 0,
@@ -692,14 +631,7 @@ function PDFViewer(props: PDFViewerProps) {
 
           {/* Show message if no pages with highlights */}
           {numPages && totalAvailablePages === 0 && (
-            <div
-              style={{
-                textAlign: "center",
-                padding: "64px 32px",
-                color: "#6b7280",
-                fontSize: "16px",
-              }}
-            >
+            <div className="no-highlights">
               No pages with highlights found in this document.
             </div>
           )}
@@ -764,9 +696,9 @@ export default function HighlightedInfoPage({
       sourceLabel: string;
       pdfUrl?: string;
       highlights?: Highlight[];
-      qa?: { question: string; answer: string };
+      qa?: { question: string; answer: string; score?: number };
       text?: string; // optional single-text content (unused for aggregated)
-      textSnippets?: string[]; // aggregated text snippets for the single text item
+      textSnippets?: Array<string | TextSnippet>; // aggregated text snippets for the single text item
       linkUrl?: string; // optional URL to open (used for crawling/text groups)
     };
 
@@ -818,14 +750,30 @@ export default function HighlightedInfoPage({
       { displayUrl: string; items: { content: string; originalUrl: string }[] }
     >();
     const out: Item[] = [];
-    const allTextSnippets: string[] = [];
+    const allTextSnippets: Array<string | TextSnippet> = [];
 
     for (let idx = 0; idx < (data?.length || 0); idx++) {
       const h = data![idx];
       if (startsWithI(h.source, "qa")) {
         const qa = parseQA(h.content);
         const label = qa.question ? `Q&A: ${qa.question}` : "Q&A";
-        out.push({ key: `qa-${idx}`, kind: "qa", sourceLabel: label, qa });
+        // try to extract score from explicit property or source label
+        let maybeScore: number | undefined = undefined;
+        if (typeof (h as any).score === "number")
+          maybeScore = (h as any).score as number;
+        else {
+          const m = String(h?.source ?? "").match(/\(score:\s*([0-9.]+)\)/i);
+          if (m && m[1]) {
+            const val = parseFloat(m[1]);
+            if (!Number.isNaN(val)) maybeScore = val;
+          }
+        }
+        out.push({
+          key: `qa-${idx}`,
+          kind: "qa",
+          sourceLabel: label,
+          qa: { question: qa.question, answer: qa.answer, score: maybeScore },
+        });
         continue;
       }
       // Group crawling items by base URL; show URL as title and concatenate contents with Vector headers
@@ -846,7 +794,15 @@ export default function HighlightedInfoPage({
       if (startsWithI(h.source, "text")) {
         const snippetFull = (h.content || "").toString();
         const clean = snippetFull.replace(/\s+/g, " ").trim();
-        if (clean) allTextSnippets.push(clean);
+        if (clean) {
+          const maybeScore =
+            typeof (h as any).score === "number"
+              ? ((h as any).score as number)
+              : undefined;
+          allTextSnippets.push(
+            maybeScore != null ? { text: clean, score: maybeScore } : clean
+          );
+        }
         continue;
       }
       const key = h.source_url || `doc-${idx}`;
@@ -896,6 +852,8 @@ export default function HighlightedInfoPage({
         highlights: v.highlights,
       });
     });
+
+    // QA items are separate sources; do not associate with PDFs.
 
     return out;
   }, [data]);
@@ -960,21 +918,10 @@ export default function HighlightedInfoPage({
   }, [sourcesContainerTitle, selectedSourceKey]);
 
   return (
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        minHeight: 400,
-        overflowY: "auto",
-      }}
-    >
-      <div
-        style={{
-          overflow: "hidden",
-        }}
-      >
+    <div className="highlighted-info-outer">
+      <div className="highlighted-info-inner">
         {grouped.length === 0 ? (
-          <div style={{ padding: 24 }}>
+          <div className="no-sources">
             <Empty description="No sources" />
           </div>
         ) : (
@@ -994,12 +941,7 @@ export default function HighlightedInfoPage({
                   <Image src={WebIcon} alt="Web Icon" />
                 );
               return (
-                <div
-                  key={item.key}
-                  style={{
-                    padding: 5,
-                  }}
-                >
+                <div key={item.key} className="source-item">
                   {/* Header: Icon title > */}
                   {!isExpanded && (
                     <button
@@ -1016,24 +958,15 @@ export default function HighlightedInfoPage({
                           return next;
                         });
                       }}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 7,
-                        // width: "100%",
-                        background: "transparent",
-                        border: "none",
-                        cursor: "pointer",
-                      }}
+                      className="source-header-btn"
                     >
                       <span aria-hidden>{icon}</span>
-                      <span style={{ flex: 1, minWidth: 0 }}>
-                        {/* the font should not exceed max width 150 px and it will terminate with ... */}
+                      <span className="source-header-title">
                         <Typography.Text
                           strong
                           ellipsis
                           title={item.sourceLabel}
-                          style={{ maxWidth: 150 }}
+                          className="source-title-text"
                         >
                           {item.sourceLabel}
                         </Typography.Text>
@@ -1046,17 +979,9 @@ export default function HighlightedInfoPage({
                   {!isExpanded && (
                     <div
                       id={`viewer-${item.key}`}
-                      style={{
-                        marginTop: 10,
-                        background: "#fff",
-                        width: "100%",
-                        maxHeight: "30vh",
-                        overflow: "hidden",
-                        position: "relative",
-                        border: "1px solid #e5e7eb",
-                        borderRadius: 4,
-                        padding: item.kind === "pdf" ? 0 : 12,
-                      }}
+                      className={`viewer-preview ${
+                        item.kind === "pdf" ? "viewer-preview--pdf" : ""
+                      }`}
                     >
                       {item.kind === "pdf" && (
                         <MemoPDFViewer
@@ -1066,41 +991,47 @@ export default function HighlightedInfoPage({
                         />
                       )}
                       {item.kind === "qa" && (
-                        <div
-                          style={
-                            {
-                              // border: "1px solid #e5e7eb",
-                              // borderRadius: 6,
-                              // padding: 12,
-                              // background: "#fafafa",
-                            }
-                          }
-                        >
-                          <Typography.Paragraph style={{ marginBottom: 8 }}>
-                            <Typography.Text strong>Q:</Typography.Text>{" "}
-                            {item.qa?.question || "Question"}
-                          </Typography.Paragraph>
-                          <Typography.Paragraph style={{ marginBottom: 0 }}>
-                            <Typography.Text strong>A:</Typography.Text>{" "}
-                            {item.qa?.answer || "Answer"}
-                          </Typography.Paragraph>
+                        <div className="qa-preview">
+                          {(() => {
+                            const score = item.qa?.score;
+                            const palette = getRelevancePalette(score);
+                            const qNodes = renderHighlightedText(
+                              item.qa?.question || "",
+                              [{ text: item.qa?.question || "", score }]
+                            );
+                            const aNodes = renderHighlightedText(
+                              item.qa?.answer || "",
+                              [{ text: item.qa?.answer || "", score }]
+                            );
+                            return (
+                              <>
+                                <div
+                                  className="qa-paragraph--q qa-highlight"
+                                  style={{
+                                    ["--qa-bg" as any]: palette.bg,
+                                    ["--qa-border" as any]: palette.border,
+                                  }}
+                                >
+                                  <Typography.Text strong>Q:</Typography.Text>{" "}
+                                  {qNodes}
+                                </div>
+                                <div
+                                  className="qa-paragraph--a qa-highlight"
+                                  style={{
+                                    ["--qa-bg" as any]: palette.bg,
+                                    ["--qa-border" as any]: palette.border,
+                                  }}
+                                >
+                                  <Typography.Text strong>A:</Typography.Text>{" "}
+                                  {aNodes}
+                                </div>
+                              </>
+                            );
+                          })()}
                         </div>
                       )}
                       {item.kind === "text" && (
-                        <div
-                          style={{
-                            // border: "1px solid #e5e7eb",
-                            borderRadius: 6,
-                            // padding: 12,
-                            background: "#fafafa",
-                            whiteSpace: "pre-wrap",
-                            display: "-webkit-box",
-                            WebkitBoxOrient: "vertical",
-                            WebkitLineClamp: 10,
-                            overflow: "hidden",
-                            fontSize: 14,
-                          }}
-                        >
+                        <div className="text-preview">
                           {(() => {
                             if (item.text && item.text.length > 0) {
                               return <>{item.text}</>;
@@ -1118,7 +1049,7 @@ export default function HighlightedInfoPage({
                                     .filter((t: string) => t && t.length > 0);
                             const highlighted = renderHighlightedText(
                               DUMMY_FULL_TEXT,
-                              snippets
+                              snippets as Array<string | TextSnippet>
                             );
                             return <>{highlighted}</>;
                           })()}
@@ -1129,27 +1060,15 @@ export default function HighlightedInfoPage({
 
                   {/* Expanded panel within component area */}
                   {isExpanded && (
-                    <div style={{ background: "#fff" }}>
+                    <div className="expanded-panel">
                       {typeof setSourcesContainerTitle !== "function" && (
-                        <div
-                          style={{
-                            display: "flex",
-                            justifyContent: "flex-start",
-                            marginBottom: 8,
-                          }}
-                        >
+                        <div className="expanded-panel__back">
                           <button
                             type="button"
                             onClick={() => {
                               setSelectedSourceKey(null);
                             }}
-                            style={{
-                              border: "1px solid #d1d5db",
-                              background: "#fff",
-                              borderRadius: 4,
-                              padding: "6px 10px",
-                              cursor: "pointer",
-                            }}
+                            className="expanded-panel__back-btn"
                             title="Back"
                           >
                             ← Back
@@ -1164,34 +1083,48 @@ export default function HighlightedInfoPage({
                         />
                       )}
                       {item.kind === "qa" && (
-                        <div
-                          style={{
-                            border: "1px solid #e5e7eb",
-                            borderRadius: 6,
-                            padding: 12,
-                            background: "#fafafa",
-                          }}
-                        >
-                          <Typography.Paragraph style={{ marginBottom: 8 }}>
-                            <Typography.Text strong>Q:</Typography.Text>{" "}
-                            {item.qa?.question || "Question"}
-                          </Typography.Paragraph>
-                          <Typography.Paragraph style={{ marginBottom: 0 }}>
-                            <Typography.Text strong>A:</Typography.Text>{" "}
-                            {item.qa?.answer || "Answer"}
-                          </Typography.Paragraph>
+                        <div className="qa-expanded">
+                          {(() => {
+                            const score = item.qa?.score;
+                            const palette = getRelevancePalette(score);
+                            const qNodes = renderHighlightedText(
+                              item.qa?.question || "",
+                              [{ text: item.qa?.question || "", score }]
+                            );
+                            const aNodes = renderHighlightedText(
+                              item.qa?.answer || "",
+                              [{ text: item.qa?.answer || "", score }]
+                            );
+                            return (
+                              <>
+                                <div
+                                  className="qa-paragraph--q qa-highlight qa-expanded--q"
+                                  style={{
+                                    ["--qa-bg" as any]: palette.bg,
+                                    ["--qa-border" as any]: palette.border,
+                                  }}
+                                >
+                                  <Typography.Text strong>Q:</Typography.Text>{" "}
+                                  {qNodes}
+                                </div>
+                                <div
+                                  className="qa-paragraph--a qa-highlight qa-expanded--a"
+                                  style={{
+                                    ["--qa-bg" as any]: palette.bg,
+                                    ["--qa-border" as any]: palette.border,
+                                  }}
+                                >
+                                  <Typography.Text strong>A:</Typography.Text>{" "}
+                                  {aNodes}
+                                </div>
+                                {/* QA items do not render PDF viewers */}
+                              </>
+                            );
+                          })()}
                         </div>
                       )}
                       {item.kind === "text" && (
-                        <div
-                          style={{
-                            border: "1px solid #e5e7eb",
-                            borderRadius: 6,
-                            padding: 12,
-                            background: "#fafafa",
-                            whiteSpace: "pre-wrap",
-                          }}
-                        >
+                        <div className="text-expanded">
                           {(() => {
                             if (item.text && item.text.length > 0) {
                               return <>{item.text}</>;
@@ -1209,7 +1142,7 @@ export default function HighlightedInfoPage({
                                     .filter((t: string) => t && t.length > 0);
                             const highlighted = renderHighlightedText(
                               DUMMY_FULL_TEXT,
-                              snippets
+                              snippets as Array<string | TextSnippet>
                             );
                             return <>{highlighted}</>;
                           })()}

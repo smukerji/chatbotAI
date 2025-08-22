@@ -30,8 +30,7 @@ function SourceUpload({
     name: "file",
     multiple: true,
     // action: `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/upload`,
-    action:
-      "https://torri-extraction-backend-108437277455.us-west3.run.app/process-doc",
+    action: "http://localhost:8080/process-doc",
     onChange(info) {
       botContext?.handleChange("isLoading")(true);
       let { status, response } = info.file;

@@ -1,0 +1,271 @@
+.highlighted-info-root {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
+
+.pdf-error-box {
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+  border-radius: 4px;
+  padding: 12px;
+}
+.pdf-error-box__desc {
+  margin-top: 8px;
+  font-size: 14px;
+}
+
+.pdf-loading {
+  text-align: center;
+  padding: 16px;
+}
+
+.pdf-loading .ant-space {
+  display: inline-flex;
+  align-items: center;
+}
+
+.highlighted-snippet {
+  background-color: rgba(255, 255, 0, 0.6);
+}
+
+.highlighted-info-outer > .highlighted-info-inner > .no-sources,
+.no-sources {
+  padding: 24px;
+}
+
+.pdf-page-loading {
+  text-align: center;
+  padding: 32px;
+}
+
+.pdf-failed {
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+  border-radius: 4px;
+  padding: 16px;
+  margin: 16px;
+}
+
+.pdf-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px;
+  background-color: #f9fafb;
+  gap: 12px;
+}
+
+.pdf-btn {
+  padding: 4px 8px;
+  background-color: transparent;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  min-width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pdf-btn[disabled] {
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.pdf-page-count {
+  font-size: 14px;
+  color: #374151;
+  min-width: 120px;
+  text-align: center;
+}
+
+.single-page-container {
+  padding: 12px;
+  min-height: 300px;
+}
+
+.pdf-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  /* allow pointer interactions for child highlight elements */
+  pointer-events: auto;
+}
+
+.pdf-page-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.pdf-page-inner {
+  position: relative;
+}
+
+.pdf-page-error {
+  color: #dc2626;
+  padding: 32px;
+  text-align: center;
+}
+
+/* Highlight overlay (single consolidated block) */
+.highlight-overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: 3px;
+  z-index: 10;
+  mix-blend-mode: multiply;
+  opacity: 0.85;
+  will-change: transform;
+  cursor: pointer;
+  transition: box-shadow 120ms ease, transform 120ms ease, opacity 120ms ease;
+  /* colors set per-element via CSS vars */
+  background-color: var(--highlight-bg);
+  border: 1px solid var(--highlight-border);
+  box-shadow: inset 0 0 0 1px var(--highlight-border),
+    0 0 3px rgba(0, 0, 0, 0.06);
+}
+
+.highlight-overlay:hover,
+.highlight-overlay:focus {
+  opacity: 1;
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.06),
+    0 6px 12px rgba(0, 0, 0, 0.08);
+  transform: translateZ(0);
+}
+
+/* QA highlight blocks -- palette via --qa-bg and --qa-border */
+.qa-highlight {
+  background-color: var(--qa-bg);
+  border-left: 4px solid var(--qa-border);
+  padding: 8px;
+  border-radius: 6px;
+}
+
+.qa-expanded--q {
+  padding: 10px;
+}
+.qa-expanded--a {
+  padding: 10px;
+}
+
+.pdf-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* allow pointer interactions for highlight children */
+  pointer-events: auto;
+}
+
+.no-highlights {
+  text-align: center;
+  padding: 64px 32px;
+  color: #6b7280;
+  font-size: 16px;
+}
+
+.highlighted-info-outer {
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+  overflow-y: auto;
+}
+
+.highlighted-info-inner {
+  overflow: hidden;
+}
+
+.source-item {
+  padding: 5px;
+}
+
+.source-header-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+}
+
+.source-header-title {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
+.source-title-text {
+  max-width: 150px;
+}
+
+.viewer-preview {
+  margin-top: 10px;
+  background: #fff;
+  width: 100%;
+  max-height: 30vh;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 12px;
+}
+.viewer-preview--pdf {
+  padding: 0;
+}
+
+.qa-preview {
+  background: transparent;
+}
+.qa-paragraph--q {
+  margin-bottom: 8px;
+}
+.qa-paragraph--a {
+  margin-bottom: 0;
+}
+
+.text-preview {
+  border-radius: 6px;
+  background: #fafafa;
+  white-space: pre-wrap;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 10;
+  line-clamp: 10;
+  overflow: hidden;
+  font-size: 14px;
+  padding: 0 12px;
+}
+
+.expanded-panel {
+  background: #fff;
+}
+.expanded-panel__back {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 8px;
+}
+.expanded-panel__back-btn {
+  border: 1px solid #d1d5db;
+  background: #fff;
+  border-radius: 4px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.qa-expanded {
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 12px;
+  background: #fafafa;
+}
+.text-expanded {
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 12px;
+  background: #fafafa;
+  white-space: pre-wrap;
+}

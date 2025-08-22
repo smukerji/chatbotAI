@@ -81,6 +81,72 @@
     }
   }
 
+  .relevance-bar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 4px;
+    padding-top: 4px;
+    align-items: center;
+
+    /* thinner, subtle horizontal scrollbar */
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: rgba(0, 0, 0, 0.12) transparent;
+
+    &::-webkit-scrollbar {
+      height: 6px; /* smaller height for webkit browsers */
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.12);
+      border-radius: 6px;
+    }
+
+    .relevance-level {
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-weight: 500;
+      font-size: 14px;
+      display: inline-block;
+      text-align: center;
+      white-space: nowrap;
+      cursor: pointer;
+      border: 2px solid transparent; /* border-color may be overridden inline */
+      transition: box-shadow 0.12s ease, transform 0.08s ease,
+        border-color 0.12s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+      }
+
+      &.active {
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      }
+
+      .relevance-label {
+        margin-right: 8px;
+      }
+
+      .relevance-count {
+        display: inline-block;
+        min-width: 22px;
+        height: 22px;
+        line-height: 22px;
+        padding: 0 3px;
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.12);
+        color: #111;
+        font-size: 12px;
+        font-weight: 600;
+      }
+    }
+  }
+
   /*------------------------------------------left-section----------------------------------------------*/
   .chatbot-history-parts {
     gap: 40px;

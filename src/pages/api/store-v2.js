@@ -572,7 +572,6 @@ export default async function handler(req, res) {
           let crwaledLinkUpsertData = crawledList.map((obj) => {
             const tempIds = [];
             const tempData = [];
-            console.log("Link >>>>>>>", obj?.crawlLink);
             obj.cleanedText?.forEach((element) => {
               const id = uuid();
               /// map the chunks to id

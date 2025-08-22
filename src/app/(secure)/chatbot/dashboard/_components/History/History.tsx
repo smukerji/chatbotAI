@@ -83,49 +83,84 @@ function History({ chatbotId }: any) {
   /// sources container title
   const [sourcesContainerTitle, setSourcesContainerTitle] = useState("sources");
 
-  const relevanceLevels = [
-    { label: "Most relevant", color: "#E0EDFF" },
-    { label: "Relevant", color: "#D3F8DE" },
-    { label: "Good", color: "#FFF3B2" },
-    { label: "Low", color: "#FFD0B2" },
-    { label: "Very low", color: "#FDD" },
-  ];
-
-  const RelevanceBar = () => (
-    <div
-      style={{
-        display: "flex",
-        gap: "12px",
-        marginBottom: "12px",
-        overflowX: "auto",
-        whiteSpace: "nowrap",
-        paddingBottom: "4px",
-        scrollbarWidth: "thin",
-        paddingTop: "4px",
-        alignItems: "center",
-      }}
-    >
-      {relevanceLevels.map((item) => (
-        <div
-          key={item.label}
-          style={{
-            background: item.color,
-            borderRadius: "20px",
-            padding: "6px 18px",
-            fontWeight: 500,
-            fontSize: "14px",
-            color: "#222",
-            display: "inline-block",
-            textAlign: "center",
-            whiteSpace: "nowrap",
-            cursor: "pointer",
-          }}
-        >
-          {item.label}
-        </div>
-      ))}
-    </div>
+  const relevanceLevels = React.useMemo(
+    () => [
+      { label: "All", color: "#F4F5F6" },
+      { label: "Most relevant", color: "#E0EDFF" },
+      { label: "Relevant", color: "#D3F8DE" },
+      { label: "Good", color: "#FFF3B2" },
+      { label: "Low", color: "#FFD0B2" },
+      { label: "Very low", color: "#FDD" },
+    ],
+    []
   );
+
+  // active relevance filter (single-select). 'All' means no filter applied.
+  const [activeRelevance, setActiveRelevance] = useState<string>("All");
+
+  // color helpers: contrast and darken
+  const hexToRgb = (hex: string) => {
+    const h = hex.replace('#', '');
+    const bigint = parseInt(h.length === 3 ? h.split('').map(c=>c+c).join('') : h, 16);
+    return {
+      r: (bigint >> 16) & 255,
+      g: (bigint >> 8) & 255,
+      b: bigint & 255,
+    };
+  };
+
+  const getContrastColor = (hex: string) => {
+    try {
+      const { r, g, b } = hexToRgb(hex);
+      // relative luminance
+      const [R, G, B] = [r, g, b].map((v) => {
+        const s = v / 255;
+        return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+      });
+      const L = 0.2126 * R + 0.7152 * G + 0.0722 * B;
+      return L > 0.5 ? '#000' : '#fff';
+    } catch {
+      return '#000';
+    }
+  };
+
+  const darkenHex = (hex: string, pct = 0.35) => {
+    try {
+      const { r, g, b } = hexToRgb(hex);
+      const nr = Math.max(0, Math.round(r * (1 - pct)));
+      const ng = Math.max(0, Math.round(g * (1 - pct)));
+      const nb = Math.max(0, Math.round(b * (1 - pct)));
+      const toHex = (v: number) => v.toString(16).padStart(2, '0');
+      return `#${toHex(nr)}${toHex(ng)}${toHex(nb)}`;
+    } catch {
+      return hex;
+    }
+  };
+
+  const getRelevanceLabelForScore = (score: number) => {
+  if (score >= 0.85) return "Most relevant";
+  if (score >= 0.8) return "Relevant";
+  if (score >= 0.7) return "Good";
+  if (score >= 0.6) return "Low";
+  return "Very low";
+  };
+
+  const extractScoreFromSource = (src: any): number | null => {
+    if (!src) return null;
+    if (typeof src.score === "number") return src.score;
+    if (typeof src.score === "string" && src.score !== "") {
+      const n = parseFloat(src.score);
+      if (!isNaN(n)) return n;
+    }
+    const label = String(src.source || src.title || "");
+    const match = label.match(/\(score:\s*([0-9.]+)\)/i);
+    if (match) return parseFloat(match[1]);
+    return null;
+  };
+
+  const handleRelevanceClick = (label: string) => {
+    setActiveRelevance((prev) => (prev === label ? "All" : label));
+  };
 
   /// update the chat history data
   const fetchHistoryCount = async (
@@ -222,7 +257,7 @@ function History({ chatbotId }: any) {
     };
 
     retriveData();
-  }, [botDetails?.leadSessionsEmail]);
+  }, [botDetails?.leadSessionsEmail, chatbotId, cookies.userId]);
 
   /// chatbot messages feedback pop up state
   const [open, setOpen] = useState(false);
@@ -233,6 +268,63 @@ function History({ chatbotId }: any) {
   /// sources modal state
   const [sourcesModal, setSourcesModal] = useState(false);
   const [selectedSources, setSelectedSources] = useState<any[]>([]);
+
+  // compute counts per relevance label based on selectedSources
+  const relevanceCounts = React.useMemo(() => {
+    const map = new Map<string, number>();
+    relevanceLevels.forEach((r) => map.set(r.label, 0));
+    if (!selectedSources || !selectedSources.length) return map;
+    for (const src of selectedSources) {
+      const s = extractScoreFromSource(src);
+      if (s == null) continue; // unscored items don't belong to any bucket
+      const label = getRelevanceLabelForScore(s);
+      map.set(label, (map.get(label) || 0) + 1);
+    }
+    // fill 'All' as total items (including unscored)
+    map.set('All', selectedSources.length);
+    return map;
+  }, [selectedSources, relevanceLevels]);
+
+  const relevanceBarRef = useRef<HTMLDivElement | null>(null);
+
+  const RelevanceBar = () => (
+    <div className="relevance-bar" ref={relevanceBarRef}>
+      {relevanceLevels.map((item) => {
+        const isActive = activeRelevance === item.label;
+        const textColor = getContrastColor(item.color);
+        const borderColor = isActive ? darkenHex(item.color, 0.35) : 'transparent';
+        const count = relevanceCounts.get(item.label) || 0;
+        const pillRef = React.createRef<HTMLDivElement>();
+        return (
+          <div
+            key={item.label}
+            ref={pillRef}
+            className={`relevance-level ${isActive ? 'active' : ''}`}
+            onClick={() => {
+              handleRelevanceClick(item.label);
+              // scroll the clicked pill to the start of the container
+              try {
+                pillRef.current?.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+              } catch {}
+            }}
+            style={{ background: item.color, color: textColor, borderColor }}
+            role="button"
+            aria-pressed={isActive}
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleRelevanceClick(item.label);
+              }
+            }}
+          >
+            <span className="relevance-label">{item.label}</span>
+            <span className="relevance-count">{count}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
 
   /// Messages feedback opener
   async function openChatbotModal(index: number, status: string) {
@@ -1061,8 +1153,19 @@ function History({ chatbotId }: any) {
               <RelevanceBar />
               {/* <Sources data={selectedSources} />
                */}
+              {/* compute filtered sources based on active relevance */}
+              {/** If activeRelevance is null, show all sources */}
               <HighlightedInfoPage
-                data={selectedSources}
+                data={
+                  activeRelevance === "All"
+                    ? selectedSources
+                    : selectedSources.filter((src) => {
+                        const s = extractScoreFromSource(src);
+                        if (s == null) return false;
+                        const label = getRelevanceLabelForScore(s);
+                        return activeRelevance === label;
+                      })
+                }
                 sourcesContainerTitle={sourcesContainerTitle}
                 setSourcesContainerTitle={setSourcesContainerTitle}
               />
