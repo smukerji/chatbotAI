@@ -85,7 +85,7 @@
     display: flex;
     gap: 12px;
     margin-bottom: 12px;
-    overflow-x: auto;
+    // overflow-x: auto;
     white-space: nowrap;
     padding-bottom: 4px;
     padding-top: 4px;
@@ -358,6 +358,7 @@
                   display: flex;
                   padding-left: 15px;
                   position: relative;
+                  flex-direction: column;
                   &::before {
                     content: "";
                     position: absolute;

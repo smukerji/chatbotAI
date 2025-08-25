@@ -106,6 +106,7 @@
           display: flex;
           padding-left: 15px;
           position: relative;
+          flex-direction: column;
           &::before {
             content: "";
             position: absolute;

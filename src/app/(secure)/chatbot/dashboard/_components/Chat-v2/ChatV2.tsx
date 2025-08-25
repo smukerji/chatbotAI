@@ -45,6 +45,7 @@ import { AssistantStream } from "openai/lib/AssistantStream.mjs";
 import { AssistantStreamEvent } from "openai/resources/beta/assistants.mjs";
 import CloseIcon from "@/assets/svg/CloseIcon";
 import CloseBtn from "../../../../../../../public/close-circle.png";
+import BackIcon from "../../../../../../../public/source-reference/arrow-left.png";
 import MicIcon from "@/assets/svg/MicIcon";
 import {
   LiveTranscriptionEvent,
@@ -160,6 +161,9 @@ function ChatV2({
   const [numberError, setNumberError] = useState("");
   const [nameError, setNameError] = useState("");
   const [validNumberError, setValidNumberError] = useState("");
+
+  /// state to hide / show chatbot details
+  const [showChatbotDetails, setShowChatbotDetails] = useState(true);
 
   /// state to ensure if user has turned webSearch on or off
   const [webSearch, setWebSearch] = useState(false);
@@ -296,44 +300,47 @@ function ChatV2({
 
   const RelevanceBar = () => (
     <div className="relevance-bar" ref={relevanceBarRef}>
-      {relevanceLevels.map((item) => {
-        const isActive = activeRelevance === item.label;
-        const textColor = getContrastColor(item.color);
-        const borderColor = isActive
-          ? darkenHex(item.color, 0.45)
-          : "transparent";
-        const count = relevanceCounts.get(item.label) || 0;
-        const pillRef: any = React.createRef();
-        return (
-          <div
-            ref={pillRef}
-            key={item.label}
-            className={`relevance-level ${isActive ? "active" : ""}`}
-            onClick={() => {
-              handleRelevanceClick(item.label);
-              // scroll the clicked pill to the start of the container
-              setTimeout(() => {
-                try {
-                  pillRef.current?.scrollIntoView({
-                    inline: "start",
-                    behavior: "smooth",
-                  });
-                } catch (e) {
-                  // ignore
-                }
-              }, 0);
-            }}
-            style={{
-              background: item.color,
-              color: textColor,
-              borderColor,
-            }}
-          >
-            <span style={{ paddingRight: 8 }}>{item.label}</span>
-            <span className="relevance-count">{count}</span>
-          </div>
-        );
-      })}
+      {relevanceLevels
+        // only render relevance items that have a positive count
+        .filter((item) => (relevanceCounts.get(item.label) || 0) > 0)
+        .map((item) => {
+          const isActive = activeRelevance === item.label;
+          const textColor = getContrastColor(item.color);
+          const borderColor = isActive
+            ? darkenHex(item.color, 0.45)
+            : "transparent";
+          const count = relevanceCounts.get(item.label) || 0;
+          const pillRef: any = React.createRef();
+          return (
+            <div
+              ref={pillRef}
+              key={item.label}
+              className={`relevance-level ${isActive ? "active" : ""}`}
+              onClick={() => {
+                handleRelevanceClick(item.label);
+                // scroll the clicked pill to the start of the container
+                setTimeout(() => {
+                  try {
+                    pillRef.current?.scrollIntoView({
+                      inline: "start",
+                      behavior: "smooth",
+                    });
+                  } catch (e) {
+                    // ignore
+                  }
+                }, 0);
+              }}
+              style={{
+                background: item.color,
+                color: textColor,
+                borderColor,
+              }}
+            >
+              <span style={{ paddingRight: 8 }}>{item.label}</span>
+              <span className="relevance-count">{count}</span>
+            </div>
+          );
+        })}
     </div>
   );
 
@@ -1345,7 +1352,7 @@ function ChatV2({
         </Modal> */}
 
       {/*------------------------------------------left-section----------------------------------------------*/}
-      {!isPopUp && (
+      {!isPopUp && showChatbotDetails && (
         <div className="chatbot-details">
           <div className="detail">
             <span>ID</span>
@@ -1428,6 +1435,8 @@ function ChatV2({
         }`}
         style={{
           backgroundColor: botSettings?.theme === "dark" ? "black" : "",
+          // When showChatbotDetails is false, force 30% width; otherwise let SCSS handle sizing
+          ...(!showChatbotDetails ? { width: "30%" } : {}),
         }}
       >
         <div className="header">
@@ -1564,7 +1573,11 @@ function ChatV2({
                         {message.sources && message.sources?.length > 0 && (
                           <button
                             className="sources-btn"
-                            onClick={() => handleShowSources(message.sources)}
+                            onClick={() => {
+                              /// hide the chatbot Details
+                              setShowChatbotDetails(false);
+                              handleShowSources(message.sources);
+                            }}
                             aria-label="Sources"
                           >
                             <Image
@@ -1977,7 +1990,13 @@ function ChatV2({
       </div>
       {/* sources div */}
       {sourceVisible && selectedSources.length > 0 && (
-        <div className="sources-container">
+        <div
+          className="sources-container"
+          style={{
+            /// when showChatbotDetails is false set its width to 70%
+            ...(!showChatbotDetails ? { width: "70%", minWidth: "70%" } : {}),
+          }}
+        >
           <div
             style={{
               display: "flex",
@@ -1987,28 +2006,26 @@ function ChatV2({
             }}
           >
             <h3
-              onClick={() => {
-                // If the title has a leading chevron (e.g., " < Selected"), treat it as Back
-                if (/^\s*<\s*/.test(String(sourcesContainerTitle))) {
-                  setSourcesContainerTitle("sources");
-                }
-              }}
               style={{
                 margin: 0,
                 // color: "#2a4d8f",
                 fontSize: "18px",
                 fontWeight: 300,
-                cursor: /^\s*<\s*/.test(String(sourcesContainerTitle))
-                  ? "pointer"
-                  : "default",
-                userSelect: "none",
               }}
               title={
-                /^\s*<\s*/.test(String(sourcesContainerTitle))
+                /^[\s]*<\s*/.test(String(sourcesContainerTitle))
                   ? "Back"
                   : undefined
               }
             >
+              {sourcesContainerTitle.toLowerCase() !== "sources" && (
+                <Image
+                  src={BackIcon}
+                  alt="back-icon"
+                  onClick={() => setSourcesContainerTitle("sources")}
+                  style={{ cursor: "pointer", userSelect: "none" }}
+                />
+              )}
               <Typography.Text
                 strong
                 ellipsis
@@ -2020,7 +2037,10 @@ function ChatV2({
             </h3>
 
             <button
-              onClick={() => setSourceVisible(false)}
+              onClick={() => {
+                setSourceVisible(false);
+                setShowChatbotDetails(true);
+              }}
               style={{
                 background: "none",
                 border: "none",

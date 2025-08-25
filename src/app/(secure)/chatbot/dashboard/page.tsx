@@ -429,109 +429,114 @@ function Dashboard() {
           {/*------------------------------------------header----------------------------------------------*/}
           <div className="sources-header">
             <div className="title">
-              <Image
-                src={arrowIcon}
-                alt="arrow-icon"
-                style={{ transform: "rotate(180deg)", cursor: "pointer" }}
-                onClick={() => {
-                  botContext?.resetCreateBotInfo();
-                  chatbotSettingContext?.resetChatbotSettings();
-                  // window.history.back();
-                  router.push(`/chatbot`);
-                }}
-              />
-              {/* <h1>{chatbot?.name}</h1> */}
-              <h1>{botDetails?.chatbotName}</h1>
+              <div>
+                <Image
+                  src={arrowIcon}
+                  alt="arrow-icon"
+                  style={{ transform: "rotate(180deg)", cursor: "pointer" }}
+                  onClick={() => {
+                    botContext?.resetCreateBotInfo();
+                    chatbotSettingContext?.resetChatbotSettings();
+                    // window.history.back();
+                    router.push(`/chatbot`);
+                  }}
+                />
+                {/* <h1>{chatbot?.name}</h1> */}
+                <h1>{botDetails?.chatbotName}</h1>
+              </div>
+
+              {/*------------------------------------------options-container----------------------------------------------*/}
+              {window.innerWidth < 767 ? (
+                <Dropdown
+                  menu={{ items: dropdownMenuItems, onClick }}
+                  placement="bottom"
+                  trigger={["click"]}
+                  onVisibleChange={(visible) => setIsOpen(visible)}
+                >
+                  <button className="options-container-dropdwon">
+                    {selectedValue}
+                    {isOpen ? <CaretUpOutlined /> : <CaretDownOutlined />}
+                  </button>
+                </Dropdown>
+              ) : (
+                <>
+                  <ul className="options-container">
+                    <li
+                      className={`${editChatbot === "chatbot" ? "active" : ""}`}
+                      value={"chatbot"}
+                      onClick={() =>
+                        botContext?.handleChange("editChatbot")("chatbot")
+                      }
+                    >
+                      <h3 className="option">chatbot</h3>
+                    </li>
+                    <li
+                      className={`${
+                        editChatbot === "settings" ? "active" : ""
+                      }`}
+                      value={"settings"}
+                      onClick={() =>
+                        botContext?.handleChange("editChatbot")("settings")
+                      }
+                    >
+                      <h3 className="option">settings</h3>
+                    </li>
+                    <li
+                      className={`${editChatbot === "sources" ? "active" : ""}`}
+                      value={"sources"}
+                      onClick={() => {
+                        // fetchData();
+                        botContext?.handleChange("editChatbot")("sources");
+                      }}
+                    >
+                      <h3 className="option">data sources</h3>
+                    </li>
+                    <li
+                      className={`${
+                        editChatbot === "integrations" ? "active" : ""
+                      }`}
+                      value={"integrations"}
+                      onClick={() =>
+                        botContext?.handleChange("editChatbot")("integrations")
+                      }
+                    >
+                      <h3 className="option">Integrations</h3>
+                    </li>
+                    <li
+                      className={`${
+                        editChatbot === "embedSite" ? "active" : ""
+                      }`}
+                      value={"embedSite"}
+                      onClick={() =>
+                        botContext?.handleChange("editChatbot")("embedSite")
+                      }
+                    >
+                      <h3 className="option">Embed on site</h3>
+                    </li>
+
+                    <li
+                      className={`${editChatbot === "history" ? "active" : ""}`}
+                      value={"history"}
+                      onClick={() =>
+                        botContext?.handleChange("editChatbot")("history")
+                      }
+                    >
+                      <h3 className="option">Conversation History</h3>
+                    </li>
+
+                    <li
+                      className={`${editChatbot === "leads" ? "active" : ""}`}
+                      value={"leads"}
+                      onClick={() =>
+                        botContext?.handleChange("editChatbot")("leads")
+                      }
+                    >
+                      <h3 className="option">Leads</h3>
+                    </li>
+                  </ul>
+                </>
+              )}
             </div>
-
-            {/*------------------------------------------options-container----------------------------------------------*/}
-            {window.innerWidth < 767 ? (
-              <Dropdown
-                menu={{ items: dropdownMenuItems, onClick }}
-                placement="bottom"
-                trigger={["click"]}
-                onVisibleChange={(visible) => setIsOpen(visible)}
-              >
-                <button className="options-container-dropdwon">
-                  {selectedValue}
-                  {isOpen ? <CaretUpOutlined /> : <CaretDownOutlined />}
-                </button>
-              </Dropdown>
-            ) : (
-              <>
-                <ul className="options-container">
-                  <li
-                    className={`${editChatbot === "chatbot" ? "active" : ""}`}
-                    value={"chatbot"}
-                    onClick={() =>
-                      botContext?.handleChange("editChatbot")("chatbot")
-                    }
-                  >
-                    <h3 className="option">chatbot</h3>
-                  </li>
-                  <li
-                    className={`${editChatbot === "settings" ? "active" : ""}`}
-                    value={"settings"}
-                    onClick={() =>
-                      botContext?.handleChange("editChatbot")("settings")
-                    }
-                  >
-                    <h3 className="option">settings</h3>
-                  </li>
-                  <li
-                    className={`${editChatbot === "sources" ? "active" : ""}`}
-                    value={"sources"}
-                    onClick={() => {
-                      // fetchData();
-                      botContext?.handleChange("editChatbot")("sources");
-                    }}
-                  >
-                    <h3 className="option">data sources</h3>
-                  </li>
-                  <li
-                    className={`${
-                      editChatbot === "integrations" ? "active" : ""
-                    }`}
-                    value={"integrations"}
-                    onClick={() =>
-                      botContext?.handleChange("editChatbot")("integrations")
-                    }
-                  >
-                    <h3 className="option">Integrations</h3>
-                  </li>
-                  <li
-                    className={`${editChatbot === "embedSite" ? "active" : ""}`}
-                    value={"embedSite"}
-                    onClick={() =>
-                      botContext?.handleChange("editChatbot")("embedSite")
-                    }
-                  >
-                    <h3 className="option">Embed on site</h3>
-                  </li>
-
-                  <li
-                    className={`${editChatbot === "history" ? "active" : ""}`}
-                    value={"history"}
-                    onClick={() =>
-                      botContext?.handleChange("editChatbot")("history")
-                    }
-                  >
-                    <h3 className="option">Conversation History</h3>
-                  </li>
-
-                  <li
-                    className={`${editChatbot === "leads" ? "active" : ""}`}
-                    value={"leads"}
-                    onClick={() =>
-                      botContext?.handleChange("editChatbot")("leads")
-                    }
-                  >
-                    <h3 className="option">Leads</h3>
-                  </li>
-                </ul>
-                <hr />
-              </>
-            )}
           </div>
         </div>
 

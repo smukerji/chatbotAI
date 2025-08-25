@@ -13,8 +13,21 @@
     .sources-header {
       .title {
         display: flex;
-        gap: 20px;
+        // gap: 20px;
+        justify-content: space-between;
         align-items: center;
+
+        div:first-child {
+          display: flex;
+          align-items: center;
+          gap: 20px;
+          @media screen and (max-width: 1440px) {
+            gap: 10px;
+          }
+          @media screen and (max-width: 1199px) {
+            gap: 5px;
+          }
+        }
 
         h1 {
           color: #000;
@@ -205,6 +218,7 @@
         flex-direction: column;
         margin-left: 5px;
         margin-right: 5px;
+        width: 100%;
 
         .chatbot-details {
           width: 100%;

@@ -1,8 +1,8 @@
 .chat-container {
   display: flex;
   gap: 40px;
-  margin-left: 45px;
-  margin-right: 45px;
+  // margin-left: 45px;
+  // margin-right: 45px;
   margin-top: 28px;
   position: relative;
 
@@ -13,14 +13,14 @@
   }
 
   @media screen and (max-width: 1440px) {
-    margin-left: 20px;
-    margin-right: 20px;
+    // margin-left: 20px;
+    // margin-right: 20px;
     margin-top: 20px;
     gap: 20px;
   }
   @media screen and (max-width: 1199px) {
-    margin-left: 10px;
-    margin-right: 10px;
+    // margin-left: 10px;
+    // margin-right: 10px;
     margin-top: 20px;
     gap: 10px;
   }
@@ -124,7 +124,7 @@
   /*------------------------------------------right-section----------------------------------------------*/
   .messages-section {
     // flex: 3;
-    width: 72%;
+    width: 100%;
     display: flex;
     padding: 8px 16px 8px 16px;
     border-radius: 16px;
@@ -280,6 +280,7 @@
               display: flex;
               padding-left: 15px;
               position: relative;
+              flex-direction: column;
               &::before {
                 content: "";
                 position: absolute;
@@ -650,7 +651,7 @@
       display: flex;
       gap: 12px;
       margin-bottom: 12px;
-      overflow-x: auto;
+      // overflow-x: auto;
       white-space: nowrap;
       padding-bottom: 4px;
       padding-top: 4px;
@@ -775,6 +776,7 @@
           display: flex;
           padding-left: 15px;
           position: relative;
+          flex-direction: column;
           &::before {
             content: "";
             position: absolute;

@@ -100,8 +100,16 @@ function History({ chatbotId }: any) {
 
   // color helpers: contrast and darken
   const hexToRgb = (hex: string) => {
-    const h = hex.replace('#', '');
-    const bigint = parseInt(h.length === 3 ? h.split('').map(c=>c+c).join('') : h, 16);
+    const h = hex.replace("#", "");
+    const bigint = parseInt(
+      h.length === 3
+        ? h
+            .split("")
+            .map((c) => c + c)
+            .join("")
+        : h,
+      16
+    );
     return {
       r: (bigint >> 16) & 255,
       g: (bigint >> 8) & 255,
@@ -118,9 +126,9 @@ function History({ chatbotId }: any) {
         return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
       });
       const L = 0.2126 * R + 0.7152 * G + 0.0722 * B;
-      return L > 0.5 ? '#000' : '#fff';
+      return L > 0.5 ? "#000" : "#fff";
     } catch {
-      return '#000';
+      return "#000";
     }
   };
 
@@ -130,7 +138,7 @@ function History({ chatbotId }: any) {
       const nr = Math.max(0, Math.round(r * (1 - pct)));
       const ng = Math.max(0, Math.round(g * (1 - pct)));
       const nb = Math.max(0, Math.round(b * (1 - pct)));
-      const toHex = (v: number) => v.toString(16).padStart(2, '0');
+      const toHex = (v: number) => v.toString(16).padStart(2, "0");
       return `#${toHex(nr)}${toHex(ng)}${toHex(nb)}`;
     } catch {
       return hex;
@@ -138,11 +146,11 @@ function History({ chatbotId }: any) {
   };
 
   const getRelevanceLabelForScore = (score: number) => {
-  if (score >= 0.85) return "Most relevant";
-  if (score >= 0.8) return "Relevant";
-  if (score >= 0.7) return "Good";
-  if (score >= 0.6) return "Low";
-  return "Very low";
+    if (score >= 0.85) return "Most relevant";
+    if (score >= 0.8) return "Relevant";
+    if (score >= 0.7) return "Good";
+    if (score >= 0.6) return "Low";
+    return "Very low";
   };
 
   const extractScoreFromSource = (src: any): number | null => {
@@ -281,7 +289,7 @@ function History({ chatbotId }: any) {
       map.set(label, (map.get(label) || 0) + 1);
     }
     // fill 'All' as total items (including unscored)
-    map.set('All', selectedSources.length);
+    map.set("All", selectedSources.length);
     return map;
   }, [selectedSources, relevanceLevels]);
 
@@ -289,40 +297,48 @@ function History({ chatbotId }: any) {
 
   const RelevanceBar = () => (
     <div className="relevance-bar" ref={relevanceBarRef}>
-      {relevanceLevels.map((item) => {
-        const isActive = activeRelevance === item.label;
-        const textColor = getContrastColor(item.color);
-        const borderColor = isActive ? darkenHex(item.color, 0.35) : 'transparent';
-        const count = relevanceCounts.get(item.label) || 0;
-        const pillRef = React.createRef<HTMLDivElement>();
-        return (
-          <div
-            key={item.label}
-            ref={pillRef}
-            className={`relevance-level ${isActive ? 'active' : ''}`}
-            onClick={() => {
-              handleRelevanceClick(item.label);
-              // scroll the clicked pill to the start of the container
-              try {
-                pillRef.current?.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
-              } catch {}
-            }}
-            style={{ background: item.color, color: textColor, borderColor }}
-            role="button"
-            aria-pressed={isActive}
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
+      {relevanceLevels
+        .filter((item) => (relevanceCounts.get(item.label) || 0) > 0)
+        .map((item) => {
+          const isActive = activeRelevance === item.label;
+          const textColor = getContrastColor(item.color);
+          const borderColor = isActive
+            ? darkenHex(item.color, 0.35)
+            : "transparent";
+          const count = relevanceCounts.get(item.label) || 0;
+          const pillRef = React.createRef<HTMLDivElement>();
+          return (
+            <div
+              key={item.label}
+              ref={pillRef}
+              className={`relevance-level ${isActive ? "active" : ""}`}
+              onClick={() => {
                 handleRelevanceClick(item.label);
-              }
-            }}
-          >
-            <span className="relevance-label">{item.label}</span>
-            <span className="relevance-count">{count}</span>
-          </div>
-        );
-      })}
+                // scroll the clicked pill to the start of the container
+                try {
+                  pillRef.current?.scrollIntoView({
+                    behavior: "smooth",
+                    inline: "start",
+                    block: "nearest",
+                  });
+                } catch {}
+              }}
+              style={{ background: item.color, color: textColor, borderColor }}
+              role="button"
+              aria-pressed={isActive}
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  handleRelevanceClick(item.label);
+                }
+              }}
+            >
+              <span className="relevance-label">{item.label}</span>
+              <span className="relevance-count">{count}</span>
+            </div>
+          );
+        })}
     </div>
   );
 
@@ -652,9 +668,15 @@ function History({ chatbotId }: any) {
         </div>
       </div>
       {chatHistoryList?.length !== 0 && (
-        <div className="chatbot-history-parts">
+        <div
+          className="chatbot-history-parts"
+          style={{ ...(sourcesModal ? { gap: "20px" } : {}) }}
+        >
           {/*------------------------------------------left-section----------------------------------------------*/}
-          <div className="chatbot-history-details">
+          <div
+            className="chatbot-history-details"
+            style={{ ...(sourcesModal ? { width: "10%" } : {}) }}
+          >
             {/*------------------------------------------chat-list-section----------------------------------------------*/}
             <div
               className="detail"
@@ -709,6 +731,7 @@ function History({ chatbotId }: any) {
                             setActiveCurrentChatHistory("today" + index);
                             setSelectedSources([]);
                             setSourcesContainerTitle("sources");
+                            setSourcesModal(false);
                           }}
                         >
                           <div
@@ -769,7 +792,7 @@ function History({ chatbotId }: any) {
                             style={{
                               textOverflow: "ellipsis",
                               overflow: "hidden",
-                              width: "250px",
+                              // width: "250px",
                               textWrap: "nowrap",
                               // flex: botDetails?.referedFrom == "leads" ? 1 : 0,
                             }}
@@ -910,6 +933,7 @@ function History({ chatbotId }: any) {
             style={{
               display:
                 window.innerWidth > 767 || chatClicked ? "block" : "none",
+              ...(sourcesModal ? { width: "30%", maxWidth: "30%" } : {}),
             }}
           >
             <div className="messages-section">
@@ -1090,7 +1114,12 @@ function History({ chatbotId }: any) {
 
           {/* sources div */}
           {sourcesModal && selectedSources.length > 0 && (
-            <div className="sources-container">
+            <div
+              className="sources-container"
+              style={{
+                ...(sourcesModal ? { width: "50%", minWidth: "50%" } : {}),
+              }}
+            >
               <div
                 style={{
                   display: "flex",
