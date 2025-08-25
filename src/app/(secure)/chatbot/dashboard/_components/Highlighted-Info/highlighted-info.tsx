@@ -15,22 +15,7 @@ import "./highlighted-info.scss";
 // Fix worker setup
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@5.3.31/build/pdf.worker.mjs`;
 
-// Temporary full text for 'text' sources; replace with API response later
-const DUMMY_FULL_TEXT = `The integration of artificial intelligence in higher education is reshaping the way universities operate, teach, and ensure security on their campuses. UNESCO emphasizes that the adoption of AI tools, such as ChatGPT, should always be guided by ethical principles, inclusivity, and accessibility. ChatGPT, as an advanced language model, has been successfully applied in teaching, research, and administrative processes, offering personalized learning support, streamlining workflows, and providing multilingual assistance to international students. Alongside these academic applications, campus security systems like Suprema, when integrated with Honeywell ProWatch, are enhancing how institutions manage identification, enrollment, and access control.
-
-In a university setting, ProWatch Badging Manager enables the creation of badge holders, assigning them virtual cards that link directly to biometric credentials. Students and staff can complete face, fingerprint, or card enrollment through the Suprema Enrollment Client, which displays all registered credentials in a central dashboard. Device enrollment allows biometric data, such as facial images, to be captured using networked cameras, while external camera enrollment provides flexibility for capturing from web-connected devices. Institutions can also allow users to upload their own photographs, provided they meet the required resolution standards, with built-in cropping tools ensuring the correct framing for identification purposes.
-
-Finger enrollment is a critical part of the system, where the interface highlights the selected finger in orange until a successful scan turns it green. Local finger enrollment enables individual finger processing, particularly useful when updating or replacing partial biometric data. Card enrollment allows external cards to be scanned and added directly to a user’s profile. AI tools can complement these security processes by scheduling enrollment sessions, sending reminders, and guiding users step-by-step through the process.
-
-UNESCO’s AI ethics framework stresses the importance of safeguarding privacy in any system that collects personal or biometric data. This includes encryption, secure storage, and restricted access protocols. Privacy concerns are coupled with the need to address bias in AI recognition systems, ensuring that the technology does not unfairly disadvantage any group. UNESCO recommends that universities incorporate AI literacy into their curriculum, enabling students to understand not only how to use AI tools but also the social, legal, and ethical issues surrounding them.
-
-In practical use, AI-powered assistants like ChatGPT can serve as personal tutors, generating study prompts, creating quizzes, and helping students prepare for assessments. They can also assist faculty in updating course content, simulating debates to foster critical thinking, and providing translation services for non-native speakers. These features are particularly beneficial in diverse, international campuses where accessibility and inclusion are key priorities.
-
-From an administrative standpoint, AI can help monitor enrollment trends, optimize scheduling, and produce real-time reports linking campus security logs with academic and operational analytics. ProWatch integration ensures that security credentials and biometric records are managed within a single unified platform, reducing redundancy and improving efficiency. This centralized approach also enables rapid synchronization of authentication modes across devices, ensuring consistent access policies across all campus entry points.
-
-UNESCO encourages institutions to conduct AI audits, which involve assessing the types of AI used, the data collected, and the effectiveness of these systems in achieving their intended goals. Such audits should also examine equity in access to AI technologies, ensuring that no student or staff member is excluded due to cost, connectivity, or technical limitations. Transparency in AI deployment is critical, with clear policies on data ownership, consent, and the purposes for which information is used.
-
-The combined use of AI and biometric systems offers a powerful framework for modern higher education. While AI provides the intelligence to personalize learning and streamline processes, biometric integration ensures that physical access to campus facilities remains secure and efficient. This fusion creates opportunities for universities to enhance both academic excellence and operational safety, but it must be balanced with rigorous ethical oversight, stakeholder consultation, and an unwavering commitment to human dignity. When implemented thoughtfully, AI-driven tools and secure enrollment systems can work together to create a campus environment that is innovative, inclusive, and resilient to the challenges of the digital era.`;
+// No local dummy full text. Full text will be fetched from the server when available.
 
 // Utilities to highlight snippets within full text (whitespace-tolerant)
 const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -682,8 +667,8 @@ export default function HighlightedInfoPage({
   sourcesContainerTitle?: string;
   setSourcesContainerTitle?: (title: string) => void;
 }>) {
+  const [fullText, setFullText] = useState<string>("");
   // Build a unified list of items: pdf (grouped by URL), qa (per item), text (per item)
-  console.log("data", data);
   const grouped = useMemo(() => {
     type PdfGroup = {
       sourceLabel: string;
@@ -896,6 +881,36 @@ export default function HighlightedInfoPage({
     setSelectedPage(null);
   }, [selectedSourceKey]);
 
+  // Only fetch consolidated text when there are text sources present
+  useEffect(() => {
+    // Determine if grouped contains any text kind
+    const hasTextSources = grouped.some((g) => g.kind === "text");
+    if (!hasTextSources) return;
+
+    // allow a static fallback chatbot id as requested
+    const effectiveChatbotId = chatbotId || "";
+
+    let aborted = false;
+    (async () => {
+      try {
+        const res = await fetch(`/chatbot/api/text-source`, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ chatbotId: effectiveChatbotId }),
+        });
+        if (!res.ok) return;
+        const json = await res.json();
+        if (aborted) return;
+        if (json && typeof json.text === "string") setFullText(json.text);
+      } catch (e) {
+        // ignore errors
+      }
+    })();
+    return () => {
+      aborted = true;
+    };
+  }, []);
+
   // Close overlay with Escape key
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -1047,10 +1062,24 @@ export default function HighlightedInfoPage({
                                         : []
                                     )
                                     .filter((t: string) => t && t.length > 0);
-                            const highlighted = renderHighlightedText(
-                              DUMMY_FULL_TEXT,
-                              snippets as Array<string | TextSnippet>
-                            );
+                            let highlighted;
+                            if (fullText && fullText.length > 0) {
+                              highlighted = renderHighlightedText(
+                                fullText,
+                                snippets as Array<string | TextSnippet>
+                              );
+                            } else {
+                              // no DB text; highlight inside the combined snippets themselves
+                              const combined = (snippets || [])
+                                .map((s) =>
+                                  typeof s === "string" ? s : s.text
+                                )
+                                .join("\n\n");
+                              highlighted = renderHighlightedText(
+                                combined,
+                                snippets as Array<string | TextSnippet>
+                              );
+                            }
                             return <>{highlighted}</>;
                           })()}
                         </div>
@@ -1140,10 +1169,23 @@ export default function HighlightedInfoPage({
                                         : []
                                     )
                                     .filter((t: string) => t && t.length > 0);
-                            const highlighted = renderHighlightedText(
-                              DUMMY_FULL_TEXT,
-                              snippets as Array<string | TextSnippet>
-                            );
+                            let highlighted;
+                            if (fullText && fullText.length > 0) {
+                              highlighted = renderHighlightedText(
+                                fullText,
+                                snippets as Array<string | TextSnippet>
+                              );
+                            } else {
+                              const combined = (snippets || [])
+                                .map((s) =>
+                                  typeof s === "string" ? s : s.text
+                                )
+                                .join("\n\n");
+                              highlighted = renderHighlightedText(
+                                combined,
+                                snippets as Array<string | TextSnippet>
+                              );
+                            }
                             return <>{highlighted}</>;
                           })()}
                         </div>

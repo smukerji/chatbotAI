@@ -1195,6 +1195,7 @@ function History({ chatbotId }: any) {
                         return activeRelevance === label;
                       })
                 }
+                chatbotId={chatbotId}
                 sourcesContainerTitle={sourcesContainerTitle}
                 setSourcesContainerTitle={setSourcesContainerTitle}
               />

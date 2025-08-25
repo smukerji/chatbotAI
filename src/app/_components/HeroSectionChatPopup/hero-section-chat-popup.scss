@@ -93,10 +93,62 @@
         display: contents;
       }
 
+      p {
+        font-size: 14px;
+        line-height: 140%;
+      }
+
+      ol {
+        /* use CSS counter since we're using flex layout which hides default markers */
+        counter-reset: list-counter;
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        margin: 10px 0 10px;
+
+        /* only count direct li children of the ol; nested lists (ul li) will not increment this counter */
+        > li {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          margin: 0 0 10px;
+          position: relative; /* anchor for the number pseudo-element */
+          padding-left: 34px; /* space for the numeric marker */
+          counter-increment: list-counter;
+
+          &::before {
+            content: counter(list-counter) ".";
+            position: absolute;
+            left: 0;
+            top: 0;
+            color: #111;
+            font-weight: 600;
+            font-size: 14px;
+            line-height: 1;
+            width: 28px;
+            text-align: right;
+            transform: translateY(2px);
+          }
+
+          strong {
+            margin: 0 0 10px;
+          }
+        }
+      }
+
+      ul {
+        li {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          margin: 0 0 5px;
+        }
+      }
+
       /// if there are any bullte points in the response
       ul,
       ol {
-        padding-left: 16px;
+        // padding-left: 16px;
       }
 
       ul {

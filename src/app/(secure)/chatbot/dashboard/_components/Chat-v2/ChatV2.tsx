@@ -2166,6 +2166,7 @@ function ChatV2({
                     return activeRelevance === label;
                   })
             }
+            chatbotId={chatbot.id}
             sourcesContainerTitle={sourcesContainerTitle}
             setSourcesContainerTitle={setSourcesContainerTitle}
           />
