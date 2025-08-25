@@ -87,7 +87,6 @@ function Dashboard() {
   const [sessionID, setSessionID]: any = useState();
   const [threadId, setThreadId] = useState("");
   const [sessionStartDate, setSessionStartDate]: any = useState();
-
   const [isPlanNotification, setIsPlanNotification] = useState(false);
   const [user, setUser] = useState<any>(null);
 

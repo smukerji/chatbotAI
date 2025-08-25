@@ -141,6 +141,9 @@ function ChatV2({
   /// skip leading form
   const [skipLeadForm, setSkipLeadForm] = useState(false);
 
+  /// mobile sub screen handler
+  const [mobileScreen, setMobileScreen] = useState("playground");
+
   /// isLeadform submitted
   const [isLeadFormSubmitted, setIsLeadFormSubmitted] = useState(false);
   const [leadError, setLeadError] = useState("");
@@ -149,6 +152,8 @@ function ChatV2({
 
   /// for apply css for embed bot on mobile screens
   const [innerWidth, setInnerWidth] = useState(false);
+  // detect whether current device is mobile/tab (width < 767)
+  const [isMobileDevice, setIsMobileDevice] = useState(false);
 
   /// chatbot messages feedback pop up state
   const [open, setOpen] = useState(false);
@@ -193,6 +198,8 @@ function ChatV2({
 
   /// sources data and if the source will be visible or not
   const [sourceVisible, setSourceVisible] = useState(false);
+  // mobile sheet open state to control slide-up animation
+  const [sheetOpen, setSheetOpen] = useState(false);
   const relevanceLevels = useMemo(
     () => [
       { label: "All", color: "#F4F5F6" },
@@ -1150,6 +1157,14 @@ function ChatV2({
     return () => {
       window.removeEventListener("resize", handleResize);
     };
+  }, [isPopUp]);
+
+  // track simple mobile breakpoint (<767px) used for tab/mobile view switching
+  useEffect(() => {
+    const handleMobileResize = () => setIsMobileDevice(window.innerWidth < 767);
+    handleMobileResize();
+    window.addEventListener("resize", handleMobileResize);
+    return () => window.removeEventListener("resize", handleMobileResize);
   }, []);
 
   useEffect(() => {
@@ -1172,11 +1187,15 @@ function ChatV2({
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, []);
+  }, [isPopUp]);
 
   useEffect(() => {
     /// when microphone is ready connect to deepgram
-    if (microphoneState === MicrophoneState.Ready && !isPopUp) {
+    const micReady = microphoneState === MicrophoneState.Ready && !isPopUp;
+    const micReadyPopup =
+      microphoneStatePopup === MicrophoneState.Ready && isPopUp;
+
+    if (micReady) {
       connectToDeepgram({
         model: "nova-2",
         interim_results: true,
@@ -1185,7 +1204,7 @@ function ChatV2({
         utterance_end_ms: 3000,
         language: language,
       });
-    } else if (microphoneStatePopup === MicrophoneState.Ready && isPopUp) {
+    } else if (micReadyPopup) {
       connectToDeepgramPopup({
         model: "nova-2",
         interim_results: true,
@@ -1196,10 +1215,23 @@ function ChatV2({
       });
     }
   }, [
-    microphoneState == MicrophoneState.Ready && !isPopUp,
-    microphoneStatePopup == MicrophoneState.Ready && isPopUp,
+    microphoneState,
+    microphoneStatePopup,
     language,
+    isPopUp,
+    connectToDeepgram,
+    connectToDeepgramPopup,
   ]);
+
+  // toggle sheetOpen to drive slide-up animation when sourceVisible toggles
+  useEffect(() => {
+    if (isMobileDevice && sourceVisible) {
+      // slight delay to allow mount then animate
+      setTimeout(() => setSheetOpen(true), 10);
+    } else {
+      setSheetOpen(false);
+    }
+  }, [isMobileDevice, sourceVisible]);
 
   // Define onTranscript and onData outside the functions so they are accessible
   const onTranscript = (data: LiveTranscriptionEvent) => {
@@ -1237,7 +1269,7 @@ function ChatV2({
     }, 8000);
 
     return () => clearInterval(interval);
-  }, [connection, connectionPopup]);
+  }, [connection, connectionPopup, isPopUp]);
 
   const startTranscription = async () => {
     if (!microphone && !isPopUp) return;
@@ -1351,381 +1383,420 @@ function ChatV2({
           <p>Upgrade now to access your chatbots!</p>
         </Modal> */}
 
-      {/*------------------------------------------left-section----------------------------------------------*/}
-      {!isPopUp && showChatbotDetails && (
-        <div className="chatbot-details">
-          <div className="detail">
-            <span>ID</span>
-            <div className="chatbot-id">
-              <span>{chatbot?.id}</span>{" "}
-              <Image
-                src={copyIcon}
-                alt="copy-icon"
-                style={{ cursor: "pointer" }}
-                onClick={handleCopy}
-              />
-            </div>
-          </div>
-
-          <div className="detail">
-            <span>Status</span>
-            <div className="status">
-              <div className="dot"></div> <span>Trained</span>
-            </div>
-          </div>
-
-          <div className="detail">
-            <span>Model</span>
-            <div className="model">
-              <span>{botSettings?.model}</span>
-            </div>
-          </div>
-
-          <div className="detail">
-            <span>Number of characters</span>
-            <div className="characters">
-              <span>{botSettings?.numberOfCharacterTrained}</span>
-            </div>
-          </div>
-
-          <div className="detail">
-            <span>Visibility</span>
-            <div className="visibility">
-              <span>{botSettings?.visibility}</span>
-            </div>
-          </div>
-
-          <div className="detail">
-            <div className="temperature">
-              <span>Temperature</span>
-              <span style={{ width: "auto" }}>{botSettings?.temperature}</span>
-            </div>
-
-            <Slider
-              style={{ zIndex: isPlanNotification ? -1 : 0 }}
-              min={0}
-              max={1}
-              onChange={onChange}
-              value={
-                typeof botSettings?.temperature === "number"
-                  ? botSettings?.temperature
-                  : 0
-              }
-              disabled={true}
-              step={0.1}
-            />
-            <div className="slider-bottom">
-              <div>Reserved</div>
-              <div>Creative</div>
-            </div>
-          </div>
-
-          <div className="detail">
-            <span>Last trained at</span>
-            <div className="trained">
-              <span>{formatTimestamp(botSettings?.lastTrained)}</span>
-            </div>
-          </div>
-        </div>
+      {!isPopUp && isMobileDevice && (
+        <ul className="mobile-options-container">
+          <li
+            className={`${mobileScreen === "playground" ? "active" : ""}`}
+            value={"playground"}
+            onClick={() => setMobileScreen("playground")}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ")
+                setMobileScreen("playground");
+            }}
+          >
+            <h3 className="option">Playground</h3>
+          </li>
+          <li
+            className={`${mobileScreen === "chatbot-details" ? "active" : ""}`}
+            value={"chatbot-details"}
+            onClick={() => setMobileScreen("chatbot-details")}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ")
+                setMobileScreen("chatbot-details");
+            }}
+          >
+            <h3 className="option">Chatbot Details</h3>
+          </li>
+        </ul>
       )}
-      {/*------------------------------------------right-section----------------------------------------------*/}
-      <div
-        className={`messages-section ${iframeLoaded ? "iframe" : ""} ${
-          innerWidth && "embed-messages-section"
-        }`}
-        style={{
-          backgroundColor: botSettings?.theme === "dark" ? "black" : "",
-          // When showChatbotDetails is false, force 30% width; otherwise let SCSS handle sizing
-          ...(!showChatbotDetails ? { width: "30%" } : {}),
-        }}
-      >
-        <div className="header">
-          <div className="chatbot-name-container">
-            <Image
-              src={
-                isPopUp
-                  ? profilePictureUrl
-                    ? profilePictureUrl
-                    : ChatBotIcon
-                  : botSettings?.profilePictureUrl
-                  ? botSettings?.profilePictureUrl
-                  : ChatBotIcon
-              }
-              alt="bot-img"
-              width={40}
-              height={40}
-              style={{ borderRadius: "50%" }}
-            />
-            <h1 className={`${isPopUp ? "popup-heading" : ""}`}>
-              {isPopUp
-                ? `${chatbotDisplayName}`
-                : botSettings?.chatbotDisplayName}
-            </h1>
+
+      {/*------------------------------------------left-section----------------------------------------------*/}
+      {!isPopUp &&
+        // on desktop show chatbot details when enabled, on mobile show it only when selected
+        ((!isMobileDevice && showChatbotDetails) ||
+          (isMobileDevice && mobileScreen === "chatbot-details")) && (
+          <div className="chatbot-details">
+            <div className="detail">
+              <span>ID</span>
+              <div className="chatbot-id">
+                <span>{chatbot?.id}</span>{" "}
+                <Image
+                  src={copyIcon}
+                  alt="copy-icon"
+                  style={{ cursor: "pointer" }}
+                  onClick={handleCopy}
+                />
+              </div>
+            </div>
+
+            <div className="detail">
+              <span>Status</span>
+              <div className="status">
+                <div className="dot"></div> <span>Trained</span>
+              </div>
+            </div>
+
+            <div className="detail">
+              <span>Model</span>
+              <div className="model">
+                <span>{botSettings?.model}</span>
+              </div>
+            </div>
+
+            <div className="detail">
+              <span>Number of characters</span>
+              <div className="characters">
+                <span>{botSettings?.numberOfCharacterTrained}</span>
+              </div>
+            </div>
+
+            <div className="detail">
+              <span>Visibility</span>
+              <div className="visibility">
+                <span>{botSettings?.visibility}</span>
+              </div>
+            </div>
+
+            <div className="detail">
+              <div className="temperature">
+                <span>Temperature</span>
+                <span style={{ width: "auto" }}>
+                  {botSettings?.temperature}
+                </span>
+              </div>
+
+              <Slider
+                style={{ zIndex: isPlanNotification ? -1 : 0 }}
+                min={0}
+                max={1}
+                onChange={onChange}
+                value={
+                  typeof botSettings?.temperature === "number"
+                    ? botSettings?.temperature
+                    : 0
+                }
+                disabled={true}
+                step={0.1}
+              />
+              <div className="slider-bottom">
+                <div>Reserved</div>
+                <div>Creative</div>
+              </div>
+            </div>
+
+            <div className="detail">
+              <span>Last trained at</span>
+              <div className="trained">
+                <span>{formatTimestamp(botSettings?.lastTrained)}</span>
+              </div>
+            </div>
           </div>
+        )}
+      {/*------------------------------------------right-section----------------------------------------------*/}
+      {(!isMobileDevice || mobileScreen === "playground") && (
+        <div
+          className={`messages-section ${iframeLoaded ? "iframe" : ""} ${
+            innerWidth && "embed-messages-section"
+          }`}
+          style={{
+            backgroundColor: botSettings?.theme === "dark" ? "black" : "",
+            // When showChatbotDetails is false, force 30% width; otherwise let SCSS handle sizing
+            ...(!showChatbotDetails && !isMobileDevice ? { width: "30%" } : {}),
+          }}
+        >
+          <div className="header">
+            <div className="chatbot-name-container">
+              <Image
+                src={
+                  isPopUp
+                    ? profilePictureUrl
+                      ? profilePictureUrl
+                      : ChatBotIcon
+                    : botSettings?.profilePictureUrl
+                    ? botSettings?.profilePictureUrl
+                    : ChatBotIcon
+                }
+                alt="bot-img"
+                width={40}
+                height={40}
+                style={{ borderRadius: "50%" }}
+              />
+              <h1 className={`${isPopUp ? "popup-heading" : ""}`}>
+                {isPopUp
+                  ? `${chatbotDisplayName}`
+                  : botSettings?.chatbotDisplayName}
+              </h1>
+            </div>
 
-          <div className="action-btns">
-            {/* <Image src={refreshBtn} alt="refresh-btn" onClick={refreshChat} /> */}
-            {/* <Image src={exportBtn} alt="export-btn" /> */}
-            <Icon
-              Icon={RefreshBtn}
-              click={refreshChat}
-              className={botSettings?.theme === "dark" ? "color-white" : ""}
-            />
-
-            {/* this is used for printing the chats initially it will be hidden but on print it will be visible*/}
-            <PrintingChats
-              ref={tempRef}
-              messages={messages}
-              messagesTime={messagesTime}
-            />
-
-            {/* If chatbot is opened from popup then add the close embed bot button */}
-            {isPopUp && (
+            <div className="action-btns">
+              {/* <Image src={refreshBtn} alt="refresh-btn" onClick={refreshChat} /> */}
+              {/* <Image src={exportBtn} alt="export-btn" /> */}
               <Icon
-                Icon={CloseEmbedBotIcon}
-                click={() => {
-                  const btn = document.getElementById("chat-frame-widget");
-                  // Send a message to the parent
-                  window.parent.postMessage("disable-iframe", "*");
-                }}
+                Icon={RefreshBtn}
+                click={refreshChat}
                 className={botSettings?.theme === "dark" ? "color-white" : ""}
               />
-            )}
 
-            {/* If the chatbot is embeded remove the print chat button */}
-            {!isPopUp && (
-              <ReactToPrint
-                trigger={() => {
-                  return (
-                    <button style={{ border: "none", background: "none" }}>
-                      <Icon
-                        Icon={ExportBtn}
-                        className={
-                          botSettings?.theme === "dark" ? "color-white" : ""
-                        }
-                      />
-                    </button>
-                  );
-                }}
-                content={() => tempRef.current}
+              {/* this is used for printing the chats initially it will be hidden but on print it will be visible*/}
+              <PrintingChats
+                ref={tempRef}
+                messages={messages}
+                messagesTime={messagesTime}
               />
-            )}
+
+              {/* If chatbot is opened from popup then add the close embed bot button */}
+              {isPopUp && (
+                <Icon
+                  Icon={CloseEmbedBotIcon}
+                  click={() => {
+                    const btn = document.getElementById("chat-frame-widget");
+                    // Send a message to the parent
+                    window.parent.postMessage("disable-iframe", "*");
+                  }}
+                  className={botSettings?.theme === "dark" ? "color-white" : ""}
+                />
+              )}
+
+              {/* If the chatbot is embeded remove the print chat button */}
+              {!isPopUp && (
+                <ReactToPrint
+                  trigger={() => {
+                    return (
+                      <button style={{ border: "none", background: "none" }}>
+                        <Icon
+                          Icon={ExportBtn}
+                          className={
+                            botSettings?.theme === "dark" ? "color-white" : ""
+                          }
+                        />
+                      </button>
+                    );
+                  }}
+                  content={() => tempRef.current}
+                />
+              )}
+            </div>
           </div>
-        </div>
 
-        <hr />
-        <div
-          className={`conversation-container ${
-            innerWidth && "embed-conversation-container"
-          }`}
-          ref={chatWindowRef}
-        >
-          {messages.map((message: any, index: any) => {
-            if (message.role == "assistant")
-              return (
-                <React.Fragment key={index}>
-                  <div
-                    className="assistant-message-container"
-                    style={{
-                      marginTop:
-                        `${messagesTime[index]?.messageType}` === "initial"
-                          ? "10px"
-                          : "0",
-
-                      position:
-                        messagesTime[index]?.messageType === "initial"
-                          ? "unset"
-                          : "relative",
-                    }}
-                  >
+          <hr />
+          <div
+            className={`conversation-container ${
+              innerWidth && "embed-conversation-container"
+            }`}
+            ref={chatWindowRef}
+          >
+            {messages.map((message: any, index: any) => {
+              if (message.role == "assistant")
+                return (
+                  <React.Fragment key={index}>
                     <div
-                      className="assistant-message"
+                      className="assistant-message-container"
                       style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        backgroundColor:
-                          botSettings?.theme === "dark" ? "#353945" : "",
-                        color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
+                        marginTop:
+                          `${messagesTime[index]?.messageType}` === "initial"
+                            ? "10px"
+                            : "0",
+
+                        position:
+                          messagesTime[index]?.messageType === "initial"
+                            ? "unset"
+                            : "relative",
                       }}
-                      dangerouslySetInnerHTML={{
-                        __html: message.content,
+                    >
+                      <div
+                        className="assistant-message"
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          backgroundColor:
+                            botSettings?.theme === "dark" ? "#353945" : "",
+                          color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
+                        }}
+                        dangerouslySetInnerHTML={{
+                          __html: message.content,
+                        }}
+                      ></div>
+                      {messagesTime[index]?.messageType !== "initial" && (
+                        <div className="time">
+                          {messagesTime[index]?.messageTime}
+                        </div>
+                      )}
+                      {(messages[index + 1] === undefined ||
+                        messages[index + 1].role == "user") && (
+                        <div className="like-dislike-container">
+                          <Image
+                            src={likeIcon}
+                            alt="like-icon"
+                            onClick={() => openChatbotModal(index, "like")}
+                          />
+                          <Image
+                            src={dislikeIcon}
+                            alt="dislike-icon"
+                            onClick={() => openChatbotModal(index, "dislike")}
+                          />
+                          {/* Only show sources button if sources are available */}
+                          {message.sources && message.sources?.length > 0 && (
+                            <button
+                              className="sources-btn"
+                              onClick={() => {
+                                /// hide the chatbot Details
+                                setShowChatbotDetails(false);
+                                handleShowSources(message.sources);
+                              }}
+                              aria-label="Sources"
+                            >
+                              <Image
+                                src={SourcesDots}
+                                alt="sources-icon"
+                                width={32}
+                                height={32}
+                              />
+                              Sources
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    <ChatbotNameModal
+                      open={open}
+                      setOpen={setOpen}
+                      chatbotText={feedbackText}
+                      setChatbotText={setfeedbackText}
+                      handleOk={handleOk}
+                      forWhat="feedback"
+                    />
+                  </React.Fragment>
+                );
+              else
+                return (
+                  <div className="user-message-container">
+                    <div
+                      className="user-message"
+                      key={index}
+                      style={{
+                        backgroundColor: botSettings?.userMessageColor
+                          ? botSettings?.userMessageColor
+                          : userMessageColor,
                       }}
-                    ></div>
-                    {messagesTime[index]?.messageType !== "initial" && (
-                      <div className="time">
-                        {messagesTime[index]?.messageTime}
+                    >
+                      {message.content}
+                    </div>
+                    <div className="time">
+                      {messagesTime[index]?.messageTime}
+                    </div>
+                  </div>
+                );
+            })}
+            {loading == false &&
+              // isPopUp &&
+              !isLeadFormSubmitted &&
+              !userDetails?.isLeadFormSubmitted &&
+              !skipLeadForm &&
+              !cookies?.[`leadDetails-${chatbot.id}`] &&
+              messages.length > 1 &&
+              messages.length % 2 == 1 &&
+              userLeadDetails !== "do-not-collect" &&
+              botSettings?.userDetails !== "do-not-collect" && (
+                <div className="lead-generation-container">
+                  <h2>
+                    {leadTitle ? leadTitle : "Let us know how to contact you"}
+                  </h2>
+
+                  <div className="collect-details">
+                    {leadFields?.name.isChecked == true && (
+                      <div className="detail-field">
+                        <p className="title">
+                          {leadFields?.name.value
+                            ? leadFields?.name.value
+                            : "Name"}
+                        </p>
+                        <input
+                          type="text"
+                          className="title-input"
+                          placeholder="Enter your name"
+                          onChange={(e: any) => {
+                            setLeadDetails({
+                              ...leadDetails,
+                              name: e.target.value,
+                            });
+                            setLeadError("");
+                            setNameError("");
+                          }}
+                          onBlur={() => {
+                            if (
+                              leadFields?.name.isChecked == true &&
+                              leadDetails.name === ""
+                            ) {
+                              setNameError("Please enter your name");
+                              return;
+                            }
+                          }}
+                          value={leadDetails.name}
+                        />
+                        <div className="lead-error">
+                          <p>{nameError}</p>
+                        </div>
                       </div>
                     )}
-                    {(messages[index + 1] === undefined ||
-                      messages[index + 1].role == "user") && (
-                      <div className="like-dislike-container">
-                        <Image
-                          src={likeIcon}
-                          alt="like-icon"
-                          onClick={() => openChatbotModal(index, "like")}
+
+                    {leadFields?.email.isChecked == true && (
+                      <div className="detail-field">
+                        <p className="title">
+                          {leadFields?.email.value
+                            ? leadFields?.email.value
+                            : "Email Address"}
+                        </p>
+                        <input
+                          type="email"
+                          className="title-input"
+                          placeholder="Enter your email address"
+                          onChange={(e) => {
+                            setLeadDetails({
+                              ...leadDetails,
+                              email: e.target.value,
+                            });
+                            setLeadError("");
+                            setEmailError("");
+                          }}
+                          onBlur={() => {
+                            if (
+                              leadFields?.email.isChecked == true &&
+                              leadDetails.email === ""
+                            ) {
+                              setEmailError("Please enter your email");
+                              return;
+                            }
+                            const pattern =
+                              /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
+                            //   message: "Invalid email address format",
+
+                            /// validate email
+                            const result = leadDetails.email?.match(pattern);
+
+                            if (!result) {
+                              setEmailError("Invalid email format.");
+                            }
+                          }}
+                          value={leadDetails?.email}
                         />
-                        <Image
-                          src={dislikeIcon}
-                          alt="dislike-icon"
-                          onClick={() => openChatbotModal(index, "dislike")}
-                        />
-                        {/* Only show sources button if sources are available */}
-                        {message.sources && message.sources?.length > 0 && (
-                          <button
-                            className="sources-btn"
-                            onClick={() => {
-                              /// hide the chatbot Details
-                              setShowChatbotDetails(false);
-                              handleShowSources(message.sources);
-                            }}
-                            aria-label="Sources"
-                          >
-                            <Image
-                              src={SourcesDots}
-                              alt="sources-icon"
-                              width={32}
-                              height={32}
-                            />
-                            Sources
-                          </button>
-                        )}
+                        <div className="lead-error">
+                          <p>{emailError}</p>
+                        </div>
                       </div>
                     )}
-                  </div>
-                  <ChatbotNameModal
-                    open={open}
-                    setOpen={setOpen}
-                    chatbotText={feedbackText}
-                    setChatbotText={setfeedbackText}
-                    handleOk={handleOk}
-                    forWhat="feedback"
-                  />
-                </React.Fragment>
-              );
-            else
-              return (
-                <div className="user-message-container">
-                  <div
-                    className="user-message"
-                    key={index}
-                    style={{
-                      backgroundColor: botSettings?.userMessageColor
-                        ? botSettings?.userMessageColor
-                        : userMessageColor,
-                    }}
-                  >
-                    {message.content}
-                  </div>
-                  <div className="time">{messagesTime[index]?.messageTime}</div>
-                </div>
-              );
-          })}
-          {loading == false &&
-            // isPopUp &&
-            !isLeadFormSubmitted &&
-            !userDetails?.isLeadFormSubmitted &&
-            !skipLeadForm &&
-            !cookies?.[`leadDetails-${chatbot.id}`] &&
-            messages.length > 1 &&
-            messages.length % 2 == 1 &&
-            userLeadDetails !== "do-not-collect" &&
-            botSettings?.userDetails !== "do-not-collect" && (
-              <div className="lead-generation-container">
-                <h2>
-                  {leadTitle ? leadTitle : "Let us know how to contact you"}
-                </h2>
 
-                <div className="collect-details">
-                  {leadFields?.name.isChecked == true && (
-                    <div className="detail-field">
-                      <p className="title">
-                        {leadFields?.name.value
-                          ? leadFields?.name.value
-                          : "Name"}
-                      </p>
-                      <input
-                        type="text"
-                        className="title-input"
-                        placeholder="Enter your name"
-                        onChange={(e: any) => {
-                          setLeadDetails({
-                            ...leadDetails,
-                            name: e.target.value,
-                          });
-                          setLeadError("");
-                          setNameError("");
-                        }}
-                        onBlur={() => {
-                          if (
-                            leadFields?.name.isChecked == true &&
-                            leadDetails.name === ""
-                          ) {
-                            setNameError("Please enter your name");
-                            return;
-                          }
-                        }}
-                        value={leadDetails.name}
-                      />
-                      <div className="lead-error">
-                        <p>{nameError}</p>
-                      </div>
-                    </div>
-                  )}
-
-                  {leadFields?.email.isChecked == true && (
-                    <div className="detail-field">
-                      <p className="title">
-                        {leadFields?.email.value
-                          ? leadFields?.email.value
-                          : "Email Address"}
-                      </p>
-                      <input
-                        type="email"
-                        className="title-input"
-                        placeholder="Enter your email address"
-                        onChange={(e) => {
-                          setLeadDetails({
-                            ...leadDetails,
-                            email: e.target.value,
-                          });
-                          setLeadError("");
-                          setEmailError("");
-                        }}
-                        onBlur={() => {
-                          if (
-                            leadFields?.email.isChecked == true &&
-                            leadDetails.email === ""
-                          ) {
-                            setEmailError("Please enter your email");
-                            return;
-                          }
-                          const pattern =
-                            /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
-                          //   message: "Invalid email address format",
-
-                          /// validate email
-                          const result = leadDetails.email?.match(pattern);
-
-                          if (!result) {
-                            setEmailError("Invalid email format.");
-                          }
-                        }}
-                        value={leadDetails?.email}
-                      />
-                      <div className="lead-error">
-                        <p>{emailError}</p>
-                      </div>
-                    </div>
-                  )}
-
-                  {leadFields?.number.isChecked == true && (
-                    <div className="detail-field">
-                      <p className="title">
-                        {leadFields?.number.value
-                          ? leadFields?.number.value
-                          : "Phone Number"}
-                      </p>
-                      {/* <input
+                    {leadFields?.number.isChecked == true && (
+                      <div className="detail-field">
+                        <p className="title">
+                          {leadFields?.number.value
+                            ? leadFields?.number.value
+                            : "Phone Number"}
+                        </p>
+                        {/* <input
                           id="mobile_code"
                           type="text"
                           className="title-input"
@@ -1740,204 +1811,204 @@ function ChatV2({
                           value={leadDetails?.number}
                         /> */}
 
-                      <PhoneInput
-                        country={
-                          botDetails?.userCountry
-                            ? botDetails?.userCountry
-                            : userLocation
-                        }
-                        value={mobileNumber}
-                        placeholder="Enter your phone number"
-                        onChange={(phone, country: any) => {
-                          // Process to format the phone number
-                          const phoneWithoutCode = phone.startsWith(
-                            `${country?.dialCode}`
-                          )
-                            ? phone.slice(`${country?.dialCode}`.length)
-                            : phone;
-                          const formattedPhone: any = `+${country?.dialCode}-${phoneWithoutCode}`;
-
-                          setMobileNumber(phone);
-
-                          setLeadDetails({
-                            ...leadDetails,
-                            number: formattedPhone,
-                          });
-                          setLeadError("");
-                          setValidNumberError("");
-                        }}
-                        // onChange={(phone, country) =>
-                        //   handlePhoneChange(phone, country)
-                        // }
-                        enableLongNumbers={true}
-                        isValid={(value: any, country: any) =>
-                          // isValidPhoneNumber(value, country)
-                          getPhoneNumberLength(value, country)
-                        }
-                        onBlur={() => {
-                          if (
-                            leadFields?.number.isChecked == true &&
-                            !isNumberValid
-                          ) {
-                            setValidNumberError("Please enter valid number");
-                            return;
+                        <PhoneInput
+                          country={
+                            botDetails?.userCountry
+                              ? botDetails?.userCountry
+                              : userLocation
                           }
-                        }}
-                      />
-                      <div className="lead-error">
-                        <p>{validNumberError}</p>
+                          value={mobileNumber}
+                          placeholder="Enter your phone number"
+                          onChange={(phone, country: any) => {
+                            // Process to format the phone number
+                            const phoneWithoutCode = phone.startsWith(
+                              `${country?.dialCode}`
+                            )
+                              ? phone.slice(`${country?.dialCode}`.length)
+                              : phone;
+                            const formattedPhone: any = `+${country?.dialCode}-${phoneWithoutCode}`;
+
+                            setMobileNumber(phone);
+
+                            setLeadDetails({
+                              ...leadDetails,
+                              number: formattedPhone,
+                            });
+                            setLeadError("");
+                            setValidNumberError("");
+                          }}
+                          // onChange={(phone, country) =>
+                          //   handlePhoneChange(phone, country)
+                          // }
+                          enableLongNumbers={true}
+                          isValid={(value: any, country: any) =>
+                            // isValidPhoneNumber(value, country)
+                            getPhoneNumberLength(value, country)
+                          }
+                          onBlur={() => {
+                            if (
+                              leadFields?.number.isChecked == true &&
+                              !isNumberValid
+                            ) {
+                              setValidNumberError("Please enter valid number");
+                              return;
+                            }
+                          }}
+                        />
+                        <div className="lead-error">
+                          <p>{validNumberError}</p>
+                        </div>
                       </div>
-                    </div>
-                  )}
-                  {leadError && (
-                    <div className="lead-error">
-                      <p>{leadError}</p>
-                    </div>
-                  )}
-                </div>
-
-                <div className="submit-skip-btn">
-                  <Button
-                    type="primary"
-                    className="save-btn"
-                    onClick={submitLeadDetail}
-                  >
-                    Submit
-                  </Button>
-
-                  {userLeadDetails !== "mandatory" &&
-                    botSettings?.userDetails !== "mandatory" && (
-                      <Button
-                        type="text"
-                        className="skip-btn"
-                        onClick={skipLeadDetail}
-                      >
-                        Skip
-                      </Button>
                     )}
+                    {leadError && (
+                      <div className="lead-error">
+                        <p>{leadError}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="submit-skip-btn">
+                    <Button
+                      type="primary"
+                      className="save-btn"
+                      onClick={submitLeadDetail}
+                    >
+                      Submit
+                    </Button>
+
+                    {userLeadDetails !== "mandatory" &&
+                      botSettings?.userDetails !== "mandatory" && (
+                        <Button
+                          type="text"
+                          className="skip-btn"
+                          onClick={skipLeadDetail}
+                        >
+                          Skip
+                        </Button>
+                      )}
+                  </div>
+                </div>
+              )}
+            {loading && response.length == 0 && (
+              <div className="assistant-message-container">
+                <div
+                  className="assistant-message"
+                  style={{
+                    backgroundColor:
+                      botSettings?.theme === "dark" ? "#353945" : "",
+                    color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
+                  }}
+                >
+                  <div className="typing-indicator">
+                    <div className="dot"></div>
+                    <div className="dot"></div>
+                    <div className="dot"></div>
+                  </div>
                 </div>
               </div>
             )}
-          {loading && response.length == 0 && (
-            <div className="assistant-message-container">
-              <div
-                className="assistant-message"
-                style={{
-                  backgroundColor:
-                    botSettings?.theme === "dark" ? "#353945" : "",
-                  color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
-                }}
-              >
-                <div className="typing-indicator">
-                  <div className="dot"></div>
-                  <div className="dot"></div>
-                  <div className="dot"></div>
+            {response && (
+              <div className="assistant-message-container">
+                <div
+                  className="assistant-message"
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    backgroundColor:
+                      botSettings?.theme === "dark" ? "#353945" : "",
+                    color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
+                  }}
+                  dangerouslySetInnerHTML={{
+                    __html: response.concat("<b> |</b>"),
+                  }}
+                />
+              </div>
+            )}
+          </div>
+          <div className="suggested-messages">
+            {/* if chatbot is opened from popup render the suggested messages from state */}
+            {suggestedMessages?.map((message: any, index: any) => {
+              return (
+                <div
+                  className="message"
+                  key={index}
+                  onClick={() => setUserQuery(message)}
+                >
+                  {message}
                 </div>
-              </div>
-            </div>
-          )}
-          {response && (
-            <div className="assistant-message-container">
-              <div
-                className="assistant-message"
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  backgroundColor:
-                    botSettings?.theme === "dark" ? "#353945" : "",
-                  color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
-                }}
-                dangerouslySetInnerHTML={{
-                  __html: response.concat("<b> |</b>"),
-                }}
-              />
-            </div>
-          )}
-        </div>
-        <div className="suggested-messages">
-          {/* if chatbot is opened from popup render the suggested messages from state */}
-          {suggestedMessages?.map((message: any, index: any) => {
-            return (
-              <div
-                className="message"
-                key={index}
-                onClick={() => setUserQuery(message)}
-              >
-                {message}
-              </div>
-            );
-          })}
-          {botSettings?.suggestedMessages?.map((message: any, index: any) => {
-            return (
-              <div
-                className="message"
-                key={index}
-                onClick={() => setUserQuery(message)}
-              >
-                {message}
-              </div>
-            );
-          })}
-        </div>
-        <a
-          className="powered-by"
-          target="_blank"
-          href={`${
-            chatbot?.id === "35910e5d-d751-4ba0-a52c-50d4c9302352"
-              ? "https://www.creolestudios.com/?utm_source=ASGTG+Website&utm_medium=referral&utm_campaign=ASGTG"
-              : "https://torri.ai"
-          }`}
-        >
-          {chatbot?.id === "35910e5d-d751-4ba0-a52c-50d4c9302352"
-            ? "Powered by Creole Studios"
-            : "Powered by Torri.AI"}
-        </a>
-        <div
-          className="chat-question"
-          style={{
-            backgroundColor: botSettings?.theme === "dark" ? "#353945" : "",
-          }}
-        >
-          <input
+              );
+            })}
+            {botSettings?.suggestedMessages?.map((message: any, index: any) => {
+              return (
+                <div
+                  className="message"
+                  key={index}
+                  onClick={() => setUserQuery(message)}
+                >
+                  {message}
+                </div>
+              );
+            })}
+          </div>
+          <a
+            className="powered-by"
+            target="_blank"
+            href={`${
+              chatbot?.id === "35910e5d-d751-4ba0-a52c-50d4c9302352"
+                ? "https://www.creolestudios.com/?utm_source=ASGTG+Website&utm_medium=referral&utm_campaign=ASGTG"
+                : "https://torri.ai"
+            }`}
+          >
+            {chatbot?.id === "35910e5d-d751-4ba0-a52c-50d4c9302352"
+              ? "Powered by Creole Studios"
+              : "Powered by Torri.AI"}
+          </a>
+          <div
+            className="chat-question"
             style={{
               backgroundColor: botSettings?.theme === "dark" ? "#353945" : "",
-              color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
             }}
-            type="text"
-            onKeyDown={getReply}
-            onChange={(event) => {
-              setUserQuery(event.target.value);
-            }}
-            placeholder={
-              // isPopUp
-              //   ? `Message ${chatbotName}`
-              //   : botSettings?.messagePlaceholder
-              // isPopUp
-              //   ? `Message ${chatbotName}`
-              //   : botSettings?.messagePlaceholder
-              botSettings?.messagePlaceholder
-                ? botSettings?.messagePlaceholder
-                : messagePlaceholder
-            }
-            value={userQuery}
-            disabled={loading ? true : false}
-          />
-          <div className="action-btns">
-            {/* <button className="web-search-button">
+          >
+            <input
+              style={{
+                backgroundColor: botSettings?.theme === "dark" ? "#353945" : "",
+                color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
+              }}
+              type="text"
+              onKeyDown={getReply}
+              onChange={(event) => {
+                setUserQuery(event.target.value);
+              }}
+              placeholder={
+                // isPopUp
+                //   ? `Message ${chatbotName}`
+                //   : botSettings?.messagePlaceholder
+                // isPopUp
+                //   ? `Message ${chatbotName}`
+                //   : botSettings?.messagePlaceholder
+                botSettings?.messagePlaceholder
+                  ? botSettings?.messagePlaceholder
+                  : messagePlaceholder
+              }
+              value={userQuery}
+              disabled={loading ? true : false}
+            />
+            <div className="action-btns">
+              {/* <button className="web-search-button">
               <Icon Icon={WebSearchIcon}></Icon>
               Search
             </button> */}
-            <div
-              className="send-record-container"
-              style={{
-                backgroundColor:
-                  botSettings?.userMessageColor &&
-                  microphoneState === MicrophoneState.Open
-                    ? botSettings?.userMessageColor
-                    : userMessageColor,
-              }}
-            >
-              {/*           
+              <div
+                className="send-record-container"
+                style={{
+                  backgroundColor:
+                    botSettings?.userMessageColor &&
+                    microphoneState === MicrophoneState.Open
+                      ? botSettings?.userMessageColor
+                      : userMessageColor,
+                }}
+              >
+                {/*           
             {(MicrophoneState.Open === microphoneState && !isPopUp) ||
             (MicrophoneState.Open === microphoneStatePopup && isPopUp) ? (
               <>
@@ -1972,29 +2043,53 @@ function ChatV2({
               />
             )}
  */}
-              <button
-                className="icon"
-                onClick={() => getReply("click")}
-                style={{
-                  backgroundColor: botSettings?.userMessageColor
-                    ? botSettings?.userMessageColor
-                    : userMessageColor,
-                }}
-                disabled={loading ? true : false}
-              >
-                <Image src={sendChatIcon} alt="send-chat-icon" />
-              </button>
+                <button
+                  className="icon"
+                  onClick={() => getReply("click")}
+                  style={{
+                    backgroundColor: botSettings?.userMessageColor
+                      ? botSettings?.userMessageColor
+                      : userMessageColor,
+                  }}
+                  disabled={loading ? true : false}
+                >
+                  <Image src={sendChatIcon} alt="send-chat-icon" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
       {/* sources div */}
       {sourceVisible && selectedSources.length > 0 && (
         <div
           className="sources-container"
           style={{
-            /// when showChatbotDetails is false set its width to 70%
-            ...(!showChatbotDetails ? { width: "70%", minWidth: "70%" } : {}),
+            // when showChatbotDetails is false set its width to 70% (desktop)
+            ...(!showChatbotDetails && !isMobileDevice
+              ? { width: "70%", minWidth: "70%" }
+              : {}),
+            // mobile: render as a bottom sheet overlay
+            ...(isMobileDevice
+              ? {
+                  position: "fixed",
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  width: "100%",
+                  minWidth: "100%",
+                  height: "72vh",
+                  maxHeight: "92vh",
+                  borderTopLeftRadius: "12px",
+                  borderTopRightRadius: "12px",
+                  boxShadow: "0 -8px 30px rgba(0,0,0,0.2)",
+                  zIndex: 9999,
+                  overflow: "auto",
+                  // slide animation: start translated down, then slide up when sheetOpen
+                  transform: sheetOpen ? "translateY(0)" : "translateY(100%)",
+                  transition: "transform 260ms cubic-bezier(.2,.8,.2,1)",
+                }
+              : {}),
           }}
         >
           <div
