@@ -1,6 +1,6 @@
-import { UploadProps, message } from "antd";
+import { UploadProps, message, Progress } from "antd";
 import Dragger from "antd/es/upload/Dragger";
-import React, { useContext } from "react";
+import React, { useContext, useState, useRef } from "react";
 import Image from "next/image";
 import documentUploadIcon from "../../../../public/create-chatbot-svgs/document-upload.svg";
 import "./source-upload.scss";
@@ -19,6 +19,34 @@ function SourceUpload({
   /// get the userID from cookies
   const [cookies, setCookies]: any = useCookies(["userId"]);
 
+  /// State to track uploading files with progress
+  const [uploadingFiles, setUploadingFiles] = useState<{
+    [key: string]: number;
+  }>({});
+  /// Use ref to track intervals for immediate access
+  const intervalsRef = useRef<{ [key: string]: NodeJS.Timeout }>({});
+
+  /// Function to simulate progress for a file
+  const simulateProgress = (fileName: string) => {
+    let progress = 0;
+    const interval = setInterval(() => {
+      progress += Math.random() * 5; // Reduced increment between 0-5%
+      if (progress >= 85) {
+        progress = 85; // Stop at 85% until actual upload completes
+      }
+
+      setUploadingFiles((prev) => ({
+        ...prev,
+        [fileName]: Math.min(progress, 85),
+      }));
+    }, 500); // Increased interval to 500ms for slower progress
+
+    // Store the interval in ref for immediate access
+    intervalsRef.current[fileName] = interval;
+
+    return interval;
+  };
+
   /// get default file to preview if any
   const defaultFileList = botDetails?.defaultFileList;
   /// get new file list
@@ -30,14 +58,61 @@ function SourceUpload({
     name: "file",
     multiple: true,
     // action: `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/upload`,
-    action: "http://localhost:8080/process-doc",
+    action:
+      "https://torri-extraction-backend-108437277455.us-west3.run.app/process-doc",
+    beforeUpload(file) {
+      // Check if file already exists in defaultFileList
+      const fileExists = defaultFileList?.some(
+        (existingFile: any) => existingFile.name === file.name
+      );
+
+      // Check if file is currently being uploaded
+      const isUploading = uploadingFiles.hasOwnProperty(file.name);
+
+      if (fileExists) {
+        message.error(`File "${file.name}" already exists!`);
+        return false; // Prevent upload
+      }
+
+      if (isUploading) {
+        message.error(`File "${file.name}" is currently being uploaded!`);
+        return false; // Prevent upload
+      }
+
+      return true; // Allow upload
+    },
     onChange(info) {
       botContext?.handleChange("isLoading")(true);
       let { status, response } = info.file;
 
+      // Start progress simulation when upload begins (only if not already started)
+      if (status === "uploading" && !intervalsRef.current[info.file.name]) {
+        simulateProgress(info.file.name);
+      }
+
       if (response?.charLength) {
+        /// Clear the interval for this file
+        if (intervalsRef.current[info.file.name]) {
+          clearInterval(intervalsRef.current[info.file.name]);
+          delete intervalsRef.current[info.file.name];
+        }
+
+        /// Complete the progress for this file
+        setUploadingFiles((prev) => ({
+          ...prev,
+          [info.file.name]: 100,
+        }));
+
+        /// Remove from uploading files after a short delay
+        setTimeout(() => {
+          setUploadingFiles((prev) => {
+            const newState = { ...prev };
+            delete newState[info.file.name];
+            return newState;
+          });
+        }, 500);
+
         /// updating the character count
-        // botContext?.handleChange();
         botContext?.handleChange("totalCharCount")(
           totalCharCount + response.charLength
         );
@@ -61,6 +136,19 @@ function SourceUpload({
           botContext?.handleChange("isLoading")(false);
         });
       } else if (status === "error") {
+        /// Clear the interval for this file on error
+        if (intervalsRef.current[info.file.name]) {
+          clearInterval(intervalsRef.current[info.file.name]);
+          delete intervalsRef.current[info.file.name];
+        }
+
+        /// Remove from uploading files on error
+        setUploadingFiles((prev) => {
+          const newState = { ...prev };
+          delete newState[info.file.name];
+          return newState;
+        });
+
         message.error(`${response}`).then(() => {
           botContext?.handleChange("isLoading")(false);
         });
@@ -156,35 +244,63 @@ function SourceUpload({
         </Dragger>
       </div>
 
-      {defaultFileList?.length > 0 && <hr />}
+      {(defaultFileList?.length > 0 ||
+        Object.keys(uploadingFiles).length > 0) && <hr />}
       <div className="attached-files-container">
-        {defaultFileList?.length > 0 && (
-          <>
-            <div className="text">
-              <h1>Attached Files</h1>
+        {(defaultFileList?.length > 0 ||
+          Object.keys(uploadingFiles).length > 0) && (
+          <div className="text">
+            <h1>Attached Files</h1>
+            {defaultFileList?.length > 0 && (
               <span onClick={deleteAll}>Delete all</span>
-            </div>
-          </>
+            )}
+          </div>
         )}
 
         <div className="item-list-container">
+          {/* Show uploading files first */}
+          {Object.entries(uploadingFiles).map(([fileName, progress]) => (
+            <div key={`uploading-${fileName}`} className="item">
+              <div
+                className="file"
+                style={{
+                  justifyContent: "space-between",
+                  width: "100%",
+                  paddingRight: "30px",
+                  alignItems: "center",
+                  gap: "0",
+                }}
+              >
+                <p>{fileName}</p>
+                <div style={{ width: "300px" }}>
+                  <Progress
+                    percent={Math.round(progress)}
+                    size="small"
+                    status={progress === 100 ? "success" : "active"}
+                    showInfo={true}
+                    strokeColor="#4D72F5"
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+
+          {/* Show completed files */}
           {defaultFileList?.map((file: any, index: number) => {
             return (
-              <React.Fragment key={index}>
-                <div className="item">
-                  <div className="file">
-                    <p>{file.name}</p>
-                    <div>({file.charLength} chars)</div>
-                  </div>
-                  <div className="delete">
-                    <Image
-                      src={deleteIcon}
-                      alt="delete-icon"
-                      onClick={() => removeFile(file)}
-                    />
-                  </div>
+              <div key={`${file.name}-${index}`} className="item">
+                <div className="file">
+                  <p>{file.name}</p>
+                  <div>({file.charLength} chars)</div>
                 </div>
-              </React.Fragment>
+                <div className="delete">
+                  <Image
+                    src={deleteIcon}
+                    alt="delete-icon"
+                    onClick={() => removeFile(file)}
+                  />
+                </div>
+              </div>
             );
           })}
         </div>
