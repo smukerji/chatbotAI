@@ -42,6 +42,15 @@ const { RangePicker } = DatePicker;
 
 function History({ chatbotId }: any) {
   let tempRef: any = useRef<HTMLDivElement>();
+  // detect whether current device is mobile/tab (width < 767)
+  const [isMobileDevice, setIsMobileDevice] = useState(false);
+
+  useEffect(() => {
+    const handleMobileResize = () => setIsMobileDevice(window.innerWidth < 767);
+    handleMobileResize();
+    window.addEventListener("resize", handleMobileResize);
+    return () => window.removeEventListener("resize", handleMobileResize);
+  }, []);
 
   const [chatHistoryList, setChatHistoryList]: any = useState([]);
   const [currentChatHistory, setCurrentChatHistory]: any = useState([]);
@@ -928,12 +937,52 @@ function History({ chatbotId }: any) {
           />
           {/*------------------------------------------right-section----------------------------------------------*/}
 
+          {/* mobile scrim for message panel (close on tap) */}
+          {isMobileDevice && chatClicked && (
+            <div
+              className="message-scrim"
+              onClick={() => setIsChatClicked(false)}
+              style={{
+                position: "fixed",
+                inset: 0,
+                background: "rgba(0,0,0,0.45)",
+                zIndex: 9998,
+              }}
+            />
+          )}
+
           <div
             className="message-section-wrapper"
             style={{
-              display:
-                window.innerWidth > 767 || chatClicked ? "block" : "none",
+              // show on desktop or when a chat is opened on mobile
+              display: !isMobileDevice
+                ? window.innerWidth > 767
+                  ? "block"
+                  : "none"
+                : chatClicked
+                ? "block"
+                : "none",
               ...(sourcesModal ? { width: "30%", maxWidth: "30%" } : {}),
+              ...(isMobileDevice && chatClicked
+                ? {
+                    position: "fixed",
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    width: "100%",
+                    minWidth: "100%",
+                    height: "72vh",
+                    maxHeight: "92vh",
+                    borderTopLeftRadius: "12px",
+                    borderTopRightRadius: "12px",
+                    boxShadow: "0 -8px 30px rgba(0,0,0,0.25)",
+                    zIndex: 9999,
+                    overflow: "auto",
+                    transform: "translateY(0)",
+                    transition: "transform 260ms cubic-bezier(.2,.8,.2,1)",
+                    background: "white",
+                  }
+                : {}),
             }}
           >
             <div className="messages-section">
@@ -1114,10 +1163,43 @@ function History({ chatbotId }: any) {
 
           {/* sources div */}
           {sourcesModal && selectedSources.length > 0 && (
+            <> 
+              {isMobileDevice && (
+                <div
+                  className="sources-scrim"
+                  onClick={() => setSourcesModal(false)}
+                  style={{
+                    position: "fixed",
+                    inset: 0,
+                    background: "rgba(0,0,0,0.45)",
+                    zIndex: 9998,
+                  }}
+                />
+              )}
             <div
               className="sources-container"
               style={{
                 ...(sourcesModal ? { width: "50%", minWidth: "50%" } : {}),
+                ...(isMobileDevice
+                  ? {
+                      position: "fixed",
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      width: "100%",
+                      minWidth: "100%",
+                      height: "72vh",
+                      maxHeight: "92vh",
+                      borderTopLeftRadius: "12px",
+                      borderTopRightRadius: "12px",
+                      boxShadow: "0 -8px 30px rgba(0,0,0,0.25)",
+                      zIndex: 9999,
+                      overflow: "auto",
+                      transform: "translateY(0)",
+                      transition: "transform 260ms cubic-bezier(.2,.8,.2,1)",
+                      background: "white",
+                    }
+                  : {}),
               }}
             >
               <div
@@ -1200,6 +1282,7 @@ function History({ chatbotId }: any) {
                 setSourcesContainerTitle={setSourcesContainerTitle}
               />
             </div>
+            </>
           )}
         </div>
       )}
