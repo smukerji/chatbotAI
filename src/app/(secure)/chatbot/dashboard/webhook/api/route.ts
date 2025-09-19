@@ -1,670 +1,3 @@
-// import { NextRequest, NextResponse } from "next/server";
-
-// import clientPromise from "@/db";
-// import { ObjectId } from "mongodb";
-// import { encodeChat, encode, decode, isWithinTokenLimit } from "gpt-tokenizer";
-
-// import moment from "moment";
-
-// export const maxDuration = 300;
-
-// interface WhatsAppChatHistoryType {
-//   _id?: ObjectId;
-//   userId: string;
-//   chatbotId: string;
-//   chats: {
-//     [key: string]: {
-//       messages: {
-//         role: string;
-//         content: string;
-//       }[];
-//       usage: {
-//         completion_tokens: number;
-//         prompt_tokens: number;
-//         total_tokens: number;
-//       };
-//     };
-//   };
-// }
-
-// const getWhatsAppDetails = async (wa_id: any) => {
-//   try {
-//     const db = (await clientPromise!).db();
-//     const collection = db.collection("whatsappbot_details");
-//     const result = await collection.findOne({
-//       phoneNumberID: wa_id,
-//       isEnabled: true,
-//     });
-//     if (result.chatbotId) {
-//       return result;
-//     }
-//     return null;
-//   } catch (error) {
-//     console.log("error getting chatbotID");
-//     return "error";
-//   }
-// };
-
-// const getResponseNumber = (res: any) => {
-//   return res?.entry?.[0]?.changes?.[0]?.value?.contacts[0]?.wa_id;
-// };
-
-// //-----------------------------------------------------------This function will send message to whatsapp
-// async function sendMessageToWhatsapp(
-//   phoneNumberId: any,
-//   recipientPhoneNumber: any,
-//   accessToken: any,
-//   message: any
-// ) {
-//   const version = "v18.0"; // Replace with your desired version
-
-//   // Define the URL for the POST request
-//   const url = `https://graph.facebook.com/${version}/${phoneNumberId}/messages`;
-
-//   // Define the data to be sent in the request body
-//   const data = {
-//     messaging_product: "whatsapp",
-//     recipient_type: "individual",
-//     to: `${recipientPhoneNumber}`,
-//     type: "text",
-//     text: {
-//       preview_url: false,
-//       body: message,
-//     },
-//   };
-
-//   // Define the options for the fetch request
-//   const options = {
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "application/json",
-//       Authorization: `Bearer ${accessToken}`,
-//     },
-//     body: JSON.stringify(data),
-//   };
-//   // Make the POST request using fetch
-//   try {
-//     const response = await fetch(url, options);
-
-//     if (!response.ok) {
-//       throw new Error(`HTTP error! Status: ${response.status}`);
-//     }
-
-//     // Handle the data as needed
-//   } catch (error) {
-//     // Handle the error as needed
-//     console.log("whatsapp sending message error \n", error);
-//   }
-// }
-
-// export async function GET(req: NextRequest) {
-//   let hubMode = req.nextUrl.searchParams.get("hub.mode");
-//   let hubChallenge = req.nextUrl.searchParams.get("hub.challenge");
-//   let hubToken = req.nextUrl.searchParams.get("hub.verify_token");
-
-//   const db = (await clientPromise!).db();
-//   const collection = db?.collection("whatsappbot_details");
-//   //find the token in database
-//   const tokenDetails = await collection?.findOne({
-//     webhook_verification_token: hubToken,
-//   });
-//   if (
-//     hubMode === "subscribe" &&
-//     hubToken === tokenDetails?.webhook_verification_token
-//     // hubToken === process.env.WHATSAPPCALLBACKTOKEN
-//   ) {
-//     // find whome the hubToken belongs to and update the isTokenVerified to true
-//     const tokenDetails = await collection?.findOne({
-//       webhook_verification_token: hubToken,
-//     });
-//     if (tokenDetails) {
-//       await collection?.updateOne(
-//         { webhook_verification_token: hubToken },
-//         { $set: { isTokenVerified: true } }
-//       );
-//     }
-
-//     console.log("verified successfully");
-//     return new Response(hubChallenge);
-//   }
-//   console.log("->>>>>>>>>>>>>>>>>>");
-//   return new Response("Invalid Credentials", { status: 400 });
-// }
-
-// // WhatsApp will triger this post request once user asked question to bot and also response to the user
-// export async function POST(req: NextRequest) {
-//   let res: any = await req.json();
-
-//   try {
-//     let questionFromWhatsapp =
-//       res?.entry?.[0]?.changes?.[0]?.value?.messages?.[0]?.text?.body; // question received from whatsapp
-//     new Response("received", { status: 200 });
-
-//     if (questionFromWhatsapp === "this is a text message") {
-//       return new Response("received", { status: 200 });
-//     }
-//     if (
-//       questionFromWhatsapp == undefined ||
-//       questionFromWhatsapp.trim().length <= 0
-//     ) {
-//       //if the request is only about status don't move further
-//       // return NextResponse.json({ message: "received" });
-//       return new Response("received", { status: 200 });
-//     }
-
-//     await whatsAppOperation(res);
-//     return new Response("received", { status: 200 });
-//   } catch (error: any) {
-//     console.log("error at step", error);
-//   }
-// }
-
-// async function whatsAppOperation(res: any) {
-//   const tokenLimit = [
-//     {
-//       model: "gpt-3.5-turbo",
-//       tokens: 15385,
-//     },
-//     {
-//       model: "gpt-4",
-//       tokens: 8000,
-//     },
-//     {
-//       model: "gpt-4o",
-//       tokens: 16000,
-//     },
-//   ];
-
-//   let step = 1;
-
-//   try {
-//     let questionFromWhatsapp =
-//       res?.entry?.[0]?.changes?.[0]?.value?.messages?.[0]?.text?.body; // question received from whatsapp
-
-//     const binessAccountNumber =
-//       res?.entry?.[0]?.changes?.[0]?.value?.metadata["phone_number_id"];
-
-//     // -----------------------------------------------------This function will if the subscription is active or not of user
-
-//     step = 2;
-//     let whatsAppDetailsResult: any = await getWhatsAppDetails(
-//       binessAccountNumber
-//     ); //here you will recieved the chatbot unique id, based on this you would identify knowledge base
-//     const userPhoneNumber = getResponseNumber(res); //user phone number
-//     const db = (await clientPromise!).db();
-//     const userChatBotcollections = db.collection("user-chatbots");
-//     const userChatBotResult = await userChatBotcollections.findOne({
-//       chatbotId: whatsAppDetailsResult.chatbotId,
-//     });
-
-//     step = 3;
-//     const userCollection = db?.collection("users");
-//     const data = await userCollection.findOne({
-//       _id: new ObjectId(userChatBotResult.userId),
-//     });
-//     const endDate = data?.endDate;
-//     // const isTelegram = data?.isWhatsapp;
-
-//     const currentDate = new Date();
-//     if (currentDate > endDate) {
-//       step = 4;
-//       await sendMessageToWhatsapp(
-//         whatsAppDetailsResult.phoneNumberID,
-//         "+" + userPhoneNumber,
-//         whatsAppDetailsResult.whatsAppAccessToken,
-//         "Your subscription has ended"
-//       );
-//       return new Response("received", { status: 200 });
-//     } else {
-//       console.log("continue..");
-//     }
-
-//     step = 5;
-//     if (whatsAppDetailsResult.isEnabled === false) {
-//       // return { message: "Chatbot with WhatsApp is disabled" };
-//       console.log("Chatbot with WhatsApp is disabled ");
-//       // return NextResponse.json({ message: "received" });
-//       return new Response("received", { status: 200 });
-//     }
-
-//     if (!whatsAppDetailsResult || whatsAppDetailsResult === "error") {
-//       return new Response("received", { status: 200 });
-//       ``;
-//     }
-
-//     const userID = userChatBotResult.userId;
-
-//     //check whether limit is reached or not
-//     const version = "v18.0"; // Replace with your desired version
-//     // const phoneNumberId = process.env.WHATSAPPPHONENUMBERID; // Replace with your phone number ID
-//     const phoneNumberId = whatsAppDetailsResult.phoneNumberID;
-//     const recipientPhoneNumber = "+" + userPhoneNumber;
-//     // const accessToken = process.env.WHATSAPPTOKEN
-//     const accessToken = whatsAppDetailsResult.whatsAppAccessToken;
-
-//     step = 6;
-//     const userDetailsCollection = db?.collection("user-details");
-//     const userDetailsResult = await userDetailsCollection.findOne({
-//       userId: userID,
-//     });
-//     if (userDetailsResult.totalMessageCount >= userDetailsResult.messageLimit) {
-//       await sendMessageToWhatsapp(
-//         whatsAppDetailsResult.phoneNumberID,
-//         "+" + userPhoneNumber,
-//         whatsAppDetailsResult.whatsAppAccessToken,
-//         "Your limit reached please upgrade your plan"
-//       );
-//       return new Response("received", { status: 200 });
-//     }
-
-//     step = 7;
-//     // if we have user id
-//     const response: any = await fetch(
-//       `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/pinecone`,
-//       {
-//         method: "POST",
-//         body: JSON.stringify({
-//           userQuery: questionFromWhatsapp,
-//           chatbotId: whatsAppDetailsResult.chatbotId,
-//           userId: userID,
-//         }),
-//       }
-//     );
-
-//     /// parse the response and extract the similarity results
-//     const respText = await response.text();
-//     let similaritySearchResults = respText;
-
-//     step = 8;
-//     //get the user's chatbot history
-//     let userChatHistoryCollection = db.collection("whatsapp-chat-history");
-//     let userChatHistory: WhatsAppChatHistoryType =
-//       await userChatHistoryCollection.findOne({
-//         userId: userID,
-//         date: moment().utc().format("YYYY-MM-DD"),
-//       });
-
-//     //get the user's chatbot setting
-//     let userChatBotSetting = db.collection("chatbot-settings");
-
-//     //find the user's chatbot model
-//     let userChatBotModel = await userChatBotSetting.findOne({
-//       userId: userID,
-//     });
-
-//     step = 9;
-//     //if user chat history is not available, create a new chat history
-//     if (!userChatHistory) {
-//       // Fetch the response from the OpenAI API
-//       const responseOpenAI: any = await fetch(
-//         "https://api.openai.com/v1/chat/completions",
-//         {
-//           method: "POST",
-//           headers: {
-//             "Content-Type": "application/json",
-//             Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENAI_KEY}`,
-//           },
-//           body: JSON.stringify({
-//             model: userChatBotModel.model,
-//             temperature: userChatBotModel?.temperature ?? 0,
-//             top_p: 1,
-//             messages: [
-//               {
-//                 role: "system",
-//                 content: `${userChatBotModel?.instruction}
-
-//                 context:
-//              ${similaritySearchResults}`,
-//               },
-//               // ...conversationMessages,
-//               {
-//                 role: "user",
-//                 content: `
-//                   query: ${questionFromWhatsapp} `,
-//               },
-//             ],
-//           }),
-//         }
-//       );
-
-//       const openaiBody = JSON.parse(await responseOpenAI.text());
-
-//       //--------update message count if we have response from openai
-//       //update message count and check message limit
-
-//       const collections = db?.collection("user-details");
-//       const result = await collections.findOne({ userId: userID });
-//       if (
-//         result?.totalMessageCount !== undefined &&
-//         openaiBody.choices[0].message.content
-//       ) {
-//         // If totalMessageCount exists, update it by adding 1
-//         await collections.updateOne(
-//           { userId: userID },
-//           { $set: { totalMessageCount: result.totalMessageCount + 1 } }
-//         );
-//       }
-
-//       // after getting response from open ai
-//       if (openaiBody.choices[0].message.content) {
-//         await sendMessageToWhatsapp(
-//           whatsAppDetailsResult.phoneNumberID,
-//           "+" + userPhoneNumber,
-//           whatsAppDetailsResult.whatsAppAccessToken,
-//           openaiBody.choices[0].message.content
-//         );
-
-//         let similarSearchToken = encode(similaritySearchResults).length;
-//         let instructionTokenLength = encode(
-//           userChatBotModel?.instruction
-//         ).length;
-//         step = 10;
-//         //stores chat history
-//         await userChatHistoryCollection.insertOne({
-//           userId: userID,
-//           chatbotId: whatsAppDetailsResult.chatbotId,
-//           chats: {
-//             [`${userPhoneNumber}`]: {
-//               messages: [
-//                 {
-//                   role: "user",
-//                   content: `${questionFromWhatsapp}`,
-//                 },
-//                 {
-//                   role: "assistant",
-//                   content: openaiBody.choices[0].message.content,
-//                 },
-//               ],
-//               usage: {
-//                 completion_tokens: openaiBody.usage.completion_tokens,
-//                 prompt_tokens:
-//                   openaiBody.usage.prompt_tokens -
-//                   instructionTokenLength -
-//                   similarSearchToken,
-//                 total_tokens:
-//                   openaiBody.usage.total_tokens -
-//                   instructionTokenLength -
-//                   similarSearchToken,
-//               },
-//             },
-//           },
-//           date: moment().utc().format("YYYY-MM-DD"),
-//         });
-
-//         //return response
-//         // return new Response("received", { status: 200 });
-//       }
-//     }
-//     //when user chat history is available
-//     else {
-//       step = 11;
-//       //calculate the total tokens based on user message
-//       let previousTotalTokens = 0;
-//       let similarSearchToken = encode(similaritySearchResults).length;
-//       let instructionTokenLength = encode(userChatBotModel?.instruction).length;
-//       let conversationMessages: any = [];
-//       let currentQuestionsTotalTokens: any =
-//         encode(questionFromWhatsapp).length;
-//       // let totalTokens = previousTotalTokens + currentQuestionsTotalTokens[1];
-
-//       //if xyz user's based on number, chat history is available
-//       if (userChatHistory.chats[`${userPhoneNumber}`]) {
-//         previousTotalTokens = userChatHistory.chats[`${userPhoneNumber}`].usage
-//           .total_tokens as number;
-//         let totalCountedToken =
-//           previousTotalTokens +
-//           currentQuestionsTotalTokens +
-//           similarSearchToken;
-//         conversationMessages =
-//           userChatHistory.chats[`${userPhoneNumber}`].messages;
-
-//         if (
-//           tokenLimit[0]["model"] == userChatBotModel.model &&
-//           totalCountedToken >= tokenLimit[0].tokens
-//         ) {
-//           // const removeCount = Math.floor(conversationMessages.length / 3); // Calculate one-third of the array length
-//           // conversationMessages.splice(0, removeCount); // Remove one-third of the messages from the start of the array
-
-//           //approach 1
-//           // while (totalCountedToken >= tokenLimit[0].tokens) {
-//           //   // Assume calculateTokens is a function that calculates the tokens for a message
-//           //   totalCountedToken -= calculateTokens(conversationMessages[0]);
-//           //   conversationMessages.shift();
-//           // }
-
-//           //approach 2
-//           let tokensToRemove = totalCountedToken - tokenLimit[0].tokens;
-//           let index = 0;
-//           let tokens = 0;
-
-//           // Find the index where the sum of tokens reaches the limit
-//           while (
-//             tokens < tokensToRemove &&
-//             index < conversationMessages.length
-//           ) {
-//             tokens += calculateTokens(conversationMessages[index]);
-//             index++;
-//           }
-
-//           // Remove the messages from the start of the array up to the found index
-//           conversationMessages.splice(0, index);
-//           // totalCountedToken -= tokens;
-//         } else if (
-//           tokenLimit[1]["model"] == userChatBotModel.model &&
-//           totalCountedToken >= tokenLimit[1].tokens
-//         ) {
-//           // const removeCount = Math.floor(conversationMessages.length / 3); // Calculate one-third of the array length
-//           // conversationMessages.splice(0, removeCount); // Remove one-third of the messages from the start of the array
-//           let tokensToRemove = totalCountedToken - tokenLimit[1].tokens;
-//           let index = 0;
-//           let tokens = 0;
-
-//           // Find the index where the sum of tokens reaches the limit
-//           while (
-//             tokens < tokensToRemove &&
-//             index < conversationMessages.length
-//           ) {
-//             tokens += calculateTokens(conversationMessages[index]);
-//             index++;
-//           }
-
-//           // Remove the messages from the start of the array up to the found index
-//           conversationMessages.splice(0, index);
-//           // totalCountedToken -= tokens;
-//         } else if (
-//           tokenLimit[2]["model"] == userChatBotModel.model &&
-//           totalCountedToken >= tokenLimit[2].tokens
-//         ) {
-//           // const removeCount = Math.floor(conversationMessages.length / 3); // Calculate one-third of the array length
-//           // conversationMessages.splice(0, removeCount); // Remove one-third of the messages from the start of the array
-//           let tokensToRemove = totalCountedToken - tokenLimit[2].tokens;
-//           let index = 0;
-//           let tokens = 0;
-
-//           // Find the index where the sum of tokens reaches the limit
-//           while (
-//             tokens < tokensToRemove &&
-//             index < conversationMessages.length
-//           ) {
-//             tokens += calculateTokens(conversationMessages[index]);
-//             index++;
-//           }
-
-//           // Remove the messages from the start of the array up to the found index
-//           conversationMessages.splice(0, index);
-//           // totalCountedToken -= tokens;
-//         }
-//       }
-
-//       // similaritySearchResults = "My name is rudresh"
-
-//       step = 12;
-//       // Fetch the response from the OpenAI API
-//       const responseOpenAI: any = await fetch(
-//         "https://api.openai.com/v1/chat/completions",
-//         {
-//           method: "POST",
-//           headers: {
-//             "Content-Type": "application/json",
-//             Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENAI_KEY}`,
-//           },
-//           body: JSON.stringify({
-//             model: userChatBotModel.model,
-//             // model:"gpt-4",
-//             temperature: userChatBotModel?.temperature ?? 0,
-//             top_p: 1,
-//             messages: [
-//               {
-//                 role: "system",
-//                 content: `${userChatBotModel?.instruction}
-
-//                 context:
-//              ${similaritySearchResults}`,
-//               },
-//               ...conversationMessages,
-//               {
-//                 role: "user",
-//                 content: `
-//                   query: ${questionFromWhatsapp} `,
-//               },
-//             ],
-//           }),
-//         }
-//       );
-
-//       //parse the response to json
-//       const openaiBody = JSON.parse(await responseOpenAI.text());
-
-//       //--------update message count if we have response from openai
-//       //update message count and check message limit
-//       const collections = db?.collection("user-details");
-//       const result = await collections.findOne({ userId: userID });
-//       if (
-//         result?.totalMessageCount !== undefined &&
-//         openaiBody.choices[0].message.content
-//       ) {
-//         // If totalMessageCount exists, update it by adding 1
-//         await collections.updateOne(
-//           { userId: userID },
-//           { $set: { totalMessageCount: result.totalMessageCount + 1 } }
-//         );
-//       }
-
-//       // after getting response from open ai
-//       if (openaiBody.choices[0].message.content) {
-//         await sendMessageToWhatsapp(
-//           whatsAppDetailsResult.phoneNumberID,
-//           "+" + userPhoneNumber,
-//           whatsAppDetailsResult.whatsAppAccessToken,
-//           openaiBody.choices[0].message.content
-//         );
-
-//         step = 13;
-//         //update the chat history
-//         //check if chat history has userPhoneNumber's chat history
-//         if (!userChatHistory.chats[`${userPhoneNumber}`]) {
-//           //if userPhoneNumber's chat history is not available, add that to the chat history
-//           userChatHistory.chats[`${userPhoneNumber}`] = {
-//             messages: [
-//               {
-//                 role: "user",
-//                 content: `${questionFromWhatsapp}`,
-//               },
-//               {
-//                 role: "assistant",
-//                 content: openaiBody.choices[0].message.content,
-//               },
-//             ],
-//             usage: {
-//               completion_tokens: openaiBody.usage.completion_tokens,
-//               prompt_tokens:
-//                 openaiBody.usage.prompt_tokens -
-//                 instructionTokenLength -
-//                 similarSearchToken,
-//               total_tokens:
-//                 openaiBody.usage.total_tokens -
-//                 instructionTokenLength -
-//                 similarSearchToken,
-//             },
-//           };
-
-//           //update the chat history
-//           await userChatHistoryCollection.updateOne(
-//             { userId: userID, date: moment().utc().format("YYYY-MM-DD") },
-//             {
-//               $set: {
-//                 chats: userChatHistory.chats,
-//               },
-//             }
-//           );
-
-//           //return resonse
-//           // return new Response("received", { status: 200 });
-//         } else {
-//           //if chat history found, update the chat history
-
-//           step = 14;
-
-//           //update the chat history
-//           userChatHistory.chats[`${userPhoneNumber}`].messages.push(
-//             {
-//               role: "user",
-//               content: `${questionFromWhatsapp}`,
-//             },
-//             {
-//               role: "assistant",
-//               content: openaiBody.choices[0].message.content,
-//             }
-//           );
-
-//           //total tokens addition
-//           let oldTotalTokens =
-//             userChatHistory.chats[`${userPhoneNumber}`].usage.total_tokens;
-//           let userEnterToken = currentQuestionsTotalTokens;
-//           let openAICompletionToken = openaiBody.usage.completion_tokens;
-//           oldTotalTokens += userEnterToken + openAICompletionToken;
-
-//           //prompt tokens addition
-//           let oldPromptTokens =
-//             userChatHistory.chats[`${userPhoneNumber}`].usage.prompt_tokens;
-//           oldPromptTokens += currentQuestionsTotalTokens;
-
-//           //add the new to previoius tokens
-//           userChatHistory.chats[`${userPhoneNumber}`].usage = {
-//             completion_tokens: openaiBody.usage.completion_tokens,
-//             prompt_tokens: oldPromptTokens,
-//             total_tokens: oldTotalTokens,
-//           };
-
-//           //update the chat history
-//           await userChatHistoryCollection.updateOne(
-//             { userId: userID, date: moment().utc().format("YYYY-MM-DD") },
-//             {
-//               $set: {
-//                 chats: userChatHistory.chats,
-//               },
-//             }
-//           );
-
-//           //return response
-//           // return new Response("received", { status: 200 });
-//         }
-//       }
-//     }
-//   } catch (error: any) {
-//     console.log("error at step", step);
-//     console.log("error", error);
-//   }
-// }
-
-// function calculateTokens(conversationMessages: {
-//   role: string;
-//   content: string;
-// }) {
-//   const token = encode(conversationMessages.content).length;
-//   return token;
-// }
-
 import { NextRequest, NextResponse } from "next/server";
 
 import clientPromise from "@/db";
@@ -686,6 +19,8 @@ interface WhatsAppChatHistoryType {
       messages: {
         role: string;
         content: string;
+        timestamp: string; // ISO timestamp for when message was sent/received
+        messageTime?: string; // Formatted time for frontend display
       }[];
       usage: {
         completion_tokens: number;
@@ -697,6 +32,9 @@ interface WhatsAppChatHistoryType {
       assistantId?: string;
     };
   };
+  date: string; // Date string in YYYY-MM-DD format
+  createdAt?: Date; // When the document was first created
+  updatedAt?: Date; // When the document was last updated
 }
 
 // Create the OpenAI client instance
@@ -857,6 +195,57 @@ async function sendMessageToWhatsapp(
       error
     );
     throw error; // Re-throw to handle upstream
+  }
+}
+
+// Format HTML/assistant output into WhatsApp-friendly plain text using OpenAI
+async function formatMessageForWhatsApp(
+  htmlMessage: string,
+  model = "gpt-3.5-turbo"
+) {
+  if (!htmlMessage || htmlMessage.trim().length === 0) return htmlMessage;
+
+  try {
+    const systemPrompt = `Format provided content as pre whatsapp messaging style. Output ONLY the converted text without any extra notes.`;
+
+    const payload = {
+      model,
+      temperature: 0.2,
+      top_p: 1,
+      messages: [
+        { role: "system", content: systemPrompt },
+        {
+          role: "user",
+          content: `Convert the following content for WhatsApp delivery. Output ONLY the converted text without any extra notes:\n\n${htmlMessage}`,
+        },
+      ],
+    };
+
+    const resp = await makeAPICallWithTimeout(
+      "https://api.openai.com/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENAI_KEY}`,
+        },
+        body: JSON.stringify(payload),
+      },
+      15000,
+      1
+    );
+
+    const text = await resp.text();
+    const parsed = JSON.parse(text || "{}");
+    const formatted =
+      parsed?.choices?.[0]?.message?.content ||
+      parsed?.choices?.[0]?.text ||
+      htmlMessage;
+
+    return (formatted as string).trim();
+  } catch (error: any) {
+    logError("Failed to format message for WhatsApp", error);
+    return htmlMessage; // Fallback to original
   }
 }
 
@@ -1221,6 +610,80 @@ export async function GET(req: NextRequest) {
   }
 }
 
+// Global Map to track processed messages and prevent duplicates
+const processedMessages = new Map<string, number>();
+const processingMessages = new Set<string>();
+
+// Circuit breaker to prevent rapid successive failures
+const circuitBreaker = new Map<
+  string,
+  { failureCount: number; lastFailure: number; isOpen: boolean }
+>();
+
+// Clean up old entries every 5 minutes
+setInterval(() => {
+  const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
+  processedMessages.forEach((timestamp, key) => {
+    if (timestamp < fiveMinutesAgo) {
+      processedMessages.delete(key);
+    }
+  });
+
+  // Reset circuit breakers after 10 minutes
+  const tenMinutesAgo = Date.now() - 10 * 60 * 1000;
+  circuitBreaker.forEach((state, key) => {
+    if (state.lastFailure < tenMinutesAgo) {
+      circuitBreaker.delete(key);
+    }
+  });
+}, 5 * 60 * 1000);
+
+// Helper function to check and update circuit breaker
+const checkCircuitBreaker = (userKey: string): boolean => {
+  const state = circuitBreaker.get(userKey);
+  if (!state) return true; // No failures yet, allow processing
+
+  const now = Date.now();
+  const fiveMinutesAgo = now - 5 * 60 * 1000;
+
+  // Reset circuit breaker if enough time has passed
+  if (state.lastFailure < fiveMinutesAgo) {
+    circuitBreaker.delete(userKey);
+    return true;
+  }
+
+  // Block if too many failures recently
+  if (state.failureCount >= 5 && state.isOpen) {
+    logWithTimestamp(
+      `Circuit breaker OPEN for user: ${userKey}, blocking request`
+    );
+    return false;
+  }
+
+  return true;
+};
+
+const recordFailure = (userKey: string) => {
+  const now = Date.now();
+  const state = circuitBreaker.get(userKey) || {
+    failureCount: 0,
+    lastFailure: 0,
+    isOpen: false,
+  };
+
+  state.failureCount += 1;
+  state.lastFailure = now;
+  state.isOpen = state.failureCount >= 5;
+
+  circuitBreaker.set(userKey, state);
+
+  if (state.isOpen) {
+    logWithTimestamp(
+      `Circuit breaker OPENED for user: ${userKey} after ${state.failureCount} failures`
+    );
+  }
+};
+
 export async function POST(req: NextRequest) {
   const startTime = Date.now();
   let step = 0;
@@ -1233,14 +696,47 @@ export async function POST(req: NextRequest) {
       entryLength: res?.entry?.length || 0,
     });
 
+    // Enhanced validation to ignore status updates and delivery receipts
+    const change = res?.entry?.[0]?.changes?.[0];
+    const value = change?.value;
+
+    // Check if this is a status update (delivery receipt, read receipt, etc.)
+    if (value?.statuses && value?.statuses?.length > 0) {
+      logWithTimestamp("Received status update, ignoring");
+      return new Response("received", { status: 200 });
+    }
+
+    // Check if this is a message or something else
+    const messages = value?.messages;
+    if (!messages || messages.length === 0) {
+      logWithTimestamp("No messages in webhook, ignoring");
+      return new Response("received", { status: 200 });
+    }
+
+    const message = messages[0];
+    const messageId = message?.id;
+    const messageType = message?.type;
+
+    // Only process text messages
+    if (messageType !== "text") {
+      logWithTimestamp(
+        `Received non-text message type: ${messageType}, ignoring`
+      );
+      return new Response("received", { status: 200 });
+    }
+
     step = 2;
-    let questionFromWhatsapp =
-      res?.entry?.[0]?.changes?.[0]?.value?.messages?.[0]?.text?.body;
+    let questionFromWhatsapp = message?.text?.body;
+    const userPhoneNumber = value?.contacts?.[0]?.wa_id;
+    const businessAccountNumber = value?.metadata?.phone_number_id;
 
     logWithTimestamp(`Extracted question from WhatsApp`, {
       hasQuestion: !!questionFromWhatsapp,
       questionLength: questionFromWhatsapp?.length || 0,
-      question: questionFromWhatsapp?.substring(0, 100), // Log first 100 chars for debugging
+      question: questionFromWhatsapp?.substring(0, 100),
+      messageId,
+      userPhoneNumber,
+      businessAccountNumber,
     });
 
     if (questionFromWhatsapp === "this is a text message") {
@@ -1256,15 +752,59 @@ export async function POST(req: NextRequest) {
       return new Response("received", { status: 200 });
     }
 
-    step = 3;
-    logWithTimestamp("Starting WhatsApp operation");
-    await whatsAppOperation(res);
+    // Create a unique identifier for this message
+    const messageKey = `${businessAccountNumber}:${userPhoneNumber}:${messageId}:${questionFromWhatsapp}`;
+    const userCircuitKey = `${businessAccountNumber}:${userPhoneNumber}`;
 
-    const totalTime = Date.now() - startTime;
-    logWithTimestamp(
-      `WhatsApp operation completed successfully in ${totalTime}ms`
-    );
-    return new Response("received", { status: 200 });
+    // Check circuit breaker first
+    if (!checkCircuitBreaker(userCircuitKey)) {
+      return new Response("received", { status: 200 });
+    }
+
+    // Check if we've already processed this exact message
+    if (processedMessages.has(messageKey)) {
+      const processedTime = processedMessages.get(messageKey);
+      const timeSinceProcessed = Date.now() - processedTime!;
+      logWithTimestamp(`Duplicate message detected, ignoring`, {
+        messageKey: messageKey.substring(0, 50) + "...",
+        timeSinceProcessed: `${timeSinceProcessed}ms`,
+      });
+      return new Response("received", { status: 200 });
+    }
+
+    // Check if we're currently processing this message
+    if (processingMessages.has(messageKey)) {
+      logWithTimestamp(`Message already being processed, ignoring duplicate`, {
+        messageKey: messageKey.substring(0, 50) + "...",
+      });
+      return new Response("received", { status: 200 });
+    }
+
+    // Mark message as being processed
+    processingMessages.add(messageKey);
+
+    try {
+      step = 3;
+      logWithTimestamp("Starting WhatsApp operation");
+      await whatsAppOperation(res);
+
+      // Mark message as successfully processed
+      processedMessages.set(messageKey, Date.now());
+
+      const totalTime = Date.now() - startTime;
+      logWithTimestamp(
+        `WhatsApp operation completed successfully in ${totalTime}ms`
+      );
+
+      return new Response("received", { status: 200 });
+    } catch (operationError: any) {
+      // Record failure in circuit breaker
+      recordFailure(userCircuitKey);
+      throw operationError;
+    } finally {
+      // Always remove from processing set, even if operation fails
+      processingMessages.delete(messageKey);
+    }
   } catch (error: any) {
     const totalTime = Date.now() - startTime;
     logError(`WhatsApp POST handler failed after ${totalTime}ms`, error, step);
@@ -1308,381 +848,468 @@ async function whatsAppOperation(res: any) {
       isEnabled: whatsAppDetailsResult.isEnabled,
     });
 
-    step = 3;
-    const db = (await clientPromise!).db();
-    const userChatBotcollections = db.collection("user-chatbots");
-    const userChatBotResult = await userChatBotcollections.findOne({
-      chatbotId: whatsAppDetailsResult.chatbotId,
-    });
+    // Create a user-specific lock to prevent concurrent processing
+    const userLockKey = `${binessAccountNumber}:${userPhoneNumber}`;
 
-    if (!userChatBotResult) {
-      logWithTimestamp("No chatbot configuration found");
-      return;
-    }
-
-    step = 4;
-    const userCollection = db?.collection("users");
-    const userData = await userCollection.findOne({
-      _id: new ObjectId(userChatBotResult.userId),
-    });
-
-    const endDate = userData?.endDate;
-    const currentDate = new Date();
-
-    logWithTimestamp(`User subscription check`, {
-      userId: userChatBotResult.userId,
-      endDate: endDate?.toISOString(),
-      currentDate: currentDate.toISOString(),
-      isExpired: currentDate > endDate,
-    });
-
-    if (currentDate > endDate) {
-      logWithTimestamp("Subscription expired, sending notification");
-      await sendMessageToWhatsapp(
-        whatsAppDetailsResult.phoneNumberID,
-        "+" + userPhoneNumber,
-        whatsAppDetailsResult.whatsAppAccessToken,
-        "Your subscription has ended"
+    if (processingMessages.has(userLockKey)) {
+      logWithTimestamp(
+        `User ${userPhoneNumber} is already being processed, skipping`,
+        {
+          userLockKey: userLockKey.substring(0, 30) + "...",
+        }
       );
       return;
     }
 
-    step = 5;
-    if (whatsAppDetailsResult.isEnabled === false) {
-      logWithTimestamp("Chatbot disabled, exiting");
-      return;
-    }
+    // Add user lock
+    processingMessages.add(userLockKey);
 
-    const userID = userChatBotResult.userId;
-
-    step = 6;
-    const userDetailsCollection = db?.collection("user-details");
-    const userDetailsResult = await userDetailsCollection.findOne({
-      userId: userID,
-    });
-
-    logWithTimestamp(`User limits check`, {
-      totalMessageCount: userDetailsResult?.totalMessageCount || 0,
-      messageLimit: userDetailsResult?.messageLimit || 0,
-      limitReached:
-        (userDetailsResult?.totalMessageCount || 0) >=
-        (userDetailsResult?.messageLimit || 0),
-    });
-
-    if (
-      (userDetailsResult?.totalMessageCount || 0) >=
-      (userDetailsResult?.messageLimit || 0)
-    ) {
-      logWithTimestamp("Message limit reached, sending notification");
-      await sendMessageToWhatsapp(
-        whatsAppDetailsResult.phoneNumberID,
-        "+" + userPhoneNumber,
-        whatsAppDetailsResult.whatsAppAccessToken,
-        "Your limit reached please upgrade your plan"
-      );
-      return;
-    }
-
-    step = 7;
-    // Get chatbot settings to determine which API to use
-    let userChatBotSetting = db.collection("chatbot-settings");
-    let userChatBotModel = await userChatBotSetting.findOne({
-      userId: userID,
-      chatbotId: userChatBotResult.chatbotId,
-    });
-
-    logWithTimestamp(`Chatbot model configuration`, {
-      userId: userID,
-      chatbotId: userChatBotResult.chatbotId,
-      hasModel: !!userChatBotModel,
-    });
-
-    if (!userChatBotModel) {
-      logWithTimestamp("No chatbot model configuration found");
-      return;
-    }
-
-    logWithTimestamp(`Chatbot configuration`, {
-      model: userChatBotModel?.model,
-      botType: userChatBotResult?.botType,
-      hasAssistantId: !!userChatBotModel?.chatbotId,
-      temperature: userChatBotModel?.temperature,
-    });
-
-    const useAssistantAPI = userChatBotResult?.botType === "bot-v2";
-
-    step = 8;
-    let similaritySearchResults = "";
-
-    // Only call Pinecone for Chat Completion API (bot-v1)
-    // Assistant API (bot-v2) will handle context through file uploads or instructions
-    if (!useAssistantAPI) {
-      logWithTimestamp("Calling Pinecone API for context", {
+    try {
+      step = 3;
+      const db = (await clientPromise!).db();
+      const userChatBotcollections = db.collection("user-chatbots");
+      const userChatBotResult = await userChatBotcollections.findOne({
         chatbotId: whatsAppDetailsResult.chatbotId,
-        userId: userID,
-        questionLength: questionFromWhatsapp.length,
       });
 
-      const pineconeStartTime = Date.now();
-      const response: any = await makeAPICallWithTimeout(
-        `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/pinecone`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userQuery: questionFromWhatsapp,
+      if (!userChatBotResult) {
+        logWithTimestamp("No chatbot configuration found");
+        return;
+      }
+
+      step = 4;
+      const userCollection = db?.collection("users");
+      const userData = await userCollection.findOne({
+        _id: new ObjectId(userChatBotResult.userId),
+      });
+
+      const endDate = userData?.endDate;
+      const currentDate = new Date();
+
+      logWithTimestamp(`User subscription check`, {
+        userId: userChatBotResult.userId,
+        endDate: endDate?.toISOString(),
+        currentDate: currentDate.toISOString(),
+        isExpired: currentDate > endDate,
+      });
+
+      if (currentDate > endDate) {
+        logWithTimestamp("Subscription expired, sending notification");
+        await sendMessageToWhatsapp(
+          whatsAppDetailsResult.phoneNumberID,
+          "+" + userPhoneNumber,
+          whatsAppDetailsResult.whatsAppAccessToken,
+          "Your subscription has ended"
+        );
+        return;
+      }
+
+      step = 5;
+      if (whatsAppDetailsResult.isEnabled === false) {
+        logWithTimestamp("Chatbot disabled, exiting");
+        return;
+      }
+
+      const userID = userChatBotResult.userId;
+
+      // New: If the incoming user's phone number already exists in the
+      // whatsappbot_details document for this chatbot+user, do not send any
+      // WhatsApp messages and return early. This prevents duplicate/outbound
+      // notifications to phone numbers that are already registered.
+      try {
+        const whatsAppDetailsCollection = db.collection("whatsappbot_details");
+        const numberForms = [userPhoneNumber, `+${userPhoneNumber}`];
+
+        const existingNumberDoc = await whatsAppDetailsCollection.findOne({
+          chatbotId: whatsAppDetailsResult.chatbotId,
+          userId: userID,
+          numbers: { $in: numberForms },
+        });
+
+        if (existingNumberDoc) {
+          logWithTimestamp("Incoming number already present in whatsappbot_details, skipping any outbound messages", {
             chatbotId: whatsAppDetailsResult.chatbotId,
             userId: userID,
-          }),
-        },
-        45000, // 45 second timeout for Pinecone
-        1 // Only 1 retry for Pinecone to avoid loops
-      );
-
-      const pineconeTime = Date.now() - pineconeStartTime;
-      const respText = await response.text();
-      similaritySearchResults = respText;
-
-      logWithTimestamp(`Pinecone API completed in ${pineconeTime}ms`, {
-        responseLength: similaritySearchResults?.length || 0,
-        responsePreview: similaritySearchResults?.substring(0, 200),
-      });
-    }
-
-    step = 9;
-    // Get chat history
-    let userChatHistoryCollection = db.collection("whatsapp-chat-history");
-    let userChatHistory: WhatsAppChatHistoryType =
-      await userChatHistoryCollection.findOne({
-        userId: userID,
-        date: moment().utc().format("YYYY-MM-DD"),
-      });
-
-    step = 10;
-    let aiResponse: string = "";
-    let usage: any = {
-      completion_tokens: 0,
-      prompt_tokens: 0,
-      total_tokens: 0,
-    };
-
-    if (useAssistantAPI) {
-      // Use Assistant API
-      logWithTimestamp("Using Assistant API for response generation");
-
-      let threadId: any;
-
-      // Check if we have existing chat history with threadId
-      if (userChatHistory?.chats?.[`${userPhoneNumber}`]?.threadId) {
-        threadId = userChatHistory.chats[`${userPhoneNumber}`].threadId;
-        logWithTimestamp(`Using existing thread: ${threadId}`);
-      } else {
-        // Create new thread
-        const thread = await createThread();
-        threadId = thread.id;
-        logWithTimestamp(`Created new thread: ${threadId}`);
+            userPhoneNumber,
+          });
+          return; // early return; finally block will still remove user lock
+        }
+      } catch (err) {
+        logError("Error checking existing numbers in whatsappbot_details", err);
+        // proceed normally if the check fails (do not block processing)
       }
 
-      // Add user message to thread
-      await addMessageToThread(threadId, questionFromWhatsapp);
+      step = 6;
+      const userDetailsCollection = db?.collection("user-details");
+      const userDetailsResult = await userDetailsCollection.findOne({
+        userId: userID,
+      });
 
-      // Run the assistant
-      const run = await runAssistant(
-        threadId,
-        userChatBotModel.chatbotId,
-        userChatBotModel?.instruction
-      );
+      logWithTimestamp(`User limits check`, {
+        totalMessageCount: userDetailsResult?.totalMessageCount || 0,
+        messageLimit: userDetailsResult?.messageLimit || 0,
+        limitReached:
+          (userDetailsResult?.totalMessageCount || 0) >=
+          (userDetailsResult?.messageLimit || 0),
+      });
 
-      // Wait for completion
-      await waitForRunCompletionWithActions(
-        threadId,
-        run.id,
-        whatsAppDetailsResult.chatbotId,
-        userID,
-        userChatHistory?.chats?.[`${userPhoneNumber}`]?.messages || []
-      );
+      if (
+        (userDetailsResult?.totalMessageCount || 0) >=
+        (userDetailsResult?.messageLimit || 0)
+      ) {
+        logWithTimestamp("Message limit reached, sending notification");
+        await sendMessageToWhatsapp(
+          whatsAppDetailsResult.phoneNumberID,
+          "+" + userPhoneNumber,
+          whatsAppDetailsResult.whatsAppAccessToken,
+          "Your limit reached please upgrade your plan"
+        );
+        return;
+      }
 
-      // Get the assistant's response
-      const messages: any = await getThreadMessages(threadId);
-      aiResponse = messages.data[0].content[0].text.value;
+      step = 7;
+      // Get chatbot settings to determine which API to use
+      let userChatBotSetting = db.collection("chatbot-settings");
+      let userChatBotModel = await userChatBotSetting.findOne({
+        userId: userID,
+        chatbotId: userChatBotResult.chatbotId,
+      });
 
-      // Estimate usage for Assistant API
-      usage = {
-        completion_tokens: encode(aiResponse).length,
-        prompt_tokens: encode(questionFromWhatsapp).length,
-        total_tokens:
-          encode(aiResponse).length + encode(questionFromWhatsapp).length,
-      };
+      logWithTimestamp(`Chatbot model configuration`, {
+        userId: userID,
+        chatbotId: userChatBotResult.chatbotId,
+        hasModel: !!userChatBotModel,
+      });
 
-      // Update or create chat history
-      if (!userChatHistory) {
-        await userChatHistoryCollection.insertOne({
-          userId: userID,
+      if (!userChatBotModel) {
+        logWithTimestamp("No chatbot model configuration found");
+        return;
+      }
+
+      logWithTimestamp(`Chatbot configuration`, {
+        model: userChatBotModel?.model,
+        botType: userChatBotResult?.botType,
+        hasAssistantId: !!userChatBotModel?.chatbotId,
+        temperature: userChatBotModel?.temperature,
+      });
+
+      const useAssistantAPI = userChatBotResult?.botType === "bot-v2";
+
+      step = 8;
+      let similaritySearchResults = "";
+
+      // Only call Pinecone for Chat Completion API (bot-v1)
+      // Assistant API (bot-v2) will handle context through file uploads or instructions
+      if (!useAssistantAPI) {
+        logWithTimestamp("Calling Pinecone API for context", {
           chatbotId: whatsAppDetailsResult.chatbotId,
-          chats: {
-            [`${userPhoneNumber}`]: {
-              messages: [
-                {
-                  role: "user",
-                  content: questionFromWhatsapp,
-                },
-                {
-                  role: "assistant",
-                  content: aiResponse,
-                },
-              ],
-              usage: usage,
-              threadId: threadId,
-              assistantId: userChatBotModel.chatbotId,
+          userId: userID,
+          questionLength: questionFromWhatsapp.length,
+        });
+
+        const pineconeStartTime = Date.now();
+        const response: any = await makeAPICallWithTimeout(
+          `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/pinecone`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
             },
+            body: JSON.stringify({
+              userQuery: questionFromWhatsapp,
+              chatbotId: whatsAppDetailsResult.chatbotId,
+              userId: userID,
+            }),
           },
+          45000, // 45 second timeout for Pinecone
+          1 // Only 1 retry for Pinecone to avoid loops
+        );
+
+        const pineconeTime = Date.now() - pineconeStartTime;
+        const respText = await response.text();
+        similaritySearchResults = respText;
+
+        logWithTimestamp(`Pinecone API completed in ${pineconeTime}ms`, {
+          responseLength: similaritySearchResults?.length || 0,
+          responsePreview: similaritySearchResults?.substring(0, 200),
+        });
+      }
+
+      step = 9;
+      // Create user message with timestamp immediately when we receive it
+      const userMessage = createMessageWithTimestamp(
+        "user",
+        questionFromWhatsapp
+      );
+
+      // Get chat history
+      let userChatHistoryCollection = db.collection("whatsapp-chat-history");
+      let userChatHistory: WhatsAppChatHistoryType =
+        await userChatHistoryCollection.findOne({
+          userId: userID,
           date: moment().utc().format("YYYY-MM-DD"),
         });
-      } else {
-        // Update existing chat history
-        if (!userChatHistory.chats[`${userPhoneNumber}`]) {
-          userChatHistory.chats[`${userPhoneNumber}`] = {
-            messages: [],
-            usage: { completion_tokens: 0, prompt_tokens: 0, total_tokens: 0 },
-            threadId: threadId,
-            assistantId: userChatBotModel.chatbotId,
-          };
+
+      step = 10;
+      let aiResponse: string = "";
+      let usage: any = {
+        completion_tokens: 0,
+        prompt_tokens: 0,
+        total_tokens: 0,
+      };
+
+      if (useAssistantAPI) {
+        // Use Assistant API
+        logWithTimestamp("Using Assistant API for response generation");
+
+        let threadId: any;
+
+        // Check if we have existing chat history with threadId
+        if (userChatHistory?.chats?.[`${userPhoneNumber}`]?.threadId) {
+          threadId = userChatHistory.chats[`${userPhoneNumber}`].threadId;
+          logWithTimestamp(`Using existing thread: ${threadId}`);
+        } else {
+          // Create new thread
+          const thread = await createThread();
+          threadId = thread.id;
+          logWithTimestamp(`Created new thread: ${threadId}`);
         }
 
-        userChatHistory.chats[`${userPhoneNumber}`].messages.push(
-          {
-            role: "user",
-            content: questionFromWhatsapp,
-          },
-          {
-            role: "assistant",
-            content: aiResponse,
-          }
+        // Add user message to thread
+        await addMessageToThread(threadId, questionFromWhatsapp);
+
+        // Run the assistant
+        const run = await runAssistant(
+          threadId,
+          userChatBotModel.chatbotId,
+          userChatBotModel?.instruction
         );
 
-        // Update usage
-        userChatHistory.chats[`${userPhoneNumber}`].usage.completion_tokens +=
-          usage.completion_tokens;
-        userChatHistory.chats[`${userPhoneNumber}`].usage.prompt_tokens +=
-          usage.prompt_tokens;
-        userChatHistory.chats[`${userPhoneNumber}`].usage.total_tokens +=
-          usage.total_tokens;
-        userChatHistory.chats[`${userPhoneNumber}`].threadId = threadId;
+        // Wait for completion
+        await waitForRunCompletionWithActions(
+          threadId,
+          run.id,
+          whatsAppDetailsResult.chatbotId,
+          userID,
+          userChatHistory?.chats?.[`${userPhoneNumber}`]?.messages || []
+        );
 
-        // Update in database
-        await userChatHistoryCollection.updateOne(
-          { userId: userID, date: moment().utc().format("YYYY-MM-DD") },
-          {
-            $set: {
-              chats: userChatHistory.chats,
+        // Get the assistant's response
+        const messages: any = await getThreadMessages(threadId);
+        aiResponse = messages.data[0].content[0].text.value;
+
+        // Estimate usage for Assistant API
+        usage = {
+          completion_tokens: encode(aiResponse).length,
+          prompt_tokens: encode(questionFromWhatsapp).length,
+          total_tokens:
+            encode(aiResponse).length + encode(questionFromWhatsapp).length,
+        };
+
+        // Update or create chat history
+        if (!userChatHistory) {
+          const assistantMessage = createMessageWithTimestamp(
+            "assistant",
+            aiResponse
+          );
+          const now = new Date();
+
+          await userChatHistoryCollection.insertOne({
+            userId: userID,
+            chatbotId: whatsAppDetailsResult.chatbotId,
+            chats: {
+              [`${userPhoneNumber}`]: {
+                messages: [userMessage, assistantMessage],
+                usage: usage,
+                threadId: threadId,
+                assistantId: userChatBotModel.chatbotId,
+              },
             },
+            date: moment().utc().format("YYYY-MM-DD"),
+            createdAt: now,
+            updatedAt: now,
+          });
+        } else {
+          // Update existing chat history
+          if (!userChatHistory.chats[`${userPhoneNumber}`]) {
+            userChatHistory.chats[`${userPhoneNumber}`] = {
+              messages: [],
+              usage: {
+                completion_tokens: 0,
+                prompt_tokens: 0,
+                total_tokens: 0,
+              },
+              threadId: threadId,
+              assistantId: userChatBotModel.chatbotId,
+            };
           }
-        );
-      }
-    } else {
-      // Use Chat Completion API (existing logic)
-      logWithTimestamp("Using Chat Completion API for response generation");
 
-      let conversationMessages: any = [];
-      let similarSearchToken = encode(similaritySearchResults).length;
-      let instructionTokenLength = encode(userChatBotModel?.instruction).length;
-      let currentQuestionsTotalTokens = encode(questionFromWhatsapp).length;
+          const assistantMessage = createMessageWithTimestamp(
+            "assistant",
+            aiResponse
+          );
 
-      // Handle existing chat history for Chat Completion API
-      if (userChatHistory?.chats?.[`${userPhoneNumber}`]) {
-        let previousTotalTokens = userChatHistory.chats[`${userPhoneNumber}`]
-          .usage.total_tokens as number;
-        let totalCountedToken =
-          previousTotalTokens +
-          currentQuestionsTotalTokens +
-          similarSearchToken;
-        conversationMessages =
-          userChatHistory.chats[`${userPhoneNumber}`].messages;
+          userChatHistory.chats[`${userPhoneNumber}`].messages.push(
+            userMessage,
+            assistantMessage
+          );
 
-        // Token limit management
-        const tokenLimits = [
-          { model: "gpt-3.5-turbo", tokens: 4000 },
-          { model: "gpt-4", tokens: 8000 },
-          { model: "gpt-4-turbo", tokens: 128000 },
-        ];
+          // Update usage
+          /// if the usage is not available in db, set it to 0
+          if (!userChatHistory.chats[`${userPhoneNumber}`]?.usage) {
+            userChatHistory.chats[`${userPhoneNumber}`].usage = {
+              completion_tokens: 0,
+              prompt_tokens: 0,
+              total_tokens: 0,
+            };
+          }
+          userChatHistory.chats[`${userPhoneNumber}`].usage.completion_tokens +=
+            usage.completion_tokens;
+          userChatHistory.chats[`${userPhoneNumber}`].usage.prompt_tokens +=
+            usage.prompt_tokens;
+          userChatHistory.chats[`${userPhoneNumber}`].usage.total_tokens +=
+            usage.total_tokens;
+          userChatHistory.chats[`${userPhoneNumber}`].threadId = threadId;
 
-        for (const limit of tokenLimits) {
-          if (
-            limit.model === userChatBotModel.model &&
-            totalCountedToken >= limit.tokens
-          ) {
-            let tokensToRemove = totalCountedToken - limit.tokens;
-            let index = 0;
-            let tokens = 0;
-
-            while (
-              tokens < tokensToRemove &&
-              index < conversationMessages.length
-            ) {
-              tokens += calculateTokens(conversationMessages[index]);
-              index++;
+          // Update in database
+          await userChatHistoryCollection.updateOne(
+            { userId: userID, date: moment().utc().format("YYYY-MM-DD") },
+            {
+              $set: {
+                chats: userChatHistory.chats,
+                updatedAt: new Date(),
+              },
             }
+          );
+        }
+      } else {
+        // Use Chat Completion API (existing logic)
+        logWithTimestamp("Using Chat Completion API for response generation");
 
-            conversationMessages.splice(0, index);
-            break;
+        let conversationMessages: any = [];
+        let similarSearchToken = encode(similaritySearchResults).length;
+        let instructionTokenLength = encode(
+          userChatBotModel?.instruction
+        ).length;
+        let currentQuestionsTotalTokens = encode(questionFromWhatsapp).length;
+
+        // Handle existing chat history for Chat Completion API
+        if (userChatHistory?.chats?.[`${userPhoneNumber}`]) {
+          let previousTotalTokens = userChatHistory.chats[`${userPhoneNumber}`]
+            .usage.total_tokens as number;
+          let totalCountedToken =
+            previousTotalTokens +
+            currentQuestionsTotalTokens +
+            similarSearchToken;
+          conversationMessages =
+            userChatHistory.chats[`${userPhoneNumber}`].messages;
+
+          // Token limit management
+          const tokenLimits = [
+            { model: "gpt-3.5-turbo", tokens: 4000 },
+            { model: "gpt-4", tokens: 8000 },
+            { model: "gpt-4-turbo", tokens: 128000 },
+          ];
+
+          for (const limit of tokenLimits) {
+            if (
+              limit.model === userChatBotModel.model &&
+              totalCountedToken >= limit.tokens
+            ) {
+              let tokensToRemove = totalCountedToken - limit.tokens;
+              let index = 0;
+              let tokens = 0;
+
+              while (
+                tokens < tokensToRemove &&
+                index < conversationMessages.length
+              ) {
+                tokens += calculateTokens(conversationMessages[index]);
+                index++;
+              }
+
+              conversationMessages.splice(0, index);
+              break;
+            }
           }
         }
-      }
 
-      // Make OpenAI API call
-      const responseOpenAI: any = await fetch(
-        "https://api.openai.com/v1/chat/completions",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENAI_KEY}`,
-          },
-          body: JSON.stringify({
-            model: userChatBotModel.model,
-            temperature: userChatBotModel?.temperature ?? 0,
-            top_p: 1,
-            messages: [
-              {
-                role: "system",
-                content: `${userChatBotModel?.instruction}
-
-                context:
-             ${similaritySearchResults}`,
-              },
-              ...conversationMessages,
-              {
-                role: "user",
-                content: `query: ${questionFromWhatsapp}`,
-              },
-            ],
-          }),
-        }
-      );
-
-      const openaiBody = JSON.parse(await responseOpenAI.text());
-      aiResponse = openaiBody.choices[0].message.content;
-      usage = openaiBody.usage;
-
-      // Update or create chat history for Chat Completion API
-      if (!userChatHistory) {
-        await userChatHistoryCollection.insertOne({
-          userId: userID,
-          chatbotId: whatsAppDetailsResult.chatbotId,
-          chats: {
-            [`${userPhoneNumber}`]: {
+        // Make OpenAI API call
+        const responseOpenAI: any = await fetch(
+          "https://api.openai.com/v1/chat/completions",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENAI_KEY}`,
+            },
+            body: JSON.stringify({
+              model: userChatBotModel.model,
+              temperature: userChatBotModel?.temperature ?? 0,
+              top_p: 1,
               messages: [
                 {
-                  role: "user",
-                  content: questionFromWhatsapp,
+                  role: "system",
+                  content: `${userChatBotModel?.instruction}
+
+                  context:
+               ${similaritySearchResults}`,
                 },
+                ...cleanMessagesForOpenAI(conversationMessages),
                 {
-                  role: "assistant",
-                  content: aiResponse,
+                  role: "user",
+                  content: `query: ${questionFromWhatsapp}`,
                 },
               ],
+            }),
+          }
+        );
+
+        const openaiBody = JSON.parse(await responseOpenAI.text());
+        aiResponse = openaiBody.choices[0].message.content;
+        usage = openaiBody.usage;
+
+        // Update or create chat history for Chat Completion API
+        if (!userChatHistory) {
+          const assistantMessage = createMessageWithTimestamp(
+            "assistant",
+            aiResponse
+          );
+          const now = new Date();
+
+          await userChatHistoryCollection.insertOne({
+            userId: userID,
+            chatbotId: whatsAppDetailsResult.chatbotId,
+            chats: {
+              [`${userPhoneNumber}`]: {
+                messages: [userMessage, assistantMessage],
+                usage: {
+                  completion_tokens: usage.completion_tokens,
+                  prompt_tokens:
+                    usage.prompt_tokens -
+                    instructionTokenLength -
+                    similarSearchToken,
+                  total_tokens:
+                    usage.total_tokens -
+                    instructionTokenLength -
+                    similarSearchToken,
+                },
+              },
+            },
+            date: moment().utc().format("YYYY-MM-DD"),
+            createdAt: now,
+            updatedAt: now,
+          });
+        } else {
+          // Update existing chat history
+          if (!userChatHistory.chats[`${userPhoneNumber}`]) {
+            const assistantMessage = createMessageWithTimestamp(
+              "assistant",
+              aiResponse
+            );
+
+            userChatHistory.chats[`${userPhoneNumber}`] = {
+              messages: [userMessage, assistantMessage],
               usage: {
                 completion_tokens: usage.completion_tokens,
                 prompt_tokens:
@@ -1694,103 +1321,78 @@ async function whatsAppOperation(res: any) {
                   instructionTokenLength -
                   similarSearchToken,
               },
-            },
-          },
-          date: moment().utc().format("YYYY-MM-DD"),
-        });
-      } else {
-        // Update existing chat history
-        if (!userChatHistory.chats[`${userPhoneNumber}`]) {
-          userChatHistory.chats[`${userPhoneNumber}`] = {
-            messages: [
-              {
-                role: "user",
-                content: questionFromWhatsapp,
-              },
-              {
-                role: "assistant",
-                content: aiResponse,
-              },
-            ],
-            usage: {
+            };
+          } else {
+            // Add new messages to existing conversation
+            const assistantMessage = createMessageWithTimestamp(
+              "assistant",
+              aiResponse
+            );
+
+            userChatHistory.chats[`${userPhoneNumber}`].messages.push(
+              userMessage,
+              assistantMessage
+            );
+
+            // Update usage tokens
+            let oldTotalTokens =
+              userChatHistory.chats[`${userPhoneNumber}`].usage.total_tokens;
+            let userEnterToken = currentQuestionsTotalTokens;
+            let openAICompletionToken = usage.completion_tokens;
+            oldTotalTokens += userEnterToken + openAICompletionToken;
+
+            let oldPromptTokens =
+              userChatHistory.chats[`${userPhoneNumber}`].usage.prompt_tokens;
+            oldPromptTokens += currentQuestionsTotalTokens;
+
+            userChatHistory.chats[`${userPhoneNumber}`].usage = {
               completion_tokens: usage.completion_tokens,
-              prompt_tokens:
-                usage.prompt_tokens -
-                instructionTokenLength -
-                similarSearchToken,
-              total_tokens:
-                usage.total_tokens -
-                instructionTokenLength -
-                similarSearchToken,
-            },
-          };
-        } else {
-          // Add new messages to existing conversation
-          userChatHistory.chats[`${userPhoneNumber}`].messages.push(
+              prompt_tokens: oldPromptTokens,
+              total_tokens: oldTotalTokens,
+            };
+          }
+
+          // Update in database
+          await userChatHistoryCollection.updateOne(
+            { userId: userID, date: moment().utc().format("YYYY-MM-DD") },
             {
-              role: "user",
-              content: questionFromWhatsapp,
-            },
-            {
-              role: "assistant",
-              content: aiResponse,
+              $set: {
+                chats: userChatHistory.chats,
+                updatedAt: new Date(),
+              },
             }
           );
-
-          // Update usage tokens
-          let oldTotalTokens =
-            userChatHistory.chats[`${userPhoneNumber}`].usage.total_tokens;
-          let userEnterToken = currentQuestionsTotalTokens;
-          let openAICompletionToken = usage.completion_tokens;
-          oldTotalTokens += userEnterToken + openAICompletionToken;
-
-          let oldPromptTokens =
-            userChatHistory.chats[`${userPhoneNumber}`].usage.prompt_tokens;
-          oldPromptTokens += currentQuestionsTotalTokens;
-
-          userChatHistory.chats[`${userPhoneNumber}`].usage = {
-            completion_tokens: usage.completion_tokens,
-            prompt_tokens: oldPromptTokens,
-            total_tokens: oldTotalTokens,
-          };
         }
+      }
 
-        // Update in database
-        await userChatHistoryCollection.updateOne(
-          { userId: userID, date: moment().utc().format("YYYY-MM-DD") },
-          {
-            $set: {
-              chats: userChatHistory.chats,
-            },
-          }
+      // Update message count
+      const collections = db?.collection("user-details");
+      const result = await collections.findOne({ userId: userID });
+      if (result?.totalMessageCount !== undefined && aiResponse) {
+        await collections.updateOne(
+          { userId: userID },
+          { $set: { totalMessageCount: result.totalMessageCount + 1 } }
         );
       }
-    }
 
-    step = 11;
-    // Update message count
-    const collections = db?.collection("user-details");
-    const result = await collections.findOne({ userId: userID });
-    if (result?.totalMessageCount !== undefined && aiResponse) {
-      await collections.updateOne(
-        { userId: userID },
-        { $set: { totalMessageCount: result.totalMessageCount + 1 } }
-      );
-    }
+      step = 12;
+      // Send response to WhatsApp (format assistant HTML to WhatsApp-friendly text first)
+      if (aiResponse) {
+        const formattedMessage = await formatMessageForWhatsApp(aiResponse);
+        await sendMessageToWhatsapp(
+          whatsAppDetailsResult.phoneNumberID,
+          "+" + userPhoneNumber,
+          whatsAppDetailsResult.whatsAppAccessToken,
+          formattedMessage
+        );
+      }
 
-    step = 12;
-    // Send response to WhatsApp
-    if (aiResponse) {
-      await sendMessageToWhatsapp(
-        whatsAppDetailsResult.phoneNumberID,
-        "+" + userPhoneNumber,
-        whatsAppDetailsResult.whatsAppAccessToken,
-        aiResponse
-      );
+      const operationTime = Date.now() - operationStartTime;
+      logWithTimestamp(`WhatsApp operation completed in ${operationTime}ms`);
+    } finally {
+      // Always remove user lock
+      processingMessages.delete(userLockKey);
     }
-
-    const operationTime = Date.now() - operationStartTime;
-    logWithTimestamp(`WhatsApp operation completed in ${operationTime}ms`);
   } catch (error: any) {
     const operationTime = Date.now() - operationStartTime;
     logError(`WhatsApp operation failed after ${operationTime}ms`, error, step);
@@ -1813,10 +1415,34 @@ async function whatsAppOperation(res: any) {
   }
 }
 
+// Helper function to create message with timestamp
+function createMessageWithTimestamp(role: string, content: string) {
+  const now = new Date();
+  const timestamp = now.toISOString();
+  const messageTime = moment(now).format("YYYY/MM/DD HH:mm:ss"); // Format like 2025/08/05 10:10:59
+
+  return {
+    role,
+    content,
+    timestamp,
+    messageTime,
+  };
+}
+
+// Helper function to clean messages for OpenAI API (remove additional parameters)
+function cleanMessagesForOpenAI(messages: any[]) {
+  return messages.map((msg) => ({
+    role: msg.role,
+    content: msg.content,
+  }));
+}
+
 // Token calculation helper (unchanged)
 function calculateTokens(conversationMessages: {
   role: string;
   content: string;
+  timestamp?: string;
+  messageTime?: string;
 }) {
   const token = encode(conversationMessages.content).length;
   return token;
