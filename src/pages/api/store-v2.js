@@ -112,7 +112,7 @@ export default async function handler(req, res) {
           const systemInstruction = getSystemInstruction(assistantType);
           const tools = getAssistantTools(assistantType);
           assistant = await openai.beta.assistants.create({
-            model: models[0],
+            model: models[2],
             instructions: systemInstruction,
             name: chatbotName,
             tools: tools,
@@ -674,7 +674,7 @@ export default async function handler(req, res) {
           await db.collection("chatbot-settings").insertOne({
             userId: userId,
             chatbotId: chatbotId,
-            model: models[0],
+            model: models[2],
             visibility: visibility.PUBLIC,
             temperature: 1,
             numberOfCharacterTrained: numberOfCharacterTrained,

@@ -725,24 +725,6 @@ function ChatV2({
     }
   };
 
-  // // imageFileDone - show image in chat
-  // const handleImageFileDone = (image: any) => {
-  //   appendToLastMessage(`\n![${image.file_id}](/api/files/${image.file_id})\n`);
-  // };
-
-  // // toolCallCreated - log new tool call
-  // const toolCallCreated = (toolCall) => {
-  //   if (toolCall.type != "code_interpreter") return;
-  //   appendMessage("code", "");
-  // };
-
-  // // toolCallDelta - log delta and snapshot for the tool call
-  // const toolCallDelta = (delta, snapshot) => {
-  //   if (delta.type != "code_interpreter") return;
-  //   if (!delta.code_interpreter.input) return;
-  //   appendToLastMessage(delta.code_interpreter.input);
-  // };
-
   /// append the message
   const appendMessage = (role: string, text: string, sources?: any[]) => {
     setMessages((prevMessages: [{ role: string; content: string }]) => [
@@ -881,97 +863,7 @@ function ChatV2({
         return;
       } else {
         try {
-          // setLoading(true);
-          /// get similarity search
-          // const response: any = await fetch(
-          //   `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/pinecone`,
-          //   {
-          //     method: "POST",
-          //     body: JSON.stringify({
-          //       userQuery,
-          //       chatbotId: chatbot?.id,
-          //       messages,
-          //       // userId: cookies.userId,
-          //       //// default chatbot set
-          //       userId: !isPopUp ? cookies.userId : userId,
-          //     }),
-          //   }
-          // );
-          // /// parse the response and extract the similarity results
-          // const respText = await response.text();
-          // const similaritySearchResults = respText;
-          // console.log("similaritySearchResults", similaritySearchResults);
-
           await sendMessage(userQuery);
-
-          /// get response from backend in streaming
-          //   const responseFromBackend: any = await fetch(
-          //     `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/chat`,
-          //     {
-          //       method: "POST",
-          //       body: JSON.stringify({
-          //         similaritySearchResults,
-          //         messages,
-          //         userQuery,
-          //         chatbotId: chatbot?.id,
-          //         //// default chatbot set
-          //         userId: !isPopUp ? cookies.userId : userId,
-          //       }),
-          //       next: { revalidate: 0 },
-          //     }
-          //   );
-          //   if (responseFromBackend.status === 429) {
-          //     // Handle the "Too Many Requests" error
-          //     const error = await responseFromBackend.text();
-          //     message.error(error);
-          //     return; // Exit early
-          //   }
-          //   if (!responseFromBackend.ok) {
-          //     // Handle other possible errors
-          //     console.error("An error occurred:", responseFromBackend.statusText);
-          //     alert("An error occurred. Please try again.");
-          //     return; // Exit early
-          //   }
-          //   let resptext = "";
-          //   const reader = responseFromBackend.body
-          //     .pipeThrough(new TextDecoderStream())
-          //     .getReader();
-          //   while (true) {
-          //     const { value, done } = await reader.read();
-          //     if (done) {
-          //       /// setting the response when completed
-          //       setMessages((prev: any) => [
-          //         ...prev,
-          //         { role: "assistant", content: resptext },
-          //       ]);
-          //       /// setting the response time when completed
-          //       setMessagesTime((prev: any) => [
-          //         ...prev,
-          //         {
-          //           role: "assistant",
-          //           content: resptext,
-          //           messageTime: getDate(),
-          //         },
-          //       ]);
-          //       /// store history
-          //       const userLatestQuery = {
-          //         role: "user",
-          //         content: userQuery,
-          //         messageTime: tempUserMessageTime,
-          //       };
-          //       const gptLatestResponse = {
-          //         role: "assistant",
-          //         content: resptext,
-          //         messageTime: getDate(),
-          //       };
-          //       storeHistory(userLatestQuery, gptLatestResponse);
-          //       setResponse("");
-          //       setLoading(false);
-          //       break;
-          //     }
-          //     resptext += value;
-          //     setResponse(resptext);
-          //   }
         } catch (e: any) {
           console.log(
             "Error while getting completion from custom chatbot",

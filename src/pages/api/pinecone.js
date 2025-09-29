@@ -219,6 +219,63 @@ export default async function handler(req, res) {
         return { content, source, filename, score, source_url, dimensions };
       });
 
+      // --- Filter retrieved chunks using OpenAI to keep only those relevant to the original query ---
+      try {
+        // Build a compact listing of chunks to avoid hitting token limits
+        const maxChunkChars = 1500;
+        const chunksList = similaritySearch
+          .map((c, i) => {
+            const truncated = c.content
+              ? c.content.slice(0, maxChunkChars)
+              : "";
+            return `${i}: ${truncated.replace(/\n+/g, " ")}`;
+          })
+          .join("\n\n");
+
+        const systemPrompt = "You are a strict filter that decides whether a text chunk is relevant to a user's question. Return a JSON object with a single key \"keep\" whose value is a list of integer indices of the chunks that should be kept (in original order). Do not return any other text.";
+
+        const userPrompt = `Original question: ${userQuery}\n\nChunks:\n${chunksList}\n\nOnly return valid JSON, for example: {\"keep\": [0,2]}`;
+
+        const filterResp = await openai.chat.completions.create({
+          model: process.env.NEXT_PUBLIC_OPENAI_MODEL || "gpt-4o",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt },
+          ],
+          temperature: 0,
+          max_tokens: 500,
+        });
+
+        const raw =
+          filterResp && filterResp.choices && filterResp.choices[0]?.message
+            ? filterResp.choices[0].message.content
+            : null;
+
+        if (raw) {
+          try {
+            // Find the first JSON start (either { or [) to avoid non-JSON prefixes
+            const jsonStart = raw.search(/[\{\[]/);
+            if (jsonStart !== -1) {
+              const parsed = JSON.parse(raw.slice(jsonStart));
+              if (parsed && Array.isArray(parsed.keep)) {
+                const keepSet = new Set(parsed.keep.map((n) => Number(n)));
+                similaritySearch = similaritySearch.filter((_, i) => keepSet.has(i));
+              } else {
+                console.warn("OpenAI filter returned unexpected JSON, skipping filter.", parsed);
+              }
+            } else {
+              console.warn("No JSON found in OpenAI filter response, skipping filter.", raw);
+            }
+          } catch (parseErr) {
+            console.warn("Failed to parse OpenAI filter response, skipping filter.", parseErr, raw);
+          }
+        } else {
+          console.warn("Empty response from OpenAI filter, returning unfiltered results.");
+        }
+      } catch (filterError) {
+        console.error("Error while filtering chunks with OpenAI, returning unfiltered results:", filterError);
+      }
+
       return res.status(200).send(similaritySearch);
     } catch (error) {
       console.error("Error initializing Pinecone client:", error);
@@ -259,14 +316,14 @@ export default async function handler(req, res) {
 
     /// delete the assistant from openai
     try {
-      const assistant = await openai.beta.assistants.del(chatbotId);
+      await openai.beta.assistants.del(chatbotId);
     } catch (error) {
       console.error("Error during assistant deletion:", error);
     }
 
     vectorId = [].concat(...vectorId);
     /// delete the vectors
-    const deleteData = await collection.deleteMany({ chatbotId: chatbotId });
+    await collection.deleteMany({ chatbotId: chatbotId });
     /// delete the chatbot
     await userChatbots.deleteOne({ chatbotId: chatbotId });
     /// delete chatbot settings

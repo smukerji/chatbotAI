@@ -894,6 +894,9 @@
       .left {
         .source-upload-container {
           height: calc(100% - 20px);
+              display: flex
+;
+    flex-direction: column;
 
           .ant-upload-wrapper .ant-upload-drag .ant-upload-drag-container {
             display: flex;
@@ -902,7 +905,9 @@
           }
 
           .ant-upload-hint {
-            width: 70%;
+            width: 100%;
+            line-height: 120%;
+            margin: 0 0 10px;
           }
         }
 

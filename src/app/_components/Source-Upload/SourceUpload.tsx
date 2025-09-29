@@ -1,6 +1,6 @@
 import { UploadProps, message, Progress } from "antd";
 import Dragger from "antd/es/upload/Dragger";
-import React, { useContext, useState, useRef } from "react";
+import React, { useContext, useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import documentUploadIcon from "../../../../public/create-chatbot-svgs/document-upload.svg";
 import "./source-upload.scss";
@@ -26,26 +26,62 @@ function SourceUpload({
   /// Use ref to track intervals for immediate access
   const intervalsRef = useRef<{ [key: string]: NodeJS.Timeout }>({});
 
-  /// Function to simulate progress for a file
+  // Clear any remaining intervals when the component unmounts to avoid leaking timers
+  useEffect(() => {
+    return () => {
+      Object.values(intervalsRef.current).forEach((iv) => clearInterval(iv));
+      intervalsRef.current = {};
+    };
+  }, []);
+
+  /// Function to simulate progress for a file deterministically over 5 minutes
   const simulateProgress = (fileName: string) => {
+    const SIMULATION_DURATION_MS = 5 * 60 * 1000; // 5 minutes
+  const MAX_SIMULATED_PROGRESS = 95; // cap until actual upload completes (stop just before completion)
+    const TICK_MS = 1000; // update every 1s
+
+    const startTime = Date.now();
     let progress = 0;
+
     const interval = setInterval(() => {
-      progress += Math.random() * 5; // Reduced increment between 0-5%
-      if (progress >= 85) {
-        progress = 85; // Stop at 85% until actual upload completes
-      }
+      const elapsed = Date.now() - startTime;
+      const fraction = Math.min(1, elapsed / SIMULATION_DURATION_MS);
+      progress = fraction * MAX_SIMULATED_PROGRESS;
 
       setUploadingFiles((prev) => ({
         ...prev,
-        [fileName]: Math.min(progress, 85),
+        [fileName]: Math.min(Math.round(progress), MAX_SIMULATED_PROGRESS),
       }));
-    }, 500); // Increased interval to 500ms for slower progress
 
-    // Store the interval in ref for immediate access
+      // If we've reached the end of the simulation window, stop the interval to avoid unnecessary work.
+      if (elapsed >= SIMULATION_DURATION_MS) {
+        clearInterval(interval);
+        // remove stored interval since it's no longer active
+        if (intervalsRef.current[fileName]) {
+          delete intervalsRef.current[fileName];
+        }
+      }
+    }, TICK_MS);
+
+    // Store the interval in ref for immediate access/cleanup by onChange
     intervalsRef.current[fileName] = interval;
 
     return interval;
   };
+
+  // Truncate filenames in the middle while preserving extension
+  function truncateFilenameMiddle(name: string, maxLen = 34) {
+    if (!name) return "";
+    if (name.length <= maxLen) return name;
+    const extIndex = name.lastIndexOf(".");
+    const ext = extIndex !== -1 ? name.slice(extIndex) : "";
+    const base = ext ? name.slice(0, extIndex) : name;
+    // reserve 5 chars for dots
+    const keep = Math.max(3, Math.floor((maxLen - ext.length - 5) / 2));
+    const start = base.slice(0, keep);
+    const end = base.slice(-keep);
+    return `${start}.....${end}${ext}`;
+  }
 
   /// get default file to preview if any
   const defaultFileList = botDetails?.defaultFileList;
@@ -266,13 +302,12 @@ function SourceUpload({
                 style={{
                   justifyContent: "space-between",
                   width: "100%",
-                  paddingRight: "30px",
                   alignItems: "center",
                   gap: "0",
                 }}
               >
-                <p>{fileName}</p>
-                <div style={{ width: "300px" }}>
+                <p>{truncateFilenameMiddle(fileName)}</p>
+                <div style={{ width: "250px", marginLeft: "20px" }}>
                   <Progress
                     percent={Math.round(progress)}
                     size="small"
@@ -290,7 +325,7 @@ function SourceUpload({
             return (
               <div key={`${file.name}-${index}`} className="item">
                 <div className="file">
-                  <p>{file.name}</p>
+                  <p>{truncateFilenameMiddle(file.name)}</p>
                   <div>({file.charLength} chars)</div>
                 </div>
                 <div className="delete">
