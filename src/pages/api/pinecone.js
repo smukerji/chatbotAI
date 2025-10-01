@@ -69,11 +69,6 @@ export default async function handler(req, res) {
       //   return res.status(200).send(error.message);
       // }
 
-      console.log("User Query:", userQuery);
-      console.log("Chatbot ID:", chatbotId);
-      console.log("User ID:", userId);
-      console.log("Messages:", messages);
-
       const pinecone = new Pinecone({
         apiKey: process.env.NEXT_PUBLIC_PINECONE_KEY,
       });
@@ -86,54 +81,200 @@ export default async function handler(req, res) {
         { pineconeIndex, namespace: userId }
       );
 
-      /// retrieve the similarity search results
+      /// Custom Multi-Query Retriever with Scores
       const llm = new OpenAI({
         apiKey: process.env.NEXT_PUBLIC_OPENAI_KEY,
         model: "gpt-4o",
       });
-      const retriever = MultiQueryRetriever.fromLLM({
-        llm: llm,
-        prompt: PromptTemplate.fromTemplate(
-          `You are an AI language model assistant. Your task is
-          to generate {queryCount} different versions of the given user
-          question corresponding to the Chat History to retrieve relevant documents from a vector database.
-          By generating multiple perspectives on the user question,
-          your goal is to help the user overcome some of the limitations
-          of distance-based similarity search.
 
-          Replace any number or words like it, that, etc according to the user's flow.
+      // Generate multiple query variations
+      const multiQueryPrompt = PromptTemplate.fromTemplate(
+        `You are an AI language model assistant. Your task is
+        to generate {queryCount} different versions of the given user
+        question corresponding to the Chat History to retrieve relevant documents from a vector database.
+        By generating multiple perspectives on the user question,
+        your goal is to help the user overcome some of the limitations
+        of distance-based similarity search.
 
-          Provide these alternative questions separated by newlines between XML tags. For example:
+        Replace any number or words like it, that, etc according to the user's flow.
 
-          <questions>
-          Question 1
-          Question 2
-          Question 3
-          </questions>
+        Provide these alternative questions separated by newlines between XML tags. For example:
 
-          Chat History: {chatHistory}
+        <questions>
+        Question 1
+        Question 2
+        Question 3
+        </questions>
 
-          Original question: {question}`,
-          { partialVariables: { chatHistory: JSON.stringify(messages) } }
-        ),
-        retriever: vectorStore.asRetriever({
-          filter: { chatbotId: chatbotId },
-        }),
-      });
+        Chat History: {chatHistory}
 
-      /// getting the relveant similaritiy search
-      const retrievedDocs = (await retriever.invoke(userQuery)).slice(0, 3);
-      let similaritySearch = "";
-      for (const doc of retrievedDocs) {
-        similaritySearch += doc.metadata.content;
+        Original question: {question}`,
+        { partialVariables: { chatHistory: JSON.stringify(messages) } }
+      );
 
-        /// if the meta data has image link add it as the reference in similaritysearch
-        if (doc?.metadata?.image_path) {
-          similaritySearch += `<img src=${doc.metadata.image_path} />`;
+      // Generate query variations
+      const queryVariations = await llm.invoke(
+        await multiQueryPrompt.format({
+          question: userQuery,
+          queryCount: 3,
+        })
+      );
+
+      // Extract queries from the response
+      const extractQueries = (response) => {
+        const questionsMatch = response.match(/<questions>(.*?)<\/questions>/s);
+        if (questionsMatch) {
+          const queries = questionsMatch[1]
+            .trim()
+            .split("\n")
+            .map((q) => q.trim())
+            .filter((q) => q.length > 0);
+
+          // Always include the original query as the first query
+          const uniqueQueries = [
+            userQuery,
+            ...queries.filter((q) => q !== userQuery),
+          ];
+          return uniqueQueries.slice(0, 10); // Limit to 3 queries max
+        }
+        return [userQuery]; // Fallback to original query
+      };
+
+      const queries = extractQueries(queryVariations);
+
+      // Custom multi-query retrieval with scores
+      const allResultsWithScores = [];
+
+      // Search with each query variation
+      for (const query of queries) {
+        try {
+          const results = await vectorStore.similaritySearchWithScore(
+            query,
+            10,
+            {
+              chatbotId: chatbotId,
+            }
+          );
+
+          // Add query source to each result
+          results.forEach(([doc, score]) => {
+            allResultsWithScores.push([doc, score, query]);
+          });
+        } catch (error) {
+          console.error(`Error searching with query "${query}":`, error);
         }
       }
 
-      console.log("Similarity Search Result:", similaritySearch);
+      // Remove duplicates and sort by score
+      const uniqueResults = new Map();
+      allResultsWithScores.forEach(([doc, score, sourceQuery]) => {
+        // Create a unique key based on content and source
+        const contentKey =
+          (doc.metadata.content || doc.pageContent || "") +
+          (doc.metadata.source || "") +
+          (doc.metadata.filename || "");
+
+        if (
+          !uniqueResults.has(contentKey) ||
+          uniqueResults.get(contentKey)[1] > score
+        ) {
+          uniqueResults.set(contentKey, [doc, score, sourceQuery]);
+        }
+      });
+
+      // Sort by score (highest scores first) and take top 3
+      const retrievedDocsWithScores = Array.from(uniqueResults.values())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10)
+        .map(([doc, score]) => [doc, score]); // Remove sourceQuery for consistency
+
+      /// extract only needed field from the retrieved documents with scores
+      let similaritySearch = retrievedDocsWithScores.map(([doc, score]) => {
+        let content = doc.metadata.content || "";
+        /// if the meta data has image link add it as the reference in similaritysearch
+        if (doc?.metadata?.image_path) {
+          content += `<img src=${doc.metadata.image_path} />`;
+        }
+
+        let source = "";
+        if (doc?.metadata?.source) {
+          source = doc.metadata.source;
+        }
+
+        let filename = "";
+        if (doc?.metadata?.filename) {
+          filename = doc.metadata.filename;
+        } 
+
+        let source_url = "";
+        if (doc?.metadata?.source_url || doc?.metadata?.link) {
+          source_url = doc.metadata.source_url || doc.metadata.link;
+        }
+
+        let dimensions = {};
+        if (doc?.metadata?.dimensions) {
+          dimensions = JSON.stringify(doc.metadata.dimensions);
+        }
+
+        return { content, source, filename, score, source_url, dimensions };
+      });
+
+      // --- Filter retrieved chunks using OpenAI to keep only those relevant to the original query ---
+      try {
+        // Build a compact listing of chunks to avoid hitting token limits
+        const maxChunkChars = 1500;
+        const chunksList = similaritySearch
+          .map((c, i) => {
+            const truncated = c.content
+              ? c.content.slice(0, maxChunkChars)
+              : "";
+            return `${i}: ${truncated.replace(/\n+/g, " ")}`;
+          })
+          .join("\n\n");
+
+        const systemPrompt = "You are a strict filter that decides whether a text chunk is relevant to a user's question. Return a JSON object with a single key \"keep\" whose value is a list of integer indices of the chunks that should be kept (in original order). Do not return any other text.";
+
+        const userPrompt = `Original question: ${userQuery}\n\nChunks:\n${chunksList}\n\nOnly return valid JSON, for example: {\"keep\": [0,2]}`;
+
+        const filterResp = await openai.chat.completions.create({
+          model: process.env.NEXT_PUBLIC_OPENAI_MODEL || "gpt-4o",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt },
+          ],
+          temperature: 0,
+          max_tokens: 500,
+        });
+
+        const raw =
+          filterResp && filterResp.choices && filterResp.choices[0]?.message
+            ? filterResp.choices[0].message.content
+            : null;
+
+        if (raw) {
+          try {
+            // Find the first JSON start (either { or [) to avoid non-JSON prefixes
+            const jsonStart = raw.search(/[\{\[]/);
+            if (jsonStart !== -1) {
+              const parsed = JSON.parse(raw.slice(jsonStart));
+              if (parsed && Array.isArray(parsed.keep)) {
+                const keepSet = new Set(parsed.keep.map((n) => Number(n)));
+                similaritySearch = similaritySearch.filter((_, i) => keepSet.has(i));
+              } else {
+                console.warn("OpenAI filter returned unexpected JSON, skipping filter.", parsed);
+              }
+            } else {
+              console.warn("No JSON found in OpenAI filter response, skipping filter.", raw);
+            }
+          } catch (parseErr) {
+            console.warn("Failed to parse OpenAI filter response, skipping filter.", parseErr, raw);
+          }
+        } else {
+          console.warn("Empty response from OpenAI filter, returning unfiltered results.");
+        }
+      } catch (filterError) {
+        console.error("Error while filtering chunks with OpenAI, returning unfiltered results:", filterError);
+      }
 
       return res.status(200).send(similaritySearch);
     } catch (error) {
@@ -175,14 +316,14 @@ export default async function handler(req, res) {
 
     /// delete the assistant from openai
     try {
-      const assistant = await openai.beta.assistants.del(chatbotId);
+      await openai.beta.assistants.del(chatbotId);
     } catch (error) {
       console.error("Error during assistant deletion:", error);
     }
 
     vectorId = [].concat(...vectorId);
     /// delete the vectors
-    const deleteData = await collection.deleteMany({ chatbotId: chatbotId });
+    await collection.deleteMany({ chatbotId: chatbotId });
     /// delete the chatbot
     await userChatbots.deleteOne({ chatbotId: chatbotId });
     /// delete chatbot settings

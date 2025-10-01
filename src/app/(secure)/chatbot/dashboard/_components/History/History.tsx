@@ -4,9 +4,20 @@ import exportBtn from "../../../../../../../public/svgs/export-btn.svg";
 import { useCookies } from "react-cookie";
 import likeIcon from "../../../../../../../public/svgs/like.svg";
 import dislikeIcon from "../../../../../../../public/svgs/dislike.svg";
+import SourcesDots from "../../../../../../../public/sources-dots.png";
+import CloseBtn from "../../../../../../../public/close-circle.png";
+import BackIcon from "../../../../../../../public/source-reference/arrow-left.png";
 import "./history.scss";
 import ChatbotNameModal from "../../../../../_components/Modal/ChatbotNameModal";
-import { ConfigProvider, DatePicker, Pagination, message } from "antd";
+import {
+  ConfigProvider,
+  DatePicker,
+  Pagination,
+  message,
+  Modal,
+  Button,
+  Typography,
+} from "antd";
 import { ChatbotSettingContext } from "../../../../../_helpers/client/Context/ChatbotSettingContext";
 import { PrintingChats } from "../Printing-Chats/Printing";
 import ReactToPrint from "react-to-print";
@@ -18,11 +29,28 @@ import { getTimeAgo } from "@/app/_helpers/client/getTime";
 import { CreateBotContext } from "@/app/_helpers/client/Context/CreateBotContext";
 import closeImage from "../../../../../../../public/svgs/close-icon.svg";
 import noHistory from "../../../../../../../public/svgs/empty-history.svg";
+import Sources from "../Sources/Sources";
+import dynamic from "next/dynamic";
+const HighlightedInfoPage = dynamic(
+  () => import("../Highlighted-Info/highlighted-info"),
+  {
+    ssr: false,
+  }
+);
 
 const { RangePicker } = DatePicker;
 
 function History({ chatbotId }: any) {
   let tempRef: any = useRef<HTMLDivElement>();
+  // detect whether current device is mobile/tab (width < 767)
+  const [isMobileDevice, setIsMobileDevice] = useState(false);
+
+  useEffect(() => {
+    const handleMobileResize = () => setIsMobileDevice(window.innerWidth < 767);
+    handleMobileResize();
+    window.addEventListener("resize", handleMobileResize);
+    return () => window.removeEventListener("resize", handleMobileResize);
+  }, []);
 
   const [chatHistoryList, setChatHistoryList]: any = useState([]);
   const [currentChatHistory, setCurrentChatHistory]: any = useState([]);
@@ -60,6 +88,96 @@ function History({ chatbotId }: any) {
   const botSettings = botSettingContext?.chatbotSettings;
 
   const [displayEmail, setDisplayEmail] = useState("");
+
+  /// sources container title
+  const [sourcesContainerTitle, setSourcesContainerTitle] = useState("sources");
+
+  const relevanceLevels = React.useMemo(
+    () => [
+      { label: "All", color: "#F4F5F6" },
+      { label: "Most relevant", color: "#E0EDFF" },
+      { label: "Relevant", color: "#D3F8DE" },
+      { label: "Good", color: "#FFF3B2" },
+      { label: "Low", color: "#FFD0B2" },
+      { label: "Very low", color: "#FDD" },
+    ],
+    []
+  );
+
+  // active relevance filter (single-select). 'All' means no filter applied.
+  const [activeRelevance, setActiveRelevance] = useState<string>("All");
+
+  // color helpers: contrast and darken
+  const hexToRgb = (hex: string) => {
+    const h = hex.replace("#", "");
+    const bigint = parseInt(
+      h.length === 3
+        ? h
+            .split("")
+            .map((c) => c + c)
+            .join("")
+        : h,
+      16
+    );
+    return {
+      r: (bigint >> 16) & 255,
+      g: (bigint >> 8) & 255,
+      b: bigint & 255,
+    };
+  };
+
+  const getContrastColor = (hex: string) => {
+    try {
+      const { r, g, b } = hexToRgb(hex);
+      // relative luminance
+      const [R, G, B] = [r, g, b].map((v) => {
+        const s = v / 255;
+        return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+      });
+      const L = 0.2126 * R + 0.7152 * G + 0.0722 * B;
+      return L > 0.5 ? "#000" : "#fff";
+    } catch {
+      return "#000";
+    }
+  };
+
+  const darkenHex = (hex: string, pct = 0.35) => {
+    try {
+      const { r, g, b } = hexToRgb(hex);
+      const nr = Math.max(0, Math.round(r * (1 - pct)));
+      const ng = Math.max(0, Math.round(g * (1 - pct)));
+      const nb = Math.max(0, Math.round(b * (1 - pct)));
+      const toHex = (v: number) => v.toString(16).padStart(2, "0");
+      return `#${toHex(nr)}${toHex(ng)}${toHex(nb)}`;
+    } catch {
+      return hex;
+    }
+  };
+
+  const getRelevanceLabelForScore = (score: number) => {
+    if (score >= 0.85) return "Most relevant";
+    if (score >= 0.8) return "Relevant";
+    if (score >= 0.7) return "Good";
+    if (score >= 0.6) return "Low";
+    return "Very low";
+  };
+
+  const extractScoreFromSource = (src: any): number | null => {
+    if (!src) return null;
+    if (typeof src.score === "number") return src.score;
+    if (typeof src.score === "string" && src.score !== "") {
+      const n = parseFloat(src.score);
+      if (!isNaN(n)) return n;
+    }
+    const label = String(src.source || src.title || "");
+    const match = label.match(/\(score:\s*([0-9.]+)\)/i);
+    if (match) return parseFloat(match[1]);
+    return null;
+  };
+
+  const handleRelevanceClick = (label: string) => {
+    setActiveRelevance((prev) => (prev === label ? "All" : label));
+  };
 
   /// update the chat history data
   const fetchHistoryCount = async (
@@ -156,13 +274,82 @@ function History({ chatbotId }: any) {
     };
 
     retriveData();
-  }, [botDetails?.leadSessionsEmail]);
+  }, [botDetails?.leadSessionsEmail, chatbotId, cookies.userId]);
 
   /// chatbot messages feedback pop up state
   const [open, setOpen] = useState(false);
   const [feedbackText, setfeedbackText] = useState("");
   const [feedbackIndex, setFeedbackIndex] = useState(0);
   const [feedbackStatus, setfeedbackStatus] = useState("");
+
+  /// sources modal state
+  const [sourcesModal, setSourcesModal] = useState(false);
+  const [selectedSources, setSelectedSources] = useState<any[]>([]);
+
+  // compute counts per relevance label based on selectedSources
+  const relevanceCounts = React.useMemo(() => {
+    const map = new Map<string, number>();
+    relevanceLevels.forEach((r) => map.set(r.label, 0));
+    if (!selectedSources || !selectedSources.length) return map;
+    for (const src of selectedSources) {
+      const s = extractScoreFromSource(src);
+      if (s == null) continue; // unscored items don't belong to any bucket
+      const label = getRelevanceLabelForScore(s);
+      map.set(label, (map.get(label) || 0) + 1);
+    }
+    // fill 'All' as total items (including unscored)
+    map.set("All", selectedSources.length);
+    return map;
+  }, [selectedSources, relevanceLevels]);
+
+  const relevanceBarRef = useRef<HTMLDivElement | null>(null);
+
+  const RelevanceBar = () => (
+    <div className="relevance-bar" ref={relevanceBarRef}>
+      {relevanceLevels
+        .filter((item) => (relevanceCounts.get(item.label) || 0) > 0)
+        .map((item) => {
+          const isActive = activeRelevance === item.label;
+          const textColor = getContrastColor(item.color);
+          const borderColor = isActive
+            ? darkenHex(item.color, 0.35)
+            : "transparent";
+          const count = relevanceCounts.get(item.label) || 0;
+          const pillRef = React.createRef<HTMLDivElement>();
+          return (
+            <div
+              key={item.label}
+              ref={pillRef}
+              className={`relevance-level ${isActive ? "active" : ""}`}
+              onClick={() => {
+                handleRelevanceClick(item.label);
+                // scroll the clicked pill to the start of the container
+                try {
+                  pillRef.current?.scrollIntoView({
+                    behavior: "smooth",
+                    inline: "start",
+                    block: "nearest",
+                  });
+                } catch {}
+              }}
+              style={{ background: item.color, color: textColor, borderColor }}
+              role="button"
+              aria-pressed={isActive}
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  handleRelevanceClick(item.label);
+                }
+              }}
+            >
+              <span className="relevance-label">{item.label}</span>
+              <span className="relevance-count">{count}</span>
+            </div>
+          );
+        })}
+    </div>
+  );
 
   /// Messages feedback opener
   async function openChatbotModal(index: number, status: string) {
@@ -172,6 +359,12 @@ function History({ chatbotId }: any) {
     /// open the chatbot naming dialog box when creating bot
     setOpen(true);
   }
+
+  /// Handle sources display
+  const handleShowSources = (sources: any[]) => {
+    setSelectedSources(sources);
+    setSourcesModal(true);
+  };
 
   /// handling the chatbot ok action
   const handleOk = async () => {
@@ -209,6 +402,123 @@ function History({ chatbotId }: any) {
   console.log("->>>>>>>>>>>>>>>>", chatClicked);
   return (
     <div className="history-chat-container">
+      {/* Sources Modal */}
+      {/* <Modal
+        title="References"
+        open={sourcesModal}
+        onCancel={() => setSourcesModal(false)}
+        footer={[
+          <Button key="close" onClick={() => setSourcesModal(false)}>
+            Close
+          </Button>,
+        ]}
+        width={800}
+        bodyStyle={{ background: "#f8f9fa" }}
+      >
+        <div style={{ maxHeight: 500, overflowY: "auto" }}>
+          {selectedSources.length === 0 ? (
+            <div style={{ textAlign: "center", color: "#888", padding: "2rem" }}>
+              No references found.
+            </div>
+          ) : (
+            selectedSources.map((src: any, idx: number) => {
+              // Extract score if present in source string
+              let score = null;
+              let sourceLabel = src.source || src.title || "Source";
+              const scoreMatch = sourceLabel.match(/\(score: ([0-9.]+)\)/);
+              if (scoreMatch) {
+                score = scoreMatch[1];
+                sourceLabel = sourceLabel.replace(scoreMatch[0], "").trim();
+              }
+              // Capitalize first letter
+              if (sourceLabel.length > 0) {
+                sourceLabel = sourceLabel.charAt(0).toUpperCase() + sourceLabel.slice(1);
+              }
+              return (
+                <div
+                  key={idx}
+                  style={{
+                    background: "#fff",
+                    borderRadius: 8,
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+                    marginBottom: 20,
+                    padding: 20,
+                    border: "1px solid #e3e3e3",
+                    position: "relative",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      marginBottom: 8,
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontWeight: 600,
+                        color: "#2a4d8f",
+                        fontSize: 16,
+                        marginRight: 12,
+                        background: "#eaf1fb",
+                        padding: "2px 10px",
+                        borderRadius: 6,
+                      }}
+                    >
+                      {sourceLabel}
+                    </span>
+                    {score && (
+                      <span
+                        style={{
+                          fontWeight: 500,
+                          color: "#fff",
+                          background: "#4caf50",
+                          borderRadius: 6,
+                          padding: "2px 10px",
+                          fontSize: 14,
+                          marginLeft: 8,
+                          letterSpacing: 1,
+                          boxShadow: "0 1px 4px rgba(76,175,80,0.12)",
+                        }}
+                      >
+                        Score: {score}
+                      </span>
+                    )}
+                  </div>
+                  <div style={{ color: "#222", fontSize: 15, lineHeight: 1.7 }}>
+                    {Array.isArray(src.content)
+                      ? src.content.map((item: any, i: number) => (
+                          <div key={i} style={{ marginBottom: 8, maxHeight: 200, overflowY: 'auto', background: '#f5f5f5', borderRadius: 6, padding: 8 }}>
+                            {typeof item === 'string'
+                              ? item
+                              : typeof item === 'object'
+                              ? <div style={{ maxHeight: 180, overflowY: 'auto' }}>
+                                  {Object.entries(item).map(([k, v]) => (
+                                    <div key={k}>
+                                      <strong>{k.charAt(0).toUpperCase() + k.slice(1)}:</strong> {String(v)}
+                                    </div>
+                                  ))}
+                                </div>
+                              : String(item)}
+                          </div>
+                        ))
+                      : typeof src.content === 'object' && src.content !== null
+                      ? <div style={{ maxHeight: 200, overflowY: 'auto', background: '#f5f5f5', borderRadius: 6, padding: 8 }}>
+                          {Object.entries(src.content).map(([k, v]) => (
+                            <div key={k}>
+                              <strong>{k.charAt(0).toUpperCase() + k.slice(1)}:</strong> {String(v)}
+                            </div>
+                          ))}
+                        </div>
+                      : src.content}
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      </Modal> */}
+
       <div className="action-container">
         <div className="date-picker-container">
           {/* custom date buttons */}
@@ -367,9 +677,15 @@ function History({ chatbotId }: any) {
         </div>
       </div>
       {chatHistoryList?.length !== 0 && (
-        <div className="chatbot-history-parts">
+        <div
+          className="chatbot-history-parts"
+          style={{ ...(sourcesModal ? { gap: "20px" } : {}) }}
+        >
           {/*------------------------------------------left-section----------------------------------------------*/}
-          <div className="chatbot-history-details">
+          <div
+            className="chatbot-history-details"
+            style={{ ...(sourcesModal ? { width: "10%" } : {}) }}
+          >
             {/*------------------------------------------chat-list-section----------------------------------------------*/}
             <div
               className="detail"
@@ -422,6 +738,9 @@ function History({ chatbotId }: any) {
                             setCurrentChatHistory(data[1]?.messages);
                             setDisplayEmail(data[1]?.email);
                             setActiveCurrentChatHistory("today" + index);
+                            setSelectedSources([]);
+                            setSourcesContainerTitle("sources");
+                            setSourcesModal(false);
                           }}
                         >
                           <div
@@ -482,7 +801,7 @@ function History({ chatbotId }: any) {
                             style={{
                               textOverflow: "ellipsis",
                               overflow: "hidden",
-                              width: "250px",
+                              // width: "250px",
                               textWrap: "nowrap",
                               // flex: botDetails?.referedFrom == "leads" ? 1 : 0,
                             }}
@@ -618,11 +937,52 @@ function History({ chatbotId }: any) {
           />
           {/*------------------------------------------right-section----------------------------------------------*/}
 
+          {/* mobile scrim for message panel (close on tap) */}
+          {isMobileDevice && chatClicked && (
+            <div
+              className="message-scrim"
+              onClick={() => setIsChatClicked(false)}
+              style={{
+                position: "fixed",
+                inset: 0,
+                background: "rgba(0,0,0,0.45)",
+                zIndex: 9998,
+              }}
+            />
+          )}
+
           <div
             className="message-section-wrapper"
             style={{
-              display:
-                window.innerWidth > 767 || chatClicked ? "block" : "none",
+              // show on desktop or when a chat is opened on mobile
+              display: !isMobileDevice
+                ? window.innerWidth > 767
+                  ? "block"
+                  : "none"
+                : chatClicked
+                ? "block"
+                : "none",
+              ...(sourcesModal ? { width: "30%", maxWidth: "30%" } : {}),
+              ...(isMobileDevice && chatClicked
+                ? {
+                    position: "fixed",
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    width: "100%",
+                    minWidth: "100%",
+                    height: "72vh",
+                    maxHeight: "92vh",
+                    borderTopLeftRadius: "12px",
+                    borderTopRightRadius: "12px",
+                    boxShadow: "0 -8px 30px rgba(0,0,0,0.25)",
+                    zIndex: 9999,
+                    overflow: "auto",
+                    transform: "translateY(0)",
+                    transition: "transform 260ms cubic-bezier(.2,.8,.2,1)",
+                    background: "white",
+                  }
+                : {}),
             }}
           >
             <div className="messages-section">
@@ -663,6 +1023,7 @@ function History({ chatbotId }: any) {
 
               <div className="history-conversation-container">
                 {currentChatHistory.map((message: any, index: any) => {
+                  console.log("📜 History message:", message); // Debug log to see message structure
                   if (message.role == "assistant")
                     return (
                       <React.Fragment key={index}>
@@ -705,6 +1066,46 @@ function History({ chatbotId }: any) {
                                   openChatbotModal(index, "dislike")
                                 }
                               />
+                              {/* Only show sources button if sources are available */}
+                              {message.sources &&
+                                message.sources?.length > 0 && (
+                                  <button
+                                    className="sources-btn"
+                                    onClick={() =>
+                                      handleShowSources(message.sources)
+                                    }
+                                    aria-label="Sources"
+                                    // style={{
+                                    //   background: "none",
+                                    //   border: "none",
+                                    //   cursor: "pointer",
+                                    //   display: "flex",
+                                    //   alignItems: "center",
+                                    //   gap: "4px",
+                                    //   padding: "4px 8px",
+                                    //   borderRadius: "4px",
+                                    //   fontSize: "12px",
+                                    //   color: "#666",
+                                    //   transition: "all 0.2s ease",
+                                    // }}
+                                    // onMouseEnter={(e) => {
+                                    //   e.currentTarget.style.backgroundColor =
+                                    //     "#f0f0f0";
+                                    // }}
+                                    // onMouseLeave={(e) => {
+                                    //   e.currentTarget.style.backgroundColor =
+                                    //     "transparent";
+                                    // }}
+                                  >
+                                    <Image
+                                      src={SourcesDots}
+                                      alt="sources-icon"
+                                      width={16}
+                                      height={16}
+                                    />
+                                    Sources
+                                  </button>
+                                )}
                             </div>
                           )}
                           {/* <div className="like-dislike-container">
@@ -759,6 +1160,130 @@ function History({ chatbotId }: any) {
               </div>
             </div>
           </div>
+
+          {/* sources div */}
+          {sourcesModal && selectedSources.length > 0 && (
+            <> 
+              {isMobileDevice && (
+                <div
+                  className="sources-scrim"
+                  onClick={() => setSourcesModal(false)}
+                  style={{
+                    position: "fixed",
+                    inset: 0,
+                    background: "rgba(0,0,0,0.45)",
+                    zIndex: 9998,
+                  }}
+                />
+              )}
+            <div
+              className="sources-container"
+              style={{
+                ...(sourcesModal ? { width: "50%", minWidth: "50%" } : {}),
+                ...(isMobileDevice
+                  ? {
+                      position: "fixed",
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      width: "100%",
+                      minWidth: "100%",
+                      height: "72vh",
+                      maxHeight: "92vh",
+                      borderTopLeftRadius: "12px",
+                      borderTopRightRadius: "12px",
+                      boxShadow: "0 -8px 30px rgba(0,0,0,0.25)",
+                      zIndex: 9999,
+                      overflow: "auto",
+                      transform: "translateY(0)",
+                      transition: "transform 260ms cubic-bezier(.2,.8,.2,1)",
+                      background: "white",
+                    }
+                  : {}),
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "15px",
+                }}
+              >
+                <h3
+                  style={{
+                    margin: 0,
+                    // color: "#2a4d8f",
+                    fontSize: "18px",
+                    fontWeight: 300,
+                  }}
+                  title={
+                    /^\s*<\s*/.test(String(sourcesContainerTitle))
+                      ? "Back"
+                      : undefined
+                  }
+                >
+                  {sourcesContainerTitle.toLowerCase() !== "sources" && (
+                    <Image
+                      src={BackIcon}
+                      alt="back-icon"
+                      onClick={() => setSourcesContainerTitle("sources")}
+                      style={{
+                        cursor: "pointer",
+                        userSelect: "none",
+                      }}
+                    />
+                  )}
+                  <Typography.Text
+                    strong
+                    ellipsis
+                    title={sourcesContainerTitle}
+                    style={{ maxWidth: 150 }}
+                  >
+                    {sourcesContainerTitle}
+                  </Typography.Text>
+                </h3>
+
+                <button
+                  onClick={() => setSourcesModal(false)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "#666",
+                    fontSize: "18px",
+                    cursor: "pointer",
+                    padding: "5px",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    display: "flex",
+                  }}
+                >
+                  <Image src={CloseBtn} alt="close-icon" />
+                </button>
+              </div>
+              <RelevanceBar />
+              {/* <Sources data={selectedSources} />
+               */}
+              {/* compute filtered sources based on active relevance */}
+              {/** If activeRelevance is null, show all sources */}
+              <HighlightedInfoPage
+                data={
+                  activeRelevance === "All"
+                    ? selectedSources
+                    : selectedSources.filter((src) => {
+                        const s = extractScoreFromSource(src);
+                        if (s == null) return false;
+                        const label = getRelevanceLabelForScore(s);
+                        return activeRelevance === label;
+                      })
+                }
+                chatbotId={chatbotId}
+                sourcesContainerTitle={sourcesContainerTitle}
+                setSourcesContainerTitle={setSourcesContainerTitle}
+              />
+            </div>
+            </>
+          )}
         </div>
       )}
       {chatHistoryList?.length == 0 && (

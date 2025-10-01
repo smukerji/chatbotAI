@@ -44,7 +44,22 @@
 
         ul {
           color: #141416;
+          li {
+            a {
+              font-size: 16px !important;
+            }
+          }
         }
+      }
+
+      .login-register-container {
+        .login-btn,
+        .try-free-btn {
+          font-size: 16px !important;
+          padding: 8px 16px !important;
+        }
+
+        gap: 10px !important;
       }
     }
 

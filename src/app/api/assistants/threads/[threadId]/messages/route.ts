@@ -22,6 +22,8 @@ export async function POST(request: any, { params: { threadId } }: any) {
     .map((data: any) => data.schema_info)
     .filter((info: any) => info !== undefined);
 
+  console.log("Schema Info:", schemaInfo);
+
   let userQuery = `userQuery: ${content} \n\n schema_info: ${JSON.stringify(
     schemaInfo
   )} `;

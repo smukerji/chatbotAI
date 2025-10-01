@@ -1,6 +1,7 @@
 import { OpenAI } from "openai";
 import { v4 as uuidv4 } from "uuid";
 import { upsert } from "./pinecone";
+import fs from "fs";
 
 /// getting the openai obj
 export function openaiObj(): OpenAI {
@@ -16,8 +17,9 @@ export async function generateChunksNEmbeddForLinks(
   filename: string = "none"
 ) {
   const crawlData = crwaledLinkUpsertData.map((item) => item.element);
-  const crawlDataId = crwaledLinkUpsertData.map((item) => item.id);
-
+  const crawlDataId = crwaledLinkUpsertData.map((item) => {
+    return { id: item.id, link: item.link };
+  });
   /// creating chunks with batch size 250
   const batchSize = 150;
   /// creating embeddings
@@ -25,6 +27,7 @@ export async function generateChunksNEmbeddForLinks(
     const upsertData: any = [];
     const batch = crawlData.slice(i, i + batchSize);
     const batchId = crawlDataId.slice(i, i + batchSize);
+
     try {
       const batchEmbedding: any = await openaiObj().embeddings.create({
         model: "text-embedding-ada-002",
@@ -35,11 +38,12 @@ export async function generateChunksNEmbeddForLinks(
           metadata: {
             content: batch[index],
             source,
+            link: batchId[index]?.link,
             filename,
             chatbotId,
           },
           values: embeddingData.embedding,
-          id: batchId[index],
+          id: batchId[index]?.id,
         });
       });
       await upsert(upsertData, userId);
@@ -195,7 +199,10 @@ export async function generateChunksNEmbeddViaDocling(
   filename: string = "none"
 ) {
   /// extract all the chunks of text / table / image
-  const { chunks, contentLength }: any = await extractChunks(content, 0);
+  const { chunks, chunksMetadata, contentLength }: any = await extractChunks(
+    content,
+    0
+  );
 
   /// creating chunks with batch size 2000
   const batchSize = 250;
@@ -205,6 +212,7 @@ export async function generateChunksNEmbeddViaDocling(
   for (let i = 0; i < chunks.length; i += batchSize) {
     let tempData: any = [];
     const batch = chunks.slice(i, i + batchSize);
+    const batchMetadata = chunksMetadata.slice(i, i + batchSize);
     const batchEmbedding: any = await openaiObj().embeddings.create({
       model: "text-embedding-ada-002",
       input: batch,
@@ -212,25 +220,30 @@ export async function generateChunksNEmbeddViaDocling(
     batchEmbedding.data.map((embeddingData: any, index: number) => {
       const id = uuidv4();
       dataIDs.push(id);
+
+      // Merge the chunk metadata with the base metadata
+      const mergedMetadata = {
+        content: chunks[index],
+        source,
+        filename,
+        chatbotId,
+        source_url: batchMetadata[index]?.source_url || "",
+        dimensions: batchMetadata[index]?.dimensions || null,
+        type: batchMetadata[index]?.type || "unknown",
+        ...(batchMetadata[index]?.image_path && {
+          image_path: batchMetadata[index].image_path,
+        }),
+      };
+
       /// storing in response data
       data.push({
-        metadata: {
-          content: chunks[index],
-          source,
-          filename,
-          chatbotId,
-        },
+        metadata: mergedMetadata,
         values: embeddingData.embedding,
         id: id,
       });
 
       tempData.push({
-        metadata: {
-          content: chunks[index],
-          source,
-          filename,
-          chatbotId,
-        },
+        metadata: mergedMetadata,
         values: embeddingData.embedding,
         id: id,
       });
@@ -250,28 +263,40 @@ interface DocumentContent {
     id: number;
     source: string;
     content: string;
+    dimensions: any;
+    source_url: string;
   }>;
   tables?: Array<{
     id: number;
     source: string;
     content: string;
+    source_url: string;
+    dimensions: any;
   }>;
   pictures?: Array<{
     id: number;
     source: string;
     content: string;
     image_path: string;
+    dimensions: any;
+    source_url: string;
   }>;
 }
 
 async function extractChunks(content: DocumentContent, contentLength: number) {
   const chunks: string[] = [];
+  const chunksMetadata: any[] = [];
 
   // Extract content from texts
   if (content?.texts) {
     content.texts.forEach((text) => {
       if (text.content) {
         chunks.push(text.content);
+        chunksMetadata.push({
+          source_url: text.source_url || "",
+          dimensions: text.dimensions ? JSON.stringify(text.dimensions) : null,
+          type: "text",
+        });
         contentLength += text.content.length;
       }
     });
@@ -282,6 +307,13 @@ async function extractChunks(content: DocumentContent, contentLength: number) {
     content.tables.forEach((table) => {
       if (table.content) {
         chunks.push(table.content);
+        chunksMetadata.push({
+          source_url: table.source_url || "",
+          dimensions: table.dimensions
+            ? JSON.stringify(table.dimensions)
+            : null,
+          type: "table",
+        });
         contentLength += table.content.length;
       }
     });
@@ -293,12 +325,20 @@ async function extractChunks(content: DocumentContent, contentLength: number) {
       if (picture.content) {
         /// add picture content + image path
         chunks.push(picture.content + " image: " + picture?.image_path);
+        chunksMetadata.push({
+          source_url: picture.source_url || "",
+          dimensions: picture.dimensions
+            ? JSON.stringify(picture.dimensions)
+            : null,
+          type: "picture",
+          image_path: picture.image_path,
+        });
         contentLength += picture.content.length + picture?.image_path.length;
       }
     });
   }
 
-  return { chunks, contentLength };
+  return { chunks, chunksMetadata, contentLength };
 }
 
 export async function createEmbedding(query: string) {
