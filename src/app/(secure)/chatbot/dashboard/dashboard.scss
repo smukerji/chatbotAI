@@ -13,8 +13,21 @@
     .sources-header {
       .title {
         display: flex;
-        gap: 20px;
+        // gap: 20px;
+        justify-content: space-between;
         align-items: center;
+
+        div:first-child {
+          display: flex;
+          align-items: center;
+          gap: 20px;
+          @media screen and (max-width: 1440px) {
+            gap: 10px;
+          }
+          @media screen and (max-width: 1199px) {
+            gap: 5px;
+          }
+        }
 
         h1 {
           color: #000;
@@ -106,6 +119,45 @@
   .bottom {
     height: calc(100% - 92px - 1vh);
     margin-left: 0px;
+
+    .mobile-options-container {
+      list-style: none;
+      display: flex;
+      gap: 12px;
+
+      li {
+        display: flex;
+        padding: 8px 16px;
+        align-items: center;
+        gap: 12px;
+
+        .option {
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 24px; /* 150% */
+          text-transform: capitalize;
+          color: #777e90;
+        }
+        cursor: pointer;
+
+        &.active {
+          .option {
+            color: #2e58ea;
+            position: relative;
+            &::before {
+              content: "";
+              position: absolute;
+              width: 100%;
+              top: 32px;
+              // bottom: -9px;
+              left: 0;
+              border: 1px solid #2e58ea;
+            }
+          }
+        }
+      }
+    }
     .create-chatbot-container {
       padding: 0px;
       .sources-header {
@@ -205,6 +257,7 @@
         flex-direction: column;
         margin-left: 5px;
         margin-right: 5px;
+        width: 100%;
 
         .chatbot-details {
           width: 100%;

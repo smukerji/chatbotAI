@@ -1,8 +1,8 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState, useMemo } from "react";
 import { useCookies } from "react-cookie";
 import "../Chat/chat.scss";
 import Image from "next/image";
-import { Button, Slider, message, Modal } from "antd";
+import { Button, Slider, message, Modal, Typography } from "antd";
 import ChatbotNameModal from "../../../../../_components/Modal/ChatbotNameModal";
 import { getDate } from "../../../../../_helpers/client/getTime";
 import copyIcon from "../../../../../../../public/svgs/copy-icon.svg";
@@ -22,6 +22,17 @@ import ReactToPrint from "react-to-print";
 import { PrintingChats } from "../Printing-Chats/Printing";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
+import dynamic from "next/dynamic";
+
+// import HighlightedInfoPage from "../Highlighted-Info/highlighted-info";
+
+const HighlightedInfoPage = dynamic(
+  () => import("../Highlighted-Info/highlighted-info"),
+  {
+    ssr: false,
+  }
+);
+
 import {
   AUTHORIZATION_FAILED,
   JWT_EXPIRED,
@@ -33,6 +44,8 @@ import CloseEmbedBotIcon from "@/assets/svg/CloseEmbedBotIcon";
 import { AssistantStream } from "openai/lib/AssistantStream.mjs";
 import { AssistantStreamEvent } from "openai/resources/beta/assistants.mjs";
 import CloseIcon from "@/assets/svg/CloseIcon";
+import CloseBtn from "../../../../../../../public/close-circle.png";
+import BackIcon from "../../../../../../../public/source-reference/arrow-left.png";
 import MicIcon from "@/assets/svg/MicIcon";
 import {
   LiveTranscriptionEvent,
@@ -128,6 +141,9 @@ function ChatV2({
   /// skip leading form
   const [skipLeadForm, setSkipLeadForm] = useState(false);
 
+  /// mobile sub screen handler
+  const [mobileScreen, setMobileScreen] = useState("playground");
+
   /// isLeadform submitted
   const [isLeadFormSubmitted, setIsLeadFormSubmitted] = useState(false);
   const [leadError, setLeadError] = useState("");
@@ -136,6 +152,8 @@ function ChatV2({
 
   /// for apply css for embed bot on mobile screens
   const [innerWidth, setInnerWidth] = useState(false);
+  // detect whether current device is mobile/tab (width < 767)
+  const [isMobileDevice, setIsMobileDevice] = useState(false);
 
   /// chatbot messages feedback pop up state
   const [open, setOpen] = useState(false);
@@ -148,6 +166,9 @@ function ChatV2({
   const [numberError, setNumberError] = useState("");
   const [nameError, setNameError] = useState("");
   const [validNumberError, setValidNumberError] = useState("");
+
+  /// state to hide / show chatbot details
+  const [showChatbotDetails, setShowChatbotDetails] = useState(true);
 
   /// state to ensure if user has turned webSearch on or off
   const [webSearch, setWebSearch] = useState(false);
@@ -165,6 +186,9 @@ function ChatV2({
     number: "",
   });
 
+  /// sources container title
+  const [sourcesContainerTitle, setSourcesContainerTitle] = useState("sources");
+
   /// to check if iframe is loaded or not
   const [iframeLoaded, setiFrameLoaded] = useState(false);
 
@@ -174,6 +198,158 @@ function ChatV2({
 
   /// sources data and if the source will be visible or not
   const [sourceVisible, setSourceVisible] = useState(false);
+  // mobile sheet open state to control slide-up animation
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const relevanceLevels = useMemo(
+    () => [
+      { label: "All", color: "#F4F5F6" },
+      { label: "Most relevant", color: "#E0EDFF" },
+      { label: "Relevant", color: "#D3F8DE" },
+      { label: "Good", color: "#FFF3B2" },
+      { label: "Low", color: "#FFD0B2" },
+      { label: "Very low", color: "#FDD" },
+    ],
+    []
+  );
+
+  // active relevance filter (single-select). 'All' means no filter applied.
+  const [activeRelevance, setActiveRelevance] = useState<string>("All");
+
+  // color helpers: contrast and darken
+  const hexToRgb = (hex: string) => {
+    const h = hex.replace("#", "");
+    const bigint = parseInt(
+      h.length === 3
+        ? h
+            .split("")
+            .map((c) => c + c)
+            .join("")
+        : h,
+      16
+    );
+    return {
+      r: (bigint >> 16) & 255,
+      g: (bigint >> 8) & 255,
+      b: bigint & 255,
+    };
+  };
+
+  const getContrastColor = (hex: string) => {
+    try {
+      const { r, g, b } = hexToRgb(hex);
+      // relative luminance
+      const [R, G, B] = [r, g, b].map((v) => {
+        const s = v / 255;
+        return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+      });
+      const L = 0.2126 * R + 0.7152 * G + 0.0722 * B;
+      return L > 0.5 ? "#000" : "#fff";
+    } catch {
+      return "#000";
+    }
+  };
+
+  const darkenHex = (hex: string, pct = 0.45) => {
+    try {
+      const { r, g, b } = hexToRgb(hex);
+      const nr = Math.max(0, Math.round(r * (1 - pct)));
+      const ng = Math.max(0, Math.round(g * (1 - pct)));
+      const nb = Math.max(0, Math.round(b * (1 - pct)));
+      const toHex = (v: number) => v.toString(16).padStart(2, "0");
+      return `#${toHex(nr)}${toHex(ng)}${toHex(nb)}`;
+    } catch {
+      return hex;
+    }
+  };
+
+  const getRelevanceLabelForScore = (score: number) => {
+    if (score >= 0.85) return "Most relevant";
+    if (score >= 0.8) return "Relevant";
+    if (score >= 0.7) return "Good";
+    if (score >= 0.6) return "Low";
+    return "Very low";
+  };
+
+  const extractScoreFromSource = (src: any): number | null => {
+    if (!src) return null;
+    if (typeof src.score === "number") return src.score;
+    if (typeof src.score === "string" && src.score !== "") {
+      const n = parseFloat(src.score);
+      if (!isNaN(n)) return n;
+    }
+    const label = String(src.source || src.title || "");
+    const match = label.match(/\(score:\s*([0-9.]+)\)/i);
+    if (match) return parseFloat(match[1]);
+    return null;
+  };
+
+  const handleRelevanceClick = (label: string) => {
+    setActiveRelevance((prev) => (prev === label ? "All" : label));
+  };
+
+  // compute counts per relevance label based on selectedSources
+  const relevanceCounts = useMemo(() => {
+    const map = new Map<string, number>();
+    relevanceLevels.forEach((r) => map.set(r.label, 0));
+    if (!selectedSources || !selectedSources.length) return map;
+    for (const src of selectedSources) {
+      const s = extractScoreFromSource(src);
+      if (s == null) continue; // unscored items don't belong to any bucket
+      const label = getRelevanceLabelForScore(s);
+      map.set(label, (map.get(label) || 0) + 1);
+    }
+    // fill 'All' as total items (including unscored)
+    map.set("All", selectedSources.length);
+    return map;
+  }, [selectedSources, relevanceLevels]);
+
+  const relevanceBarRef: any = useRef(null);
+
+  const RelevanceBar = () => (
+    <div className="relevance-bar" ref={relevanceBarRef}>
+      {relevanceLevels
+        // only render relevance items that have a positive count
+        .filter((item) => (relevanceCounts.get(item.label) || 0) > 0)
+        .map((item) => {
+          const isActive = activeRelevance === item.label;
+          const textColor = getContrastColor(item.color);
+          const borderColor = isActive
+            ? darkenHex(item.color, 0.45)
+            : "transparent";
+          const count = relevanceCounts.get(item.label) || 0;
+          const pillRef: any = React.createRef();
+          return (
+            <div
+              ref={pillRef}
+              key={item.label}
+              className={`relevance-level ${isActive ? "active" : ""}`}
+              onClick={() => {
+                handleRelevanceClick(item.label);
+                // scroll the clicked pill to the start of the container
+                setTimeout(() => {
+                  try {
+                    pillRef.current?.scrollIntoView({
+                      inline: "start",
+                      behavior: "smooth",
+                    });
+                  } catch (e) {
+                    // ignore
+                  }
+                }, 0);
+              }}
+              style={{
+                background: item.color,
+                color: textColor,
+                borderColor,
+              }}
+            >
+              <span style={{ paddingRight: 8 }}>{item.label}</span>
+              <span className="relevance-count">{count}</span>
+            </div>
+          );
+        })}
+    </div>
+  );
 
   // const deepgram: any = useDeepgram();
   //// deepgram & mic context
@@ -376,6 +552,8 @@ function ChatV2({
 
             // Find the last assistant message
             for (let i = updatedMessages.length - 1; i >= 0; i--) {
+              console.log(toolSourcesToAdd);
+
               if (updatedMessages[i].role === "assistant") {
                 updatedMessages[i] = {
                   ...updatedMessages[i],
@@ -454,7 +632,7 @@ function ChatV2({
             // Not JSON, leave as is
           }
         }
-
+        console.log(parsedResult);
         // If parsedResult has data array, process each item
         if (
           parsedResult &&
@@ -472,9 +650,13 @@ function ChatV2({
                 item.score.toFixed ? item.score.toFixed(3) : item.score
               })`;
             }
+
             toolSources.push({
               source: sourceName,
               content: item.content,
+              metadata: item.dimensions || {},
+              source_url: item.source_url || "",
+              score: item.score || 0,
             });
           });
         } else {
@@ -486,6 +668,16 @@ function ChatV2({
                 ? result
                 : JSON.stringify(result, null, 2),
           });
+        }
+
+        // pass only the content in output
+        if (parsedResult.data && Array.isArray(parsedResult.data)) {
+          return {
+            output: parsedResult.data
+              .map((item: any) => item.content)
+              .join("\n"),
+            tool_call_id: toolCall.id,
+          };
         }
 
         return { output: result, tool_call_id: toolCall.id };
@@ -532,24 +724,6 @@ function ChatV2({
       annotateLastMessage(delta.annotations);
     }
   };
-
-  // // imageFileDone - show image in chat
-  // const handleImageFileDone = (image: any) => {
-  //   appendToLastMessage(`\n![${image.file_id}](/api/files/${image.file_id})\n`);
-  // };
-
-  // // toolCallCreated - log new tool call
-  // const toolCallCreated = (toolCall) => {
-  //   if (toolCall.type != "code_interpreter") return;
-  //   appendMessage("code", "");
-  // };
-
-  // // toolCallDelta - log delta and snapshot for the tool call
-  // const toolCallDelta = (delta, snapshot) => {
-  //   if (delta.type != "code_interpreter") return;
-  //   if (!delta.code_interpreter.input) return;
-  //   appendToLastMessage(delta.code_interpreter.input);
-  // };
 
   /// append the message
   const appendMessage = (role: string, text: string, sources?: any[]) => {
@@ -689,97 +863,7 @@ function ChatV2({
         return;
       } else {
         try {
-          // setLoading(true);
-          /// get similarity search
-          // const response: any = await fetch(
-          //   `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/pinecone`,
-          //   {
-          //     method: "POST",
-          //     body: JSON.stringify({
-          //       userQuery,
-          //       chatbotId: chatbot?.id,
-          //       messages,
-          //       // userId: cookies.userId,
-          //       //// default chatbot set
-          //       userId: !isPopUp ? cookies.userId : userId,
-          //     }),
-          //   }
-          // );
-          // /// parse the response and extract the similarity results
-          // const respText = await response.text();
-          // const similaritySearchResults = respText;
-          // console.log("similaritySearchResults", similaritySearchResults);
-
           await sendMessage(userQuery);
-
-          /// get response from backend in streaming
-          //   const responseFromBackend: any = await fetch(
-          //     `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/chat`,
-          //     {
-          //       method: "POST",
-          //       body: JSON.stringify({
-          //         similaritySearchResults,
-          //         messages,
-          //         userQuery,
-          //         chatbotId: chatbot?.id,
-          //         //// default chatbot set
-          //         userId: !isPopUp ? cookies.userId : userId,
-          //       }),
-          //       next: { revalidate: 0 },
-          //     }
-          //   );
-          //   if (responseFromBackend.status === 429) {
-          //     // Handle the "Too Many Requests" error
-          //     const error = await responseFromBackend.text();
-          //     message.error(error);
-          //     return; // Exit early
-          //   }
-          //   if (!responseFromBackend.ok) {
-          //     // Handle other possible errors
-          //     console.error("An error occurred:", responseFromBackend.statusText);
-          //     alert("An error occurred. Please try again.");
-          //     return; // Exit early
-          //   }
-          //   let resptext = "";
-          //   const reader = responseFromBackend.body
-          //     .pipeThrough(new TextDecoderStream())
-          //     .getReader();
-          //   while (true) {
-          //     const { value, done } = await reader.read();
-          //     if (done) {
-          //       /// setting the response when completed
-          //       setMessages((prev: any) => [
-          //         ...prev,
-          //         { role: "assistant", content: resptext },
-          //       ]);
-          //       /// setting the response time when completed
-          //       setMessagesTime((prev: any) => [
-          //         ...prev,
-          //         {
-          //           role: "assistant",
-          //           content: resptext,
-          //           messageTime: getDate(),
-          //         },
-          //       ]);
-          //       /// store history
-          //       const userLatestQuery = {
-          //         role: "user",
-          //         content: userQuery,
-          //         messageTime: tempUserMessageTime,
-          //       };
-          //       const gptLatestResponse = {
-          //         role: "assistant",
-          //         content: resptext,
-          //         messageTime: getDate(),
-          //       };
-          //       storeHistory(userLatestQuery, gptLatestResponse);
-          //       setResponse("");
-          //       setLoading(false);
-          //       break;
-          //     }
-          //     resptext += value;
-          //     setResponse(resptext);
-          //   }
         } catch (e: any) {
           console.log(
             "Error while getting completion from custom chatbot",
@@ -965,6 +1049,14 @@ function ChatV2({
     return () => {
       window.removeEventListener("resize", handleResize);
     };
+  }, [isPopUp]);
+
+  // track simple mobile breakpoint (<767px) used for tab/mobile view switching
+  useEffect(() => {
+    const handleMobileResize = () => setIsMobileDevice(window.innerWidth < 767);
+    handleMobileResize();
+    window.addEventListener("resize", handleMobileResize);
+    return () => window.removeEventListener("resize", handleMobileResize);
   }, []);
 
   useEffect(() => {
@@ -987,11 +1079,15 @@ function ChatV2({
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, []);
+  }, [isPopUp]);
 
   useEffect(() => {
     /// when microphone is ready connect to deepgram
-    if (microphoneState === MicrophoneState.Ready && !isPopUp) {
+    const micReady = microphoneState === MicrophoneState.Ready && !isPopUp;
+    const micReadyPopup =
+      microphoneStatePopup === MicrophoneState.Ready && isPopUp;
+
+    if (micReady) {
       connectToDeepgram({
         model: "nova-2",
         interim_results: true,
@@ -1000,7 +1096,7 @@ function ChatV2({
         utterance_end_ms: 3000,
         language: language,
       });
-    } else if (microphoneStatePopup === MicrophoneState.Ready && isPopUp) {
+    } else if (micReadyPopup) {
       connectToDeepgramPopup({
         model: "nova-2",
         interim_results: true,
@@ -1011,10 +1107,23 @@ function ChatV2({
       });
     }
   }, [
-    microphoneState == MicrophoneState.Ready && !isPopUp,
-    microphoneStatePopup == MicrophoneState.Ready && isPopUp,
+    microphoneState,
+    microphoneStatePopup,
     language,
+    isPopUp,
+    connectToDeepgram,
+    connectToDeepgramPopup,
   ]);
+
+  // toggle sheetOpen to drive slide-up animation when sourceVisible toggles
+  useEffect(() => {
+    if (isMobileDevice && sourceVisible) {
+      // slight delay to allow mount then animate
+      setTimeout(() => setSheetOpen(true), 10);
+    } else {
+      setSheetOpen(false);
+    }
+  }, [isMobileDevice, sourceVisible]);
 
   // Define onTranscript and onData outside the functions so they are accessible
   const onTranscript = (data: LiveTranscriptionEvent) => {
@@ -1052,7 +1161,7 @@ function ChatV2({
     }, 8000);
 
     return () => clearInterval(interval);
-  }, [connection, connectionPopup]);
+  }, [connection, connectionPopup, isPopUp]);
 
   const startTranscription = async () => {
     if (!microphone && !isPopUp) return;
@@ -1166,375 +1275,420 @@ function ChatV2({
           <p>Upgrade now to access your chatbots!</p>
         </Modal> */}
 
-      {/*------------------------------------------left-section----------------------------------------------*/}
-      {!isPopUp && (
-        <div className="chatbot-details">
-          <div className="detail">
-            <span>ID</span>
-            <div className="chatbot-id">
-              <span>{chatbot?.id}</span>{" "}
-              <Image
-                src={copyIcon}
-                alt="copy-icon"
-                style={{ cursor: "pointer" }}
-                onClick={handleCopy}
-              />
-            </div>
-          </div>
-
-          <div className="detail">
-            <span>Status</span>
-            <div className="status">
-              <div className="dot"></div> <span>Trained</span>
-            </div>
-          </div>
-
-          <div className="detail">
-            <span>Model</span>
-            <div className="model">
-              <span>{botSettings?.model}</span>
-            </div>
-          </div>
-
-          <div className="detail">
-            <span>Number of characters</span>
-            <div className="characters">
-              <span>{botSettings?.numberOfCharacterTrained}</span>
-            </div>
-          </div>
-
-          <div className="detail">
-            <span>Visibility</span>
-            <div className="visibility">
-              <span>{botSettings?.visibility}</span>
-            </div>
-          </div>
-
-          <div className="detail">
-            <div className="temperature">
-              <span>Temperature</span>
-              <span style={{ width: "auto" }}>{botSettings?.temperature}</span>
-            </div>
-
-            <Slider
-              style={{ zIndex: isPlanNotification ? -1 : 0 }}
-              min={0}
-              max={1}
-              onChange={onChange}
-              value={
-                typeof botSettings?.temperature === "number"
-                  ? botSettings?.temperature
-                  : 0
-              }
-              disabled={true}
-              step={0.1}
-            />
-            <div className="slider-bottom">
-              <div>Reserved</div>
-              <div>Creative</div>
-            </div>
-          </div>
-
-          <div className="detail">
-            <span>Last trained at</span>
-            <div className="trained">
-              <span>{formatTimestamp(botSettings?.lastTrained)}</span>
-            </div>
-          </div>
-        </div>
+      {!isPopUp && isMobileDevice && (
+        <ul className="mobile-options-container">
+          <li
+            className={`${mobileScreen === "playground" ? "active" : ""}`}
+            value={"playground"}
+            onClick={() => setMobileScreen("playground")}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ")
+                setMobileScreen("playground");
+            }}
+          >
+            <h3 className="option">Playground</h3>
+          </li>
+          <li
+            className={`${mobileScreen === "chatbot-details" ? "active" : ""}`}
+            value={"chatbot-details"}
+            onClick={() => setMobileScreen("chatbot-details")}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ")
+                setMobileScreen("chatbot-details");
+            }}
+          >
+            <h3 className="option">Chatbot Details</h3>
+          </li>
+        </ul>
       )}
-      {/*------------------------------------------right-section----------------------------------------------*/}
-      <div
-        className={`messages-section ${iframeLoaded ? "iframe" : ""} ${
-          innerWidth && "embed-messages-section"
-        }`}
-        style={{
-          backgroundColor: botSettings?.theme === "dark" ? "black" : "",
-        }}
-      >
-        <div className="header">
-          <div className="chatbot-name-container">
-            <Image
-              src={
-                isPopUp
-                  ? profilePictureUrl
-                    ? profilePictureUrl
-                    : ChatBotIcon
-                  : botSettings?.profilePictureUrl
-                  ? botSettings?.profilePictureUrl
-                  : ChatBotIcon
-              }
-              alt="bot-img"
-              width={40}
-              height={40}
-              style={{ borderRadius: "50%" }}
-            />
-            <h1 className={`${isPopUp ? "popup-heading" : ""}`}>
-              {isPopUp
-                ? `${chatbotDisplayName}`
-                : botSettings?.chatbotDisplayName}
-            </h1>
+
+      {/*------------------------------------------left-section----------------------------------------------*/}
+      {!isPopUp &&
+        // on desktop show chatbot details when enabled, on mobile show it only when selected
+        ((!isMobileDevice && showChatbotDetails) ||
+          (isMobileDevice && mobileScreen === "chatbot-details")) && (
+          <div className="chatbot-details">
+            <div className="detail">
+              <span>ID</span>
+              <div className="chatbot-id">
+                <span>{chatbot?.id}</span>{" "}
+                <Image
+                  src={copyIcon}
+                  alt="copy-icon"
+                  style={{ cursor: "pointer" }}
+                  onClick={handleCopy}
+                />
+              </div>
+            </div>
+
+            <div className="detail">
+              <span>Status</span>
+              <div className="status">
+                <div className="dot"></div> <span>Trained</span>
+              </div>
+            </div>
+
+            <div className="detail">
+              <span>Model</span>
+              <div className="model">
+                <span>{botSettings?.model}</span>
+              </div>
+            </div>
+
+            <div className="detail">
+              <span>Number of characters</span>
+              <div className="characters">
+                <span>{botSettings?.numberOfCharacterTrained}</span>
+              </div>
+            </div>
+
+            <div className="detail">
+              <span>Visibility</span>
+              <div className="visibility">
+                <span>{botSettings?.visibility}</span>
+              </div>
+            </div>
+
+            <div className="detail">
+              <div className="temperature">
+                <span>Temperature</span>
+                <span style={{ width: "auto" }}>
+                  {botSettings?.temperature}
+                </span>
+              </div>
+
+              <Slider
+                style={{ zIndex: isPlanNotification ? -1 : 0 }}
+                min={0}
+                max={1}
+                onChange={onChange}
+                value={
+                  typeof botSettings?.temperature === "number"
+                    ? botSettings?.temperature
+                    : 0
+                }
+                disabled={true}
+                step={0.1}
+              />
+              <div className="slider-bottom">
+                <div>Reserved</div>
+                <div>Creative</div>
+              </div>
+            </div>
+
+            <div className="detail">
+              <span>Last trained at</span>
+              <div className="trained">
+                <span>{formatTimestamp(botSettings?.lastTrained)}</span>
+              </div>
+            </div>
           </div>
+        )}
+      {/*------------------------------------------right-section----------------------------------------------*/}
+      {(!isMobileDevice || mobileScreen === "playground") && (
+        <div
+          className={`messages-section ${iframeLoaded ? "iframe" : ""} ${
+            innerWidth && "embed-messages-section"
+          }`}
+          style={{
+            backgroundColor: botSettings?.theme === "dark" ? "black" : "",
+            // When showChatbotDetails is false, force 30% width; otherwise let SCSS handle sizing
+            ...(!showChatbotDetails && !isMobileDevice ? { width: "30%" } : {}),
+          }}
+        >
+          <div className="header">
+            <div className="chatbot-name-container">
+              <Image
+                src={
+                  isPopUp
+                    ? profilePictureUrl
+                      ? profilePictureUrl
+                      : ChatBotIcon
+                    : botSettings?.profilePictureUrl
+                    ? botSettings?.profilePictureUrl
+                    : ChatBotIcon
+                }
+                alt="bot-img"
+                width={40}
+                height={40}
+                style={{ borderRadius: "50%" }}
+              />
+              <h1 className={`${isPopUp ? "popup-heading" : ""}`}>
+                {isPopUp
+                  ? `${chatbotDisplayName}`
+                  : botSettings?.chatbotDisplayName}
+              </h1>
+            </div>
 
-          <div className="action-btns">
-            {/* <Image src={refreshBtn} alt="refresh-btn" onClick={refreshChat} /> */}
-            {/* <Image src={exportBtn} alt="export-btn" /> */}
-            <Icon
-              Icon={RefreshBtn}
-              click={refreshChat}
-              className={botSettings?.theme === "dark" ? "color-white" : ""}
-            />
-
-            {/* this is used for printing the chats initially it will be hidden but on print it will be visible*/}
-            <PrintingChats
-              ref={tempRef}
-              messages={messages}
-              messagesTime={messagesTime}
-            />
-
-            {/* If chatbot is opened from popup then add the close embed bot button */}
-            {isPopUp && (
+            <div className="action-btns">
+              {/* <Image src={refreshBtn} alt="refresh-btn" onClick={refreshChat} /> */}
+              {/* <Image src={exportBtn} alt="export-btn" /> */}
               <Icon
-                Icon={CloseEmbedBotIcon}
-                click={() => {
-                  const btn = document.getElementById("chat-frame-widget");
-                  // Send a message to the parent
-                  window.parent.postMessage("disable-iframe", "*");
-                }}
+                Icon={RefreshBtn}
+                click={refreshChat}
                 className={botSettings?.theme === "dark" ? "color-white" : ""}
               />
-            )}
 
-            {/* If the chatbot is embeded remove the print chat button */}
-            {!isPopUp && (
-              <ReactToPrint
-                trigger={() => {
-                  return (
-                    <button style={{ border: "none", background: "none" }}>
-                      <Icon
-                        Icon={ExportBtn}
-                        className={
-                          botSettings?.theme === "dark" ? "color-white" : ""
-                        }
-                      />
-                    </button>
-                  );
-                }}
-                content={() => tempRef.current}
+              {/* this is used for printing the chats initially it will be hidden but on print it will be visible*/}
+              <PrintingChats
+                ref={tempRef}
+                messages={messages}
+                messagesTime={messagesTime}
               />
-            )}
+
+              {/* If chatbot is opened from popup then add the close embed bot button */}
+              {isPopUp && (
+                <Icon
+                  Icon={CloseEmbedBotIcon}
+                  click={() => {
+                    const btn = document.getElementById("chat-frame-widget");
+                    // Send a message to the parent
+                    window.parent.postMessage("disable-iframe", "*");
+                  }}
+                  className={botSettings?.theme === "dark" ? "color-white" : ""}
+                />
+              )}
+
+              {/* If the chatbot is embeded remove the print chat button */}
+              {!isPopUp && (
+                <ReactToPrint
+                  trigger={() => {
+                    return (
+                      <button style={{ border: "none", background: "none" }}>
+                        <Icon
+                          Icon={ExportBtn}
+                          className={
+                            botSettings?.theme === "dark" ? "color-white" : ""
+                          }
+                        />
+                      </button>
+                    );
+                  }}
+                  content={() => tempRef.current}
+                />
+              )}
+            </div>
           </div>
-        </div>
 
-        <hr />
-        <div
-          className={`conversation-container ${
-            innerWidth && "embed-conversation-container"
-          }`}
-          ref={chatWindowRef}
-        >
-          {messages.map((message: any, index: any) => {
-            if (message.role == "assistant")
-              return (
-                <React.Fragment key={index}>
-                  <div
-                    className="assistant-message-container"
-                    style={{
-                      marginTop:
-                        `${messagesTime[index]?.messageType}` === "initial"
-                          ? "10px"
-                          : "0",
-
-                      position:
-                        messagesTime[index]?.messageType === "initial"
-                          ? "unset"
-                          : "relative",
-                    }}
-                  >
+          <hr />
+          <div
+            className={`conversation-container ${
+              innerWidth && "embed-conversation-container"
+            }`}
+            ref={chatWindowRef}
+          >
+            {messages.map((message: any, index: any) => {
+              if (message.role == "assistant")
+                return (
+                  <React.Fragment key={index}>
                     <div
-                      className="assistant-message"
+                      className="assistant-message-container"
                       style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        backgroundColor:
-                          botSettings?.theme === "dark" ? "#353945" : "",
-                        color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
+                        marginTop:
+                          `${messagesTime[index]?.messageType}` === "initial"
+                            ? "10px"
+                            : "0",
+
+                        position:
+                          messagesTime[index]?.messageType === "initial"
+                            ? "unset"
+                            : "relative",
                       }}
-                      dangerouslySetInnerHTML={{
-                        __html: message.content,
+                    >
+                      <div
+                        className="assistant-message"
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          backgroundColor:
+                            botSettings?.theme === "dark" ? "#353945" : "",
+                          color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
+                        }}
+                        dangerouslySetInnerHTML={{
+                          __html: message.content,
+                        }}
+                      ></div>
+                      {messagesTime[index]?.messageType !== "initial" && (
+                        <div className="time">
+                          {messagesTime[index]?.messageTime}
+                        </div>
+                      )}
+                      {(messages[index + 1] === undefined ||
+                        messages[index + 1].role == "user") && (
+                        <div className="like-dislike-container">
+                          <Image
+                            src={likeIcon}
+                            alt="like-icon"
+                            onClick={() => openChatbotModal(index, "like")}
+                          />
+                          <Image
+                            src={dislikeIcon}
+                            alt="dislike-icon"
+                            onClick={() => openChatbotModal(index, "dislike")}
+                          />
+                          {/* Only show sources button if sources are available */}
+                          {message.sources && message.sources?.length > 0 && (
+                            <button
+                              className="sources-btn"
+                              onClick={() => {
+                                /// hide the chatbot Details
+                                setShowChatbotDetails(false);
+                                handleShowSources(message.sources);
+                              }}
+                              aria-label="Sources"
+                            >
+                              <Image
+                                src={SourcesDots}
+                                alt="sources-icon"
+                                width={32}
+                                height={32}
+                              />
+                              Sources
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    <ChatbotNameModal
+                      open={open}
+                      setOpen={setOpen}
+                      chatbotText={feedbackText}
+                      setChatbotText={setfeedbackText}
+                      handleOk={handleOk}
+                      forWhat="feedback"
+                    />
+                  </React.Fragment>
+                );
+              else
+                return (
+                  <div className="user-message-container">
+                    <div
+                      className="user-message"
+                      key={index}
+                      style={{
+                        backgroundColor: botSettings?.userMessageColor
+                          ? botSettings?.userMessageColor
+                          : userMessageColor,
                       }}
-                    ></div>
-                    {messagesTime[index]?.messageType !== "initial" && (
-                      <div className="time">
-                        {messagesTime[index]?.messageTime}
+                    >
+                      {message.content}
+                    </div>
+                    <div className="time">
+                      {messagesTime[index]?.messageTime}
+                    </div>
+                  </div>
+                );
+            })}
+            {loading == false &&
+              // isPopUp &&
+              !isLeadFormSubmitted &&
+              !userDetails?.isLeadFormSubmitted &&
+              !skipLeadForm &&
+              !cookies?.[`leadDetails-${chatbot.id}`] &&
+              messages.length > 1 &&
+              messages.length % 2 == 1 &&
+              userLeadDetails !== "do-not-collect" &&
+              botSettings?.userDetails !== "do-not-collect" && (
+                <div className="lead-generation-container">
+                  <h2>
+                    {leadTitle ? leadTitle : "Let us know how to contact you"}
+                  </h2>
+
+                  <div className="collect-details">
+                    {leadFields?.name.isChecked == true && (
+                      <div className="detail-field">
+                        <p className="title">
+                          {leadFields?.name.value
+                            ? leadFields?.name.value
+                            : "Name"}
+                        </p>
+                        <input
+                          type="text"
+                          className="title-input"
+                          placeholder="Enter your name"
+                          onChange={(e: any) => {
+                            setLeadDetails({
+                              ...leadDetails,
+                              name: e.target.value,
+                            });
+                            setLeadError("");
+                            setNameError("");
+                          }}
+                          onBlur={() => {
+                            if (
+                              leadFields?.name.isChecked == true &&
+                              leadDetails.name === ""
+                            ) {
+                              setNameError("Please enter your name");
+                              return;
+                            }
+                          }}
+                          value={leadDetails.name}
+                        />
+                        <div className="lead-error">
+                          <p>{nameError}</p>
+                        </div>
                       </div>
                     )}
-                    {(messages[index + 1] === undefined ||
-                      messages[index + 1].role == "user") && (
-                      <div className="like-dislike-container">
-                        <Image
-                          src={likeIcon}
-                          alt="like-icon"
-                          onClick={() => openChatbotModal(index, "like")}
+
+                    {leadFields?.email.isChecked == true && (
+                      <div className="detail-field">
+                        <p className="title">
+                          {leadFields?.email.value
+                            ? leadFields?.email.value
+                            : "Email Address"}
+                        </p>
+                        <input
+                          type="email"
+                          className="title-input"
+                          placeholder="Enter your email address"
+                          onChange={(e) => {
+                            setLeadDetails({
+                              ...leadDetails,
+                              email: e.target.value,
+                            });
+                            setLeadError("");
+                            setEmailError("");
+                          }}
+                          onBlur={() => {
+                            if (
+                              leadFields?.email.isChecked == true &&
+                              leadDetails.email === ""
+                            ) {
+                              setEmailError("Please enter your email");
+                              return;
+                            }
+                            const pattern =
+                              /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
+                            //   message: "Invalid email address format",
+
+                            /// validate email
+                            const result = leadDetails.email?.match(pattern);
+
+                            if (!result) {
+                              setEmailError("Invalid email format.");
+                            }
+                          }}
+                          value={leadDetails?.email}
                         />
-                        <Image
-                          src={dislikeIcon}
-                          alt="dislike-icon"
-                          onClick={() => openChatbotModal(index, "dislike")}
-                        />
-                        {/* Only show sources button if sources are available */}
-                        {message.sources && message.sources?.length > 0 && (
-                          <button
-                            className="sources-btn"
-                            onClick={() => handleShowSources(message.sources)}
-                            aria-label="Sources"
-                          >
-                            <Image
-                              src={SourcesDots}
-                              alt="sources-icon"
-                              width={32}
-                              height={32}
-                            />
-                            Sources
-                          </button>
-                        )}
+                        <div className="lead-error">
+                          <p>{emailError}</p>
+                        </div>
                       </div>
                     )}
-                  </div>
-                  <ChatbotNameModal
-                    open={open}
-                    setOpen={setOpen}
-                    chatbotText={feedbackText}
-                    setChatbotText={setfeedbackText}
-                    handleOk={handleOk}
-                    forWhat="feedback"
-                  />
-                </React.Fragment>
-              );
-            else
-              return (
-                <div className="user-message-container">
-                  <div
-                    className="user-message"
-                    key={index}
-                    style={{
-                      backgroundColor: botSettings?.userMessageColor
-                        ? botSettings?.userMessageColor
-                        : userMessageColor,
-                    }}
-                  >
-                    {message.content}
-                  </div>
-                  <div className="time">{messagesTime[index]?.messageTime}</div>
-                </div>
-              );
-          })}
-          {loading == false &&
-            // isPopUp &&
-            !isLeadFormSubmitted &&
-            !userDetails?.isLeadFormSubmitted &&
-            !skipLeadForm &&
-            !cookies?.[`leadDetails-${chatbot.id}`] &&
-            messages.length > 1 &&
-            messages.length % 2 == 1 &&
-            userLeadDetails !== "do-not-collect" &&
-            botSettings?.userDetails !== "do-not-collect" && (
-              <div className="lead-generation-container">
-                <h2>
-                  {leadTitle ? leadTitle : "Let us know how to contact you"}
-                </h2>
 
-                <div className="collect-details">
-                  {leadFields?.name.isChecked == true && (
-                    <div className="detail-field">
-                      <p className="title">
-                        {leadFields?.name.value
-                          ? leadFields?.name.value
-                          : "Name"}
-                      </p>
-                      <input
-                        type="text"
-                        className="title-input"
-                        placeholder="Enter your name"
-                        onChange={(e: any) => {
-                          setLeadDetails({
-                            ...leadDetails,
-                            name: e.target.value,
-                          });
-                          setLeadError("");
-                          setNameError("");
-                        }}
-                        onBlur={() => {
-                          if (
-                            leadFields?.name.isChecked == true &&
-                            leadDetails.name === ""
-                          ) {
-                            setNameError("Please enter your name");
-                            return;
-                          }
-                        }}
-                        value={leadDetails.name}
-                      />
-                      <div className="lead-error">
-                        <p>{nameError}</p>
-                      </div>
-                    </div>
-                  )}
-
-                  {leadFields?.email.isChecked == true && (
-                    <div className="detail-field">
-                      <p className="title">
-                        {leadFields?.email.value
-                          ? leadFields?.email.value
-                          : "Email Address"}
-                      </p>
-                      <input
-                        type="email"
-                        className="title-input"
-                        placeholder="Enter your email address"
-                        onChange={(e) => {
-                          setLeadDetails({
-                            ...leadDetails,
-                            email: e.target.value,
-                          });
-                          setLeadError("");
-                          setEmailError("");
-                        }}
-                        onBlur={() => {
-                          if (
-                            leadFields?.email.isChecked == true &&
-                            leadDetails.email === ""
-                          ) {
-                            setEmailError("Please enter your email");
-                            return;
-                          }
-                          const pattern =
-                            /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
-                          //   message: "Invalid email address format",
-
-                          /// validate email
-                          const result = leadDetails.email?.match(pattern);
-
-                          if (!result) {
-                            setEmailError("Invalid email format.");
-                          }
-                        }}
-                        value={leadDetails?.email}
-                      />
-                      <div className="lead-error">
-                        <p>{emailError}</p>
-                      </div>
-                    </div>
-                  )}
-
-                  {leadFields?.number.isChecked == true && (
-                    <div className="detail-field">
-                      <p className="title">
-                        {leadFields?.number.value
-                          ? leadFields?.number.value
-                          : "Phone Number"}
-                      </p>
-                      {/* <input
+                    {leadFields?.number.isChecked == true && (
+                      <div className="detail-field">
+                        <p className="title">
+                          {leadFields?.number.value
+                            ? leadFields?.number.value
+                            : "Phone Number"}
+                        </p>
+                        {/* <input
                           id="mobile_code"
                           type="text"
                           className="title-input"
@@ -1549,204 +1703,204 @@ function ChatV2({
                           value={leadDetails?.number}
                         /> */}
 
-                      <PhoneInput
-                        country={
-                          botDetails?.userCountry
-                            ? botDetails?.userCountry
-                            : userLocation
-                        }
-                        value={mobileNumber}
-                        placeholder="Enter your phone number"
-                        onChange={(phone, country: any) => {
-                          // Process to format the phone number
-                          const phoneWithoutCode = phone.startsWith(
-                            `${country?.dialCode}`
-                          )
-                            ? phone.slice(`${country?.dialCode}`.length)
-                            : phone;
-                          const formattedPhone: any = `+${country?.dialCode}-${phoneWithoutCode}`;
-
-                          setMobileNumber(phone);
-
-                          setLeadDetails({
-                            ...leadDetails,
-                            number: formattedPhone,
-                          });
-                          setLeadError("");
-                          setValidNumberError("");
-                        }}
-                        // onChange={(phone, country) =>
-                        //   handlePhoneChange(phone, country)
-                        // }
-                        enableLongNumbers={true}
-                        isValid={(value: any, country: any) =>
-                          // isValidPhoneNumber(value, country)
-                          getPhoneNumberLength(value, country)
-                        }
-                        onBlur={() => {
-                          if (
-                            leadFields?.number.isChecked == true &&
-                            !isNumberValid
-                          ) {
-                            setValidNumberError("Please enter valid number");
-                            return;
+                        <PhoneInput
+                          country={
+                            botDetails?.userCountry
+                              ? botDetails?.userCountry
+                              : userLocation
                           }
-                        }}
-                      />
-                      <div className="lead-error">
-                        <p>{validNumberError}</p>
+                          value={mobileNumber}
+                          placeholder="Enter your phone number"
+                          onChange={(phone, country: any) => {
+                            // Process to format the phone number
+                            const phoneWithoutCode = phone.startsWith(
+                              `${country?.dialCode}`
+                            )
+                              ? phone.slice(`${country?.dialCode}`.length)
+                              : phone;
+                            const formattedPhone: any = `+${country?.dialCode}-${phoneWithoutCode}`;
+
+                            setMobileNumber(phone);
+
+                            setLeadDetails({
+                              ...leadDetails,
+                              number: formattedPhone,
+                            });
+                            setLeadError("");
+                            setValidNumberError("");
+                          }}
+                          // onChange={(phone, country) =>
+                          //   handlePhoneChange(phone, country)
+                          // }
+                          enableLongNumbers={true}
+                          isValid={(value: any, country: any) =>
+                            // isValidPhoneNumber(value, country)
+                            getPhoneNumberLength(value, country)
+                          }
+                          onBlur={() => {
+                            if (
+                              leadFields?.number.isChecked == true &&
+                              !isNumberValid
+                            ) {
+                              setValidNumberError("Please enter valid number");
+                              return;
+                            }
+                          }}
+                        />
+                        <div className="lead-error">
+                          <p>{validNumberError}</p>
+                        </div>
                       </div>
-                    </div>
-                  )}
-                  {leadError && (
-                    <div className="lead-error">
-                      <p>{leadError}</p>
-                    </div>
-                  )}
-                </div>
-
-                <div className="submit-skip-btn">
-                  <Button
-                    type="primary"
-                    className="save-btn"
-                    onClick={submitLeadDetail}
-                  >
-                    Submit
-                  </Button>
-
-                  {userLeadDetails !== "mandatory" &&
-                    botSettings?.userDetails !== "mandatory" && (
-                      <Button
-                        type="text"
-                        className="skip-btn"
-                        onClick={skipLeadDetail}
-                      >
-                        Skip
-                      </Button>
                     )}
+                    {leadError && (
+                      <div className="lead-error">
+                        <p>{leadError}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="submit-skip-btn">
+                    <Button
+                      type="primary"
+                      className="save-btn"
+                      onClick={submitLeadDetail}
+                    >
+                      Submit
+                    </Button>
+
+                    {userLeadDetails !== "mandatory" &&
+                      botSettings?.userDetails !== "mandatory" && (
+                        <Button
+                          type="text"
+                          className="skip-btn"
+                          onClick={skipLeadDetail}
+                        >
+                          Skip
+                        </Button>
+                      )}
+                  </div>
+                </div>
+              )}
+            {loading && response.length == 0 && (
+              <div className="assistant-message-container">
+                <div
+                  className="assistant-message"
+                  style={{
+                    backgroundColor:
+                      botSettings?.theme === "dark" ? "#353945" : "",
+                    color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
+                  }}
+                >
+                  <div className="typing-indicator">
+                    <div className="dot"></div>
+                    <div className="dot"></div>
+                    <div className="dot"></div>
+                  </div>
                 </div>
               </div>
             )}
-          {loading && response.length == 0 && (
-            <div className="assistant-message-container">
-              <div
-                className="assistant-message"
-                style={{
-                  backgroundColor:
-                    botSettings?.theme === "dark" ? "#353945" : "",
-                  color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
-                }}
-              >
-                <div className="typing-indicator">
-                  <div className="dot"></div>
-                  <div className="dot"></div>
-                  <div className="dot"></div>
+            {response && (
+              <div className="assistant-message-container">
+                <div
+                  className="assistant-message"
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    backgroundColor:
+                      botSettings?.theme === "dark" ? "#353945" : "",
+                    color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
+                  }}
+                  dangerouslySetInnerHTML={{
+                    __html: response.concat("<b> |</b>"),
+                  }}
+                />
+              </div>
+            )}
+          </div>
+          <div className="suggested-messages">
+            {/* if chatbot is opened from popup render the suggested messages from state */}
+            {suggestedMessages?.map((message: any, index: any) => {
+              return (
+                <div
+                  className="message"
+                  key={index}
+                  onClick={() => setUserQuery(message)}
+                >
+                  {message}
                 </div>
-              </div>
-            </div>
-          )}
-          {response && (
-            <div className="assistant-message-container">
-              <div
-                className="assistant-message"
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  backgroundColor:
-                    botSettings?.theme === "dark" ? "#353945" : "",
-                  color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
-                }}
-                dangerouslySetInnerHTML={{
-                  __html: response.concat("<b> |</b>"),
-                }}
-              />
-            </div>
-          )}
-        </div>
-        <div className="suggested-messages">
-          {/* if chatbot is opened from popup render the suggested messages from state */}
-          {suggestedMessages?.map((message: any, index: any) => {
-            return (
-              <div
-                className="message"
-                key={index}
-                onClick={() => setUserQuery(message)}
-              >
-                {message}
-              </div>
-            );
-          })}
-          {botSettings?.suggestedMessages?.map((message: any, index: any) => {
-            return (
-              <div
-                className="message"
-                key={index}
-                onClick={() => setUserQuery(message)}
-              >
-                {message}
-              </div>
-            );
-          })}
-        </div>
-        <a
-          className="powered-by"
-          target="_blank"
-          href={`${
-            chatbot?.id === "35910e5d-d751-4ba0-a52c-50d4c9302352"
-              ? "https://www.creolestudios.com/?utm_source=ASGTG+Website&utm_medium=referral&utm_campaign=ASGTG"
-              : "https://torri.ai"
-          }`}
-        >
-          {chatbot?.id === "35910e5d-d751-4ba0-a52c-50d4c9302352"
-            ? "Powered by Creole Studios"
-            : "Powered by Torri.AI"}
-        </a>
-        <div
-          className="chat-question"
-          style={{
-            backgroundColor: botSettings?.theme === "dark" ? "#353945" : "",
-          }}
-        >
-          <input
+              );
+            })}
+            {botSettings?.suggestedMessages?.map((message: any, index: any) => {
+              return (
+                <div
+                  className="message"
+                  key={index}
+                  onClick={() => setUserQuery(message)}
+                >
+                  {message}
+                </div>
+              );
+            })}
+          </div>
+          <a
+            className="powered-by"
+            target="_blank"
+            href={`${
+              chatbot?.id === "35910e5d-d751-4ba0-a52c-50d4c9302352"
+                ? "https://www.creolestudios.com/?utm_source=ASGTG+Website&utm_medium=referral&utm_campaign=ASGTG"
+                : "https://torri.ai"
+            }`}
+          >
+            {chatbot?.id === "35910e5d-d751-4ba0-a52c-50d4c9302352"
+              ? "Powered by Creole Studios"
+              : "Powered by Torri.AI"}
+          </a>
+          <div
+            className="chat-question"
             style={{
               backgroundColor: botSettings?.theme === "dark" ? "#353945" : "",
-              color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
             }}
-            type="text"
-            onKeyDown={getReply}
-            onChange={(event) => {
-              setUserQuery(event.target.value);
-            }}
-            placeholder={
-              // isPopUp
-              //   ? `Message ${chatbotName}`
-              //   : botSettings?.messagePlaceholder
-              // isPopUp
-              //   ? `Message ${chatbotName}`
-              //   : botSettings?.messagePlaceholder
-              botSettings?.messagePlaceholder
-                ? botSettings?.messagePlaceholder
-                : messagePlaceholder
-            }
-            value={userQuery}
-            disabled={loading ? true : false}
-          />
-          <div className="action-btns">
-            {/* <button className="web-search-button">
+          >
+            <input
+              style={{
+                backgroundColor: botSettings?.theme === "dark" ? "#353945" : "",
+                color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
+              }}
+              type="text"
+              onKeyDown={getReply}
+              onChange={(event) => {
+                setUserQuery(event.target.value);
+              }}
+              placeholder={
+                // isPopUp
+                //   ? `Message ${chatbotName}`
+                //   : botSettings?.messagePlaceholder
+                // isPopUp
+                //   ? `Message ${chatbotName}`
+                //   : botSettings?.messagePlaceholder
+                botSettings?.messagePlaceholder
+                  ? botSettings?.messagePlaceholder
+                  : messagePlaceholder
+              }
+              value={userQuery}
+              disabled={loading ? true : false}
+            />
+            <div className="action-btns">
+              {/* <button className="web-search-button">
               <Icon Icon={WebSearchIcon}></Icon>
               Search
             </button> */}
-            <div
-              className="send-record-container"
-              style={{
-                backgroundColor:
-                  botSettings?.userMessageColor &&
-                  microphoneState === MicrophoneState.Open
-                    ? botSettings?.userMessageColor
-                    : userMessageColor,
-              }}
-            >
-              {/*           
+              <div
+                className="send-record-container"
+                style={{
+                  backgroundColor:
+                    botSettings?.userMessageColor &&
+                    microphoneState === MicrophoneState.Open
+                      ? botSettings?.userMessageColor
+                      : userMessageColor,
+                }}
+              >
+                {/*           
             {(MicrophoneState.Open === microphoneState && !isPopUp) ||
             (MicrophoneState.Open === microphoneStatePopup && isPopUp) ? (
               <>
@@ -1781,31 +1935,53 @@ function ChatV2({
               />
             )}
  */}
-              <button
-                className="icon"
-                onClick={() => getReply("click")}
-                style={{
-                  backgroundColor: botSettings?.userMessageColor
-                    ? botSettings?.userMessageColor
-                    : userMessageColor,
-                }}
-                disabled={loading ? true : false}
-              >
-                <Image src={sendChatIcon} alt="send-chat-icon" />
-              </button>
+                <button
+                  className="icon"
+                  onClick={() => getReply("click")}
+                  style={{
+                    backgroundColor: botSettings?.userMessageColor
+                      ? botSettings?.userMessageColor
+                      : userMessageColor,
+                  }}
+                  disabled={loading ? true : false}
+                >
+                  <Image src={sendChatIcon} alt="send-chat-icon" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
       {/* sources div */}
       {sourceVisible && selectedSources.length > 0 && (
         <div
           className="sources-container"
           style={{
-            padding: "10px",
-            backgroundColor: "#f8f9fa",
-            borderRadius: "8px",
-            border: "1px solid #e3e3e3",
+            // when showChatbotDetails is false set its width to 70% (desktop)
+            ...(!showChatbotDetails && !isMobileDevice
+              ? { width: "70%", minWidth: "70%" }
+              : {}),
+            // mobile: render as a bottom sheet overlay
+            ...(isMobileDevice
+              ? {
+                  position: "fixed",
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  width: "100%",
+                  minWidth: "100%",
+                  height: "72vh",
+                  maxHeight: "92vh",
+                  borderTopLeftRadius: "12px",
+                  borderTopRightRadius: "12px",
+                  boxShadow: "0 -8px 30px rgba(0,0,0,0.2)",
+                  zIndex: 9999,
+                  overflow: "auto",
+                  // slide animation: start translated down, then slide up when sheetOpen
+                  transform: sheetOpen ? "translateY(0)" : "translateY(100%)",
+                  transition: "transform 260ms cubic-bezier(.2,.8,.2,1)",
+                }
+              : {}),
           }}
         >
           <div
@@ -1823,11 +1999,35 @@ function ChatV2({
                 fontSize: "18px",
                 fontWeight: 300,
               }}
+              title={
+                /^[\s]*<\s*/.test(String(sourcesContainerTitle))
+                  ? "Back"
+                  : undefined
+              }
             >
-              Referenced Sources
+              {sourcesContainerTitle.toLowerCase() !== "sources" && (
+                <Image
+                  src={BackIcon}
+                  alt="back-icon"
+                  onClick={() => setSourcesContainerTitle("sources")}
+                  style={{ cursor: "pointer", userSelect: "none" }}
+                />
+              )}
+              <Typography.Text
+                strong
+                ellipsis
+                title={sourcesContainerTitle}
+                style={{ maxWidth: 150 }}
+              >
+                {sourcesContainerTitle}
+              </Typography.Text>
             </h3>
+
             <button
-              onClick={() => setSourceVisible(false)}
+              onClick={() => {
+                setSourceVisible(false);
+                setShowChatbotDetails(true);
+              }}
               style={{
                 background: "none",
                 border: "none",
@@ -1835,12 +2035,33 @@ function ChatV2({
                 fontSize: "18px",
                 cursor: "pointer",
                 padding: "5px",
+                justifyContent: "center",
+                alignItems: "center",
+                display: "flex",
               }}
             >
-              ×
+              <Image src={CloseBtn} alt="close-icon" />
             </button>
           </div>
-          <Sources data={selectedSources} />
+          {/* <Sources data={selectedSources} /> */}
+
+          <RelevanceBar />
+
+          <HighlightedInfoPage
+            data={
+              activeRelevance === "All"
+                ? selectedSources
+                : selectedSources.filter((src: any) => {
+                    const s = extractScoreFromSource(src);
+                    if (s == null) return false;
+                    const label = getRelevanceLabelForScore(s);
+                    return activeRelevance === label;
+                  })
+            }
+            chatbotId={chatbot.id}
+            sourcesContainerTitle={sourcesContainerTitle}
+            setSourcesContainerTitle={setSourcesContainerTitle}
+          />
         </div>
       )}
     </div>

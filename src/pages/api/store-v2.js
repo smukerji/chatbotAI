@@ -112,7 +112,7 @@ export default async function handler(req, res) {
           const systemInstruction = getSystemInstruction(assistantType);
           const tools = getAssistantTools(assistantType);
           assistant = await openai.beta.assistants.create({
-            model: models[0],
+            model: models[2],
             instructions: systemInstruction,
             name: chatbotName,
             tools: tools,
@@ -535,7 +535,7 @@ export default async function handler(req, res) {
             obj.cleanedText?.forEach((element) => {
               const id = uuid();
               /// map the chunks to id
-              tempData.push({ element, id });
+              tempData.push({ element, id, link: obj?.crawlLink });
               tempIds.push(id);
             });
 
@@ -568,13 +568,14 @@ export default async function handler(req, res) {
         } else if (crawledList.length > 0 && updateChatbot) {
           /// geenrated the ID's for each chunks and storing in DB before upserting in pinecone
           const dbCrawlSource = [];
+
           let crwaledLinkUpsertData = crawledList.map((obj) => {
             const tempIds = [];
             const tempData = [];
             obj.cleanedText?.forEach((element) => {
               const id = uuid();
               /// map the chunks to id
-              tempData.push({ element, id });
+              tempData.push({ element, id, link: obj?.crawlLink });
               tempIds.push(id);
             });
 
@@ -598,12 +599,10 @@ export default async function handler(req, res) {
               userId
             ).then(async () => {
               /// get the previous content
-
               const previousLinksContent = await collection.findOne({
                 chatbotId: chatbotId,
                 source: "crawling",
               });
-
               collection.findOneAndUpdate(
                 { chatbotId: chatbotId, source: "crawling" },
                 {
@@ -675,7 +674,7 @@ export default async function handler(req, res) {
           await db.collection("chatbot-settings").insertOne({
             userId: userId,
             chatbotId: chatbotId,
-            model: models[0],
+            model: models[2],
             visibility: visibility.PUBLIC,
             temperature: 1,
             numberOfCharacterTrained: numberOfCharacterTrained,

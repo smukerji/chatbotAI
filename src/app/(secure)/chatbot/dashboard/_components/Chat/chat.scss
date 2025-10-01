@@ -1,8 +1,8 @@
 .chat-container {
   display: flex;
   gap: 40px;
-  margin-left: 45px;
-  margin-right: 45px;
+  // margin-left: 45px;
+  // margin-right: 45px;
   margin-top: 28px;
   position: relative;
 
@@ -13,14 +13,14 @@
   }
 
   @media screen and (max-width: 1440px) {
-    margin-left: 20px;
-    margin-right: 20px;
+    // margin-left: 20px;
+    // margin-right: 20px;
     margin-top: 20px;
     gap: 20px;
   }
   @media screen and (max-width: 1199px) {
-    margin-left: 10px;
-    margin-right: 10px;
+    // margin-left: 10px;
+    // margin-right: 10px;
     margin-top: 20px;
     gap: 10px;
   }
@@ -124,7 +124,7 @@
   /*------------------------------------------right-section----------------------------------------------*/
   .messages-section {
     // flex: 3;
-    width: 72%;
+    width: 100%;
     display: flex;
     padding: 8px 16px 8px 16px;
     border-radius: 16px;
@@ -267,10 +267,62 @@
             display: contents;
           }
 
+          p {
+            font-size: 14px;
+            line-height: 140%;
+          }
+
+          ol {
+            /* use CSS counter since we're using flex layout which hides default markers */
+            counter-reset: list-counter;
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            margin: 10px 0 10px;
+
+            /* only count direct li children of the ol; nested lists (ul li) will not increment this counter */
+            > li {
+              width: 100%;
+              display: flex;
+              flex-direction: column;
+              margin: 0 0 10px;
+              position: relative; /* anchor for the number pseudo-element */
+              padding-left: 34px; /* space for the numeric marker */
+              counter-increment: list-counter;
+
+              &::before {
+                content: counter(list-counter) ".";
+                position: absolute;
+                left: 0;
+                top: 0;
+                color: #111;
+                font-weight: 600;
+                font-size: 14px;
+                line-height: 1;
+                width: 28px;
+                text-align: right;
+                transform: translateY(2px);
+              }
+
+              strong {
+                margin: 0 0 10px;
+              }
+            }
+          }
+
+          ul {
+            li {
+              width: 100%;
+              display: flex;
+              flex-direction: column;
+              margin: 0 0 5px;
+            }
+          }
+
           /// if there are any bullte points in the response
           ul,
           ol {
-            padding-left: 16px;
+            // padding-left: 16px;
           }
 
           ul {
@@ -280,6 +332,7 @@
               display: flex;
               padding-left: 15px;
               position: relative;
+              flex-direction: column;
               &::before {
                 content: "";
                 position: absolute;
@@ -623,17 +676,93 @@
   }
 
   .sources-container {
-    width: 40%;
+    width: 30%;
     display: flex;
     padding: 8px 16px 8px 16px;
     border-radius: 16px;
     border: 1px solid #e6e8ec;
     flex-direction: column;
     height: 650px;
-    background: #fff;
+    background: #fcfcfd;
+    max-width: 30%;
+    min-width: 30%;
+
+    h3 {
+      text-transform: capitalize;
+      align-items: center;
+      justify-content: center;
+      display: flex;
+      gap: 10px;
+    }
 
     .sources {
       overflow-y: auto;
+    }
+
+    .relevance-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+      // overflow-x: auto;
+      white-space: nowrap;
+      padding-bottom: 4px;
+      padding-top: 4px;
+      align-items: center;
+
+      /* thinner, subtle horizontal scrollbar */
+      scrollbar-width: thin; /* Firefox */
+      scrollbar-color: rgba(0, 0, 0, 0.12) transparent;
+
+      &::-webkit-scrollbar {
+        height: 6px; /* smaller height for webkit browsers */
+      }
+      &::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      &::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.12);
+        border-radius: 6px;
+      }
+
+      .relevance-level {
+        border-radius: 20px;
+        padding: 4px 10px;
+        font-weight: 500;
+        font-size: 14px;
+        display: inline-block;
+        text-align: center;
+        white-space: nowrap;
+        cursor: pointer;
+        border: 2px solid transparent; /* border-color may be overridden inline */
+        transition: box-shadow 0.12s ease, transform 0.08s ease,
+          border-color 0.12s ease;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+        }
+
+        &.active {
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        .relevance-label {
+          margin-right: 8px;
+        }
+
+        .relevance-count {
+          display: inline-block;
+          min-width: 22px;
+          height: 22px;
+          line-height: 22px;
+          padding: 0 3px;
+          border-radius: 999px;
+          background: rgba(0, 0, 0, 0.12);
+          color: #111;
+          font-size: 12px;
+          font-weight: 600;
+        }
+      }
     }
   }
 
@@ -687,9 +816,61 @@
         display: contents;
       }
 
+      p {
+        font-size: 14px;
+        line-height: 140%;
+      }
+
+      ol {
+        /* use CSS counter since we're using flex layout which hides default markers */
+        counter-reset: list-counter;
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        margin: 10px 0 10px;
+
+        /* only count direct li children of the ol; nested lists (ul li) will not increment this counter */
+        > li {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          margin: 0 0 10px;
+          position: relative; /* anchor for the number pseudo-element */
+          padding-left: 34px; /* space for the numeric marker */
+          counter-increment: list-counter;
+
+          &::before {
+            content: counter(list-counter) ".";
+            position: absolute;
+            left: 0;
+            top: 0;
+            color: #111;
+            font-weight: 600;
+            font-size: 14px;
+            line-height: 1;
+            width: 28px;
+            text-align: right;
+            transform: translateY(2px);
+          }
+
+          strong {
+            margin: 0 0 10px;
+          }
+        }
+      }
+
+      ul {
+        li {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          margin: 0 0 5px;
+        }
+      }
+
       ul,
       ol {
-        padding-left: 16px;
+        // padding-left: 16px;
       }
 
       ul {
@@ -699,6 +880,7 @@
           display: flex;
           padding-left: 15px;
           position: relative;
+          flex-direction: column;
           &::before {
             content: "";
             position: absolute;
