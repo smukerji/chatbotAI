@@ -922,12 +922,7 @@ async function whatsAppOperation(res: any) {
 
       // Get or create chat history and store user message immediately
       let userChatHistoryCollection = db.collection("whatsapp-chat-history");
-      let userChatHistory: WhatsAppChatHistoryType =
-        await userChatHistoryCollection.findOne({
-          userId: userID,
-          date: moment().utc().format("YYYY-MM-DD"),
-        });
-
+      
       // Get chatbot settings to determine which API to use (needed for chat history structure)
       let userChatBotSetting = db.collection("chatbot-settings");
       let userChatBotModel = await userChatBotSetting.findOne({
@@ -936,16 +931,155 @@ async function whatsAppOperation(res: any) {
       });
 
       const useAssistantAPI = userChatBotResult?.botType === "bot-v2";
+      const dateKey = moment().utc().format("YYYY-MM-DD");
+      const phoneKey = `${userPhoneNumber}`;
 
-      // Store user message immediately, before processing AI response
-      if (!userChatHistory) {
+      // FIXED: Check for existing thread FIRST before creating a new one
+      // This prevents creating multiple threads for the same user
+      let existingChatDoc = await userChatHistoryCollection.findOne({
+        userId: userID,
+        date: dateKey,
+      });
+
+      let threadIdToUse: string | null = null;
+      
+      // Check if this phone number already has a conversation today
+      const phoneAlreadyExists = existingChatDoc?.chats?.[phoneKey];
+      
+      if (phoneAlreadyExists) {
+        // Phone number exists - use existing thread or create if missing
+        logWithTimestamp(`Phone ${phoneKey} already has conversation today`);
+        
+        if (useAssistantAPI) {
+          threadIdToUse = existingChatDoc.chats[phoneKey]?.threadId || null;
+          
+          if (!threadIdToUse) {
+            // Thread missing for this phone, create one
+            logWithTimestamp("Thread missing, creating new thread for existing phone");
+            try {
+              const thread = await createThread();
+              threadIdToUse = thread?.id;
+              if (threadIdToUse) {
+                // Update the thread ID in database
+                await userChatHistoryCollection.updateOne(
+                  { userId: userID, date: dateKey },
+                  {
+                    $set: {
+                      [`chats.${phoneKey}.threadId`]: threadIdToUse,
+                      [`chats.${phoneKey}.assistantId`]: userChatBotModel?.chatbotId,
+                    }
+                  }
+                );
+                logWithTimestamp(`Created and stored new thread: ${threadIdToUse}`);
+              }
+            } catch (err) {
+              logError("Failed to create thread for existing phone", err);
+            }
+          } else {
+            logWithTimestamp(`Using existing thread: ${threadIdToUse}`);
+          }
+          
+          // Add message to thread
+          if (threadIdToUse) {
+            try {
+              await addMessageToThread(threadIdToUse, questionFromWhatsapp);
+              logWithTimestamp(`User message added to thread: ${threadIdToUse}`);
+            } catch (err) {
+              logError("Failed to add message to thread", err);
+            }
+          }
+        }
+        
+        // Atomically push message to existing conversation
+        await userChatHistoryCollection.updateOne(
+          { userId: userID, date: dateKey },
+          {
+            $push: { [`chats.${phoneKey}.messages`]: userMessage },
+            $set: { updatedAt: new Date() }
+          }
+        );
+        
+        logWithTimestamp("Added user message to existing conversation");
+        
+      } else if (existingChatDoc) {
+        // Document exists but phone number is new
+        logWithTimestamp(`Adding new phone ${phoneKey} to existing document`);
+        
+        if (useAssistantAPI) {
+          // Create new thread for this phone number
+          try {
+            const thread = await createThread();
+            threadIdToUse = thread?.id;
+            logWithTimestamp(`Created new thread for new phone: ${threadIdToUse}`);
+            
+            if (threadIdToUse) {
+              try {
+                await addMessageToThread(threadIdToUse, questionFromWhatsapp);
+                logWithTimestamp(`User message added to new thread: ${threadIdToUse}`);
+              } catch (err) {
+                logError("Failed to add message to new thread", err);
+              }
+            }
+          } catch (err) {
+            logError("Failed to create thread for new phone number", err);
+          }
+        }
+        
+        // Atomically add new phone conversation
+        const updateDoc: any = {
+          [`chats.${phoneKey}.messages`]: [userMessage],
+          [`chats.${phoneKey}.usage`]: {
+            completion_tokens: 0,
+            prompt_tokens: 0,
+            total_tokens: 0,
+          },
+          updatedAt: new Date(),
+        };
+        
+        if (threadIdToUse) {
+          updateDoc[`chats.${phoneKey}.threadId`] = threadIdToUse;
+          updateDoc[`chats.${phoneKey}.assistantId`] = userChatBotModel?.chatbotId;
+        }
+        
+        await userChatHistoryCollection.updateOne(
+          { userId: userID, date: dateKey },
+          { $set: updateDoc }
+        );
+        
+        logWithTimestamp("Added new phone conversation to existing document");
+        
+      } else {
+        // No document exists for today - create new one
+        logWithTimestamp("Creating new document for today");
+        
+        if (useAssistantAPI) {
+          // Create new thread for new document
+          try {
+            const thread = await createThread();
+            threadIdToUse = thread?.id;
+            logWithTimestamp(`Created new thread for new document: ${threadIdToUse}`);
+            
+            if (threadIdToUse) {
+              try {
+                await addMessageToThread(threadIdToUse, questionFromWhatsapp);
+                logWithTimestamp(`User message added to new thread: ${threadIdToUse}`);
+              } catch (err) {
+                logError("Failed to add message to new thread", err);
+              }
+            }
+          } catch (err) {
+            logError("Failed to create thread for new document", err);
+          }
+        }
+        
+        // Create new document
         const now = new Date();
-        const chatDoc: any = {
+        const newChatDoc: any = {
           userId: userID,
           chatbotId: whatsAppDetailsResult.chatbotId,
           chats: {
-            [`${userPhoneNumber}`]: {
-              messages: [userMessage], // Only user message for now
+            [phoneKey]: {
+              messages: [userMessage],
               usage: {
                 completion_tokens: 0,
                 prompt_tokens: 0,
@@ -953,141 +1087,18 @@ async function whatsAppOperation(res: any) {
               },
             },
           },
-          date: moment().utc().format("YYYY-MM-DD"),
+          date: dateKey,
           createdAt: now,
           updatedAt: now,
         };
-
-        // If using Assistant API, attempt to create a thread immediately and add the user message
-        if (useAssistantAPI) {
-          try {
-            const thread = await createThread();
-            const threadId = thread?.id;
-            if (threadId) {
-              // update chat doc with threadId and assistantId
-              chatDoc.chats[`${userPhoneNumber}`].threadId = threadId;
-              chatDoc.chats[`${userPhoneNumber}`].assistantId =
-                userChatBotModel?.chatbotId;
-
-              // Add the user message to the thread so assistant has context
-              try {
-                await addMessageToThread(threadId, questionFromWhatsapp);
-                logWithTimestamp(
-                  `User message added to new thread: ${threadId}`
-                );
-              } catch (err) {
-                logError("Failed to add user message to new thread", err);
-              }
-            }
-          } catch (err) {
-            logError(
-              "Failed to create thread when storing new chat history",
-              err
-            );
-          }
+        
+        if (threadIdToUse) {
+          newChatDoc.chats[phoneKey].threadId = threadIdToUse;
+          newChatDoc.chats[phoneKey].assistantId = userChatBotModel?.chatbotId;
         }
-
-        await userChatHistoryCollection.insertOne(chatDoc);
-
-        logWithTimestamp("Created new chat history with user message");
-      } else {
-        // Update existing chat history with user message
-        if (!userChatHistory.chats[`${userPhoneNumber}`]) {
-          userChatHistory.chats[`${userPhoneNumber}`] = {
-            messages: [userMessage], // Only user message for now
-            usage: {
-              completion_tokens: 0,
-              prompt_tokens: 0,
-              total_tokens: 0,
-            },
-          };
-
-          // If Assistant API, create a thread and add threadId
-          if (useAssistantAPI) {
-            try {
-              const thread = await createThread();
-              const threadId = thread?.id;
-              if (threadId) {
-                userChatHistory.chats[`${userPhoneNumber}`].threadId = threadId;
-                userChatHistory.chats[`${userPhoneNumber}`].assistantId =
-                  userChatBotModel?.chatbotId;
-
-                try {
-                  await addMessageToThread(threadId, questionFromWhatsapp);
-                  logWithTimestamp(
-                    `User message added to new thread: ${threadId}`
-                  );
-                } catch (err) {
-                  logError("Failed to add user message to new thread", err);
-                }
-              }
-            } catch (err) {
-              logError("Failed to create thread for existing chat entry", err);
-            }
-          }
-        } else {
-          // Add user message to existing conversation
-          userChatHistory.chats[`${userPhoneNumber}`].messages.push(
-            userMessage
-          );
-
-          // If using Assistant API and there's no threadId, create one and add the user message
-          if (
-            useAssistantAPI &&
-            !userChatHistory.chats[`${userPhoneNumber}`].threadId
-          ) {
-            try {
-              const thread = await createThread();
-              const threadId = thread?.id;
-              if (threadId) {
-                userChatHistory.chats[`${userPhoneNumber}`].threadId = threadId;
-                userChatHistory.chats[`${userPhoneNumber}`].assistantId =
-                  userChatBotModel?.chatbotId;
-
-                try {
-                  await addMessageToThread(threadId, questionFromWhatsapp);
-                  logWithTimestamp(
-                    `User message added to created thread: ${threadId}`
-                  );
-                } catch (err) {
-                  logError("Failed to add user message to created thread", err);
-                }
-              }
-            } catch (err) {
-              logError(
-                "Failed to create thread for existing conversation",
-                err
-              );
-            }
-          } else {
-            try {
-              await addMessageToThread(
-                userChatHistory.chats[`${userPhoneNumber}`].threadId!,
-                questionFromWhatsapp
-              );
-              logWithTimestamp(
-                `User message added to existing thread: ${
-                  userChatHistory.chats[`${userPhoneNumber}`].threadId
-                }`
-              );
-            } catch (err) {
-              logError("Failed to add user message to new thread", err);
-            }
-          }
-        }
-
-        // Update in database immediately
-        await userChatHistoryCollection.updateOne(
-          { userId: userID, date: moment().utc().format("YYYY-MM-DD") },
-          {
-            $set: {
-              chats: userChatHistory.chats,
-              updatedAt: new Date(),
-            },
-          }
-        );
-
-        logWithTimestamp("Added user message to existing chat history");
+        
+        await userChatHistoryCollection.insertOne(newChatDoc);
+        logWithTimestamp("Created new chat history document");
       }
       // ========== END MOVED SECTION ==========
 
@@ -1216,35 +1227,20 @@ async function whatsAppOperation(res: any) {
         // Use Assistant API
         logWithTimestamp("Using Assistant API for response generation");
 
-        let threadId: any;
-
-        // Get fresh chat history to check for threadId
-        userChatHistory = await userChatHistoryCollection.findOne({
+        // Get the thread ID - it should already be stored in step 5.5
+        const chatHistoryForThread = await userChatHistoryCollection.findOne({
           userId: userID,
-          date: moment().utc().format("YYYY-MM-DD"),
+          date: dateKey,
         });
 
-        // Check if we have existing chat history with threadId
-        if (userChatHistory?.chats?.[`${userPhoneNumber}`]?.threadId) {
-          threadId = userChatHistory.chats[`${userPhoneNumber}`].threadId;
-          logWithTimestamp(`Using existing thread: ${threadId}`);
-        } else {
-          // Create new thread
-          const thread = await createThread();
-          threadId = thread.id;
-          logWithTimestamp(`Created new thread: ${threadId}`);
-
-          // Update the threadId in database immediately
-          await userChatHistoryCollection.updateOne(
-            { userId: userID, date: moment().utc().format("YYYY-MM-DD") },
-            {
-              $set: {
-                [`chats.${userPhoneNumber}.threadId`]: threadId,
-                updatedAt: new Date(),
-              },
-            }
-          );
+        const threadId = chatHistoryForThread?.chats?.[phoneKey]?.threadId;
+        
+        if (!threadId) {
+          logError("No thread ID found for user", { phoneKey, dateKey });
+          throw new Error("Thread ID not found - this should not happen");
         }
+        
+        logWithTimestamp(`Using thread: ${threadId}`);
 
         const messages1: any = await openai.beta.threads.messages.list(
           threadId
@@ -1257,8 +1253,8 @@ async function whatsAppOperation(res: any) {
           );
         }
 
-        // // Add user message to thread
-        // await addMessageToThread(threadId, questionFromWhatsapp);
+        // Get messages for context
+        const messagesForContext = chatHistoryForThread?.chats?.[phoneKey]?.messages || [];
 
         // Run the assistant
         const run = await runAssistant(
@@ -1273,7 +1269,7 @@ async function whatsAppOperation(res: any) {
           run.id,
           whatsAppDetailsResult.chatbotId,
           userID,
-          userChatHistory?.chats?.[`${userPhoneNumber}`]?.messages || []
+          messagesForContext
         );
 
   // Get the assistant's response
@@ -1289,47 +1285,27 @@ async function whatsAppOperation(res: any) {
             encode(aiResponse).length + encode(questionFromWhatsapp).length,
         };
 
-        // Now add assistant response to existing chat history
+        // Now add assistant response to existing chat history using atomic operations
         const assistantMessage = createMessageWithTimestamp(
           "assistant",
           aiResponse
         );
 
-        // Get updated chat history (in case it was modified during processing)
-        userChatHistory = await userChatHistoryCollection.findOne({
-          userId: userID,
-          date: moment().utc().format("YYYY-MM-DD"),
-        });
-
-        userChatHistory.chats[`${userPhoneNumber}`].messages.push(
-          assistantMessage
-        );
-
-        // Update usage
-        if (!userChatHistory.chats[`${userPhoneNumber}`]?.usage) {
-          userChatHistory.chats[`${userPhoneNumber}`].usage = {
-            completion_tokens: 0,
-            prompt_tokens: 0,
-            total_tokens: 0,
-          };
-        }
-        userChatHistory.chats[`${userPhoneNumber}`].usage.completion_tokens +=
-          usage.completion_tokens;
-        userChatHistory.chats[`${userPhoneNumber}`].usage.prompt_tokens +=
-          usage.prompt_tokens;
-        userChatHistory.chats[`${userPhoneNumber}`].usage.total_tokens +=
-          usage.total_tokens;
-
-        // Update in database with assistant response
+        // Atomically push assistant message and update usage
         await userChatHistoryCollection.updateOne(
-          { userId: userID, date: moment().utc().format("YYYY-MM-DD") },
+          { userId: userID, date: dateKey },
           {
-            $set: {
-              chats: userChatHistory.chats,
-              updatedAt: new Date(),
+            $push: { [`chats.${phoneKey}.messages`]: assistantMessage },
+            $inc: {
+              [`chats.${phoneKey}.usage.completion_tokens`]: usage.completion_tokens,
+              [`chats.${phoneKey}.usage.prompt_tokens`]: usage.prompt_tokens,
+              [`chats.${phoneKey}.usage.total_tokens`]: usage.total_tokens,
             },
+            $set: { updatedAt: new Date() }
           }
         );
+
+        logWithTimestamp("Added assistant message using atomic operations");
       } else {
         // Use Chat Completion API (existing logic with modifications)
         logWithTimestamp("Using Chat Completion API for response generation");
@@ -1342,14 +1318,17 @@ async function whatsAppOperation(res: any) {
         let currentQuestionsTotalTokens = encode(questionFromWhatsapp).length;
 
         // Get fresh chat history to get all messages including the user message we just stored
-        userChatHistory = await userChatHistoryCollection.findOne({
+        const chatHistoryForCompletion = await userChatHistoryCollection.findOne({
           userId: userID,
-          date: moment().utc().format("YYYY-MM-DD"),
+          date: dateKey,
         });
 
+        // Get existing usage tokens for calculations
+        let previousTotalTokens = 0;
+
         // Handle existing chat history for Chat Completion API
-        if (userChatHistory?.chats?.[`${userPhoneNumber}`]) {
-          let previousTotalTokens = userChatHistory.chats[`${userPhoneNumber}`]
+        if (chatHistoryForCompletion?.chats?.[phoneKey]) {
+          previousTotalTokens = chatHistoryForCompletion.chats[phoneKey]
             .usage.total_tokens as number;
           let totalCountedToken =
             previousTotalTokens +
@@ -1357,8 +1336,8 @@ async function whatsAppOperation(res: any) {
             similarSearchToken;
 
           // Get all messages except the last one (which is the current user message we just added)
-          conversationMessages = userChatHistory.chats[
-            `${userPhoneNumber}`
+          conversationMessages = chatHistoryForCompletion.chats[
+            phoneKey
           ].messages.slice(0, -1);
 
           // Token limit management
@@ -1426,59 +1405,40 @@ async function whatsAppOperation(res: any) {
         aiResponse = openaiBody.choices[0].message.content;
         usage = openaiBody.usage;
 
-        // Add assistant response to existing chat history
+        // Add assistant response to existing chat history using atomic operations
         const assistantMessage = createMessageWithTimestamp(
           "assistant",
           aiResponse
         );
 
-        // Get fresh chat history again to ensure we have latest data
-        userChatHistory = await userChatHistoryCollection.findOne({
-          userId: userID,
-          date: moment().utc().format("YYYY-MM-DD"),
-        });
-
-        // Add assistant message to existing conversation
-        userChatHistory.chats[`${userPhoneNumber}`].messages.push(
-          assistantMessage
-        );
-
-        // Update usage tokens
-        let oldTotalTokens =
-          userChatHistory.chats[`${userPhoneNumber}`].usage.total_tokens;
+        // Calculate token increments
         let userEnterToken = currentQuestionsTotalTokens;
         let openAICompletionToken = usage.completion_tokens;
-        oldTotalTokens += userEnterToken + openAICompletionToken;
+        let totalTokenIncrement = userEnterToken + openAICompletionToken;
 
-        let oldPromptTokens =
-          userChatHistory.chats[`${userPhoneNumber}`].usage.prompt_tokens;
-        oldPromptTokens += currentQuestionsTotalTokens;
-
-        userChatHistory.chats[`${userPhoneNumber}`].usage = {
-          completion_tokens: usage.completion_tokens,
-          prompt_tokens: oldPromptTokens,
-          total_tokens: oldTotalTokens,
-        };
-
-        // Update in database with assistant response
+        // Atomically push assistant message and update usage
         await userChatHistoryCollection.updateOne(
-          { userId: userID, date: moment().utc().format("YYYY-MM-DD") },
+          { userId: userID, date: dateKey },
           {
+            $push: { [`chats.${phoneKey}.messages`]: assistantMessage },
             $set: {
-              chats: userChatHistory.chats,
-              updatedAt: new Date(),
-            },
+              [`chats.${phoneKey}.usage.completion_tokens`]: usage.completion_tokens,
+              [`chats.${phoneKey}.usage.prompt_tokens`]: previousTotalTokens + currentQuestionsTotalTokens,
+              [`chats.${phoneKey}.usage.total_tokens`]: previousTotalTokens + totalTokenIncrement,
+              updatedAt: new Date()
+            }
           }
         );
+
+        logWithTimestamp("Added assistant message using atomic operations");
       }
 
-      // Update message count
+      // Update message count using atomic increment
       const collections = db?.collection("user-details");
-      const result = await collections.findOne({ userId: userID });
-      if (result?.totalMessageCount !== undefined && aiResponse) {
+      if (aiResponse) {
         await collections.updateOne(
           { userId: userID },
-          { $set: { totalMessageCount: result.totalMessageCount + 1 } }
+          { $inc: { totalMessageCount: 1 } }
         );
       }
 
