@@ -984,8 +984,21 @@ async function whatsAppOperation(res: any) {
             try {
               await addMessageToThread(threadIdToUse, questionFromWhatsapp);
               logWithTimestamp(`User message added to thread: ${threadIdToUse}`);
-            } catch (err) {
+            } catch (err: any) {
               logError("Failed to add message to thread", err);
+              
+              // If there's an active run, this is a duplicate/retry request
+              if (err?.message && err.message.includes("while a run") && err.message.includes("is active")) {
+                logWithTimestamp("Active run detected - this is a duplicate/retry request from WhatsApp", {
+                  threadId: threadIdToUse,
+                  action: "Skipping DB update and exiting gracefully"
+                });
+                return; // Exit early - don't add to DB again
+              }
+              
+              // For other errors, we might want to continue
+              // but log it prominently
+              logWithTimestamp("Non-active-run error occurred, will attempt to continue");
             }
           }
         }
@@ -1257,11 +1270,24 @@ async function whatsAppOperation(res: any) {
         const messagesForContext = chatHistoryForThread?.chats?.[phoneKey]?.messages || [];
 
         // Run the assistant
-        const run = await runAssistant(
-          threadId,
-          userChatBotModel.chatbotId,
-          userChatBotModel?.instruction
-        );
+        let run;
+        try {
+          run = await runAssistant(
+            threadId,
+            userChatBotModel.chatbotId,
+            userChatBotModel?.instruction
+          );
+        } catch (runError: any) {
+          // Check if this is an "already has an active run" error
+          if (runError?.message && runError.message.includes("already has an active run")) {
+            logWithTimestamp("Thread already has active run - duplicate/retry request from WhatsApp detected", {
+              threadId,
+              action: "Exiting gracefully - first request will handle response"
+            });
+            return; // Exit gracefully - the first request will handle the response
+          }
+          throw runError; // Re-throw other errors
+        }
 
         // Wait for completion
         await waitForRunCompletionWithActions(
