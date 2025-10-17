@@ -321,6 +321,17 @@
           height: 510px;
           margin-top: 17px;
 
+          .whatsapp-sender-label {
+            .whatsapp-dot {
+              width: 4px;
+              height: 4px;
+              background: #b1b5c3; /* medium grey for better visibility */
+              border-radius: 50%;
+              display: inline-block;
+              box-shadow: 0 0 0 2px rgba(154, 160, 166, 0.08);
+            }
+          }
+
           @media screen and (max-width: 767px) {
             height: auto;
           }
@@ -361,9 +372,9 @@
                 max-width: 100%;
               }
 
-              > div:first-of-type {
-                display: contents;
-              }
+              // > div:first-of-type {
+              //   display: contents;
+              // }
 
               p {
                 font-size: 14px;
@@ -732,13 +743,6 @@
               overflow: hidden;
               text-overflow: ellipsis;
             }
-
-            .whatsapp-time {
-              font-size: 12px;
-              color: #777e90;
-              white-space: nowrap;
-              flex-shrink: 0;
-            }
           }
 
           .whatsapp-chat-footer {
@@ -775,11 +779,14 @@
 
         .whatsapp-toggle {
           flex-shrink: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
 
           .toggle-switch {
             position: relative;
             display: inline-block;
-            width: 44px;
+            width: 56px; /* widen slightly to fit labels */
             height: 24px;
 
             input {
@@ -789,10 +796,6 @@
 
               &:checked + .toggle-slider {
                 background-color: #4d72f5;
-              }
-
-              &:checked + .toggle-slider:before {
-                transform: translateX(20px);
               }
             }
 
@@ -804,21 +807,72 @@
               right: 0;
               bottom: 0;
               background-color: #ccc;
-              transition: 0.3s;
+              transition: background-color 0.18s ease;
               border-radius: 24px;
+              overflow: hidden;
 
-              &:before {
+              /* labels inside the track */
+              .toggle-label {
                 position: absolute;
-                content: "";
-                height: 18px;
-                width: 18px;
-                left: 3px;
-                bottom: 3px;
-                background-color: white;
-                transition: 0.3s;
-                border-radius: 50%;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 10px;
+                font-weight: 600;
+                color: rgba(255, 255, 255, 0.9);
+                pointer-events: none;
+                user-select: none;
+                opacity: 0.95;
+                letter-spacing: 0.2px;
               }
+
+              .toggle-label-on {
+                left: 8px;
+                /* dim by default (off state) */
+                color: rgba(255, 255, 255, 0.6);
+                opacity: 0.95;
+              }
+
+              .toggle-label-off {
+                right: 8px;
+                /* active by default when unchecked */
+                color: rgba(0, 0, 0, 0.85);
+                opacity: 1;
+              }
+
+              /* the visible knob - moved using transform */
+              .toggle-knob {
+                position: absolute;
+                height: 18px; /* keep original height */
+                width: 24px; /* increase width only */
+                left: 3px;
+                bottom: 3px; /* original vertical offset */
+                background-color: white;
+                border-radius: 50%;
+                box-shadow: 0 1px 2px rgba(16, 24, 40, 0.12);
+                transition: transform 0.18s ease;
+                transform: translateX(0);
+              }
+
+              /* (moved checked-state selectors to parent level) */
             }
+            /* checked-state: move knob and swap emphasis */
+            input:checked + .toggle-slider .toggle-knob {
+              /* track width 56px, keep 3px left + 3px right spacing: translateX = 56 - knobWidth - 6 */
+              transform: translateX(26px);
+            }
+            input:checked + .toggle-slider .toggle-label-on {
+              color: rgba(255, 255, 255, 0.98);
+            }
+            input:checked + .toggle-slider .toggle-label-off {
+              color: rgba(255, 255, 255, 0.6);
+            }
+          }
+
+          .whatsapp-time {
+            font-size: 12px;
+            color: #777e90;
+            white-space: nowrap;
+            flex-shrink: 0;
           }
         }
       }
@@ -871,7 +925,6 @@
     display: flex;
     gap: 10px;
     padding: 12px 16px;
-    background: #f0f2f5;
     border-top: 1px solid #e9edef;
     align-items: center;
 

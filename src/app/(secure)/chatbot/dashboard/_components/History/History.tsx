@@ -60,6 +60,34 @@ function History({ chatbotId }: any) {
 
   const [cookies, setCookies] = useCookies(["userId"]);
 
+  // User details fetched once on client mount (used by WhatsApp sender label)
+  const [userDetails, setUserDetails] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        const userId = cookies?.userId;
+        if (!userId) return;
+
+        const res = await fetch(
+          `/api/user?userId=${encodeURIComponent(userId)}`
+        );
+
+        if (!res.ok) {
+          console.error("Failed to fetch user details", res.status);
+          return;
+        }
+
+        const json = await res.json();
+        setUserDetails(json.user);
+      } catch (err) {
+        console.error("Error fetching user details", err);
+      }
+    };
+
+    fetchUserDetails();
+  }, [cookies.userId]);
+
   const [leadsFilter, setLeadsFilter] = useState("");
   const [openDatePicker, setOpenDatePicker] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -115,7 +143,8 @@ function History({ chatbotId }: any) {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   // WhatsApp socket server URL - update this to your actual server URL
-  const WHATSAPP_SERVER_URL = process.env.NEXT_PUBLIC_WHATSAPP_SOCKET_URL || "http://localhost:3001";
+  const WHATSAPP_SERVER_URL =
+    process.env.NEXT_PUBLIC_WHATSAPP_SOCKET_URL || "http://localhost:3001";
 
   // Update refs when state changes
   useEffect(() => {
@@ -149,7 +178,11 @@ function History({ chatbotId }: any) {
       // Reset when no chat selected
       prevMessageCountRef.current = 0;
     }
-  }, [selectedWhatsappChat?.allMessages?.length, chatHistoryClassifier, selectedWhatsappChat]);
+  }, [
+    selectedWhatsappChat?.allMessages?.length,
+    chatHistoryClassifier,
+    selectedWhatsappChat,
+  ]);
 
   const relevanceLevels = React.useMemo(
     () => [
@@ -365,6 +398,12 @@ function History({ chatbotId }: any) {
             autoReply: !json.numbers.includes(c.phoneNumber),
           }))
         );
+
+        setSelectedWhatsappChat((prev: any) =>
+          prev.phoneNumber === phoneNumber
+            ? { ...prev, autoReply: newState }
+            : prev
+        );
       }
     } catch (err) {
       console.error("Failed to toggle auto-reply:", err);
@@ -373,6 +412,12 @@ function History({ chatbotId }: any) {
         prev.map((c) =>
           c.phoneNumber === phoneNumber ? { ...c, autoReply: currentState } : c
         )
+      );
+      /// Revert the selected chat also
+      setSelectedWhatsappChat((prev: any) =>
+        prev.phoneNumber === phoneNumber
+          ? { ...prev, autoReply: currentState }
+          : prev
       );
       message.error("Failed to update auto-reply setting");
     }
@@ -425,19 +470,26 @@ function History({ chatbotId }: any) {
 
           updatedChats[existingIndex] = incomingChat;
 
-          if (!Object.prototype.hasOwnProperty.call(incomingChat, "autoReply")) {
+          if (
+            !Object.prototype.hasOwnProperty.call(incomingChat, "autoReply")
+          ) {
             updatedChats[existingIndex].autoReply = hadAutoReply
               ? preservedAuto
               : true;
           }
 
           // Update selected chat if this is the currently selected chat
-          if (selectedWhatsappChatRef.current?.phoneNumber === incomingChat.phoneNumber) {
+          if (
+            selectedWhatsappChatRef.current?.phoneNumber ===
+            incomingChat.phoneNumber
+          ) {
             setSelectedWhatsappChat(updatedChats[existingIndex]);
           }
         } else {
           // New chat - default autoReply to true
-          if (!Object.prototype.hasOwnProperty.call(incomingChat, "autoReply")) {
+          if (
+            !Object.prototype.hasOwnProperty.call(incomingChat, "autoReply")
+          ) {
             incomingChat.autoReply = true;
           }
           updatedChats.push(incomingChat);
@@ -532,7 +584,8 @@ function History({ chatbotId }: any) {
         // If this is the selected chat, update it using ref
         if (
           selectedWhatsappChatRef.current &&
-          selectedWhatsappChatRef.current.phoneNumber === response.data.phoneNumber
+          selectedWhatsappChatRef.current.phoneNumber ===
+            response.data.phoneNumber
         ) {
           setSelectedWhatsappChat(response.data);
         }
@@ -542,7 +595,7 @@ function History({ chatbotId }: any) {
     // Handle message sent confirmation
     socket.on("message_sent", (payload: any) => {
       if (!payload || !payload.clientMessageId) return;
-      
+
       const { clientMessageId } = payload;
       markLocalMessageDelivery(clientMessageId, "sent");
     });
@@ -550,7 +603,7 @@ function History({ chatbotId }: any) {
     // Handle message send errors
     socket.on("message_error", (payload: any) => {
       if (!payload || !payload.clientMessageId) return;
-      
+
       const { clientMessageId, error } = payload;
       markLocalMessageDelivery(clientMessageId, "failed");
       message.error(`Failed to send message: ${error || "Unknown error"}`);
@@ -567,7 +620,13 @@ function History({ chatbotId }: any) {
     });
 
     socketRef.current = socket;
-  }, [chatbotId, cookies.userId, WHATSAPP_SERVER_URL, fetchAutoReplyList, fetchServerStats]);
+  }, [
+    chatbotId,
+    cookies.userId,
+    WHATSAPP_SERVER_URL,
+    fetchAutoReplyList,
+    fetchServerStats,
+  ]);
 
   // Disconnect from WhatsApp socket
   const disconnectWhatsappSocket = React.useCallback(() => {
@@ -626,6 +685,36 @@ function History({ chatbotId }: any) {
     });
   };
 
+  // Determine sender label to show beside WhatsApp timestamps
+  const getWhatsappSenderLabel = (message: any) => {
+    // Rule 1: If the display text contains 'status' or message has an explicit status field,
+    // it's considered sent by the account owner.
+    const displayText = (message?.display || "").toString();
+    const hasDisplayStatus = /status/i.test(displayText);
+    const hasExplicitStatus = !!(
+      message &&
+      (message.status || message.deliveryStatus)
+    );
+
+    if (hasDisplayStatus || hasExplicitStatus) {
+      return userDetails?.username?.split("_")[0];
+    }
+
+    // Rule 2: If message type/role indicates assistant (or isFromBot) and it DOES NOT have status,
+    // it's sent by Torri AI.
+    const isAssistantType =
+      message?.type === "assistant" ||
+      message?.role === "assistant" ||
+      message?.isFromBot;
+
+    if (isAssistantType && !hasExplicitStatus && !hasDisplayStatus) {
+      return "Torri AI";
+    }
+
+    // Else: user message - no extra label
+    return null;
+  };
+
   // Format date for WhatsApp display
   const formatDateForDisplay = (dateString: string) => {
     const date = new Date(dateString);
@@ -652,11 +741,11 @@ function History({ chatbotId }: any) {
   // Group WhatsApp messages by date
   const groupMessagesByDate = (messages: any[]) => {
     const grouped: { [key: string]: any[] } = {};
-    
+
     messages.forEach((message) => {
       const date = new Date(message.timestamp);
       const dateKey = date.toISOString().split("T")[0];
-      
+
       if (!grouped[dateKey]) {
         grouped[dateKey] = [];
       }
@@ -690,33 +779,38 @@ function History({ chatbotId }: any) {
   };
 
   // Mark local message delivery status
-  const markLocalMessageDelivery = (clientMessageId: string, status: "pending" | "sent" | "failed") => {
+  const markLocalMessageDelivery = (
+    clientMessageId: string,
+    status: "pending" | "sent" | "failed"
+  ) => {
     setWhatsappChats((prevChats) => {
       return prevChats.map((chat) => {
         const messageIndex = (chat.allMessages || []).findIndex(
           (m: any) => m.clientMessageId === clientMessageId
         );
-        
+
         if (messageIndex >= 0) {
           const updatedMessages = [...chat.allMessages];
           updatedMessages[messageIndex] = {
             ...updatedMessages[messageIndex],
             deliveryStatus: status,
           };
-          
+
           const updatedChat = {
             ...chat,
             allMessages: updatedMessages,
           };
 
           // If this is the selected chat, update it
-          if (selectedWhatsappChatRef.current?.phoneNumber === chat.phoneNumber) {
+          if (
+            selectedWhatsappChatRef.current?.phoneNumber === chat.phoneNumber
+          ) {
             setSelectedWhatsappChat(updatedChat);
           }
 
           return updatedChat;
         }
-        
+
         return chat;
       });
     });
@@ -742,12 +836,16 @@ function History({ chatbotId }: any) {
 
     // Check if auto-reply is enabled for this chat
     if (selectedWhatsappChat.autoReply) {
-      message.warning("Auto-reply is enabled for this chat. Please disable it to send manual messages.");
+      message.warning(
+        "Auto-reply is enabled for this chat. Please disable it to send manual messages."
+      );
       return;
     }
 
     // Generate unique client message ID
-    const clientMessageId = `cmsg_${Date.now()}_${Math.floor(Math.random() * 9000 + 1000)}`;
+    const clientMessageId = `cmsg_${Date.now()}_${Math.floor(
+      Math.random() * 9000 + 1000
+    )}`;
 
     // Create optimistic local message
     const localMsg = {
@@ -801,7 +899,9 @@ function History({ chatbotId }: any) {
         } else {
           // Mark as failed if server immediately rejects
           markLocalMessageDelivery(clientMessageId, "failed");
-          message.error(`Failed to send message: ${response?.error || "Unknown error"}`);
+          message.error(
+            `Failed to send message: ${response?.error || "Unknown error"}`
+          );
         }
       }
     );
@@ -1058,171 +1158,185 @@ function History({ chatbotId }: any) {
               </button>
             </div>
 
-            <div className="date-picker-container">
-              <button
-                className={`interval-btn ${
-                  leadsFilter === "today" && "active"
-                }`}
-                onClick={() => {
-                  const today: any = new Date().toLocaleDateString("en-CA");
-                  fetchHistoryCount(true, 1, 10, today, today);
-                  setCurrentPage(1);
-                  setLeadsFilter("today");
-                  setOpenDatePicker(false);
-                  setDisplayDate(null);
-                  setCurrentChatHistory([]);
-                }}
-              >
-                Today
-              </button>
-              <button
-                className={`interval-btn ${
-                  leadsFilter === "last-7-day" && "active"
-                }`}
-                onClick={() => {
-                  const today: any = new Date().toLocaleDateString("en-CA");
-                  const last7Days: any = new Date();
-                  last7Days.setDate(last7Days.getDate() - 7);
-                  let refinedFormatLast7Days =
-                    last7Days.toLocaleDateString("en-CA");
-                  fetchHistoryCount(true, 1, 10, refinedFormatLast7Days, today);
-                  setCurrentPage(1);
-                  setLeadsFilter("last-7-day");
-                  setOpenDatePicker(false);
-                  setDisplayDate(null);
-                  setCurrentChatHistory([]);
-                }}
-              >
-                Last 7 Days
-              </button>
-              <button
-                className={`interval-btn ${
-                  leadsFilter === "last-month" && "active"
-                }`}
-                onClick={() => {
-                  const today: any = new Date();
-                  today.setDate(0);
-                  let refinedFormatLastMonthEndDate =
-                    today.toLocaleDateString("en-CA");
-
-                  const lastMonth: any = new Date();
-                  lastMonth.setMonth(lastMonth.getMonth() - 1);
-                  lastMonth.setDate(1);
-                  let refinedFormatLastMonth =
-                    lastMonth.toLocaleDateString("en-CA");
-                  setCurrentPage(1);
-                  fetchHistoryCount(
-                    true,
-                    1,
-                    10,
-                    refinedFormatLastMonth,
-                    refinedFormatLastMonthEndDate
-                  );
-                  setLeadsFilter("last-month");
-                  setOpenDatePicker(false);
-                  setDisplayDate(null);
-                  setCurrentChatHistory([]);
-                }}
-              >
-                Last Month
-              </button>
-              <ConfigProvider
-                theme={{
-                  components: {
-                    DatePicker: {
-                      cellActiveWithRangeBg: "#ECF0FE",
-                      cellHoverBg: "#ECF0FE",
-                      colorPrimary: "#4D72F5",
-                    },
-                  },
-                }}
-              >
-                <RangePicker
-                  className={`${leadsFilter === "custom-date" && "active"}`}
+            {chatHistoryClassifier !== "whatsapp" && (
+              <div className="date-picker-container">
+                <button
+                  className={`interval-btn ${
+                    leadsFilter === "today" && "active"
+                  }`}
                   onClick={() => {
-                    setOpenDatePicker(true);
-                    setLeadsFilter("custom-date");
+                    const today: any = new Date().toLocaleDateString("en-CA");
+                    fetchHistoryCount(true, 1, 10, today, today);
+                    setCurrentPage(1);
+                    setLeadsFilter("today");
+                    setOpenDatePicker(false);
+                    setDisplayDate(null);
+                    setCurrentChatHistory([]);
                   }}
-                  // superNextIcon={null}
-                  // superPrevIcon={null}
-                  onCalendarChange={(date: any) => {
-                    setDisplayDate(date);
-                    if (date) {
-                      selectedDate.current = [
-                        date[0]?.toDate().toLocaleDateString("en-CA"),
-                        date[1]?.toDate().toLocaleDateString("en-CA"),
-                      ];
+                >
+                  Today
+                </button>
+                <button
+                  className={`interval-btn ${
+                    leadsFilter === "last-7-day" && "active"
+                  }`}
+                  onClick={() => {
+                    const today: any = new Date().toLocaleDateString("en-CA");
+                    const last7Days: any = new Date();
+                    last7Days.setDate(last7Days.getDate() - 7);
+                    let refinedFormatLast7Days =
+                      last7Days.toLocaleDateString("en-CA");
+                    fetchHistoryCount(
+                      true,
+                      1,
+                      10,
+                      refinedFormatLast7Days,
+                      today
+                    );
+                    setCurrentPage(1);
+                    setLeadsFilter("last-7-day");
+                    setOpenDatePicker(false);
+                    setDisplayDate(null);
+                    setCurrentChatHistory([]);
+                  }}
+                >
+                  Last 7 Days
+                </button>
+                <button
+                  className={`interval-btn ${
+                    leadsFilter === "last-month" && "active"
+                  }`}
+                  onClick={() => {
+                    const today: any = new Date();
+                    today.setDate(0);
+                    let refinedFormatLastMonthEndDate =
+                      today.toLocaleDateString("en-CA");
 
-                      // setSelectedDate((prev: any) => {
-                      //   return [
-                      //     date[0]?.toDate().toLocaleDateString("en-CA"),
-                      //     date[1]?.toDate().toLocaleDateString("en-CA"),
-                      //   ];
-                      // });
-                    } else {
-                      selectedDate.current = null;
-                    }
+                    const lastMonth: any = new Date();
+                    lastMonth.setMonth(lastMonth.getMonth() - 1);
+                    lastMonth.setDate(1);
+                    let refinedFormatLastMonth =
+                      lastMonth.toLocaleDateString("en-CA");
+                    setCurrentPage(1);
+                    fetchHistoryCount(
+                      true,
+                      1,
+                      10,
+                      refinedFormatLastMonth,
+                      refinedFormatLastMonthEndDate
+                    );
+                    setLeadsFilter("last-month");
+                    setOpenDatePicker(false);
+                    setDisplayDate(null);
+                    setCurrentChatHistory([]);
                   }}
-                  // value={emptyDateRange ?? null}
-                  format={"DD-MM-YYYY"}
-                  open={openDatePicker}
-                  value={displayDate}
-                  renderExtraFooter={() => (
-                    <>
-                      <div className="action-btns">
-                        <button
-                          className="cancel-date-btn"
-                          onClick={handleCancel}
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          className="set-date-btn"
-                          onClick={() => {
-                            if (!selectedDate.current) {
-                              message.error("Please select a date range");
-                              return;
-                            }
-                            if (
-                              selectedDate.current[0] > selectedDate.current[1]
-                            ) {
-                              message.error(
-                                "Start date cannot be greater than end date"
+                >
+                  Last Month
+                </button>
+                <ConfigProvider
+                  theme={{
+                    components: {
+                      DatePicker: {
+                        cellActiveWithRangeBg: "#ECF0FE",
+                        cellHoverBg: "#ECF0FE",
+                        colorPrimary: "#4D72F5",
+                      },
+                    },
+                  }}
+                >
+                  <RangePicker
+                    className={`${leadsFilter === "custom-date" && "active"}`}
+                    onClick={() => {
+                      setOpenDatePicker(true);
+                      setLeadsFilter("custom-date");
+                    }}
+                    // superNextIcon={null}
+                    // superPrevIcon={null}
+                    onCalendarChange={(date: any) => {
+                      setDisplayDate(date);
+                      if (date) {
+                        selectedDate.current = [
+                          date[0]?.toDate().toLocaleDateString("en-CA"),
+                          date[1]?.toDate().toLocaleDateString("en-CA"),
+                        ];
+
+                        // setSelectedDate((prev: any) => {
+                        //   return [
+                        //     date[0]?.toDate().toLocaleDateString("en-CA"),
+                        //     date[1]?.toDate().toLocaleDateString("en-CA"),
+                        //   ];
+                        // });
+                      } else {
+                        selectedDate.current = null;
+                      }
+                    }}
+                    // value={emptyDateRange ?? null}
+                    format={"DD-MM-YYYY"}
+                    open={openDatePicker}
+                    value={displayDate}
+                    renderExtraFooter={() => (
+                      <>
+                        <div className="action-btns">
+                          <button
+                            className="cancel-date-btn"
+                            onClick={handleCancel}
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            className="set-date-btn"
+                            onClick={() => {
+                              if (!selectedDate.current) {
+                                message.error("Please select a date range");
+                                return;
+                              }
+                              if (
+                                selectedDate.current[0] >
+                                selectedDate.current[1]
+                              ) {
+                                message.error(
+                                  "Start date cannot be greater than end date"
+                                );
+                                return;
+                              }
+
+                              setCurrentChatHistory([]);
+                              setCurrentPage(1);
+                              fetchHistoryCount(
+                                true,
+                                1,
+                                10,
+                                selectedDate.current[0],
+                                selectedDate.current[1]
                               );
-                              return;
-                            }
-
-                            setCurrentChatHistory([]);
-                            setCurrentPage(1);
-                            fetchHistoryCount(
-                              true,
-                              1,
-                              10,
-                              selectedDate.current[0],
-                              selectedDate.current[1]
-                            );
-                            setOpenDatePicker(false);
-                          }}
-                        >
-                          Set Date
-                        </button>
-                      </div>
-                    </>
-                  )}
-                />
-              </ConfigProvider>
-            </div>
+                              setOpenDatePicker(false);
+                            }}
+                          >
+                            Set Date
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  />
+                </ConfigProvider>
+              </div>
+            )}
           </div>
         </div>
       </div>
-      {(chatHistoryList?.length !== 0 || chatHistoryClassifier === "whatsapp") && (
+      {(chatHistoryList?.length !== 0 ||
+        chatHistoryClassifier === "whatsapp") && (
         <div
-          className={`chatbot-history-parts ${sourcesModal ? "with-sources" : ""}`}
+          className={`chatbot-history-parts ${
+            sourcesModal ? "with-sources" : ""
+          }`}
         >
           {/*------------------------------------------left-section----------------------------------------------*/}
           {chatHistoryClassifier === "normal" ? (
             <div
-              className={`chatbot-history-details ${sourcesModal ? "with-sources" : ""}`}
+              className={`chatbot-history-details ${
+                sourcesModal ? "with-sources" : ""
+              }`}
             >
               {/*------------------------------------------chat-list-section----------------------------------------------*/}
               <div
@@ -1260,7 +1374,9 @@ function History({ chatbotId }: any) {
                             }`}
                             style={{
                               display:
-                                botDetails?.referedFrom == "leads" ? "flex" : "",
+                                botDetails?.referedFrom == "leads"
+                                  ? "flex"
+                                  : "",
                               justifyContent:
                                 botDetails?.referedFrom == "leads"
                                   ? "space-between"
@@ -1384,7 +1500,9 @@ function History({ chatbotId }: any) {
           ) : (
             // WhatsApp History View
             <div
-              className={`whatsapp-history-details ${sourcesModal ? "with-sources" : ""}`}
+              className={`whatsapp-history-details ${
+                sourcesModal ? "with-sources" : ""
+              }`}
             >
               {/* Search Bar */}
               <div className="whatsapp-search-container">
@@ -1471,9 +1589,6 @@ function History({ chatbotId }: any) {
                               <span className="whatsapp-phone">
                                 {displayName}
                               </span>
-                              <span className="whatsapp-time">
-                                {formatContactTime(chat.lastUpdate)}
-                              </span>
                             </div>
                             <div className="whatsapp-chat-footer">
                               <span className="whatsapp-message">
@@ -1488,8 +1603,24 @@ function History({ chatbotId }: any) {
                           </div>
 
                           {/* Toggle Switch */}
-                          <div className="whatsapp-toggle">
-                            <label className="toggle-switch">
+                          <div
+                            className="whatsapp-toggle"
+                            title={
+                              chat.autoReply
+                                ? "AI will reply"
+                                : `${
+                                    userDetails?.username.split("_")[0]
+                                  } will reply`
+                            }
+                          >
+                            <label
+                              className="toggle-switch"
+                              aria-label={
+                                chat.autoReply
+                                  ? "Auto-reply on"
+                                  : "Auto-reply off"
+                              }
+                            >
                               <input
                                 type="checkbox"
                                 checked={chat.autoReply !== false}
@@ -1498,8 +1629,23 @@ function History({ chatbotId }: any) {
                                   toggleAutoReply(chat.phoneNumber);
                                 }}
                               />
-                              <span className="toggle-slider"></span>
+                              <span className="toggle-slider">
+                                <span className="toggle-label toggle-label-on">
+                                  AI
+                                </span>
+                                <span className="toggle-label toggle-label-off">
+                                  You
+                                </span>
+                                <span
+                                  className="toggle-knob"
+                                  aria-hidden="true"
+                                ></span>
+                              </span>
                             </label>
+
+                            <span className="whatsapp-time">
+                              {formatContactTime(chat.lastUpdate)}
+                            </span>
                           </div>
                         </div>
                       );
@@ -1539,9 +1685,9 @@ function History({ chatbotId }: any) {
           )}
 
           <div
-            className={`message-section-wrapper ${sourcesModal ? "with-sources" : ""} ${
-              isMobileDevice && chatClicked ? "mobile-panel" : ""
-            }`}
+            className={`message-section-wrapper ${
+              sourcesModal ? "with-sources" : ""
+            } ${isMobileDevice && chatClicked ? "mobile-panel" : ""}`}
             style={{
               // show on desktop or when a chat is opened on mobile
               display: !isMobileDevice
@@ -1558,7 +1704,9 @@ function History({ chatbotId }: any) {
                 className="header"
                 style={{
                   visibility:
-                    currentChatHistory?.length != 0 || selectedWhatsappChat ? "visible" : "hidden",
+                    currentChatHistory?.length != 0 || selectedWhatsappChat
+                      ? "visible"
+                      : "hidden",
                 }}
               >
                 <p className="header-email">
@@ -1589,187 +1737,225 @@ function History({ chatbotId }: any) {
               <hr
                 style={{
                   visibility:
-                    currentChatHistory?.length != 0 || selectedWhatsappChat ? "visible" : "hidden",
+                    currentChatHistory?.length != 0 || selectedWhatsappChat
+                      ? "visible"
+                      : "hidden",
                 }}
               />
 
-              <div 
+              <div
                 className="history-conversation-container"
                 ref={messagesContainerRef}
               >
-                {chatHistoryClassifier === "whatsapp" && selectedWhatsappChat ? (
-                  // WhatsApp Message Display
-                  (() => {
-                    const messagesByDate = groupMessagesByDate(
-                      selectedWhatsappChat.allMessages || []
-                    );
-                    const sortedDates = Object.keys(messagesByDate).sort();
+                {chatHistoryClassifier === "whatsapp" && selectedWhatsappChat
+                  ? // WhatsApp Message Display
+                    (() => {
+                      const messagesByDate = groupMessagesByDate(
+                        selectedWhatsappChat.allMessages || []
+                      );
+                      const sortedDates = Object.keys(messagesByDate).sort();
 
-                    return sortedDates.map((dateKey) => (
-                      <React.Fragment key={dateKey}>
-                        {/* Date Separator */}
-                        <div className="whatsapp-date-separator">
-                          <span className="date-label">
-                            {formatDateForDisplay(dateKey)}
-                          </span>
-                        </div>
+                      return sortedDates.map((dateKey) => (
+                        <React.Fragment key={dateKey}>
+                          {/* Date Separator */}
+                          <div className="whatsapp-date-separator">
+                            <span className="date-label">
+                              {formatDateForDisplay(dateKey)}
+                            </span>
+                          </div>
 
-                        {/* Messages for this date */}
-                        {messagesByDate[dateKey].map(
-                          (message: any, index: number) => {
-                            const isFromUser = message.isFromUser;
-                            const isFromBot = message.isFromBot;
-                            const deliveryStatus = message.deliveryStatus;
+                          {/* Messages for this date */}
+                          {messagesByDate[dateKey].map(
+                            (message: any, index: number) => {
+                              const isFromUser = message.isFromUser;
+                              const isFromBot = message.isFromBot;
+                              const deliveryStatus = message.deliveryStatus;
 
-                            return (
-                              <div
-                                key={`${dateKey}-${index}`}
-                                className={
-                                  isFromUser
-                                    ? "user-message-container"
-                                    : "assistant-message-container"
-                                }
-                              >
+                              return (
                                 <div
+                                  key={`${dateKey}-${index}`}
                                   className={
                                     isFromUser
-                                      ? "user-message"
-                                      : "assistant-message"
+                                      ? "user-message-container"
+                                      : "assistant-message-container"
                                   }
-                                  style={{
-                                    ...(isFromUser
-                                      ? {
-                                          backgroundColor:
-                                            botSettings?.userMessageColor ||
-                                            "#d9fdd3",
-                                        }
-                                      : {}),
-                                  }}
                                 >
-                                  {isFromBot ? (
-                                    <div
-                                      dangerouslySetInnerHTML={{
-                                        __html: message.content,
-                                      }}
-                                    />
-                                  ) : (
-                                    <div>{message.content}</div>
-                                  )}
-                                </div>
-                                <div className="time" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                  <span>{formatMessageTime(message.timestamp)}</span>
-                                  {/* Show delivery status only for bot messages (sent by us) */}
-                                  {isFromBot && message.clientMessageId && deliveryStatus && (
-                                    <span 
-                                      className={`whatsapp-delivery-status ${deliveryStatus}`}
-                                      title={deliveryStatus}
-                                    >
-                                      {deliveryStatus === "pending" && "🕐"}
-                                      {deliveryStatus === "sent" && "✓"}
-                                      {deliveryStatus === "failed" && "❌"}
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-                            );
-                          }
-                        )}
-                      </React.Fragment>
-                    ));
-                  })()
-                ) : (
-                  // Normal Chat Message Display
-                  currentChatHistory.map((message: any, index: any) => {
-                    if (message.role == "assistant")
-                      return (
-                        <React.Fragment key={index}>
-                          <div
-                            className="assistant-message-container"
-                            style={{
-                              marginTop:
-                                `${message.messageType}` === "initial"
-                                  ? "10px"
-                                  : "0",
-                            }}
-                          >
-                            <div
-                              className="assistant-message"
-                              style={{
-                                display: "flex",
-                                flexDirection: "column",
-                              }}
-                              dangerouslySetInnerHTML={{
-                                __html: message.content,
-                              }}
-                            ></div>
-                            {/* <div className="time">{message?.messageTime}</div> */}
-                            {message.messageType !== "initial" && (
-                              <div className="time">{message?.messageTime}</div>
-                            )}
-
-                            {(currentChatHistory[index + 1] === undefined ||
-                              currentChatHistory[index + 1].role == "user") && (
-                              <div className="like-dislike-container">
-                                <Image
-                                  src={likeIcon}
-                                  alt="like-icon"
-                                  onClick={() => openChatbotModal(index, "like")}
-                                />
-                                <Image
-                                  src={dislikeIcon}
-                                  alt="dislike-icon"
-                                  onClick={() =>
-                                    openChatbotModal(index, "dislike")
-                                  }
-                                />
-                                {/* Only show sources button if sources are available */}
-                                {message.sources &&
-                                  message.sources?.length > 0 && (
-                                    <button
-                                      className="sources-btn"
-                                      onClick={() =>
-                                        handleShowSources(message.sources)
-                                      }
-                                      aria-label="Sources"
-                                    >
-                                      <Image
-                                        src={SourcesDots}
-                                        alt="sources-icon"
-                                        width={16}
-                                        height={16}
+                                  <div
+                                    className={
+                                      isFromUser
+                                        ? "user-message"
+                                        : "assistant-message"
+                                    }
+                                    style={{
+                                      ...(isFromUser
+                                        ? {
+                                            backgroundColor:
+                                              botSettings?.userMessageColor ||
+                                              "#d9fdd3",
+                                          }
+                                        : {}),
+                                    }}
+                                  >
+                                    {isFromBot ? (
+                                      <div
+                                        dangerouslySetInnerHTML={{
+                                          __html: message.content,
+                                        }}
                                       />
-                                      Sources
-                                    </button>
-                                  )}
-                              </div>
-                            )}
-                          </div>
-                          <ChatbotNameModal
-                            open={open}
-                            setOpen={setOpen}
-                            chatbotText={feedbackText}
-                            setChatbotText={setfeedbackText}
-                            handleOk={handleOk}
-                            forWhat="feedback"
-                          />
+                                    ) : (
+                                      <div>{message.content}</div>
+                                    )}
+                                  </div>
+                                  <div
+                                    className="time"
+                                    style={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: "6px",
+                                    }}
+                                  >
+                                    <span>
+                                      {formatMessageTime(message.timestamp)}
+                                    </span>
+                                    {(() => {
+                                      const label =
+                                        getWhatsappSenderLabel(message);
+                                      return label ? (
+                                        <span
+                                          className="whatsapp-sender-label"
+                                          style={{
+                                            display: "inline-flex",
+                                            alignItems: "center",
+                                            gap: 6,
+                                          }}
+                                        >
+                                          <span
+                                            className="whatsapp-dot"
+                                            aria-hidden="true"
+                                          />
+                                          <span className="whatsapp-sender-text">
+                                            {label}
+                                          </span>
+                                        </span>
+                                      ) : null;
+                                    })()}
+                                    {/* Show delivery status only for bot messages (sent by us) */}
+                                    {isFromBot &&
+                                      message.clientMessageId &&
+                                      deliveryStatus && (
+                                        <span
+                                          className={`whatsapp-delivery-status ${deliveryStatus}`}
+                                          title={deliveryStatus}
+                                        >
+                                          {deliveryStatus === "pending" && "🕐"}
+                                          {deliveryStatus === "sent" && "✓"}
+                                          {deliveryStatus === "failed" && "❌"}
+                                        </span>
+                                      )}
+                                  </div>
+                                </div>
+                              );
+                            }
+                          )}
                         </React.Fragment>
-                      );
-                    else
-                      return (
-                        <div className="user-message-container" key={index}>
-                          <div
-                            className="user-message"
-                            style={{
-                              backgroundColor: botSettings?.userMessageColor,
-                            }}
-                          >
-                            {message.content}
+                      ));
+                    })()
+                  : // Normal Chat Message Display
+                    currentChatHistory.map((message: any, index: any) => {
+                      if (message.role == "assistant")
+                        return (
+                          <React.Fragment key={index}>
+                            <div
+                              className="assistant-message-container"
+                              style={{
+                                marginTop:
+                                  `${message.messageType}` === "initial"
+                                    ? "10px"
+                                    : "0",
+                              }}
+                            >
+                              <div
+                                className="assistant-message"
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                }}
+                                dangerouslySetInnerHTML={{
+                                  __html: message.content,
+                                }}
+                              ></div>
+                              {/* <div className="time">{message?.messageTime}</div> */}
+                              {message.messageType !== "initial" && (
+                                <div className="time">
+                                  {message?.messageTime}
+                                </div>
+                              )}
+
+                              {(currentChatHistory[index + 1] === undefined ||
+                                currentChatHistory[index + 1].role ==
+                                  "user") && (
+                                <div className="like-dislike-container">
+                                  <Image
+                                    src={likeIcon}
+                                    alt="like-icon"
+                                    onClick={() =>
+                                      openChatbotModal(index, "like")
+                                    }
+                                  />
+                                  <Image
+                                    src={dislikeIcon}
+                                    alt="dislike-icon"
+                                    onClick={() =>
+                                      openChatbotModal(index, "dislike")
+                                    }
+                                  />
+                                  {/* Only show sources button if sources are available */}
+                                  {message.sources &&
+                                    message.sources?.length > 0 && (
+                                      <button
+                                        className="sources-btn"
+                                        onClick={() =>
+                                          handleShowSources(message.sources)
+                                        }
+                                        aria-label="Sources"
+                                      >
+                                        <Image
+                                          src={SourcesDots}
+                                          alt="sources-icon"
+                                          width={16}
+                                          height={16}
+                                        />
+                                        Sources
+                                      </button>
+                                    )}
+                                </div>
+                              )}
+                            </div>
+                            <ChatbotNameModal
+                              open={open}
+                              setOpen={setOpen}
+                              chatbotText={feedbackText}
+                              setChatbotText={setfeedbackText}
+                              handleOk={handleOk}
+                              forWhat="feedback"
+                            />
+                          </React.Fragment>
+                        );
+                      else
+                        return (
+                          <div className="user-message-container" key={index}>
+                            <div
+                              className="user-message"
+                              style={{
+                                backgroundColor: botSettings?.userMessageColor,
+                              }}
+                            >
+                              {message.content}
+                            </div>
+                            <div className="time">{message?.messageTime}</div>
                           </div>
-                          <div className="time">{message?.messageTime}</div>
-                        </div>
-                      );
-                  })
-                )}
+                        );
+                    })}
               </div>
 
               {/* WhatsApp Chat Input - Only show for WhatsApp chats */}
@@ -1790,7 +1976,9 @@ function History({ chatbotId }: any) {
                         sendWhatsappMessage();
                       }
                     }}
-                    disabled={selectedWhatsappChat.autoReply || !isWhatsappConnected}
+                    disabled={
+                      selectedWhatsappChat.autoReply || !isWhatsappConnected
+                    }
                     rows={1}
                     style={{
                       resize: "none",
@@ -1801,7 +1989,11 @@ function History({ chatbotId }: any) {
                   <button
                     className="whatsapp-send-btn"
                     onClick={sendWhatsappMessage}
-                    disabled={selectedWhatsappChat.autoReply || !isWhatsappConnected || !outgoingMessage.trim()}
+                    disabled={
+                      selectedWhatsappChat.autoReply ||
+                      !isWhatsappConnected ||
+                      !outgoingMessage.trim()
+                    }
                     title={
                       selectedWhatsappChat.autoReply
                         ? "Disable auto-reply to send messages"
@@ -1819,7 +2011,9 @@ function History({ chatbotId }: any) {
                 className="footer"
                 style={{
                   visibility:
-                    currentChatHistory?.length != 0 || selectedWhatsappChat ? "visible" : "hidden",
+                    currentChatHistory?.length != 0 || selectedWhatsappChat
+                      ? "visible"
+                      : "hidden",
                 }}
               >
                 <p>Powered by Torri.AI</p>
@@ -1837,9 +2031,9 @@ function History({ chatbotId }: any) {
                 />
               )}
               <div
-                className={`sources-container ${sourcesModal ? "with-sources" : ""} ${
-                  isMobileDevice ? "mobile-panel" : ""
-                }`}
+                className={`sources-container ${
+                  sourcesModal ? "with-sources" : ""
+                } ${isMobileDevice ? "mobile-panel" : ""}`}
               >
                 <div className="sources-header">
                   <h3
