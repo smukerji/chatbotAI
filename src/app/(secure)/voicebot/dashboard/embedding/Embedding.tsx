@@ -7,10 +7,8 @@ import "./embedding-style.scss";
 function Embedding({assistantId}:{assistantId:string}) {
 
 
-    const script = `
-    <script>
-    
-        var vapiInstance = null;
+const script = `<script>
+  var vapiInstance = null;
         const assistant = "${assistantId}"; 
         // Substitute with your assistant ID
         const apiKey = "${process.env.NEXT_PUBLIC_VAP_API}"; 
@@ -19,9 +17,7 @@ function Embedding({assistantId}:{assistantId:string}) {
         (function (d, t) {
             var g = document.createElement(t),
             s = d.getElementsByTagName(t)[0];
-            g.src =
-            "https://cdn.jsdelivr.net/gh/VapiAI/
-            html-script-tag@latest/dist/assets/index.js";
+           g.src = "https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";
             g.defer = true;
             g.async = true;
             s.parentNode.insertBefore(g, s);
@@ -70,9 +66,10 @@ function Embedding({assistantId}:{assistantId:string}) {
         try {
             if(type === "script"){
           await navigator.clipboard.writeText(text);
-        }else{
-            await navigator.clipboard.writeText("const buttonConfig = "+JSON.stringify(copyButtonConfig));
-        }
+        } else {
+      const formattedConfig = JSON.stringify(copyButtonConfig, null, 2);
+      await navigator.clipboard.writeText(`const buttonConfig = ${formattedConfig}`);
+    }
           message.success("Content copied to clipboard");
         } catch (err: any) {
           message.error("Failed to copy ", err.message);
@@ -98,7 +95,7 @@ function Embedding({assistantId}:{assistantId:string}) {
                     </code>
                     </pre>
                 </p>
-                <button onClick={() => handleOk(script,"button")}>
+                <button onClick={() => handleOk("","button")}>
                     <Image src={copyIcon} alt="copy-icon" />
                     Copy Button Config
                 </button>
