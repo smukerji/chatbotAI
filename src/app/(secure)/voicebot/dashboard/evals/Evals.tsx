@@ -163,8 +163,8 @@ export default function Evals() {
           type="primary"
           className="create-eval-btn"
           onClick={() => {
-    router.push("voicebot/dashboard/api/create-evaluation"); // adjust path as per your folder structure
-  }}
+            router.push("/voicebot/dashboard/evals/create-evaluation"); 
+          }}
         >
           <span className="plus-icon">+</span> Create Evaluation
         </Button>
