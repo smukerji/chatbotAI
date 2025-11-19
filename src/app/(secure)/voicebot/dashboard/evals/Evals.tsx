@@ -1,11 +1,11 @@
 "use client";
 import React, { useState, useContext } from "react";
-import { Table, Button, Input, message } from "antd";
-import { SearchOutlined, PlayCircleOutlined } from "@ant-design/icons";
+import { Table, Button, Input, message, Pagination, Modal, Select } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import "./evals.scss";
 import { CreateVoiceBotContext } from "@/app/_helpers/client/Context/VoiceBotContextApi";
 import { redirect, useRouter } from "next/navigation";
+import Image from "next/image";
 
 // Table item interface
 interface EvalTableItem {
@@ -46,57 +46,61 @@ const DUMMY_EVALS: EvalTableItem[] = [
   // Add more rows as needed for testing
 ];
 
-// Table columns
-const columns: ColumnsType<EvalTableItem> = [
+// Add new interface for runs table
+interface RunTableItem {
+  key: string;
+  evalName: string;
+  assistantName: string;
+  status: "Success" | "Failed";
+  duration: string;
+  totalTurns: number;
+  evalTurns: number;
+  runAt: string;
+}
+
+// Static dummy data for runs
+const DUMMY_RUNS: RunTableItem[] = [
   {
-    title: "Name",
-    dataIndex: "name",
-    key: "name",
-    sorter: (a, b) => a.name.localeCompare(b.name),
+    key: "1",
+    evalName: "Welcome",
+    assistantName: "Tifi",
+    status: "Success",
+    duration: "30s",
+    totalTurns: 1,
+    evalTurns: 1,
+    runAt: "Nov 14, 2025 1:42 AM",
   },
   {
-    title: "Description",
-    dataIndex: "description",
-    key: "description",
+    key: "2",
+    evalName: "Check out guidance",
+    assistantName: "Tifi",
+    status: "Failed",
+    duration: "30s",
+    totalTurns: 1,
+    evalTurns: 1,
+    runAt: "Nov 14, 2025 1:42 AM",
   },
   {
-    title: "Eval Turns",
-    dataIndex: "evalTurns",
-    key: "evalTurns",
-    align: "center",
-    sorter: (a, b) => a.evalTurns - b.evalTurns,
+    key: "3",
+    evalName: "Welcome",
+    assistantName: "Tifi",
+    status: "Failed",
+    duration: "30s",
+    totalTurns: 1,
+    evalTurns: 1,
+    runAt: "Nov 19, 2025 6:10 AM",
   },
   {
-    title: "Total Turns",
-    dataIndex: "totalTurns",
-    key: "totalTurns",
-    align: "center",
-    sorter: (a, b) => a.totalTurns - b.totalTurns,
+    key: "4",
+    evalName: "Welcome",
+    assistantName: "Tifi",
+    status: "Success",
+    duration: "30s",
+    totalTurns: 1,
+    evalTurns: 1,
+    runAt: "Nov 17, 2025 4:45 AM",
   },
-  {
-    title: "Created At",
-    dataIndex: "createdAt",
-    key: "createdAt",
-    sorter: (a, b) =>
-      new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-  },
-  {
-    title: "Actions",
-    key: "actions",
-    render: (_: any, record: EvalTableItem) => (
-      <Button
-        type="link"
-        className="test-button"
-        icon={<PlayCircleOutlined />}
-        onClick={() => {
-          console.log("Test button clicked for eval:", record);
-          message.info(`Test clicked for ${record.name}`);
-        }}
-      >
-        Test
-      </Button>
-    ),
-  },
+  // Add more runs data...
 ];
 
 export default function Evals() {
@@ -105,14 +109,198 @@ export default function Evals() {
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState("created");
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedEval, setSelectedEval] = useState<EvalTableItem | null>(null);
+  const [selectedAssistant, setSelectedAssistant] = useState("gpt-4o");
+  const pageSize = 2;
 
-  // Use static test data only
+  // Assistant options
+  const assistantOptions = [
+    {
+      value: "gpt-4o",
+      label: "Vifi (GPT-4o)",
+      icon: "/svgs/chat-gpt-icon.svg",
+    },
+    { value: "gpt-4", label: "GPT-4", icon: "/svgs/assistant.svg" },
+    { value: "gemini-pro", label: "Gemini Pro", icon: "/svgs/assistant.svg" },
+    { value: "claude-3", label: "Claude 3", icon: "/svgs/assistant.svg" },
+  ];
+
+  // Created table columns (existing)
+  const createdColumns: ColumnsType<EvalTableItem> = [
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+      sorter: (a, b) => a.name.localeCompare(b.name),
+    },
+    {
+      title: "Description",
+      dataIndex: "description",
+      key: "description",
+    },
+    {
+      title: "Eval Turns",
+      dataIndex: "evalTurns",
+      key: "evalTurns",
+      sorter: (a, b) => a.evalTurns - b.evalTurns,
+    },
+    {
+      title: "Total Turns",
+      dataIndex: "totalTurns",
+      key: "totalTurns",
+      sorter: (a, b) => a.totalTurns - b.totalTurns,
+    },
+    {
+      title: "Created At",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      sorter: (a, b) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+    },
+    {
+      title: "Actions",
+      key: "actions",
+      render: (_: any, record: EvalTableItem) => (
+        <Button
+          type="link"
+          className="test-button"
+          icon={
+            <Image
+              src="/svgs/play.svg"
+              alt="Play"
+              width={22}
+              height={22}
+              style={{ verticalAlign: "middle" }}
+            />
+          }
+          onClick={() => {
+            setSelectedEval(record);
+            setIsModalOpen(true);
+          }}
+        >
+          Test
+        </Button>
+      ),
+    },
+  ];
+
+  // Runs table columns (new)
+  const runsColumns: ColumnsType<RunTableItem> = [
+    {
+      title: "Eval Name",
+      dataIndex: "evalName",
+      key: "evalName",
+      sorter: (a, b) => a.evalName.localeCompare(b.evalName),
+    },
+    {
+      title: "Assistant Name",
+      dataIndex: "assistantName",
+      key: "assistantName",
+      sorter: (a, b) => a.assistantName.localeCompare(b.assistantName),
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: (status: string) => (
+        <span
+          className={`status-badge ${status.toLowerCase()}`}
+          style={{
+            color: status === "Success" ? "#2e5bea" : "#ff4d4f",
+            fontWeight: 500,
+          }}
+        >
+          {status}
+        </span>
+      ),
+      sorter: (a, b) => a.status.localeCompare(b.status),
+    },
+    {
+      title: "Duration",
+      dataIndex: "duration",
+      key: "duration",
+    },
+    {
+      title: "Total Turns",
+      dataIndex: "totalTurns",
+      key: "totalTurns",
+      sorter: (a, b) => a.totalTurns - b.totalTurns,
+    },
+    {
+      title: "Eval Turns",
+      dataIndex: "evalTurns",
+      key: "evalTurns",
+      sorter: (a, b) => a.evalTurns - b.evalTurns,
+    },
+    {
+      title: "Run At",
+      dataIndex: "runAt",
+      key: "runAt",
+      sorter: (a, b) =>
+        new Date(a.runAt).getTime() - new Date(b.runAt).getTime(),
+    },
+    {
+      title: "Actions",
+      key: "actions",
+      render: (_: any, record: RunTableItem) => (
+        <Button
+          type="link"
+          className="view-details-button"
+          icon={
+            <Image
+              src="/svgs/blue-eye.svg"
+              alt="View"
+              width={18}
+              height={18}
+              style={{ verticalAlign: "middle" }}
+            />
+          }
+          onClick={() => {
+            console.log("View details for run:", record);
+            message.info(`View details for ${record.evalName}`);
+          }}
+        >
+          View Details
+        </Button>
+      ),
+    },
+  ];
+
   const [evals] = useState<EvalTableItem[]>(DUMMY_EVALS);
+  const [runs] = useState<RunTableItem[]>(DUMMY_RUNS);
 
-  const filteredData = evals.filter(
-    (d) =>
-      d.name.toLowerCase().includes(search.toLowerCase()) ||
-      d.description.toLowerCase().includes(search.toLowerCase())
+  // Get current data and columns based on active tab
+  const getCurrentData = () => {
+    const sourceData = activeTab === "created" ? evals : runs;
+    return sourceData.filter((d) => {
+      if (activeTab === "created") {
+        const item = d as EvalTableItem;
+        return (
+          item.name.toLowerCase().includes(search.toLowerCase()) ||
+          item.description.toLowerCase().includes(search.toLowerCase())
+        );
+      } else {
+        const item = d as RunTableItem;
+        return (
+          item.evalName.toLowerCase().includes(search.toLowerCase()) ||
+          item.assistantName.toLowerCase().includes(search.toLowerCase())
+        );
+      }
+    });
+  };
+
+  const getCurrentColumns = () => {
+    return activeTab === "created" ? createdColumns : runsColumns;
+  };
+
+  const filteredData = getCurrentData();
+
+  // Paginate data manually
+  const paginatedData = filteredData.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
   );
 
   const rowSelection = {
@@ -132,6 +320,11 @@ export default function Evals() {
   React.useEffect(() => {
     console.log("Filtered data after search:", filteredData);
   }, [search, evals]);
+
+  // Reset pagination when switching tabs
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab]);
 
   return (
     <div className="evals-content">
@@ -153,7 +346,15 @@ export default function Evals() {
 
         <Input
           placeholder="Search evaluations by name or description"
-          prefix={<SearchOutlined />}
+          prefix={
+            <Image
+              src="/svgs/search-normal.svg"
+              alt="Search"
+              width={18}
+              height={18}
+              // style={{ verticalAlign: "middle" }}
+            />
+          }
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="evals-search"
@@ -163,26 +364,123 @@ export default function Evals() {
           type="primary"
           className="create-eval-btn"
           onClick={() => {
-            router.push("/voicebot/dashboard/evals/create-evaluation"); 
+            router.push("/voicebot/dashboard/evals/create-evaluation");
           }}
         >
           <span className="plus-icon">+</span> Create Evaluation
         </Button>
       </div>
       <Table
-        columns={columns}
-        dataSource={filteredData}
-        rowSelection={rowSelection}
-        pagination={{
-          pageSize: 2,
-          showSizeChanger: false,
-          className: "evals-pagination",
-        }}
+        columns={getCurrentColumns()}
+        dataSource={paginatedData}
+        rowSelection={activeTab === "created" ? rowSelection : undefined}
+        pagination={false}
         className="evals-table"
         locale={{
-          emptyText: "No evaluations found for this assistant.",
+          emptyText: `No ${activeTab} found for this assistant.`,
         }}
       />
+
+      {/* Modal */}
+
+      {isModalOpen && (
+        <div className="evals-modal-overlay">
+          <div className="evals-modal">
+            <div className="modal-header">
+              <div>
+                <h3>Run Evaluation</h3>
+                <div className="modal-subtitle">
+                  Select an assistant to run{" "}
+                  <span className="eval-name">"{selectedEval?.name}"</span>
+                </div>
+              </div>
+              <Image
+                src="/svgs/close-circle.svg"
+                width={18}
+                height={18}
+                alt="Close"
+                className="close-button"
+                onClick={() => setIsModalOpen(false)}
+              />
+            </div>
+
+            <div className="modal-section">
+              <div className="section-label">Assistant</div>
+              <Select
+                value={selectedAssistant}
+                onChange={setSelectedAssistant}
+                style={{ width: "100%" }}
+                className="assistant-select"
+                suffixIcon={<span className="dropdown-icon">⌄</span>}
+                options={assistantOptions.map((option) => ({
+                  value: option.value,
+                  label: (
+                    <div className="assistant-option">
+                      <Image
+                        src={option.icon}
+                        alt="Assistant"
+                        width={20}
+                        height={20}
+                      />
+                      <span>{option.label}</span>
+                    </div>
+                  ),
+                }))}
+              />
+            </div>
+
+            <div
+              className="modal-section"
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <div className="section-label">Assistant Variables</div>
+              <button className="add-button">+ Add</button>
+            </div>
+
+            <div className="modal-section">
+              <div className="checkbox-option">
+                <input type="checkbox" id="navigate-checkbox" defaultChecked />
+                <label htmlFor="navigate-checkbox">
+                  Navigate to runs page after completion
+                </label>
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button
+                className="cancel-button"
+                onClick={() => setIsModalOpen(false)}
+              >
+                Cancel
+              </button>
+              <button className="run-button">
+                <Image
+                  src="/svgs/play-white.svg"
+                  alt="Run"
+                  width={16}
+                  height={16}
+                />
+                Run
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div>
+        <Pagination
+          current={currentPage}
+          pageSize={pageSize}
+          total={filteredData.length}
+          onChange={setCurrentPage}
+          showSizeChanger={false}
+          className="evals-pagination"
+        />
+      </div>
     </div>
   );
 }
