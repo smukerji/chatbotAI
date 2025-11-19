@@ -45,6 +45,21 @@ export default function CreateEvaluationForm() {
   const [model, setModel] = useState("");
   const [selectedAssistant, setSelectedAssistant] = useState("");
 
+  // Test results state
+  const [testResults, setTestResults] = useState<{
+    status: "idle" | "loading" | "success" | "error";
+    conversation: Array<{
+      role: "user" | "assistant";
+      content: string;
+    }>;
+  }>({
+    status: "idle",
+    conversation: [],
+  });
+
+  // Track if test has been run - NEW
+  const [hasRunTest, setHasRunTest] = useState(false);
+
   const addTurn = (type: TurnType) => {
     setTurns([
       ...turns,
@@ -178,6 +193,7 @@ export default function CreateEvaluationForm() {
     setTurns(newTurns);
     message.success("Tool call saved successfully!");
   };
+
   const editToolCall = (turnIdx: number, callIdx: number) => {
     const newTurns = [...turns];
     const toolCall = newTurns[turnIdx].toolCalls?.[callIdx];
@@ -209,6 +225,51 @@ export default function CreateEvaluationForm() {
     const newTurns = [...turns];
     newTurns[turnIdx].toolCallInput = null;
     setTurns(newTurns);
+  };
+
+  // UPDATED: Handle test runs
+  const handleTestRun = async () => {
+    setTestResults((prev) => ({ ...prev, status: "loading" }));
+
+    try {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      // Build mock conversation from your form data
+      const mockConversation = [];
+
+      // Get first user message
+      const userTurn = turns.find((t) => t.type === "user");
+      if (userTurn) {
+        mockConversation.push({
+          role: "user" as const,
+          content: userTurn.content || "What's your name?",
+        });
+      }
+
+      // Get first assistant message
+      const assistantTurn = turns.find((t) => t.type === "assistant");
+      if (assistantTurn) {
+        mockConversation.push({
+          role: "assistant" as const,
+          content:
+            assistantTurn.content ||
+            "I'm sorry, but based on the provided context, I don't have the information to answer your question.",
+        });
+      }
+
+      setTestResults({
+        status: "success",
+        conversation: mockConversation,
+      });
+
+      setHasRunTest(true);
+      message.success("Test run completed!");
+    } catch (error) {
+      setTestResults((prev) => ({ ...prev, status: "error" }));
+      message.error("Test run failed");
+      console.error("Test run failed:", error);
+    }
   };
 
   return (
@@ -390,9 +451,6 @@ export default function CreateEvaluationForm() {
                                 height={16}
                               />
                               <Select
-                                // style={{
-                                //   width: 120,
-                                // }}
                                 value="user"
                                 className="role-select user-select"
                                 size="small"
@@ -407,12 +465,6 @@ export default function CreateEvaluationForm() {
                               >
                                 <Select.Option value="user">User</Select.Option>
                               </Select>
-                              {/* <img
-                                src="/svgs/arrow-down-blue.svg"
-                                alt="Arrow Down Blue"
-                                width={12}
-                                height={12}
-                              /> */}
                             </div>
                           </div>
                           <div className="message-actions">
@@ -834,41 +886,59 @@ export default function CreateEvaluationForm() {
           </div>
         </Card>
 
+        {/* Sidebar with conditional button */}
         <div className="eval-sidebar">
-          <Card title="Test runs" size="small" className="sidebar-card">
+          <Card title="Test runs" size="small" className="test-runs-card">
             <div className="sidebar-section">
               <div className="sidebar-row">
                 <span>Assistant Variables</span>
-                <Button
-                  size="small"
-                  icon={<PlusOutlined />}
-                  className="add-btn"
-                />
+                <img src="/svgs/add.svg" alt="Add" />
               </div>
             </div>
+
             <div className="sidebar-section">
               <div className="sidebar-row">
                 <span>Result</span>
-                <Button
-                  type="link"
-                  size="small"
-                  className="test-link"
-                  icon={
-                    <img
-                      src="/svgs/play.svg"
-                      alt="Play"
-                      style={{
-                        width: 24,
-                        height: 24,
-                        marginRight: 2,
-                        verticalAlign: "middle",
-                      }}
-                    />
-                  }
-                >
-                  Test
-                </Button>
+                {!hasRunTest ? (
+                  <Button
+                    type="link"
+                    size="small"
+                    className="test-link"
+                    onClick={handleTestRun}
+                    loading={testResults.status === "loading"}
+                  >
+                    <img src="/svgs/play.svg" alt="Play" />
+                    Test
+                  </Button>
+                ) : (
+                  <Button
+                    type="link"
+                    size="small"
+                    className="test-link"
+                    onClick={handleTestRun}
+                    loading={testResults.status === "loading"}
+                  >
+                    <img src="/svgs/play.svg" alt="Play" />
+                    Re-run
+                  </Button>
+                )}
               </div>
+
+              {testResults.status === "success" && hasRunTest && (
+                <div className="conversation-history">
+                  {testResults.conversation.map((message, index) => (
+                    <div
+                      key={index}
+                      className={`message-bubble ${message.role}`}
+                    >
+                      <div className="message-role">
+                        {message.role === "user" ? "User" : "Assistant"}
+                      </div>
+                      <div className="message-content">{message.content}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </Card>
         </div>
