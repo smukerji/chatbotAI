@@ -113,6 +113,8 @@ export default function Evals() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedEval, setSelectedEval] = useState<EvalTableItem | null>(null);
   const [selectedAssistant, setSelectedAssistant] = useState("gpt-4o");
+  const [selectedRun, setSelectedRun] = useState<RunTableItem | null>(null);
+  const [isViewDetailsOpen, setIsViewDetailsOpen] = useState(false);
   const pageSize = 2;
 
   // Assistant options
@@ -258,8 +260,8 @@ export default function Evals() {
             />
           }
           onClick={() => {
-            console.log("View details for run:", record);
-            message.info(`View details for ${record.evalName}`);
+            setSelectedRun(record);
+            setIsViewDetailsOpen(true);
           }}
         >
           View Details
@@ -291,8 +293,11 @@ export default function Evals() {
     });
   };
 
-  const getCurrentColumns = () => {
-    return activeTab === "created" ? createdColumns : runsColumns;
+  const getCurrentColumns = (): ColumnsType<EvalTableItem | RunTableItem> => {
+    if (activeTab === "created") {
+      return createdColumns as ColumnsType<EvalTableItem | RunTableItem>;
+    }
+    return runsColumns as ColumnsType<EvalTableItem | RunTableItem>;
   };
 
   const filteredData = getCurrentData();
@@ -306,20 +311,9 @@ export default function Evals() {
   const rowSelection = {
     selectedRowKeys,
     onChange: (keys: React.Key[]) => {
-      console.log("Row selection changed:", keys);
       setSelectedRowKeys(keys);
     },
   };
-
-  // Log active tab change (for testing tab switch logic)
-  React.useEffect(() => {
-    console.log("Active tab set to:", activeTab);
-  }, [activeTab]);
-
-  // Log filtered data on search
-  React.useEffect(() => {
-    console.log("Filtered data after search:", filteredData);
-  }, [search, evals]);
 
   // Reset pagination when switching tabs
   React.useEffect(() => {
@@ -352,7 +346,6 @@ export default function Evals() {
               alt="Search"
               width={18}
               height={18}
-              // style={{ verticalAlign: "middle" }}
             />
           }
           value={search}
@@ -381,8 +374,7 @@ export default function Evals() {
         }}
       />
 
-      {/* Modal */}
-
+      {/* Run Evaluation Modal */}
       {isModalOpen && (
         <div className="evals-modal-overlay">
           <div className="evals-modal">
@@ -481,6 +473,58 @@ export default function Evals() {
           className="evals-pagination"
         />
       </div>
+
+      {/* View Details Modal */}
+      {isViewDetailsOpen && selectedRun && (
+        <div className="view-details-modal-overlay" onClick={() => setIsViewDetailsOpen(false)}>
+          <div className="view-details-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <div className="header-content">
+                <h3>Eval Run Details</h3>
+                <p className="modal-subtitle">
+                  View the conversation transcript and evaluation results
+                </p>
+              </div>
+              <div className="close-button" onClick={() => setIsViewDetailsOpen(false)}>
+                ✕
+              </div>
+            </div>
+
+            <div className="details-section">
+              <div className="detail-row">
+                <span className="detail-label">Status</span>
+                <span className={`status-badge ${selectedRun.status.toLowerCase()}`}>
+                  {selectedRun.status}
+                </span>
+              </div>
+              <div className="detail-row">
+                <span className="detail-label">Duration</span>
+                <p className="detail-value">{selectedRun.duration}</p>
+              </div>
+              <div className="detail-row">
+                <span className="detail-label">Started At</span>
+                <p className="detail-value">{selectedRun.runAt}</p>
+              </div>
+            </div>
+
+            <div className="conversation-section">
+              <h4>Conversation Transcript</h4>
+              <div className="conversation-container">
+                <div className="message user-message">
+                  <p className="message-sender">User</p>
+                  <p className="message-content">What's your name?</p>
+                </div>
+                <div className="message assistant-message">
+                  <p className="message-sender">Assistant</p>
+                  <p className="message-content">
+                    I'm sorry, but based on the provided context, I don't have the information to answer your question.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
