@@ -557,10 +557,31 @@ export default function CreateEvaluationForm() {
                               </button>
                             </div>
                           </div>
+                          {turn.mode !== "mock" && (
+                            <div className="filter-dropdown">
+                              <span className="label">Approach</span>
+                              <div className="custom-select">
+                                <Select
+                                  className="filter-select"
+                                  value="Exact"
+                                  bordered={false}
+                                  suffixIcon={null}
+                                >
+                                  <Select.Option value="Exact">
+                                    Exact
+                                  </Select.Option>
+                                  <Select.Option value="Broad">
+                                    Broad
+                                  </Select.Option>
+                                </Select>
+                              </div>
+                            </div>
+                          )}
                           <div className="message-actions">
                             <span className="turn-label">
                               Turn {turnNumber}
                             </span>
+
                             <Button
                               type="text"
                               size="small"

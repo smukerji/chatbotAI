@@ -1400,3 +1400,95 @@
     width: 100%;
   }
 }
+.filter-dropdown {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  border: 1px solid #e6e8ec;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-family: "Inter", sans-serif;
+  gap: 18px; // Reduced gap
+  height: 32px;
+  // margin-right: auto; // Push to right side of header
+
+  .label {
+    color: #777e91;
+    font-size: 14px;
+    font-weight: 400;
+    white-space: nowrap;
+  }
+
+  .custom-select {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    .filter-select {
+      &.ant-select {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        min-width: 80px; // Set minimum width for "Exact" text
+
+        .ant-select-selector {
+          border: none !important;
+          background: transparent !important;
+          box-shadow: none !important;
+          padding: 0 16px 0 0 !important; // Add right padding for arrow
+          height: auto !important;
+          min-height: auto !important;
+        }
+
+        .ant-select-selection-item {
+          color: #353945;
+          font-size: 14px;
+          font-weight: 500;
+          padding: 0 !important;
+          line-height: 20px;
+        }
+
+        .ant-select-arrow {
+          display: none !important;
+        }
+
+        &:hover .ant-select-selector,
+        &.ant-select-focused .ant-select-selector,
+        &.ant-select-open .ant-select-selector {
+          border: none !important;
+          box-shadow: none !important;
+        }
+      }
+    }
+
+    // Custom dropdown arrow
+    &::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 12px;
+      height: 12px;
+      background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iMTIiIHZpZXdCb3g9IjAgMCAxMiAxMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTMgNC41TDYgNy41TDkgNC41IiBzdHJva2U9IiM3NzdlOTEiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+");
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      pointer-events: none;
+    }
+  }
+}
+
+// Ensure proper positioning in message header
+.message-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+
+  // .filter-dropdown {
+  //   margin-left: auto;
+  //   margin-right: 16px; // Add space before turn number
+  // }
+}

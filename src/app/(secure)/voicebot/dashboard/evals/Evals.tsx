@@ -476,8 +476,14 @@ export default function Evals() {
 
       {/* View Details Modal */}
       {isViewDetailsOpen && selectedRun && (
-        <div className="view-details-modal-overlay" onClick={() => setIsViewDetailsOpen(false)}>
-          <div className="view-details-modal" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="view-details-modal-overlay"
+          onClick={() => setIsViewDetailsOpen(false)}
+        >
+          <div
+            className="view-details-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="modal-header">
               <div className="header-content">
                 <h3>Eval Run Details</h3>
@@ -485,7 +491,10 @@ export default function Evals() {
                   View the conversation transcript and evaluation results
                 </p>
               </div>
-              <div className="close-button" onClick={() => setIsViewDetailsOpen(false)}>
+              <div
+                className="close-button"
+                onClick={() => setIsViewDetailsOpen(false)}
+              >
                 ✕
               </div>
             </div>
@@ -493,7 +502,9 @@ export default function Evals() {
             <div className="details-section">
               <div className="detail-row">
                 <span className="detail-label">Status</span>
-                <span className={`status-badge ${selectedRun.status.toLowerCase()}`}>
+                <span
+                  className={`status-badge ${selectedRun.status.toLowerCase()}`}
+                >
                   {selectedRun.status}
                 </span>
               </div>
@@ -507,8 +518,10 @@ export default function Evals() {
               </div>
             </div>
 
+            <h4 className="conversation-section-heading">
+              Conversation Transcript
+            </h4>
             <div className="conversation-section">
-              <h4>Conversation Transcript</h4>
               <div className="conversation-container">
                 <div className="message user-message">
                   <p className="message-sender">User</p>
@@ -517,7 +530,8 @@ export default function Evals() {
                 <div className="message assistant-message">
                   <p className="message-sender">Assistant</p>
                   <p className="message-content">
-                    I'm sorry, but based on the provided context, I don't have the information to answer your question.
+                    I'm sorry, but based on the provided context, I don't have
+                    the information to answer your question.
                   </p>
                 </div>
               </div>
