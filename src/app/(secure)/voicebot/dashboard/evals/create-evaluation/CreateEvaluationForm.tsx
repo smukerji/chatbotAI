@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Button, Input, Select, Card, Typography, Form, message } from "antd";
 import { LeftOutlined, PlusOutlined, CloseOutlined } from "@ant-design/icons";
 import "./CreateEvaluationForm.scss";
+import { CreateVoiceBotContext } from "@/app/_helpers/client/Context/VoiceBotContextApi";
+import { useCookies } from "react-cookie";
 
 const { TextArea } = Input;
 const { Title } = Typography;
@@ -29,6 +31,21 @@ interface Turn {
 }
 
 export default function CreateEvaluationForm() {
+const [cookies] = useCookies(["userId"]);
+const voiceBotContextData: any = useContext(CreateVoiceBotContext);
+
+// Unified fallback logic
+const assistantMongoId =
+  voiceBotContextData?.assistantMongoId ||
+  voiceBotContextData?.assistantInfo?._id ||
+  "";
+
+const vapiAssistantId =
+  voiceBotContextData?.assistantVapiId ||
+  voiceBotContextData?.assistantInfo?.vapiAssistantId ||
+  "";
+
+const userId = cookies.userId || "";
   const [activeToggle, setActiveToggle] = useState<"assistant" | "squad">(
     "assistant"
   );
@@ -213,6 +230,49 @@ export default function CreateEvaluationForm() {
     }
   };
 
+  const handleSave = async () => {
+  try {
+    if (!evalName || !vapiAssistantId) {
+      message.error("Evaluation name and assistant are required.");
+      return;
+    }
+    if (!userId) {
+      message.error("User is not authenticated.");
+      return;
+    }
+    if (!assistantMongoId) {
+      message.error("Assistant not loaded.");
+      return;
+    }
+    console.log("evalName", evalName, "vapiAssistantId", vapiAssistantId, "assistantMongoId", assistantMongoId, "userId", userId);
+
+    const resp = await fetch("/voicebot/dashboard/api/evals", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        evalName,
+        evalDesc,
+        assistantMongoId,
+        userId,
+        vapiAssistantId,
+        turns,
+      }),
+    });
+    console.log("evalName", evalName, "vapiAssistantId", vapiAssistantId, "assistantMongoId", assistantMongoId, "userId", userId);
+
+    const result = await resp.json();
+    if (resp.ok && !result.error) {
+      message.success("Evaluation created successfully!");
+      // Optionally reset form/navigate
+    } else {
+      throw new Error(result.error || "Failed to create evaluation");
+    }
+  } catch (err: any) {
+    message.error(err.message || "Error saving evaluation.");
+  }
+};
+
+
   const removeToolCall = (turnIdx: number, callIdx: number) => {
     const newTurns = [...turns];
     newTurns[turnIdx].toolCalls =
@@ -274,9 +334,9 @@ export default function CreateEvaluationForm() {
 
   return (
     <div className="eval-main-layout">
-      <Button type="primary" className="save-btn-floating">
-        Save
-      </Button>
+   <Button type="primary" className="save-btn-floating" onClick={handleSave}>
+  Save
+</Button>
       <div className="eval-content-wrapper">
         <Card className="eval-form-card" bordered={false}>
           <div className="eval-header">
