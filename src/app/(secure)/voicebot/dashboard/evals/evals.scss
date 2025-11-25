@@ -190,8 +190,12 @@ $white: #ffffff;
         "Helvetica Neue", Arial, sans-serif;
     }
 
+    // .ant-table-thead > th {
+    // }
+
     .ant-table-thead {
       > tr > th {
+        // border-right: 1px solid gray;
         background: $background-gray;
         border-bottom: 1px solid $border-color;
         padding: 16px;
@@ -291,7 +295,7 @@ $white: #ffffff;
 
     // Test Button
     .test-button {
-      color: $primary-blue;
+      color: #2e58ea;
       font-weight: 500;
       padding: 0;
       height: auto;
@@ -328,7 +332,7 @@ $white: #ffffff;
       min-width: 32px;
       height: 32px;
       line-height: 30px;
-      border-radius: 8px;
+      // border-radius: 8px;
       margin: 0 4px;
 
       a {
@@ -463,13 +467,13 @@ $white: #ffffff;
     }
 
     .modal-subtitle {
-      color: $primary-blue;
+      color: grey;
       font-size: 14px;
       margin-top: 4px;
       line-height: 1.4;
 
       .eval-name {
-        color: $text-medium;
+        color: grey;
         font-weight: 500;
       }
     }
@@ -498,18 +502,15 @@ $white: #ffffff;
   // .modal-section-add {
   // }
   // Content sections
+  // hr {
+  //   color: rgb(221, 221, 221);
+  // }
   .modal-section {
-    // display: flex;
-    // align-items: center;
-    // justify-content: space-between;
-    margin-bottom: 20px;
-    // width: 100%;
-
     .section-label {
       font-weight: 500;
       font-size: 14px;
       color: $text-dark;
-      margin-bottom: 8px;
+      // margin-bottom: 8px;
     }
 
     .assistant-option {
@@ -519,14 +520,10 @@ $white: #ffffff;
       gap: 5px;
     }
 
-    .assistant-selector {
+    .assistant-select {
       width: 100%;
-      display: flex;
-      align-items: center;
-      background: $background-gray;
-      border: 1px solid $border-color;
-      border-radius: 8px;
-      padding: 12px 16px;
+      height: 45px;
+      // padding: 20px 16px;
 
       .assistant-icon {
         margin-right: 12px;
@@ -581,6 +578,14 @@ $white: #ffffff;
       }
     }
   }
+  .model-section-down {
+    border-top: 1px solid gainsboro;
+    border-bottom: 1px solid gainsboro;
+    padding-bottom: 20px;
+    padding-top: 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
 
   // Footer buttons
   .modal-footer {
@@ -590,11 +595,11 @@ $white: #ffffff;
     margin-top: 24px;
 
     .cancel-button {
-      background: none;
+      background: #e6e8ec;
       border: 1px solid $border-color;
       color: $text-medium;
       border-radius: 8px;
-      padding: 8px 16px;
+      padding: 12px 24px;
       font-size: 14px;
       cursor: pointer;
 
@@ -609,7 +614,7 @@ $white: #ffffff;
       border: none;
       color: white;
       border-radius: 8px;
-      padding: 8px 20px;
+      padding: 12px 24px;
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
@@ -639,13 +644,12 @@ $white: #ffffff;
 
 // View Details Button
 .view-details-button {
-  color: $primary-blue;
+  color: #2e58ea;
   font-weight: 500;
   padding: 0;
   height: auto;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
   font-size: 14px;
 
   &:hover {

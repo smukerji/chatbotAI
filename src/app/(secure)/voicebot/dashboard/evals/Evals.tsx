@@ -141,6 +141,7 @@ export default function Evals() {
       title: "Description",
       dataIndex: "description",
       key: "description",
+      sorter: (a, b) => a.description.localeCompare(b.description),
     },
     {
       title: "Eval Turns",
@@ -210,7 +211,7 @@ export default function Evals() {
         <span
           className={`status-badge ${status.toLowerCase()}`}
           style={{
-            color: status === "Success" ? "#2e5bea" : "#ff4d4f",
+            color: status === "Success" ? "#4D72F5" : "#f00000",
             fontWeight: 500,
           }}
         >
@@ -228,13 +229,13 @@ export default function Evals() {
       title: "Total Turns",
       dataIndex: "totalTurns",
       key: "totalTurns",
-      sorter: (a, b) => a.totalTurns - b.totalTurns,
+      // sorter: (a, b) => a.totalTurns - b.totalTurns,
     },
     {
       title: "Eval Turns",
       dataIndex: "evalTurns",
       key: "evalTurns",
-      sorter: (a, b) => a.evalTurns - b.evalTurns,
+      // sorter: (a, b) => a.evalTurns - b.evalTurns,
     },
     {
       title: "Run At",
@@ -397,13 +398,21 @@ export default function Evals() {
             </div>
 
             <div className="modal-section">
-              <div className="section-label">Assistant</div>
+              <div className="section-label" style={{ marginBottom: "5px" }}>
+                Assistant
+              </div>
               <Select
                 value={selectedAssistant}
                 onChange={setSelectedAssistant}
-                style={{ width: "100%" }}
                 className="assistant-select"
-                suffixIcon={<span className="dropdown-icon">⌄</span>}
+                suffixIcon={
+                  <img
+                    src="/svgs/arrow-down-black.svg"
+                    alt="Arrow Down"
+                    width={20}
+                    height={20}
+                  />
+                }
                 options={assistantOptions.map((option) => ({
                   value: option.value,
                   label: (
@@ -422,7 +431,7 @@ export default function Evals() {
             </div>
 
             <div
-              className="modal-section"
+              className="modal-section model-section-down"
               style={{
                 display: "flex",
                 justifyContent: "space-between",

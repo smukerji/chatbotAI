@@ -5,6 +5,7 @@ import "./CreateEvaluationForm.scss";
 import { CreateVoiceBotContext } from "@/app/_helpers/client/Context/VoiceBotContextApi";
 import { useCookies } from "react-cookie";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const { TextArea } = Input;
 const { Title } = Typography;
@@ -63,6 +64,10 @@ export default function CreateEvaluationForm() {
   const [provider, setProvider] = useState("");
   const [model, setModel] = useState("");
   const [selectedAssistant, setSelectedAssistant] = useState("");
+
+  const [approachMode, setApproachMode] = useState<string | undefined>(
+    undefined
+  );
 
   // Test results state
   const [testResults, setTestResults] = useState<{
@@ -410,7 +415,7 @@ export default function CreateEvaluationForm() {
                   <Form.Item label="Provider" className="form-group half">
                     <Select
                       placeholder="Select tool"
-                      value={provider}
+                      // value={provider}
                       onChange={setProvider}
                       suffixIcon={
                         <img
@@ -429,8 +434,8 @@ export default function CreateEvaluationForm() {
 
                   <Form.Item label="Model" className="form-group half">
                     <Select
-                      placeholder="Select tool"
-                      value={model}
+                      placeholder="Select model"
+                      // value={model}
                       onChange={setModel}
                       suffixIcon={
                         <img
@@ -476,7 +481,7 @@ export default function CreateEvaluationForm() {
                   <Form.Item className="form-group select-full">
                     <Select
                       placeholder="Select assistant"
-                      value={selectedAssistant}
+                      // value={selectedAssistant}
                       onChange={setSelectedAssistant}
                       suffixIcon={
                         <img
@@ -578,12 +583,19 @@ export default function CreateEvaluationForm() {
                               <span className="turn-label">
                                 Turn {turnNumber}
                               </span>
-                              <Button
+                              {/* <Button
                                 type="text"
                                 size="small"
                                 icon={<CloseOutlined />}
                                 onClick={() => removeTurn(turn.id)}
                                 className="icon-btn"
+                              /> */}
+                              <Image
+                                src="/svgs/close-circle.svg"
+                                width={20}
+                                height={20}
+                                alt="Close"
+                                onClick={() => removeTurn(turn.id)}
                               />
                             </div>
                           </div>
@@ -670,8 +682,9 @@ export default function CreateEvaluationForm() {
                                 <div className="custom-select">
                                   <Select
                                     className="filter-select"
-                                    placeholder="Exact"
-                                    bordered={false}
+                                    placeholder="Select approach"
+                                    // value={approachMode}
+                                    onChange={setApproachMode}
                                     suffixIcon={null}
                                   >
                                     <Select.Option value="Exact">
@@ -689,12 +702,19 @@ export default function CreateEvaluationForm() {
                                 Turn {turnNumber}
                               </span>
 
-                              <Button
+                              {/* <Button
                                 type="text"
                                 size="small"
                                 icon={<CloseOutlined />}
                                 onClick={() => removeTurn(turn.id)}
                                 className="icon-btn"
+                              /> */}
+                              <Image
+                                src="/svgs/close-circle.svg"
+                                width={20}
+                                height={20}
+                                alt="Close"
+                                onClick={() => removeTurn(turn.id)}
                               />
                             </div>
                           </div>
@@ -944,12 +964,19 @@ export default function CreateEvaluationForm() {
                               <span className="turn-label">
                                 Turn {turnNumber}
                               </span>
-                              <Button
+                              {/* <Button
                                 type="text"
                                 size="small"
                                 icon={<CloseOutlined />}
                                 onClick={() => removeTurn(turn.id)}
                                 className="icon-btn"
+                              /> */}
+                              <Image
+                                src="/svgs/close-circle.svg"
+                                width={20}
+                                height={20}
+                                alt="Close"
+                                onClick={() => removeTurn(turn.id)}
                               />
                             </div>
                           </div>
