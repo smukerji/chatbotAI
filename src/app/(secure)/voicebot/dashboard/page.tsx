@@ -127,6 +127,16 @@ function Dashboard() {
     );
   }, []);
 
+  useEffect(() => {
+  const savedTab = sessionStorage.getItem('activeTab');
+  if (savedTab) {
+    const tabValue = savedTab.toLowerCase();
+    setTab(tabValue);
+    sessionStorage.removeItem('activeTab');
+  }
+}, []);
+
+
   const duplicateAssistantHandler = async () => {
     if (!voiceBotContextData?.assistantInfo["vapiAssistantId"]) {
       message.error("Assistant is not published yet");
@@ -613,10 +623,15 @@ function Dashboard() {
     voiceBotContextData?.publishLoading
   );
 
-  const changeHandler = (value: string) => {
-    console.log("working , clicking");
-    setTab(value);
-  };
+const changeHandler = (value: string) => {
+  console.log("working , clicking");
+  setTab(value);
+  
+  // Clean up the URL - remove the tab parameter
+  const currentUrl = new URL(window.location.href);
+  currentUrl.searchParams.delete('tab');
+  window.history.replaceState({}, '', currentUrl.toString());
+};
 
   const tatabyebyeHandler = () => {
     setIsMoreContentVisible(false);

@@ -5,6 +5,7 @@ import "./CreateEvaluationForm.scss";
 import { CreateVoiceBotContext } from "@/app/_helpers/client/Context/VoiceBotContextApi";
 import { useCookies } from "react-cookie";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import Image from "next/image";
 
 const { TextArea } = Input;
@@ -13,14 +14,22 @@ const { Title } = Typography;
 type TurnType = "system" | "user" | "assistant" | "tool-response";
 type AssistantMode = "mock" | "evaluation";
 
+interface CreateEvaluationFormProps {
+  mode?: "create" | "edit";
+  initialData?: any;
+}
 interface ToolArg {
   key: string;
   value: string;
 }
 
 interface ToolCall {
-  toolName: string;
+  name: string;
   args: Array<{ key: string; value: string }>;
+}
+interface CreateEvaluationFormProps {
+  mode?: "create" | "edit";
+  initialData?: any;
 }
 
 interface Turn {
@@ -32,12 +41,20 @@ interface Turn {
   toolCallInput?: ToolCall | null;
 }
 
-export default function CreateEvaluationForm() {
+type ProviderInfo = {
+  id: string;
+  label: string;
+  models: { id: string; label: string }[];
+};
+
+export default function CreateEvaluationForm({
+  mode = "create",
+  initialData,
+}: CreateEvaluationFormProps) {
   const [cookies] = useCookies(["userId"]);
   const voiceBotContextData: any = useContext(CreateVoiceBotContext);
   const router = useRouter();
 
-  // Unified fallback logic
   const assistantMongoId =
     voiceBotContextData?.assistantMongoId ||
     voiceBotContextData?.assistantInfo?._id ||
@@ -61,9 +78,13 @@ export default function CreateEvaluationForm() {
 
   const [evalName, setEvalName] = useState("");
   const [evalDesc, setEvalDesc] = useState("");
+  const [selectedAssistant, setSelectedAssistant] = useState<string>("");
+  const [systemPrompt, setSystemPrompt] = useState("");
+  const [loadingSystemPrompt, setLoadingSystemPrompt] = useState(false);
+  const [providers, setProviders] = useState<ProviderInfo[]>([]);
   const [provider, setProvider] = useState("");
   const [model, setModel] = useState("");
-  const [selectedAssistant, setSelectedAssistant] = useState("");
+
 
   const [approachMode, setApproachMode] = useState<string | undefined>(
     undefined
@@ -81,7 +102,72 @@ export default function CreateEvaluationForm() {
     conversation: [],
   });
 
-  // Track if test has been run - NEW
+  // sync once context loads
+  useEffect(() => {
+    if (voiceBotContextData?.assistantInfo?.assistantName) {
+      setSelectedAssistant(voiceBotContextData?.assistantInfo?.assistantName);
+    }
+  }, [voiceBotContextData?.assistantInfo?.assistantName]);
+
+  useEffect(() => {
+    if (mode === "edit" && initialData) {
+      console.log("Loading initial data in edit mode:", initialData);
+
+      setEvalName(initialData.name || "");
+      setEvalDesc(initialData.description || "");
+      setProvider(initialData.provider || "openai");
+      setModel(initialData.model || "gpt-4o");
+
+      // Transform messages to turns
+      if (initialData.messages && Array.isArray(initialData.messages)) {
+        const transformedTurns = initialData.messages.map((msg: any) => {
+          const turn: Turn = {
+            id: msg.id,
+            type: msg.type,
+            content: msg.content || "",
+            mode: msg.mode,
+            toolCalls: msg.toolCalls || [],
+            toolCallInput: null,
+          };
+          return turn;
+        });
+
+        setTurns(transformedTurns);
+        // Set next ID to be higher than the highest current ID
+        const maxId = Math.max(...transformedTurns.map((t: any) => t.id), 0);
+        setNextId(maxId + 1);
+      }
+    }
+  }, [mode, initialData]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch("/voicebot/dashboard/api/evals/models");
+        const data = await res.json();
+
+        if (!res.ok || data.error) {
+          throw new Error(data.error || "Failed to load models");
+        }
+
+        const list: ProviderInfo[] = data.providers || [];
+        setProviders(list);
+
+        if (list.length) {
+          const first = list[0];
+          setProvider(first.id);
+          if (first.models.length) {
+            setModel(first.models[0].id);
+          }
+        }
+      } catch (err: any) {
+        console.error("Error loading models", err);
+        message.error(err.message || "Failed to load models");
+      }
+    })();
+  }, []);
+
+  // Track if test has been run
   const [hasRunTest, setHasRunTest] = useState(false);
 
   const addTurn = (type: TurnType) => {
@@ -116,7 +202,7 @@ export default function CreateEvaluationForm() {
   const startToolCallInput = (turnIdx: number) => {
     const newTurns = [...turns];
     newTurns[turnIdx].toolCallInput = {
-      toolName: "",
+      name: "",
       args: [{ key: "", value: "" }],
     };
     setTurns(newTurns);
@@ -126,7 +212,7 @@ export default function CreateEvaluationForm() {
     const newTurns = [...turns];
     newTurns[turnIdx].toolCallInput = {
       ...newTurns[turnIdx].toolCallInput!,
-      toolName: name,
+      name: name,
     };
     setTurns(newTurns);
   };
@@ -180,7 +266,7 @@ export default function CreateEvaluationForm() {
       return;
     }
 
-    if (!input.toolName?.trim()) {
+    if (!input.name?.trim()) {
       message.error("Please enter a tool name");
       return;
     }
@@ -192,7 +278,7 @@ export default function CreateEvaluationForm() {
 
     // Create a new tool call object to avoid reference issues
     const newToolCall: ToolCall = {
-      toolName: input.toolName.trim(),
+      name: input.name.trim(),
       args: (input.args || [])
         .filter((arg) => arg.key.trim() !== "") // Only keep args with non-empty keys
         .map((arg) => ({
@@ -209,7 +295,7 @@ export default function CreateEvaluationForm() {
 
     // Reset the tool call input
     newTurns[turnIdx].toolCallInput = {
-      toolName: "",
+      name: "",
       args: [{ key: "", value: "" }],
     };
 
@@ -224,7 +310,7 @@ export default function CreateEvaluationForm() {
 
     if (toolCall) {
       newTurns[turnIdx].toolCallInput = {
-        toolName: toolCall.toolName,
+        name: toolCall.name,
         args:
           toolCall.args.length > 0
             ? [...toolCall.args]
@@ -236,6 +322,40 @@ export default function CreateEvaluationForm() {
       setTurns(newTurns);
     }
   };
+  //  Add function to fetch system prompt from VAPI assistant
+  const fetchSystemPrompt = async () => {
+    if (!vapiAssistantId) {
+      console.warn("No VAPI Assistant ID available");
+      return;
+    }
+
+    try {
+      setLoadingSystemPrompt(true);
+
+      const response = await fetch(
+        `/voicebot/dashboard/api/assistant/${vapiAssistantId}/system-prompt`
+      );
+
+      const data = await response.json();
+
+      if (response.ok && !data.error) {
+        setSystemPrompt(data.systemPrompt || "");
+      } else {
+        console.error("Failed to fetch system prompt:", data.error);
+        message.warning("Could not load system prompt from assistant");
+      }
+    } catch (error) {
+      console.error("Error fetching system prompt:", error);
+    } finally {
+      setLoadingSystemPrompt(false);
+    }
+  };
+  // Add useEffect to fetch system prompt when component loads or vapiAssistantId changes
+  useEffect(() => {
+    if (vapiAssistantId) {
+      fetchSystemPrompt();
+    }
+  }, [vapiAssistantId]);
 
   // after submit the form it reset all feilds
   const resetForm = () => {
@@ -258,6 +378,23 @@ export default function CreateEvaluationForm() {
     setHasRunTest(false);
   };
 
+  const changeTurnType = (turnIdx: number, newType: TurnType) => {
+    const newTurns = [...turns];
+    const currentTurn = newTurns[turnIdx];
+
+    // Preserve the content and id, but reset type-specific properties
+    newTurns[turnIdx] = {
+      id: currentTurn.id,
+      type: newType,
+      content: currentTurn.content,
+      mode: newType === "assistant" ? "mock" : undefined,
+      toolCalls: newType === "assistant" ? [] : undefined,
+      toolCallInput: undefined,
+    };
+
+    setTurns(newTurns);
+    message.success(`Turn changed to ${newType}`);
+  };
   const handleSave = async () => {
     try {
       if (!evalName) {
@@ -280,33 +417,97 @@ export default function CreateEvaluationForm() {
         return;
       }
 
-      const resp = await fetch("/voicebot/dashboard/api/evals", {
-        method: "POST",
+      // Transform turns to the format expected by backend
+      const formattedTurns = turns.map((turn) => {
+        const formattedTurn: any = {
+          role: turn.type === "tool-response" ? "tool" : turn.type,
+          message: turn.content,
+        };
+
+        // If assistant turn has tool calls, add them
+        if (
+          turn.type === "assistant" &&
+          turn.mode === "evaluation" &&
+          turn.toolCalls &&
+          turn.toolCalls.length > 0
+        ) {
+          formattedTurn.tool_calls = turn.toolCalls.map((toolCall) => {
+            const argsObject: Record<string, string> = {};
+            toolCall.args.forEach((arg) => {
+              if (arg.key) {
+                argsObject[arg.key] = arg.value;
+              }
+            });
+
+            return {
+              function: {
+                name: toolCall.name,
+                arguments: JSON.stringify(argsObject),
+              },
+            };
+          });
+        }
+
+        return formattedTurn;
+      });
+      const payload = {
+        evalName,
+        evalDesc,
+        assistantMongoId,
+        userId,
+        vapiAssistantId,
+        turns: formattedTurns,
+      };
+
+      console.log(
+        "Frontend sending payload:",
+        JSON.stringify(payload, null, 2)
+      );
+
+      // Determine endpoint and method based on mode
+      const endpoint =
+        mode === "edit" && initialData?.evalId
+          ? `/voicebot/dashboard/api/evals/${initialData.evalId}`
+          : "/voicebot/dashboard/api/evals";
+
+      const method = mode === "edit" ? "PATCH" : "POST";
+
+      const resp = await fetch(endpoint, {
+        method: method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          evalName,
-          evalDesc,
-          assistantMongoId,
-          userId,
-          vapiAssistantId,
-          turns,
-        }),
+        body: JSON.stringify(payload),
       });
 
       const result = await resp.json();
+
       if (resp.ok && !result.error) {
-        message.success("Evaluation created successfully!");
-        // Optionally reset form/navigate
-        // Reset all form fields after successful save
-        resetForm();
+        message.success(
+          mode === "edit"
+            ? "Evaluation updated successfully!"
+            : "Evaluation created successfully!"
+        );
+
+        if (mode === "create") {
+          resetForm();
+        } else {
+          sessionStorage.setItem("activeTab", "evals");
+          // In edit mode, navigate back to evals list
+          router.push("/voicebot/dashboard?interaction=voicebot&tab=evals");
+        }
       } else {
-        throw new Error(result.error || "Failed to create evaluation");
+        console.error("API Error Response:", result);
+        throw new Error(
+          result.error || result.message || `Failed to ${mode} evaluation`
+        );
       }
     } catch (err: any) {
-      message.error(err.message || "Error saving evaluation.");
+      console.error("Save Error:", err);
+      message.error(
+        err.message ||
+          `Error ${mode === "edit" ? "updating" : "saving"} evaluation.`
+      );
     }
   };
-
   const removeToolCall = (turnIdx: number, callIdx: number) => {
     const newTurns = [...turns];
     newTurns[turnIdx].toolCalls =
@@ -321,50 +522,118 @@ export default function CreateEvaluationForm() {
     setTurns(newTurns);
   };
 
-  // UPDATED: Handle test runs
   const handleTestRun = async () => {
+    // Validate required fields before testing
+    if (!evalName.trim()) {
+      message.error("Please enter an evaluation name before testing");
+      return;
+    }
+
+    if (!vapiAssistantId) {
+      message.error("Assistant not found. Please select an assistant first.");
+      return;
+    }
+
+    // Check if there's at least one user and one assistant turn
+    const hasUserTurn = turns.some(
+      (t) => t.type === "user" && t.content.trim()
+    );
+    const hasAssistantTurn = turns.some((t) => t.type === "assistant");
+
+    if (!hasUserTurn || !hasAssistantTurn) {
+      message.warning("Please add at least one user and one assistant turn");
+      return;
+    }
+
     setTestResults((prev) => ({ ...prev, status: "loading" }));
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Transform turns to the format expected by backend
+      const formattedTurns = turns.map((turn) => {
+        const formattedTurn: any = {
+          role: turn.type === "tool-response" ? "tool" : turn.type,
+          message: turn.content,
+        };
 
-      // Build mock conversation from your form data
-      const mockConversation = [];
+        // If assistant turn has tool calls, add them
+        if (
+          turn.type === "assistant" &&
+          turn.mode === "evaluation" &&
+          turn.toolCalls &&
+          turn.toolCalls.length > 0
+        ) {
+          formattedTurn.tool_calls = turn.toolCalls.map((toolCall) => {
+            const argsObject: Record<string, string> = {};
+            toolCall.args.forEach((arg) => {
+              if (arg.key) {
+                argsObject[arg.key] = arg.value;
+              }
+            });
 
-      // Get first user message
-      const userTurn = turns.find((t) => t.type === "user");
-      if (userTurn) {
-        mockConversation.push({
-          role: "user" as const,
-          content: userTurn.content || "What's your name?",
-        });
+            return {
+              function: {
+                name: toolCall.name,
+                arguments: JSON.stringify(argsObject),
+              },
+            };
+          });
+        }
+
+        return formattedTurn;
+      });
+
+      // Call the test API endpoint (doesn't save to database)
+      const response = await fetch("/voicebot/dashboard/api/evals/test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          evalName,
+          evalDesc,
+          vapiAssistantId,
+          turns: formattedTurns,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || result.error) {
+        throw new Error(result.error || "Failed to run test");
       }
 
-      // Get first assistant message
-      const assistantTurn = turns.find((t) => t.type === "assistant");
-      if (assistantTurn) {
-        mockConversation.push({
-          role: "assistant" as const,
-          content:
-            assistantTurn.content ||
-            "I'm sorry, but based on the provided context, I don't have the information to answer your question.",
-        });
-      }
+      // Use the conversation from the API response
+      const conversation =
+        result.conversation && result.conversation.length > 0
+          ? result.conversation
+          : [
+              {
+                role: "user" as const,
+                content:
+                  turns.find((t) => t.type === "user")?.content ||
+                  "Test message",
+              },
+              {
+                role: "assistant" as const,
+                content:
+                  turns.find((t) => t.type === "assistant")?.content ||
+                  "I'm sorry, but based on the provided context, I don't have the information to answer your question.",
+              },
+            ];
 
       setTestResults({
         status: "success",
-        conversation: mockConversation,
+        conversation,
       });
 
       setHasRunTest(true);
       message.success("Test run completed!");
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Test run error:", error);
       setTestResults((prev) => ({ ...prev, status: "error" }));
-      message.error("Test run failed");
-      console.error("Test run failed:", error);
+      message.error(error.message || "Test run failed");
     }
   };
+
+  const currentProvider = providers.find((p) => p.id === provider);
 
   return (
     <>
@@ -374,10 +643,14 @@ export default function CreateEvaluationForm() {
             type="text"
             icon={<LeftOutlined />}
             className="back-btn"
-            onClick={() => router.back()}
+            onClick={() => {
+              sessionStorage.setItem("activeTab", "evals");
+              router.push("/voicebot/dashboard?interaction=voicebot&tab=evals");
+            }}
           />
+
           <Title level={3} className="eval-title">
-            Create Evaluation
+            {mode === "edit" ? "Edit Evaluation" : "Create Evaluation"}
           </Title>
         </div>
         <Button
@@ -385,7 +658,7 @@ export default function CreateEvaluationForm() {
           className="save-btn-floating"
           onClick={handleSave}
         >
-          Save
+          {mode === "edit" ? "Update" : "Save"}
         </Button>
       </div>
       <div className="eval-main-layout">
@@ -408,15 +681,22 @@ export default function CreateEvaluationForm() {
                     onChange={(e) => setEvalDesc(e.target.value)}
                   />
                 </Form.Item>
-
                 <div className="section-title">Evaluator</div>
 
                 <div className="row">
                   <Form.Item label="Provider" className="form-group half">
                     <Select
-                      placeholder="Select tool"
-                      // value={provider}
-                      onChange={setProvider}
+                      placeholder="Select provider"
+                      value={provider || undefined}
+                      onChange={(val) => {
+                        setProvider(val);
+                        const p = providers.find((x) => x.id === val);
+                        if (p && p.models.length) {
+                          setModel(p.models[0].id); // reset model when provider changes
+                        } else {
+                          setModel("");
+                        }
+                      }}
                       suffixIcon={
                         <img
                           src="/svgs/arrow-down-black.svg"
@@ -427,16 +707,20 @@ export default function CreateEvaluationForm() {
                         />
                       }
                     >
-                      <Select.Option value="openai">OpenAI</Select.Option>
-                      <Select.Option value="azure">Azure</Select.Option>
+                      {providers.map((p) => (
+                        <Select.Option key={p.id} value={p.id}>
+                          {p.label}
+                        </Select.Option>
+                      ))}
                     </Select>
                   </Form.Item>
 
                   <Form.Item label="Model" className="form-group half">
                     <Select
                       placeholder="Select model"
-                      // value={model}
-                      onChange={setModel}
+                      value={model || undefined}
+                      onChange={(val: string) => setModel(val)}
+                      disabled={!currentProvider}
                       suffixIcon={
                         <img
                           src="/svgs/arrow-down-black.svg"
@@ -447,8 +731,11 @@ export default function CreateEvaluationForm() {
                         />
                       }
                     >
-                      <Select.Option value="gpt-4o">GPT-4o</Select.Option>
-                      <Select.Option value="llama-3">Llama 3</Select.Option>
+                      {currentProvider?.models.map((m) => (
+                        <Select.Option key={m.id} value={m.id}>
+                          {m.label}
+                        </Select.Option>
+                      ))}
                     </Select>
                   </Form.Item>
                 </div>
@@ -480,23 +767,20 @@ export default function CreateEvaluationForm() {
                   </div>
                   <Form.Item className="form-group select-full">
                     <Select
+                      value={selectedAssistant || undefined}
+                      onChange={(value) => setSelectedAssistant(value)}
+                      style={{ width: "100%" }}
                       placeholder="Select assistant"
-                      // value={selectedAssistant}
-                      onChange={setSelectedAssistant}
-                      suffixIcon={
-                        <img
-                          src="/svgs/arrow-down-black.svg"
-                          alt="Arrow Down"
-                          width={24}
-                          height={24}
-                          style={{ marginTop: "10px" }}
-                        />
-                      }
                     >
-                      <Select.Option value="viff">Viff (GPT-4o)</Select.Option>
-                      <Select.Option value="other-ai">
-                        Other AI model
-                      </Select.Option>
+                      {voiceBotContextData?.assistantName && (
+                        <Select.Option
+                          value={
+                            voiceBotContextData?.assistantInfo?.assistantName
+                          }
+                        >
+                          {voiceBotContextData?.assistantInfo?.assistantName}
+                        </Select.Option>
+                      )}
                     </Select>
                   </Form.Item>
                 </div>
@@ -527,17 +811,26 @@ export default function CreateEvaluationForm() {
                               </div>
                             </div>
                           </div>
-                          <TextArea
-                            className="message-textarea"
-                            placeholder="This is a blank template with minimal defaults, you can change the model, temperature, and messages."
-                            rows={3}
-                            value={turn.content}
-                            onChange={(e) => {
-                              const newTurns = [...turns];
-                              newTurns[index].content = e.target.value;
-                              setTurns(newTurns);
-                            }}
-                          />
+                          <Form.Item className="form-group">
+                            <TextArea
+                              className="message-textarea system-prompt-readonly"
+                              placeholder={
+                                loadingSystemPrompt
+                                  ? "Loading system prompt..."
+                                  : "No system prompt configured"
+                              }
+                              rows={6}
+                              value={systemPrompt}
+                              readOnly
+                              disabled={loadingSystemPrompt}
+                              style={{
+                                backgroundColor: "#f5f5f5",
+                                cursor: "not-allowed",
+                                color: "#262626",
+                                resize: "vertical",
+                              }}
+                            />
+                          </Form.Item>
                         </Card>
                       );
                     }
@@ -564,6 +857,9 @@ export default function CreateEvaluationForm() {
                                   value="user"
                                   className="role-select user-select"
                                   size="small"
+                                  onChange={(value: TurnType) =>
+                                    changeTurnType(index, value)
+                                  }
                                   suffixIcon={
                                     <img
                                       src="/svgs/arrow-down-blue.svg"
@@ -575,6 +871,12 @@ export default function CreateEvaluationForm() {
                                 >
                                   <Select.Option value="user">
                                     User
+                                  </Select.Option>
+                                  <Select.Option value="assistant">
+                                    Assistant
+                                  </Select.Option>
+                                  <Select.Option value="tool-response">
+                                    Tool Response
                                   </Select.Option>
                                 </Select>
                               </div>
@@ -636,6 +938,9 @@ export default function CreateEvaluationForm() {
                                   className="role-select assistant-select"
                                   size="small"
                                   bordered={false}
+                                  onChange={(value: TurnType) =>
+                                    changeTurnType(index, value)
+                                  }
                                   suffixIcon={
                                     <img
                                       src="/svgs/arrow-down-eval.svg"
@@ -645,8 +950,14 @@ export default function CreateEvaluationForm() {
                                     />
                                   }
                                 >
+                                  <Select.Option value="user">
+                                    User
+                                  </Select.Option>
                                   <Select.Option value="assistant">
                                     Assistant
+                                  </Select.Option>
+                                  <Select.Option value="tool-response">
+                                    Tool Response
                                   </Select.Option>
                                 </Select>
                               </div>
@@ -689,9 +1000,6 @@ export default function CreateEvaluationForm() {
                                   >
                                     <Select.Option value="Exact">
                                       Exact
-                                    </Select.Option>
-                                    <Select.Option value="Broad">
-                                      Broad
                                     </Select.Option>
                                   </Select>
                                 </div>
@@ -781,7 +1089,7 @@ export default function CreateEvaluationForm() {
                                   <Input
                                     className="tool-call-input"
                                     placeholder="Tool name"
-                                    value={turn.toolCallInput.toolName}
+                                    value={turn.toolCallInput.name}
                                     onChange={(e) =>
                                       updateToolCallName(index, e.target.value)
                                     }
@@ -875,14 +1183,19 @@ export default function CreateEvaluationForm() {
                                     >
                                       <div className="toolcall-content">
                                         <span className="toolcall-name">
-                                          {call.toolName}
+                                          {call.name || "No Tool Name"}
                                         </span>
-                                        {call.args && call.args.length > 0 && (
-                                          <span className="toolcall-args">
-                                            {call.args.length} arg
-                                            {call.args.length !== 1 ? "s" : ""}
-                                          </span>
-                                        )}
+                                        {call.args &&
+                                          Object.keys(call.args).length > 0 && (
+                                            <span className="toolcall-args">
+                                              {Object.keys(call.args).length}{" "}
+                                              arg
+                                              {Object.keys(call.args).length !==
+                                              1
+                                                ? "s"
+                                                : ""}
+                                            </span>
+                                          )}
                                       </div>
                                       <div className="toolcall-actions">
                                         <button
@@ -944,7 +1257,10 @@ export default function CreateEvaluationForm() {
                                   className="role-select tool-response-select"
                                   size="small"
                                   bordered={false}
-                                  disabled
+                                  disabled={false} // Remove the disabled prop or set to false
+                                  onChange={(value: TurnType) =>
+                                    changeTurnType(index, value)
+                                  }
                                   suffixIcon={
                                     <img
                                       src="/svgs/arrow-down-yellow.svg"
@@ -954,6 +1270,12 @@ export default function CreateEvaluationForm() {
                                     />
                                   }
                                 >
+                                  <Select.Option value="user">
+                                    User
+                                  </Select.Option>
+                                  <Select.Option value="assistant">
+                                    Assistant
+                                  </Select.Option>
                                   <Select.Option value="tool-response">
                                     Tool Response
                                   </Select.Option>
