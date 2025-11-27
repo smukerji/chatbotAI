@@ -43,29 +43,6 @@ interface RunTableItem {
   runAt: string;
 }
 
-// const DUMMY_RUNS: RunTableItem[] = [
-//   {
-//     key: "1",
-//     evalName: "Welcome",
-//     assistantName: "Tifi",
-//     status: "Success",
-//     duration: "30s",
-//     totalTurns: 1,
-//     evalTurns: 1,
-//     runAt: "Nov 14, 2025 1:42 AM",
-//   },
-//   {
-//     key: "2",
-//     evalName: "Check out guidance",
-//     assistantName: "Tifi",
-//     status: "Failed",
-//     duration: "30s",
-//     totalTurns: 1,
-//     evalTurns: 1,
-//     runAt: "Nov 14, 2025 1:42 AM",
-//   },
-// ];
-
 export default function Evals() {
   const router = useRouter();
   const [cookies] = useCookies(["userId"]);
@@ -664,7 +641,7 @@ export default function Evals() {
         </Button>
       </div>
 
-      {loading ? (
+      {activeTab === "runs" && runsLoading ? (
         <div
           className="loading-container"
           style={{
@@ -681,7 +658,6 @@ export default function Evals() {
           <Table
             columns={getCurrentColumns()}
             dataSource={paginatedData}
-            loading={activeTab === "runs" ? runsLoading : loading}
             rowSelection={activeTab === "created" ? rowSelection : undefined}
             pagination={false}
             className="evals-table"
