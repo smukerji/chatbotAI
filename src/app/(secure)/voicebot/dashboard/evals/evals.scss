@@ -322,8 +322,8 @@ $white: #ffffff;
   .evals-pagination {
     margin-top: 16px;
     display: flex;
-    justify-content: start;
-    align-items: start;
+    justify-content:flex-start;
+    align-items:flex-start;
 
     .ant-pagination-item {
       border: 1px solid $border-color;

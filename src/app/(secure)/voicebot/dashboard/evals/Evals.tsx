@@ -799,7 +799,7 @@ export default function Evals() {
                 <h3>Run Evaluation</h3>
                 <div className="modal-subtitle">
                   Select an assistant to run{" "}
-                  <span className="eval-name">"{selectedEval?.name}"</span>
+                  <span className="eval-name">'{selectedEval?.name}'</span>
                 </div>
               </div>
               <Image
@@ -1140,7 +1140,7 @@ export default function Evals() {
                 <h3>Delete {deleteType === "eval" ? "Evaluation" : "Run"}?</h3>
                 <div className="modal-subtitle">
                   Are you sure you want to delete{" "}
-                  <span className="eval-name">"{itemToDelete?.name}"</span>?
+                  <span className="eval-name">'{itemToDelete?.name}'</span>?
                   This action cannot be undone.
                 </div>
               </div>
