@@ -589,7 +589,7 @@ export default function Evals() {
   // Get current data and columns based on active tab
   const getCurrentData = () => {
     const sourceData = activeTab === "created" ? evals : runs;
-    return sourceData.filter((d) => {
+    return (sourceData as Array<any>).filter((d) => {
       if (activeTab === "created") {
         const item = d as EvalTableItem;
         return (
