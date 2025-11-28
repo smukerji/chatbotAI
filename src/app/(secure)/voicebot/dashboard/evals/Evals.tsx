@@ -1050,43 +1050,76 @@ export default function Evals() {
                     {(() => {
                       const messages = runDetails?.results?.[0]?.messages || [];
 
-                      if (!messages.length) {
+                      // Filter out messages with no content unless they have tool calls
+                      const filteredMessages = messages.filter((msg: any) => {
+                        // Keep messages that have content
+                        if (msg.content && msg.content.trim() !== "")
+                          return true;
+                        // Keep assistant messages with tool calls (check both property names)
+                        if (
+                          msg.role === "assistant" &&
+                          (msg.tool_calls || msg.toolCalls) &&
+                          ((msg.tool_calls && msg.tool_calls.length > 0) ||
+                            (msg.toolCalls && msg.toolCalls.length > 0))
+                        ) {
+                          return true;
+                        }
+                        // Filter out everything else (empty messages)
+                        return false;
+                      });
+
+                      // Show empty state if no messages after filtering
+                      if (filteredMessages.length === 0) {
                         return (
-                          <div className="conversation-empty">
-                            <div className="message user-message empty-badge">
-                              <span className="message-sender">User</span>
+                          <div className="conversation-empty-state">
+                            <div className="empty-badge user-badge">
+                              <span>User</span>
                             </div>
-                            <div className="message assistant-message empty-badge">
-                              <span className="message-sender">Assistant</span>
+                            <div className="empty-badge assistant-badge">
+                              <span>Assistant</span>
                             </div>
+                            
                           </div>
                         );
                       }
 
-                      // Normal transcript
-                      return messages.map((msg: any, i: number) => (
-                        <div
-                          key={i}
-                          className={`message ${
-                            msg.role === "user"
-                              ? "user-message"
-                              : "assistant-message"
-                          }`}
-                        >
-                          <p className="message-sender">
-                            {msg.role === "user" ? "User" : "Assistant"}
-                          </p>
+                      // Render filtered messages
+                      return filteredMessages.map((msg: any, i: number) => {
+                        // Check if this message has tool calls (check both property names)
+                        const hasToolCalls =
+                          (msg.tool_calls && msg.tool_calls.length > 0) ||
+                          (msg.toolCalls && msg.toolCalls.length > 0);
+                        const isEmptyContent =
+                          !msg.content || msg.content.trim() === "";
 
-                          {/* If no content (tool-only step), show label instead of empty bubble */}
-                          {!msg.content ? (
-                            <p className="message-content">
-                              Tool call initiated
+                        return (
+                          <div
+                            key={i}
+                            className={`message ${
+                              msg.role === "user"
+                                ? "user-message"
+                                : "assistant-message"
+                            }`}
+                          >
+                            <p className="message-sender">
+                              {msg.role === "user" ? "User" : "Assistant"}
                             </p>
-                          ) : (
-                            <p className="message-content">{msg.content}</p>
-                          )}
-                        </div>
-                      ));
+
+                            {/* Show "Tool call initiated" only for assistant messages with tool calls and no content */}
+                            {msg.role === "assistant" &&
+                            hasToolCalls &&
+                            isEmptyContent ? (
+                              <p className="message-content tool-call-indicator">
+                                Tool call initiated
+                              </p>
+                            ) : (
+                              <p className="message-content">
+                                {msg.content || ""}
+                              </p>
+                            )}
+                          </div>
+                        );
+                      });
                     })()}
                   </div>
                 </div>
