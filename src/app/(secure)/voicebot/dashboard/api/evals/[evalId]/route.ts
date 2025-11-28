@@ -7,6 +7,7 @@ import { apiHandler } from "@/app/_helpers/server/api/api-handler";
 
 module.exports = apiHandler({
   GET:getEval,
+  PATCH:updateEval
 });
 
 
@@ -95,7 +96,7 @@ module.exports = apiHandler({
  * PATCH /api/evals/[evalId]
  * Updates an evaluation in VAPI and local DB
  */
-export async function updateEval(
+ async function updateEval(
   req: NextRequest,
   { params }: { params: { evalId: string } }
 ) {
