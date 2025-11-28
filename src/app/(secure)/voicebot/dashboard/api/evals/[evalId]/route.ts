@@ -3,8 +3,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import clientPromise from "@/db";
+import { apiHandler } from "@/app/_helpers/server/api/api-handler";
+module.exports = apiHandler({
+  GET:getEval,
+});
 
-export { getEval as GET, updateEval as PATCH };
 
 /**
  * GET /api/evals/[evalId]
