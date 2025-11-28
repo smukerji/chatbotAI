@@ -58,6 +58,7 @@ async function createEval(req: NextRequest) {
             }
 
             // Assistant messages
+
             if (role === "assistant") {
                 // Check if this is an evaluation checkpoint (has tool_calls to validate)
                 if (t.tool_calls && t.tool_calls.length > 0) {
@@ -66,10 +67,11 @@ async function createEval(req: NextRequest) {
                         type: "exact",
                     };
 
-                    // Add content validation if there's a message
-                    if (t.message && t.message.trim()) {
-                        judgePlan.content = t.message;
+                    // Only add content validation if message exists and is not empty
+                    if (t.message && t.message.trim() !== "") {
+                        judgePlan.content = t.message.trim();
                     }
+                    //  If no message field at all, don't add content
 
                     // Add tool call validation - FIXED STRUCTURE
                     judgePlan.toolCalls = t.tool_calls.map((tc: any) => {
@@ -128,7 +130,7 @@ async function createEval(req: NextRequest) {
         });
 
         const vapiData = await vapiRes.json();
-        
+
         if (!vapiRes.ok) {
             console.error("VAPI Error Response:", vapiData);
             return {
@@ -155,7 +157,7 @@ async function createEval(req: NextRequest) {
                         description: evalDesc,
                         vapiAssistantId: vapiAssistantId,
                         createdAt: new Date(),
-                           runs: [] 
+                        runs: []
                     }
                 }
             }
@@ -191,13 +193,13 @@ async function getEvalsList(req: NextRequest) {
         const evalIds = (assistant.evals || []).map((evalItem: any) => evalItem.evalId);
 
         if (evalIds.length === 0) {
-            return { 
-                evals: [], 
+            return {
+                evals: [],
                 assistant: {
                     name: assistant.assistantName,
                     vapiAssistantId: assistant.vapiAssistantId
                 },
-                status: 200 
+                status: 200
             };
         }
 
@@ -219,9 +221,9 @@ async function getEvalsList(req: NextRequest) {
         }
 
         const vapiData = await vapiRes.json();
-        
+
         // Filter only evals that belong to this assistant
-        const filteredEvals = (vapiData.results || []).filter((vapiEval: any) => 
+        const filteredEvals = (vapiData.results || []).filter((vapiEval: any) =>
             evalIds.includes(vapiEval.id)
         );
 
@@ -233,13 +235,13 @@ async function getEvalsList(req: NextRequest) {
                 name: localEval?.name || "",
                 description: localEval?.description || "",
                 localCreatedAt: localEval?.createdAt,
-                      
+
             };
-     
-            
+
+
         }
-        
-    );
+
+        );
 
         return {
             evals: evalsWithMetadata,

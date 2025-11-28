@@ -84,7 +84,13 @@ export default function CreateEvaluationForm({
   const [providers, setProviders] = useState<ProviderInfo[]>([]);
   const [provider, setProvider] = useState("");
   const [model, setModel] = useState("");
-
+  // Add to your state in CreateEvaluationForm
+  const [assistantVariables, setAssistantVariables] = useState<
+    Array<{
+      key: string;
+      value: string;
+    }>
+  >([]);
 
   const [approachMode, setApproachMode] = useState<string | undefined>(
     undefined
@@ -323,7 +329,7 @@ export default function CreateEvaluationForm({
     }
   };
   //  Add function to fetch system prompt from VAPI assistant
-  const fetchSystemPrompt = async () => {
+  const fetchSystemPrompt = async (forceRefresh = false) => {
     if (!vapiAssistantId) {
       console.warn("No VAPI Assistant ID available");
       return;
@@ -332,14 +338,27 @@ export default function CreateEvaluationForm({
     try {
       setLoadingSystemPrompt(true);
 
+      const cacheBuster = forceRefresh ? `?t=${Date.now()}` : "";
       const response = await fetch(
-        `/voicebot/dashboard/api/assistant/${vapiAssistantId}/system-prompt`
+        `/voicebot/dashboard/api/assistant/${vapiAssistantId}/system-prompt${cacheBuster}`,
+        {
+          method: "GET",
+
+          cache: "no-store",
+          headers: {
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            Pragma: "no-cache",
+          },
+        }
       );
 
       const data = await response.json();
 
       if (response.ok && !data.error) {
         setSystemPrompt(data.systemPrompt || "");
+        if (forceRefresh) {
+          message.success("System prompt refreshed");
+        }
       } else {
         console.error("Failed to fetch system prompt:", data.error);
         message.warning("Could not load system prompt from assistant");
@@ -358,12 +377,19 @@ export default function CreateEvaluationForm({
   }, [vapiAssistantId]);
 
   // after submit the form it reset all feilds
+  // Update your resetForm function
   const resetForm = () => {
     setEvalName("");
     setEvalDesc("");
     setProvider("");
     setModel("");
     setSelectedAssistant("");
+    //  Re-fetch system prompt instead of clearing it
+    if (vapiAssistantId) {
+      fetchSystemPrompt(true);
+    }
+    //  Clear assistant variables
+    setAssistantVariables([]);
     setTurns([
       { id: 1, type: "system", content: "" },
       { id: 2, type: "user", content: "" },
@@ -377,7 +403,6 @@ export default function CreateEvaluationForm({
     });
     setHasRunTest(false);
   };
-
   const changeTurnType = (turnIdx: number, newType: TurnType) => {
     const newTurns = [...turns];
     const currentTurn = newTurns[turnIdx];
@@ -395,6 +420,25 @@ export default function CreateEvaluationForm({
     setTurns(newTurns);
     message.success(`Turn changed to ${newType}`);
   };
+  // Add handlers
+  const addVariable = () => {
+    setAssistantVariables([...assistantVariables, { key: "", value: "" }]);
+  };
+
+  const updateVariable = (
+    index: number,
+    field: "key" | "value",
+    value: string
+  ) => {
+    const newVars = [...assistantVariables];
+    newVars[index][field] = value;
+    setAssistantVariables(newVars);
+  };
+
+  const removeVariable = (index: number) => {
+    setAssistantVariables(assistantVariables.filter((_, i) => i !== index));
+  };
+
   const handleSave = async () => {
     try {
       if (!evalName) {
@@ -549,38 +593,46 @@ export default function CreateEvaluationForm({
 
     try {
       // Transform turns to the format expected by backend
-      const formattedTurns = turns.map((turn) => {
-        const formattedTurn: any = {
-          role: turn.type === "tool-response" ? "tool" : turn.type,
-          message: turn.content,
-        };
+const formattedTurns = turns.map((turn) => {
+  const formattedTurn: any = {
+    role: turn.type === "tool-response" ? "tool" : turn.type,
+  };
 
-        // If assistant turn has tool calls, add them
-        if (
-          turn.type === "assistant" &&
-          turn.mode === "evaluation" &&
-          turn.toolCalls &&
-          turn.toolCalls.length > 0
-        ) {
-          formattedTurn.tool_calls = turn.toolCalls.map((toolCall) => {
-            const argsObject: Record<string, string> = {};
-            toolCall.args.forEach((arg) => {
-              if (arg.key) {
-                argsObject[arg.key] = arg.value;
-              }
-            });
+  // Check if this is an assistant evaluation turn with tool calls
+  const isAssistantEvalWithTools = 
+    turn.type === "assistant" && 
+    turn.mode === "evaluation" && 
+    turn.toolCalls && 
+    turn.toolCalls.length > 0;
 
-            return {
-              function: {
-                name: toolCall.name,
-                arguments: JSON.stringify(argsObject),
-              },
-            };
-          });
+  // Only add message if:
+  // 1. It's NOT an assistant evaluation with tools, OR
+  // 2. The content is not empty
+  if (!isAssistantEvalWithTools || (turn.content && turn.content.trim() !== "")) {
+    formattedTurn.message = turn.content;
+  }
+
+  // If assistant turn has tool calls, add them
+  if (isAssistantEvalWithTools && turn.toolCalls) { 
+    formattedTurn.tool_calls = turn.toolCalls.map((toolCall) => {
+      const argsObject: Record<string, string> = {};
+      toolCall.args.forEach((arg) => {
+        if (arg.key) {
+          argsObject[arg.key] = arg.value;
         }
-
-        return formattedTurn;
       });
+
+      return {
+        function: {
+          name: toolCall.name,
+          arguments: JSON.stringify(argsObject),
+        },
+      };
+    });
+  }
+
+  return formattedTurn;
+});
 
       // Call the test API endpoint (doesn't save to database)
       const response = await fetch("/voicebot/dashboard/api/evals/test", {
@@ -1384,9 +1436,81 @@ export default function CreateEvaluationForm({
           <div className="eval-sidebar">
             <Card title="Test runs" size="small" className="test-runs-card">
               <div className="sidebar-section">
-                <div className="sidebar-row">
-                  <span>Assistant Variables</span>
-                  <img src="/svgs/add.svg" alt="Add" />
+                {/* Variables List */}
+
+                <div className="sidebar-section">
+                  <div className="sidebar-row">
+                    <span>Assistant Variables</span>
+                    <button
+                      type="button"
+                      onClick={addVariable}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <img src="/svgs/add.svg" alt="Add" />
+                    </button>
+                  </div>
+                  {/* Variables List */}
+                  {assistantVariables.length > 0 && (
+                    <div
+                      className="variables-list"
+                      style={{ marginTop: "12px" }}
+                    >
+                      {assistantVariables.map((variable, index) => (
+                        <div
+                          key={index}
+                          className="variable-row"
+                          style={{
+                            display: "flex",
+                            gap: "8px",
+                            marginBottom: "8px",
+                            alignItems: "center",
+                          }}
+                        >
+                          <Input
+                            placeholder="{{variable_name}}"
+                            value={variable.key}
+                            onChange={(e) =>
+                              updateVariable(index, "key", e.target.value)
+                            }
+                            style={{ flex: 1 }}
+                            size="small"
+                          />
+                          <Input
+                            placeholder="Enter value"
+                            value={variable.value}
+                            onChange={(e) =>
+                              updateVariable(index, "value", e.target.value)
+                            }
+                            style={{ flex: 1 }}
+                            size="small"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeVariable(index)}
+                            style={{
+                              border: "none",
+                              borderRadius: "4px",
+                              padding: "4px 8px",
+                              cursor: "pointer",
+                              display: "flex",
+                              alignItems: "center",
+                            }}
+                          >
+                            <img
+                              src="/svgs/trash.svg"
+                              alt="Delete"
+                              width={14}
+                              height={14}
+                            />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 

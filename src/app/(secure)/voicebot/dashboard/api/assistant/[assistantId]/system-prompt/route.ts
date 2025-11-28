@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
@@ -17,13 +16,18 @@ export async function GET(
 
     console.log("Fetching system prompt for assistant:", assistantId);
 
-    // Fetch assistant details from VAPI
+    // Fetch assistant details from VAPI with cache-busting
     const vapiRes = await fetch(`https://api.vapi.ai/assistant/${assistantId}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${process.env.VAPI_PRIVATE_KEY}`,
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
       },
+ 
+      cache: "no-store",
+      next: { revalidate: 0 }
     });
 
     if (!vapiRes.ok) {
@@ -51,12 +55,20 @@ export async function GET(
       }
     }
 
+  
     return NextResponse.json(
       { 
         systemPrompt,
         assistantName: assistantData.name || "Unknown Assistant"
       },
-      { status: 200 }
+      { 
+        status: 200,
+        headers: {
+          "Cache-Control": "no-cache, no-store, must-revalidate, max-age=0",
+          "Pragma": "no-cache",
+          "Expires": "0"
+        }
+      }
     );
 
   } catch (e: any) {

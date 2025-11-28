@@ -57,6 +57,10 @@ export default function Evals() {
   const [selectedAssistant, setSelectedAssistant] = useState("gpt-4o");
   const [selectedRun, setSelectedRun] = useState<RunTableItem | null>(null);
   const [isViewDetailsOpen, setIsViewDetailsOpen] = useState(false);
+  const [assistantVariables, setAssistantVariables] = useState<Array<{
+  key: string;
+  value: string;
+}>>([]);
 
   // State for API data
   const [evals, setEvals] = useState<EvalTableItem[]>([]);
@@ -218,56 +222,85 @@ export default function Evals() {
     setRunDetailsLoading(false);
   };
 
-  //  Handle Run Evaluation
-  const handleRunEvaluation = async () => {
-    if (!selectedEval) {
-      message.error("No evaluation selected");
-      return;
-    }
-
-    if (!vapiAssistantId) {
-      message.error("Assistant not found. Please select an assistant first.");
-      return;
-    }
-
-    try {
-      setIsRunning(true);
-
-      const response = await fetch("/voicebot/dashboard/api/evals/run", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          evalId: selectedEval.id,
-          assistantId: vapiAssistantId,
-          assistantMongoId: assistantMongoId,
-          userId: userId,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok && !data.error) {
-        message.success("Evaluation run started successfully!");
-
-        // Close the modal
-        setIsModalOpen(false);
-
-        // If navigate to runs page is checked, switch to runs tab
-        if (navigateToRuns) {
-          setActiveTab("runs");
-        }
-      } else {
-        message.error(data.error || "Failed to start evaluation run");
-      }
-    } catch (error) {
-      console.error("Error running evaluation:", error);
-      message.error("Failed to start evaluation run");
-    } finally {
-      setIsRunning(false);
-    }
+    // Add handlers
+  const addVariable = () => {
+    setAssistantVariables([...assistantVariables, { key: "", value: "" }]);
   };
+
+  const updateVariable = (
+    index: number,
+    field: "key" | "value",
+    value: string
+  ) => {
+    const newVars = [...assistantVariables];
+    newVars[index][field] = value;
+    setAssistantVariables(newVars);
+  };
+
+  const removeVariable = (index: number) => {
+    setAssistantVariables(assistantVariables.filter((_, i) => i !== index));
+  };
+
+const handleRunEvaluation = async () => {
+  if (!selectedEval) {
+    message.error("No evaluation selected");
+    return;
+  }
+
+  if (!vapiAssistantId) {
+    message.error("Assistant not found. Please select an assistant first.");
+    return;
+  }
+
+  try {
+    setIsRunning(true);
+
+    //  Filter and format variables
+    const validVariables = assistantVariables
+      .filter(v => v.key.trim() && v.value.trim())
+      .reduce((acc, v) => {
+        // Remove {{ }} if user added them
+        const cleanKey = v.key.trim().replace(/^\{\{|\}\}$/g, '');
+        acc[cleanKey] = v.value.trim();
+        return acc;
+      }, {} as Record<string, string>);
+
+    const response = await fetch("/voicebot/dashboard/api/evals/run", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        evalId: selectedEval.id,
+        assistantId: vapiAssistantId,
+        assistantMongoId: assistantMongoId,
+        userId: userId,
+        assistantVariables: Object.keys(validVariables).length > 0 ? validVariables : undefined, // ✅ Only send if not empty
+      }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok && !data.error) {
+      message.success("Evaluation run started successfully!");
+      setIsModalOpen(false);
+      
+      //  Reset variables after successful run
+      setAssistantVariables([]);
+      
+      if (navigateToRuns) {
+        setActiveTab("runs");
+      }
+    } else {
+      message.error(data.error || "Failed to start evaluation run");
+    }
+  } catch (error) {
+    console.error("Error running evaluation:", error);
+    message.error("Failed to start evaluation run");
+  } finally {
+    setIsRunning(false);
+  }
+};
   const handleDeleteEval = async (evalId: string, evalName: string) => {
     setDeleteType("eval");
     setItemToDelete({ id: evalId, name: evalName });
@@ -803,8 +836,77 @@ export default function Evals() {
               }}
             >
               <div className="section-label">Assistant Variables</div>
-              <button className="add-button">+ Add</button>
+              <button className="add-button"  onClick={() => {
+      setAssistantVariables([
+        ...assistantVariables,
+        { key: "", value: "" }
+      ]);
+    }}>+ Add</button>
             </div>
+{/* Variables List in Modal */}
+      {assistantVariables.length > 0 && (
+        <div className="modal-section" style={{ paddingTop: 0 }}>
+          <div className="variables-list">
+            {assistantVariables.map((variable, index) => (
+              <div 
+                key={index}
+                className="variable-row"
+                style={{
+                  display: 'flex',
+                  gap: '8px',
+                  marginBottom: '12px',
+                  alignItems: 'center'
+                }}
+              >
+                <Input
+                  placeholder="{{variable_name}}"
+                  value={variable.key}
+                  onChange={(e) => {
+                    const newVars = [...assistantVariables];
+                    newVars[index].key = e.target.value;
+                    setAssistantVariables(newVars);
+                  }}
+                  style={{ flex: 1 }}
+                  size="middle"
+                />
+                <Input
+                  placeholder="Enter value"
+                  value={variable.value}
+                  onChange={(e) => {
+                    const newVars = [...assistantVariables];
+                    newVars[index].value = e.target.value;
+                    setAssistantVariables(newVars);
+                  }}
+                  style={{ flex: 1 }}
+                  size="middle"
+                />
+                <Button
+                  danger
+                  size="middle"
+                  icon={
+                    <Image
+                      src="/svgs/trash.svg"
+                      alt="Delete"
+                      width={14}
+                      height={14}
+                    />
+                  }
+                  onClick={() => {
+                    setAssistantVariables(
+                      assistantVariables.filter((_, i) => i !== index)
+                    );
+                  }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
             <div className="modal-section">
               <div className="checkbox-option">
