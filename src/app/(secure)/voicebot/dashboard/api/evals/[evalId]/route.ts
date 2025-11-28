@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import clientPromise from "@/db";
 import { apiHandler } from "@/app/_helpers/server/api/api-handler";
+
 module.exports = apiHandler({
   GET:getEval,
 });
@@ -13,7 +14,7 @@ module.exports = apiHandler({
  * GET /api/evals/[evalId]
  * Fetches a single evaluation by ID from VAPI and merges with local DB metadata
  */
-export async function getEval(
+ async function getEval(
   req: NextRequest,
   { params }: { params: { evalId: string } }
 ) {
