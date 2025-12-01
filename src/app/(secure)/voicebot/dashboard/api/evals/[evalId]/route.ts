@@ -1,15 +1,7 @@
 
-
 import { NextRequest, NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import clientPromise from "@/db";
-import { apiHandler } from "@/app/_helpers/server/api/api-handler";
-
-module.exports = apiHandler({
-  GET:getEval,
-  PATCH:updateEval
-});
-
 
 /**
  * GET /api/evals/[evalId]
@@ -17,12 +9,16 @@ module.exports = apiHandler({
  */
  async function getEval(
   req: NextRequest,
-  { params }: { params: { evalId: string } }
+  context: { params: { evalId: string } }
 ) {
   try {
-    const { evalId } = params;
+    console.log("Context received:", context);
+    console.log("Params:", context?.params);
+    
+    const evalId = context?.params?.evalId;
 
     if (!evalId) {
+      console.error("Missing evalId from params");
       return NextResponse.json(
         { error: "Missing evalId" },
         { status: 400 }
@@ -96,14 +92,18 @@ module.exports = apiHandler({
  * PATCH /api/evals/[evalId]
  * Updates an evaluation in VAPI and local DB
  */
- async function updateEval(
+export async function PATCH(
   req: NextRequest,
-  { params }: { params: { evalId: string } }
+  context: { params: { evalId: string } }
 ) {
   try {
-    const { evalId } = params;
+    console.log("PATCH Context received:", context);
+    console.log("PATCH Params:", context?.params);
+    
+    const evalId = context?.params?.evalId;
 
     if (!evalId) {
+      console.error("Missing evalId from params");
       return NextResponse.json(
         { error: "Missing evalId" },
         { status: 400 }
