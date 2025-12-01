@@ -10,8 +10,9 @@ module.exports = apiHandler({
   DELETE: deleteEval,
 });
 
+
+
 /**
- * Delete an evaluation
  * DELETE /api/evals/delete?evalId=xxx&assistantId=xxx
  */
 async function deleteEval(req: NextRequest) {
