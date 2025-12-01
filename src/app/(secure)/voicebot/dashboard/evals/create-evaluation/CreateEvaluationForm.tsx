@@ -462,38 +462,37 @@ export default function CreateEvaluationForm({
       }
 
       // Transform turns to the format expected by backend
-      const formattedTurns = turns.map((turn) => {
-        const formattedTurn: any = {
-          role: turn.type === "tool-response" ? "tool" : turn.type,
-          message: turn.content,
-        };
+const formattedTurns = turns.map((turn) => {
+  const formattedTurn: any = {
+    role: turn.type === "tool-response" ? "tool" : turn.type,
+    message: turn.content,
+  };
 
-        // If assistant turn has tool calls, add them
-        if (
-          turn.type === "assistant" &&
-          turn.mode === "evaluation" &&
-          turn.toolCalls &&
-          turn.toolCalls.length > 0
-        ) {
-          formattedTurn.tool_calls = turn.toolCalls.map((toolCall) => {
-            const argsObject: Record<string, string> = {};
-            toolCall.args.forEach((arg) => {
-              if (arg.key) {
-                argsObject[arg.key] = arg.value;
-              }
-            });
-
-            return {
-              function: {
-                name: toolCall.name,
-                arguments: JSON.stringify(argsObject),
-              },
-            };
-          });
+  // If assistant turn has tool calls (both mock and evaluation modes)
+  if (
+    turn.type === "assistant" &&
+    turn.toolCalls &&
+    turn.toolCalls.length > 0
+  ) {
+    formattedTurn.tool_calls = turn.toolCalls.map((toolCall) => {
+      const argsObject: Record<string, string> = {};
+      toolCall.args.forEach((arg) => {
+        if (arg.key) {
+          argsObject[arg.key] = arg.value;
         }
-
-        return formattedTurn;
       });
+
+      return {
+        function: {
+          name: toolCall.name,
+          arguments: JSON.stringify(argsObject),
+        },
+      };
+    });
+  }
+
+  return formattedTurn;
+});
       const payload = {
         evalName,
         evalDesc,
@@ -593,46 +592,49 @@ export default function CreateEvaluationForm({
 
     try {
       // Transform turns to the format expected by backend
-const formattedTurns = turns.map((turn) => {
-  const formattedTurn: any = {
-    role: turn.type === "tool-response" ? "tool" : turn.type,
-  };
+      const formattedTurns = turns.map((turn) => {
+        const formattedTurn: any = {
+          role: turn.type === "tool-response" ? "tool" : turn.type,
+        };
 
-  // Check if this is an assistant evaluation turn with tool calls
-  const isAssistantEvalWithTools = 
-    turn.type === "assistant" && 
-    turn.mode === "evaluation" && 
-    turn.toolCalls && 
-    turn.toolCalls.length > 0;
+        // Check if this is an assistant evaluation turn with tool calls
+        const isAssistantEvalWithTools =
+          turn.type === "assistant" &&
+          turn.mode === "evaluation" &&
+          turn.toolCalls &&
+          turn.toolCalls.length > 0;
 
-  // Only add message if:
-  // 1. It's NOT an assistant evaluation with tools, OR
-  // 2. The content is not empty
-  if (!isAssistantEvalWithTools || (turn.content && turn.content.trim() !== "")) {
-    formattedTurn.message = turn.content;
-  }
-
-  // If assistant turn has tool calls, add them
-  if (isAssistantEvalWithTools && turn.toolCalls) { 
-    formattedTurn.tool_calls = turn.toolCalls.map((toolCall) => {
-      const argsObject: Record<string, string> = {};
-      toolCall.args.forEach((arg) => {
-        if (arg.key) {
-          argsObject[arg.key] = arg.value;
+        // Only add message if:
+        // 1. It's NOT an assistant evaluation with tools, OR
+        // 2. The content is not empty
+        if (
+          !isAssistantEvalWithTools ||
+          (turn.content && turn.content.trim() !== "")
+        ) {
+          formattedTurn.message = turn.content;
         }
+
+        // If assistant turn has tool calls, add them
+        if (isAssistantEvalWithTools && turn.toolCalls) {
+          formattedTurn.tool_calls = turn.toolCalls.map((toolCall) => {
+            const argsObject: Record<string, string> = {};
+            toolCall.args.forEach((arg) => {
+              if (arg.key) {
+                argsObject[arg.key] = arg.value;
+              }
+            });
+
+            return {
+              function: {
+                name: toolCall.name,
+                arguments: JSON.stringify(argsObject),
+              },
+            };
+          });
+        }
+
+        return formattedTurn;
       });
-
-      return {
-        function: {
-          name: toolCall.name,
-          arguments: JSON.stringify(argsObject),
-        },
-      };
-    });
-  }
-
-  return formattedTurn;
-});
 
       // Call the test API endpoint (doesn't save to database)
       const response = await fetch("/voicebot/dashboard/api/evals/test", {
@@ -1080,17 +1082,194 @@ const formattedTurns = turns.map((turn) => {
                           </div>
 
                           {turn.mode === "mock" ? (
-                            <TextArea
-                              className="message-textarea"
-                              placeholder="Mock content"
-                              rows={3}
-                              value={turn.content}
-                              onChange={(e) => {
-                                const newTurns = [...turns];
-                                newTurns[index].content = e.target.value;
-                                setTurns(newTurns);
-                              }}
-                            />
+                            <>
+                              <TextArea
+                                className="message-textarea"
+                                placeholder="Mock content"
+                                rows={3}
+                                value={turn.content}
+                                onChange={(e) => {
+                                  const newTurns = [...turns];
+                                  newTurns[index].content = e.target.value;
+                                  setTurns(newTurns);
+                                }}
+                              />
+
+                              {/* Tool Calls Section for Mock Mode */}
+                              {!turn.toolCallInput && (
+                                <div className="add-toolcall-row">
+                                  <div
+                                    style={{
+                                      display: "flex",
+                                      justifyContent: "space-between",
+                                      marginTop: "10px",
+                                    }}
+                                  >
+                                    <div className="add-toolcall-row-second">
+                                      Tool Calls
+                                    </div>
+
+                                    <button
+                                      type="button"
+                                      className="toolcall-btn"
+                                      onClick={() => startToolCallInput(index)}
+                                    >
+                                      <PlusOutlined style={{ fontSize: 16 }} />{" "}
+                                      Add Tool Call
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+
+                              {turn.toolCallInput && (
+                                <Card
+                                  className="expected-toolcalls"
+                                  size="small"
+                                >
+                                  <Input
+                                    className="tool-call-input"
+                                    placeholder="Tool name"
+                                    value={turn.toolCallInput.name}
+                                    onChange={(e) =>
+                                      updateToolCallName(index, e.target.value)
+                                    }
+                                  />
+                                  <div className="arguments-label">
+                                    Arguments
+                                  </div>
+                                  <div className="toolcall-rows">
+                                    {(turn.toolCallInput.args || []).map(
+                                      (arg, idx2) => (
+                                        <div
+                                          className="toolcall-row"
+                                          key={idx2}
+                                        >
+                                          <Input
+                                            className="tool-call-arg"
+                                            placeholder="Key"
+                                            value={arg.key}
+                                            onChange={(e) =>
+                                              updateToolCallArg(
+                                                index,
+                                                idx2,
+                                                "key",
+                                                e.target.value
+                                              )
+                                            }
+                                          />
+                                          <Input
+                                            className="tool-call-arg"
+                                            placeholder="Value"
+                                            value={arg.value}
+                                            onChange={(e) =>
+                                              updateToolCallArg(
+                                                index,
+                                                idx2,
+                                                "value",
+                                                e.target.value
+                                              )
+                                            }
+                                          />
+                                          <button
+                                            className="delete-arg-btn"
+                                            type="button"
+                                            onClick={() =>
+                                              removeToolCallArg(index, idx2)
+                                            }
+                                          >
+                                            <img
+                                              src="/svgs/trash.svg"
+                                              alt="Tool Response"
+                                              width={16}
+                                              height={16}
+                                            />
+                                          </button>
+                                        </div>
+                                      )
+                                    )}
+                                    <button
+                                      className="add-arg-btn toolcall-btn"
+                                      type="button"
+                                      onClick={() => addToolCallArg(index)}
+                                    >
+                                      <PlusOutlined style={{ fontSize: 13 }} />{" "}
+                                      Add
+                                    </button>
+                                  </div>
+                                  <div className="toolcall-footer">
+                                    <Button
+                                      className="action-btn secondary"
+                                      onClick={() => cancelToolCall(index)}
+                                    >
+                                      Cancel
+                                    </Button>
+                                    <Button
+                                      type="primary"
+                                      className="action-btn primary"
+                                      onClick={() => saveToolCall(index)}
+                                    >
+                                      Save
+                                    </Button>
+                                  </div>
+                                </Card>
+                              )}
+
+                              {turn.toolCalls && turn.toolCalls.length > 0 && (
+                                <div className="saved-toolcalls-list">
+                                  {turn.toolCalls.map((call, callIdx) => (
+                                    <div
+                                      className="toolcall-item"
+                                      key={callIdx}
+                                    >
+                                      <div className="toolcall-content">
+                                        <span className="toolcall-name">
+                                          {call.name || "No Tool Name"}
+                                        </span>
+                                        {call.args &&
+                                          Object.keys(call.args).length > 0 && (
+                                            <span className="toolcall-args">
+                                              {Object.keys(call.args).length}{" "}
+                                              arg
+                                              {Object.keys(call.args).length !==
+                                              1
+                                                ? "s"
+                                                : ""}
+                                            </span>
+                                          )}
+                                      </div>
+                                      <div className="toolcall-actions">
+                                        <button
+                                          className="toolcall-action-btn edit-btn"
+                                          onClick={() =>
+                                            editToolCall(index, callIdx)
+                                          }
+                                        >
+                                          <img
+                                            src="/svgs/edit-2.svg"
+                                            alt="Edit"
+                                            width={16}
+                                            height={16}
+                                          />
+                                        </button>
+                                        <button
+                                          className="toolcall-action-btn delete-btn"
+                                          onClick={() =>
+                                            removeToolCall(index, callIdx)
+                                          }
+                                        >
+                                          <img
+                                            src="/svgs/trash.svg"
+                                            alt="Delete"
+                                            width={16}
+                                            height={16}
+                                          />
+                                        </button>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </>
                           ) : (
                             <div className="evaluation-section">
                               <TextArea

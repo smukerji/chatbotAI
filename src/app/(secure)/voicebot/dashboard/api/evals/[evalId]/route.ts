@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import clientPromise from "@/db";
@@ -7,7 +6,7 @@ import clientPromise from "@/db";
  * GET /api/evals/[evalId]
  * Fetches a single evaluation by ID from VAPI and merges with local DB metadata
  */
- async function getEval(
+export async function GET(
   req: NextRequest,
   context: { params: { evalId: string } }
 ) {
@@ -80,7 +79,7 @@ import clientPromise from "@/db";
     return NextResponse.json({ eval: vapiData }, { status: 200 });
 
   } catch (e: any) {
-    console.error("Error in getEval:", e);
+    console.error("Error in GET handler:", e);
     return NextResponse.json(
       { error: e.message || "Internal server error" },
       { status: 500 }
@@ -212,7 +211,6 @@ export async function PATCH(
     console.log("Transformed messages for VAPI:", JSON.stringify(vapiMessages, null, 2));
 
     // Build VAPI payload 
-    
     const vapiPayload = {
       name: evalName,
       description: evalDesc || "",
@@ -269,7 +267,6 @@ export async function PATCH(
       console.log("Local DB updated successfully");
     } catch (dbError) {
       console.error("DB update error:", dbError);
-     
     }
 
     return NextResponse.json(
@@ -281,7 +278,7 @@ export async function PATCH(
     );
 
   } catch (e: any) {
-    console.error("Error in updateEval:", e);
+    console.error("Error in PATCH handler:", e);
     return NextResponse.json(
       { error: e.message || "Internal server error" },
       { status: 500 }
