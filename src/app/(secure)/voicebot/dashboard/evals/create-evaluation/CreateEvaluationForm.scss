@@ -304,13 +304,6 @@
   font-size: 13px;
   font-weight: 500;
 
-  flex-wrap: wrap;
-  flex: 1;
-
-  // Make sure the filter dropdown appears inline
-  .filter-dropdown {
-    margin-left: auto;
-  }
   .label-text {
     color: #1a1a1a;
     font-weight: 600;
@@ -477,11 +470,6 @@
 
 .evaluation-section {
   margin-top: 12px;
-
-  // Remove any standalone approach selectors
-  .approach-selector {
-    display: none; // Hide if it exists
-  }
 }
 
 .expected-toolcalls {
@@ -1475,9 +1463,9 @@
   border-radius: 20px;
   padding: 6px 14px;
   font-family: "Inter", sans-serif;
-  gap: 12px;
+  gap: 18px; // Reduced gap
   height: 32px;
-  min-width: 160px; // Ensure enough space for all options
+  // margin-right: auto; // Push to right side of header
 
   .label {
     color: #777e91;
@@ -1490,20 +1478,19 @@
     position: relative;
     display: flex;
     align-items: center;
-    min-width: 120px; // Adjust for "LLM-as-a-judge"
 
     .filter-select {
       &.ant-select {
         border: none !important;
         background: transparent !important;
         box-shadow: none !important;
-        width: 100%;
+        min-width: 80px; // Set minimum width for "Exact" text
 
         .ant-select-selector {
           border: none !important;
           background: transparent !important;
           box-shadow: none !important;
-          padding: 0 20px 0 0 !important;
+          padding: 0 16px 0 0 !important; // Add right padding for arrow
           height: auto !important;
           min-height: auto !important;
         }
@@ -1547,26 +1534,6 @@
   }
 }
 
-// Update message-header to better accommodate the approach dropdown
-.message-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-  gap: 16px;
-
-  .message-label {
-    flex: 1;
-    min-width: 0; // Allow flexbox to shrink if needed
-  }
-
-  .message-actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-shrink: 0; // Prevent shrinking
-  }
-}
 // Ensure proper positioning in message header
 .message-header {
   display: flex;
@@ -1578,319 +1545,4 @@
   //   margin-left: auto;
   //   margin-right: 16px; // Add space before turn number
   // }
-}
-
-
-// Add these styles to your existing CreateEvaluationForm.scss
-
-/* Approach Selector */
-.approach-selector {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
-  padding: 8px 12px;
-  background: #ffffff;
-  border: 1px solid #e6e8ec;
-  border-radius: 8px;
-
-  .approach-label {
-    font-size: 14px;
-    font-weight: 500;
-    color: #777e90;
-    white-space: nowrap;
-  }
-
-  .approach-select {
-    flex: 1;
-    
-    &.ant-select {
-      .ant-select-selector {
-        border: none !important;
-        background: transparent !important;
-        box-shadow: none !important;
-        height: 32px !important;
-        padding: 0 24px 0 8px !important;
-      }
-
-      .ant-select-selection-item {
-        font-size: 14px;
-        font-weight: 500;
-        color: #353945;
-        line-height: 32px;
-      }
-    }
-  }
-}
-
-/* Evaluation Hint */
-.evaluation-hint {
-  margin-top: 8px;
-  font-size: 12px;
-  color: #b1b5c3;
-  font-style: italic;
-}
-
-/* Regex Section */
-.regex-section {
-  .field-label {
-    font-size: 14px;
-    font-weight: 500;
-    color: #353945;
-    margin-bottom: 8px;
-  }
-}
-
-/* LLM-as-a-judge Section */
-.llm-judge-section {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  margin-top: 16px;
-
-  .criteria-field {
-    .field-label {
-      font-size: 14px;
-      font-weight: 600;
-      color: #141416;
-      margin-bottom: 8px;
-      display: block;
-    }
-
-    .criteria-input {
-      &.ant-input {
-        padding: 10px 14px;
-        font-size: 14px;
-        border-radius: 8px;
-        border: 1px solid #e6e8ec;
-        background: #ffffff;
-        
-        &::placeholder {
-          color: #9ca3af;
-        }
-
-        &:focus {
-          border-color: #4361ee;
-          box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.1);
-        }
-      }
-    }
-
-    .field-hint {
-      margin-top: 6px;
-      font-size: 12px;
-      color: #777e90;
-      font-style: italic;
-    }
-  }
-
-  .context-toggle {
-    background: #f9fafb;
-    border: 1px solid #e6e8ec;
-    border-radius: 8px;
-    padding: 16px;
-
-    .toggle-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-
-      .toggle-label {
-        font-size: 14px;
-        font-weight: 500;
-        color: #141416;
-        margin-bottom: 4px;
-      }
-
-      .toggle-description {
-        font-size: 12px;
-        color: #777e90;
-      }
-    }
-
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 44px;
-      height: 24px;
-      flex-shrink: 0;
-
-      input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-
-        &:checked + .slider {
-          background-color: #4361ee;
-        }
-
-        &:checked + .slider:before {
-          transform: translateX(20px);
-        }
-
-        &:focus + .slider {
-          box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
-        }
-      }
-
-      .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #d1d5db;
-        transition: 0.3s;
-        border-radius: 24px;
-
-        &:before {
-          position: absolute;
-          content: "";
-          height: 18px;
-          width: 18px;
-          left: 3px;
-          bottom: 3px;
-          background-color: white;
-          transition: 0.3s;
-          border-radius: 50%;
-        }
-      }
-    }
-  }
-
-  .custom-prompt-section {
-    .custom-prompt-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
-
-      .field-label {
-        font-size: 14px;
-        font-weight: 600;
-        color: #141416;
-      }
-
-      .optional-badge {
-        font-size: 11px;
-        font-weight: 500;
-        color: #777e90;
-        background: #f4f5f6;
-        padding: 2px 8px;
-        border-radius: 4px;
-      }
-    }
-
-    .custom-prompt-textarea {
-      &.ant-input-textarea textarea {
-        font-family: 'Courier New', monospace;
-        font-size: 13px;
-        line-height: 1.6;
-      }
-    }
-
-    .field-hint {
-      margin-top: 6px;
-      font-size: 12px;
-      color: #777e90;
-      font-style: italic;
-    }
-  }
-}
-
-// Regex section styles
-.regex-section {
-  .field-label {
-    font-size: 14px;
-    font-weight: 500;
-    color: #353945;
-    margin-bottom: 8px;
-  }
-}
-
-// Update tool calls section spacing
-.add-toolcall-row {
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid #e6e8ec;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  .add-toolcall-row-second {
-    color: #353945;
-    font-size: 14px;
-    font-weight: 500;
-  }
-}
-
-// Responsive adjustments
-@media (max-width: 1200px) {
-  .message-label {
-    .filter-dropdown {
-      margin-left: 0;
-      margin-top: 8px;
-      width: 100%;
-    }
-  }
-}
-
-/* Update the add-toolcall-row styles */
-.add-toolcall-row {
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid #e6e8ec;
-
-  .add-toolcall-row-first {
-    color: #b1b5c3;
-    font-size: 12px;
-    margin-bottom: 12px;
-  }
-
-  .add-toolcall-row-second {
-    color: #777e90;
-    font-size: 14px;
-    font-weight: 500;
-    margin-bottom: 12px;
-  }
-
-  .toolcall-btn {
-    background: transparent;
-    border: 1px solid #e6e8ec;
-    color: #4361ee;
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    transition: all 0.2s;
-
-    &:hover {
-      background: #f5f8fd;
-      border-color: #4361ee;
-    }
-  }
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .approach-selector {
-    flex-direction: column;
-    align-items: stretch;
-
-    .approach-label {
-      margin-bottom: 4px;
-    }
-  }
-
-  .context-toggle .toggle-row {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
 }

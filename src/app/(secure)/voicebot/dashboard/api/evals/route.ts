@@ -1,3 +1,4 @@
+// app/(secure)/voicebot/dashboard/api/evals/route.ts
 
 import { NextRequest, NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
@@ -57,93 +58,42 @@ async function createEval(req: NextRequest) {
             }
 
             // Assistant messages
+
             if (role === "assistant") {
-                // Check if this is an evaluation checkpoint (has judgePlan)
-                if (t.judgePlan) {
-                    console.log("Processing judgePlan:", JSON.stringify(t.judgePlan, null, 2));
-                    
+                // Check if this is an evaluation checkpoint (has tool_calls to validate)
+                if (t.tool_calls && t.tool_calls.length > 0) {
+                    // This is an evaluation checkpoint
                     const judgePlan: any = {
-                        type: t.judgePlan.type || "exact",
+                        type: "exact",
                     };
 
-                    // EXACT approach
-                    if (judgePlan.type === "exact") {
-                        if (t.judgePlan.content && t.judgePlan.content.trim() !== "") {
-                            judgePlan.content = t.judgePlan.content.trim();
-                        }
+                    // Only add content validation if message exists and is not empty
+                    if (t.message && t.message.trim() !== "") {
+                        judgePlan.content = t.message.trim();
                     }
+                    //  If no message field at all, don't add content
 
-                    // REGEX approach - pattern goes in 'content' field
-                    else if (judgePlan.type === "regex") {
-                        console.log("Regex pattern received:", t.judgePlan.regexPattern);
-                        if (t.judgePlan.regexPattern && t.judgePlan.regexPattern.trim() !== "") {
-                            judgePlan.content = t.judgePlan.regexPattern.trim(); // Use 'content', not 'regexPattern'
-                            console.log("Setting judgePlan.content to:", judgePlan.content);
-                        } else {
-                            console.log("WARNING: No regex pattern provided!");
-                        }
-                    }
-
-                    // LLM-as-a-judge approach
-                    else if (judgePlan.type === "llm-as-a-judge") {
-                        if (t.judgePlan.passCriteria && t.judgePlan.passCriteria.trim() !== "") {
-                            judgePlan.passCriteria = t.judgePlan.passCriteria.trim();
-                        }
-                        if (t.judgePlan.failCriteria && t.judgePlan.failCriteria.trim() !== "") {
-                            judgePlan.failCriteria = t.judgePlan.failCriteria.trim();
-                        }
-                        if (t.judgePlan.includeConversationContext !== undefined) {
-                            judgePlan.includeConversationContext = t.judgePlan.includeConversationContext;
-                        }
-                        if (t.judgePlan.customPrompt && t.judgePlan.customPrompt.trim() !== "") {
-                            judgePlan.customPrompt = t.judgePlan.customPrompt.trim();
-                        }
-                    }
-
-                    // Add tool call validation if present (for all evaluation types)
-                    if (t.judgePlan.toolCalls && t.judgePlan.toolCalls.length > 0) {
-                        judgePlan.toolCalls = t.judgePlan.toolCalls.map((tc: any) => {
-                            return {
-                                name: tc.name,
-                                arguments: tc.arguments,
-                            };
-                        });
-                    }
-
-                    console.log("Final judgePlan being sent to VAPI:", JSON.stringify(judgePlan, null, 2));
-
-                    return {
-                        role: "assistant",
-                        judgePlan: judgePlan,
-                    };
-                }
-                // Check if this is a mock message with tool calls
-                else if (t.tool_calls && t.tool_calls.length > 0) {
-                    const message: any = {
-                        role: "assistant",
-                        content: t.message || t.content || "",
-                    };
-
-                    // Add tool calls for mock mode
-                    message.tool_calls = t.tool_calls.map((tc: any) => {
+                    // Add tool call validation - FIXED STRUCTURE
+                    judgePlan.toolCalls = t.tool_calls.map((tc: any) => {
+                        // Parse arguments if it's a string
                         let args = tc.function.arguments;
                         if (typeof args === 'string') {
                             args = JSON.parse(args);
                         }
 
+                        // Return correct structure without 'type' or 'function' wrapper
                         return {
-                            type: "function",
-                            function: {
-                                name: tc.function.name,
-                                arguments: args,
-                            },
+                            name: tc.function.name,
+                            arguments: args,
                         };
                     });
 
-                    return message;
-                }
-                // Regular mock assistant message without tool calls
-                else {
+                    return {
+                        role: "assistant",
+                        judgePlan: judgePlan,
+                    };
+                } else {
+                    // Regular mock assistant message
                     return {
                         role: "assistant",
                         content: t.message || t.content || "",
@@ -285,8 +235,13 @@ async function getEvalsList(req: NextRequest) {
                 name: localEval?.name || "",
                 description: localEval?.description || "",
                 localCreatedAt: localEval?.createdAt,
+
             };
-        });
+
+
+        }
+
+        );
 
         return {
             evals: evalsWithMetadata,
