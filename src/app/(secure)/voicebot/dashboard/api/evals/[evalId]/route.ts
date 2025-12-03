@@ -13,7 +13,7 @@ export async function GET(
   try {
     console.log("Context received:", context);
     console.log("Params:", context?.params);
-    
+
     const evalId = context?.params?.evalId;
 
     if (!evalId) {
@@ -49,7 +49,7 @@ export async function GET(
 
     try {
       const db = (await clientPromise!).db();
-      
+
       // Find the assistant that has this eval
       const assistant = await db.collection("voice-assistance").findOne({
         "evals.evalId": evalId
@@ -57,7 +57,7 @@ export async function GET(
 
       if (assistant) {
         const localEval = assistant.evals.find((e: any) => e.evalId === evalId);
-        
+
         // Merge local metadata with VAPI data
         const mergedData = {
           ...vapiData,
@@ -98,7 +98,7 @@ export async function PATCH(
   try {
     console.log("PATCH Context received:", context);
     console.log("PATCH Params:", context?.params);
-    
+
     const evalId = context?.params?.evalId;
 
     if (!evalId) {
@@ -157,49 +157,41 @@ export async function PATCH(
         };
       }
 
-      // Assistant messages
-      if (role === "assistant") {
-        // Check if this is an evaluation checkpoint
-        if (t.tool_calls && t.tool_calls.length > 0) {
-          const judgePlan: any = {
-            type: "exact", 
-          };
+// Assistant messages
+if (role === "assistant") {
+  // If this is an evaluation checkpoint
+  if (t.judgePlan) {
+    const jpIn = t.judgePlan;
+    const judgePlan: any = { type: jpIn.type || "exact" };
 
-          // Only add content if it exists and is not empty
-          if (t.message && t.message.trim()) {
-            judgePlan.content = t.message.trim();
-          }
-
-          // Add tool call validation
-          judgePlan.toolCalls = t.tool_calls.map((tc: any) => {
-            let args = tc.function.arguments;
-            if (typeof args === 'string') {
-              try {
-                args = JSON.parse(args);
-              } catch (e) {
-                console.error("Failed to parse tool call arguments:", args);
-                args = {};
-              }
-            }
-
-            return {
-              name: tc.function.name,
-              arguments: args,
-            };
-          });
-
-          return {
-            role: "assistant",
-            judgePlan: judgePlan,
-          };
-        } else {
-          // Regular mock assistant message
-          return {
-            role: "assistant",
-            content: t.message || t.content || "",
-          };
-        }
+    if (judgePlan.type === "exact") {
+      if (jpIn.content && jpIn.content.trim()) {
+        judgePlan.content = jpIn.content.trim();
       }
+    } else if (judgePlan.type === "regex") {
+      if (jpIn.content && jpIn.content.trim()) {
+        judgePlan.content = jpIn.content.trim();
+      }
+    } 
+
+    //  Add tool calls from judgePlan
+    if (jpIn.toolCalls && Array.isArray(jpIn.toolCalls) && jpIn.toolCalls.length > 0) {
+      judgePlan.toolCalls = jpIn.toolCalls.map((tc: any) => {
+        return {
+          name: tc.name,
+          arguments: tc.arguments || {}
+        };
+      });
+    }
+
+    return { role: "assistant", judgePlan };
+  }
+
+  // Otherwise this is a mock assistant message
+  return { role: "assistant", content: t.message || t.content || "" };
+}
+
+
 
       // Fallback
       return {
@@ -230,7 +222,7 @@ export async function PATCH(
     });
 
     const vapiData = await vapiRes.json();
-    
+
     if (!vapiRes.ok) {
       console.error("VAPI Error Response:", vapiData);
       return NextResponse.json(
@@ -247,7 +239,7 @@ export async function PATCH(
     // Update local DB metadata
     try {
       const db = (await clientPromise!).db();
-      
+
       await db.collection("voice-assistance").updateOne(
         {
           _id: new ObjectId(assistantMongoId),

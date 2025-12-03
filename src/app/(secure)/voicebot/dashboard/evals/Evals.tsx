@@ -274,6 +274,7 @@ export default function Evals() {
         },
         body: JSON.stringify({
           evalId: selectedEval.id,
+          evalName: selectedEval.name,
           assistantId: vapiAssistantId,
           assistantMongoId: assistantMongoId,
           userId: userId,

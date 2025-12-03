@@ -10,9 +10,9 @@ module.exports = apiHandler({
 async function createEvalRun(req: NextRequest) {
   try {
     const data = await req.json();
-    const { evalId, assistantId, assistantMongoId, userId, assistantVariables, eval: evalObj } = data;
+    const { evalId,evalName, assistantId, assistantMongoId, userId, assistantVariables, eval: evalObj } = data;
 
-    console.log("Received data:", { evalId, assistantId, assistantMongoId, userId, assistantVariables });
+    console.log("Received data:", { evalId,evalName, assistantId, assistantMongoId, userId, assistantVariables });
 
     if (!assistantId) {
       return { error: "assistantId is required", status: 400 };
@@ -112,7 +112,8 @@ async function createEvalRun(req: NextRequest) {
     if (evalId && vapiData.workflowId && vapiData.evalRunId) {
       const newRun = {
         workflowId: vapiData.workflowId,  
-        evalRunId: vapiData.evalRunId,    
+        evalRunId: vapiData.evalRunId,   
+        evalName: evalName || "Unknown", 
         status: vapiRes.status || 200,
         createdAt: new Date(),
       };

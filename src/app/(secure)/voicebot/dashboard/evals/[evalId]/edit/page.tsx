@@ -1,4 +1,3 @@
-
 "use client";
 import { useEffect, useState } from "react";
 import { Spin, message } from "antd";
@@ -26,17 +25,24 @@ export default function EditEvalPage({ params }: EditEvalPageProps) {
       setLoading(true);
       setError(null);
 
+      console.log(" Fetching eval with ID:", evalId);
+
       const response = await fetch(`/voicebot/dashboard/api/evals/${evalId}`);
       const data = await response.json();
+
+      console.log(" Raw API response:", JSON.stringify(data, null, 2));
 
       if (!response.ok || data.error) {
         throw new Error(data.error || "Failed to fetch evaluation");
       }
 
-      console.log("Fetched eval data:", data.eval);
+      console.log(" Fetched eval data:", data.eval);
+      console.log(" Messages array:", data.eval?.messages);
 
       // Transform VAPI data to match the form's expected format
       const transformedData = transformVAPIDataToFormData(data.eval);
+      
+      console.log(" Transformed data for form:", JSON.stringify(transformedData, null, 2));
       
       setEvalData(transformedData);
     } catch (err: any) {
@@ -50,6 +56,9 @@ export default function EditEvalPage({ params }: EditEvalPageProps) {
 
 
   const transformVAPIDataToFormData = (vapiEval: any) => {
+    console.log("===  TRANSFORMATION START ===");
+    console.log("Input:", vapiEval);
+    
     // Extract basic info
     const formData: any = {
       evalId: vapiEval.id,
@@ -57,53 +66,109 @@ export default function EditEvalPage({ params }: EditEvalPageProps) {
       description: vapiEval.localDescription || vapiEval.description || "",
       assistantMongoId: vapiEval.assistantMongoId || "",
       vapiAssistantId: vapiEval.assistantId || vapiEval.vapiAssistantId || "",
-      provider: "openai", // Default, you might want to extract this from assistant config
-      model: "gpt-4o", // Default, you might want to extract this from assistant config
-      selectedAssistant: "viff", // Default
+      provider: "openai",
+      model: "gpt-4o",
       messages: [],
     };
 
+    console.log(" Basic info extracted:", formData);
+
     // Transform messages to form's turn format
-    if (vapiEval.messages && Array.isArray(vapiEval.messages)) {
-      formData.messages = vapiEval.messages.map((msg: any, index: number) => {
-        const baseTurn: any = {
-          id: index + 1,
-          type: msg.role === "tool" ? "tool-response" : msg.role,
-          content: msg.content || "",
-        };
-
-        // Handle assistant messages with judgePlan (evaluation mode)
-        if (msg.role === "assistant" && msg.judgePlan) {
-          baseTurn.mode = "evaluation";
-          
-          // Extract tool calls from judgePlan
-          if (msg.judgePlan.toolCalls && Array.isArray(msg.judgePlan.toolCalls)) {
-            baseTurn.toolCalls = msg.judgePlan.toolCalls.map((tc: any) => ({
-              name: tc.name || "",
-              args: Object.entries(tc.arguments || {}).map(([key, value]) => ({
-                key,
-                value: String(value),
-              })),
-            }));
-          } else {
-            baseTurn.toolCalls = [];
-          }
-
-          // If judgePlan has content, use it
-          if (msg.judgePlan.content) {
-            baseTurn.content = msg.judgePlan.content;
-          }
-        } else if (msg.role === "assistant") {
-          // Regular mock assistant message
-          baseTurn.mode = "mock";
-          baseTurn.toolCalls = [];
-        }
-
-        return baseTurn;
-      });
+    if (!vapiEval.messages) {
+      console.error(" NO MESSAGES FOUND in vapiEval!");
+      return formData;
     }
 
-    console.log("Transformed form data:", formData);
+    if (!Array.isArray(vapiEval.messages)) {
+      console.error(" Messages is not an array:", typeof vapiEval.messages);
+      return formData;
+    }
+
+    console.log(`Processing ${vapiEval.messages.length} messages`);
+      
+    formData.messages = vapiEval.messages.map((msg: any, index: number) => {
+      console.log(`\n--- Message ${index + 1}/${vapiEval.messages.length} ---`);
+      console.log("Role:", msg.role);
+      console.log("Content:", msg.content);
+      console.log("Has judgePlan:", !!msg.judgePlan);
+      
+      const baseTurn: any = {
+        id: index + 1,
+        type: msg.role === "tool" ? "tool-response" : msg.role,
+        content: msg.content || "",
+      };
+
+      // Handle assistant messages with judgePlan (evaluation mode)
+      if (msg.role === "assistant" && msg.judgePlan) {
+        console.log("EVALUATION MODE - judgePlan:", JSON.stringify(msg.judgePlan, null, 2));
+        
+        baseTurn.mode = "evaluation";
+        
+        const judgePlan = msg.judgePlan;
+        baseTurn.evaluationApproach = {
+          type: judgePlan.type || "exact"
+        };
+
+        console.log("Approach type:", baseTurn.evaluationApproach.type);
+
+        // Handle EXACT approach
+        if (judgePlan.type === "exact") {
+          baseTurn.content = judgePlan.content || "";
+          console.log("✓ Exact content:", baseTurn.content);
+        } 
+        // Handle REGEX approach
+        else if (judgePlan.type === "regex") {
+          // CRITICAL: VAPI stores regex pattern in judgePlan.content
+          baseTurn.evaluationApproach.regexPattern = judgePlan.content || "";
+          baseTurn.content = ""; // Clear display content
+          console.log("✓ Regex pattern:", baseTurn.evaluationApproach.regexPattern);
+        }
+     
+        // Extract tool calls from judgePlan
+        if (judgePlan.toolCalls && Array.isArray(judgePlan.toolCalls)) {
+          console.log(`Found ${judgePlan.toolCalls.length} tool calls`);
+          
+          baseTurn.toolCalls = judgePlan.toolCalls.map((tc: any, tcIndex: number) => {
+            console.log(` Tool ${tcIndex + 1}: ${tc.name}`);
+            console.log(` Arguments:`, tc.arguments);
+            
+            const args: Array<{ key: string; value: string }> = [];
+            
+            if (tc.arguments && typeof tc.arguments === 'object') {
+              Object.entries(tc.arguments).forEach(([key, value]) => {
+                args.push({ key, value: String(value) });
+                console.log(`    - ${key}: ${value}`);
+              });
+            }
+
+            return {
+              name: tc.name || "",
+              args: args.length > 0 ? args : [{ key: "", value: "" }],
+            };
+          });
+          
+          console.log("✓ Tool calls transformed:", baseTurn.toolCalls);
+        } else {
+          baseTurn.toolCalls = [];
+          console.log("✓ No tool calls");
+        }
+      } 
+      // Handle regular mock assistant messages
+      else if (msg.role === "assistant") {
+        console.log("MOCK MODE");
+        baseTurn.mode = "mock";
+        baseTurn.toolCalls = [];
+        baseTurn.content = msg.content || "";
+      }
+
+      console.log("Transformed turn:", JSON.stringify(baseTurn, null, 2));
+      return baseTurn;
+    });
+
+    console.log("=== TRANSFORMATION COMPLETE ===");
+    console.log("Total messages transformed:", formData.messages.length);
+    console.log("Final formData:", JSON.stringify(formData, null, 2));
+    
     return formData;
   };
 
@@ -167,6 +232,8 @@ export default function EditEvalPage({ params }: EditEvalPageProps) {
       </div>
     );
   }
+
+  console.log("Rendering CreateEvaluationForm with:", evalData);
 
   return <CreateEvaluationForm mode="edit" initialData={evalData} />;
 }

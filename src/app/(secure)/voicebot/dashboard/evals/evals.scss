@@ -512,6 +512,51 @@ $white: #ffffff;
       color: $text-dark;
       // margin-bottom: 8px;
     }
+     .variables-list {
+      max-height: 200px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding-right: 8px;
+      margin-top: 0;
+
+      // Custom scrollbar styling
+      &::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 3px;
+
+        &:hover {
+          background: #9ca3af;
+        }
+      }
+
+      // Firefox scrollbar
+      scrollbar-width: thin;
+      scrollbar-color: #d1d5db #f1f1f1;
+    }
+
+    .variable-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      align-items: center;
+
+      .ant-input {
+        flex: 1;
+      }
+
+      .ant-btn {
+        flex-shrink: 0;
+      }
+    }
 
     .assistant-option {
       display: flex;
