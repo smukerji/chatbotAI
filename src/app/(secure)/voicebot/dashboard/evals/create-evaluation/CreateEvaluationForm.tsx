@@ -1,5 +1,14 @@
 import React, { useContext, useState } from "react";
-import { Button, Input, Select, Card, Typography, Form, message } from "antd";
+import {
+  Button,
+  Input,
+  Select,
+  Card,
+  Typography,
+  Form,
+  message,
+  Modal,
+} from "antd";
 import { LeftOutlined, PlusOutlined, CloseOutlined } from "@ant-design/icons";
 import "./CreateEvaluationForm.scss";
 import { CreateVoiceBotContext } from "@/app/_helpers/client/Context/VoiceBotContextApi";
@@ -20,6 +29,16 @@ interface EvaluationApproach {
   failCriteria?: string;
   includeContext?: boolean;
   customPrompt?: string;
+  provider?: string;
+  modelName?: string;
+  model?: {
+    provider: string;
+    model: string;
+    messages: Array<{
+      role: string;
+      content: string;
+    }>;
+  };
 }
 
 interface Turn {
@@ -297,10 +316,21 @@ export default function CreateEvaluationForm({
 
   const setAssistantMode = (turnId: number, mode: AssistantMode) => {
     setTurns(
-      turns.map((turn) => (turn.id === turnId ? { ...turn, mode } : turn))
+      turns.map((turn) => {
+        if (turn.id === turnId) {
+          const updatedTurn = { ...turn, mode };
+
+          // Initialize evaluationApproach when switching to evaluation mode
+          if (mode === "evaluation" && !updatedTurn.evaluationApproach) {
+            updatedTurn.evaluationApproach = { type: "exact" };
+          }
+
+          return updatedTurn;
+        }
+        return turn;
+      })
     );
   };
-
   const getTurnNumber = (index: number) => {
     return turns.slice(0, index + 1).filter((t) => t.type !== "system").length;
   };
@@ -493,9 +523,9 @@ export default function CreateEvaluationForm({
   const resetForm = () => {
     setEvalName("");
     setEvalDesc("");
-    setProvider("");
-    setModel("");
-    setSelectedAssistant("");
+    // setProvider("");
+    // setModel("");
+    // setSelectedAssistant("");
     //  Re-fetch system prompt instead of clearing it
     if (vapiAssistantId) {
       fetchSystemPrompt(true);
@@ -635,20 +665,49 @@ export default function CreateEvaluationForm({
           }
           // LLM-as-a-judge approach
           else if (approach.type === "llm-as-a-judge") {
-            if (approach.passCriteria && approach.passCriteria.trim()) {
-              judgePlan.passCriteria = approach.passCriteria.trim();
-            }
-            if (approach.failCriteria && approach.failCriteria.trim()) {
-              judgePlan.failCriteria = approach.failCriteria.trim();
-            }
-            if (approach.includeContext !== undefined) {
-              judgePlan.includeConversationContext = approach.includeContext;
-            }
-            if (approach.customPrompt && approach.customPrompt.trim()) {
-              judgePlan.customPrompt = approach.customPrompt.trim();
-            }
-          }
+            // Build the system prompt for the LLM judge
+            let systemPrompt = approach.customPrompt || "";
 
+            // If no custom prompt, build default prompt from criteria
+            if (!systemPrompt.trim()) {
+              const contextInstruction =
+                approach.includeContext !== false
+                  ? "Evaluate ONLY the last assistant message: {{messages[-1]}}.\n\nInclude context: {{messages}}\n\n"
+                  : "Evaluate the assistant's response.\n\n";
+
+              systemPrompt = `You are an LLM-Judge. ${contextInstruction}Decision rule:\n- PASS if ALL pass criteria are met AND NO fail criteria are triggered.\n- Otherwise FAIL.\n\n`;
+
+              if (approach.passCriteria && approach.passCriteria.trim()) {
+                systemPrompt += `Pass criteria:\n${approach.passCriteria.trim()}\n\n`;
+              }
+
+              if (approach.failCriteria && approach.failCriteria.trim()) {
+                systemPrompt += `Fail criteria (any triggers FAIL):\n${approach.failCriteria.trim()}\n\n`;
+              }
+
+              systemPrompt += `Output format: respond with exactly one word: pass or fail`;
+            }
+
+            // Store the full model structure
+            judgePlan.model = {
+              model: approach.modelName || model || "gpt-4o",
+              messages: [
+                {
+                  role: "system",
+                  content: systemPrompt,
+                },
+              ],
+              provider: approach.provider || provider || "openai",
+            };
+
+            // Also store individual fields for re-editing
+            judgePlan.passCriteria = approach.passCriteria;
+            judgePlan.failCriteria = approach.failCriteria;
+            judgePlan.includeConversationContext = approach.includeContext;
+            judgePlan.customPrompt = approach.customPrompt;
+            judgePlan.provider = approach.provider || provider || "openai";
+            judgePlan.modelName = approach.modelName || model || "gpt-4o";
+          }
           // Add tool calls to judgePlan for evaluation mode
           if (
             turn.toolCalls &&
@@ -1348,143 +1407,305 @@ export default function CreateEvaluationForm({
                                 "llm-as-a-judge" && (
                                 <>
                                   <div className="llm-judge-section">
-                                    {/* Pass Criteria */}
-                                    <div className="criteria-field">
-                                      <div className="field-label">
-                                        Pass Criteria
-                                      </div>
-                                      <Input
-                                        placeholder="e.g., Response is helpful and answers the question accurately"
-                                        value={
-                                          turn.evaluationApproach
-                                            ?.passCriteria || ""
-                                        }
-                                        onChange={(e) =>
-                                          updateLLMJudgeField(
-                                            index,
-                                            "passCriteria",
-                                            e.target.value
-                                          )
-                                        }
-                                        className="criteria-input"
-                                      />
-                                      <div className="field-hint">
-                                        The assistant message must meet ALL pass
-                                        criteria
-                                      </div>
-                                    </div>
-
-                                    {/* Fail Criteria */}
-                                    <div className="criteria-field">
-                                      <div className="field-label">
-                                        Fail Criteria
-                                      </div>
-                                      <Input
-                                        placeholder="e.g., Response is rude, inappropriate, or off-topic"
-                                        value={
-                                          turn.evaluationApproach
-                                            ?.failCriteria || ""
-                                        }
-                                        onChange={(e) =>
-                                          updateLLMJudgeField(
-                                            index,
-                                            "failCriteria",
-                                            e.target.value
-                                          )
-                                        }
-                                        className="criteria-input"
-                                      />
-                                      <div className="field-hint">
-                                        ANY fail criteria will result in
-                                        evaluation failure
-                                      </div>
-                                    </div>
-
-                                    {/* Include Context Toggle */}
-                                    <div className="context-toggle">
-                                      <div className="toggle-row">
-                                        <div>
-                                          <div className="toggle-label">
-                                            Include Conversation Context
-                                          </div>
-                                          <div className="toggle-description">
-                                            Provide full conversation history as
-                                            context for evaluation
-                                          </div>
-                                        </div>
-                                        <label className="switch">
+                                    {/* Mode Toggle: Structured vs Custom */}
+                                    <div className="llm-judge-mode-toggle">
+                                      <div className="mode-options">
+                                        <label className="mode-option">
                                           <input
-                                            type="checkbox"
+                                            type="radio"
+                                            name={`llm-mode-${index}`}
                                             checked={
+                                              !turn.evaluationApproach
+                                                ?.customPrompt ||
                                               turn.evaluationApproach
-                                                ?.includeContext !== false
+                                                ?.customPrompt === ""
                                             }
-                                            onChange={(e) =>
-                                              updateLLMJudgeField(
-                                                index,
-                                                "includeContext",
-                                                e.target.checked
-                                              )
-                                            }
+                                            onChange={() => {
+                                              const newTurns = [...turns];
+                                              if (
+                                                !newTurns[index]
+                                                  .evaluationApproach
+                                              ) {
+                                                newTurns[
+                                                  index
+                                                ].evaluationApproach = {
+                                                  type: "llm-as-a-judge",
+                                                };
+                                              }
+                                              newTurns[
+                                                index
+                                              ].evaluationApproach!.customPrompt =
+                                                "";
+                                              setTurns(newTurns);
+                                            }}
                                           />
-                                          <span className="slider"></span>
+                                          <span>Use Structured Fields</span>
+                                        </label>
+                                        <label className="mode-option">
+                                          <input
+                                            type="radio"
+                                            name={`llm-mode-${index}`}
+                                            checked={
+                                              !!turn.evaluationApproach
+                                                ?.customPrompt &&
+                                              turn.evaluationApproach
+                                                ?.customPrompt !== ""
+                                            }
+                                            onChange={() => {
+                                              const newTurns = [...turns];
+                                              if (
+                                                !newTurns[index]
+                                                  .evaluationApproach
+                                              ) {
+                                                newTurns[
+                                                  index
+                                                ].evaluationApproach = {
+                                                  type: "llm-as-a-judge",
+                                                };
+                                              }
+                                              // Initialize with a template if switching to custom
+                                              if (
+                                                !newTurns[index]
+                                                  .evaluationApproach!
+                                                  .customPrompt
+                                              ) {
+                                                newTurns[
+                                                  index
+                                                ].evaluationApproach!.customPrompt =
+                                                  'You are an LLM-Judge. Evaluate ONLY the last assistant message in the mock conversation: {{messages[-1]}}.\n\nContext is available in {{messages}}, but your judgment must focus on the last assistant message.\n\nDecision rule:\n- PASS if ALL "pass criteria" are satisfied AND NONE of the "fail criteria" are triggered.\n- Otherwise FAIL.\n\nOutput format: respond with exactly one word: pass or fail\n- No explanations\n- No punctuation\n- No additional text';
+                                              }
+                                              setTurns(newTurns);
+                                            }}
+                                          />
+                                          <span>Custom AI Judge Prompt</span>
                                         </label>
                                       </div>
                                     </div>
 
-                                    {/* Custom Prompt Section */}
-                                    <div className="custom-prompt-section">
-                                      <div className="custom-prompt-header">
-                                        <span className="field-label">
-                                          Custom AI Judge Prompt
-                                        </span>
-                                        <span className="optional-badge">
-                                          Optional
-                                        </span>
-                                      </div>
-                                      <TextArea
-                                        className="message-textarea custom-prompt-textarea"
-                                        placeholder="Write a custom prompt for the AI judge..."
-                                        rows={6}
-                                        value={
-                                          turn.evaluationApproach
-                                            ?.customPrompt || ""
-                                        }
-                                        onChange={(e) =>
-                                          updateLLMJudgeField(
-                                            index,
-                                            "customPrompt",
-                                            e.target.value
-                                          )
-                                        }
-                                      />
-                                      <div className="field-hint">
-                                        Override the default system prompt with
-                                        your own evaluation criteria
-                                      </div>
-                                    </div>
+                                    {/* Structured Fields Mode */}
+                                    {(!turn.evaluationApproach?.customPrompt ||
+                                      turn.evaluationApproach?.customPrompt ===
+                                        "") && (
+                                      <>
+                                        {/* Pass Criteria */}
+                                        <div className="criteria-field">
+                                          <div className="field-label">
+                                            Pass Criteria
+                                          </div>
+                                          <Input
+                                            placeholder="e.g., Response is helpful and answers the question accurately"
+                                            value={
+                                              turn.evaluationApproach
+                                                ?.passCriteria || ""
+                                            }
+                                            onChange={(e) =>
+                                              updateLLMJudgeField(
+                                                index,
+                                                "passCriteria",
+                                                e.target.value
+                                              )
+                                            }
+                                            className="criteria-input"
+                                          />
+                                          <div className="field-hint">
+                                            The assistant message must meet ALL
+                                            pass criteria
+                                          </div>
+                                        </div>
+
+                                        {/* Fail Criteria */}
+                                        <div className="criteria-field">
+                                          <div className="field-label">
+                                            Fail Criteria
+                                          </div>
+                                          <Input
+                                            placeholder="e.g., Response is rude, inappropriate, or off-topic"
+                                            value={
+                                              turn.evaluationApproach
+                                                ?.failCriteria || ""
+                                            }
+                                            onChange={(e) =>
+                                              updateLLMJudgeField(
+                                                index,
+                                                "failCriteria",
+                                                e.target.value
+                                              )
+                                            }
+                                            className="criteria-input"
+                                          />
+                                          <div className="field-hint">
+                                            ANY fail criteria will result in
+                                            evaluation failure
+                                          </div>
+                                        </div>
+
+                                        {/* Include Context Toggle */}
+                                        <div className="context-toggle">
+                                          <div className="toggle-row">
+                                            <div>
+                                              <div className="toggle-label">
+                                                Include Conversation Context
+                                              </div>
+                                              <div className="toggle-description">
+                                                Provide full conversation
+                                                history as context for
+                                                evaluation
+                                              </div>
+                                            </div>
+                                            <label className="switch">
+                                              <input
+                                                type="checkbox"
+                                                checked={
+                                                  turn.evaluationApproach
+                                                    ?.includeContext !== false
+                                                }
+                                                onChange={(e) =>
+                                                  updateLLMJudgeField(
+                                                    index,
+                                                    "includeContext",
+                                                    e.target.checked
+                                                  )
+                                                }
+                                              />
+                                              <span className="slider"></span>
+                                            </label>
+                                          </div>
+                                        </div>
+
+                                        {/* Preview System Prompt Button */}
+                                        <div className="preview-prompt-section">
+                                          <Button
+                                            type="link"
+                                            size="small"
+                                            onClick={() => {
+                                              // Generate preview
+                                              const contextInstruction =
+                                                turn.evaluationApproach
+                                                  ?.includeContext !== false
+                                                  ? "Evaluate ONLY the last assistant message: {{messages[-1]}}.\n\nInclude context: {{messages}}\n\n"
+                                                  : "Evaluate the assistant's response.\n\n";
+
+                                              let preview = `You are an LLM-Judge. ${contextInstruction}Decision rule:\n- PASS if ALL pass criteria are met AND NO fail criteria are triggered.\n- Otherwise FAIL.\n\n`;
+
+                                              if (
+                                                turn.evaluationApproach
+                                                  ?.passCriteria
+                                              ) {
+                                                preview += `Pass criteria:\n${turn.evaluationApproach.passCriteria.trim()}\n\n`;
+                                              }
+
+                                              if (
+                                                turn.evaluationApproach
+                                                  ?.failCriteria
+                                              ) {
+                                                preview += `Fail criteria (any triggers FAIL):\n${turn.evaluationApproach.failCriteria.trim()}\n\n`;
+                                              }
+
+                                              preview += `Output format: respond with exactly one word: pass or fail`;
+
+                                              // Use Modal instead of message
+                                              const modal = Modal.info({
+                                                title: "System Prompt Preview",
+                                                content: (
+                                                  <div
+                                                    style={{
+                                                      whiteSpace: "pre-wrap",
+                                                      fontFamily:
+                                                        "Courier New, monospace",
+                                                      fontSize: "13px",
+                                                      lineHeight: "1.6",
+                                                      backgroundColor:
+                                                        "#f5f5f5",
+                                                      padding: "16px",
+                                                      borderRadius: "8px",
+                                                      maxHeight: "400px",
+                                                      overflowY: "auto",
+                                                      border:
+                                                        "1px solid #e6e8ec",
+                                                    }}
+                                                  >
+                                                    {preview}
+                                                  </div>
+                                                ),
+                                                width: 700,
+                                                okText: "Close",
+                                                maskClosable: true,
+                                                onOk() {
+                                                  modal.destroy();
+                                                },
+                                              });
+                                            }}
+                                            style={{
+                                              padding: 0,
+                                              height: "auto",
+                                            }}
+                                          >
+                                            ⌄ Preview System Prompt
+                                          </Button>
+                                        </div>
+                                      </>
+                                    )}
+
+                                    {/* Custom Prompt Mode */}
+                                    {turn.evaluationApproach?.customPrompt &&
+                                      turn.evaluationApproach?.customPrompt !==
+                                        "" && (
+                                        <div className="custom-prompt-section">
+                                          <div className="custom-prompt-header">
+                                            <span className="field-label">
+                                              Custom AI Judge Prompt
+                                            </span>
+                                          </div>
+                                          <TextArea
+                                            className="message-textarea custom-prompt-textarea"
+                                            placeholder="Write a custom prompt for the AI judge..."
+                                            rows={8}
+                                            value={
+                                              turn.evaluationApproach
+                                                ?.customPrompt || ""
+                                            }
+                                            onChange={(e) =>
+                                              updateLLMJudgeField(
+                                                index,
+                                                "customPrompt",
+                                                e.target.value
+                                              )
+                                            }
+                                          />
+                                          <div className="field-hint">
+                                            Write your own evaluation prompt.
+                                            Use {`{{messages[-1]}}`} for the
+                                            last assistant message and{" "}
+                                            {`{{messages}}`} for full context.
+                                          </div>
+                                        </div>
+                                      )}
                                   </div>
                                 </>
                               )}
                             </div>
                           )}
-
-                          {/* Tool Calls Section - Same for all approaches and modes */}
-                          <div className="add-toolcall-row">
-                            <div className="add-toolcall-row-second">
-                              Expected Tool Calls
+                          {/* Only show Tool Calls section if NOT in LLM-as-a-judge evaluation mode */}
+                          {!(
+                            turn.mode === "evaluation" &&
+                            turn.evaluationApproach?.type === "llm-as-a-judge"
+                          ) && (
+                            <div className="add-toolcall-row">
+                              <div className="add-toolcall-row-second">
+                                Expected Tool Calls
+                              </div>
+                              {!turn.toolCallInput && (
+                                <button
+                                  type="button"
+                                  className="toolcall-btn"
+                                  onClick={() => startToolCallInput(index)}
+                                >
+                                  <PlusOutlined style={{ fontSize: 16 }} /> Add
+                                  Tool Call
+                                </button>
+                              )}
                             </div>
-                            {!turn.toolCallInput && (
-                              <button
-                                type="button"
-                                className="toolcall-btn"
-                                onClick={() => startToolCallInput(index)}
-                              >
-                                <PlusOutlined style={{ fontSize: 16 }} /> Add
-                                Tool Call
-                              </button>
-                            )}
-                          </div>
+                          )}
 
                           {turn.toolCallInput && (
                             <Card className="expected-toolcalls" size="small">
@@ -1851,50 +2072,90 @@ export default function CreateEvaluationForm({
                 </div>
               </div>
 
-              <div className="sidebar-section">
-                <div className="sidebar-row">
-                  <span>Result</span>
-                  {!hasRunTest ? (
-                    <Button
-                      type="link"
-                      size="small"
-                      className="test-link"
-                      onClick={handleTestRun}
-                      loading={testResults.status === "loading"}
-                    >
-                      <img src="/svgs/play.svg" alt="Play" />
-                      Test
-                    </Button>
-                  ) : (
-                    <Button
-                      type="link"
-                      size="small"
-                      className="test-link"
-                      onClick={handleTestRun}
-                      loading={testResults.status === "loading"}
-                    >
-                      <img src="/svgs/play.svg" alt="Play" />
-                      Re-run
-                    </Button>
-                  )}
-                </div>
+<div className="sidebar-section">
+  <div className="sidebar-row">
+    <span>Result</span>
+    {!hasRunTest ? (
+      <Button
+        type="link"
+        size="small"
+        className="test-link"
+        onClick={handleTestRun}
+        loading={testResults.status === "loading"}
+      >
+        <img src="/svgs/play.svg" alt="Play" />
+        Test
+      </Button>
+    ) : (
+      <Button
+        type="link"
+        size="small"
+        className="test-link"
+        onClick={handleTestRun}
+        loading={testResults.status === "loading"}
+      >
+        <img src="/svgs/play.svg" alt="Play" />
+        Re-run
+      </Button>
+    )}
+  </div>
 
-                {testResults.status === "success" && hasRunTest && (
-                  <div className="conversation-history">
-                    {testResults.conversation.map((message, index) => (
-                      <div
-                        key={index}
-                        className={`message-bubble ${message.role}`}
-                      >
-                        <div className="message-role">
-                          {message.role === "user" ? "User" : "Assistant"}
-                        </div>
-                        <div className="message-content">{message.content}</div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+  {testResults.status === "success" && hasRunTest && (
+    <>
+      {/*  ADD: Overall test status */}
+      <div style={{ marginBottom: "12px", padding: "8px 12px", backgroundColor: "#f0f9ff", borderRadius: "6px" }}>
+        <span
+          className="status-badge Success"
+          style={{
+            fontSize: "13px",
+            padding: "4px 12px",
+            color: "#4D72F5",
+            fontWeight: 500,
+          }}
+        >
+          ✓ Test Passed
+        </span>
+      </div>
+      
+      <div className="conversation-history">
+        {testResults.conversation.map((message, index) => (
+          <div
+            key={index}
+            className={`message-bubble ${message.role}`}
+          >
+            <div className="message-role">
+              {message.role === "user" ? "User" : "Assistant"}
+            </div>
+            <div className="message-content">
+              {message.content && message.content.trim() !== ""
+                ? message.content
+                : message.role === "assistant"
+                ? "Tool call initiated"
+                : ""}
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
+  )}
+  
+  {/* ADD: Show error state */}
+  {testResults.status === "error" && hasRunTest && (
+    <div style={{ marginTop: "12px", padding: "8px 12px", backgroundColor: "#fff1f0", borderRadius: "6px" }}>
+      <span
+        className="status-badge Failed"
+        style={{
+          fontSize: "13px",
+          padding: "4px 12px",
+          color: "#f00000",
+          fontWeight: 500,
+        }}
+      >
+        ✗ Test Failed
+      </span>
+    </div>
+  )}
+</div>
             </Card>
           </div>
         </div>

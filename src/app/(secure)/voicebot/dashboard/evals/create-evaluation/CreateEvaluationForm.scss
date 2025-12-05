@@ -1894,3 +1894,91 @@
     gap: 12px;
   }
 }
+/* LLM Judge Mode Toggle */
+.llm-judge-mode-toggle {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #e6e8ec;
+
+  .mode-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .mode-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 6px;
+    transition: background 0.2s;
+
+    &:hover {
+      background: #ffffff;
+    }
+
+    input[type="radio"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: #4361ee;
+    }
+
+    span {
+      font-size: 14px;
+      font-weight: 500;
+      color: #353945;
+    }
+  }
+}
+
+/* Preview Prompt Section */
+.preview-prompt-section {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e6e8ec;
+
+  .ant-btn-link {
+    color: #4361ee;
+    font-size: 13px;
+    font-weight: 500;
+
+    &:hover {
+      color: #3651d4;
+      text-decoration: underline;
+    }
+  }
+}
+
+/* Custom Prompt Section Updates */
+.custom-prompt-section {
+  .custom-prompt-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+
+    .field-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #141416;
+    }
+  }
+
+  .custom-prompt-textarea {
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .field-hint {
+    margin-top: 6px;
+    font-size: 12px;
+    color: #777e90;
+    font-style: italic;
+  }
+}

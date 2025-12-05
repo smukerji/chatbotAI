@@ -123,16 +123,46 @@ export default function EditEvalPage({ params }: EditEvalPageProps) {
           baseTurn.content = ""; // Clear display content
           console.log("✓ Regex pattern:", baseTurn.evaluationApproach.regexPattern);
         }
-        // Handle LLM-as-a-judge approach
-        else if (judgePlan.type === "llm-as-a-judge") {
-          baseTurn.evaluationApproach.passCriteria = judgePlan.passCriteria || "";
-          baseTurn.evaluationApproach.failCriteria = judgePlan.failCriteria || "";
-          baseTurn.evaluationApproach.includeContext = 
-            judgePlan.includeConversationContext !== false;
-          baseTurn.evaluationApproach.customPrompt = judgePlan.customPrompt || "";
-          baseTurn.content = "";
-          console.log("✓ LLM judge criteria loaded");
-        }
+      // Handle LLM-as-a-judge approach
+else if (judgePlan.type === "llm-as-a-judge" || judgePlan.type === "ai") {
+  console.log("Processing LLM-as-a-judge from VAPI");
+  
+  baseTurn.evaluationApproach.type = "llm-as-a-judge";
+  
+  // Extract from model.messages if it exists
+  if (judgePlan.model && judgePlan.model.messages && judgePlan.model.messages.length > 0) {
+    const systemMessage = judgePlan.model.messages.find((m: any) => m.role === "system");
+    if (systemMessage && systemMessage.content) {
+      // Try to parse the system prompt back into structured criteria
+      const content = systemMessage.content;
+      
+      // Extract pass criteria
+      const passMatch = content.match(/Pass criteria:\n([\s\S]*?)(?:\n\nFail criteria|\n\nOutput format|$)/);
+      if (passMatch) {
+        baseTurn.evaluationApproach.passCriteria = passMatch[1].trim();
+      }
+      
+      // Extract fail criteria
+     const failMatch = content.match(/Fail criteria.*?:\n([\s\S]*?)(?:\n\nOutput format|$)/);
+      if (failMatch) {
+        baseTurn.evaluationApproach.failCriteria = failMatch[1].trim();
+      }
+      
+      // Check for context inclusion
+      baseTurn.evaluationApproach.includeContext = content.includes("{{messages}}");
+      
+      // Store the full custom prompt
+      baseTurn.evaluationApproach.customPrompt = content;
+    }
+    
+    // Store provider and model info for display
+    baseTurn.evaluationApproach.provider = judgePlan.model.provider || "openai";
+    baseTurn.evaluationApproach.modelName = judgePlan.model.model || "gpt-4o";
+  }
+  
+  baseTurn.content = "";
+  console.log("✓ LLM judge configuration loaded");
+}
 
         // Extract tool calls from judgePlan
         if (judgePlan.toolCalls && Array.isArray(judgePlan.toolCalls)) {

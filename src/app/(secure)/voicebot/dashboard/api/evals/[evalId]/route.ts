@@ -173,33 +173,65 @@ if (role === "assistant") {
         judgePlan.content = jpIn.content.trim();
       }
     } else if (judgePlan.type === "llm-as-a-judge") {
-      if (jpIn.passCriteria) judgePlan.passCriteria = jpIn.passCriteria;
-      if (jpIn.failCriteria) judgePlan.failCriteria = jpIn.failCriteria;
-      if (jpIn.includeConversationContext !== undefined) {
-        judgePlan.includeConversationContext = jpIn.includeConversationContext;
+        // CRITICAL: VAPI expects type "ai" not "llm-as-a-judge"
+        judgePlan.type = "ai";
+        
+        // Check if model is already provided (from edit mode)
+        if (jpIn.model && jpIn.model.messages) {
+          // Use existing model structure
+          judgePlan.model = jpIn.model;
+        } else {
+          // Build model configuration from criteria
+          let systemPrompt = jpIn.customPrompt || "";
+          
+          if (!systemPrompt.trim()) {
+            const contextInstruction = jpIn.includeConversationContext !== false
+              ? "Evaluate ONLY the last assistant message: {{messages[-1]}}.\n\nInclude context: {{messages}}\n\n"
+              : "Evaluate the assistant's response.\n\n";
+            
+            systemPrompt = `You are an LLM-Judge. ${contextInstruction}Decision rule:\n- PASS if ALL pass criteria are met AND NO fail criteria are triggered.\n- Otherwise FAIL.\n\n`;
+            
+            if (jpIn.passCriteria && jpIn.passCriteria.trim()) {
+              systemPrompt += `Pass criteria:\n${jpIn.passCriteria.trim()}\n\n`;
+            }
+            
+            if (jpIn.failCriteria && jpIn.failCriteria.trim()) {
+              systemPrompt += `Fail criteria (any triggers FAIL):\n${jpIn.failCriteria.trim()}\n\n`;
+            }
+            
+            systemPrompt += `Output format: respond with exactly one word: pass or fail`;
+          }
+          
+          // Match VAPI's exact structure
+          judgePlan.model = {
+            model: jpIn.modelName || "gpt-4o",
+            messages: [
+              {
+                role: "system",
+                content: systemPrompt
+              }
+            ],
+            provider: jpIn.provider || "openai"
+          };
+        }
       }
-      if (jpIn.customPrompt) judgePlan.customPrompt = jpIn.customPrompt;
+
+      // Add tool calls from judgePlan
+      if (jpIn.toolCalls && Array.isArray(jpIn.toolCalls) && jpIn.toolCalls.length > 0) {
+        judgePlan.toolCalls = jpIn.toolCalls.map((tc: any) => {
+          return {
+            name: tc.name,
+            arguments: tc.arguments || {}
+          };
+        });
+      }
+
+      return { role: "assistant", judgePlan };
     }
 
-    //  Add tool calls from judgePlan
-    if (jpIn.toolCalls && Array.isArray(jpIn.toolCalls) && jpIn.toolCalls.length > 0) {
-      judgePlan.toolCalls = jpIn.toolCalls.map((tc: any) => {
-        return {
-          name: tc.name,
-          arguments: tc.arguments || {}
-        };
-      });
-    }
-
-    return { role: "assistant", judgePlan };
+    // Otherwise this is a mock assistant message
+    return { role: "assistant", content: t.message || t.content || "" };
   }
-
-  // Otherwise this is a mock assistant message
-  return { role: "assistant", content: t.message || t.content || "" };
-}
-
-
-
       // Fallback
       return {
         role: "assistant",

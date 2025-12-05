@@ -110,24 +110,27 @@ export default function Evals() {
     return map;
   }, [evals]);
 
-  useEffect(() => {
-    if (activeTab === "runs") {
-      setRunsLoading(true);
-      fetch(
-        `/voicebot/dashboard/api/evals/runs?assistantId=${assistantMongoId}&userId=${userId}`
-      )
-        .then((res) => res.json())
-        .then((data) => {
-          const apiRuns = (data.runs || []).map((run: any) => ({
+useEffect(() => {
+  if (activeTab === "runs") {
+    setRunsLoading(true);
+    fetch(
+      `/voicebot/dashboard/api/evals/runs?assistantId=${assistantMongoId}&userId=${userId}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        const apiRuns = (data.runs || []).map((run: any) => {
+          //  FIX: Check if ALL results passed, not just the first one
+          const allPassed = Array.isArray(run.results) && 
+                           run.results.length > 0 &&
+                           run.results.every((r: any) => r.status === "pass");
+          
+          return {
             key: run.id || run.evalId || Math.random().toString(),
             evalName: evalMap[run.evalId]?.name || "Unknown",
             description: evalMap[run.evalId]?.description || "No description",
             assistantName:
               contextData?.assistantInfo?.assistantName || "Unknown",
-            status:
-              Array.isArray(run.results) && run.results[0]?.status === "pass"
-                ? "Success"
-                : "Failed",
+            status: allPassed ? "Success" : "Failed", // Use the allPassed logic
             duration:
               run.endedAt && run.startedAt
                 ? `${Math.ceil(
@@ -148,13 +151,14 @@ export default function Evals() {
                   hour12: true,
                 })
               : "N/A",
-          }));
-          setRuns(apiRuns);
-        })
-        .catch(() => setRuns([]))
-        .finally(() => setRunsLoading(false));
-    }
-  }, [activeTab, evalMap, assistantMongoId, userId]);
+          };
+        });
+        setRuns(apiRuns);
+      })
+      .catch(() => setRuns([]))
+      .finally(() => setRunsLoading(false));
+  }
+}, [activeTab, evalMap, assistantMongoId, userId]);
 
   //  Fetch evals from API
   const fetchEvals = async () => {
@@ -211,18 +215,19 @@ export default function Evals() {
       message.error(data.error || "Failed to load run details");
       setRunDetails(null);
     } else {
-      const transformedRun = {
-        ...data.run,
-        status:
-          Array.isArray(data.run.results) &&
-          data.run.results[0]?.status === "pass"
-            ? "Success"
-            : "Failed",
-      };
-      setRunDetails(transformedRun);
-    }
-    setRunDetailsLoading(false);
-  };
+    //  FIX: Check if ALL results passed
+    const allPassed = Array.isArray(data.run.results) && 
+                     data.run.results.length > 0 &&
+                     data.run.results.every((r: any) => r.status === "pass");
+    
+    const transformedRun = {
+      ...data.run,
+      status: allPassed ? "Success" : "Failed", //Use the allPassed logic
+    };
+    setRunDetails(transformedRun);
+  }
+  setRunDetailsLoading(false);
+};
 
   // Add handlers
   const addVariable = () => {
@@ -274,6 +279,7 @@ export default function Evals() {
         },
         body: JSON.stringify({
           evalId: selectedEval.id,
+          evalName: selectedEval.name,
           assistantId: vapiAssistantId,
           assistantMongoId: assistantMongoId,
           userId: userId,
@@ -964,173 +970,215 @@ export default function Evals() {
           </div>
         </div>
       )}
-
-      {/* View Details Modal */}
-      {isViewDetailsOpen && (
+{/* View Details Modal */}
+{isViewDetailsOpen && (
+  <div
+    className="view-details-modal-overlay"
+    onClick={() => setIsViewDetailsOpen(false)}
+  >
+    <div
+      className="view-details-modal"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div className="modal-header">
+        <div className="header-content">
+          <h3>Eval Run Details</h3>
+          <p className="modal-subtitle">
+            View the conversation transcript and evaluation results
+          </p>
+        </div>
         <div
-          className="view-details-modal-overlay"
+          className="close-button"
           onClick={() => setIsViewDetailsOpen(false)}
         >
-          <div
-            className="view-details-modal"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="modal-header">
-              <div className="header-content">
-                <h3>Eval Run Details</h3>
-                <p className="modal-subtitle">
-                  View the conversation transcript and evaluation results
-                </p>
-              </div>
-              <div
-                className="close-button"
-                onClick={() => setIsViewDetailsOpen(false)}
-              >
-                ✕
-              </div>
-            </div>
-
-            {runDetailsLoading ? (
-              <div
-                style={{
-                  minHeight: 120,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Spin size="small" />
-              </div>
-            ) : runDetails ? (
-              <>
-                <div className="details-section">
-                  <div className="detail-row">
-                    <span className="detail-label">Status</span>
-                    <span className={`status-badge ${runDetails.status}`}>
-                      {runDetails.status}
-                    </span>
-                  </div>
-                  <div className="detail-row">
-                    <span className="detail-label">Duration</span>
-                    <p className="detail-value">
-                      {runDetails.endedAt && runDetails.startedAt
-                        ? `${Math.ceil(
-                            (new Date(runDetails.endedAt).getTime() -
-                              new Date(runDetails.startedAt).getTime()) /
-                              1000
-                          )}s`
-                        : "N/A"}
-                    </p>
-                  </div>
-                  <div className="detail-row">
-                    <span className="detail-label">Started At</span>
-                    <p className="detail-value">
-                      {runDetails.startedAt
-                        ? new Date(runDetails.startedAt).toLocaleString(
-                            "en-US",
-                            {
-                              month: "short",
-                              day: "numeric",
-                              year: "numeric",
-                              hour: "numeric",
-                              minute: "2-digit",
-                              hour12: true,
-                            }
-                          )
-                        : "N/A"}
-                    </p>
-                  </div>
-                </div>
-
-                <h4 className="conversation-section-heading">
-                  Conversation Transcript
-                </h4>
-                <div className="conversation-section">
-                  <div className="conversation-container">
-                    {(() => {
-                      const messages = runDetails?.results?.[0]?.messages || [];
-
-                      // Filter out messages with no content unless they have tool calls
-                      const filteredMessages = messages.filter((msg: any) => {
-                        // Keep messages that have content
-                        if (msg.content && msg.content.trim() !== "")
-                          return true;
-                        // Keep assistant messages with tool calls (check both property names)
-                        if (
-                          msg.role === "assistant" &&
-                          (msg.tool_calls || msg.toolCalls) &&
-                          ((msg.tool_calls && msg.tool_calls.length > 0) ||
-                            (msg.toolCalls && msg.toolCalls.length > 0))
-                        ) {
-                          return true;
-                        }
-                        // Filter out everything else (empty messages)
-                        return false;
-                      });
-
-                      // Show empty state if no messages after filtering
-                      if (filteredMessages.length === 0) {
-                        return (
-                          <div className="conversation-empty-state">
-                            <div className="empty-badge user-badge">
-                              <span>User</span>
-                            </div>
-                            <div className="empty-badge assistant-badge">
-                              <span>Assistant</span>
-                            </div>
-                            
-                          </div>
-                        );
-                      }
-
-                      // Render filtered messages
-                      return filteredMessages.map((msg: any, i: number) => {
-                        // Check if this message has tool calls (check both property names)
-                        const hasToolCalls =
-                          (msg.tool_calls && msg.tool_calls.length > 0) ||
-                          (msg.toolCalls && msg.toolCalls.length > 0);
-                        const isEmptyContent =
-                          !msg.content || msg.content.trim() === "";
-
-                        return (
-                          <div
-                            key={i}
-                            className={`message ${
-                              msg.role === "user"
-                                ? "user-message"
-                                : "assistant-message"
-                            }`}
-                          >
-                            <p className="message-sender">
-                              {msg.role === "user" ? "User" : "Assistant"}
-                            </p>
-
-                            {/* Show "Tool call initiated" only for assistant messages with tool calls and no content */}
-                            {msg.role === "assistant" &&
-                            hasToolCalls &&
-                            isEmptyContent ? (
-                              <p className="message-content tool-call-indicator">
-                                Tool call initiated
-                              </p>
-                            ) : (
-                              <p className="message-content">
-                                {msg.content || ""}
-                              </p>
-                            )}
-                          </div>
-                        );
-                      });
-                    })()}
-                  </div>
-                </div>
-              </>
-            ) : (
-              <div style={{ minHeight: 120 }}>No data found.</div>
-            )}
-          </div>
+          ✕
         </div>
-      )}
+      </div>
 
+      {runDetailsLoading ? (
+        <div
+          style={{
+            minHeight: 120,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Spin size="small" />
+        </div>
+      ) : runDetails ? (
+        <>
+          <div className="details-section">
+            <div className="detail-row">
+              <span className="detail-label">Status</span>
+              <span className={`status-badge ${runDetails.status}`}>
+                {runDetails.status}
+              </span>
+            </div>
+            <div className="detail-row">
+              <span className="detail-label">Duration</span>
+              <p className="detail-value">
+                {runDetails.endedAt && runDetails.startedAt
+                  ? `${Math.ceil(
+                      (new Date(runDetails.endedAt).getTime() -
+                        new Date(runDetails.startedAt).getTime()) /
+                        1000
+                    )}s`
+                  : "N/A"}
+              </p>
+            </div>
+            <div className="detail-row">
+              <span className="detail-label">Started At</span>
+              <p className="detail-value">
+                {runDetails.startedAt
+                  ? new Date(runDetails.startedAt).toLocaleString(
+                      "en-US",
+                      {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                        hour: "numeric",
+                        minute: "2-digit",
+                        hour12: true,
+                      }
+                    )
+                  : "N/A"}
+              </p>
+            </div>
+          </div>
+
+          <h4 className="conversation-section-heading">
+            Conversation Transcript
+          </h4>
+
+          <div className="conversation-section">
+            <div className="conversation-container">
+              {(() => {
+                const messages = runDetails?.results?.[0]?.messages || [];
+                const results = runDetails?.results || [];
+
+                // Filter out messages with no content unless they have tool calls
+                const filteredMessages = messages.filter((msg: any) => {
+                  if (msg.content && msg.content.trim() !== "")
+                    return true;
+                  if (
+                    msg.role === "assistant" &&
+                    (msg.tool_calls || msg.toolCalls) &&
+                    ((msg.tool_calls && msg.tool_calls.length > 0) ||
+                      (msg.toolCalls && msg.toolCalls.length > 0))
+                  ) {
+                    return true;
+                  }
+                  return false;
+                });
+
+                if (filteredMessages.length === 0) {
+                  return (
+                    <div className="conversation-empty-state">
+                      <div className="empty-badge user-badge">
+                        <span>User</span>
+                      </div>
+                      <div className="empty-badge assistant-badge">
+                        <span>Assistant</span>
+                      </div>
+                    </div>
+                  );
+                }
+
+                //  Track which assistant message we're on for evaluation matching
+                let assistantMessageIndex = 0;
+
+                return filteredMessages.map((msg: any, i: number) => {
+                  const hasToolCalls =
+                    (msg.tool_calls && msg.tool_calls.length > 0) ||
+                    (msg.toolCalls && msg.toolCalls.length > 0);
+                  const isEmptyContent =
+                    !msg.content || msg.content.trim() === "";
+
+                  //  Get the evaluation result for THIS specific assistant message
+                  let evalResult = null;
+                  if (msg.role === "assistant") {
+                    evalResult = results[assistantMessageIndex];
+                    assistantMessageIndex++; // Increment for next assistant message
+                  }
+
+                  return (
+                    <div
+                      key={i}
+                      className={`message ${
+                        msg.role === "user"
+                          ? "user-message"
+                          : "assistant-message"
+                      }`}
+                    >
+                      <p className="message-sender">
+                        {msg.role === "user" ? "User" : "Assistant"}
+                      </p>
+
+                      {msg.role === "assistant" &&
+                      hasToolCalls &&
+                      isEmptyContent ? (
+                        <p className="message-content tool-call-indicator">
+                          Tool call initiated
+                        </p>
+                      ) : (
+                        <p className="message-content">
+                          {msg.content || ""}
+                        </p>
+                      )}
+
+                      {/*  Show evaluation status ONLY for assistant messages that have an evaluation */}
+                      {msg.role === "assistant" && evalResult && (
+                        <div style={{ marginTop: "8px" }}>
+                          <span
+                            className={`status-badge ${
+                              evalResult.status === "pass" ? "Success" : "Failed"
+                            }`}
+                            style={{
+                              fontSize: "12px",
+                              padding: "4px 10px",
+                              borderRadius: "4px",
+                              display: "inline-block",
+                              color: evalResult.status === "pass" ? "#4D72F5" : "#f00000",
+                              fontWeight: 500,
+                              backgroundColor: evalResult.status === "pass" ? "#f0f9ff" : "#fff1f0",
+                            }}
+                          >
+                            {evalResult.status === "pass" ? "✓ Evaluation passed" : "✗ Evaluation failed"}
+                          </span>
+                          
+                          {/*  Show failure reason if evaluation failed */}
+                          {evalResult.status === "fail" && evalResult.reason && (
+                            <div
+                              style={{
+                                marginTop: "6px",
+                                padding: "8px 12px",
+                                backgroundColor: "#fff1f0",
+                                borderLeft: "3px solid #f00000",
+                                borderRadius: "4px",
+                                fontSize: "13px",
+                                color: "#262626",
+                              }}
+                            >
+                              <strong style={{ color: "#f00000" }}>Reason:</strong>{" "}
+                              {evalResult.reason}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                });
+              })()}
+            </div>
+          </div>
+        </>
+      ) : (
+        <div style={{ minHeight: 120 }}>No data found.</div>
+      )}
+    </div>
+  </div>
+)}
       {/* Delete Confirmation Modal */}
       {deleteModalOpen && (
         <div className="evals-modal-overlay">
