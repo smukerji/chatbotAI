@@ -66,6 +66,8 @@ export async function GET(
           localCreatedAt: localEval?.createdAt,
           assistantMongoId: assistant._id.toString(),
           vapiAssistantId: assistant.vapiAssistantId,
+          provider: localEval?.provider || "openai",     
+          model: localEval?.model || "gpt-4o",           
         };
 
         return NextResponse.json({ eval: mergedData }, { status: 200 });
@@ -117,6 +119,8 @@ export async function PATCH(
       userId,
       vapiAssistantId,
       turns,
+       provider,  
+       model,     
     } = data;
 
     console.log("Updating eval:", evalId);
@@ -169,10 +173,14 @@ if (role === "assistant") {
         judgePlan.content = jpIn.content.trim();
       }
     } else if (judgePlan.type === "regex") {
-      if (jpIn.content && jpIn.content.trim()) {
-        judgePlan.content = jpIn.content.trim();
-      }
-    } else if (judgePlan.type === "llm-as-a-judge") {
+  // FIX: Check for regexPattern, not content
+  if (jpIn.regexPattern && jpIn.regexPattern.trim()) {
+    judgePlan.content = jpIn.regexPattern.trim();
+    console.log("Setting regex pattern:", judgePlan.content);
+  } else {
+    console.warn("No regex pattern provided!");
+  }
+} else if (judgePlan.type === "llm-as-a-judge") {
         // CRITICAL: VAPI expects type "ai" not "llm-as-a-judge"
         judgePlan.type = "ai";
         
@@ -291,6 +299,8 @@ if (role === "assistant") {
             "evals.$.description": evalDesc,
             "evals.$.vapiAssistantId": vapiAssistantId,
             "evals.$.updatedAt": new Date(),
+            "evals.$.provider": data.provider || "openai",
+            "evals.$.model": data.model || "gpt-4o",
           }
         }
       );

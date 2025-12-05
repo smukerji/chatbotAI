@@ -1053,123 +1053,130 @@ useEffect(() => {
 
           <div className="conversation-section">
             <div className="conversation-container">
-              {(() => {
-                const messages = runDetails?.results?.[0]?.messages || [];
-                const results = runDetails?.results || [];
+{(() => {
+  const messages = runDetails?.results?.[0]?.messages || [];
+  const results = runDetails?.results || [];
 
-                // Filter out messages with no content unless they have tool calls
-                const filteredMessages = messages.filter((msg: any) => {
-                  if (msg.content && msg.content.trim() !== "")
-                    return true;
-                  if (
-                    msg.role === "assistant" &&
-                    (msg.tool_calls || msg.toolCalls) &&
-                    ((msg.tool_calls && msg.tool_calls.length > 0) ||
-                      (msg.toolCalls && msg.toolCalls.length > 0))
-                  ) {
-                    return true;
-                  }
-                  return false;
-                });
+  // Filter out messages with no content unless they have tool calls
+  const filteredMessages = messages.filter((msg: any) => {
+    if (msg.content && msg.content.trim() !== "") return true;
+    if (
+      msg.role === "assistant" &&
+      (msg.tool_calls || msg.toolCalls) &&
+      ((msg.tool_calls && msg.tool_calls.length > 0) ||
+        (msg.toolCalls && msg.toolCalls.length > 0))
+    ) {
+      return true;
+    }
+    return false;
+  });
 
-                if (filteredMessages.length === 0) {
-                  return (
-                    <div className="conversation-empty-state">
-                      <div className="empty-badge user-badge">
-                        <span>User</span>
-                      </div>
-                      <div className="empty-badge assistant-badge">
-                        <span>Assistant</span>
-                      </div>
-                    </div>
-                  );
-                }
+  if (filteredMessages.length === 0) {
+    return (
+      <div className="conversation-empty-state">
+        <div className="empty-badge user-badge">
+          <span>User</span>
+        </div>
+        <div className="empty-badge assistant-badge">
+          <span>Assistant</span>
+        </div>
+      </div>
+    );
+  }
 
-                //  Track which assistant message we're on for evaluation matching
-                let assistantMessageIndex = 0;
+  // Track which assistant message we're on for evaluation matching
+  let assistantMessageIndex = 0;
 
-                return filteredMessages.map((msg: any, i: number) => {
-                  const hasToolCalls =
-                    (msg.tool_calls && msg.tool_calls.length > 0) ||
-                    (msg.toolCalls && msg.toolCalls.length > 0);
-                  const isEmptyContent =
-                    !msg.content || msg.content.trim() === "";
+  return filteredMessages.map((msg: any, i: number) => {
+    const hasToolCalls =
+      (msg.tool_calls && msg.tool_calls.length > 0) ||
+      (msg.toolCalls && msg.toolCalls.length > 0);
+    const isEmptyContent = !msg.content || msg.content.trim() === "";
 
-                  //  Get the evaluation result for THIS specific assistant message
-                  let evalResult = null;
-                  if (msg.role === "assistant") {
-                    evalResult = results[assistantMessageIndex];
-                    assistantMessageIndex++; // Increment for next assistant message
-                  }
+    // Get the judge result for assistant messages
+    const judgeResult = msg.judge;
+    
+    // Get evaluation status from results array if not in message
+    let evalResult = null;
+    if (msg.role === "assistant") {
+      evalResult = results[assistantMessageIndex];
+      assistantMessageIndex++;
+    }
 
-                  return (
-                    <div
-                      key={i}
-                      className={`message ${
-                        msg.role === "user"
-                          ? "user-message"
-                          : "assistant-message"
-                      }`}
-                    >
-                      <p className="message-sender">
-                        {msg.role === "user" ? "User" : "Assistant"}
-                      </p>
+    return (
+      <div
+        key={i}
+        className={`message ${
+          msg.role === "user" ? "user-message" : "assistant-message"
+        }`}
+      >
+        <p className="message-sender">
+          {msg.role === "user" ? "User" : "Assistant"}
+        </p>
 
-                      {msg.role === "assistant" &&
-                      hasToolCalls &&
-                      isEmptyContent ? (
-                        <p className="message-content tool-call-indicator">
-                          Tool call initiated
-                        </p>
-                      ) : (
-                        <p className="message-content">
-                          {msg.content || ""}
-                        </p>
-                      )}
+        {msg.role === "assistant" && hasToolCalls && isEmptyContent ? (
+          <p className="message-content tool-call-indicator">
+            Tool call initiated
+          </p>
+        ) : (
+          <p className="message-content">{msg.content || ""}</p>
+        )}
 
-                      {/*  Show evaluation status ONLY for assistant messages that have an evaluation */}
-                      {msg.role === "assistant" && evalResult && (
-                        <div style={{ marginTop: "8px" }}>
-                          <span
-                            className={`status-badge ${
-                              evalResult.status === "pass" ? "Success" : "Failed"
-                            }`}
-                            style={{
-                              fontSize: "12px",
-                              padding: "4px 10px",
-                              borderRadius: "4px",
-                              display: "inline-block",
-                              color: evalResult.status === "pass" ? "#4D72F5" : "#f00000",
-                              fontWeight: 500,
-                              backgroundColor: evalResult.status === "pass" ? "#f0f9ff" : "#fff1f0",
-                            }}
-                          >
-                            {evalResult.status === "pass" ? "✓ Evaluation passed" : "✗ Evaluation failed"}
-                          </span>
-                          
-                          {/*  Show failure reason if evaluation failed */}
-                          {evalResult.status === "fail" && evalResult.reason && (
-                            <div
-                              style={{
-                                marginTop: "6px",
-                                padding: "8px 12px",
-                                backgroundColor: "#fff1f0",
-                                borderLeft: "3px solid #f00000",
-                                borderRadius: "4px",
-                                fontSize: "13px",
-                                color: "#262626",
-                              }}
-                            >
-                              <strong style={{ color: "#f00000" }}>Reason:</strong>{" "}
-                              {evalResult.reason}
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  );
-                });
-              })()}
+        {/* Show evaluation status for assistant messages */}
+        {msg.role === "assistant" && (judgeResult || evalResult) && (
+          <div style={{ marginTop: "8px" }}>
+            <span
+              className={`status-badge ${
+                (judgeResult?.status === "pass" || evalResult?.status === "pass")
+                  ? "Success"
+                  : "Failed"
+              }`}
+              style={{
+                fontSize: "12px",
+                padding: "4px 10px",
+                borderRadius: "4px",
+                display: "inline-block",
+                color: 
+                  (judgeResult?.status === "pass" || evalResult?.status === "pass")
+                    ? "#4D72F5"
+                    : "#f00000",
+                fontWeight: 500,
+                backgroundColor:
+                  (judgeResult?.status === "pass" || evalResult?.status === "pass")
+                    ? "#f0f9ff"
+                    : "#fff1f0",
+              }}
+            >
+              {(judgeResult?.status === "pass" || evalResult?.status === "pass")
+                ? "✓ Evaluation passed"
+                : "✗ Evaluation failed"}
+            </span>
+
+            {/* Show failure reason if evaluation failed */}
+            {(judgeResult?.status === "fail" || evalResult?.status === "fail") &&
+              (judgeResult?.failureReason || evalResult?.reason) && (
+                <div
+                  style={{
+                    marginTop: "6px",
+                    padding: "8px 12px",
+                    backgroundColor: "#fff1f0",
+                    borderLeft: "3px solid #f00000",
+                    borderRadius: "4px",
+                    fontSize: "13px",
+                    color: "#262626",
+                    lineHeight: "1.5",
+                  }}
+                >
+                  <strong style={{ color: "#f00000" }}>Reason:</strong>{" "}
+                  {judgeResult?.failureReason || evalResult?.reason}
+                </div>
+              )}
+          </div>
+        )}
+      </div>
+    );
+  });
+})()}
             </div>
           </div>
         </>

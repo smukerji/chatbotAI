@@ -148,31 +148,6 @@ else if (judgePlan.type === "llm-as-a-judge" || judgePlan.type === "ai") {
                         judgePlan: judgePlan,
                     };
                 }
-                // Check if this is a mock message with tool calls
-                else if (t.tool_calls && t.tool_calls.length > 0) {
-                    const message: any = {
-                        role: "assistant",
-                        content: t.message || t.content || "",
-                    };
-
-                    // Add tool calls for mock mode
-                    message.tool_calls = t.tool_calls.map((tc: any) => {
-                        let args = tc.function.arguments;
-                        if (typeof args === 'string') {
-                            args = JSON.parse(args);
-                        }
-
-                        return {
-                            type: "function",
-                            function: {
-                                name: tc.function.name,
-                                arguments: args,
-                            },
-                        };
-                    });
-
-                    return message;
-                }
                 // Regular mock assistant message without tool calls
                 else {
                     return {

@@ -131,16 +131,23 @@ export default function CreateEvaluationForm({
   );
 
   // Test results state
-  const [testResults, setTestResults] = useState<{
-    status: "idle" | "loading" | "success" | "error";
-    conversation: Array<{
-      role: "user" | "assistant";
-      content: string;
-    }>;
-  }>({
-    status: "idle",
-    conversation: [],
-  });
+ const [testResults, setTestResults] = useState<{
+  status: "idle" | "loading" | "success" | "error";
+  testPassed: boolean;
+  conversation: Array<{
+    role: "user" | "assistant";
+    content: string;
+    toolCalls?: any[];
+    judge?: {
+      status: "pass" | "fail";
+      failureReason?: string;
+    };
+  }>;
+}>({
+  status: "idle",
+  testPassed: false,
+  conversation: [],
+});
 
   // sync once context loads
   useEffect(() => {
@@ -149,92 +156,54 @@ export default function CreateEvaluationForm({
     }
   }, [voiceBotContextData?.assistantInfo?.assistantName]);
 
-  useEffect(() => {
-    if (mode === "edit" && initialData) {
-      console.log(" Loading initial data in edit mode:", initialData);
+useEffect(() => {
+  if (mode === "edit" && initialData) {
+    console.log("📝 Loading initial data in edit mode:", initialData);
 
-      setEvalName(initialData.name || "");
-      setEvalDesc(initialData.description || "");
-      setProvider(initialData.provider || "openai");
-      setModel(initialData.model || "gpt-4o");
-
-      // Transform messages to turns
-      if (initialData.messages && Array.isArray(initialData.messages)) {
-        console.log("📨 Processing messages:", initialData.messages);
-
-        //  USE THE DATA DIRECTLY - it's already in the correct format!
-        const transformedTurns = initialData.messages.map((msg: any) => {
-          console.log("Processing message:", msg);
-
-          // The data from edit page is ALREADY transformed correctly
-          // Just return it as-is
-          return {
-            id: msg.id,
-            type: msg.type,
-            content: msg.content || "",
-            mode: msg.mode,
-            toolCalls: msg.toolCalls || [],
-            toolCallInput: null,
-            evaluationApproach: msg.evaluationApproach,
-          };
-        });
-
-        console.log("Transformed turns:", transformedTurns);
-        setTurns(transformedTurns);
-
-        // Set next ID to be higher than the highest current ID
-        const maxId = Math.max(...transformedTurns.map((t: any) => t.id), 0);
-        setNextId(maxId + 1);
-
-        console.log("Set nextId to:", maxId + 1);
-      } else {
-        console.error("No messages array found or it's not an array");
-      }
+    setEvalName(initialData.name || "");
+    setEvalDesc(initialData.description || "");
+    
+    // FIX: Set provider and model FIRST before the models useEffect runs
+    if (initialData.provider) {
+      setProvider(initialData.provider);
+      console.log("Set provider to:", initialData.provider);
     }
-  }, [mode, initialData]);
-  useEffect(() => {
-    if (mode === "edit" && initialData) {
-      console.log("Loading initial data in edit mode:", initialData);
-
-      setEvalName(initialData.name || "");
-      setEvalDesc(initialData.description || "");
-      setProvider(initialData.provider || "openai");
-      setModel(initialData.model || "gpt-4o");
-
-      // Transform messages to turns
-      if (initialData.messages && Array.isArray(initialData.messages)) {
-        console.log("Processing messages:", initialData.messages);
-
-        // USE THE DATA DIRECTLY - it's already in the correct format!
-        const transformedTurns = initialData.messages.map((msg: any) => {
-          console.log("Processing message:", msg);
-
-          // The data from edit page is ALREADY transformed correctly
-          // Just return it as-is
-          return {
-            id: msg.id,
-            type: msg.type,
-            content: msg.content || "",
-            mode: msg.mode,
-            toolCalls: msg.toolCalls || [],
-            toolCallInput: null,
-            evaluationApproach: msg.evaluationApproach,
-          };
-        });
-
-        console.log("Transformed turns:", transformedTurns);
-        setTurns(transformedTurns);
-
-        // Set next ID to be higher than the highest current ID
-        const maxId = Math.max(...transformedTurns.map((t: any) => t.id), 0);
-        setNextId(maxId + 1);
-
-        console.log("Set nextId to:", maxId + 1);
-      } else {
-        console.error("No messages array found or it's not an array");
-      }
+    if (initialData.model) {
+      setModel(initialData.model);
+      console.log("Set model to:", initialData.model);
     }
-  }, [mode, initialData]);
+
+    // Transform messages to turns
+    if (initialData.messages && Array.isArray(initialData.messages)) {
+      console.log("📨 Processing messages:", initialData.messages);
+
+      const transformedTurns = initialData.messages.map((msg: any) => {
+        console.log("Processing message:", msg);
+
+        return {
+          id: msg.id,
+          type: msg.type,
+          content: msg.content || "",
+          mode: msg.mode,
+          toolCalls: msg.toolCalls || [],
+          toolCallInput: null,
+          evaluationApproach: msg.evaluationApproach,
+        };
+      });
+
+      console.log("✓ Transformed turns:", transformedTurns);
+      setTurns(transformedTurns);
+
+      const maxId = Math.max(...transformedTurns.map((t: any) => t.id), 0);
+      setNextId(maxId + 1);
+
+      console.log("✓ Set nextId to:", maxId + 1);
+    } else {
+      console.error("❌ No messages array found or it's not an array");
+    }
+  }
+}, [mode, initialData]); 
+
 
   useEffect(() => {
     (async () => {
@@ -249,10 +218,10 @@ export default function CreateEvaluationForm({
         const list: ProviderInfo[] = data.providers || [];
         setProviders(list);
 
-        if (list.length) {
+        if (list.length && mode !== "edit")  {
           const first = list[0];
-          setProvider(first.id);
-          if (first.models.length) {
+          if (!provider) setProvider(first.id);
+          if (!model && first.models.length) {
             setModel(first.models[0].id);
           }
         }
@@ -541,6 +510,7 @@ export default function CreateEvaluationForm({
     setActiveToggle("assistant");
     setTestResults({
       status: "idle",
+      testPassed: false, 
       conversation: [],
     });
     setHasRunTest(false);
@@ -603,45 +573,54 @@ export default function CreateEvaluationForm({
         return;
       }
 
-      // Transform turns to the format expected by backend
-      const formattedTurns = turns.map((turn) => {
-        const formattedTurn: any = {
-          role: turn.type === "tool-response" ? "tool" : turn.type,
-        };
+// Transform turns to the format expected by backend
+const formattedTurns = turns.flatMap((turn) => {
+  const formattedTurn: any = {
+    role: turn.type === "tool-response" ? "tool" : turn.type,
+  };
 
-        // Handle MOCK mode
-        if (turn.type === "assistant" && turn.mode === "mock") {
-          formattedTurn.message = turn.content || "";
-
-          //  ADD TOOL CALLS FOR MOCK MODE TOO!
-          if (
-            turn.toolCalls &&
-            Array.isArray(turn.toolCalls) &&
-            turn.toolCalls.length > 0
-          ) {
-            formattedTurn.tool_calls = turn.toolCalls.map((toolCall) => {
-              const argsObject: Record<string, string> = {};
-
-              if (toolCall.args && Array.isArray(toolCall.args)) {
-                toolCall.args.forEach((arg) => {
-                  if (arg.key && arg.key.trim()) {
-                    argsObject[arg.key] = arg.value || "";
-                  }
-                });
-              }
-
-              return {
-                function: {
-                  name: toolCall.name || "",
-                  arguments: JSON.stringify(argsObject),
-                },
-              };
-            });
-          }
-
-          return formattedTurn;
+  // Handle MOCK mode
+  if (turn.type === "assistant" && turn.mode === "mock") {
+    const messages = [];
+    
+    // First message: content only (if there is content)
+    if (turn.content && turn.content.trim()) {
+      messages.push({
+        role: "assistant",
+        message: turn.content.trim(),
+      });
+    }
+    
+    // If there are tool calls, add them as a SEPARATE evaluation turn
+    if (turn.toolCalls && Array.isArray(turn.toolCalls) && turn.toolCalls.length > 0) {
+      const toolCallsForJudge = turn.toolCalls.map((toolCall) => {
+        const argsObject: Record<string, string> = {};
+        if (toolCall.args && Array.isArray(toolCall.args)) {
+          toolCall.args.forEach((arg) => {
+            if (arg.key && arg.key.trim()) {
+              argsObject[arg.key] = arg.value || "";
+            }
+          });
         }
-
+        return {
+          name: toolCall.name || "",
+          arguments: argsObject,
+        };
+      });
+      
+      // Add as evaluation turn with judgePlan (NO content, NO tool_calls, ONLY judgePlan)
+      messages.push({
+        role: "assistant",
+        judgePlan: {
+          type: "exact",
+          toolCalls: toolCallsForJudge,
+        },
+      });
+    }
+    
+    // Return array of messages (could be 1 or 2 messages)
+    return messages.length > 0 ? messages : [{ role: "assistant", message: "" }];
+  }
         // Handle EVALUATION mode
         if (turn.type === "assistant" && turn.mode === "evaluation") {
           const approach = turn.evaluationApproach || { type: "exact" };
@@ -751,6 +730,8 @@ export default function CreateEvaluationForm({
         userId,
         vapiAssistantId,
         turns: formattedTurns,
+        provider: provider || "openai",  // ADD
+        model: model || "gpt-4o",        // ADD
       };
 
       console.log(
@@ -904,39 +885,53 @@ export default function CreateEvaluationForm({
         throw new Error(result.error || "Failed to run test");
       }
 
-      // Use the conversation from the API response
-      const conversation =
-        result.conversation && result.conversation.length > 0
-          ? result.conversation
-          : [
-              {
-                role: "user" as const,
-                content:
-                  turns.find((t) => t.type === "user")?.content ||
-                  "Test message",
-              },
-              {
-                role: "assistant" as const,
-                content:
-                  turns.find((t) => t.type === "assistant")?.content ||
-                  "I'm sorry, but based on the provided context, I don't have the information to answer your question.",
-              },
-            ];
+      // FIX: Properly filter messages with tool calls
+const messages = result.results?.[0]?.messages || [];
+    
+    // Keep ALL messages - don't filter out tool calls or empty content
+    const conversation = messages.map((msg: any) => ({
+      role: msg.role,
+      content: msg.content || "", // Keep empty content
+      toolCalls: msg.tool_calls || undefined,
+      judge: msg.judge ? {
+        status: msg.judge.status,
+        failureReason: msg.judge.failureReason
+      } : undefined
+    }));
 
-      setTestResults({
-        status: "success",
-        conversation,
-      });
+    // FIX: Check if ALL evaluations passed
+    const allEvaluationsPassed = messages
+      .filter((msg: any) => msg.judge) // Only check messages with evaluations
+      .every((msg: any) => msg.judge.status === "pass");
 
-      setHasRunTest(true);
-      message.success("Test run completed!");
-    } catch (error: any) {
-      console.error("Test run error:", error);
-      setTestResults((prev) => ({ ...prev, status: "error" }));
-      message.error(error.message || "Test run failed");
+    // FIX: Overall test passes if there are no failed evaluations
+    const testPassed = result.results?.[0]?.status === "pass" && allEvaluationsPassed;
+
+    setTestResults({
+      status: "success",
+      testPassed,
+      conversation,
+    });
+
+    setHasRunTest(true);
+    
+    // Show appropriate message
+    if (testPassed) {
+      message.success("✓ Test run completed - All evaluations passed!");
+    } else {
+      message.warning("✗ Test run completed - Some evaluations failed");
     }
-  };
 
+  } catch (error: any) {
+    console.error("Test run error:", error);
+    setTestResults({
+      status: "error",
+      testPassed: false,
+      conversation: [],
+    });
+    message.error(error.message || "Test run failed");
+  }
+};
   const currentProvider = providers.find((p) => p.id === provider);
 
   return (
@@ -1070,22 +1065,18 @@ export default function CreateEvaluationForm({
                     </Button>
                   </div>
                   <Form.Item className="form-group select-full">
-                    <Select
-                      value={selectedAssistant || undefined}
-                      onChange={(value) => setSelectedAssistant(value)}
+                    <Input
+                      value={
+                        selectedAssistant ||
+                        voiceBotContextData?.assistantInfo?.assistantName ||
+                        ""
+                      }
+                      onChange={(e) => setSelectedAssistant(e.target.value)}
+                      placeholder="Enter assistant name"
                       style={{ width: "100%" }}
-                      placeholder="Select assistant"
-                    >
-                      {voiceBotContextData?.assistantName && (
-                        <Select.Option
-                          value={
-                            voiceBotContextData?.assistantInfo?.assistantName
-                          }
-                        >
-                          {voiceBotContextData?.assistantInfo?.assistantName}
-                        </Select.Option>
-                      )}
-                    </Select>
+                      readOnly // Make it read-only if you want
+                      disabled // Or disabled if it shouldn't be editable
+                    />
                   </Form.Item>
                 </div>
 
@@ -2072,53 +2063,64 @@ export default function CreateEvaluationForm({
                 </div>
               </div>
 
-<div className="sidebar-section">
-  <div className="sidebar-row">
-    <span>Result</span>
-    {!hasRunTest ? (
-      <Button
-        type="link"
-        size="small"
-        className="test-link"
-        onClick={handleTestRun}
-        loading={testResults.status === "loading"}
-      >
-        <img src="/svgs/play.svg" alt="Play" />
-        Test
-      </Button>
-    ) : (
-      <Button
-        type="link"
-        size="small"
-        className="test-link"
-        onClick={handleTestRun}
-        loading={testResults.status === "loading"}
-      >
-        <img src="/svgs/play.svg" alt="Play" />
-        Re-run
-      </Button>
-    )}
-  </div>
+              <div className="sidebar-section">
+                <div className="sidebar-row">
+                  <span>Result</span>
+                  {!hasRunTest ? (
+                    <Button
+                      type="link"
+                      size="small"
+                      className="test-link"
+                      onClick={handleTestRun}
+                      loading={testResults.status === "loading"}
+                    >
+                      <img src="/svgs/play.svg" alt="Play" />
+                      Test
+                    </Button>
+                  ) : (
+                    <Button
+                      type="link"
+                      size="small"
+                      className="test-link"
+                      onClick={handleTestRun}
+                      loading={testResults.status === "loading"}
+                    >
+                      <img src="/svgs/play.svg" alt="Play" />
+                      Re-run
+                    </Button>
+                  )}
+                </div>
 
-  {testResults.status === "success" && hasRunTest && (
-    <>
-      {/*  ADD: Overall test status */}
-      <div style={{ marginBottom: "12px", padding: "8px 12px", backgroundColor: "#f0f9ff", borderRadius: "6px" }}>
-        <span
-          className="status-badge Success"
-          style={{
-            fontSize: "13px",
-            padding: "4px 12px",
-            color: "#4D72F5",
-            fontWeight: 500,
-          }}
-        >
-          ✓ Test Passed
-        </span>
-      </div>
-      
-      <div className="conversation-history">
-        {testResults.conversation.map((message, index) => (
+                {testResults.status === "success" && hasRunTest && (
+  <>
+    {/* Overall test status */}
+    <div
+      style={{
+        marginBottom: "12px",
+        padding: "8px 12px",
+        backgroundColor: testResults.testPassed ? "#f0f9ff" : "#fff1f0",
+        borderRadius: "6px",
+      }}
+    >
+      <span
+        className={`status-badge ${testResults.testPassed ? "Success" : "Failed"}`}
+        style={{
+          fontSize: "13px",
+          padding: "4px 12px",
+          color: testResults.testPassed ? "#4D72F5" : "#f00000",
+          fontWeight: 500,
+        }}
+      >
+        {testResults.testPassed ? "✓ Test Passed" : "✗ Test Failed"}
+      </span>
+    </div>
+
+    <div className="conversation-history">
+      {testResults.conversation.map((message, index) => {
+        const hasToolCalls = message.toolCalls && message.toolCalls.length > 0;
+        const isEmptyContent = !message.content || message.content.trim() === "";
+
+        return (
           <div
             key={index}
             className={`message-bubble ${message.role}`}
@@ -2127,35 +2129,58 @@ export default function CreateEvaluationForm({
               {message.role === "user" ? "User" : "Assistant"}
             </div>
             <div className="message-content">
-              {message.content && message.content.trim() !== ""
-                ? message.content
-                : message.role === "assistant"
+              {hasToolCalls && isEmptyContent
                 ? "Tool call initiated"
-                : ""}
+                : message.content || ""}
             </div>
+            
+            {/* Show evaluation result for assistant messages */}
+            {message.role === "assistant" && message.judge && (
+              <div style={{ marginTop: "8px" }}>
+                <span
+                  className={`status-badge ${
+                    message.judge.status === "pass" ? "Success" : "Failed"
+                  }`}
+                  style={{
+                    fontSize: "12px",
+                    padding: "4px 10px",
+                    borderRadius: "4px",
+                    display: "inline-block",
+                    color: message.judge.status === "pass" ? "#4D72F5" : "#f00000",
+                    fontWeight: 500,
+                    backgroundColor: message.judge.status === "pass" ? "#f0f9ff" : "#fff1f0",
+                  }}
+                >
+                  {message.judge.status === "pass" ? "✓ Pass" : "✗ Fail"}
+                </span>
+                
+                {/* Show failure reason if failed */}
+                {message.judge.status === "fail" && message.judge.failureReason && (
+                  <div
+                    style={{
+                      marginTop: "6px",
+                      padding: "8px 12px",
+                      backgroundColor: "#fff1f0",
+                      borderLeft: "3px solid #f00000",
+                      borderRadius: "4px",
+                      fontSize: "12px",
+                      color: "#262626",
+                      lineHeight: "1.5",
+                    }}
+                  >
+                    <strong style={{ color: "#f00000" }}>Reason:</strong>{" "}
+                    {message.judge.failureReason}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
-        ))}
-      </div>
-    </>
-  )}
-  
-  {/* ADD: Show error state */}
-  {testResults.status === "error" && hasRunTest && (
-    <div style={{ marginTop: "12px", padding: "8px 12px", backgroundColor: "#fff1f0", borderRadius: "6px" }}>
-      <span
-        className="status-badge Failed"
-        style={{
-          fontSize: "13px",
-          padding: "4px 12px",
-          color: "#f00000",
-          fontWeight: 500,
-        }}
-      >
-        ✗ Test Failed
-      </span>
+        );
+      })}
     </div>
-  )}
-</div>
+  </>
+)}
+              </div>
             </Card>
           </div>
         </div>

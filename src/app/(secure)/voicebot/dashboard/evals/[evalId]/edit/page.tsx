@@ -55,56 +55,102 @@ export default function EditEvalPage({ params }: EditEvalPageProps) {
   };
 
 
-  const transformVAPIDataToFormData = (vapiEval: any) => {
-    console.log("===  TRANSFORMATION START ===");
-    console.log("Input:", vapiEval);
+const transformVAPIDataToFormData = (vapiEval: any) => {
+  console.log("===  TRANSFORMATION START ===");
+  console.log("Input:", vapiEval);
+  
+  // Extract basic info
+  const formData: any = {
+    evalId: vapiEval.id,
+    name: vapiEval.localName || vapiEval.name || "",
+    description: vapiEval.localDescription || vapiEval.description || "",
+    assistantMongoId: vapiEval.assistantMongoId || "",
+    vapiAssistantId: vapiEval.assistantId || vapiEval.vapiAssistantId || "",
+    provider: vapiEval.provider || "openai",  
+    model: vapiEval.model || "gpt-4o",       
+    messages: [],
+  };
+
+  console.log(" Basic info extracted:", formData);
+
+  if (!vapiEval.messages) {
+    console.error(" NO MESSAGES FOUND in vapiEval!");
+    return formData;
+  }
+
+  if (!Array.isArray(vapiEval.messages)) {
+    console.error(" Messages is not an array:", typeof vapiEval.messages);
+    return formData;
+  }
+
+  console.log(`Processing ${vapiEval.messages.length} messages`);
+  
+  let turnId = 1;
+  const messages = vapiEval.messages;
+  
+  for (let i = 0; i < messages.length; i++) {
+    const msg = messages[i];
+    console.log(`\n--- Message ${i + 1}/${messages.length} ---`);
+    console.log("Role:", msg.role);
+    console.log("Content:", msg.content);
+    console.log("Has judgePlan:", !!msg.judgePlan);
     
-    // Extract basic info
-    const formData: any = {
-      evalId: vapiEval.id,
-      name: vapiEval.localName || vapiEval.name || "",
-      description: vapiEval.localDescription || vapiEval.description || "",
-      assistantMongoId: vapiEval.assistantMongoId || "",
-      vapiAssistantId: vapiEval.assistantId || vapiEval.vapiAssistantId || "",
-      provider: "openai",
-      model: "gpt-4o",
-      messages: [],
+    const baseTurn: any = {
+      id: turnId++,
+      type: msg.role === "tool" ? "tool-response" : msg.role,
+      content: msg.content || "",
     };
 
-    console.log(" Basic info extracted:", formData);
-
-    // Transform messages to form's turn format
-    if (!vapiEval.messages) {
-      console.error(" NO MESSAGES FOUND in vapiEval!");
-      return formData;
-    }
-
-    if (!Array.isArray(vapiEval.messages)) {
-      console.error(" Messages is not an array:", typeof vapiEval.messages);
-      return formData;
-    }
-
-    console.log(`Processing ${vapiEval.messages.length} messages`);
-      
-    formData.messages = vapiEval.messages.map((msg: any, index: number) => {
-      console.log(`\n--- Message ${index + 1}/${vapiEval.messages.length} ---`);
-      console.log("Role:", msg.role);
-      console.log("Content:", msg.content);
-      console.log("Has judgePlan:", !!msg.judgePlan);
-      
-      const baseTurn: any = {
-        id: index + 1,
-        type: msg.role === "tool" ? "tool-response" : msg.role,
-        content: msg.content || "",
-      };
-
-      // Handle assistant messages with judgePlan (evaluation mode)
-      if (msg.role === "assistant" && msg.judgePlan) {
-        console.log("EVALUATION MODE - judgePlan:", JSON.stringify(msg.judgePlan, null, 2));
-        
-        baseTurn.mode = "evaluation";
-        
+    // Handle assistant messages
+    if (msg.role === "assistant") {
+      // Check if this is an evaluation checkpoint with judgePlan
+      if (msg.judgePlan) {
         const judgePlan = msg.judgePlan;
+        console.log("EVALUATION/TOOL MODE - judgePlan:", JSON.stringify(judgePlan, null, 2));
+        
+        // Check if the PREVIOUS message was a mock assistant message (content only)
+        // If so, this is actually tool calls for that mock message
+        const prevMsg = i > 0 ? messages[i - 1] : null;
+        const isPrevMockAssistant = prevMsg && 
+          prevMsg.role === "assistant" && 
+          !prevMsg.judgePlan && 
+          prevMsg.content;
+        
+        if (isPrevMockAssistant && judgePlan.type === "exact" && judgePlan.toolCalls) {
+          // This is tool calls for the previous mock message
+          // Find the previous turn we just added and add tool calls to it
+          const prevTurn = formData.messages[formData.messages.length - 1];
+          if (prevTurn && prevTurn.type === "assistant" && prevTurn.mode === "mock") {
+            console.log("Adding tool calls to previous mock turn");
+            
+            prevTurn.toolCalls = judgePlan.toolCalls.map((tc: any, tcIndex: number) => {
+              console.log(` Tool ${tcIndex + 1}: ${tc.name}`);
+              console.log(` Arguments:`, tc.arguments);
+              
+              const args: Array<{ key: string; value: string }> = [];
+              
+              if (tc.arguments && typeof tc.arguments === 'object') {
+                Object.entries(tc.arguments).forEach(([key, value]) => {
+                  args.push({ key, value: String(value) });
+                  console.log(`    - ${key}: ${value}`);
+                });
+              }
+
+              return {
+                name: tc.name || "",
+                args: args.length > 0 ? args : [{ key: "", value: "" }],
+              };
+            });
+            
+            console.log("✓ Tool calls added to previous mock turn:", prevTurn.toolCalls);
+            // Don't create a new turn, skip to next iteration
+            turnId--; // Decrement since we're not creating a new turn
+            continue;
+          }
+        }
+        
+        // Otherwise, this is a true evaluation mode turn
+        baseTurn.mode = "evaluation";
         baseTurn.evaluationApproach = {
           type: judgePlan.type || "exact"
         };
@@ -118,9 +164,8 @@ export default function EditEvalPage({ params }: EditEvalPageProps) {
         } 
         // Handle REGEX approach
         else if (judgePlan.type === "regex") {
-          // CRITICAL: VAPI stores regex pattern in judgePlan.content
           baseTurn.evaluationApproach.regexPattern = judgePlan.content || "";
-          baseTurn.content = ""; // Clear display content
+          baseTurn.content = "";
           console.log("✓ Regex pattern:", baseTurn.evaluationApproach.regexPattern);
         }
       // Handle LLM-as-a-judge approach
@@ -193,24 +238,25 @@ else if (judgePlan.type === "llm-as-a-judge" || judgePlan.type === "ai") {
           console.log("✓ No tool calls");
         }
       } 
-      // Handle regular mock assistant messages
-      else if (msg.role === "assistant") {
+      // Handle regular mock assistant messages (no judgePlan)
+      else {
         console.log("MOCK MODE");
         baseTurn.mode = "mock";
         baseTurn.toolCalls = [];
         baseTurn.content = msg.content || "";
       }
+    }
 
-      console.log("Transformed turn:", JSON.stringify(baseTurn, null, 2));
-      return baseTurn;
-    });
+    console.log("Transformed turn:", JSON.stringify(baseTurn, null, 2));
+    formData.messages.push(baseTurn);
+  }
 
-    console.log("=== TRANSFORMATION COMPLETE ===");
-    console.log("Total messages transformed:", formData.messages.length);
-    console.log("Final formData:", JSON.stringify(formData, null, 2));
-    
-    return formData;
-  };
+  console.log("=== TRANSFORMATION COMPLETE ===");
+  console.log("Total messages transformed:", formData.messages.length);
+  console.log("Final formData:", JSON.stringify(formData, null, 2));
+  
+  return formData;
+};
 
   if (loading) {
     return (
