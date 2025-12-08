@@ -867,31 +867,30 @@ const formattedTurns = turns.flatMap((turn) => {
         return formattedTurn;
       });
 
-      // Call the test API endpoint (doesn't save to database)
-      const response = await fetch("/voicebot/dashboard/api/evals/test", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          evalName,
-          evalDesc,
-          vapiAssistantId,
-          turns: formattedTurns,
-        }),
-      });
+ const response = await fetch("/voicebot/dashboard/api/evals/test", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        evalName,
+        evalDesc,
+        vapiAssistantId,
+        turns: formattedTurns,
+      }),
+    });
 
-      const result = await response.json();
+    const result = await response.json();
 
-      if (!response.ok || result.error) {
-        throw new Error(result.error || "Failed to run test");
-      }
+    if (!response.ok || result.error) {
+      throw new Error(result.error || "Failed to run test");
+    }
 
-      // FIX: Properly filter messages with tool calls
-const messages = result.results?.[0]?.messages || [];
+    // FIX: Use runDetails.results instead of results
+    const messages = result.runDetails?.results?.[0]?.messages || [];
     
-    // Keep ALL messages - don't filter out tool calls or empty content
+    // Keep ALL messages
     const conversation = messages.map((msg: any) => ({
       role: msg.role,
-      content: msg.content || "", // Keep empty content
+      content: msg.content || "",
       toolCalls: msg.tool_calls || undefined,
       judge: msg.judge ? {
         status: msg.judge.status,
@@ -899,13 +898,14 @@ const messages = result.results?.[0]?.messages || [];
       } : undefined
     }));
 
-    // FIX: Check if ALL evaluations passed
-    const allEvaluationsPassed = messages
-      .filter((msg: any) => msg.judge) // Only check messages with evaluations
-      .every((msg: any) => msg.judge.status === "pass");
+    // FIX: Check if ALL evaluations passed using runDetails
+    const resultsArray = result.runDetails?.results || [];
+    const allEvaluationsPassed = resultsArray.length > 0 && 
+                                 resultsArray.every((r: any) => r.status === "pass");
 
-    // FIX: Overall test passes if there are no failed evaluations
-    const testPassed = result.results?.[0]?.status === "pass" && allEvaluationsPassed;
+    // FIX: Overall test passes if status is "pass"
+    const testPassed = result.runDetails?.status === "ended" && 
+                       result.runDetails?.results?.[0]?.status === "pass";
 
     setTestResults({
       status: "success",
@@ -2116,7 +2116,19 @@ const messages = result.results?.[0]?.messages || [];
     </div>
 
     <div className="conversation-history">
-      {testResults.conversation.map((message, index) => {
+      {testResults.conversation.filter((message) => {
+          // Filter out assistant messages that have no content AND no tool calls AND no judge
+          if (message.role === "assistant") {
+            const hasContent = message.content && message.content.trim() !== "";
+            const hasToolCalls = message.toolCalls && message.toolCalls.length > 0;
+            const hasJudge = message.judge !== undefined;
+            
+            // Keep if it has ANY of these
+            return hasContent || hasToolCalls || hasJudge;
+          }
+          // Keep all user messages
+          return true;
+        }).map((message, index) => {
         const hasToolCalls = message.toolCalls && message.toolCalls.length > 0;
         const isEmptyContent = !message.content || message.content.trim() === "";
 
