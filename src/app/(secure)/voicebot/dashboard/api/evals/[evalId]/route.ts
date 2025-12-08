@@ -66,8 +66,8 @@ export async function GET(
           localCreatedAt: localEval?.createdAt,
           assistantMongoId: assistant._id.toString(),
           vapiAssistantId: assistant.vapiAssistantId,
-          provider: localEval?.provider || "openai",     
-          model: localEval?.model || "gpt-4o",           
+          provider: getProviderAndModel(vapiData?.message).provider, //|| localEval?.provider || "openai",     
+          model: getProviderAndModel(vapiData?.message).model,           
         };
 
         return NextResponse.json({ eval: mergedData }, { status: 200 });
@@ -87,6 +87,23 @@ export async function GET(
       { status: 500 }
     );
   }
+}
+
+const getProviderAndModel = (evalData:any)=>{
+
+  const firstMatch = evalData.find((rec: any) => {
+    // Return true for the first record that meets all criteria
+    return (
+      rec.role === "assistant" &&
+      ["ai", "exact", "regex"].includes(rec?.judgePlan?.type)
+    );
+  });
+
+  const [provider, model] = firstMatch
+    ? [firstMatch.judgePlan.model.provider, firstMatch.judgePlan.model.model]
+    : [undefined, undefined];
+
+  return {provider,model};
 }
 
 /**

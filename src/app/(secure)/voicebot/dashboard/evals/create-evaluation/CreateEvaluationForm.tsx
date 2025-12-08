@@ -131,23 +131,23 @@ export default function CreateEvaluationForm({
   );
 
   // Test results state
- const [testResults, setTestResults] = useState<{
-  status: "idle" | "loading" | "success" | "error";
-  testPassed: boolean;
-  conversation: Array<{
-    role: "user" | "assistant";
-    content: string;
-    toolCalls?: any[];
-    judge?: {
-      status: "pass" | "fail";
-      failureReason?: string;
-    };
-  }>;
-}>({
-  status: "idle",
-  testPassed: false,
-  conversation: [],
-});
+  const [testResults, setTestResults] = useState<{
+    status: "idle" | "loading" | "success" | "error";
+    testPassed: boolean;
+    conversation: Array<{
+      role: "user" | "assistant";
+      content: string;
+      toolCalls?: any[];
+      judge?: {
+        status: "pass" | "fail";
+        failureReason?: string;
+      };
+    }>;
+  }>({
+    status: "idle",
+    testPassed: false,
+    conversation: [],
+  });
 
   // sync once context loads
   useEffect(() => {
@@ -156,54 +156,53 @@ export default function CreateEvaluationForm({
     }
   }, [voiceBotContextData?.assistantInfo?.assistantName]);
 
-useEffect(() => {
-  if (mode === "edit" && initialData) {
-    console.log("📝 Loading initial data in edit mode:", initialData);
+  useEffect(() => {
+    if (mode === "edit" && initialData) {
+      console.log("📝 Loading initial data in edit mode:", initialData);
 
-    setEvalName(initialData.name || "");
-    setEvalDesc(initialData.description || "");
-    
-    // FIX: Set provider and model FIRST before the models useEffect runs
-    if (initialData.provider) {
-      setProvider(initialData.provider);
-      console.log("Set provider to:", initialData.provider);
+      setEvalName(initialData.name || "");
+      setEvalDesc(initialData.description || "");
+
+      // FIX: Set provider and model FIRST before the models useEffect runs
+      if (initialData.provider) {
+        setProvider(initialData.provider);
+        console.log("Set provider to:", initialData.provider);
+      }
+      if (initialData.model) {
+        setModel(initialData.model);
+        console.log("Set model to:", initialData.model);
+      }
+
+      // Transform messages to turns
+      if (initialData.messages && Array.isArray(initialData.messages)) {
+        console.log("📨 Processing messages:", initialData.messages);
+
+        const transformedTurns = initialData.messages.map((msg: any) => {
+          console.log("Processing message:", msg);
+
+          return {
+            id: msg.id,
+            type: msg.type,
+            content: msg.content || "",
+            mode: msg.mode,
+            toolCalls: msg.toolCalls || [],
+            toolCallInput: null,
+            evaluationApproach: msg.evaluationApproach,
+          };
+        });
+
+        console.log("✓ Transformed turns:", transformedTurns);
+        setTurns(transformedTurns);
+
+        const maxId = Math.max(...transformedTurns.map((t: any) => t.id), 0);
+        setNextId(maxId + 1);
+
+        console.log("✓ Set nextId to:", maxId + 1);
+      } else {
+        console.error("❌ No messages array found or it's not an array");
+      }
     }
-    if (initialData.model) {
-      setModel(initialData.model);
-      console.log("Set model to:", initialData.model);
-    }
-
-    // Transform messages to turns
-    if (initialData.messages && Array.isArray(initialData.messages)) {
-      console.log("📨 Processing messages:", initialData.messages);
-
-      const transformedTurns = initialData.messages.map((msg: any) => {
-        console.log("Processing message:", msg);
-
-        return {
-          id: msg.id,
-          type: msg.type,
-          content: msg.content || "",
-          mode: msg.mode,
-          toolCalls: msg.toolCalls || [],
-          toolCallInput: null,
-          evaluationApproach: msg.evaluationApproach,
-        };
-      });
-
-      console.log("✓ Transformed turns:", transformedTurns);
-      setTurns(transformedTurns);
-
-      const maxId = Math.max(...transformedTurns.map((t: any) => t.id), 0);
-      setNextId(maxId + 1);
-
-      console.log("✓ Set nextId to:", maxId + 1);
-    } else {
-      console.error("❌ No messages array found or it's not an array");
-    }
-  }
-}, [mode, initialData]); 
-
+  }, [mode, initialData]);
 
   useEffect(() => {
     (async () => {
@@ -218,7 +217,7 @@ useEffect(() => {
         const list: ProviderInfo[] = data.providers || [];
         setProviders(list);
 
-        if (list.length && mode !== "edit")  {
+        if (list.length && mode !== "edit") {
           const first = list[0];
           if (!provider) setProvider(first.id);
           if (!model && first.models.length) {
@@ -510,7 +509,7 @@ useEffect(() => {
     setActiveToggle("assistant");
     setTestResults({
       status: "idle",
-      testPassed: false, 
+      testPassed: false,
       conversation: [],
     });
     setHasRunTest(false);
@@ -573,54 +572,60 @@ useEffect(() => {
         return;
       }
 
-// Transform turns to the format expected by backend
-const formattedTurns = turns.flatMap((turn) => {
-  const formattedTurn: any = {
-    role: turn.type === "tool-response" ? "tool" : turn.type,
-  };
-
-  // Handle MOCK mode
-  if (turn.type === "assistant" && turn.mode === "mock") {
-    const messages = [];
-    
-    // First message: content only (if there is content)
-    if (turn.content && turn.content.trim()) {
-      messages.push({
-        role: "assistant",
-        message: turn.content.trim(),
-      });
-    }
-    
-    // If there are tool calls, add them as a SEPARATE evaluation turn
-    if (turn.toolCalls && Array.isArray(turn.toolCalls) && turn.toolCalls.length > 0) {
-      const toolCallsForJudge = turn.toolCalls.map((toolCall) => {
-        const argsObject: Record<string, string> = {};
-        if (toolCall.args && Array.isArray(toolCall.args)) {
-          toolCall.args.forEach((arg) => {
-            if (arg.key && arg.key.trim()) {
-              argsObject[arg.key] = arg.value || "";
-            }
-          });
-        }
-        return {
-          name: toolCall.name || "",
-          arguments: argsObject,
+      // Transform turns to the format expected by backend
+      const formattedTurns = turns.flatMap((turn) => {
+        const formattedTurn: any = {
+          role: turn.type === "tool-response" ? "tool" : turn.type,
         };
-      });
-      
-      // Add as evaluation turn with judgePlan (NO content, NO tool_calls, ONLY judgePlan)
-      messages.push({
-        role: "assistant",
-        judgePlan: {
-          type: "exact",
-          toolCalls: toolCallsForJudge,
-        },
-      });
-    }
-    
-    // Return array of messages (could be 1 or 2 messages)
-    return messages.length > 0 ? messages : [{ role: "assistant", message: "" }];
-  }
+
+        // Handle MOCK mode
+        if (turn.type === "assistant" && turn.mode === "mock") {
+          const messages = [];
+
+          // First message: content only (if there is content)
+          if (turn.content && turn.content.trim()) {
+            messages.push({
+              role: "assistant",
+              message: turn.content.trim(),
+            });
+          }
+
+          // If there are tool calls, add them as a SEPARATE evaluation turn
+          if (
+            turn.toolCalls &&
+            Array.isArray(turn.toolCalls) &&
+            turn.toolCalls.length > 0
+          ) {
+            const toolCallsForJudge = turn.toolCalls.map((toolCall) => {
+              const argsObject: Record<string, string> = {};
+              if (toolCall.args && Array.isArray(toolCall.args)) {
+                toolCall.args.forEach((arg) => {
+                  if (arg.key && arg.key.trim()) {
+                    argsObject[arg.key] = arg.value || "";
+                  }
+                });
+              }
+              return {
+                name: toolCall.name || "",
+                arguments: argsObject,
+              };
+            });
+
+            // Add as evaluation turn with judgePlan (NO content, NO tool_calls, ONLY judgePlan)
+            messages.push({
+              role: "assistant",
+              judgePlan: {
+                type: "exact",
+                toolCalls: toolCallsForJudge,
+              },
+            });
+          }
+
+          // Return array of messages (could be 1 or 2 messages)
+          return messages.length > 0
+            ? messages
+            : [{ role: "assistant", message: "" }];
+        }
         // Handle EVALUATION mode
         if (turn.type === "assistant" && turn.mode === "evaluation") {
           const approach = turn.evaluationApproach || { type: "exact" };
@@ -642,8 +647,10 @@ const formattedTurns = turns.flatMap((turn) => {
               judgePlan.regexPattern = approach.regexPattern.trim();
             }
           }
+        
           // LLM-as-a-judge approach
           else if (approach.type === "llm-as-a-judge") {
+              debugger;
             // Build the system prompt for the LLM judge
             let systemPrompt = approach.customPrompt || "";
 
@@ -678,7 +685,7 @@ const formattedTurns = turns.flatMap((turn) => {
               ],
               provider: approach.provider || provider || "openai",
             };
-
+            debugger;
             // Also store individual fields for re-editing
             judgePlan.passCriteria = approach.passCriteria;
             judgePlan.failCriteria = approach.failCriteria;
@@ -688,11 +695,7 @@ const formattedTurns = turns.flatMap((turn) => {
             judgePlan.modelName = approach.modelName || model || "gpt-4o";
           }
           // Add tool calls to judgePlan for evaluation mode
-          if (
-            turn.toolCalls &&
-            Array.isArray(turn.toolCalls) &&
-            turn.toolCalls.length > 0
-          ) {
+          if (turn.toolCalls && Array.isArray(turn.toolCalls) && turn.toolCalls.length > 0) {
             judgePlan.toolCalls = turn.toolCalls.map((toolCall) => {
               const argsObject: Record<string, string> = {};
 
@@ -713,7 +716,7 @@ const formattedTurns = turns.flatMap((turn) => {
 
           formattedTurn.role = "assistant";
           formattedTurn.judgePlan = judgePlan;
-
+          debugger;
           // Do NOT include message field for evaluation turns
           return formattedTurn;
         }
@@ -730,8 +733,8 @@ const formattedTurns = turns.flatMap((turn) => {
         userId,
         vapiAssistantId,
         turns: formattedTurns,
-        provider: provider || "openai",  // ADD
-        model: model || "gpt-4o",        // ADD
+        provider: provider || "openai", // ADD
+        model: model || "gpt-4o", // ADD
       };
 
       console.log(
@@ -867,71 +870,74 @@ const formattedTurns = turns.flatMap((turn) => {
         return formattedTurn;
       });
 
- const response = await fetch("/voicebot/dashboard/api/evals/test", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        evalName,
-        evalDesc,
-        vapiAssistantId,
-        turns: formattedTurns,
-      }),
-    });
+      const response = await fetch("/voicebot/dashboard/api/evals/test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          evalName,
+          evalDesc,
+          vapiAssistantId,
+          turns: formattedTurns,
+        }),
+      });
 
-    const result = await response.json();
+      const result = await response.json();
 
-    if (!response.ok || result.error) {
-      throw new Error(result.error || "Failed to run test");
+      if (!response.ok || result.error) {
+        throw new Error(result.error || "Failed to run test");
+      }
+
+      // FIX: Use runDetails.results instead of results
+      const messages = result.runDetails?.results?.[0]?.messages || [];
+
+      // Keep ALL messages
+      const conversation = messages.map((msg: any) => ({
+        role: msg.role,
+        content: msg.content || "",
+        toolCalls: msg.tool_calls || undefined,
+        judge: msg.judge
+          ? {
+              status: msg.judge.status,
+              failureReason: msg.judge.failureReason,
+            }
+          : undefined,
+      }));
+
+      // FIX: Check if ALL evaluations passed using runDetails
+      const resultsArray = result.runDetails?.results || [];
+      const allEvaluationsPassed =
+        resultsArray.length > 0 &&
+        resultsArray.every((r: any) => r.status === "pass");
+
+      // FIX: Overall test passes if status is "pass"
+      const testPassed =
+        result.runDetails?.status === "ended" &&
+        result.runDetails?.results?.[0]?.status === "pass";
+
+      setTestResults({
+        status: "success",
+        testPassed,
+        conversation,
+      });
+
+      setHasRunTest(true);
+
+      // Show appropriate message
+      if (testPassed) {
+        message.success("✓ Test run completed - All evaluations passed!");
+      } else {
+        message.warning("✗ Test run completed - Some evaluations failed");
+      }
+    } catch (error: any) {
+      console.error("Test run error:", error);
+      setTestResults({
+        status: "error",
+        testPassed: false,
+        conversation: [],
+      });
+      message.error(error.message || "Test run failed");
     }
-
-    // FIX: Use runDetails.results instead of results
-    const messages = result.runDetails?.results?.[0]?.messages || [];
-    
-    // Keep ALL messages
-    const conversation = messages.map((msg: any) => ({
-      role: msg.role,
-      content: msg.content || "",
-      toolCalls: msg.tool_calls || undefined,
-      judge: msg.judge ? {
-        status: msg.judge.status,
-        failureReason: msg.judge.failureReason
-      } : undefined
-    }));
-
-    // FIX: Check if ALL evaluations passed using runDetails
-    const resultsArray = result.runDetails?.results || [];
-    const allEvaluationsPassed = resultsArray.length > 0 && 
-                                 resultsArray.every((r: any) => r.status === "pass");
-
-    // FIX: Overall test passes if status is "pass"
-    const testPassed = result.runDetails?.status === "ended" && 
-                       result.runDetails?.results?.[0]?.status === "pass";
-
-    setTestResults({
-      status: "success",
-      testPassed,
-      conversation,
-    });
-
-    setHasRunTest(true);
-    
-    // Show appropriate message
-    if (testPassed) {
-      message.success("✓ Test run completed - All evaluations passed!");
-    } else {
-      message.warning("✗ Test run completed - Some evaluations failed");
-    }
-
-  } catch (error: any) {
-    console.error("Test run error:", error);
-    setTestResults({
-      status: "error",
-      testPassed: false,
-      conversation: [],
-    });
-    message.error(error.message || "Test run failed");
-  }
-};
+  };
   const currentProvider = providers.find((p) => p.id === provider);
 
   return (
@@ -2092,106 +2098,132 @@ const formattedTurns = turns.flatMap((turn) => {
                 </div>
 
                 {testResults.status === "success" && hasRunTest && (
-  <>
-    {/* Overall test status */}
-    <div
-      style={{
-        marginBottom: "12px",
-        padding: "8px 12px",
-        backgroundColor: testResults.testPassed ? "#f0f9ff" : "#fff1f0",
-        borderRadius: "6px",
-      }}
-    >
-      <span
-        className={`status-badge ${testResults.testPassed ? "Success" : "Failed"}`}
-        style={{
-          fontSize: "13px",
-          padding: "4px 12px",
-          color: testResults.testPassed ? "#4D72F5" : "#f00000",
-          fontWeight: 500,
-        }}
-      >
-        {testResults.testPassed ? "✓ Test Passed" : "✗ Test Failed"}
-      </span>
-    </div>
+                  <>
+                    {/* Overall test status */}
+                    <div
+                      style={{
+                        marginBottom: "12px",
+                        padding: "8px 12px",
+                        backgroundColor: testResults.testPassed
+                          ? "#f0f9ff"
+                          : "#fff1f0",
+                        borderRadius: "6px",
+                      }}
+                    >
+                      <span
+                        className={`status-badge ${
+                          testResults.testPassed ? "Success" : "Failed"
+                        }`}
+                        style={{
+                          fontSize: "13px",
+                          padding: "4px 12px",
+                          color: testResults.testPassed ? "#4D72F5" : "#f00000",
+                          fontWeight: 500,
+                        }}
+                      >
+                        {testResults.testPassed
+                          ? "✓ Test Passed"
+                          : "✗ Test Failed"}
+                      </span>
+                    </div>
 
-    <div className="conversation-history">
-      {testResults.conversation.filter((message) => {
-          // Filter out assistant messages that have no content AND no tool calls AND no judge
-          if (message.role === "assistant") {
-            const hasContent = message.content && message.content.trim() !== "";
-            const hasToolCalls = message.toolCalls && message.toolCalls.length > 0;
-            const hasJudge = message.judge !== undefined;
-            
-            // Keep if it has ANY of these
-            return hasContent || hasToolCalls || hasJudge;
-          }
-          // Keep all user messages
-          return true;
-        }).map((message, index) => {
-        const hasToolCalls = message.toolCalls && message.toolCalls.length > 0;
-        const isEmptyContent = !message.content || message.content.trim() === "";
+                    <div className="conversation-history">
+                      {testResults.conversation
+                        .filter((message) => {
+                          // Filter out assistant messages that have no content AND no tool calls AND no judge
+                          if (message.role === "assistant") {
+                            const hasContent =
+                              message.content && message.content.trim() !== "";
+                            const hasToolCalls =
+                              message.toolCalls && message.toolCalls.length > 0;
+                            const hasJudge = message.judge !== undefined;
 
-        return (
-          <div
-            key={index}
-            className={`message-bubble ${message.role}`}
-          >
-            <div className="message-role">
-              {message.role === "user" ? "User" : "Assistant"}
-            </div>
-            <div className="message-content">
-              {hasToolCalls && isEmptyContent
-                ? "Tool call initiated"
-                : message.content || ""}
-            </div>
-            
-            {/* Show evaluation result for assistant messages */}
-            {message.role === "assistant" && message.judge && (
-              <div style={{ marginTop: "8px" }}>
-                <span
-                  className={`status-badge ${
-                    message.judge.status === "pass" ? "Success" : "Failed"
-                  }`}
-                  style={{
-                    fontSize: "12px",
-                    padding: "4px 10px",
-                    borderRadius: "4px",
-                    display: "inline-block",
-                    color: message.judge.status === "pass" ? "#4D72F5" : "#f00000",
-                    fontWeight: 500,
-                    backgroundColor: message.judge.status === "pass" ? "#f0f9ff" : "#fff1f0",
-                  }}
-                >
-                  {message.judge.status === "pass" ? "✓ Pass" : "✗ Fail"}
-                </span>
-                
-                {/* Show failure reason if failed */}
-                {message.judge.status === "fail" && message.judge.failureReason && (
-                  <div
-                    style={{
-                      marginTop: "6px",
-                      padding: "8px 12px",
-                      backgroundColor: "#fff1f0",
-                      borderLeft: "3px solid #f00000",
-                      borderRadius: "4px",
-                      fontSize: "12px",
-                      color: "#262626",
-                      lineHeight: "1.5",
-                    }}
-                  >
-                    <strong style={{ color: "#f00000" }}>Reason:</strong>{" "}
-                    {message.judge.failureReason}
-                  </div>
+                            // Keep if it has ANY of these
+                            return hasContent || hasToolCalls || hasJudge;
+                          }
+                          // Keep all user messages
+                          return true;
+                        })
+                        .map((message, index) => {
+                          const hasToolCalls =
+                            message.toolCalls && message.toolCalls.length > 0;
+                          const isEmptyContent =
+                            !message.content || message.content.trim() === "";
+
+                          return (
+                            <div
+                              key={index}
+                              className={`message-bubble ${message.role}`}
+                            >
+                              <div className="message-role">
+                                {message.role === "user" ? "User" : "Assistant"}
+                              </div>
+                              <div className="message-content">
+                                {hasToolCalls && isEmptyContent
+                                  ? "Tool call initiated"
+                                  : message.content || ""}
+                              </div>
+
+                              {/* Show evaluation result for assistant messages */}
+                              {message.role === "assistant" &&
+                                message.judge && (
+                                  <div style={{ marginTop: "8px" }}>
+                                    <span
+                                      className={`status-badge ${
+                                        message.judge.status === "pass"
+                                          ? "Success"
+                                          : "Failed"
+                                      }`}
+                                      style={{
+                                        fontSize: "12px",
+                                        padding: "4px 10px",
+                                        borderRadius: "4px",
+                                        display: "inline-block",
+                                        color:
+                                          message.judge.status === "pass"
+                                            ? "#4D72F5"
+                                            : "#f00000",
+                                        fontWeight: 500,
+                                        backgroundColor:
+                                          message.judge.status === "pass"
+                                            ? "#f0f9ff"
+                                            : "#fff1f0",
+                                      }}
+                                    >
+                                      {message.judge.status === "pass"
+                                        ? "✓ Pass"
+                                        : "✗ Fail"}
+                                    </span>
+
+                                    {/* Show failure reason if failed */}
+                                    {message.judge.status === "fail" &&
+                                      message.judge.failureReason && (
+                                        <div
+                                          style={{
+                                            marginTop: "6px",
+                                            padding: "8px 12px",
+                                            backgroundColor: "#fff1f0",
+                                            borderLeft: "3px solid #f00000",
+                                            borderRadius: "4px",
+                                            fontSize: "12px",
+                                            color: "#262626",
+                                            lineHeight: "1.5",
+                                          }}
+                                        >
+                                          <strong style={{ color: "#f00000" }}>
+                                            Reason:
+                                          </strong>{" "}
+                                          {message.judge.failureReason}
+                                        </div>
+                                      )}
+                                  </div>
+                                )}
+                            </div>
+                          );
+                        })}
+                    </div>
+                  </>
                 )}
-              </div>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  </>
-)}
               </div>
             </Card>
           </div>

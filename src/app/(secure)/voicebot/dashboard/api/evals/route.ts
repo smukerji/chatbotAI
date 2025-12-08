@@ -11,6 +11,7 @@ module.exports = apiHandler({
 });
 
 async function createEval(req: NextRequest) {
+
     try {
         const data = await req.json();
         const {
@@ -61,7 +62,7 @@ async function createEval(req: NextRequest) {
                 // Check if this is an evaluation checkpoint (has judgePlan)
                 if (t.judgePlan) {
                     console.log("Processing judgePlan:", JSON.stringify(t.judgePlan, null, 2));
-                    
+
                     const judgePlan: any = {
                         type: t.judgePlan.type || "exact",
                     };
@@ -83,54 +84,54 @@ async function createEval(req: NextRequest) {
                             console.log("WARNING: No regex pattern provided!");
                         }
                     }
-// LLM-as-a-judge approach
-else if (judgePlan.type === "llm-as-a-judge" || judgePlan.type === "ai") {
-    console.log("Processing LLM-as-a-judge:", JSON.stringify(t.judgePlan, null, 2));
-    
-    // VAPI expects type "ai" for LLM-as-a-judge
-    judgePlan.type = "ai";
-    
-    // Build the model configuration
-    if (t.judgePlan.model) {
-        judgePlan.model = t.judgePlan.model;
-    } else {
-        // Fallback if model not provided (shouldn't happen with updated frontend)
-        let systemPrompt = t.judgePlan.customPrompt || "";
-        
-        if (!systemPrompt.trim()) {
-            const contextInstruction = t.judgePlan.includeConversationContext !== false
-                ? "Evaluate ONLY the last assistant message: {{messages[-1]}}.\n\nInclude context: {{messages}}\n\n"
-                : "Evaluate the assistant's response.\n\n";
-            
-            systemPrompt = `You are an LLM-Judge. ${contextInstruction}Decision rule:\n- PASS if ALL pass criteria are met AND NO fail criteria are triggered.\n- Otherwise FAIL.\n\n`;
-            
-            if (t.judgePlan.passCriteria) {
-                systemPrompt += `Pass criteria:\n${t.judgePlan.passCriteria.trim()}\n\n`;
-            }
-            
-            if (t.judgePlan.failCriteria) {
-                systemPrompt += `Fail criteria (any triggers FAIL):\n${t.judgePlan.failCriteria.trim()}\n\n`;
-            }
-            
-            systemPrompt += `Output format: respond with exactly one word: pass or fail`;
-        }
-        
-         // CRITICAL: Match VAPI's exact structure - "model" comes before "messages"
-        judgePlan.model = {
-            model: t.judgePlan.modelName || "gpt-4o",
-            messages: [
-                {
-                    role: "system",
-                    content: systemPrompt
-                }
-            ],
-            provider: t.judgePlan.provider || "openai"
-        };
-    }
-    
-    console.log("Final LLM judge judgePlan:", JSON.stringify(judgePlan, null, 2));
-}
-              
+                    // LLM-as-a-judge approach
+                    else if (judgePlan.type === "llm-as-a-judge" || judgePlan.type === "ai") {
+                        console.log("Processing LLM-as-a-judge:", JSON.stringify(t.judgePlan, null, 2));
+
+                        // VAPI expects type "ai" for LLM-as-a-judge
+                        judgePlan.type = "ai";
+
+                        // Build the model configuration
+                        if (t.judgePlan.model) {
+                            judgePlan.model = t.judgePlan.model;
+                        } else {
+                            // Fallback if model not provided (shouldn't happen with updated frontend)
+                            let systemPrompt = t.judgePlan.customPrompt || "";
+
+                            if (!systemPrompt.trim()) {
+                                const contextInstruction = t.judgePlan.includeConversationContext !== false
+                                    ? "Evaluate ONLY the last assistant message: {{messages[-1]}}.\n\nInclude context: {{messages}}\n\n"
+                                    : "Evaluate the assistant's response.\n\n";
+
+                                systemPrompt = `You are an LLM-Judge. ${contextInstruction}Decision rule:\n- PASS if ALL pass criteria are met AND NO fail criteria are triggered.\n- Otherwise FAIL.\n\n`;
+
+                                if (t.judgePlan.passCriteria) {
+                                    systemPrompt += `Pass criteria:\n${t.judgePlan.passCriteria.trim()}\n\n`;
+                                }
+
+                                if (t.judgePlan.failCriteria) {
+                                    systemPrompt += `Fail criteria (any triggers FAIL):\n${t.judgePlan.failCriteria.trim()}\n\n`;
+                                }
+
+                                systemPrompt += `Output format: respond with exactly one word: pass or fail`;
+                            }
+
+                            // CRITICAL: Match VAPI's exact structure - "model" comes before "messages"
+                            judgePlan.model = {
+                                model: t.judgePlan.modelName || "gpt-4o",
+                                messages: [
+                                    {
+                                        role: "system",
+                                        content: systemPrompt
+                                    }
+                                ],
+                                provider: t.judgePlan.provider || "openai"
+                            };
+                        }
+
+                        console.log("Final LLM judge judgePlan:", JSON.stringify(judgePlan, null, 2));
+                    }
+
                     // Add tool call validation if present (for all evaluation types)
                     if (t.judgePlan.toolCalls && t.judgePlan.toolCalls.length > 0) {
                         judgePlan.toolCalls = t.judgePlan.toolCalls.map((tc: any) => {
