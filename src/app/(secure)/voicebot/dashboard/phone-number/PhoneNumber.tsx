@@ -18,6 +18,9 @@ import phoneNumberDelete from "../../../../../../public/voiceBot/phone-number/tr
 
 import { useCookies } from "react-cookie";
 import ImportNumberCustomModel from "../../../create-first-assistant/_components/ImportNumberCustomModel/ImportNumberCustomModel";
+import { EllipsisOutlined } from "@ant-design/icons";
+import { Dropdown, Space } from "antd";
+import FreeTorriNumberModal from "../../../create-first-assistant/_components/FreeTorriNumberModal/FreeTorriNumberModal";
 interface TwilioDetails {
   createdAt: string;
   id: string;
@@ -52,9 +55,22 @@ function PhoneNumber() {
   const [cookies, setCookie] = useCookies(["userId"]);
 
   const [openModel, setOpenModel] = useState<boolean>(false);
+  const [activeDialog, setActiveDialog] = useState("");
+  const menuItems = [
+    {
+      key: "1",
+      label: "Free Torri Number",
+    },
+  ];
 
   const openHandleModel = () => {
     setOpenModel(true);
+  };
+  const onMenuClick = (e: any) => {
+    if (e.key === "1") {
+      setActiveDialog("free-torri");
+    }
+    // ...other cases
   };
 
   async function getPublishAssistantDataFromDB() {
@@ -232,9 +248,24 @@ function PhoneNumber() {
               )}
             </div>
             <div className="bottom-button">
-              <Button className="previous" onClick={() => openHandleModel()}>
-                Import Phone Number
-              </Button>
+              <Space.Compact className="bottom-button">
+                <Button
+                  className="previous import-btn"
+                  onClick={openHandleModel}
+                >
+                  Import Phone Number
+                </Button>
+                <Dropdown
+                  menu={{ items: menuItems, onClick: onMenuClick }}
+                  placement="bottomRight"
+                  className="dropdown-button"
+                >
+                  <Button
+                    className="dropdown-btn"
+                    icon={<EllipsisOutlined />}
+                  />
+                </Dropdown>
+              </Space.Compact>
             </div>
           </div>
           <div className="right-container">
@@ -329,6 +360,13 @@ function PhoneNumber() {
               title={"Create a Tool"}
               content={<ImportNumber />}
               onClose={getImportedTwilioDataFromDB}
+            />
+          )}
+
+          {activeDialog === "free-torri" && (
+            <FreeTorriNumberModal
+              open={true}
+              onClose={() => setActiveDialog("")}
             />
           )}
         </div>

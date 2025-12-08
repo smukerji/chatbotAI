@@ -1,0 +1,85 @@
+.free-torri-modal .ant-modal-content {
+  //   background: #181a20;
+  border-radius: 12px;
+  //   color: #fff;
+  padding: 32px 24px;
+}
+.backdrop {
+  cursor: pointer;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: rgba($color: #000000, $alpha: 0.5);
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.modal-label {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.modal-input {
+  //   background: #23262f;
+  //   color: #fff;
+  //   border: 1px solid #353945;
+  border-radius: 8px;
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.modal-info-box {
+  //   background: #23262f;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+  border: 1px solid #353945;
+}
+
+.info-title {
+  font-weight: 600;
+  //   color: #fff;
+}
+
+.info-detail {
+  //   color: #fff;
+  font-weight: 400;
+}
+
+.info-desc {
+  //   color: #b1b5c3;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.cancel-btn {
+  //   background: #23262f;
+  //   color: #fff;
+  border: none;
+  border-radius: 8px;
+  border: 1px solid #353945;
+}
+
+.create-btn {
+  background: #2e5bea;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+}
