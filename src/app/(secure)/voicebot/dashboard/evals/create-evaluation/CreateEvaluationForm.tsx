@@ -650,7 +650,7 @@ export default function CreateEvaluationForm({
         
           // LLM-as-a-judge approach
           else if (approach.type === "llm-as-a-judge") {
-              debugger;
+              ;
             // Build the system prompt for the LLM judge
             let systemPrompt = approach.customPrompt || "";
 
@@ -676,23 +676,23 @@ export default function CreateEvaluationForm({
 
             // Store the full model structure
             judgePlan.model = {
-              model: approach.modelName || model || "gpt-4o",
+              model: model || "gpt-4o",
               messages: [
                 {
                   role: "system",
                   content: systemPrompt,
                 },
               ],
-              provider: approach.provider || provider || "openai",
+              provider:  provider || "openai",
             };
-            debugger;
+            ;
             // Also store individual fields for re-editing
             judgePlan.passCriteria = approach.passCriteria;
             judgePlan.failCriteria = approach.failCriteria;
             judgePlan.includeConversationContext = approach.includeContext;
             judgePlan.customPrompt = approach.customPrompt;
-            judgePlan.provider = approach.provider || provider || "openai";
-            judgePlan.modelName = approach.modelName || model || "gpt-4o";
+            judgePlan.provider = provider || "openai";
+            judgePlan.modelName =  model || "gpt-4o";
           }
           // Add tool calls to judgePlan for evaluation mode
           if (turn.toolCalls && Array.isArray(turn.toolCalls) && turn.toolCalls.length > 0) {
@@ -716,7 +716,7 @@ export default function CreateEvaluationForm({
 
           formattedTurn.role = "assistant";
           formattedTurn.judgePlan = judgePlan;
-          debugger;
+          ;
           // Do NOT include message field for evaluation turns
           return formattedTurn;
         }

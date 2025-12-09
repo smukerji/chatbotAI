@@ -66,8 +66,8 @@ export async function GET(
           localCreatedAt: localEval?.createdAt,
           assistantMongoId: assistant._id.toString(),
           vapiAssistantId: assistant.vapiAssistantId,
-          provider: getProviderAndModel(vapiData?.message).provider, //|| localEval?.provider || "openai",     
-          model: getProviderAndModel(vapiData?.message).model,           
+          provider: getProviderAndModel(vapiData?.messages).provider, //|| localEval?.provider || "openai",     
+          model: getProviderAndModel(vapiData?.messages).model,           
         };
 
         return NextResponse.json({ eval: mergedData }, { status: 200 });
