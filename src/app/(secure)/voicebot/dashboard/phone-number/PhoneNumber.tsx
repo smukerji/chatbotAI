@@ -33,12 +33,29 @@ interface TwilioDetails {
   updatedAt: string;
 }
 
+interface VapiDetails {
+  id: string;
+  orgId: string;
+  assistantId: string;
+  number: string;
+  createdAt: string;
+  updatedAt: string;
+  provider: string;
+  status: string;
+  providerResourceId: string;
+}
+
+
+
 interface InboundNumberDetails {
   label: string;
-  twilio: TwilioDetails;
+  twilio?: TwilioDetails;
+  vapi?: VapiDetails;
   userId: string;
   _id: string;
 }
+
+
 function PhoneNumber() {
   // let phoneNumber:any = [];
   const voiceBotContextData: any = useContext(CreateVoiceBotContext);
@@ -155,7 +172,7 @@ function PhoneNumber() {
 
     setInboundNumberDetails(contact);
     if ("assistantId" in contact) {
-      setSelectedAssistant(contact?.assistantId);
+      setSelectedAssistant(contact?.assistantId || contact?.vapi?.assistantId);
     } else {
       setSelectedAssistant(null);
     }
@@ -171,7 +188,7 @@ function PhoneNumber() {
 
     if (inboundNumberDetails || true) {
       const updateValue = {
-        twilioId: inboundNumberDetails ? inboundNumberDetails.twilio.id : "bb",
+        twilioId: inboundNumberDetails ? "vapi" in inboundNumberDetails ? inboundNumberDetails.vapi?.id : inboundNumberDetails?.twilio?.id : undefined,
         assistantId: values?.assistantId,
       };
 
@@ -244,8 +261,8 @@ function PhoneNumber() {
                       )}
                     >
                       <div className="number-details">
-                        <h2> {contact?.twilio?.number} </h2>
-                        <p> {contact?.label} </p>
+                        <h2> {contact?.twilio?.number || contact?.vapi?.number} </h2>
+                        <p> {contact?.label || "Vapi Number"} </p>
                       </div>
                       {/* <div className='switch-input'>
                       <Switch className="switch-btn" defaultChecked />
@@ -308,7 +325,7 @@ function PhoneNumber() {
                     <h4 className="lable">Inbound Phone Number</h4>
                     <Input
                       className="phone-number-input"
-                      value={inboundNumberDetails?.twilio?.number}
+                      value={inboundNumberDetails?.twilio?.number || inboundNumberDetails?.vapi?.number}
                       disabled
                     />
                   </div>
