@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 
 import "./phone-number-design.scss";
 import PhoneInput from "react-phone-input-2";
@@ -21,6 +21,7 @@ import ImportNumberCustomModel from "../../../create-first-assistant/_components
 import { EllipsisOutlined } from "@ant-design/icons";
 import { Dropdown, Space } from "antd";
 import FreeTorriNumberModal from "../../../create-first-assistant/_components/FreeTorriNumberModal/FreeTorriNumberModal";
+import { CreateVoiceBotContext } from "@/app/_helpers/client/Context/VoiceBotContextApi";
 interface TwilioDetails {
   createdAt: string;
   id: string;
@@ -40,6 +41,9 @@ interface InboundNumberDetails {
 }
 function PhoneNumber() {
   // let phoneNumber:any = [];
+  const voiceBotContextData: any = useContext(CreateVoiceBotContext);
+  const voicebotDetails = voiceBotContextData.state;
+
 
   const [phoneNumbers, setPhoneNumbers] = useState([]);
   const [publishAssistantList, setPublishAssistantList] = useState([
@@ -56,6 +60,11 @@ function PhoneNumber() {
 
   const [openModel, setOpenModel] = useState<boolean>(false);
   const [activeDialog, setActiveDialog] = useState("");
+  const [vapiFreeNumberDetails, setVapiFreeNumberDetails] = useState<{
+    assistantId: string,
+    userId: string,
+  } | null>(null);
+
   const menuItems = [
     {
       key: "1",
@@ -69,6 +78,10 @@ function PhoneNumber() {
   const onMenuClick = (e: any) => {
     if (e.key === "1") {
       setActiveDialog("free-torri");
+      setVapiFreeNumberDetails({
+        assistantId: voiceBotContextData?.assistantInfo?.vapiAssistantId,
+        userId: cookies?.userId,
+      })
     }
     // ...other cases
   };
@@ -102,6 +115,7 @@ function PhoneNumber() {
 
   async function getImportedTwilioDataFromDB() {
     try {
+
       setIsLoading(true);
 
       const phoneNumberData: any = await fetch(
@@ -113,7 +127,7 @@ function PhoneNumber() {
       );
       const twilioNumbers = await phoneNumberData.json();
       setPhoneNumbers(twilioNumbers?.importedNumbers);
-      debugger;
+
       setInboundNumberDetails(twilioNumbers?.importedNumbers[0]);
       if (
         Array.isArray(twilioNumbers?.importedNumbers) &&
@@ -138,7 +152,7 @@ function PhoneNumber() {
   }, []);
 
   function changedTheInboundNumberHandler(contact: any) {
-    debugger;
+
     setInboundNumberDetails(contact);
     if ("assistantId" in contact) {
       setSelectedAssistant(contact?.assistantId);
@@ -147,20 +161,23 @@ function PhoneNumber() {
     }
   }
 
+
+
   async function assistantSelectOnPhoneNumberHandler(option: any, values: any) {
+
     console.clear();
     console.log("selected option:", option);
     console.log("selected values:", values);
-    debugger;
-    if (inboundNumberDetails) {
+
+    if (inboundNumberDetails || true) {
       const updateValue = {
-        twilioId: inboundNumberDetails.twilio.id,
+        twilioId: inboundNumberDetails ? inboundNumberDetails.twilio.id : "bb",
         assistantId: values?.assistantId,
       };
 
       setSelectedAssistant(values?.assistantId);
 
-      debugger;
+
       const updatedRequest: any = await fetch(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/phone?userId=${cookies?.userId}`,
         {
@@ -227,8 +244,8 @@ function PhoneNumber() {
                       )}
                     >
                       <div className="number-details">
-                        <h2> {contact.twilio.number} </h2>
-                        <p> {contact.label} </p>
+                        <h2> {contact?.twilio?.number} </h2>
+                        <p> {contact?.label} </p>
                       </div>
                       {/* <div className='switch-input'>
                       <Switch className="switch-btn" defaultChecked />
@@ -291,7 +308,7 @@ function PhoneNumber() {
                     <h4 className="lable">Inbound Phone Number</h4>
                     <Input
                       className="phone-number-input"
-                      value={inboundNumberDetails?.twilio.number}
+                      value={inboundNumberDetails?.twilio?.number}
                       disabled
                     />
                   </div>
@@ -367,6 +384,11 @@ function PhoneNumber() {
             <FreeTorriNumberModal
               open={true}
               onClose={() => setActiveDialog("")}
+              data={vapiFreeNumberDetails as {
+                assistantId: string,
+                userId: string,
+              }}
+
             />
           )}
         </div>

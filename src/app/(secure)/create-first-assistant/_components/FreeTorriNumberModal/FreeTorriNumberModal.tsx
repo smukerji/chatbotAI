@@ -6,10 +6,57 @@ import "./FreeTorriNumberModal.scss";
 interface Props {
   open: boolean;
   onClose: () => void;
+  data: {
+    assistantId: string,
+    userId: string,
+  }
 }
 
-const FreeTorriNumberModal: React.FC<Props> = ({ open, onClose }) => {
+const FreeTorriNumberModal: React.FC<Props> = ({ open, onClose, data }) => {
   const [areaCode, setAreaCode] = useState("");
+
+
+  const [loading, setLoading] = useState(false);
+
+  async function savedFreeVapiNumber() {
+    const { assistantId, userId } = data;
+    debugger;
+
+    if (!areaCode) {
+      return;
+    }
+
+
+
+    setLoading(true);
+
+    try {
+      const response = await fetch("/voicebot/dashboard/api/phone/vapi-free-number", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          assistantId,
+          userId,
+          areaCode: areaCode,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Failed to create number");
+      }
+
+    } catch (error: any) {
+      console.error("Error creating number:", error);
+    } finally {
+      setLoading(false);
+    }
+
+
+  }
 
   return (
     <div>
@@ -20,7 +67,7 @@ const FreeTorriNumberModal: React.FC<Props> = ({ open, onClose }) => {
         footer={null}
         centered
         className="free-torri-modal"
-        //   width={500}
+      //   width={500}
       >
         <div className="modal-content">
           <div className="modal-label">Area Code</div>
@@ -42,7 +89,7 @@ const FreeTorriNumberModal: React.FC<Props> = ({ open, onClose }) => {
             <Button onClick={onClose} className="cancel-btn">
               Cancel
             </Button>
-            <Button type="primary" className="create-btn">
+            <Button onClick={savedFreeVapiNumber} type="primary" className="create-btn">
               Create
             </Button>
           </div>
