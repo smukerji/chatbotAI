@@ -189,11 +189,11 @@ async function deleteSingleAssistant(req: NextRequest) {
 
     console.log("Record found:", recordResult);
     //delete the record from twilio
-    if (recordResult.twilio) {
+    if (recordResult.twilio || "vapi" in recordResult) {
       const token = await generateAndGetToken();
       const client = new VapiClient({ token });
       const twilioResonse = await client.phoneNumbers.delete(
-        recordResult.twilio.id
+        recordResult?.twilio?.id || recordResult?.vapi?.id
       );
       console.log("Twilio response:", twilioResonse);
       if (twilioResonse) {
@@ -207,6 +207,7 @@ async function deleteSingleAssistant(req: NextRequest) {
         return { message: "Error deleting record from twilio" };
       }
     }
+
     return { message: "Record not found" };
   } catch (error: any) {
     console.error("Error parsing request body:", error);
