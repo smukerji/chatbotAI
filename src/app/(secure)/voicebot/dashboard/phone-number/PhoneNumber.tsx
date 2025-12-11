@@ -392,15 +392,15 @@ function PhoneNumber() {
             />
           )}
 
-          {activeDialog === "free-torri" && (
+          {activeDialog === "free-torri" && vapiFreeNumberDetails && (
             <FreeTorriNumberModal
               open={true}
-              onClose={() => setActiveDialog("")}
-              data={vapiFreeNumberDetails as {
-                assistantId: string,
-                userId: string,
+              onClose={() => {
+                setActiveDialog("");
+                // Refresh the phone numbers list
+                getImportedTwilioDataFromDB();
               }}
-
+              data={vapiFreeNumberDetails}
             />
           )}
         </div>
