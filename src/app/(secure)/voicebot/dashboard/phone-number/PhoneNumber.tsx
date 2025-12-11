@@ -124,7 +124,6 @@ function PhoneNumber() {
       );
       setPublishAssistantList(assistantDataMap);
 
-      console.log("assistant list:", assistantResult);
     } catch (error: any) {
       console.error("Error parsing request body:", error);
     }
@@ -151,7 +150,6 @@ function PhoneNumber() {
         twilioNumbers?.importedNumbers.length > 0 &&
         "assistantId"
       ) {
-        console.log("twilioNumbers:", twilioNumbers);
         setSelectedAssistant(twilioNumbers?.importedNumbers[0]?.assistantId);
       }
     } catch (error: any) {
@@ -170,8 +168,9 @@ function PhoneNumber() {
 
   function changedTheInboundNumberHandler(contact: any) {
 
+
     setInboundNumberDetails(contact);
-    if ("assistantId" in contact) {
+    if ("assistantId" in contact || "vapi" in contact) {
       setSelectedAssistant(contact?.assistantId || contact?.vapi?.assistantId);
     } else {
       setSelectedAssistant(null);
@@ -183,10 +182,8 @@ function PhoneNumber() {
   async function assistantSelectOnPhoneNumberHandler(option: any, values: any) {
 
     console.clear();
-    console.log("selected option:", option);
-    console.log("selected values:", values);
 
-    if (inboundNumberDetails || true) {
+    if (inboundNumberDetails) {
       const updateValue = {
         twilioId: inboundNumberDetails ? "vapi" in inboundNumberDetails ? inboundNumberDetails.vapi?.id : inboundNumberDetails?.twilio?.id : undefined,
         assistantId: values?.assistantId,
@@ -207,14 +204,13 @@ function PhoneNumber() {
       const updatedData = await updatedRequest.json();
 
       message.info(updatedData.message);
+      await getImportedTwilioDataFromDB();
 
-      console.log("updateValue", updateValue);
     }
   }
 
   async function deletePhoneNumberHandler() {
-    console.clear();
-    console.log("Phone number details ", inboundNumberDetails);
+
 
     if (!inboundNumberDetails || !inboundNumberDetails?._id) {
       console.error("No phone number selected or missing ID");
@@ -231,7 +227,6 @@ function PhoneNumber() {
       );
 
       const data = await response.json();
-      console.log("Delete response:", data.data);
       await getImportedTwilioDataFromDB();
       await getPublishAssistantDataFromDB();
     } catch (error: any) {

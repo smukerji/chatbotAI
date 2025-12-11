@@ -97,8 +97,12 @@ async function updateNumberWithAssistant(req: NextRequest) {
     const voiceAssistantCollection = db?.collection(
       "voice-assistance-phone-numbers"
     );
+
     const recordResult = await voiceAssistantCollection?.findOne({
-      "twilio.id": data.twilioId,
+      $or: [
+        { "twilio.id": data.twilioId },
+        { "vapi.id": data.twilioId }
+      ]
     });
 
     if (!recordResult) {
@@ -141,7 +145,8 @@ async function updateNumberWithAssistant(req: NextRequest) {
 
     const responseBody = await response.json();
 
-    if ("id" in responseBody && "assistantId" in responseBody) {
+
+    if ("id" in responseBody && "assistantId" in responseBody && responseBody.provider !== "vapi") {
       //update the record with assistantId
       await voiceAssistantCollection?.updateOne(
         { "twilio.id": data.twilioId },
@@ -149,6 +154,15 @@ async function updateNumberWithAssistant(req: NextRequest) {
       );
 
       return { message: "Assistant bind with the number" };
+    }
+    else if (responseBody && responseBody?.provider === "vapi" && "assistantId" in responseBody) {
+      await voiceAssistantCollection?.updateOne(
+        { "vapi.id": data.twilioId },
+        { $set: { "vapi.assistantId": data.assistantId } }
+      );
+
+      return { message: "Assistant bind with the number" };
+
     } else {
       return { message: "Error binding assistant with the number" };
     }
