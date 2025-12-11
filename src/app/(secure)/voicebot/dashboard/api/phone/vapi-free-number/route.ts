@@ -16,15 +16,9 @@ module.exports = apiHandler({
 
 async function addFreeVapiNumberWithAssistantAndAreaCode(req: NextRequest) {
     console.log("=== API Route Called ===");
-    
+
     try {
         const data: { assistantId: string; areaCode: string, userId: string } = await req.json();
-        
-        console.log("Received Data:", {
-            assistantId: data.assistantId,
-            areaCode: data.areaCode,
-            userId: data.userId
-        });
 
         // Validate input
         if (!data.assistantId || !data.areaCode || !data.userId) {
@@ -47,12 +41,9 @@ async function addFreeVapiNumberWithAssistantAndAreaCode(req: NextRequest) {
             "vapi.provider": "vapi"  // Only count VAPI numbers, not Twilio
         });
 
-        console.log(`User ${data.userId} currently has ${existingVapiNumbersCount} free VAPI numbers`);
-
         // Only prevent if user already has 2 VAPI numbers
         if (existingVapiNumbersCount >= 2) {
-            console.log("User has reached VAPI number limit");
-            
+
             // Return error 
             return {
                 message: "You have reached the maximum limit of 2 free VAPI numbers. Please delete an existing VAPI number before adding a new one.",
@@ -62,17 +53,13 @@ async function addFreeVapiNumberWithAssistantAndAreaCode(req: NextRequest) {
             };
         }
 
-        console.log("Generating VAPI token...");
         const token = await generateAndGetToken();
-        console.log("Token generated successfully");
 
         const requestBody = {
             "provider": "vapi",
             "assistantId": data.assistantId,
             "numberDesiredAreaCode": data.areaCode
         };
-
-        console.log("Calling VAPI API with body:", JSON.stringify(requestBody, null, 2));
 
         // Create Phone Number (POST /phone-number)
         const response = await fetch("https://api.vapi.ai/phone-number", {
@@ -84,14 +71,8 @@ async function addFreeVapiNumberWithAssistantAndAreaCode(req: NextRequest) {
             body: JSON.stringify(requestBody),
         });
 
-        console.log("=== VAPI API Response ===");
-        console.log("Status:", response.status);
-        console.log("Status Text:", response.statusText);
-        console.log("Headers:", Object.fromEntries(response.headers.entries()));
-
         // Get response text first to handle both JSON and non-JSON responses
         const responseText = await response.text();
-        console.log("Response Text:", responseText);
 
         let body;
         try {
@@ -102,13 +83,11 @@ async function addFreeVapiNumberWithAssistantAndAreaCode(req: NextRequest) {
             body = { raw: responseText };
         }
 
-        console.log("========================");
-
         // Check if VAPI API request was successful
         if (!response.ok) {
             console.error("VAPI API Error - Status:", response.status);
             console.error("VAPI API Error - Body:", body);
-            
+
             // Return error in format that apiHandler expects
             return {
                 message: body?.message || body?.error || `VAPI API error: ${response.statusText}`,
@@ -120,15 +99,12 @@ async function addFreeVapiNumberWithAssistantAndAreaCode(req: NextRequest) {
 
         // Only insert into DB if VAPI API call was successful
         console.log("VAPI API call successful, inserting into database...");
-        const result = await voiceAssistantCollection?.insertOne({
+        await voiceAssistantCollection?.insertOne({
             vapi: body,
             userId: new ObjectId(data.userId),
         });
 
-        console.log(body);
-        console.log("db result ", result);
-
-        return { 
+        return {
             message: "VAPI number created successfully",
             data: body
         };
