@@ -227,12 +227,14 @@ export default async function handler(req, res) {
           });
         }
 
+        // console.log(deleteQAList,"Qa>>>>>>>>>>>>>>>>>");
         /// deleting QA that needs to be deleted
         if (deleteQAList.length > 0) {
           /// delete all the QA from DB
-          deleteQAList.forEach(async (qa) => {
+          await Promise.all(deleteQAList.map(async (qa) => {
             /// get the QA id
             const objectId = new ObjectId(qa.id);
+            
             /// fetch the QA to get the data IDs of vector stores
             const dbQA = await collection.findOne({
               _id: objectId,
@@ -243,8 +245,9 @@ export default async function handler(req, res) {
             await collection.deleteOne({
               _id: objectId,
             });
-          });
+          }));
         }
+        
 
         /// deleting weblinks that needs to be deleted
         if (deleteCrawlList.length > 0) {
