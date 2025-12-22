@@ -41,7 +41,9 @@ export function isPublicPath(req: NextRequest) {
     "GET:/voicebot/dashboard/api/knowledge-file",
     "DELETE:/voicebot/dashboard/api/knowledge-file",
     "GET:/voicebot/dashboard/api/knowledge-file/file-check",
-    "PUT:/voicebot/dashboard/api/phone/fallback", 
+    "PUT:/voicebot/dashboard/api/phone/fallback",
+    "POST:/voicebot/dashboard/api/evals",
+    "GET:/voicebot/dashboard/api/evals",
   ];
 
   return publicPaths.includes(`${req.method}:${req.nextUrl.pathname}`);

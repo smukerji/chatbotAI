@@ -54,6 +54,7 @@
     "jsonwebtoken": "^9.0.2",
     "langchain": "^0.2.11",
     "lottie-react": "^2.4.0",
+    "lucide-react": "^0.553.0",
     "mammoth": "^1.6.0",
     "markdown-to-jsx": "^7.4.7",
     "moment": "^2.30.1",
