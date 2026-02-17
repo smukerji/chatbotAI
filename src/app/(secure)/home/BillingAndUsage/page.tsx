@@ -169,22 +169,24 @@ function BillingAndUsage() {
               <CancelPlanModal planDetail={planDetail} date={date} />
             </Modal>
 
-            <Modal
-              title="Upgrade Now to create new Chatbots!"
-              open={isPlanNotification}
-              onCancel={() => {}}
-              footer={[
-                <Button key="submit" type="primary" onClick={handleUpgradePlan}>
-                  Upgrade Now
-                </Button>,
-              ]}
-              closable={false}
-              centered
-              className="subscription-expire-popup"
-              width={800}
-            >
-              <p>Upgrade now to access your chatbots!</p>
-            </Modal>
+            {activeTab !== "2" && (
+              <Modal
+                title="Upgrade Now to create new Chatbots!"
+                open={isPlanNotification}
+                onCancel={() => { }}
+                footer={[
+                  <Button key="submit" type="primary" onClick={handleUpgradePlan}>
+                    Upgrade Now
+                  </Button>,
+                ]}
+                closable={false}
+                centered
+                className="subscription-expire-popup"
+                width={800}
+              >
+                <p>Upgrade now to access your chatbots!</p>
+              </Modal>
+            )}
 
             <div className="billing-main">
               <div className="billing-head">
@@ -293,7 +295,7 @@ function BillingAndUsage() {
 
               {activeTab === "2" && (
                 <>
-                  <VoicebotUsage firstPurchase={true}   />
+                  <VoicebotUsage firstPurchase={true} />
                   <div className="manage-plan">Payment history</div>
                   <VoicebotPaymentHistory />
                 </>
