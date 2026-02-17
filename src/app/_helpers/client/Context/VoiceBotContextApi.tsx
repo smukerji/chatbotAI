@@ -180,7 +180,7 @@ export const VoiceBotDataProvider = ({ children }: { children: ReactNode }) => {
     const {punctuationBoundaries,minCharacters} = chunkPlan;
    
     ;
-    if (provider && model && language && modelProvider && modelsModel && state.firstMessage && state.name && maxTokens && (typeof maxTokens === 'number') && punctuationBoundaries.length > 0 && minCharacters > 0 && modelMessages[0].content.length > 0) {
+    if (provider && model && language && modelProvider && modelsModel && state.firstMessage && state.name && maxTokens && (typeof maxTokens === 'number') && punctuationBoundaries.length > 0 && minCharacters > 0 && modelMessages && modelMessages.length > 0 && modelMessages[0] && modelMessages[0].content && modelMessages[0].content.length > 0) {
       
       setIsPublishEnabled(true);
       if(publishLoading){

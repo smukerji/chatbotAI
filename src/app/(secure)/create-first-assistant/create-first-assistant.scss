@@ -828,6 +828,7 @@
       gap: 20px;
       border-radius: 12px;
       background: #fcfcfd;
+      border: 2px solid transparent;
       // margin-top: 35px;
 
       .blank-template {
@@ -865,6 +866,19 @@
         // &.hover{
         //   cursor: pointer !important;
         // }
+      }
+
+      &.selected-assistant {
+        background: #9fb5ff !important;
+        border: 2px solid #2e58ea;
+
+        .blank-template {
+          background: #9fb5ff !important;
+
+          .card_sub-header {
+            color: #000 !important;
+          }
+        }
       }
     }
   }

@@ -11,17 +11,25 @@ interface AssistantListProps {
   assistantList: any[];
   selectedAssistantIndex: number;
   selectedAssistantChangeHandler: (assistant: any, index: number) => void;
+  blankTemplateClickHandler?: () => void;
+  isBlankTemplateSelected?: boolean;
 }
 
 const ChooseVoiceAssistantType: React.FC<AssistantListProps> = ({
   assistantList,
   selectedAssistantIndex,
   selectedAssistantChangeHandler,
+  blankTemplateClickHandler,
+  isBlankTemplateSelected = false,
 }) => {
   console.log("assistantList &*", assistantList);
   return (
     <>
-      <div className="custom_assistant-card">
+      <div
+        className={`custom_assistant-card ${isBlankTemplateSelected ? "selected-assistant" : ""}`}
+        onClick={blankTemplateClickHandler}
+        style={{ cursor: 'pointer' }}
+      >
         <div className="blank-template">
           <div className="image-card">
             <Image
@@ -48,16 +56,22 @@ const ChooseVoiceAssistantType: React.FC<AssistantListProps> = ({
             }}
           >
             <div className="card-image">
-              <Image src={assistant.imageUrl} alt="" height={100} width={100} />
+              {assistant.imageUrl ? (
+                <Image src={assistant.imageUrl} alt="" height={100} width={100} />
+              ) : (
+                <Image src={customTemplate} alt="" height={100} width={100} />
+              )}
             </div>
             <div className="header-information">
               <div className="header_container">
                 <h2 className="card_header">{assistant.assistantType}</h2>
-                <div className="image-info">
-                <Tooltip placement="bottomRight" title={assistant.info}>
-                  <Image src={infoImage} alt="" height={100} width={100} />
-                </Tooltip>
-                </div>
+                {assistant.info && (
+                  <div className="image-info">
+                    <Tooltip placement="bottomRight" title={assistant.info}>
+                      <Image src={infoImage} alt="" height={100} width={100} />
+                    </Tooltip>
+                  </div>
+                )}
               </div>
               <h3 className="card_sub-header">{assistant.dispcrtion}</h3>
             </div>

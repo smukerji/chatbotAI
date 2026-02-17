@@ -28,6 +28,8 @@ function CreateAssitstantContainerItems({
   crawlData,
   isModalVisible,
   setIsModalVisible,
+  blankTemplateClickHandler,
+  isBlankTemplateSelected,
 }: any) {
   /// get the context data
   const createAssistantFlowContext: any = useContext(
@@ -56,6 +58,8 @@ function CreateAssitstantContainerItems({
               assistantList={assistantList}
               selectedAssistantIndex={selectedAssistantIndex}
               selectedAssistantChangeHandler={selectedAssistantChangeHandler}
+              blankTemplateClickHandler={blankTemplateClickHandler}
+              isBlankTemplateSelected={isBlankTemplateSelected}
             />
           </div>
         ))}

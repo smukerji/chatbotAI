@@ -80,6 +80,8 @@ export default function FirstAssistant() {
 	const [selectedAssistantIndex, setSelectedAssistantIndex] =
 		useState<number>(-1);
 	const [selectedAssistant, setSelectedAssistant] = useState<any>(null);
+	const [defaultAssistant, setDefaultAssistant] = useState<any>(null);
+	const [isBlankTemplateSelected, setIsBlankTemplateSelected] = useState<boolean>(false);
 	const [selecteExpertIndex, setSelectedExpertIndex] = useState<number>(-1);
 	const [selectedIndustryExpert, setSelectedIndustryExpert] =
 		useState<any>(null);
@@ -122,13 +124,13 @@ export default function FirstAssistant() {
 	const continuesChangeHandler = async () => {
 		// if (createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.CHAT) {
 		/// change the steps according to the flow
-		if (createAssistantFlowContextDetails?.currentAssistantFlowStep ===	AssistantFlowStep.CHOOSE_BOT_TYPE) {
+		if (createAssistantFlowContextDetails?.currentAssistantFlowStep === AssistantFlowStep.CHOOSE_BOT_TYPE) {
 			/// validation for assistant name & creation flow
 			if (createAssistantFlowContextDetails?.assistantName.trim().length === 0) {
 				setinputValidationMessage('Please, Provide Assistant Name!');
 				return;
 			}
-			if (createAssistantFlowContextDetails?.creationFlow ===	SelectedAssistantType.NULL) {
+			if (createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.NULL) {
 				message.warning('Please select the type of assistant!');
 				return;
 			}
@@ -138,7 +140,7 @@ export default function FirstAssistant() {
 				return;
 			}
 			await giveFreeVoicebotCreditToUser();
-			if(voicePlan > 0 && createAssistantFlowContextDetails.creationFlow === SelectedAssistantType.VOICE){
+			if (voicePlan > 0 && createAssistantFlowContextDetails.creationFlow === SelectedAssistantType.VOICE) {
 				createAssistantFlowContext?.handleChange('currentAssistantFlowStep')(AssistantFlowStep.CHOOSE_ASSISTANT_TYPE);
 				return;
 			}
@@ -182,6 +184,78 @@ export default function FirstAssistant() {
 				message.warning("Please select an assistant first!");
 				return;
 			}
+
+			/// if "Default" (Blank Template) is selected and it's a VOICE flow, skip industry expert step
+			if (
+				(isBlankTemplateSelected ||
+					selectedAssistant?.dispcrtion === "Default" ||
+					createAssistantFlowContextDetails?.assistantType?.description === "Default") &&
+				createAssistantFlowContextDetails?.creationFlow === SelectedAssistantType.VOICE
+			) {
+				const assistantTemplateIDs = [
+					selectedAssistant?._id,
+				];
+
+				let assistantName =
+					createAssistantFlowContextDetails?.assistantName;
+
+				if (acknowledgedData?.isAcknowledged) {
+					//update the data
+					try {
+						const assistantUpdateResponse = await fetch(
+							`${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/voice`,
+							{
+								method: 'PUT',
+								body: JSON.stringify({
+									assistantName: assistantName,
+									assistantTemplateIDs: assistantTemplateIDs,
+									imageUrl: assistantImagePath,
+									recordId: acknowledgedData?.insertedId,
+								}),
+							}
+						);
+
+						const assistantUpdateResponseParse =
+							await assistantUpdateResponse.json();
+
+						router.push(`/voicebot/dashboard?voicBotName=${assistantName}&firstInit=true`);
+					} catch (error: any) {
+						console.log(error);
+						message.error(error.message);
+					}
+				} else {
+					//create the data
+					try {
+						const assistantCreateResponse = await fetch(
+							`${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/voice`,
+							{
+								method: 'POST',
+								body: JSON.stringify({
+									assistantName: assistantName,
+									assistantTemplateIDs: assistantTemplateIDs,
+									imageUrl: assistantImagePath,
+									userId: cookies.userId,
+								}),
+							}
+						);
+
+						const assistantCreateResponseParse =
+							await assistantCreateResponse.json();
+
+						voiceBotContextData.setAssistantMongoId(
+							assistantCreateResponseParse?.result?.insertedId
+						);
+						let assistantData = assistantCreateResponseParse?.record;
+						voiceBotContextData.setAssistantInfo(assistantData);
+						router.push(`/voicebot/dashboard?voicBotName=${assistantName}&firstInit=true`);
+					} catch (error: any) {
+						console.log(error);
+						message.error(error.message);
+					}
+				}
+				return;
+			}
+
 			createAssistantFlowContext?.handleChange("currentAssistantFlowStep")(
 				AssistantFlowStep.CHOOSE_INDUSTRY_EXPERT
 			);
@@ -294,7 +368,7 @@ export default function FirstAssistant() {
 		// }
 	};
 
-	
+
 
 	const checkPlan = async () => {
 		try {
@@ -405,9 +479,16 @@ export default function FirstAssistant() {
 			);
 			const data = await res.json();
 
+			// Find the "Default" assistant and store it separately
+			const defaultAsst = data?.assistantTemplates.find(
+				(assistance: any) =>
+					assistance?.industryType === 'Assistant' && assistance?.dispcrtion === 'Default'
+			);
+
+			// Filter out the "Default" from the list (Blank Template will represent it)
 			let assistantDataList = data?.assistantTemplates.filter(
 				(assistance: any) =>
-					assistance?.industryType === 'Assistant'
+					assistance?.industryType === 'Assistant' && assistance?.dispcrtion !== 'Default'
 			);
 			let industryExpertDataList = data?.assistantTemplates.filter(
 				(assistance: any) =>
@@ -416,6 +497,11 @@ export default function FirstAssistant() {
 
 			setAssistantList(assistantDataList);
 			setIndustryExpertList(industryExpertDataList);
+
+			// Store default assistant for Blank Template
+			if (defaultAsst) {
+				setDefaultAssistant(defaultAsst);
+			}
 		} catch (error: any) {
 			console.log(error);
 		}
@@ -448,6 +534,7 @@ export default function FirstAssistant() {
 		index: number
 	) => {
 		setSelectedAssistantIndex(index);
+		setIsBlankTemplateSelected(false);
 
 		setSelectedAssistant(choosenAssistant);
 		let assistantTypeObj = {
@@ -459,6 +546,24 @@ export default function FirstAssistant() {
 		createAssistantFlowContext?.handleChange('assistantType')(
 			assistantTypeObj
 		);
+	};
+
+	const blankTemplateClickHandler = () => {
+		setSelectedAssistantIndex(-1);
+		setIsBlankTemplateSelected(true);
+
+		if (defaultAssistant) {
+			setSelectedAssistant(defaultAssistant);
+			let assistantTypeObj = {
+				title: defaultAssistant?.assistantType,
+				description: defaultAssistant?.dispcrtion,
+				imageUrl: defaultAssistant?.imageUrl || '',
+				abbreviation: defaultAssistant?._id,
+			};
+			createAssistantFlowContext?.handleChange('assistantType')(
+				assistantTypeObj
+			);
+		}
 	};
 
 	const selectedExpertChangeHandler = (
@@ -486,7 +591,7 @@ export default function FirstAssistant() {
 			createAssistantFlowContext?.handleChange(
 				'currentAssistantFlowStep'
 			)(AssistantFlowStep.CHOOSE_BOT_TYPE);
-		} else if (	createAssistantFlowContextDetails?.currentAssistantFlowStep ===	AssistantFlowStep.CHOOSE_ASSISTANT_TYPE	) {
+		} else if (createAssistantFlowContextDetails?.currentAssistantFlowStep === AssistantFlowStep.CHOOSE_ASSISTANT_TYPE) {
 			/// if user is not first time user then skip the plan step
 			if (plan?.price) {
 				createAssistantFlowContext?.handleChange(
@@ -494,7 +599,7 @@ export default function FirstAssistant() {
 				)(AssistantFlowStep.CHOOSE_BOT_TYPE);
 				return;
 			}
-			createAssistantFlowContext?.handleChange('currentAssistantFlowStep'	)(AssistantFlowStep.CHOOSE_PLAN);
+			createAssistantFlowContext?.handleChange('currentAssistantFlowStep')(AssistantFlowStep.CHOOSE_PLAN);
 		} else if (createAssistantFlowContextDetails?.currentAssistantFlowStep === AssistantFlowStep.CHOOSE_INDUSTRY_EXPERT) {
 			/// empty the industry expert type
 			// createAssistantFlowContext?.handleChange(
@@ -1050,6 +1155,8 @@ export default function FirstAssistant() {
 							selectedAssistantChangeHandler={
 								selectedAssistantChangeHandler
 							}
+							blankTemplateClickHandler={blankTemplateClickHandler}
+							isBlankTemplateSelected={isBlankTemplateSelected}
 						/>
 					</>
 				)}
@@ -1187,6 +1294,8 @@ export default function FirstAssistant() {
 							selectedAssistantChangeHandler={
 								selectedAssistantChangeHandler
 							}
+							blankTemplateClickHandler={blankTemplateClickHandler}
+							isBlankTemplateSelected={isBlankTemplateSelected}
 						/>
 
 						<div className="mobile-stepper-navigation">
