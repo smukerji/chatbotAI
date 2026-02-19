@@ -153,7 +153,7 @@ const languageDictionary = [
   { code: "hi", name: "Hindi" },
   { code: "hi-IN", name: "Hindi (India)" },
   { code: "hi-Latn", name: "Hindi (Latin script)" },
-  { code:"ho",name :"Hiri Motu"},
+  { code: "ho", name: "Hiri Motu" },
   { code: "hr", name: "Croatian" },
   { code: "hr-HR", name: "Croatian (Croatia)" },
   { code: "ht", name: "Haitian Creole" },
@@ -302,7 +302,7 @@ const languageDictionary = [
   { code: "te-IN", name: "Telugu (India)" },
   { code: "tg", name: "Tajik" },
   { code: "th", name: "Thai" },
-  {code : "ti",name : "Tigrinya"},
+  { code: "ti", name: "Tigrinya" },
   { code: "th-TH", name: "Thai (Thailand)" },
   { code: "tk", name: "Turkmen" },
   { code: "tl", name: "Tagalog" },
@@ -369,12 +369,12 @@ function Transcriber() {
     {
       value: "4",
       label: "azure",
-      
+
     },
     {
       value: "1",
       label: "deepgram",
-      language:[
+      language: [
         "bg", // Bulgarian
         "ca", // Catalan
         "cs", // Czech
@@ -432,7 +432,11 @@ function Transcriber() {
         "zh-Hant", // Traditional Chinese
         "zh-TW"  // Traditional Chinese (Taiwan)
       ],
-      model:[
+      model: [
+        "flux-general-en",
+        "nova-3",
+        "nova-3-general",
+        "nova-3-medical",
         "nova-2",
         "nova-2-general",
         "nova-2-meeting",
@@ -460,7 +464,8 @@ function Transcriber() {
         "base-finance",
         "base-conversationalai",
         "base-voicemail",
-        "base-video"
+        "base-video",
+        "whisper"
       ]
     },
     {
@@ -568,12 +573,12 @@ function Transcriber() {
         "yi", // Yiddish
         "yo" // Yoruba
       ],
-      model:["Fast","Accurate"]
+      model: ["fast", "accurate", "solaria-1"]
     },
     {
       value: "6",
-      label:"openai",
-      language:[
+      label: "openai",
+      language: [
         "af",
         "ar",
         "hy",
@@ -632,13 +637,13 @@ function Transcriber() {
         "vi",
         "cy",
       ],
-      model:["gpt-4o-mini-transcribe","gpt-4o-transcribe"]
+      model: ["gpt-4o-mini-transcribe", "gpt-4o-transcribe"]
     },
 
     {
       value: "2",
       label: "talkscriber",//label
-      language:[
+      language: [
         "en", // English
         "zh", // Chinese
         "de", // German
@@ -739,12 +744,12 @@ function Transcriber() {
         "su", // Sundanese
         "yue" // Cantonese
       ],
-      model:["Whisper"]
+      model: ["whisper"]
     },
-    
+
     {
       value: "5",
-      label:"11labs",
+      label: "11labs",
       language: [
         "aa",
         "ab",
@@ -932,7 +937,7 @@ function Transcriber() {
         "zh",
         "zu",
       ],
-      model:["scribe_v1"]
+      model: ["scribe_v1", "scribe_v2", "scribe_v2_realtime"]
     },
 
   ]
@@ -963,18 +968,18 @@ function Transcriber() {
       setSelectedModel(undefined);
       setSelectedLanguage(undefined);
     }
-    if(voicebotDetails["transcriber"]["provider"] === "azure") {
+    if (voicebotDetails["transcriber"]["provider"] === "azure") {
       setModelDisable(true);
 
       // const selectedProviderList = providerList.find(provider => provider.label === selectedProvider);
       // if (selectedProviderList && selectedProviderList.language) {
-        // setModels(selectedProviderList.model.map(model => ({ value: model+".", label: model })));
-        setLanguage(azureProviderLanguage
-          .map(language => ({ value: language[1], label: language[0] })));
+      // setModels(selectedProviderList.model.map(model => ({ value: model+".", label: model })));
+      setLanguage(azureProviderLanguage
+        .map(language => ({ value: language[1], label: language[0] })));
       // }
-      
+
     }
-  },[]);
+  }, []);
 
   useEffect(() => {
     if (language.length > 0) {
@@ -996,16 +1001,16 @@ function Transcriber() {
 
 
 
-  const providerChangeHandler = (value:any,options:any)=>{
- debugger;
+  const providerChangeHandler = (value: any, options: any) => {
+    debugger;
     setSelectedProvider(options.label);
     setProviderValidationMessage(""); // Clear validation message on valid selection
     voiceBotContextData.updateState("transcriber.provider", options.label);
 
     // Update models based on selected provider
     const selectedProvider = providerList.find(provider => provider.label === options.label);
-    
-    if(options.label === 'azure'){
+
+    if (options.label === 'azure') {
       setModelDisable(true);
       setModelValidationMessage(""); // Clear validation message on valid selection
       setModels([]);
@@ -1308,41 +1313,41 @@ function Transcriber() {
     "multi",
     "bg",
     "ca",
-    "zh","zh-CN","zh-Hans",
-    "zh-TW","zh-Hant",
+    "zh", "zh-CN", "zh-Hans",
+    "zh-TW", "zh-Hant",
     "zh-HK",
-     "cs",
-     "da", "da-DK",
+    "cs",
+    "da", "da-DK",
     "nl",
-     "en","en-US", "en-AU", "en-GB", "en-NZ", "en-IN",
-     "et",
+    "en", "en-US", "en-AU", "en-GB", "en-NZ", "en-IN",
+    "et",
     "fi",
-     "nl-BE",
-     "fr", "fr-CA",
+    "nl-BE",
+    "fr", "fr-CA",
     "de",
-     "de-CH",
+    "de-CH",
     "el",
-     "hi",
+    "hi",
     "hu",
     "id",
-     "it",
+    "it",
     "ja",
-     "ko", "ko-KR",
+    "ko", "ko-KR",
     "lv",
-     "lt",
-     "ms",
+    "lt",
+    "ms",
     "no",
     "pl",
-     "pt", "pt-BR", "pt-PT",
-     "ro",
+    "pt", "pt-BR", "pt-PT",
+    "ro",
     "ru",
     'sk',
-     "es", "es-419",
-     "sv", "sv-SE",
-     "th","th-TH",
-     "tr",
-     "uk",
-     "vi"].map(code => {
+    "es", "es-419",
+    "sv", "sv-SE",
+    "th", "th-TH",
+    "tr",
+    "uk",
+    "vi"].map(code => {
       const language = languageDictionary.find(lang => lang.code === code);
       return language ? [language.name, code] : [code, code];
     });
@@ -1350,7 +1355,7 @@ function Transcriber() {
 
   const modelChangeHandler = (value: string, option: any) => {
     // ;
-    console.log("Option selected",value,option)
+    console.log("Option selected", value, option)
     setLanguage([]);
     setSelectedLanguage(undefined);
     voiceBotContextData.updateState("transcriber.language", "");
@@ -1358,57 +1363,57 @@ function Transcriber() {
     debugger
     //if user select nova2 model
     const exist = nova2Model.some((element) => element == option.label);
-    if(exist){
+    if (exist) {
       // setNova2ModelLanguage(true);
 
-      setLanguage([["English","en"],["American-English","en-US"]].map(language => ({ value: language[1], label: language[0] })));
+      setLanguage([["English", "en"], ["American-English", "en-US"]].map(language => ({ value: language[1], label: language[0] })));
     }
 
     //if selected mode is nova-2 or nova-2-general
-    else if(option.label === "nova-2" || option.label === "nova-2-general"){
+    else if (option.label === "nova-2" || option.label === "nova-2-general") {
 
       setLanguage(nov2AndNova2GeneralModelLanguage.map(language => ({ value: language[1], label: language[0] })));
     }
 
-    else if(option.label === "nova" || option.label === "nova-general"){
-      setLanguage([ "en", "en-US", "en-AU", "en-GB", "en-NZ", "en-IN", "es", "es-419" ,"hi-Latn"].map(code => {
+    else if (option.label === "nova" || option.label === "nova-general") {
+      setLanguage(["en", "en-US", "en-AU", "en-GB", "en-NZ", "en-IN", "es", "es-419", "hi-Latn"].map(code => {
         const language = languageDictionary.find(lang => lang.code === code);
         return language ? [language.name, code] : [code, code];
       }).map(language => ({ value: language[1], label: language[0] })))
     }
 
-   else if(option.label === "nova-phonecall" || option.label === "nova-medical"){
-      setLanguage([["English","en"],["American-English","en-US"]].map(language => ({ value: language[1], label: language[0] })));
+    else if (option.label === "nova-phonecall" || option.label === "nova-medical") {
+      setLanguage([["English", "en"], ["American-English", "en-US"]].map(language => ({ value: language[1], label: language[0] })));
     }
 
-    else if(option.label === "enhanced-general" || option.label === "enhanced"){
-      setLanguage(["da","nl" , "en", "en-US",  "nl" , "fr" , "de" , "hi" , "it" , "ja"  ,"ko" , "no" , "pl"  ,"pt", "pt-BR", "pt-PT" , "es", "es-419", "es-LATAM" ,"sv",  "taq" , "ta"].map(code => {
+    else if (option.label === "enhanced-general" || option.label === "enhanced") {
+      setLanguage(["da", "nl", "en", "en-US", "nl", "fr", "de", "hi", "it", "ja", "ko", "no", "pl", "pt", "pt-BR", "pt-PT", "es", "es-419", "es-LATAM", "sv", "taq", "ta"].map(code => {
         const language = languageDictionary.find(lang => lang.code === code);
         return language ? [language.name, code] : [code, code];
       }).map(language => ({ value: language[1], label: language[0] })));
     }
 
-    else if(option.label === "enhanced-meeting" || option.label === "enhanced-phonecall" || option.label === "enhanced-finance"){
-      setLanguage([["English","en"],["American-English","en-US"]].map(language => ({ value: language[1], label: language[0] })));
+    else if (option.label === "enhanced-meeting" || option.label === "enhanced-phonecall" || option.label === "enhanced-finance") {
+      setLanguage([["English", "en"], ["American-English", "en-US"]].map(language => ({ value: language[1], label: language[0] })));
     }
 
-    else if(option.label === "base-general" || option.label === "base"){
-      setLanguage([ "zh", "zh-CN", "zh-TW" , "da" , "nl" , "en", "en-US" , "nl", "fr", "fr-CA" , "de" , "hi", "hi-Latn" , "id" , "it" , "ja" , "ko" , "no" , "pl" , "pt", "pt-BR", "pt-PT" ,"ru" , "es", "es-419", "es-LATAM" , "sv" , "taq" , "tr" , "uk"].map(code => {
+    else if (option.label === "base-general" || option.label === "base") {
+      setLanguage(["zh", "zh-CN", "zh-TW", "da", "nl", "en", "en-US", "nl", "fr", "fr-CA", "de", "hi", "hi-Latn", "id", "it", "ja", "ko", "no", "pl", "pt", "pt-BR", "pt-PT", "ru", "es", "es-419", "es-LATAM", "sv", "taq", "tr", "uk"].map(code => {
         const language = languageDictionary.find(lang => lang.code === code);
         return language ? [language.name, code] : [code, code];
       }).map(language => ({ value: language[1], label: language[0] })));
     }
 
-    else if(option.label === "base-video" || option.label === "base-voicemail" || option.label === "base-conversationalai" || option.label === "base-finance" || option.label === "base-phonecall" || option.label === "base-meeting"){
-      setLanguage([["English","en"],["American-English","en-US"]].map(language => ({ value: language[1], label: language[0] })));
+    else if (option.label === "base-video" || option.label === "base-voicemail" || option.label === "base-conversationalai" || option.label === "base-finance" || option.label === "base-phonecall" || option.label === "base-meeting") {
+      setLanguage([["English", "en"], ["American-English", "en-US"]].map(language => ({ value: language[1], label: language[0] })));
     }
 
     //if 
-    else if(option.label == "Whisper"){
+    else if (option.label == "Whisper") {
       setLanguage(wisperModelLanguage.map(language => ({ value: language[1], label: language[0] })));
     }
 
-    else if(option.label == "Accurate" || option.label == "Fast"){
+    else if (option.label == "Accurate" || option.label == "Fast") {
       const selectedProviderList = providerList.find(provider => provider.label === selectedProvider);
       if (selectedProviderList && selectedProviderList.language) {
         // setModels(selectedProviderList.model.map(model => ({ value: model+".", label: model })));
@@ -1421,7 +1426,7 @@ function Transcriber() {
       }
     }
 
-    else if(option.label == "scribe_v1"){
+    else if (option.label == "scribe_v1") {
       const selectedProviderList = providerList.find(provider => provider.label === selectedProvider);
       if (selectedProviderList && selectedProviderList.language) {
         // setModels(selectedProviderList.model.map(model => ({ value: model+".", label: model })));
@@ -1433,7 +1438,7 @@ function Transcriber() {
           .map(language => ({ value: language[1], label: language[0] })));
       }
     }
-    else if(option.label == "gpt-4o-transcribe" || option.label =="gpt-4o-mini-transcribe"){
+    else if (option.label == "gpt-4o-transcribe" || option.label == "gpt-4o-mini-transcribe") {
       const selectedProviderList = providerList.find(provider => provider.label === selectedProvider);
       if (selectedProviderList && selectedProviderList.language) {
         // setModels(selectedProviderList.model.map(model => ({ value: model+".", label: model })));
@@ -1463,7 +1468,7 @@ function Transcriber() {
     console.log("Clicked");
 
 
-    
+
     // 
     if (models.length === 0 && selectedProvider) {
       console.log("selected model providers ", selectedProvider)
@@ -1485,7 +1490,7 @@ function Transcriber() {
   }
 
   const languageChangeHandlerListUpdate = () => {
-    if(language.length === 0 && selectedProvider){
+    if (language.length === 0 && selectedProvider) {
       const selectedProviderList = providerList.find(provider => provider.label === selectedProvider);
       if (selectedProviderList && selectedProviderList.language) {
         // setModels(selectedProviderList.model.map(model => ({ value: model+".", label: model })));
@@ -1502,10 +1507,10 @@ function Transcriber() {
   const languageChangeHandler = (value: string, option: any) => {
     // ;
     console.clear();
-    console.log("Option selected",value,option.value)
+    console.log("Option selected", value, option.value)
     setSelectedLanguage(option.label);
     setLanguageValidationMessage("");// Clear validation message on valid selection
-    
+
     voiceBotContextData.updateState("transcriber.language", option.value);
   }
 
@@ -1523,7 +1528,7 @@ function Transcriber() {
 
 
 
-  
+
   return (
     <div className="transcribe-container">
       <div className="left-column">
@@ -1550,7 +1555,7 @@ function Transcriber() {
           disabled={modelDisable}
         />
         {modelValidationMessage && <p className="invalidation-message">{modelValidationMessage}</p>}
-        
+
         {/* <p className="model-info">GPT-4 is more accurate but slower and costlier than GPT-3.5 Turbo (1 min = 1 credit for GPT-3.5 Turbo, 20 credits for GPT-4).</p> */}
 
       </div>
@@ -1564,7 +1569,7 @@ function Transcriber() {
           // onClick={languageChangeHandlerListUpdate}
           onBlur={handleLanguageBlur}
           value={selectedLanguage}
-          
+
         />
         {languageValidationMessage && <p className="invalidation-message">{languageValidationMessage}</p>}
       </div>
