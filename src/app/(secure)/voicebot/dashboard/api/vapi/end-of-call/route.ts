@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "../../../../../../../db";
+import fs from "fs";
 
 /**
  * Vapi Webhook: end-of-call-report
@@ -12,6 +13,9 @@ import clientPromise from "../../../../../../../db";
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
+
+        // log the request body to a file
+        fs.writeFileSync("vapi-end-of-call-request.json", JSON.stringify(body, null, 2));
 
         // The webhook payload has the structure: { message: { ... } }
         const messageData = body?.message || body;
