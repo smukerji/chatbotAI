@@ -9,6 +9,8 @@ import fs from "fs";
  * It receives the end-of-call-report payload, extracts the assistantId and cost,
  * looks up the userId from the voice-assistance collection,
  * and deducts the call cost (with 30% margin) from the user's voicebot credits.
+ * 
+ * voicebot/dashboard/api/vapi/end-of-call
  */
 export async function POST(req: NextRequest) {
     try {
