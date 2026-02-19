@@ -5,189 +5,244 @@ import { ObjectId } from "mongodb";
 
 
 module.exports = apiHandler({
-    POST: createVapiAssistant,
-    GET: getSingleAssistantDataFromVapi
-  });
+  POST: createVapiAssistant,
+  GET: getSingleAssistantDataFromVapi
+});
 
-  //  voicebot/dashboard/api/template
+//  voicebot/dashboard/api/template
 async function createVapiAssistant(req: NextRequest) {
 
-    try {
+  try {
 
-      const voicBotData = await req.json();
+    const voicBotData = await req.json();
 
-      const localData = voicBotData?.assistantLocalData;
-      const vapiData = voicBotData?.assistantVapiData;
+    const localData = voicBotData?.assistantLocalData;
+    const vapiData = voicBotData?.assistantVapiData;
 
-    
-      let propertyArrayData = vapiData.analysisPlan.structuredDataSchema.properties;
+
+    let propertyArrayData = vapiData.analysisPlan.structuredDataSchema.properties;
 
     if (Array.isArray(propertyArrayData) && propertyArrayData[0] !== "") {
-         const propertiesObject = propertyArrayData?.reduce((acc: any, item: any) => {
-            acc[item.name] = {
-            type: item.type,
-            description: item.description
-            };
-            return acc;
-        }, {});
+      const propertiesObject = propertyArrayData?.reduce((acc: any, item: any) => {
+        acc[item.name] = {
+          type: item.type,
+          description: item.description
+        };
+        return acc;
+      }, {});
 
-        vapiData.analysisPlan.structuredDataSchema.properties = propertiesObject;
+      vapiData.analysisPlan.structuredDataSchema.properties = propertiesObject;
     }
-    else{
+    else {
       delete vapiData.analysisPlan.structuredDataSchema;
-      }
+    }
 
-      delete vapiData.model.toolIds;
-      // delete vapiData.voice.chunkPlan.punctuationBoundaries;
-      delete vapiData.analysisPlan.artifactPlan;
-      // if(vapiData.analysisPlan.messagePlan?.idleMessages.length <= 0){//not grether than 0
-      // }
-      delete vapiData.analysisPlan.messagePlan;
-      delete vapiData.analysisPlan.startSpeakingPlan;
-      delete vapiData.analysisPlan.stopSpeakingPlan;
-      delete vapiData.analysisPlan.monitorPlan;
-      delete vapiData.analysisPlan.credentialIds;
+    delete vapiData.model.toolIds;
+    // delete vapiData.voice.chunkPlan.punctuationBoundaries;
+    delete vapiData.analysisPlan.artifactPlan;
+    // if(vapiData.analysisPlan.messagePlan?.idleMessages.length <= 0){//not grether than 0
+    // }
+    delete vapiData.analysisPlan.messagePlan;
+    delete vapiData.analysisPlan.startSpeakingPlan;
+    delete vapiData.analysisPlan.stopSpeakingPlan;
+    delete vapiData.analysisPlan.monitorPlan;
+    delete vapiData.analysisPlan.credentialIds;
 
-      if(vapiData.transcriber.provider === "talkscriber"){
+    if (vapiData.transcriber.provider === "talkscriber") {
 
-        delete vapiData.transcriber.languageDetectionEnabled;
-        delete vapiData.transcriber.endpointing;
-        vapiData.transcriber.model = vapiData.transcriber.model.toLowerCase();
-
-      }
-
-      if(vapiData.transcriber.provider === "gladia"){
-
-        delete vapiData.transcriber.languageDetectionEnabled;
-        delete vapiData.transcriber.endpointing;
-        vapiData.transcriber.model = vapiData.transcriber.model.toLowerCase();
-
-      }
-      
-      //punctuation boundaries refactor
-      vapiData.voice.chunkPlan.punctuationBoundaries = vapiData.voice.chunkPlan.punctuationBoundaries.map((item: any) => item.label);
-
-      //check if punctuation boundaries is empty
-      let punctionBon = vapiData.voice.chunkPlan.punctuationBoundaries;
-      if(Array.isArray(punctionBon) && punctionBon.length === 0){
-        vapiData.voice.chunkPlan.punctuationBoundaries = ["，", "。"];
-      }
-      
-
-      const db = (await clientPromise!).db();
-      const collection = db?.collection("voice-assistance");
-      
-      //check if the record is exist in the db
-        const voiceBotRecord = await collection?.findOne({ 
-          _id: new ObjectId(localData._id)
-        });
-        if (!voiceBotRecord) {
-            return { error: "VoiceBot record not found" };
-        }
-        else{
-          //if record is exist then check if the vapi assistant id is exist or not
-          const voiceBotRecordVapiExist = await collection?.findOne({ 
-            _id: new ObjectId(localData._id),
-            vapiAssistantId: { $exists: true }
-          });
-
-          // vapiData.model.knowledgeBaseId = vapiData.model.knowledgeBase.fileIds[0];
-          // delete vapiData.model.knowledgeBase;
-          // delete vapiData.knowledgeFile;
-          delete vapiData.voice.speed;
-          let fileId = ""
-          if (("tools" in vapiData.model) && "fileIds" in vapiData.model.tools[0].knowledgeBases[0] && Array.isArray(vapiData.model.tools[0].knowledgeBases[0].fileIds)) {
-
-            fileId = vapiData.model.tools[0].knowledgeBases[0].fileIds[0];
-          }
-          if (voiceBotRecordVapiExist) { //check if the record is already exist then update the record
-            const options = {
-              method: 'PUT',
-              headers: { Authorization: `Bearer ${process.env.VAPI_PRIVATE_KEY}`, 'Content-Type': 'application/json' },
-              body: JSON.stringify(vapiData)
-            };
-
-            let vapiResponse = await fetch(`https://api.vapi.ai/assistant/${voiceBotRecordVapiExist.vapiAssistantId}`, options);
-            let vapiResponseData = await vapiResponse.json();
-            if (!vapiResponseData?.id) {
-              return { error: "Failed to update the assistant" };
-            }
-            //update the voicebot record with the vapi assistant id
-            const updateFields: any = { vapiAssistantId: vapiResponseData.id };
-            // if (fileId) {
-            //   updateFields.fileId = fileId;
-            // }
-            const updateResult = await collection?.updateOne(
-              { _id: new ObjectId(localData._id) },
-              { $set: updateFields }
-            );
-
-            //if the record is not updated
-
-            if (updateResult?.matchedCount !== 1) {
-              // delete the assistant from the vapi server
-              return { error: "Failed to update voicebot record" };
-            }
-            else {
-              return { result: "result", assistantVapiId: vapiResponseData?.id };
-            }
-            return { result: "result", assistantVapiId: vapiResponseData?.id };
-          }
-          else { //if the record is not exist then create the record
-            //send the data to the vapi server
-            // vapiData.voice.speed = 1;
-            const options = {
-              method: 'POST',
-              headers: { Authorization: `Bearer ${process.env.VAPI_PRIVATE_KEY}`, 'Content-Type': 'application/json' },
-              body: JSON.stringify(vapiData)
-            };
-
-            let vapiResponse = await fetch('https://api.vapi.ai/assistant', options);
-            let vapiResponseData = await vapiResponse.json();
-            if (!vapiResponseData?.id) {
-              return { error: "Failed to create assistant" };
-            }
-            
-
-            //update the voicebot record with the vapi assistant id
-            const updateFields: any = { vapiAssistantId: vapiResponseData.id };
-            // if (fileId) {
-            //   updateFields.fileId = fileId;
-            // }
-            const updateResult = await collection?.updateOne(
-              { _id: new ObjectId(localData._id) },
-              { $set: updateFields }
-            );
-
-            //if the record is not updated
-            if (updateResult?.modifiedCount !== 1) {
-              // delete the assistant from the vapi server
-              return { error: "Failed to update voicebot record" };
-            }
-            else {
-              return { result: "result", assistantVapiId: vapiResponseData?.id };
-            }
-              return { result: "result", assistantVapiId: vapiResponseData?.id };
-
-
-          }
-
-        }
+      delete vapiData.transcriber.languageDetectionEnabled;
+      delete vapiData.transcriber.endpointing;
+      vapiData.transcriber.model = vapiData.transcriber.model.toLowerCase();
 
     }
-    catch (error: any) {
-        return { error: error.message };
+
+    if (vapiData.transcriber.provider === "gladia") {
+
+      delete vapiData.transcriber.languageDetectionEnabled;
+      delete vapiData.transcriber.endpointing;
+      vapiData.transcriber.model = vapiData.transcriber.model.toLowerCase();
+
     }
+
+    if (vapiData.transcriber.provider === "google") {
+
+      delete vapiData.transcriber.languageDetectionEnabled;
+      delete vapiData.transcriber.endpointing;
+
+      // Vapi requires full language names for Google provider, not ISO codes
+      const googleLanguageMap: Record<string, string> = {
+        "multi": "Multilingual",
+        "ar": "Arabic",
+        "bn": "Bengali",
+        "bg": "Bulgarian",
+        "zh": "Chinese",
+        "hr": "Croatian",
+        "cs": "Czech",
+        "da": "Danish",
+        "nl": "Dutch",
+        "en": "English",
+        "et": "Estonian",
+        "fi": "Finnish",
+        "fr": "French",
+        "de": "German",
+        "el": "Greek",
+        "he": "Hebrew",
+        "hi": "Hindi",
+        "hu": "Hungarian",
+        "id": "Indonesian",
+        "it": "Italian",
+        "ja": "Japanese",
+        "ko": "Korean",
+        "lv": "Latvian",
+        "lt": "Lithuanian",
+        "no": "Norwegian",
+        "pl": "Polish",
+        "pt": "Portuguese",
+        "ro": "Romanian",
+        "ru": "Russian",
+        "sr": "Serbian",
+        "sk": "Slovak",
+        "sl": "Slovenian",
+        "es": "Spanish",
+        "sw": "Swahili",
+        "sv": "Swedish",
+        "th": "Thai",
+        "tr": "Turkish",
+        "uk": "Ukrainian",
+        "vi": "Vietnamese",
+      };
+
+      if (vapiData.transcriber.language && googleLanguageMap[vapiData.transcriber.language]) {
+        vapiData.transcriber.language = googleLanguageMap[vapiData.transcriber.language];
+      }
+
+    }
+
+    //punctuation boundaries refactor
+    vapiData.voice.chunkPlan.punctuationBoundaries = vapiData.voice.chunkPlan.punctuationBoundaries.map((item: any) => item.label);
+
+    //check if punctuation boundaries is empty
+    let punctionBon = vapiData.voice.chunkPlan.punctuationBoundaries;
+    if (Array.isArray(punctionBon) && punctionBon.length === 0) {
+      vapiData.voice.chunkPlan.punctuationBoundaries = ["，", "。"];
+    }
+
+
+    const db = (await clientPromise!).db();
+    const collection = db?.collection("voice-assistance");
+
+    //check if the record is exist in the db
+    const voiceBotRecord = await collection?.findOne({
+      _id: new ObjectId(localData._id)
+    });
+    if (!voiceBotRecord) {
+      return { error: "VoiceBot record not found" };
+    }
+    else {
+      //if record is exist then check if the vapi assistant id is exist or not
+      const voiceBotRecordVapiExist = await collection?.findOne({
+        _id: new ObjectId(localData._id),
+        vapiAssistantId: { $exists: true }
+      });
+
+      // vapiData.model.knowledgeBaseId = vapiData.model.knowledgeBase.fileIds[0];
+      // delete vapiData.model.knowledgeBase;
+      // delete vapiData.knowledgeFile;
+      delete vapiData.voice.speed;
+      let fileId = ""
+      if (("tools" in vapiData.model) && "fileIds" in vapiData.model.tools[0].knowledgeBases[0] && Array.isArray(vapiData.model.tools[0].knowledgeBases[0].fileIds)) {
+
+        fileId = vapiData.model.tools[0].knowledgeBases[0].fileIds[0];
+      }
+      if (voiceBotRecordVapiExist) { //check if the record is already exist then update the record
+        const options = {
+          method: 'PUT',
+          headers: { Authorization: `Bearer ${process.env.VAPI_PRIVATE_KEY}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify(vapiData)
+        };
+
+        let vapiResponse = await fetch(`https://api.vapi.ai/assistant/${voiceBotRecordVapiExist.vapiAssistantId}`, options);
+        let vapiResponseData = await vapiResponse.json();
+        if (!vapiResponseData?.id) {
+          console.log("Failed to update assistant VAPI Response:", vapiResponseData);
+          return { error: "Failed to update the assistant" };
+        }      //update the voicebot record with the vapi assistant id
+        const updateFields: any = { vapiAssistantId: vapiResponseData.id };
+        // if (fileId) {
+        //   updateFields.fileId = fileId;
+        // }
+        const updateResult = await collection?.updateOne(
+          { _id: new ObjectId(localData._id) },
+          { $set: updateFields }
+        );
+
+        //if the record is not updated
+
+        if (updateResult?.matchedCount !== 1) {
+          // delete the assistant from the vapi server
+          return { error: "Failed to update voicebot record" };
+        }
+        else {
+          return { result: "result", assistantVapiId: vapiResponseData?.id };
+        }
+        return { result: "result", assistantVapiId: vapiResponseData?.id };
+      }
+      else { //if the record is not exist then create the record
+        //send the data to the vapi server
+        // vapiData.voice.speed = 1;
+        const options = {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${process.env.VAPI_PRIVATE_KEY}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify(vapiData)
+        };
+
+        let vapiResponse = await fetch('https://api.vapi.ai/assistant', options);
+        let vapiResponseData = await vapiResponse.json();
+        if (!vapiResponseData?.id) {
+          console.log("Failed to create assistant VAPI Response:", vapiResponseData);
+          return { error: "Failed to create assistant" };
+        }
+
+
+        //update the voicebot record with the vapi assistant id
+        const updateFields: any = { vapiAssistantId: vapiResponseData.id };
+        // if (fileId) {
+        //   updateFields.fileId = fileId;
+        // }
+        const updateResult = await collection?.updateOne(
+          { _id: new ObjectId(localData._id) },
+          { $set: updateFields }
+        );
+
+        //if the record is not updated
+        if (updateResult?.modifiedCount !== 1) {
+          // delete the assistant from the vapi server
+          return { error: "Failed to update voicebot record" };
+        }
+        else {
+          return { result: "result", assistantVapiId: vapiResponseData?.id };
+        }
+        return { result: "result", assistantVapiId: vapiResponseData?.id };
+
+
+      }
+
+    }
+
+  }
+  catch (error: any) {
+    return { error: error.message };
+  }
 
 }
 
 async function getSingleAssistantDataFromVapi(req: NextRequest) {
   let step = 1;
-  try{
+  try {
 
-    const vapiAssiId:string = req.nextUrl.searchParams.get("assistantId") as string;
+    const vapiAssiId: string = req.nextUrl.searchParams.get("assistantId") as string;
 
-    if(!vapiAssiId){
+    if (!vapiAssiId) {
       return { error: "Assistant Id is required" };
     }
     //db access
@@ -195,7 +250,7 @@ async function getSingleAssistantDataFromVapi(req: NextRequest) {
     const collectionVoiceAssistant = db?.collection("voice-assistance");
 
     //check if the assistant id is exist in the db
-    const voiceBotRecordVapiExist = await collectionVoiceAssistant?.findOne({ 
+    const voiceBotRecordVapiExist = await collectionVoiceAssistant?.findOne({
       vapiAssistantId: vapiAssiId
     });
 
@@ -220,7 +275,7 @@ async function getSingleAssistantDataFromVapi(req: NextRequest) {
     return { result: vapiResponseData, assistantLocalData: voiceBotRecordVapiExist };
 
   }
-  catch(error:any){
+  catch (error: any) {
     console.log(`error in step ${step}`, error);
     return { error: error.message };
   }
