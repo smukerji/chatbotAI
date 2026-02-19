@@ -23,7 +23,7 @@ function Model() {
   const [selectedModel, setSelectedModel] = useState<string | undefined>(undefined);
   const [maxToken, setMaxToken] = useState<string>("");
   const [validationMessage, setValidationMessage] = useState<string>("");
-  
+
   const [inputValidationMessage, setinputValidationMessage] = useState<string>("");
   const [systemPromptValidationMessage, setSystemPromptValidationMessage] = useState<string>("");
   const [providerValidationMessage, setProviderValidationMessage] = useState<string>("");
@@ -49,51 +49,51 @@ function Model() {
     //   setSelectedKnowledgeFile(voicebotDetails.model.tools[0].knowledgeBases[0].fileIds || undefined);
     // }
 
-   
+
 
     setStepsCount(voicebotDetails["model"]["temperature"] || 0);
     setMaxToken(voicebotDetails["model"]["maxTokens"] || "");
     setEmotionRecognitionEnabled(voicebotDetails["model"]["emotionRecognitionEnabled"]);
 
 
-  },[ voicebotDetails.firstMessage, 
-      voicebotDetails["model"]["messages"][0]["content"],
-      voicebotDetails["model"]["provider"],
-      voicebotDetails["model"]["model"],
-      voicebotDetails["model"]["temperature"],
-      voicebotDetails["model"]["maxTokens"],
-      voicebotDetails["model"]["emotionRecognitionEnabled"],
-      // voicebotDetails["model"]["knowledgeBaseId"],
-    ]);
+  }, [voicebotDetails.firstMessage,
+  voicebotDetails["model"]["messages"][0]["content"],
+  voicebotDetails["model"]["provider"],
+  voicebotDetails["model"]["model"],
+  voicebotDetails["model"]["temperature"],
+  voicebotDetails["model"]["maxTokens"],
+  voicebotDetails["model"]["emotionRecognitionEnabled"],
+    // voicebotDetails["model"]["knowledgeBaseId"],
+  ]);
 
 
 
-    // async function getUsersFile(){
-    //   try {
-    //     debugger;
-    //       const assistantId = voiceBotContextData?.assistantInfo?.vapiAssistantId;
-    //       const response = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/knowledge-file?userId=${cookies.userId}&route=model&assistantId=${assistantId}`)
-    //       const data = await response.json();
-    //       console.table(data.data);
-    //       if(data.status === 200 && data.data.length > 0){
-    //           //set the name as value and the id as label
-    //           setUserFiles(data.data.map((file:any) => ({ value:file.fileData.id , label: file.fileData.name})));
-    //       }
-    //       else if(data.status === 200 && data.data.length === 0){
-    //         setUserFiles([]);
-    //         delete voiceBotContextData.state.model.tools;
-    //         setSelectedKnowledgeFile("");
-    //       }
+  // async function getUsersFile(){
+  //   try {
+  //     debugger;
+  //       const assistantId = voiceBotContextData?.assistantInfo?.vapiAssistantId;
+  //       const response = await fetch(`${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/knowledge-file?userId=${cookies.userId}&route=model&assistantId=${assistantId}`)
+  //       const data = await response.json();
+  //       console.table(data.data);
+  //       if(data.status === 200 && data.data.length > 0){
+  //           //set the name as value and the id as label
+  //           setUserFiles(data.data.map((file:any) => ({ value:file.fileData.id , label: file.fileData.name})));
+  //       }
+  //       else if(data.status === 200 && data.data.length === 0){
+  //         setUserFiles([]);
+  //         delete voiceBotContextData.state.model.tools;
+  //         setSelectedKnowledgeFile("");
+  //       }
 
-    //   }
-    //   catch (error) {
-    //       console.error(error);
-    //   }
-    // }
+  //   }
+  //   catch (error) {
+  //       console.error(error);
+  //   }
+  // }
 
 
 
-  const firstMessageEnterHandler = (e:React.ChangeEvent<HTMLInputElement>) => {
+  const firstMessageEnterHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const enteredValue: string = e.target.value;
     // ;
     setFirstMessage(enteredValue);
@@ -102,32 +102,32 @@ function Model() {
       voiceBotContextData.updateState("firstMessage", "");
     } else {
       setinputValidationMessage("");
-      voiceBotContextData.updateState("firstMessage",enteredValue);
+      voiceBotContextData.updateState("firstMessage", enteredValue);
     }
   }
 
   const fileKnowledgeChangeHandler = (value: string, option: any) => {
     console.log("file knowledge ", value, option);
-  
+
     // debugger;
     //check if tools is in the model
     if (!("tools" in voicebotDetails.model)) {
       voiceBotContextData.updateState("model.tools", [
-                {
-                  type: "query",
-                  knowledgeBases: [
-                    {
-                      name: option.label,
-                      provider: "google",
-                      description: "file",
-                      fileIds: [
-                        value
-                      ]
-                    }
-                  ],
-                },
-              ]);
-              setSelectedKnowledgeFile(value);
+        {
+          type: "query",
+          knowledgeBases: [
+            {
+              name: option.label,
+              provider: "google",
+              description: "file",
+              fileIds: [
+                value
+              ]
+            }
+          ],
+        },
+      ]);
+      setSelectedKnowledgeFile(value);
     } else {
       voiceBotContextData.updateState("model.tools.0.knowledgeBases.0.fileIds", [value]);
       voiceBotContextData.updateState("model.tools.0.knowledgeBases.0.name", option.label);
@@ -137,7 +137,7 @@ function Model() {
     voiceBotContextData.updateState("model.tools.0.knowledgeBases.0.fileIds.0", value); //model.tools.0.knowledgeBase.0.fileIds.0
   }
 
-  const systemPromptEnterHandler = (e:React.ChangeEvent<HTMLTextAreaElement>) => {
+  const systemPromptEnterHandler = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const enteredValue: string = e.target.value;
     setSystemPrompt(enteredValue);
     if (enteredValue.trim().length == 0) {
@@ -149,7 +149,7 @@ function Model() {
     }
   }
 
-  const providerChangeHandler = (value: string,option:any) => {
+  const providerChangeHandler = (value: string, option: any) => {
     ;
     setSelectedProvider(option.label);
     setProviderValidationMessage(""); // Clear validation message on valid selection
@@ -208,7 +208,7 @@ function Model() {
 
   const maxTokenChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    
+
     setMaxToken(value);
     const intValue = parseInt(value, 10);
     if (!isNaN(intValue) && intValue <= 1000 && intValue > 50) {
@@ -228,13 +228,21 @@ function Model() {
   }
 
   console.log("your voicebot details ", voicebotDetails);
-  
-  const providersOption: {value: string; label: string; models:string[]}[] = [
+
+  const providersOption: { value: string; label: string; models: string[] }[] = [
     {
       value: '1',
       label: 'openai',
       models: [
-        "gpt-4o-mini","gpt-4o-mini-2024-07-18", "gpt-4o", "gpt-4o-2024-05-13", "gpt-4o-2024-08-06", "gpt-4-turbo", "gpt-4-turbo-2024-04-09", "gpt-4-turbo-preview", "gpt-4-0125-preview", "gpt-4-1106-preview", "gpt-4", "gpt-4-0613", "gpt-3.5-turbo", "gpt-3.5-turbo-0125", "gpt-3.5-turbo-1106", "gpt-3.5-turbo-16k", "gpt-3.5-turbo-0613"
+        "gpt-5.2",
+        "gpt-5.2-chat-latest",
+        "gpt-5.1",
+        "gpt-5.1-chat-latest",
+        "gpt-5",
+        "gpt-5-chat-latest",
+        "gpt-5-mini",
+        "gpt-5-nano",
+        "gpt-4o-mini", "gpt-4o-mini-2024-07-18", "gpt-4o", "gpt-4o-2024-05-13", "gpt-4o-2024-08-06", "gpt-4-turbo", "gpt-4-turbo-2024-04-09", "gpt-4-turbo-preview", "gpt-4-0125-preview", "gpt-4-1106-preview", "gpt-4", "gpt-4-0613", "gpt-3.5-turbo", "gpt-3.5-turbo-0125", "gpt-3.5-turbo-1106", "gpt-3.5-turbo-16k", "gpt-3.5-turbo-0613"
       ]
     },
     {
@@ -244,7 +252,117 @@ function Model() {
         "claude-3-opus-20240229",
         "claude-3-sonnet-20240229",
         "claude-3-haiku-20240307",
-        "claude-3-5-sonnet-20240620"
+        "claude-3-5-sonnet-20240620",
+        "claude-3-5-sonnet-20241022",
+        "claude-3-5-haiku-20241022",
+        "claude-3-7-sonnet-20250219",
+        "claude-opus-4-20250514",
+        "claude-opus-4-5-20251101",
+        "claude-opus-4-6",
+        "claude-sonnet-4-20250514",
+        "claude-sonnet-4-5-20250929",
+        "claude-haiku-4-5-20251001"
+      ]
+    },
+    {
+      value: '3',
+      label: 'anthropic-bedrock',
+      models: [
+        "claude-3-opus-20240229",
+        "claude-3-sonnet-20240229",
+        "claude-3-haiku-20240307",
+        "claude-3-5-sonnet-20240620",
+        "claude-3-5-sonnet-20241022",
+        "claude-3-5-haiku-20241022",
+        "claude-3-7-sonnet-20250219",
+        "claude-opus-4-20250514",
+        "claude-opus-4-5-20251101",
+        "claude-opus-4-6",
+        "claude-sonnet-4-20250514",
+        "claude-sonnet-4-5-20250929",
+        "claude-haiku-4-5-20251001"
+      ]
+    },
+
+    {
+      value: '4',
+      label: 'cerebras',
+      models: [
+        "llama3.1-8b",
+        "llama3.1-8b"
+
+      ]
+    },
+    {
+      value: '5',
+      label: 'deep-seek',
+      models: [
+        "deepseek-chat",
+        "deepseek-reasoner"
+
+      ]
+    }, {
+      value: '6',
+      label: 'google',
+      models: [
+        "gemini-3-flash-preview",
+        "gemini-2.5-pro",
+        "gemini-2.5-flash",
+        "gemini-2.5-flash-lite",
+        "gemini-2.0-flash-thinking-exp",
+        "gemini-2.0-pro-exp-02-05",
+        "gemini-2.0-flash",
+        "gemini-2.0-flash-lite",
+        "gemini-2.0-flash-exp",
+        "gemini-2.0-flash-realtime-exp",
+        "gemini-1.5-flash",
+        "gemini-1.5-flash-002",
+        "gemini-1.5-pro",
+        "gemini-1.5-pro-002",
+        "gemini-1.0-pro"
+
+      ]
+    },
+    {
+      value: '7',
+      label: 'groq',
+      models: [
+        "openai/gpt-oss-20b",
+        "openai/gpt-oss-120b",
+        "deepseek-r1-distill-llama-70b",
+        "llama-3.3-70b-versatile",
+        "llama-3.1-405b-reasoning",
+        "llama-3.1-8b-instant",
+        "llama3-8b-8192",
+        "llama3-70b-8192",
+        "gemma2-9b-it",
+        "moonshotai/kimi-k2-instruct-0905",
+        "meta-llama/llama-4-maverick-17b-128e-instruct",
+        "meta-llama/llama-4-scout-17b-16e-instruct",
+        "mistral-saba-24b",
+        "compound-beta",
+        "compound-beta-mini"
+
+      ]
+    },
+    {
+      value: '8',
+      label: 'inflection-ai',
+      models: [
+        "inflection_3_pi"
+
+      ]
+    },
+    {
+      value: '9',
+      label: 'xai',
+      models: [
+        "grok-beta",
+        "grok-2",
+        "grok-3",
+        "grok-4-fast-reasoning",
+        "grok-4-fast-non-reasoning"
+
       ]
     }
 
@@ -258,23 +376,23 @@ function Model() {
 
         </h4>
         <p className="input-description">The first message that the assistant will say.</p>
-        <Input className={inputValidationMessage ? "input-field invalid-input" : "input-field"} 
-        placeholder="Hi, Provide me the first message!" 
-        onChange={firstMessageEnterHandler}  
+        <Input className={inputValidationMessage ? "input-field invalid-input" : "input-field"}
+          placeholder="Hi, Provide me the first message!"
+          onChange={firstMessageEnterHandler}
           value={firstMessage} />
 
         {inputValidationMessage && <p className="invalidation-message">{inputValidationMessage}</p>}
 
         <h4 className="input-header second">System Prompt <span style={{ fontWeight: 'bold', color: systemPromptValidationMessage ? 'red' : 'black' }}>*</span></h4>
         <p className="input-description">The context allows you to customize your voicebot&lsquo;s personality, role and instructions. </p>
-        
+
         <TextArea className={systemPromptValidationMessage ? "text-area invalid-input" : "text-area"}
-         rows={4} 
-         placeholder="Write your system prompts here..." 
-         value={systemPrompt}
-         onChange={systemPromptEnterHandler}
-         />
-           {systemPromptValidationMessage && <p className="invalidation-message">{systemPromptValidationMessage}</p>}
+          rows={4}
+          placeholder="Write your system prompts here..."
+          value={systemPrompt}
+          onChange={systemPromptEnterHandler}
+        />
+        {systemPromptValidationMessage && <p className="invalidation-message">{systemPromptValidationMessage}</p>}
       </div>
 
       <div className="right-column">
@@ -332,7 +450,7 @@ function Model() {
 
         <div className="temprature emotional-detect">
           <h4 className="emotional-header">Emotion Detects</h4>
-          <Switch className="emotional-switch" value={emotionRecognitionEnabled} onChange={emotionRecognitionChangeHandler}/>
+          <Switch className="emotional-switch" value={emotionRecognitionEnabled} onChange={emotionRecognitionChangeHandler} />
         </div>
 
       </div>
