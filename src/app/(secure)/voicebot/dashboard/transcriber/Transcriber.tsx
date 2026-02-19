@@ -433,7 +433,6 @@ function Transcriber() {
         "zh-TW"  // Traditional Chinese (Taiwan)
       ],
       model: [
-        "flux-general-en",
         "nova-3",
         "nova-3-general",
         "nova-3-medical",
@@ -465,7 +464,6 @@ function Transcriber() {
         "base-conversationalai",
         "base-voicemail",
         "base-video",
-        "whisper"
       ]
     },
     {
@@ -638,6 +636,68 @@ function Transcriber() {
         "cy",
       ],
       model: ["gpt-4o-mini-transcribe", "gpt-4o-transcribe"]
+    },
+    {
+      value: "7",
+      label: "google",
+      language: [
+        "multi",
+        "ar",
+        "bn",
+        "bg",
+        "zh",
+        "hr",
+        "cs",
+        "da",
+        "nl",
+        "en",
+        "et",
+        "fi",
+        "fr",
+        "de",
+        "el",
+        "he",
+        "hi",
+        "hu",
+        "id",
+        "it",
+        "ja",
+        "ko",
+        "lv",
+        "lt",
+        "no",
+        "pl",
+        "pt",
+        "ro",
+        "ru",
+        "sr",
+        "sk",
+        "sl",
+        "es",
+        "sw",
+        "sv",
+        "th",
+        "tr",
+        "uk",
+        "vi"
+      ],
+      model: [
+        "gemini-3-flash-preview",
+        "gemini-2.5-pro",
+        "gemini-2.5-flash",
+        "gemini-2.5-flash-lite",
+        "gemini-2.0-flash-thinking-exp",
+        "gemini-2.0-pro-exp-02-05",
+        "gemini-2.0-flash",
+        "gemini-2.0-flash-lite",
+        "gemini-2.0-flash-exp",
+        "gemini-2.0-flash-realtime-exp",
+        "gemini-1.5-flash",
+        "gemini-1.5-flash-002",
+        "gemini-1.5-pro",
+        "gemini-1.5-pro-002",
+        "gemini-1.0-pro"
+      ]
     },
 
     {
@@ -1370,7 +1430,7 @@ function Transcriber() {
     }
 
     //if selected mode is nova-2 or nova-2-general
-    else if (option.label === "nova-2" || option.label === "nova-2-general") {
+    else if (option.label === "nova-2" || option.label === "nova-2-general" || option.label === "nova-3" || option.label === "nova-3-general") {
 
       setLanguage(nov2AndNova2GeneralModelLanguage.map(language => ({ value: language[1], label: language[0] })));
     }
@@ -1382,7 +1442,7 @@ function Transcriber() {
       }).map(language => ({ value: language[1], label: language[0] })))
     }
 
-    else if (option.label === "nova-phonecall" || option.label === "nova-medical") {
+    else if (option.label === "nova-phonecall" || option.label === "nova-medical" || option.label === "nova-3-medical") {
       setLanguage([["English", "en"], ["American-English", "en-US"]].map(language => ({ value: language[1], label: language[0] })));
     }
 
@@ -1409,11 +1469,11 @@ function Transcriber() {
     }
 
     //if 
-    else if (option.label == "Whisper") {
+    else if (option.label == "Whisper" || option.label == "whisper") {
       setLanguage(wisperModelLanguage.map(language => ({ value: language[1], label: language[0] })));
     }
 
-    else if (option.label == "Accurate" || option.label == "Fast") {
+    else if (option.label == "Accurate" || option.label == "Fast" || option.label == "fast" || option.label == "accurate" || option.label == "solaria-1") {
       const selectedProviderList = providerList.find(provider => provider.label === selectedProvider);
       if (selectedProviderList && selectedProviderList.language) {
         // setModels(selectedProviderList.model.map(model => ({ value: model+".", label: model })));
@@ -1426,10 +1486,21 @@ function Transcriber() {
       }
     }
 
-    else if (option.label == "scribe_v1") {
+    else if (option.label == "scribe_v1" || option.label == "scribe_v2" || option.label == "scribe_v2_realtime") {
       const selectedProviderList = providerList.find(provider => provider.label === selectedProvider);
       if (selectedProviderList && selectedProviderList.language) {
         // setModels(selectedProviderList.model.map(model => ({ value: model+".", label: model })));
+        setLanguage(selectedProviderList.language
+          .map(code => {
+            const language = languageDictionary.find(lang => lang.code === code);
+            return language ? [language.name, code] : [code, code];
+          })
+          .map(language => ({ value: language[1], label: language[0] })));
+      }
+    }
+    else if (option.label.includes("gemini")) {
+      const selectedProviderList = providerList.find(provider => provider.label === selectedProvider);
+      if (selectedProviderList && selectedProviderList.language) {
         setLanguage(selectedProviderList.language
           .map(code => {
             const language = languageDictionary.find(lang => lang.code === code);
