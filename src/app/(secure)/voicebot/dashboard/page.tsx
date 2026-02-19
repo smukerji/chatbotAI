@@ -128,13 +128,13 @@ function Dashboard() {
   }, []);
 
   useEffect(() => {
-  const savedTab = sessionStorage.getItem('activeTab');
-  if (savedTab) {
-    const tabValue = savedTab.toLowerCase();
-    setTab(tabValue);
-    sessionStorage.removeItem('activeTab');
-  }
-}, []);
+    const savedTab = sessionStorage.getItem('activeTab');
+    if (savedTab) {
+      const tabValue = savedTab.toLowerCase();
+      setTab(tabValue);
+      sessionStorage.removeItem('activeTab');
+    }
+  }, []);
 
 
   const duplicateAssistantHandler = async () => {
@@ -437,30 +437,30 @@ function Dashboard() {
     }
   };
 
-  async function costDeductionOnCallEndHandler() {
-    try {
-      const data = {
-        assistantId: voiceBotContextData?.assistantInfo?.vapiAssistantId,
-      };
-      const costDeductionResponse: any = await fetch(
-        `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/costs-wallates?userId=${cookies.userId}`,
-        {
-          method: "PUT",
-          body: JSON.stringify(data),
-        }
-      );
-      /**
-       * voicebot/dashboard/api/vapi/end-of-call
-       */
+  // async function costDeductionOnCallEndHandler() {
+  //   try {
+  //     const data = {
+  //       assistantId: voiceBotContextData?.assistantInfo?.vapiAssistantId,
+  //     };
+  //     const costDeductionResponse: any = await fetch(
+  //       `${process.env.NEXT_PUBLIC_WEBSITE_URL}voicebot/dashboard/api/costs-wallates?userId=${cookies.userId}`,
+  //       {
+  //         method: "PUT",
+  //         body: JSON.stringify(data),
+  //       }
+  //     );
+  //     /**
+  //      * voicebot/dashboard/api/vapi/end-of-call
+  //      */
 
-      const costDeductionResponseParse = costDeductionResponse.json();
-      if (costDeductionResponseParse?.message) {
-        message.success("Call cost affect on your credits");
-      }
-    } catch (error: any) {
-      message.error("Error while deducting the cost", error);
-    }
-  }
+  //     const costDeductionResponseParse = costDeductionResponse.json();
+  //     if (costDeductionResponseParse?.message) {
+  //       message.success("Call cost affect on your credits");
+  //     }
+  //   } catch (error: any) {
+  //     message.error("Error while deducting the cost", error);
+  //   }
+  // }
 
   console.log("isPublishEnabled", voiceBotContextData?.isPublishEnabled);
 
@@ -548,9 +548,9 @@ function Dashboard() {
       d?._id
     );
 
-    setTimeout(async () => {
-      await costDeductionOnCallEndHandler();
-    }, 3000);
+    // setTimeout(async () => {
+    //   await costDeductionOnCallEndHandler();
+    // }, 3000);
   };
 
   const muteCallHandler = () => {
@@ -626,15 +626,15 @@ function Dashboard() {
     voiceBotContextData?.publishLoading
   );
 
-const changeHandler = (value: string) => {
-  console.log("working , clicking");
-  setTab(value);
-  
-  // Clean up the URL - remove the tab parameter
-  const currentUrl = new URL(window.location.href);
-  currentUrl.searchParams.delete('tab');
-  window.history.replaceState({}, '', currentUrl.toString());
-};
+  const changeHandler = (value: string) => {
+    console.log("working , clicking");
+    setTab(value);
+
+    // Clean up the URL - remove the tab parameter
+    const currentUrl = new URL(window.location.href);
+    currentUrl.searchParams.delete('tab');
+    window.history.replaceState({}, '', currentUrl.toString());
+  };
 
   const tatabyebyeHandler = () => {
     setIsMoreContentVisible(false);
@@ -738,22 +738,20 @@ const changeHandler = (value: string) => {
                     <Image alt="phone-call" src={callOutgoing}></Image>
                     <span className="button-text">
                       {isListening == CALLSTATUS.VOID
-                        ? `Talk with ${
-                            voicebotDetails?.name ||
-                            voiceBotContextData?.assistantInfo?.assistantName
-                          }!`
+                        ? `Talk with ${voicebotDetails?.name ||
+                        voiceBotContextData?.assistantInfo?.assistantName
+                        }!`
                         : isListening == CALLSTATUS.CONNECTING
-                        ? "Calling..."
-                        : isListening == CALLSTATUS.SPEAKING
-                        ? "speaking..."
-                        : isListening == CALLSTATUS.LISTENING
-                        ? "listening..."
-                        : isListening == CALLSTATUS.CALLSTOP
-                        ? "Call Again"
-                        : `Talk with ${
-                            voicebotDetails?.name ||
-                            voiceBotContextData?.assistantInfo?.assistantName
-                          }!`}
+                          ? "Calling..."
+                          : isListening == CALLSTATUS.SPEAKING
+                            ? "speaking..."
+                            : isListening == CALLSTATUS.LISTENING
+                              ? "listening..."
+                              : isListening == CALLSTATUS.CALLSTOP
+                                ? "Call Again"
+                                : `Talk with ${voicebotDetails?.name ||
+                                voiceBotContextData?.assistantInfo?.assistantName
+                                }!`}
                     </span>
                   </div>
                 </Button>
