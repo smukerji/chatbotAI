@@ -660,3 +660,166 @@ Header a {
     text-transform: capitalize;
   }
 }
+
+/* ── WhatsApp QR / Personal Modal ──────────────────────────────────────────── */
+
+.whatsapp-qr-modal .ant-modal-footer {
+  display: none !important;
+}
+
+.whatsapp-qr-modal .ant-modal-content {
+  border-radius: 16px;
+  padding: 28px 24px 20px;
+}
+
+.waqr-title {
+  color: #141416;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 28px;
+  margin-bottom: 4px;
+}
+
+.waqr-subtitle {
+  color: #777e90;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  margin-bottom: 20px;
+}
+
+.waqr-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 32px 0;
+  color: #777e90;
+  font-size: 14px;
+}
+
+.waqr-qr-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0 8px;
+}
+
+.waqr-qr-img {
+  border-radius: 10px;
+  border: 3px solid #25d366;
+  display: block;
+}
+
+.waqr-qr-hint {
+  font-size: 13px;
+  color: #777e90;
+  text-align: center;
+  max-width: 280px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.waqr-connected {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 0;
+  text-align: center;
+}
+
+.waqr-check-icon {
+  font-size: 48px !important;
+  color: #25d366 !important;
+}
+
+.waqr-connected-title {
+  color: #141416;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 26px;
+}
+
+.waqr-phone-number {
+  color: #25d366;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: monospace;
+}
+
+.waqr-connected-hint {
+  color: #777e90;
+  font-size: 13px;
+  max-width: 280px;
+}
+
+.waqr-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 0;
+  color: #ff4d4f;
+  font-size: 14px;
+  text-align: center;
+}
+
+.waqr-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #e6e8ec;
+}
+
+.waqr-btn-disconnect {
+  background: transparent;
+  border: 1px solid #ff4d4f;
+  color: #ff4d4f;
+  border-radius: 12px;
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover {
+    background: rgba(255, 77, 79, 0.08);
+  }
+}
+
+.waqr-btn-retry {
+  background: #f4f5f6;
+  border: 1px solid #e6e8ec;
+  color: #353945;
+  border-radius: 12px;
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #e6e8ec;
+  }
+}
+
+.waqr-btn-close {
+  background: #25d366;
+  border: none;
+  color: #fff;
+  border-radius: 12px;
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #1ebe59;
+    cursor: pointer;
+  }
+}

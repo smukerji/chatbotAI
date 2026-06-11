@@ -40,3 +40,5 @@ next-env.d.ts
 /public/qa-images/*.jpg
 /public/qa-images/*.jpeg
 .prettierrc
+
+whatsapp-server.env.local
