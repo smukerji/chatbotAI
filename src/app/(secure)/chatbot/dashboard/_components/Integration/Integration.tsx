@@ -164,7 +164,7 @@ function Integration({ isPlanNotification, setIsPlanNotification }: any) {
     setWhatsAppQRLoader(true);
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard/whatsapp-qr/session/api?chatbotId=${chatbot.id}`,
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard/whatsapp-qr/session/api?chatbotId=${chatbot.id}&userId=${userId[0].userId}`,
         { method: "GET", cache: "no-cache" }
       );
       if (res.ok) {

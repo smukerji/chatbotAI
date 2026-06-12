@@ -30,6 +30,7 @@ const {
   isJidBroadcast,
   isJidGroup,
   fetchLatestBaileysVersion,
+  makeCacheableSignalKeyStore,
   Browsers,
 } = require("@whiskeysockets/baileys");
 const pino = require("pino");
@@ -168,37 +169,63 @@ async function useMongoAuthState(chatbotId) {
 // chatbotId → { sock, chatbotId, userId, status, phoneNumber }
 const sessions = new Map();
 
-// ─── AI reply helper ──────────────────────────────────────────────────────────
+// ─── OpenAI client (Assistants API) ──────────────────────────────────────────
 
-async function getAIReply(userMessage, chatbotId, userId) {
+const OpenAI = require("openai");
+const openai = new OpenAI.default({
+  apiKey: OPENAI_KEY,
+  ...(process.env.NEXT_PUBLIC_OPENAI_PROJ_KEY && { project: process.env.NEXT_PUBLIC_OPENAI_PROJ_KEY }),
+  ...(process.env.NEXT_PUBLIC_OPENAI_ORG_KEY  && { organization: process.env.NEXT_PUBLIC_OPENAI_ORG_KEY }),
+});
+
+// ─── Fetch with timeout ───────────────────────────────────────────────────────
+// Tool-call fetches hit the Next.js app (pinecone, shopify, etc.). Without a
+// timeout, a slow/stalled endpoint blocks the assistant run indefinitely,
+// causing the whole run to hit the 120s wall. AbortController bounds each call.
+async function fetchWithTimeout(url, options = {}, timeoutMs = 30_000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    // 1. Pinecone similarity search (calls the Next.js API)
-    const pineconeRes = await fetch(`${PINECONE_BASE}api/pinecone`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userQuery: userMessage, chatbotId, userId }),
-    });
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
 
-    let similarityResults = "";
-    if (pineconeRes.ok) {
-      try {
-        // The pinecone route returns an array of { content, source, filename, score, ... }
-        const chunks = await pineconeRes.json();
-        if (Array.isArray(chunks)) {
-          similarityResults = chunks
-            .map((c) => c.content || "")
-            .filter(Boolean)
-            .join("\n\n");
-        }
-      } catch (parseErr) {
-        console.warn(`[AI] Could not parse Pinecone response, proceeding without context:`, parseErr.message);
-      }
-    } else {
-      console.warn(`[AI] Pinecone returned HTTP ${pineconeRes.status}, proceeding without context`);
-    }
+// ─── Token helpers ────────────────────────────────────────────────────────────
+// Simple UTF-8 character-based token estimate (≈ 4 chars per token).
+// Avoids pulling in gpt-tokenizer as a native dep on the GCP VM while keeping
+// the history-trimming logic functionally equivalent to the Next.js webhook.
+function estimateTokens(text) {
+  if (!text) return 0;
+  return Math.ceil(String(text).length / 4);
+}
 
-    // 2. OpenAI completion
-    const openaiRes = await fetch("https://api.openai.com/v1/chat/completions", {
+// ─── Timestamp helpers (mirrors route.ts) ─────────────────────────────────────
+
+function createMessageWithTimestamp(role, content) {
+  const now = new Date();
+  return {
+    role,
+    content,
+    timestamp: now.toISOString(),
+    messageTime: now.toISOString().replace("T", " ").slice(0, 19),
+  };
+}
+
+function cleanMessagesForOpenAI(messages) {
+  return messages.map((m) => ({ role: m.role, content: m.content }));
+}
+
+// ─── Format helper (mirrors formatMessageForWhatsApp in route.ts) ─────────────
+
+async function formatMessageForWhatsApp(text) {
+  if (!text || !text.trim()) return text;
+  // Only bother calling the formatter when the response looks like HTML
+  if (!/<[a-z][\s\S]*>/i.test(text)) return text;
+
+  try {
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -206,23 +233,534 @@ async function getAIReply(userMessage, chatbotId, userId) {
       },
       body: JSON.stringify({
         model: "gpt-3.5-turbo",
-        temperature: 0.5,
+        temperature: 0.2,
         messages: [
           {
             role: "system",
-            content: `Use the following context to answer the user's question. If you don't know, say so.
-Context:
-${similarityResults}`,
+            content:
+              "Format provided content as pre whatsapp messaging style. Output ONLY the converted text without any extra notes.",
           },
-          { role: "user", content: userMessage },
+          {
+            role: "user",
+            content: `Convert the following content for WhatsApp delivery. Output ONLY the converted text without any extra notes:\n\n${text}`,
+          },
         ],
       }),
     });
-    const openaiBody = await openaiRes.json();
-    return openaiBody.choices?.[0]?.message?.content || "Sorry, I could not generate a reply.";
+    const body = await res.json();
+    return body?.choices?.[0]?.message?.content?.trim() || text;
   } catch (err) {
-    console.error(`[AI] Error for chatbot ${chatbotId}:`, err.message);
-    return "Sorry, something went wrong. Please try again.";
+    console.warn("[FORMAT] Could not format for WhatsApp, using raw text:", err.message);
+    return text;
+  }
+}
+
+// ─── Assistants-API helpers (mirrors route.ts) ────────────────────────────────
+
+async function createThread() {
+  const thread = await openai.beta.threads.create();
+  console.log(`[THREAD] Created ${thread.id}`);
+  return thread;
+}
+
+async function addMessageToThread(threadId, message) {
+  return openai.beta.threads.messages.create(threadId, {
+    role: "user",
+    content: message,
+  });
+}
+
+async function runAssistant(threadId, assistantId) {
+  return openai.beta.threads.runs.create(threadId, { assistant_id: assistantId });
+}
+
+/**
+ * Cancel any runs left in a non-terminal state on this thread.
+ * Previous attempts that timed out (e.g. Baileys socket drop) can leave the
+ * thread wedged with an orphaned active run. Until that run is cancelled,
+ * the thread rejects new messages ("while a run is active") and new runs
+ * ("already has an active run"), so every subsequent message silently fails.
+ * Clearing them first makes the flow self-healing.
+ */
+async function cancelActiveRuns(threadId) {
+  try {
+    const runs = await openai.beta.threads.runs.list(threadId, { limit: 10 });
+    const activeStatuses = ["queued", "in_progress", "requires_action", "cancelling"];
+    for (const run of runs.data) {
+      if (activeStatuses.includes(run.status)) {
+        console.warn(`[AI] Cancelling orphaned run ${run.id} (status=${run.status}) on thread ${threadId}`);
+        try {
+          await openai.beta.threads.runs.cancel(threadId, run.id);
+        } catch (err) {
+          console.warn(`[AI] Could not cancel run ${run.id}: ${err.message}`);
+        }
+      }
+    }
+    // Give OpenAI a moment to register the cancellation before we continue
+    if (runs.data.some((r) => activeStatuses.includes(r.status))) {
+      await new Promise((r) => setTimeout(r, 1_500));
+    }
+  } catch (err) {
+    console.warn(`[AI] cancelActiveRuns failed for ${threadId}: ${err.message}`);
+  }
+}
+
+/**
+ * Handle tool/function calls emitted by the assistant run.
+ * Mirrors handleRequiredAction in route.ts — routes each tool call to the
+ * Next.js API endpoints (pinecone, shopify, etc.) and submits outputs back.
+ */
+async function handleRequiredAction(threadId, runId, chatbotId, userId, messages) {
+  const run = await openai.beta.threads.runs.retrieve(threadId, runId);
+  if (run.status !== "requires_action") return run;
+
+  const toolCalls = run.required_action?.submit_tool_outputs?.tool_calls || [];
+  console.log(`[TOOLS] Processing ${toolCalls.length} tool call(s) for run ${runId}`);
+
+  const toolOutputs = await Promise.all(
+    toolCalls.map(async (toolCall) => {
+      const fnName = toolCall.function.name;
+      let args = {};
+      try { args = JSON.parse(toolCall.function.arguments); } catch (_) {}
+
+      console.log(`[TOOLS] → ${fnName} args=${JSON.stringify(args).slice(0, 200)}`);
+      const toolStart = Date.now();
+
+      let output;
+      try {
+        if (fnName === "find_product") {
+          const r = await fetchWithTimeout(`${PINECONE_BASE}api/integrations/shopify/products`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ product_name: args.query, chatbotId }),
+          });
+          output = r.ok
+            ? JSON.stringify({ success: true, data: [{ source: "shopify store", content: await r.json() }] })
+            : JSON.stringify({ success: false, message: "Shopify lookup failed" });
+
+        } else if (fnName === "get_customer_orders") {
+          const r = await fetchWithTimeout(`${PINECONE_BASE}api/integrations/shopify/orders`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: args.email, chatbotId }),
+          });
+          output = r.ok
+            ? JSON.stringify({ success: true, data: [{ source: "shopify store", content: await r.json() }] })
+            : JSON.stringify({ success: false, message: "Order lookup failed" });
+
+        } else if (fnName === "get_products") {
+          const r = await fetchWithTimeout(`${PINECONE_BASE}api/integrations/shopify/products?chatbotId=${chatbotId}`, {
+            method: "GET",
+          });
+          output = r.ok
+            ? JSON.stringify({ success: true, data: [{ source: "shopify store", content: await r.json() }] })
+            : JSON.stringify({ success: false, message: "Products lookup failed" });
+
+        } else if (fnName === "get_reference") {
+          const r = await fetchWithTimeout(`${PINECONE_BASE}api/pinecone`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userQuery: args.userQuery, chatbotId, userId, messages }),
+          });
+          output = JSON.stringify({ success: true, data: r.ok ? await r.json() : [] });
+
+        } else if (fnName === "get_search_results") {
+          const r = await fetchWithTimeout(`${PINECONE_BASE}api/integrations/perplexity/sonar`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userQuery: args.userQuery }),
+          });
+          const d = r.ok ? await r.json() : {};
+          output = JSON.stringify({ success: true, data: d.message, sources: d.sources });
+
+        } else if (fnName === "ask_relevant_followup_questions") {
+          output = JSON.stringify({ success: true });
+
+        } else {
+          output = JSON.stringify({ success: false, message: "This functionality will be available soon" });
+        }
+        console.log(`[TOOLS] ✓ ${fnName} done in ${Date.now() - toolStart}ms`);
+      } catch (err) {
+        // Always return an output (even on failure) so the run can resume
+        // instead of hanging in requires_action until the 120s wall.
+        console.error(`[TOOLS] ✗ ${fnName} failed after ${Date.now() - toolStart}ms:`, err.message);
+        output = JSON.stringify({ success: false, message: err.message || "tool error" });
+      }
+
+      return { tool_call_id: toolCall.id, output };
+    })
+  );
+
+  console.log(`[TOOLS] Submitting ${toolOutputs.length} output(s) for run ${runId}`);
+  const submitted = await openai.beta.threads.runs.submitToolOutputs(threadId, runId, { tool_outputs: toolOutputs });
+  console.log(`[TOOLS] Submitted — run ${runId} now ${submitted.status}`);
+  return submitted;
+}
+
+/**
+ * Poll until the run reaches a terminal state, handling requires_action
+ * the same way the Next.js webhook does.
+ */
+async function waitForRunCompletion(threadId, runId, chatbotId, userId, messages, maxWaitMs = 180_000) {
+  const deadline = Date.now() + maxWaitMs;
+  let checkInterval = 2_000;
+  let pollCount = 0;
+
+  while (Date.now() < deadline) {
+    const run = await openai.beta.threads.runs.retrieve(threadId, runId);
+    pollCount++;
+    console.log(`[AI][${chatbotId}] run ${runId} poll #${pollCount} status=${run.status}`);
+
+    if (run.status === "completed") return run;
+
+    if (run.status === "requires_action") {
+      await handleRequiredAction(threadId, runId, chatbotId, userId, messages);
+      await new Promise((r) => setTimeout(r, 2_000));
+      continue;
+    }
+
+    if (["failed", "cancelled", "expired"].includes(run.status)) {
+      throw new Error(`Assistant run ${run.status}: ${run.last_error?.message || "unknown"}`);
+    }
+
+    await new Promise((r) => setTimeout(r, checkInterval));
+    // Back off slightly for longer-running jobs
+    if (checkInterval < 5_000) checkInterval = Math.min(checkInterval + 1_000, 5_000);
+  }
+
+  throw new Error(`Assistant run timed out after ${maxWaitMs}ms`);
+}
+
+/** Extract plain text from an OpenAI thread message (handles nested shapes). */
+function extractMessageText(msg) {
+  if (!msg) return null;
+  if (typeof msg.content === "string") return msg.content;
+  if (Array.isArray(msg.content) && msg.content.length > 0) {
+    const c = msg.content[0];
+    if (c?.text?.value) return c.text.value;
+    if (typeof c?.text === "string") return c.text;
+    if (typeof c === "string") return c;
+  }
+  return null;
+}
+
+// ─── Token-limit constants (mirrors route.ts) ─────────────────────────────────
+
+const MODEL_TOKEN_LIMITS = {
+  "gpt-3.5-turbo": 4_000,
+  "gpt-4": 8_000,
+  "gpt-4-turbo": 128_000,
+  "gpt-4o": 128_000,
+};
+
+// ─── Core AI dispatch ─────────────────────────────────────────────────────────
+
+/**
+ * Get an AI reply for an incoming WhatsApp QR message.
+ *
+ * Mirrors the full logic in route.ts:
+ *   - bot-v2  → OpenAI Assistants API with persistent threads + tool calls
+ *   - others  → Chat Completions API with Pinecone context + conversation history
+ *
+ * Also persists conversation history to the same `whatsapp-qr-chat-history`
+ * MongoDB collection so chats are visible in the dashboard.
+ *
+ * @param {string} userMessage   - cleaned incoming message text
+ * @param {string} chatbotId     - OpenAI assistant ID / chatbot ID
+ * @param {string} userId        - owner user ID
+ * @param {string} senderJid     - WhatsApp JID of the sender (used as conversation key)
+ */
+async function getAIReply(userMessage, chatbotId, userId, senderJid) {
+  // ── 1. Load chatbot config ────────────────────────────────────────────────
+  const [chatbotDoc, chatbotSettings] = await Promise.all([
+    db.collection("user-chatbots").findOne({ chatbotId }),
+    db.collection("chatbot-settings").findOne({ chatbotId }),
+  ]);
+
+  if (!chatbotDoc) throw new Error(`No chatbot found for chatbotId=${chatbotId}`);
+
+  const botType        = chatbotDoc.botType;                         // "bot-v2" or legacy
+  const model          = chatbotSettings?.model          || "gpt-3.5-turbo";
+  const temperature    = chatbotSettings?.temperature    ?? 0;
+  const instruction    = chatbotSettings?.instruction    || "";
+  const useAssistantAPI = botType === "bot-v2";
+
+  // ── 2. Chat history setup ─────────────────────────────────────────────────
+  const historyCol = db.collection("whatsapp-qr-chat-history");
+  // Use the bare JID phone number as the conversation key (strip @s.whatsapp.net / @g.us)
+  const phoneKey = senderJid.split("@")[0];
+  const dateKey  = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+
+  // Store user message immediately (mirrors route.ts step 5.5)
+  const userMsg = createMessageWithTimestamp("user", userMessage);
+
+  let existingDoc = await historyCol.findOne({ userId, chatbotId, date: dateKey });
+
+  // ── 2a. Ensure the history document + phone-key entry exist ──────────────
+  if (!existingDoc) {
+    const newDoc = {
+      userId,
+      chatbotId,
+      chats: {
+        [phoneKey]: {
+          messages: [],
+          usage: { completion_tokens: 0, prompt_tokens: 0, total_tokens: 0 },
+        },
+      },
+      date: dateKey,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    await historyCol.insertOne(newDoc);
+    existingDoc = newDoc;
+  } else if (!existingDoc.chats?.[phoneKey]) {
+    await historyCol.updateOne(
+      { userId, chatbotId, date: dateKey },
+      {
+        $set: {
+          [`chats.${phoneKey}.messages`]: [],
+          [`chats.${phoneKey}.usage`]: { completion_tokens: 0, prompt_tokens: 0, total_tokens: 0 },
+          updatedAt: new Date(),
+        },
+      }
+    );
+    existingDoc.chats = existingDoc.chats || {};
+    existingDoc.chats[phoneKey] = { messages: [], usage: { completion_tokens: 0, prompt_tokens: 0, total_tokens: 0 } };
+  }
+
+  // ── 2b. Handle per-path thread wiring for bot-v2 ─────────────────────────
+  let threadId = existingDoc?.chats?.[phoneKey]?.threadId || null;
+
+  if (useAssistantAPI) {
+    if (!threadId) {
+      const thread = await createThread();
+      threadId = thread.id;
+      await historyCol.updateOne(
+        { userId, chatbotId, date: dateKey },
+        {
+          $set: {
+            [`chats.${phoneKey}.threadId`]: threadId,
+            [`chats.${phoneKey}.assistantId`]: chatbotId,
+            updatedAt: new Date(),
+          },
+        }
+      );
+      console.log(`[AI][${chatbotId}] New thread ${threadId} for ${phoneKey}`);
+    }
+    // Clear any orphaned active runs from prior timed-out attempts so the
+    // thread can accept a new message + run. Without this the thread stays
+    // wedged and every message silently fails.
+    await cancelActiveRuns(threadId);
+
+    // Add user message to the OpenAI thread
+    try {
+      await addMessageToThread(threadId, userMessage);
+    } catch (err) {
+      // If there's still an active run this is a genuine concurrent duplicate
+      if (err?.message?.includes("while a run") && err.message.includes("is active")) {
+        console.warn(`[AI][${chatbotId}] Active run in thread ${threadId} — skipping duplicate`);
+        return null; // caller should not send a reply
+      }
+      throw err;
+    }
+  }
+
+  // Persist user message to history
+  await historyCol.updateOne(
+    { userId, chatbotId, date: dateKey },
+    {
+      $push: { [`chats.${phoneKey}.messages`]: userMsg },
+      $set: { updatedAt: new Date() },
+    }
+  );
+
+  // ── 3. Generate AI response ───────────────────────────────────────────────
+  let aiResponse = "";
+  let usage = { completion_tokens: 0, prompt_tokens: 0, total_tokens: 0 };
+
+  if (useAssistantAPI) {
+    // ── bot-v2: Assistants API ────────────────────────────────────────────
+    console.log(`[AI][${chatbotId}] bot-v2 path — thread ${threadId}`);
+
+    const existingMessages = existingDoc?.chats?.[phoneKey]?.messages || [];
+
+    let run;
+    try {
+      run = await runAssistant(threadId, chatbotId);
+      console.log(`[AI][${chatbotId}] started run ${run.id} on thread ${threadId}`);
+    } catch (err) {
+      if (err?.message?.includes("already has an active run")) {
+        console.warn(`[AI][${chatbotId}] Thread ${threadId} already has an active run — skipping`);
+        return null;
+      }
+      throw err;
+    }
+
+    await waitForRunCompletion(threadId, run.id, chatbotId, userId, existingMessages);
+
+    const threadMessages = await openai.beta.threads.messages.list(threadId);
+    aiResponse = extractMessageText(threadMessages.data[0]) || "";
+    console.log(`[AI][${chatbotId}] run ${run.id} done — responseLength=${aiResponse.length}`);
+
+    usage = {
+      completion_tokens: estimateTokens(aiResponse),
+      prompt_tokens: estimateTokens(userMessage),
+      total_tokens: estimateTokens(aiResponse) + estimateTokens(userMessage),
+    };
+
+  } else {
+    // ── legacy bot: Chat Completions API with Pinecone + history ─────────
+    console.log(`[AI][${chatbotId}] legacy path — model ${model}`);
+
+    // 3a. Pinecone context
+    let similarityResults = "";
+    try {
+      const pineconeRes = await fetch(`${PINECONE_BASE}api/pinecone`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userQuery: userMessage, chatbotId, userId }),
+      });
+      if (pineconeRes.ok) {
+        similarityResults = await pineconeRes.text();
+      } else {
+        console.warn(`[AI] Pinecone returned HTTP ${pineconeRes.status}`);
+      }
+    } catch (err) {
+      console.warn("[AI] Pinecone failed, proceeding without context:", err.message);
+    }
+
+    // 3b. Build conversation history respecting token limits
+    const previousMessages = (existingDoc?.chats?.[phoneKey]?.messages || []).slice(0, -1); // exclude current user msg we just pushed
+    const previousTotalTokens = existingDoc?.chats?.[phoneKey]?.usage?.total_tokens || 0;
+    const tokenLimit = MODEL_TOKEN_LIMITS[model] || 4_000;
+
+    let conversationMessages = [...previousMessages];
+    let usedTokens =
+      previousTotalTokens +
+      estimateTokens(userMessage) +
+      estimateTokens(similarityResults);
+
+    // Trim oldest messages until we're under the limit
+    while (usedTokens > tokenLimit && conversationMessages.length > 0) {
+      const removed = conversationMessages.shift();
+      usedTokens -= estimateTokens(removed?.content || "");
+    }
+
+    // 3c. OpenAI Chat Completions call
+    const openaiRes = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${OPENAI_KEY}`,
+      },
+      body: JSON.stringify({
+        model,
+        temperature,
+        top_p: 1,
+        messages: [
+          {
+            role: "system",
+            content: `${instruction}\n\ncontext:\n${similarityResults}`,
+          },
+          ...cleanMessagesForOpenAI(conversationMessages),
+          { role: "user", content: `query: ${userMessage}` },
+        ],
+      }),
+    });
+
+    const openaiBody = await openaiRes.json();
+    if (!openaiRes.ok) {
+      throw new Error(`OpenAI error ${openaiRes.status}: ${JSON.stringify(openaiBody)}`);
+    }
+    aiResponse = openaiBody.choices?.[0]?.message?.content || "";
+    usage = openaiBody.usage || usage;
+  }
+
+  if (!aiResponse) return "Sorry, I could not generate a reply.";
+
+  // ── 4. Persist assistant message + update token usage ────────────────────
+  const assistantMsg = createMessageWithTimestamp("assistant", aiResponse);
+
+  await historyCol.updateOne(
+    { userId, chatbotId, date: dateKey },
+    {
+      $push: { [`chats.${phoneKey}.messages`]: assistantMsg },
+      $inc: {
+        [`chats.${phoneKey}.usage.completion_tokens`]: usage.completion_tokens || 0,
+        [`chats.${phoneKey}.usage.prompt_tokens`]:    usage.prompt_tokens    || 0,
+        [`chats.${phoneKey}.usage.total_tokens`]:     usage.total_tokens     || 0,
+      },
+      $set: { updatedAt: new Date() },
+    }
+  );
+
+  // ── 5. Update global message count ───────────────────────────────────────
+  await db
+    .collection("user-details")
+    .updateOne({ userId }, { $inc: { totalMessageCount: 1 } });
+
+  // ── 6. Format HTML → WhatsApp-friendly plain text ────────────────────────
+  return formatMessageForWhatsApp(aiResponse);
+}
+
+// ─── Async message handler (runs detached from Baileys event loop) ───────────
+//
+// The Baileys messages.upsert event handler must return synchronously.
+// Awaiting AI work (OpenAI Assistants polling can take 30-120s) inside it
+// blocks the Node event loop, preventing Baileys from sending WebSocket
+// keepalive frames — which causes the socket to time out at 60s.
+// This function is called fire-and-forget from the event handler.
+
+async function handleIncomingMessage({ msg, isGroup, userMessage, chatbotId, sock }) {
+  try {
+    const chatbotDoc = await db
+      .collection("user-chatbots")
+      .findOne({ chatbotId });
+
+    if (!chatbotDoc) {
+      console.warn(`[MSG] No chatbot found for chatbotId=${chatbotId}`);
+      return;
+    }
+
+    // senderJid: participant JID for groups, remoteJid for 1-1
+    const senderJid = isGroup
+      ? (msg.key.participant || msg.key.remoteJid)
+      : msg.key.remoteJid;
+
+    const reply = await getAIReply(userMessage, chatbotId, chatbotDoc.userId, senderJid);
+
+    // null means a duplicate active-run was detected — skip sending
+    if (reply === null) return;
+
+    // In groups, @tag the sender and quote their message so the reply is
+    // both threaded and notifies them directly.
+    let sent;
+    if (isGroup) {
+      // Mention text must be "@<number>" where number is the JID's id part
+      // (works for both phone "...@s.whatsapp.net" and LID "...@lid").
+      const senderTag = senderJid.split(/[:@]/)[0];
+      sent = await sock.sendMessage(msg.key.remoteJid, {
+        text: `@${senderTag} ${reply}`,
+        mentions: [senderJid],
+        quoted: msg,
+      });
+    } else {
+      sent = await sock.sendMessage(msg.key.remoteJid, { text: reply });
+    }
+
+    // Remember the message we just sent so it can be re-served to WhatsApp
+    // if the recipient's device requests a re-send (decryption retry).
+    const session = sessions.get(chatbotId);
+    if (sent?.key?.id && sent.message && session?.rememberMessage) {
+      session.rememberMessage(sent.key, sent.message);
+    }
+
+    await db
+      .collection("whatsapp_qr_sessions")
+      .updateOne({ chatbotId }, { $set: { lastActivity: new Date() } });
+
+  } catch (err) {
+    console.error(`[MSG] Error handling message for ${chatbotId}:`, err.message);
   }
 }
 
@@ -238,8 +776,38 @@ async function startSession(chatbotId, userId) {
   const session = { sock: null, chatbotId, userId, status: "initializing", phoneNumber: null };
   sessions.set(chatbotId, session);
 
+  // Bounded in-memory store of recently sent/received messages, keyed by
+  // message id. WhatsApp asks the sender to RE-SEND a message when the
+  // recipient's device can't decrypt it (the "Waiting for this message"
+  // state). Baileys fulfils that retry via the getMessage callback below —
+  // without a message store the retry fails and the recipient stays stuck.
+  const messageStore = new Map();
+  const MESSAGE_STORE_LIMIT = 1_000;
+  const rememberMessage = (key, message) => {
+    if (!key?.id || !message) return;
+    if (messageStore.size >= MESSAGE_STORE_LIMIT) {
+      // Drop the oldest entry (Map preserves insertion order)
+      messageStore.delete(messageStore.keys().next().value);
+    }
+    messageStore.set(key.id, message);
+  };
+  session.rememberMessage = rememberMessage;
+
   const logger = pino({ level: "silent" });
   const { state, saveCreds } = await useMongoAuthState(chatbotId);
+
+  // Resolve the bot's own LID (privacy id used for group mentions). It is NOT
+  // reliably present on sock.user.lid after every reconnect, so seed it from
+  // the persisted auth creds and the session doc, then refresh it whenever a
+  // fresh value appears. Without it, group @mentions of the bot can't be
+  // matched and the bot silently ignores them.
+  const persistedSessionDoc = await db
+    .collection("whatsapp_qr_sessions")
+    .findOne({ chatbotId });
+  session.botLid =
+    (state.creds?.me?.lid || "").split(/[:@]/)[0] ||
+    persistedSessionDoc?.botLid ||
+    null;
 
   // Always use the current WhatsApp Web protocol version — a stale version
   // causes the server to reject the handshake with code 405 before any QR.
@@ -249,12 +817,24 @@ async function startSession(chatbotId, userId) {
   const sock = makeWASocket({
     version,
     logger,
-    auth: state,
+    auth: {
+      creds: state.creds,
+      // Cache signal keys in memory on top of the Mongo store. This keeps
+      // encryption keys consistent across rapid send/receive and is the
+      // recommended setup for reliable group/E2E message delivery.
+      keys: makeCacheableSignalKeyStore(state.keys, logger),
+    },
     printQRInTerminal: false,
     browser: Browsers.ubuntu("Chrome"),
-    defaultQueryTimeoutMs: 60_000,
+    defaultQueryTimeoutMs: 120_000,
     msgRetryCounterMap: {},
     shouldIgnoreJid: (jid) => isJidBroadcast(jid),
+    // Required for reliable delivery: supplies the original message content
+    // when WhatsApp requests a re-send for an undecryptable message.
+    getMessage: async (key) => {
+      const cached = messageStore.get(key?.id);
+      return cached || proto.Message.fromObject({});
+    },
   });
 
   // Swallow low-level WebSocket errors so a single socket fault can't crash the
@@ -297,9 +877,16 @@ async function startSession(chatbotId, userId) {
     }
 
     if (connection === "open") {
-      const phoneNumber = sock.user?.id?.split(":")[0] || null;
+      const phoneNumber = sock.user?.id?.split(/[:@]/)[0] || null;
+      // Capture the bot's LID from whatever source has it this session, falling
+      // back to any value we already cached/persisted.
+      const freshLid =
+        (sock.user?.lid || sock.authState?.creds?.me?.lid || "").split(/[:@]/)[0] || null;
+      const botLid = freshLid || session.botLid || null;
+
       session.status = "connected";
       session.phoneNumber = phoneNumber;
+      session.botLid = botLid;
       session.qrDataUrl = null;
 
       await db.collection("whatsapp_qr_sessions").updateOne(
@@ -308,6 +895,7 @@ async function startSession(chatbotId, userId) {
           $set: {
             status: "connected",
             phoneNumber,
+            botLid, // persist so future reconnects can match mentions
             connectedAt: new Date(),
             updatedAt: new Date(),
           },
@@ -315,7 +903,7 @@ async function startSession(chatbotId, userId) {
         },
         { upsert: true }
       );
-      console.log(`✅ [${chatbotId}] Connected as ${phoneNumber}`);
+      console.log(`✅ [${chatbotId}] Connected as ${phoneNumber} (lid=${botLid})`);
     }
 
     if (connection === "close") {
@@ -360,10 +948,16 @@ async function startSession(chatbotId, userId) {
   sock.ev.on("creds.update", saveCreds);
 
   // ── messages.upsert ───────────────────────────────────────────────────────
-  sock.ev.on("messages.upsert", async ({ messages: msgs, type }) => {
+  sock.ev.on("messages.upsert", ({ messages: msgs, type }) => {
+    // Return synchronously so Baileys can keep processing frames.
+    // All async AI work runs in a detached promise — errors are caught inside.
     if (type !== "notify") return;
 
     for (const msg of msgs) {
+      // Remember every inbound message so it can be served back to WhatsApp
+      // if a re-send (decryption retry) is requested for it.
+      if (msg.key?.id && msg.message) session.rememberMessage(msg.key, msg.message);
+
       // Skip outbound and broadcast messages
       if (msg.key.fromMe) continue;
       if (isJidBroadcast(msg.key.remoteJid)) continue;
@@ -378,57 +972,71 @@ async function startSession(chatbotId, userId) {
         msg.message?.videoMessage?.caption ||
         "";
 
+      // Debug log for every inbound message so group issues are visible in pm2 logs
+      if (isGroup) {
+        console.log(`[GROUP][${chatbotId}] inbound — jid=${msg.key.remoteJid} participant=${msg.key.participant} rawText="${rawText.slice(0, 80)}" msgKeys=${Object.keys(msg.message || {}).join(",")}`);
+      }
+
       if (!rawText.trim()) continue;
 
       // In group chats, only respond when the bot's number is @mentioned.
       // This prevents the bot from replying to every message in every group.
       if (isGroup) {
-        const botNumber = sock.user?.id?.split(":")[0]; // e.g. "15551234567"
-        const mentionedJids = msg.message?.extendedTextMessage?.contextInfo?.mentionedJid || [];
-        const isMentioned =
-          botNumber &&
-          mentionedJids.some((jid) => jid.startsWith(botNumber));
+        // WhatsApp addresses group participants/mentions by either the phone
+        // JID ("...@s.whatsapp.net") or the newer privacy LID ("...@lid").
+        // The mention JID for this bot can be EITHER, so match against both.
+        // session.botLid is the persisted/cached LID — more reliable than
+        // sock.user.lid, which is often empty after a reconnect/restore.
+        const botNumber = (sock.user?.id || "").split(/[:@]/)[0];
+        const botLid =
+          session.botLid ||
+          (sock.user?.lid || sock.authState?.creds?.me?.lid || "").split(/[:@]/)[0] ||
+          "";
 
-        if (!isMentioned) continue;
+        const mentionedJids =
+          msg.message?.extendedTextMessage?.contextInfo?.mentionedJid ||
+          msg.message?.imageMessage?.contextInfo?.mentionedJid ||
+          msg.message?.videoMessage?.contextInfo?.mentionedJid ||
+          [];
 
-        // Strip the @mention tag from the message before sending to AI
-        // so the model doesn't see a raw JID in the query
+        const isMentioned = mentionedJids.some((jid) => {
+          const id = jid.split(/[:@]/)[0]; // bare number/lid before @ or :
+          return (botNumber && id === botNumber) || (botLid && id === botLid);
+        });
+
+        // Fallback: some clients send the mention without a mentionedJid entry
+        // (e.g. as a plain "conversation" with the number wrapped in unicode
+        // isolate markers U+2068/U+2069). Detect it by checking whether the
+        // text contains "@" and the bot's phone-number digits.
+        const textDigits = rawText.replace(/\D/g, "");
+        const mentionedByText =
+          rawText.includes("@") &&
+          botNumber.length > 0 &&
+          textDigits.includes(botNumber);
+
+        const mentioned = isMentioned || mentionedByText;
+
+        console.log(`[GROUP][${chatbotId}] mention check — botNumber=${botNumber} botLid=${botLid} mentionedJids=${JSON.stringify(mentionedJids)} jidMatch=${isMentioned} textMatch=${mentionedByText}`);
+
+        if (!mentioned) continue;
       }
 
-      // Clean the message text (remove @mention tags like @15551234567)
-      const userMessage = rawText.replace(/@\d+/g, "").trim();
+      // Clean the message text before sending to the AI: drop the @mention of
+      // the bot in all its forms — "@<digits>", "@<lid>", and the formatted
+      // "@⁨+852 5392 2699⁩" with unicode isolate markers (U+2068/U+2069).
+      const userMessage = rawText
+        .replace(/[\u2066-\u2069]/g, "")       // strip directional isolate markers
+        .replace(/@\s*\+?[\d\s]+/g, " ")        // strip "@ +852 5392 2699" / "@123"
+        .replace(/\s{2,}/g, " ")                 // collapse double spaces
+        .trim();
       if (!userMessage) continue;
 
-      try {
-        // Look up userId for this chatbot
-        const chatbotDoc = await db
-          .collection("user-chatbots")
-          .findOne({ chatbotId });
-
-        if (!chatbotDoc) {
-          console.warn(`[MSG] No chatbot found for chatbotId=${chatbotId}`);
-          continue;
-        }
-
-        const reply = await getAIReply(userMessage, chatbotId, chatbotDoc.userId);
-
-        // In groups, quote the original message so the reply is threaded correctly
-        if (isGroup) {
-          await sock.sendMessage(msg.key.remoteJid, {
-            text: reply,
-            quoted: msg,
-          });
-        } else {
-          await sock.sendMessage(msg.key.remoteJid, { text: reply });
-        }
-
-        // Update last activity
-        await db
-          .collection("whatsapp_qr_sessions")
-          .updateOne({ chatbotId }, { $set: { lastActivity: new Date() } });
-      } catch (err) {
-        console.error(`[MSG] Error handling message for ${chatbotId}:`, err.message);
-      }
+      // ── Fire-and-forget: never await inside the Baileys event handler.
+      // Awaiting here blocks the Node event loop and prevents Baileys from
+      // sending keepalive frames, causing the socket to time out at 60s.
+      handleIncomingMessage({ msg, isGroup, userMessage, chatbotId, sock }).catch((err) => {
+        console.error(`[MSG] Unhandled error for ${chatbotId}:`, err.message);
+      });
     }
   });
 
@@ -565,21 +1173,33 @@ app.get("/wa-qr/status/:chatbotId", async (req, res) => {
   const { chatbotId } = req.params;
 
   try {
-    // In-memory is authoritative; fall back to DB for just-restarted server
     const session = sessions.get(chatbotId);
-    if (session) {
-      return res.json({
-        status: session.status,
-        qrDataUrl: session.qrDataUrl || null,
-        phoneNumber: session.phoneNumber || null,
-      });
-    }
-
-    // Check DB in case server just restarted
+    // Persisted state — needed both for just-restarted servers and to resolve
+    // the transient "initializing" window while a restored session reconnects.
     const doc = await db
       .collection("whatsapp_qr_sessions")
       .findOne({ chatbotId });
 
+    if (session) {
+      // During restore the session is briefly "initializing" with no phone
+      // number yet. If the persisted state says it was connected, surface
+      // "connected" so the UI shows the connected/edit state immediately
+      // instead of falling back to "Connect".
+      if (session.status === "initializing" && doc?.status === "connected") {
+        return res.json({
+          status: "connected",
+          qrDataUrl: null,
+          phoneNumber: doc.phoneNumber || null,
+        });
+      }
+      return res.json({
+        status: session.status,
+        qrDataUrl: session.qrDataUrl || null,
+        phoneNumber: session.phoneNumber || doc?.phoneNumber || null,
+      });
+    }
+
+    // No in-memory session — fall back to persisted state
     if (!doc) return res.json({ status: "disconnected" });
 
     return res.json({
