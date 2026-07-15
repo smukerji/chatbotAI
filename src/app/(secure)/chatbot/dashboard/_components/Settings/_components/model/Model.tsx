@@ -112,12 +112,25 @@ function Model({ chatbotId }: any) {
                 className="antd-select"
                 defaultValue={botSettings?.model}
                 options={[
-                  { value: "gpt-3.5-turbo", label: "gpt-3.5-turbo" },
-                  { value: "gpt-4", label: "gpt-4" },
-                  { value: "gpt-4o", label: "gpt-4o" },
-                  { value: "gpt-4o-mini", label: "gpt-4o-mini" },
-                  { value: "o1", label: "o1" },
-                  { value: "o3-mini", label: "o3-mini" },
+                  // ── Latest GPT-5 series ──────────────────────────────────
+                  { value: "gpt-5.5",     label: "GPT-5.5 (Latest)" },
+                  { value: "gpt-5",       label: "GPT-5" },
+                  { value: "gpt-5-mini",  label: "GPT-5 Mini" },
+                  // ── GPT-4.1 series (tool calling, 1M context) ────────────
+                  { value: "gpt-4.1",      label: "GPT-4.1" },
+                  { value: "gpt-4.1-mini", label: "GPT-4.1 Mini" },
+                  { value: "gpt-4.1-nano", label: "GPT-4.1 Nano" },
+                  // ── GPT-4o series ────────────────────────────────────────
+                  { value: "gpt-4o",      label: "GPT-4o" },
+                  { value: "gpt-4o-mini", label: "GPT-4o Mini" },
+                  // ── Reasoning / o-series ─────────────────────────────────
+                  { value: "o3",          label: "o3" },
+                  { value: "o4-mini",     label: "o4-mini" },
+                  { value: "o3-mini",     label: "o3-mini" },
+                  { value: "o1",          label: "o1" },
+                  // ── Legacy (backwards compatibility) ─────────────────────
+                  { value: "gpt-4",       label: "GPT-4 (Legacy)" },
+                  { value: "gpt-3.5-turbo", label: "GPT-3.5 Turbo (Legacy)" },
                 ]}
                 onChange={(e) => {
                   botSettingContext?.handleChange("model")(e);
@@ -144,10 +157,12 @@ function Model({ chatbotId }: any) {
               />
 
               <p className="model-sub-description">
-                gpt-4 is much better at following the instructions and not
-                hallucinating, but it&lsquo;s slower and more expensive than
-                gpt-3.5-turbo (1 message using gpt-3.5-turbo costs 1 message
-                credit. 1 message using gpt-4 costs 20 message credits)
+                GPT-5.5 and GPT-5 are the most capable models with the best
+                instruction following and tool calling. GPT-4.1 and GPT-4o
+                are excellent all-rounders with a 1M token context window.
+                o-series models (o3, o4-mini) excel at complex reasoning tasks.
+                Legacy models (GPT-4, GPT-3.5 Turbo) are kept for backwards
+                compatibility but are not recommended for new assistants.
               </p>
             </div>
             <div className="temperature-selection">
