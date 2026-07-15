@@ -2,6 +2,25 @@
 
 const nextConfig = {
    reactStrictMode: false,
+
+  // Keep heavy server-only packages out of the webpack bundle.
+  // googleapis is 97MB — bundling it causes OOM crashes in dev.
+  serverExternalPackages: ["googleapis", "google-auth-library"],
+
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      // Also ensure these are treated as externals by webpack directly
+      // (for Next 13 pages router compatibility)
+      const originalExternals = config.externals || [];
+      config.externals = [
+        ...(Array.isArray(originalExternals) ? originalExternals : [originalExternals]),
+        "googleapis",
+        "google-auth-library",
+      ];
+    }
+    return config;
+  },
+
   images: {
     remotePatterns: [
       { hostname: "via.placeholder.com" },

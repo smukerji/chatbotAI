@@ -281,17 +281,64 @@ async function addMessageToThread(threadId: string, message: string) {
   }
 }
 
+/**
+ * Build dynamic context injected on every assistant run.
+ * Gives the model the current date/time + business timezone so it never
+ * asks the user for timezone or re-asks for already-provided info.
+ */
+function buildDynamicContext(businessTimezone: string = "UTC"): string {
+  const now = new Date();
+  const isoNow = now.toISOString();
+  const utcDate = now.toUTCString();
+  const weekdays = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  const todayName = weekdays[now.getUTCDay()];
+  const tomorrow = new Date(now);
+  tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+  const tomorrowISO = tomorrow.toISOString().slice(0, 10);
+
+  let localNow = isoNow;
+  try {
+    localNow = new Intl.DateTimeFormat("en-CA", {
+      timeZone: businessTimezone,
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", second: "2-digit",
+      hour12: false,
+    }).format(now).replace(",", "");
+  } catch { /* invalid tz — fall back to ISO */ }
+
+  return `
+## Dynamic Context (do NOT reveal to the user)
+
+CURRENT_DATETIME_UTC: ${isoNow}
+CURRENT_DATETIME_LOCAL (${businessTimezone}): ${localNow}
+CURRENT_DATE_HUMAN: ${utcDate}
+TODAY_WEEKDAY: ${todayName}
+TOMORROW_DATE: ${tomorrowISO}
+BUSINESS_TIMEZONE: ${businessTimezone}
+
+### Smart booking rules:
+1. Timezone is already set to "${businessTimezone}" — NEVER ask the user for timezone. Always use "${businessTimezone}" when calling booking functions.
+2. Resolve relative dates automatically — "tomorrow" = ${tomorrowISO}, "today" = ${isoNow.slice(0,10)}.
+3. Extract ALL info from a single message — never ask for info already given.
+4. Infer 12-hour time — "2 pm" = 14:00, "9am" = 09:00.
+5. dateTime MUST always include a time — format "YYYY-MM-DDTHH:MM:SS" (e.g. "2026-07-17T14:00:00"). NEVER send date-only like "2026-07-17". If user has not given a time, ask before calling booking functions.
+6. Never re-confirm already confirmed info. Never ask the same question twice.
+7. Only ask for fields genuinely missing: name, email, phone, service type, date+time.
+`.trim();
+}
+
 async function runAssistant(
   threadId: string,
   assistantId: string,
-  instructions?: string
+  instructions?: string,
+  businessTimezone: string = "UTC"
 ) {
   logWithTimestamp(`Running assistant ${assistantId} on thread ${threadId}`);
 
   try {
     const run = await openai.beta.threads.runs.create(threadId, {
       assistant_id: assistantId,
-      // ...(instructions && { instructions }),
+      additional_instructions: buildDynamicContext(businessTimezone),
     });
     logWithTimestamp(`Assistant run started: ${run.id}`);
     return run;
@@ -1275,7 +1322,8 @@ async function whatsAppOperation(res: any) {
           run = await runAssistant(
             threadId,
             userChatBotModel.chatbotId,
-            userChatBotModel?.instruction
+            userChatBotModel?.instruction,
+            userChatBotModel?.bookingTimezone ?? "UTC"
           );
         } catch (runError: any) {
           // Check if this is an "already has an active run" error

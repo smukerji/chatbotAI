@@ -42,3 +42,9 @@ next-env.d.ts
 .prettierrc
 
 whatsapp-server.env.local
+
+# CPU profiles
+*.cpuprofile
+
+# VS Code workspace file
+*.code-workspace

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"node initializeDb.js\" \"next dev\" \"node cron.js\" \"node --env-file=whatsapp-server.env.local whatsapp-server.js\"",
+    "dev": "concurrently \"node initializeDb.js\" \"NODE_OPTIONS='--max-old-space-size=4096' next dev\" \"node cron.js\" \"node --env-file=whatsapp-server.env.local whatsapp-server.js\"",
     "dev:wa": "node --env-file=whatsapp-server.env.local whatsapp-server.js",
     "build": "next build",
     "start": "next start",

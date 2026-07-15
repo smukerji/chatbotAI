@@ -4,15 +4,42 @@ import Icon from "@/app/_components/Icon/Icon";
 import DocumentIcon from "@/assets/svg/DocumentIcon";
 import DeleteIcon from "@/assets/svg/DeleteIcon";
 import { useCookies } from "react-cookie";
-import { message } from "antd";
+import { message, Select } from "antd";
 import DeleteModal from "../../../Modal/DeleteModal";
 import { CreateBotContext } from "../../../../../../../_helpers/client/Context/CreateBotContext";
 import { UserDetailsContext } from "../../../../../../../_helpers/client/Context/UserDetailsContext";
 import { formatNumber } from "../../../../../../../_helpers/client/formatNumber";
+import { ChatbotSettingContext } from "../../../../../../../_helpers/client/Context/ChatbotSettingContext";
 
-function General({ chatbotId, chatbotName }: any) {
+// Common IANA timezones grouped for easy selection
+const TIMEZONE_OPTIONS = [
+  { label: "UTC", value: "UTC" },
+  { label: "Asia/Kolkata (IST +5:30)", value: "Asia/Kolkata" },
+  { label: "Asia/Seoul (KST +9:00)", value: "Asia/Seoul" },
+  { label: "Asia/Shanghai (CST +8:00)", value: "Asia/Shanghai" },
+  { label: "Asia/Tokyo (JST +9:00)", value: "Asia/Tokyo" },
+  { label: "Asia/Dubai (GST +4:00)", value: "Asia/Dubai" },
+  { label: "Asia/Singapore (SGT +8:00)", value: "Asia/Singapore" },
+  { label: "Europe/London (GMT/BST)", value: "Europe/London" },
+  { label: "Europe/Paris (CET +1:00)", value: "Europe/Paris" },
+  { label: "Europe/Berlin (CET +1:00)", value: "Europe/Berlin" },
+  { label: "America/New_York (EST -5:00)", value: "America/New_York" },
+  { label: "America/Chicago (CST -6:00)", value: "America/Chicago" },
+  { label: "America/Denver (MST -7:00)", value: "America/Denver" },
+  { label: "America/Los_Angeles (PST -8:00)", value: "America/Los_Angeles" },
+  { label: "America/Toronto (EST -5:00)", value: "America/Toronto" },
+  { label: "America/Sao_Paulo (BRT -3:00)", value: "America/Sao_Paulo" },
+  { label: "Australia/Sydney (AEDT +11:00)", value: "Australia/Sydney" },
+  { label: "Australia/Melbourne (AEDT +11:00)", value: "Australia/Melbourne" },
+  { label: "Pacific/Auckland (NZDT +13:00)", value: "Pacific/Auckland" },
+];
+
+function General({ chatbotId, chatbotName, assistantType }: any) {
   const botContext: any = useContext(CreateBotContext);
   const botDetails = botContext?.createBotInfo;
+
+  const chatbotSettingContext: any = useContext(ChatbotSettingContext);
+  const chatbotSettings = chatbotSettingContext?.chatbotSettings;
 
   /// get userDetails context
   const userDetailContext: any = useContext(UserDetailsContext);
@@ -20,8 +47,13 @@ function General({ chatbotId, chatbotName }: any) {
 
   const [cookies, setCookies]: any = useCookies(["userId"]);
 
-  /// this is use to check if chatbot name has been changed or not
   const [currentChatbotName, setCurrentChatbotName] = useState(chatbotName);
+  const [bookingTimezone, setBookingTimezone] = useState<string>(
+    chatbotSettings?.bookingTimezone ?? "UTC"
+  );
+  const [savingTimezone, setSavingTimezone] = useState(false);
+
+  const isBookingAgent = assistantType === "booking-agent-general";
 
   const changeName = async () => {
     try {
@@ -37,18 +69,41 @@ function General({ chatbotId, chatbotName }: any) {
           next: { revalidate: 0 },
         }
       );
-      /// displaying status
       const data = await res.json();
-
       message.success(data?.message);
       botContext.handleChange("chatbotName")(currentChatbotName);
-      // window.location.href = `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot`;
     } catch (error) {
       console.log("Error while renaming chatbot", error);
     }
   };
 
-  /// to copy chatbot Id
+  const saveBookingTimezone = async () => {
+    setSavingTimezone(true);
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/api/setting/api`,
+        {
+          method: "PUT",
+          body: JSON.stringify({
+            chatbotId,
+            userId: cookies?.userId,
+            bookingTimezone,
+          }),
+        }
+      );
+      const data = await res.json();
+      message.success("Booking timezone saved!");
+      chatbotSettingContext?.loadData({
+        ...chatbotSettings,
+        bookingTimezone,
+      });
+    } catch (error) {
+      message.error("Failed to save timezone");
+    } finally {
+      setSavingTimezone(false);
+    }
+  };
+
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(chatbotId);
@@ -58,8 +113,8 @@ function General({ chatbotId, chatbotName }: any) {
     }
   };
 
-  /// managing delete chatbot
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
+
   return (
     <div className="general-setting-parent">
       <div className="ids-container">
@@ -67,39 +122,24 @@ function General({ chatbotId, chatbotName }: any) {
         <div className="ids-details">
           <div className="ids-detail-content">{chatbotId}</div>
           <div className="icon" onClick={handleCopy}>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 20 20"
-              fill="none"
-            >
-              <path
-                d="M9.24984 18.9577H5.74984C2.4915 18.9577 1.0415 17.5077 1.0415 14.2494V10.7493C1.0415 7.49102 2.4915 6.04102 5.74984 6.04102H9.24984C12.5082 6.04102 13.9582 7.49102 13.9582 10.7493V14.2494C13.9582 17.5077 12.5082 18.9577 9.24984 18.9577ZM5.74984 7.29102C3.1665 7.29102 2.2915 8.16602 2.2915 10.7493V14.2494C2.2915 16.8327 3.1665 17.7077 5.74984 17.7077H9.24984C11.8332 17.7077 12.7082 16.8327 12.7082 14.2494V10.7493C12.7082 8.16602 11.8332 7.29102 9.24984 7.29102H5.74984V7.29102Z"
-                fill="#2E58EA"
-              />
-              <path
-                d="M14.2498 13.9577H13.3332C12.9915 13.9577 12.7082 13.6743 12.7082 13.3327V10.7493C12.7082 8.16602 11.8332 7.29102 9.24984 7.29102H6.6665C6.32484 7.29102 6.0415 7.00768 6.0415 6.66602V5.74935C6.0415 2.49102 7.4915 1.04102 10.7498 1.04102H14.2498C17.5082 1.04102 18.9582 2.49102 18.9582 5.74935V9.24935C18.9582 12.5077 17.5082 13.9577 14.2498 13.9577ZM13.9582 12.7077H14.2498C16.8332 12.7077 17.7082 11.8327 17.7082 9.24935V5.74935C17.7082 3.16602 16.8332 2.29102 14.2498 2.29102H10.7498C8.1665 2.29102 7.2915 3.16602 7.2915 5.74935V6.04102H9.24984C12.5082 6.04102 13.9582 7.49102 13.9582 10.7493V12.7077Z"
-                fill="#2E58EA"
-              />
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M9.24984 18.9577H5.74984C2.4915 18.9577 1.0415 17.5077 1.0415 14.2494V10.7493C1.0415 7.49102 2.4915 6.04102 5.74984 6.04102H9.24984C12.5082 6.04102 13.9582 7.49102 13.9582 10.7493V14.2494C13.9582 17.5077 12.5082 18.9577 9.24984 18.9577ZM5.74984 7.29102C3.1665 7.29102 2.2915 8.16602 2.2915 10.7493V14.2494C2.2915 16.8327 3.1665 17.7077 5.74984 17.7077H9.24984C11.8332 17.7077 12.7082 16.8327 12.7082 14.2494V10.7493C12.7082 8.16602 11.8332 7.29102 9.24984 7.29102H5.74984V7.29102Z" fill="#2E58EA"/>
+              <path d="M14.2498 13.9577H13.3332C12.9915 13.9577 12.7082 13.6743 12.7082 13.3327V10.7493C12.7082 8.16602 11.8332 7.29102 9.24984 7.29102H6.6665C6.32484 7.29102 6.0415 7.00768 6.0415 6.66602V5.74935C6.0415 2.49102 7.4915 1.04102 10.7498 1.04102H14.2498C17.5082 1.04102 18.9582 2.49102 18.9582 5.74935V9.24935C18.9582 12.5077 17.5082 13.9577 14.2498 13.9577ZM13.9582 12.7077H14.2498C16.8332 12.7077 17.7082 11.8327 17.7082 9.24935V5.74935C17.7082 3.16602 16.8332 2.29102 14.2498 2.29102H10.7498C8.1665 2.29102 7.2915 3.16602 7.2915 5.74935V6.04102H9.24984C12.5082 6.04102 13.9582 7.49102 13.9582 10.7493V12.7077Z" fill="#2E58EA"/>
             </svg>
           </div>
         </div>
       </div>
+
       <div className="characters-container">
         <div className="characters-details">Characters Used</div>
         <div>
           {botDetails?.totalCharCount}
           <span className="span">
-            /
-            {formatNumber(
-              userDetails?.plan?.trainingDataLimit
-                ? userDetails?.plan?.trainingDataLimit
-                : 0
-            )}
+            /{formatNumber(userDetails?.plan?.trainingDataLimit ?? 0)}
           </span>
         </div>
       </div>
+
       <div className="parent-name-btn">
         <div className="name-container">
           <div className="name-container-details">Name</div>
@@ -107,10 +147,8 @@ function General({ chatbotId, chatbotName }: any) {
             <input
               className="input-box"
               value={currentChatbotName}
-              onChange={(e) => {
-                setCurrentChatbotName(e.target.value);
-              }}
-            ></input>
+              onChange={(e) => setCurrentChatbotName(e.target.value)}
+            />
           </div>
         </div>
         <button
@@ -122,11 +160,41 @@ function General({ chatbotId, chatbotName }: any) {
         </button>
       </div>
 
+      {/* Booking timezone — only shown for booking agents */}
+      {isBookingAgent && (
+        <div className="parent-name-btn" style={{ marginTop: 16 }}>
+          <div className="name-container">
+            <div className="name-container-details">
+              Booking Timezone
+              <span style={{ fontSize: 11, color: "#888", marginLeft: 6 }}>
+                (used for all bookings — customers are never asked)
+              </span>
+            </div>
+            <div>
+              <Select
+                style={{ width: "100%", minWidth: 280 }}
+                value={bookingTimezone}
+                onChange={(val) => setBookingTimezone(val)}
+                showSearch
+                optionFilterProp="label"
+                options={TIMEZONE_OPTIONS}
+                placeholder="Select timezone"
+              />
+            </div>
+          </div>
+          <button
+            className="save-btn"
+            disabled={bookingTimezone === (chatbotSettings?.bookingTimezone ?? "UTC") || savingTimezone}
+            onClick={saveBookingTimezone}
+          >
+            <div className="save-btn-content">{savingTimezone ? "Saving…" : "Save"}</div>
+          </button>
+        </div>
+      )}
+
       <div
         className="delete-container"
-        onClick={() => {
-          setOpenDeleteModal(true);
-        }}
+        onClick={() => setOpenDeleteModal(true)}
       >
         <div className="delete-icon">
           <Icon Icon={DeleteIcon} />

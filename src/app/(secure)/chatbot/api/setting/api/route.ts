@@ -153,6 +153,7 @@ async function updateChatbotSettings(request: NextRequest) {
       rateLimitMessage,
       rateLimitTime,
       allowIframe,
+      bookingTimezone,
     } = body;
 
     /// extract only the field that need to be updated
@@ -195,6 +196,7 @@ async function updateChatbotSettings(request: NextRequest) {
       ...(rateLimitMessage !== undefined && { rateLimitMessage }),
       ...(rateLimitTime !== undefined && { rateLimitTime }),
       ...(allowIframe !== undefined && { allowIframe }),
+      ...(bookingTimezone !== undefined && { bookingTimezone }),
     };
     const collection = db.collection("chatbot-settings");
 
@@ -268,4 +270,5 @@ updateChatbotSettings.schema = joi.object({
   rateLimitMessage: joi.string().optional(),
   rateLimitTime: joi.number().optional(),
   allowIframe: joi.boolean().optional(),
+  bookingTimezone: joi.string().optional(),
 });
