@@ -350,7 +350,7 @@ async function runAssistant(
 
 async function checkRunStatus(threadId: string, runId: string) {
   try {
-    const run = await openai.beta.threads.runs.retrieve(threadId, runId);
+    const run = await openai.beta.threads.runs.retrieve(runId, { thread_id: threadId });
     logWithTimestamp(`Run status check: ${run.status}`, {
       runId,
       threadId,
@@ -458,7 +458,7 @@ async function handleRequiredAction(
   logWithTimestamp(`Handling required action for run: ${runId}`);
 
   try {
-    const run = await openai.beta.threads.runs.retrieve(threadId, runId);
+    const run = await openai.beta.threads.runs.retrieve(runId, { thread_id: threadId });
 
     if (run.status !== "requires_action") {
       logWithTimestamp(`Run status is ${run.status}, no action required`);
@@ -514,9 +514,9 @@ async function handleRequiredAction(
     // Submit tool outputs
     logWithTimestamp(`Submitting ${toolOutputs.length} tool outputs`);
     const updatedRun = await openai.beta.threads.runs.submitToolOutputs(
-      threadId,
       runId,
       {
+        thread_id: threadId,
         tool_outputs: toolOutputs,
       }
     );

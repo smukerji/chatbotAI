@@ -59,8 +59,11 @@ export async function GET(request: NextRequest) {
 
 	const result = await cursor.toArray();
 
+	// Fallback: if botType is missing, infer it from assistantType.
+	// Chatbots with an assistantType were created via the Assistant flow → bot-v2.
+	// Legacy RAG chatbots have no assistantType → bot-v1.
 	if (!result?.[0]?.botType) {
-		result[0]['botType'] = 'bot-v1';
+		result[0]['botType'] = result[0]?.assistantType ? 'bot-v2' : 'bot-v1';
 	}
 
 	/// close the cursor
