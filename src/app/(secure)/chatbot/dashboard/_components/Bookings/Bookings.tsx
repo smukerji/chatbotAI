@@ -86,7 +86,7 @@ export default function Bookings({ chatbotId }: BookingsProps) {
       params.delete("gcalError");
       window.history.replaceState({}, "", `${window.location.pathname}?${params}`);
     }
-  }, [fetchCalendarStatus, fetchBookings]);
+  }, [fetchCalendarStatus, fetchBookings, messageApi]);
 
   const handleConnectCalendar = () => {
     setConnectingCalendar(true);

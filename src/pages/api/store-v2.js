@@ -112,7 +112,7 @@ export default async function handler(req, res) {
           const systemInstruction = getSystemInstruction(assistantType);
           const tools = getAssistantTools(assistantType);
           assistant = await openai.beta.assistants.create({
-            model: models[2],
+            model: models[3],
             instructions: systemInstruction,
             name: chatbotName,
             tools: tools,

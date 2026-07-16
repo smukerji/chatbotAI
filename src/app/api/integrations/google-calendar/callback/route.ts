@@ -46,11 +46,13 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  // Redirect back to chatbot dashboard with a success signal
+  // Redirect back to chatbot dashboard with a success signal.
+  // editChatbotSource=bookings ensures the Bookings tab is active so the
+  // gcalSuccess message is shown and the calendar status refreshes.
   const chatbotParam = encodeURIComponent(
     JSON.stringify({ id: chatbotId })
   );
   return NextResponse.redirect(
-    `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard?chatbot=${chatbotParam}&editChatbotSource=integrations&gcalSuccess=1`
+    `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard?chatbot=${chatbotParam}&editChatbotSource=bookings&gcalSuccess=1`
   );
 }
