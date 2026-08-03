@@ -319,12 +319,8 @@ export default async function handler(req, res) {
     /// close the cursor
     await cursor.close();
 
-    /// delete the assistant from openai
-    try {
-      await openai.beta.assistants.del(chatbotId);
-    } catch (error) {
-      console.error("Error during assistant deletion:", error);
-    }
+    /// No OpenAI assistant object to delete — Responses API is stateless
+    /// (chatbot config lives only in MongoDB)
 
     vectorId = [].concat(...vectorId);
     /// delete the vectors

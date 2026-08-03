@@ -8,8 +8,7 @@ import SendIcon from "../../../../public/svgs/send-3.svg";
 import "./hero-section-chat-popup.scss";
 import { getDate } from "@/app/_helpers/client/getTime";
 import { message } from "antd";
-import { AssistantStream } from "openai/lib/AssistantStream.mjs";
-import { AssistantStreamEvent } from "openai/resources/beta/assistants.mjs";
+import { ResponseStream } from "@/app/_helpers/client/ResponseStream";
 import { functionCallHandler } from "@/app/_helpers/client/functionCallHandler";
 import VapiAssistantCall from "./VapiCall/VapiAssistantCall";
 import JessicaImg from "../../../../public/sections-images/header-background/jessica.png";
@@ -26,7 +25,9 @@ function HeroSectionChatPopup({ onClose, agent, torriAssistantId }: any) {
   const [loading, setLoading] = useState(false);
   const [messagesTime, setMessagesTime]: any = useState([]);
   const [sessionStartDate, setSessionStartDate]: any = useState();
-  const [threadId, setThreadId] = useState();
+  const [threadId, setThreadId] = useState<string | undefined>();
+  // Responses API: tracks the last response ID for conversation chaining
+  const previousResponseId = useRef<string | null>(null);
   const chatWindowRef: any = useRef(null);
   const inputRef: any = useRef(null);
   const messageLimit = process.env.NEXT_PUBLIC_MESSAGE_LIMIT;
@@ -40,45 +41,37 @@ function HeroSectionChatPopup({ onClose, agent, torriAssistantId }: any) {
     setThreadId(data.threadId);
   };
 
-  /// handle the user message stream
-  const handleReadableStream = (stream: AssistantStream) => {
-    // messages
+  /// handle the user message stream (Responses API)
+  const handleReadableStream = (body: ReadableStream<Uint8Array>) => {
+    const stream = new ResponseStream(body);
+
     stream.on("textCreated", handleTextCreated);
     stream.on("textDelta", handleTextDelta);
-
-    // // image
-    // stream.on("imageFileDone", handleImageFileDone);
-
-    // // code interpreter
-    // stream.on("toolCallCreated", toolCallCreated);
-    // stream.on("toolCallDelta", toolCallDelta);
-
-    // events without helpers yet (e.g. requires_action and run.done)
-    stream.on("event", (event) => {
-      if (event.event === "thread.run.requires_action")
-        handleRequiresAction(event);
-      if (event.event === "thread.run.completed") {
-        /// setting the response time when completed
-        setMessagesTime((prev: any) => {
-          return [...prev];
-        });
-      }
+    stream.on("requiresAction", ({ responseId, toolCalls }) => {
+      // Keep loading spinner visible while tools execute and response comes back
+      handleRequiresAction(responseId, toolCalls);
     });
+    stream.on("completed", () => {
+      setMessagesTime((prev: any) => [...prev]);
+    });
+    stream.on("error", ({ message: errMsg }) => {
+      console.error("ResponseStream error:", errMsg);
+      setLoading(false);
+    });
+
+    stream.start();
   };
 
-  // handleRequiresAction - handle function call
-  const handleRequiresAction = async (
-    event: AssistantStreamEvent.ThreadRunRequiresAction
-  ) => {
-    const runId = event.data.id;
-    const toolCalls: any =
-      event?.data?.required_action?.submit_tool_outputs.tool_calls;
+  // handleRequiresAction - handle function calls
+  const handleRequiresAction = async (responseId: string, toolCalls: any[]) => {
+    previousResponseId.current = responseId;
 
-    // loop over tool calls and call function handler
+    // Execute all tool calls in parallel
     const toolCallOutputs = await Promise.all(
       toolCalls.map(async (toolCall: any) => {
         const result = await functionCallHandler(
-          toolCall,
+          // Normalise shape so functionCallHandler still works
+          { type: "function" as const, id: toolCall.id, function: { name: toolCall.name, arguments: toolCall.arguments } },
           torriAssistantId,
           "",
           messages,
@@ -87,26 +80,24 @@ function HeroSectionChatPopup({ onClose, agent, torriAssistantId }: any) {
         return { output: result, tool_call_id: toolCall.id };
       })
     );
-    // setInputDisabled(true);
-    submitActionResult(runId, toolCallOutputs);
+
+    submitActionResult(responseId, toolCallOutputs);
   };
 
-  const submitActionResult = async (runId: any, toolCallOutputs: any) => {
-    const response: any = await fetch(
+  const submitActionResult = async (responseId: string, toolCallOutputs: any) => {
+    const res: any = await fetch(
       `/api/assistants/threads/${threadId}/actions`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          runId: runId,
-          toolCallOutputs: toolCallOutputs,
+          assistantId: torriAssistantId,
+          previousResponseId: responseId,
+          toolCallOutputs,
         }),
       }
     );
-    const stream = AssistantStream.fromReadableStream(response.body);
-    handleReadableStream(stream);
+    handleReadableStream(res.body);
   };
 
   // textCreated - create new assistant message
@@ -183,7 +174,7 @@ function HeroSectionChatPopup({ onClose, agent, torriAssistantId }: any) {
 
   /// send the user message
   const sendMessage = async (text: string) => {
-    const response: any = await fetch(
+    const res: any = await fetch(
       `/api/assistants/threads/${threadId}/messages`,
       {
         method: "POST",
@@ -193,13 +184,13 @@ function HeroSectionChatPopup({ onClose, agent, torriAssistantId }: any) {
         }),
       }
     );
-    const stream = AssistantStream.fromReadableStream(response.body);
-    handleReadableStream(stream);
+    handleReadableStream(res.body);
   };
 
   /// refresh the chat window
   const refreshChat = () => {
     createThread();
+    previousResponseId.current = null;
     setMessages([]);
     setMessagesTime([]);
 

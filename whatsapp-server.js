@@ -290,7 +290,7 @@ async function cancelActiveRuns(threadId) {
       if (activeStatuses.includes(run.status)) {
         console.warn(`[AI] Cancelling orphaned run ${run.id} (status=${run.status}) on thread ${threadId}`);
         try {
-          await openai.beta.threads.runs.cancel(threadId, run.id);
+          await openai.beta.threads.runs.cancel(run.id, { thread_id: threadId });
         } catch (err) {
           console.warn(`[AI] Could not cancel run ${run.id}: ${err.message}`);
         }
@@ -311,7 +311,7 @@ async function cancelActiveRuns(threadId) {
  * Next.js API endpoints (pinecone, shopify, etc.) and submits outputs back.
  */
 async function handleRequiredAction(threadId, runId, chatbotId, userId, messages) {
-  const run = await openai.beta.threads.runs.retrieve(threadId, runId);
+  const run = await openai.beta.threads.runs.retrieve(runId, { thread_id: threadId });
   if (run.status !== "requires_action") return run;
 
   const toolCalls = run.required_action?.submit_tool_outputs?.tool_calls || [];
@@ -392,7 +392,7 @@ async function handleRequiredAction(threadId, runId, chatbotId, userId, messages
   );
 
   console.log(`[TOOLS] Submitting ${toolOutputs.length} output(s) for run ${runId}`);
-  const submitted = await openai.beta.threads.runs.submitToolOutputs(threadId, runId, { tool_outputs: toolOutputs });
+  const submitted = await openai.beta.threads.runs.submitToolOutputs(runId, { thread_id: threadId, tool_outputs: toolOutputs });
   console.log(`[TOOLS] Submitted — run ${runId} now ${submitted.status}`);
   return submitted;
 }
@@ -407,7 +407,7 @@ async function waitForRunCompletion(threadId, runId, chatbotId, userId, messages
   let pollCount = 0;
 
   while (Date.now() < deadline) {
-    const run = await openai.beta.threads.runs.retrieve(threadId, runId);
+    const run = await openai.beta.threads.runs.retrieve(runId, { thread_id: threadId });
     pollCount++;
     console.log(`[AI][${chatbotId}] run ${runId} poll #${pollCount} status=${run.status}`);
 

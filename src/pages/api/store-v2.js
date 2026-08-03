@@ -35,7 +35,6 @@ import {
   getAssistantTools,
   getSystemInstruction,
 } from "../../app/_helpers/assistant-creation-contants";
-import OpenAI from "openai";
 
 import {
   deleteFileVectorsById,
@@ -98,32 +97,18 @@ export default async function handler(req, res) {
         }
 
         /// if assistant is being created for the first time
-        let assistant;
+        let chatbotUUID;
         const assistantType = fields?.assistantType[0];
         if (!updateChatbot) {
-          /// create the openai object
-          const openai = new OpenAI({
-            apiKey: process.env.NEXT_PUBLIC_OPENAI_KEY,
-            project: process.env.NEXT_PUBLIC_OPENAI_PROJ_KEY,
-            organization: process.env.NEXT_PUBLIC_OPENAI_ORG_KEY,
-          });
-
-          /// create the assistant based on the type of assistant with the necessary instructions and function calls
-          const systemInstruction = getSystemInstruction(assistantType);
-          const tools = getAssistantTools(assistantType);
-          assistant = await openai.beta.assistants.create({
-            model: models[3],
-            instructions: systemInstruction,
-            name: chatbotName,
-            tools: tools,
-            temperature: 1,
-          });
+          /// Generate a UUID as the chatbot ID (no OpenAI assistant object created —
+          /// the Responses API is stateless: instructions & tools are passed per-request)
+          chatbotUUID = uuid();
         }
 
         const chatbotId =
           fields?.chatbotId[0] !== "undefined"
             ? fields?.chatbotId[0]
-            : assistant.id;
+            : chatbotUUID;
 
         const qaList = JSON.parse(fields?.qaList);
         const text = fields?.text[0];
@@ -137,7 +122,7 @@ export default async function handler(req, res) {
         const deleteQAList = JSON.parse(fields?.deleteQAList[0]);
 
         /// assistant type and secrets
-        const botType = fields?.botType[0];
+        const botType = fields?.botType[0] || (assistantType ? "bot-v2" : "bot-v1");
         let integrations = {};
         if (!updateChatbot) {
           integrations = JSON.parse(fields?.integrations[0]);

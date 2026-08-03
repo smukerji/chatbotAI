@@ -1,12 +1,17 @@
-import { openai } from "@/app/openai";
+import { randomUUID } from "crypto";
 
 export const runtime = "nodejs";
 
-// Create a new thread
+/**
+ * Responses API migration: threads are no longer persisted in OpenAI.
+ * We generate a client-side session ID here so the calling code doesn't
+ * need to change its contract (still expects { threadId }).
+ * The actual conversation state is maintained server-side by OpenAI via
+ * previous_response_id chaining in the messages route.
+ */
 export async function POST() {
-  const thread = await openai.beta.threads.create();
-  // Return the response with JSON content
-  return new Response(JSON.stringify({ threadId: thread.id }), {
+  const sessionId = randomUUID();
+  return new Response(JSON.stringify({ threadId: sessionId }), {
     headers: { "Content-Type": "application/json" },
   });
 }

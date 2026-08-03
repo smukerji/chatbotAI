@@ -6,7 +6,6 @@ import { getDate } from "../../../../../_helpers/client/getTime";
 import joi from "joi";
 import { authOptions } from "../../../../../api/auth/[...nextauth]/route";
 import { getServerSession } from "next-auth";
-import { openai } from "@/app/openai";
 
 module.exports = apiHandler({
   POST: retriveChatbotSettings,
@@ -107,23 +106,11 @@ async function updateChatbotSettings(request: NextRequest) {
   if (chatbotRename !== "" && chatbotRename !== undefined) {
     const collection = db.collection("user-chatbots");
 
-    /// update the name
+    /// update the name in MongoDB (Responses API is stateless — no OpenAI assistant object to sync)
     await collection.updateOne(
-      {
-        userId: userId,
-        chatbotId: chatbotId,
-      },
+      { userId: userId, chatbotId: chatbotId },
       { $set: { chatbotName: chatbotRename } }
     );
-
-    /// update chatbot name using assistant api
-    try {
-      const assistant = await openai.beta.assistants.update(chatbotId, {
-        name: chatbotRename,
-      });
-    } catch (error) {
-      console.log("Error while updating assistant name", error);
-    }
   } else {
     /// update the chatbot settings table
     const {
@@ -200,24 +187,8 @@ async function updateChatbotSettings(request: NextRequest) {
     };
     const collection = db.collection("chatbot-settings");
 
-    /// update the assistant configuration
-    try {
-      const assistant = await openai.beta.assistants.update(chatbotId, {
-        instructions: updateFields.instruction,
-        model: updateFields.model,
-        /// do not set temparature if model is o1 or o3-mini
-        ...(updateFields.model !== "o1" && updateFields.model !== "o3-mini"
-          ? {
-              temperature: updateFields.temperature,
-              reasoning_effort: null,
-            }
-          : { temperature: null, reasoning_effort: "medium" }),
-        // reasoning_effort: "medium",
-        // temperature: updateFields.temperature,
-      });
-    } catch (error) {
-      console.log("Error while updating assistant configuration", error);
-    }
+    /// Responses API is stateless — model/instructions/temperature are passed per-request
+    /// from MongoDB. No OpenAI assistant object to sync. Just update MongoDB.
     /// update the name
     await collection.updateOne(
       {
