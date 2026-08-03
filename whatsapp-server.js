@@ -169,7 +169,7 @@ async function useMongoAuthState(chatbotId) {
 // chatbotId → { sock, chatbotId, userId, status, phoneNumber }
 const sessions = new Map();
 
-// ─── OpenAI client (Assistants API) ──────────────────────────────────────────
+// ─── OpenAI client ───────────────────────────────────────────────────────────
 
 const OpenAI = require("openai");
 const openai = new OpenAI.default({
@@ -255,7 +255,7 @@ async function formatMessageForWhatsApp(text) {
   }
 }
 
-// ─── Assistants-API helpers (mirrors route.ts) ────────────────────────────────
+// ─── Assistants-API helpers (used only by legacy bot paths) ──────────────────
 
 async function createThread() {
   const thread = await openai.beta.threads.create();
@@ -270,8 +270,288 @@ async function addMessageToThread(threadId, message) {
   });
 }
 
+// NOTE: runAssistant via beta.threads.runs is only valid for chatbots that have
+// a real OpenAI asst_xxx ID. bot-v2 chatbots use the Responses API instead
+// (see getResponsesAPIReply below).
 async function runAssistant(threadId, assistantId) {
   return openai.beta.threads.runs.create(threadId, { assistant_id: assistantId });
+}
+
+// ─── Responses-API helper for bot-v2 (mirrors messages/route.ts) ─────────────
+
+/**
+ * Build the dynamic context injected into every turn's instructions.
+ * Mirrors buildDynamicContext in messages/route.ts.
+ */
+function buildDynamicContext(businessTimezone) {
+  const now = new Date();
+  const isoNow = now.toISOString();
+  const utcDate = now.toUTCString();
+  const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const todayName = weekdays[now.getUTCDay()];
+  const tomorrow = new Date(now);
+  tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+  const tomorrowISO = tomorrow.toISOString().slice(0, 10);
+
+  let localNow = isoNow;
+  try {
+    localNow = new Intl.DateTimeFormat("en-CA", {
+      timeZone: businessTimezone,
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", second: "2-digit",
+      hour12: false,
+    }).format(now).replace(",", "");
+  } catch (_) { /* invalid tz — fall back to ISO */ }
+
+  return `
+## SYSTEM OVERRIDE — Dynamic Context (HIGHEST PRIORITY — these rules override all previous instructions)
+
+CURRENT_DATETIME_UTC: ${isoNow}
+CURRENT_DATETIME_LOCAL (${businessTimezone}): ${localNow}
+CURRENT_DATE_HUMAN: ${utcDate}
+TODAY_WEEKDAY: ${todayName}
+TOMORROW_DATE: ${tomorrowISO}
+BUSINESS_TIMEZONE: ${businessTimezone}
+
+### CRITICAL BOOKING RULES — MUST follow exactly, no exceptions:
+
+1. **NEVER ask for information already given.** Scan the ENTIRE conversation before asking anything.
+2. **Extract ALL fields from a single message.** If the user provides all required fields in one message, proceed directly to calling the booking function.
+3. **Resolve relative dates silently.** "tomorrow" = ${tomorrowISO}. "today" = ${isoNow.slice(0, 10)}.
+4. **Resolve 12-hour times silently.** "6 pm" = 18:00, "2 pm" = 14:00.
+5. **BUSINESS_TIMEZONE = "${businessTimezone}".** Use this for all bookings.
+6. **dateTime format = "YYYY-MM-DDTHH:MM:SS".**
+7. **After user confirms any field — move on.**
+8. **The "ask one thing at a time" rule applies ONLY to genuinely missing fields.**
+`.trim();
+}
+
+/**
+ * Call the Responses API for bot-v2 chatbots (stateless, no asst_xxx needed).
+ * Uses previous_response_id chaining stored in whatsapp-qr-chat-history for
+ * conversation continuity, mirroring what messages/route.ts does for web chat.
+ *
+ * @param {string} userMessage
+ * @param {object} chatbotDoc     - document from user-chatbots
+ * @param {object} chatbotSettings - document from chatbot-settings
+ * @param {string|null} previousResponseId - last response ID for this conversation
+ * @returns {{ text: string, responseId: string }}
+ */
+async function getResponsesAPIReply(userMessage, chatbotDoc, chatbotSettings, previousResponseId) {
+  const assistantType  = chatbotDoc.assistantType ?? "";
+  const model          = chatbotSettings?.model ?? "gpt-4o";
+  const temperature    = chatbotSettings?.temperature !== undefined ? chatbotSettings.temperature : 1;
+  const businessTimezone = chatbotSettings?.bookingTimezone ?? "UTC";
+
+  // Use instruction from settings if set; otherwise fall back to the type-based system prompt.
+  // We keep this simple for whatsapp-server.js — the full prompt library lives in the Next.js app.
+  const baseInstruction = chatbotSettings?.instruction ?? "";
+  const dynamicContext  = buildDynamicContext(businessTimezone);
+  const fullInstructions = baseInstruction
+    ? `${baseInstruction}\n\n${dynamicContext}`
+    : dynamicContext;
+
+  // Derive tool definitions from assistantType.
+  // This mirrors getAssistantTools() in assistant-creation-contants.ts.
+  const tools = getToolsForAssistantType(assistantType, chatbotDoc.chatbotId);
+
+  const responseParams = {
+    model,
+    instructions: fullInstructions,
+    input: userMessage,
+    ...(tools.length > 0 ? { tools } : {}),
+    ...(previousResponseId ? { previous_response_id: previousResponseId } : {}),
+    ...(!model.startsWith("o1") && !model.startsWith("o3")
+      ? { temperature }
+      : { reasoning: { effort: "medium" } }),
+  };
+
+  console.log(`[ResponsesAPI] model=${model} assistantType=${assistantType} prevRespId=${previousResponseId ?? "(none)"}`);
+
+  const response = await openai.responses.create(responseParams);
+
+  // Handle tool calls if any (single-pass for WhatsApp — no streaming)
+  let finalResponse = response;
+  let toolIterations = 0;
+  const MAX_TOOL_ITERATIONS = 5;
+
+  while (toolIterations < MAX_TOOL_ITERATIONS) {
+    const functionCalls = (finalResponse.output || []).filter((o) => o.type === "function_call");
+    if (functionCalls.length === 0) break;
+
+    toolIterations++;
+    console.log(`[ResponsesAPI][TOOLS] Processing ${functionCalls.length} tool call(s) — iteration ${toolIterations}`);
+
+    const toolOutputs = await Promise.all(
+      functionCalls.map(async (toolCall) => {
+        const fnName = toolCall.name;
+        let args = {};
+        try { args = JSON.parse(toolCall.arguments); } catch (_) {}
+
+        console.log(`[ResponsesAPI][TOOLS] → ${fnName} args=${JSON.stringify(args).slice(0, 200)}`);
+        let output;
+        try {
+          if (fnName === "find_product") {
+            const r = await fetchWithTimeout(`${PINECONE_BASE}api/integrations/shopify/products`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ product_name: args.query, chatbotId: chatbotDoc.chatbotId }),
+            });
+            output = r.ok
+              ? JSON.stringify({ success: true, data: [{ source: "shopify store", content: await r.json() }] })
+              : JSON.stringify({ success: false, message: "Shopify lookup failed" });
+          } else if (fnName === "get_customer_orders") {
+            const r = await fetchWithTimeout(`${PINECONE_BASE}api/integrations/shopify/orders`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email: args.email, chatbotId: chatbotDoc.chatbotId }),
+            });
+            output = r.ok
+              ? JSON.stringify({ success: true, data: [{ source: "shopify store", content: await r.json() }] })
+              : JSON.stringify({ success: false, message: "Order lookup failed" });
+          } else if (fnName === "get_products") {
+            const r = await fetchWithTimeout(`${PINECONE_BASE}api/integrations/shopify/products?chatbotId=${chatbotDoc.chatbotId}`, {
+              method: "GET",
+            });
+            output = r.ok
+              ? JSON.stringify({ success: true, data: [{ source: "shopify store", content: await r.json() }] })
+              : JSON.stringify({ success: false, message: "Products lookup failed" });
+          } else if (fnName === "get_reference") {
+            const r = await fetchWithTimeout(`${PINECONE_BASE}api/pinecone`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ userQuery: args.userQuery, chatbotId: chatbotDoc.chatbotId, userId: chatbotDoc.userId }),
+            });
+            output = JSON.stringify({ success: true, data: r.ok ? await r.json() : [] });
+          } else if (fnName === "get_search_results") {
+            const r = await fetchWithTimeout(`${PINECONE_BASE}api/integrations/perplexity/sonar`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ userQuery: args.userQuery }),
+            });
+            const d = r.ok ? await r.json() : {};
+            output = JSON.stringify({ success: true, data: d.message, sources: d.sources });
+          } else if (fnName === "ask_relevant_followup_questions") {
+            output = JSON.stringify({ success: true });
+          } else if (fnName === "create_booking") {
+            const r = await fetchWithTimeout(`${PINECONE_BASE}api/integrations/booking/create`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ ...args, chatbotId: chatbotDoc.chatbotId }),
+            });
+            output = r.ok ? JSON.stringify(await r.json()) : JSON.stringify({ success: false, message: "Booking failed" });
+          } else {
+            output = JSON.stringify({ success: false, message: "This functionality will be available soon" });
+          }
+        } catch (err) {
+          console.error(`[ResponsesAPI][TOOLS] ✗ ${fnName} failed:`, err.message);
+          output = JSON.stringify({ success: false, message: err.message || "tool error" });
+        }
+
+        return { call_id: toolCall.call_id, output };
+      })
+    );
+
+    // Submit tool outputs back to the Responses API
+    finalResponse = await openai.responses.create({
+      model,
+      instructions: fullInstructions,
+      ...(tools.length > 0 ? { tools } : {}),
+      previous_response_id: finalResponse.id,
+      input: toolOutputs.map((to) => ({
+        type: "function_call_output",
+        call_id: to.call_id,
+        output: to.output,
+      })),
+      ...(!model.startsWith("o1") && !model.startsWith("o3")
+        ? { temperature }
+        : { reasoning: { effort: "medium" } }),
+    });
+  }
+
+  // Extract text from the completed response
+  const textOutput = (finalResponse.output || []).find((o) => o.type === "message");
+  const text = (textOutput?.content || []).map((c) => c.text ?? "").join("") ?? "";
+
+  return { text, responseId: finalResponse.id };
+}
+
+/**
+ * Return Responses-API-shaped tool definitions for a given assistantType.
+ * This is a lightweight mirror of getAssistantTools() from the TypeScript app.
+ * Only tool shapes are defined here — the actual implementations are in the tool-call
+ * handler above.
+ */
+function getToolsForAssistantType(assistantType, chatbotId) {
+  const common = {
+    get_reference: {
+      type: "function",
+      name: "get_reference",
+      description: "Search the knowledge base for relevant information to answer the user query.",
+      parameters: {
+        type: "object",
+        properties: { userQuery: { type: "string", description: "The user's question" } },
+        required: ["userQuery"],
+      },
+    },
+    ask_relevant_followup_questions: {
+      type: "function",
+      name: "ask_relevant_followup_questions",
+      description: "Ask the user a clarifying follow-up question.",
+      parameters: {
+        type: "object",
+        properties: { question: { type: "string" } },
+        required: ["question"],
+      },
+    },
+  };
+
+  if (assistantType === "ecommerce-agent-shopify") {
+    return [
+      { type: "function", name: "find_product", description: "Find a product by name.", parameters: { type: "object", properties: { query: { type: "string" } }, required: ["query"] } },
+      { type: "function", name: "get_customer_orders", description: "Get orders for a customer by email.", parameters: { type: "object", properties: { email: { type: "string" } }, required: ["email"] } },
+      { type: "function", name: "get_products", description: "List all products.", parameters: { type: "object", properties: {} } },
+      common.ask_relevant_followup_questions,
+    ];
+  }
+
+  if (assistantType === "booking-agent") {
+    return [
+      {
+        type: "function",
+        name: "create_booking",
+        description: "Create a booking for the customer.",
+        parameters: {
+          type: "object",
+          properties: {
+            customerName: { type: "string" },
+            customerEmail: { type: "string" },
+            customerPhone: { type: "string" },
+            serviceType: { type: "string" },
+            dateTime: { type: "string", description: "ISO 8601 format: YYYY-MM-DDTHH:MM:SS" },
+            timezone: { type: "string" },
+          },
+          required: ["customerName", "customerEmail", "customerPhone", "serviceType", "dateTime", "timezone"],
+        },
+      },
+      common.ask_relevant_followup_questions,
+    ];
+  }
+
+  if (assistantType === "research-web") {
+    return [
+      {
+        type: "function",
+        name: "get_search_results",
+        description: "Search the web for current information.",
+        parameters: { type: "object", properties: { userQuery: { type: "string" } }, required: ["userQuery"] },
+      },
+      common.ask_relevant_followup_questions,
+    ];
+  }
+
+  // All other types: knowledge-base reference + follow-up
+  return [common.get_reference, common.ask_relevant_followup_questions];
 }
 
 /**
@@ -459,7 +739,7 @@ const MODEL_TOKEN_LIMITS = {
  * Get an AI reply for an incoming WhatsApp QR message.
  *
  * Mirrors the full logic in route.ts:
- *   - bot-v2  → OpenAI Assistants API with persistent threads + tool calls
+ *   - bot-v2  → OpenAI Responses API (stateless, no asst_xxx ID needed)
  *   - others  → Chat Completions API with Pinecone context + conversation history
  *
  * Also persists conversation history to the same `whatsapp-qr-chat-history`
@@ -528,42 +808,10 @@ async function getAIReply(userMessage, chatbotId, userId, senderJid) {
     existingDoc.chats[phoneKey] = { messages: [], usage: { completion_tokens: 0, prompt_tokens: 0, total_tokens: 0 } };
   }
 
-  // ── 2b. Handle per-path thread wiring for bot-v2 ─────────────────────────
-  let threadId = existingDoc?.chats?.[phoneKey]?.threadId || null;
-
-  if (useAssistantAPI) {
-    if (!threadId) {
-      const thread = await createThread();
-      threadId = thread.id;
-      await historyCol.updateOne(
-        { userId, chatbotId, date: dateKey },
-        {
-          $set: {
-            [`chats.${phoneKey}.threadId`]: threadId,
-            [`chats.${phoneKey}.assistantId`]: chatbotId,
-            updatedAt: new Date(),
-          },
-        }
-      );
-      console.log(`[AI][${chatbotId}] New thread ${threadId} for ${phoneKey}`);
-    }
-    // Clear any orphaned active runs from prior timed-out attempts so the
-    // thread can accept a new message + run. Without this the thread stays
-    // wedged and every message silently fails.
-    await cancelActiveRuns(threadId);
-
-    // Add user message to the OpenAI thread
-    try {
-      await addMessageToThread(threadId, userMessage);
-    } catch (err) {
-      // If there's still an active run this is a genuine concurrent duplicate
-      if (err?.message?.includes("while a run") && err.message.includes("is active")) {
-        console.warn(`[AI][${chatbotId}] Active run in thread ${threadId} — skipping duplicate`);
-        return null; // caller should not send a reply
-      }
-      throw err;
-    }
-  }
+  // ── 2b. Handle per-path thread wiring for legacy bots ───────────────────
+  // bot-v2 uses the Responses API (stateless) — no thread needed.
+  // Legacy bots don't use threads either; this variable is kept for compatibility.
+  let threadId = null;
 
   // Persist user message to history
   await historyCol.updateOne(
@@ -579,28 +827,30 @@ async function getAIReply(userMessage, chatbotId, userId, senderJid) {
   let usage = { completion_tokens: 0, prompt_tokens: 0, total_tokens: 0 };
 
   if (useAssistantAPI) {
-    // ── bot-v2: Assistants API ────────────────────────────────────────────
-    console.log(`[AI][${chatbotId}] bot-v2 path — thread ${threadId}`);
+    // ── bot-v2: Responses API (stateless — no asst_xxx ID required) ───────
+    console.log(`[AI][${chatbotId}] bot-v2 path — Responses API`);
 
-    const existingMessages = existingDoc?.chats?.[phoneKey]?.messages || [];
+    // Retrieve the previous response ID for conversation continuity
+    const previousResponseId = existingDoc?.chats?.[phoneKey]?.previousResponseId ?? null;
 
-    let run;
-    try {
-      run = await runAssistant(threadId, chatbotId);
-      console.log(`[AI][${chatbotId}] started run ${run.id} on thread ${threadId}`);
-    } catch (err) {
-      if (err?.message?.includes("already has an active run")) {
-        console.warn(`[AI][${chatbotId}] Thread ${threadId} already has an active run — skipping`);
-        return null;
-      }
-      throw err;
+    const { text, responseId } = await getResponsesAPIReply(
+      userMessage,
+      chatbotDoc,
+      chatbotSettings,
+      previousResponseId
+    );
+
+    aiResponse = text;
+
+    // Persist the new response ID so the next turn can chain off it
+    if (responseId) {
+      await historyCol.updateOne(
+        { userId, chatbotId, date: dateKey },
+        { $set: { [`chats.${phoneKey}.previousResponseId`]: responseId, updatedAt: new Date() } }
+      );
     }
 
-    await waitForRunCompletion(threadId, run.id, chatbotId, userId, existingMessages);
-
-    const threadMessages = await openai.beta.threads.messages.list(threadId);
-    aiResponse = extractMessageText(threadMessages.data[0]) || "";
-    console.log(`[AI][${chatbotId}] run ${run.id} done — responseLength=${aiResponse.length}`);
+    console.log(`[AI][${chatbotId}] Responses API done — responseLength=${aiResponse.length}`);
 
     usage = {
       completion_tokens: estimateTokens(aiResponse),
@@ -913,6 +1163,10 @@ async function startSession(chatbotId, userId) {
       // auth). Reconnecting in a loop just repeats it, so treat it as fatal:
       // clear auth and stop so the next manual start gets a clean QR.
       const fatalHandshake = statusCode === 405;
+      // 440 = connectionReplaced — another WhatsApp Web session (phone multi-device
+      // or another server instance) took over this slot. Reconnecting just gets
+      // kicked again immediately. Treat as fatal: stop and let the user re-scan.
+      const connectionReplaced = statusCode === 440;
 
       session.status = "disconnected";
 
@@ -930,11 +1184,11 @@ async function startSession(chatbotId, userId) {
 
       sessions.delete(chatbotId);
 
-      if (loggedOut || fatalHandshake) {
+      if (loggedOut || fatalHandshake || connectionReplaced) {
         // Clear stored auth so next start forces a fresh QR
         await db.collection("whatsapp_auth").deleteMany({ chatbotId });
         console.log(
-          `🔒 [${chatbotId}] ${loggedOut ? "Logged out" : "Handshake rejected (405)"} — auth cleared`
+          `🔒 [${chatbotId}] ${loggedOut ? "Logged out" : fatalHandshake ? "Handshake rejected (405)" : "Connection replaced (440) — another session took over"} — auth cleared, re-scan QR to reconnect`
         );
       } else {
         // Auto-reconnect after 5s for unexpected transient disconnects
