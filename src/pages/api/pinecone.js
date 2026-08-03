@@ -4,7 +4,7 @@ import { createEmbedding } from "../../app/_helpers/server/embeddings";
 import clientPromise from "../../db";
 import { deletevectors } from "../../app/_helpers/server/pinecone";
 import { PineconeStore } from "@langchain/pinecone";
-import { OpenAI, OpenAIEmbeddings } from "@langchain/openai";
+import { ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai";
 import { PromptTemplate } from "@langchain/core/prompts";
 import { MultiQueryRetriever } from "langchain/retrievers/multi_query";
 import { openai } from "@/app/openai";
@@ -82,7 +82,7 @@ export default async function handler(req, res) {
       );
 
       /// Custom Multi-Query Retriever with Scores
-      const llm = new OpenAI({
+      const llm = new ChatOpenAI({
         apiKey: process.env.NEXT_PUBLIC_OPENAI_KEY,
         model: "gpt-4o",
       });
@@ -113,12 +113,17 @@ export default async function handler(req, res) {
       );
 
       // Generate query variations
-      const queryVariations = await llm.invoke(
+      const queryVariationsMsg = await llm.invoke(
         await multiQueryPrompt.format({
           question: userQuery,
           queryCount: 3,
         })
       );
+      // ChatOpenAI returns an AIMessage; extract the string content
+      const queryVariations =
+        typeof queryVariationsMsg === "string"
+          ? queryVariationsMsg
+          : queryVariationsMsg?.content ?? "";
 
       // Extract queries from the response
       const extractQueries = (response) => {
@@ -314,12 +319,8 @@ export default async function handler(req, res) {
     /// close the cursor
     await cursor.close();
 
-    /// delete the assistant from openai
-    try {
-      await openai.beta.assistants.del(chatbotId);
-    } catch (error) {
-      console.error("Error during assistant deletion:", error);
-    }
+    /// No OpenAI assistant object to delete — Responses API is stateless
+    /// (chatbot config lives only in MongoDB)
 
     vectorId = [].concat(...vectorId);
     /// delete the vectors

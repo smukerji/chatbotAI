@@ -180,6 +180,140 @@ export const functionCallHandler = async (
         data: webData.message,
         sources: webData.sources,
       });
+
+    // -----------------------------------------------------------------------
+    // BOOKING AGENT — create_booking
+    // -----------------------------------------------------------------------
+    } else if (functionName === "create_booking") {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/integrations/google-calendar/bookings`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chatbotId,
+            userId: userID,
+            customerName: args.customerName,
+            customerEmail: args.customerEmail,
+            customerPhone: args.customerPhone,
+            serviceType: args.serviceType,
+            dateTime: args.dateTime,
+            // timezone comes from chatbot settings, not from user
+            // pass it through if the model somehow set it, otherwise
+            // the bookings route will fall back to chatbot-settings
+            timezone: args.timezone ?? null,
+            notes: args.notes ?? null,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        if (data.conflict) {
+          return JSON.stringify({
+            success: false,
+            conflict: true,
+            message:
+              "The requested time slot is already booked. Please ask the customer to choose a different date or time.",
+          });
+        }
+        return JSON.stringify({
+          success: false,
+          message: data.error ?? "Failed to create booking. Please try again.",
+        });
+      }
+
+      return JSON.stringify({
+        success: true,
+        bookingId: data.bookingId,
+        serviceType: data.serviceType,
+        dateTime: data.dateTime,
+        timezone: data.timezone,
+        message: `Booking confirmed! ID: ${data.bookingId}. A confirmation email has been sent to the customer.`,
+      });
+
+    // -----------------------------------------------------------------------
+    // BOOKING AGENT — update_booking
+    // -----------------------------------------------------------------------
+    } else if (functionName === "update_booking") {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/integrations/google-calendar/bookings`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chatbotId,
+            bookingId: args.bookingId,
+            customerEmail: args.customerEmail,
+            newDateTime: args.newDateTime ?? null,
+            newTimezone: args.newTimezone ?? null,
+            newServiceType: args.newServiceType ?? null,
+            notes: args.notes ?? null,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        if (data.conflict) {
+          return JSON.stringify({
+            success: false,
+            conflict: true,
+            message:
+              "The new time slot is already booked. Please ask the customer to choose a different date or time.",
+          });
+        }
+        return JSON.stringify({
+          success: false,
+          message:
+            data.error ??
+            "Could not update the booking. Please check the booking ID and email.",
+        });
+      }
+
+      return JSON.stringify({
+        success: true,
+        bookingId: data.bookingId,
+        message: `Booking ${data.bookingId} has been updated successfully.`,
+      });
+
+    // -----------------------------------------------------------------------
+    // BOOKING AGENT — delete_booking
+    // -----------------------------------------------------------------------
+    } else if (functionName === "delete_booking") {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/integrations/google-calendar/bookings`,
+        {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chatbotId,
+            bookingId: args.bookingId,
+            customerEmail: args.customerEmail,
+            reason: args.reason ?? null,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        return JSON.stringify({
+          success: false,
+          message:
+            data.error ??
+            "Could not cancel the booking. Please check the booking ID and email.",
+        });
+      }
+
+      return JSON.stringify({
+        success: true,
+        bookingId: data.bookingId,
+        message: `Booking ${data.bookingId} has been cancelled successfully.`,
+      });
+
     } else {
       return JSON.stringify({
         success: false,

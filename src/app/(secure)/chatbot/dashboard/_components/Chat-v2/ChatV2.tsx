@@ -41,8 +41,7 @@ import { useRouter } from "next/navigation";
 import CustomModal from "../CustomModal/CustomModal";
 import { parsePhoneNumber } from "awesome-phonenumber";
 import CloseEmbedBotIcon from "@/assets/svg/CloseEmbedBotIcon";
-import { AssistantStream } from "openai/lib/AssistantStream.mjs";
-import { AssistantStreamEvent } from "openai/resources/beta/assistants.mjs";
+import { ResponseStream } from "@/app/_helpers/client/ResponseStream";
 import CloseIcon from "@/assets/svg/CloseIcon";
 import CloseBtn from "../../../../../../../public/close-circle.png";
 import BackIcon from "../../../../../../../public/source-reference/arrow-left.png";
@@ -178,6 +177,9 @@ function ChatV2({
 
   /// tool call sources state
   const currentToolSources = useRef<any[]>([]);
+
+  /// Responses API: tracks the last response ID for conversation chaining
+  const previousResponseId = useRef<string | null>(null);
 
   /// chatbot lead section state
   const [leadDetails, setLeadDetails] = useState({
@@ -519,138 +521,105 @@ function ChatV2({
     botSettingContext?.handleChange("temperature")(newValue);
   };
 
-  /// handle the user message stream
-  const handleReadableStream = (stream: AssistantStream) => {
-    // messages
+  /// handle the user message stream (Responses API)
+  const handleReadableStream = (body: ReadableStream<Uint8Array>) => {
+    const stream = new ResponseStream(body);
+
     stream.on("textCreated", handleTextCreated);
     stream.on("textDelta", handleTextDelta);
 
-    // // image
-    // stream.on("imageFileDone", handleImageFileDone);
+    stream.on("requiresAction", ({ responseId, toolCalls }) => {
+      // Keep loading spinner visible while tools execute and response comes back
+      handleRequiresAction(responseId, toolCalls);
+    });
 
-    // // code interpreter
-    // stream.on("toolCallCreated", toolCallCreated);
-    // stream.on("toolCallDelta", toolCallDelta);
+    stream.on("completed", () => {
+      setMessagesTime((prev: any) => {
+        const updatedPrev = [...prev];
+        return updatedPrev;
+      });
 
-    // events without helpers yet (e.g. requires_action and run.done)
-    stream.on("event", (event) => {
-      if (event.event === "thread.run.requires_action")
-        handleRequiresAction(event);
-      if (event.event === "thread.run.completed") {
-        /// setting the response time when completed
-        setMessagesTime((prev: any) => {
-          const updatedPrev = [...prev];
-          return updatedPrev;
+      // Add tool sources to the actual messages array and store history after
+      if (currentToolSources.current.length > 0) {
+        const toolSourcesToAdd = [...currentToolSources.current];
+
+        setMessages((prevMessages: any) => {
+          const updatedMessages = [...prevMessages];
+          for (let i = updatedMessages.length - 1; i >= 0; i--) {
+            if (updatedMessages[i].role === "assistant") {
+              updatedMessages[i] = { ...updatedMessages[i], sources: toolSourcesToAdd };
+              break;
+            }
+          }
+          return updatedMessages;
         });
 
-        // Add tool sources to the actual messages array and store history after
-        if (currentToolSources.current.length > 0) {
-          const toolSourcesToAdd = [...currentToolSources.current]; // Create a copy before clearing
-
-          setMessages((prevMessages: any) => {
-            const updatedMessages = [...prevMessages];
-
-            // Find the last assistant message
-            for (let i = updatedMessages.length - 1; i >= 0; i--) {
-              console.log(toolSourcesToAdd);
-
-              if (updatedMessages[i].role === "assistant") {
-                updatedMessages[i] = {
-                  ...updatedMessages[i],
-                  sources: toolSourcesToAdd, // Use the copy
-                };
-                break;
-              }
+        setMessagesTime((prevTime: any) => {
+          const updatedTime = [...prevTime];
+          for (let i = updatedTime.length - 1; i >= 0; i--) {
+            if (updatedTime[i].role === "assistant") {
+              updatedTime[i] = { ...updatedTime[i], sources: toolSourcesToAdd };
+              break;
             }
-            return updatedMessages;
-          });
+          }
+          storeHistory(updatedTime);
+          return updatedTime;
+        });
 
-          // Update messagesTime with sources and store history immediately
-          setMessagesTime((prevTime: any) => {
-            const updatedTime = [...prevTime];
-
-            // Find the last assistant message in messagesTime and add sources
-            for (let i = updatedTime.length - 1; i >= 0; i--) {
-              if (updatedTime[i].role === "assistant") {
-                updatedTime[i] = {
-                  ...updatedTime[i],
-                  sources: toolSourcesToAdd,
-                };
-                break;
-              }
-            }
-
-            // Store history immediately with the updated messagesTime that includes sources
-            storeHistory(updatedTime);
-            return updatedTime;
-          });
-
-          // Clear tool sources after copying them
-          currentToolSources.current = [];
-        } else {
-          // Store history immediately if no sources to add
-          setMessagesTime((prevTime: any) => {
-            storeHistory(prevTime);
-            return prevTime;
-          });
-        }
+        currentToolSources.current = [];
+      } else {
+        setMessagesTime((prevTime: any) => {
+          storeHistory(prevTime);
+          return prevTime;
+        });
       }
     });
+
+    stream.on("error", ({ message: errMsg }) => {
+      console.error("ResponseStream error:", errMsg);
+      setLoading(false);
+    });
+
+    stream.start();
   };
 
-  // handleRequiresAction - handle function call
-  const handleRequiresAction = async (
-    event: AssistantStreamEvent.ThreadRunRequiresAction
-  ) => {
-    const runId = event.data.id;
-    const toolCalls: any =
-      event?.data?.required_action?.submit_tool_outputs.tool_calls;
+  // handleRequiresAction - handle function calls
+  const handleRequiresAction = async (responseId: string, toolCalls: any[]) => {
+    previousResponseId.current = responseId;
 
     const userID = !isPopUp ? cookies.userId : userId;
-
-    // Create sources array from tool calls
-
     const toolSources: any[] = [];
 
-    // loop over tool calls and call function handler
     const toolCallOutputs = await Promise.all(
       toolCalls.map(async (toolCall: any) => {
+        // Normalise shape so functionCallHandler still works
+        const normalised = {
+          type: "function" as const,
+          id: toolCall.id,
+          function: { name: toolCall.name, arguments: toolCall.arguments },
+        };
         const result = await functionCallHandler(
-          toolCall,
+          normalised,
           chatbot.id,
           userID,
           messages,
           webSearch
         );
 
-        // Try to parse result if it's a JSON string
         let parsedResult = result;
         if (typeof result === "string") {
-          try {
-            parsedResult = JSON.parse(result);
-          } catch (e) {
-            // Not JSON, leave as is
-          }
+          try { parsedResult = JSON.parse(result); } catch { /* not JSON */ }
         }
-        console.log(parsedResult);
-        // If parsedResult has data array, process each item
-        if (
-          parsedResult &&
-          parsedResult.data &&
-          Array.isArray(parsedResult.data)
-        ) {
+
+        if (parsedResult?.data && Array.isArray(parsedResult.data)) {
           parsedResult.data.forEach((item: any) => {
             let sourceName = item.source;
             if (item.source === "file" && item.filename) {
               sourceName = `file - ${item.filename}`;
             }
-            // If score is available, append it to the source name
             if (typeof item.score !== "undefined") {
-              sourceName += ` (score: ${
-                item.score.toFixed ? item.score.toFixed(3) : item.score
-              })`;
+              sourceName += ` (score: ${item.score.toFixed ? item.score.toFixed(3) : item.score})`;
             }
-
             toolSources.push({
               source: sourceName,
               content: item.content,
@@ -660,53 +629,40 @@ function ChatV2({
             });
           });
         } else {
-          // Fallback: just push the tool call output as before
           toolSources.push({
-            source: toolCall.function?.name || "Function Call",
-            content:
-              typeof result === "string"
-                ? result
-                : JSON.stringify(result, null, 2),
+            source: toolCall.name || "Function Call",
+            content: typeof result === "string" ? result : JSON.stringify(result, null, 2),
           });
         }
 
-        // pass only the content in output
-        if (parsedResult.data && Array.isArray(parsedResult.data)) {
+        if (parsedResult?.data && Array.isArray(parsedResult.data)) {
           return {
-            output: parsedResult.data
-              .map((item: any) => item.content)
-              .join("\n"),
+            output: parsedResult.data.map((item: any) => item.content).join("\n"),
             tool_call_id: toolCall.id,
           };
         }
-
         return { output: result, tool_call_id: toolCall.id };
       })
     );
 
-    // Store tool sources for adding to the assistant's response
     currentToolSources.current = toolSources;
-
-    // setInputDisabled(true);
-    submitActionResult(runId, toolCallOutputs);
+    submitActionResult(responseId, toolCallOutputs);
   };
 
-  const submitActionResult = async (runId: any, toolCallOutputs: any) => {
-    const response: any = await fetch(
+  const submitActionResult = async (responseId: string, toolCallOutputs: any) => {
+    const res: any = await fetch(
       `/api/assistants/threads/${threadID}/actions`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          runId: runId,
-          toolCallOutputs: toolCallOutputs,
+          assistantId: chatbot?.id,
+          previousResponseId: responseId,
+          toolCallOutputs,
         }),
       }
     );
-    const stream = AssistantStream.fromReadableStream(response.body);
-    handleReadableStream(stream);
+    handleReadableStream(res.body);
   };
 
   // textCreated - create new assistant message
@@ -795,7 +751,7 @@ function ChatV2({
 
   /// send the user message
   const sendMessage = async (text: string) => {
-    const response: any = await fetch(
+    const res: any = await fetch(
       `/api/assistants/threads/${threadID}/messages`,
       {
         method: "POST",
@@ -805,8 +761,7 @@ function ChatV2({
         }),
       }
     );
-    const stream = AssistantStream.fromReadableStream(response.body);
-    handleReadableStream(stream);
+    handleReadableStream(res.body);
   };
 
   /// get the chatbase response
@@ -878,6 +833,7 @@ function ChatV2({
 
   /// refresh the chat window
   const refreshChat = () => {
+    previousResponseId.current = null;
     setMessages([]);
     setMessagesTime([]);
     setSelectedSources([]);

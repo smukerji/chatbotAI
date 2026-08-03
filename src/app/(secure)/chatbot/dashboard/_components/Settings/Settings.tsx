@@ -20,6 +20,7 @@ import { useRouter } from "next/navigation";
 function Settings({
   chatbotId,
   chatbotName,
+  assistantType,
   isPlanNotification,
   setIsPlanNotification,
 }: any) {
@@ -121,7 +122,7 @@ function Settings({
       <div className="bottom">
         <div className="left">
           {chabotSettings === "general" && (
-            <General chatbotId={chatbotId} chatbotName={chatbotName} />
+            <General chatbotId={chatbotId} chatbotName={chatbotName} assistantType={assistantType} />
           )}
           {chabotSettings === "model" && <Model chatbotId={chatbotId} />}
           {chabotSettings === "chatInterface" && (

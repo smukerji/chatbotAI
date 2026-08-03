@@ -39,6 +39,7 @@ import ChatV2 from "./_components/Chat-v2/ChatV2";
 import { functionCallHandler } from "@/app/_helpers/client/functionCallHandler";
 import { useRouter } from "next/navigation";
 import Sources from "./_components/Sources/Sources";
+import Bookings from "./_components/Bookings/Bookings";
 
 function Dashboard() {
   const { status } = useSession();
@@ -251,6 +252,27 @@ function Dashboard() {
         </div>
       ),
       onClick: () => botContext?.handleChange("editChatbot")("leads"),
+    },
+    {
+      key: "Bookings",
+      label: (
+        <div
+          className="dropdown-item"
+          style={{
+            color: selectedValue === "Bookings" ? "#2e58ea" : undefined,
+            alignItems: "center",
+            justifyContent: "space-between",
+            display: "flex",
+            fontSize: "16px",
+          }}
+        >
+          Bookings
+          {selectedValue === "Bookings" ? (
+            <Image src={tick} alt="tick-icon" />
+          ) : null}
+        </div>
+      ),
+      onClick: () => botContext?.handleChange("editChatbot")("bookings"),
     },
   ];
 
@@ -532,6 +554,15 @@ function Dashboard() {
                     >
                       <h3 className="option">Leads</h3>
                     </li>
+                    <li
+                      className={`${editChatbot === "bookings" ? "active" : ""}`}
+                      value={"bookings"}
+                      onClick={() =>
+                        botContext?.handleChange("editChatbot")("bookings")
+                      }
+                    >
+                      <h3 className="option">Bookings</h3>
+                    </li>
                   </ul>
                 </>
               )}
@@ -580,6 +611,7 @@ function Dashboard() {
             <Settings
               chatbotId={chatbot.id}
               chatbotName={botDetails?.chatbotName}
+              assistantType={chatbot.assistantType}
               isPlanNotification={isPlanNotification}
               setIsPlanNotification={setIsPlanNotification}
             />
@@ -624,6 +656,11 @@ function Dashboard() {
 
           {/*------------------------------------------leads-component----------------------------------------------*/}
           {editChatbot == "leads" && <Leads chatbotId={chatbot.id} />}
+
+          {/*------------------------------------------bookings-component----------------------------------------------*/}
+          {editChatbot == "bookings" && (
+            <Bookings chatbotId={chatbot.id} />
+          )}
         </div>
       </div>
     );

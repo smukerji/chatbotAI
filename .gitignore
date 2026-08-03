@@ -1,7 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
+**/node_modules
 /.pnp
 .pnp.js
 
@@ -43,3 +43,11 @@ next-env.d.ts
 /public/qa-images/*.jpg
 /public/qa-images/*.jpeg
 .prettierrc
+
+whatsapp-server.env.local
+
+# CPU profiles
+*.cpuprofile
+
+# VS Code workspace file
+*.code-workspace

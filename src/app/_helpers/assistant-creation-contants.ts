@@ -12,6 +12,7 @@ export enum AssistantType {
   IT_SUPPORT_HOSPITALITY_EXPERT = "it-agent-hospitality-expert",
   REAL_ESTATE_AGENT = "re-agent-real-estate",
   RESEARCH_WEB = "research-agent-web-expert",
+  BOOKING_AGENT = "booking-agent-general",
 }
 
 /// system prompts and tools for assistant
@@ -1395,6 +1396,82 @@ This prompt ensures that the research assistant chatbot:
 ✔ Calls get_search_results only when necessary.
 ✔ Delivers responses exclusively in HTML format for structured presentation.
       `;
+    case AssistantType.BOOKING_AGENT:
+      return `
+Role:
+You are a smart, multilingual AI Booking Agent. You help customers create new bookings, change existing bookings, and delete/cancel existing bookings. You communicate fluently in English, Chinese (Simplified), and Korean. Always detect the language the customer is writing in and reply in that same language throughout the entire conversation.
+
+## Core Behaviour
+- Be warm, concise, and professional.
+- Always guide the customer step by step — never ask for multiple pieces of information in one message. Ask for one thing at a time.
+- Before performing any booking action, you MUST collect ALL required fields listed below.
+- Once all fields are collected, call the appropriate booking function.
+- After calling the function, always relay the result (booking ID, time, confirmation) back to the customer in their language.
+
+## Multilingual Support
+- English: Respond entirely in English.
+- Chinese (Simplified 中文): Respond entirely in Simplified Chinese.
+- Korean (한국어): Respond entirely in Korean.
+
+## Required Information Collection Order
+
+### For CREATE BOOKING:
+Collect in this exact order, one at a time:
+1. Customer full name
+2. Customer email address (explain it is needed for confirmation)
+3. Customer phone number
+4. Service type or reason for booking
+5. Preferred date (ask in YYYY-MM-DD format, clarify if ambiguous)
+6. Preferred time (ask in HH:MM 24-hour format)
+7. Any special notes or requirements (optional — accept "none")
+
+Then call create_booking with all collected fields. The timezone is pre-configured — do NOT ask the user for it.
+
+### For CHANGE BOOKING:
+Collect in this exact order:
+1. Booking ID (format BK-XXXX-XXXXXX)
+2. Customer email (to verify ownership)
+3. What they want to change (date/time, service type, or notes)
+4. New value for the changed field(s)
+
+Then call update_booking. Timezone is pre-configured — do NOT ask the user for it.
+
+### For DELETE / CANCEL BOOKING:
+Collect in this exact order:
+1. Booking ID (format BK-XXXX-XXXXXX)
+2. Customer email (to verify ownership)
+3. Reason for cancellation (optional)
+
+Then call delete_booking.
+
+## Important Rules
+- NEVER ask the user for timezone — it is pre-configured by the business owner.
+- NEVER make up or guess a booking ID.
+- NEVER skip collecting the email — it is required for sending confirmation and verifying ownership.
+- NEVER proceed with a booking action if any required field is missing.
+- If the customer's requested time slot is unavailable (conflict detected), apologise and suggest they provide an alternative time.
+- Always format date/time clearly back to the customer after booking.
+- For the get_reference function: use it to answer any general questions about the business (services offered, pricing, location, hours) that are not booking actions.
+
+## Example Interaction Flow (English)
+
+Customer: "I'd like to book an appointment"
+Agent: "Happy to help! May I have your full name please?"
+
+Customer: "John Smith"
+Agent: "Thank you John! What email address should I send your confirmation to?"
+
+Customer: "john@email.com"
+Agent: "Great! And your phone number?"
+
+...and so on until all fields are collected, then call create_booking.
+
+## Response Format
+- Respond in plain conversational text (no HTML tags).
+- Keep responses short and focused — one question or one confirmation per message.
+- When confirming a booking, include: Booking ID, service, date/time, and email address the confirmation was sent to.
+      `;
+
     default:
       return "Hello! What can I help you with today?";
   }
@@ -2521,6 +2598,152 @@ export function getAssistantTools(type: string): FunctionsArray {
           },
         },
       ];
+
+    case AssistantType.BOOKING_AGENT:
+      return [
+        {
+          type: "function",
+          function: {
+            name: "create_booking",
+            description:
+              "Creates a new booking after all required customer details have been collected. Checks for calendar conflicts before confirming. Sends a confirmation email to the customer.",
+            strict: false,
+            parameters: {
+              type: "object",
+              properties: {
+                customerName: {
+                  type: "string",
+                  description: "Full name of the customer",
+                },
+                customerEmail: {
+                  type: "string",
+                  description: "Email address of the customer for confirmation",
+                },
+                customerPhone: {
+                  type: "string",
+                  description: "Phone number of the customer",
+                },
+                serviceType: {
+                  type: "string",
+                  description: "Type of service or reason for the booking",
+                },
+                dateTime: {
+                  type: "string",
+                  description:
+                    "Requested booking date and time in ISO 8601 format (e.g. 2026-08-15T14:00:00)",
+                },
+                timezone: {
+                  type: "string",
+                  description:
+                    "IANA timezone string provided by the customer (e.g. Asia/Seoul, America/New_York)",
+                },
+                notes: {
+                  type: "string",
+                  description: "Optional additional notes or requirements",
+                },
+              },
+              required: [
+                "customerName",
+                "customerEmail",
+                "customerPhone",
+                "serviceType",
+                "dateTime",
+                "timezone",
+              ],
+            },
+          },
+        },
+        {
+          type: "function",
+          function: {
+            name: "update_booking",
+            description:
+              "Updates an existing booking (reschedule or change details). Verifies ownership via bookingId + customerEmail before making changes.",
+            strict: false,
+            parameters: {
+              type: "object",
+              properties: {
+                bookingId: {
+                  type: "string",
+                  description:
+                    "The human-readable booking ID (format BK-XXXX-XXXXXX)",
+                },
+                customerEmail: {
+                  type: "string",
+                  description: "Email used to verify ownership of the booking",
+                },
+                newDateTime: {
+                  type: "string",
+                  description:
+                    "New date and time in ISO 8601 format (if rescheduling)",
+                },
+                newTimezone: {
+                  type: "string",
+                  description: "New IANA timezone string (if rescheduling)",
+                },
+                newServiceType: {
+                  type: "string",
+                  description: "Updated service type (if changing)",
+                },
+                notes: {
+                  type: "string",
+                  description: "Updated notes",
+                },
+              },
+              required: ["bookingId", "customerEmail"],
+            },
+          },
+        },
+        {
+          type: "function",
+          function: {
+            name: "delete_booking",
+            description:
+              "Cancels an existing booking. Verifies ownership via bookingId + customerEmail before cancelling. Removes the Google Calendar event.",
+            strict: false,
+            parameters: {
+              type: "object",
+              properties: {
+                bookingId: {
+                  type: "string",
+                  description:
+                    "The human-readable booking ID (format BK-XXXX-XXXXXX)",
+                },
+                customerEmail: {
+                  type: "string",
+                  description: "Email used to verify ownership of the booking",
+                },
+                reason: {
+                  type: "string",
+                  description: "Optional reason for cancellation",
+                },
+              },
+              required: ["bookingId", "customerEmail"],
+            },
+          },
+        },
+        {
+          type: "function",
+          function: {
+            name: "get_reference",
+            description:
+              "Use this to answer general questions about the business (services, pricing, location, hours) that are not booking actions.",
+            strict: true,
+            parameters: {
+              type: "object",
+              properties: {
+                userQuery: {
+                  type: "string",
+                  description: "The user latest message",
+                },
+              },
+              additionalProperties: false,
+              required: ["userQuery"],
+            },
+          },
+        },
+      ];
+
     default:
       return [];
   }

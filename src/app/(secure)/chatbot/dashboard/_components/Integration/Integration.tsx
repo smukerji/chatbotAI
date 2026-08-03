@@ -5,6 +5,7 @@ import whatsAppIcon from "../../../../../../../public/svgs/whatsapp-icon.svg";
 import telegramIcon from "../../../../../../../public/telegram.svg";
 import slackIcon from "../../../../../../../public/Slack_icon_2019.svg";
 import WhatsappModal from "../Modal/WhatsappModal";
+import WhatsappQRModal from "../Modal/WhatsappQRModal";
 import { useCookies } from "react-cookie";
 import { Spin, message } from "antd";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -25,6 +26,13 @@ function Integration({ isPlanNotification, setIsPlanNotification }: any) {
   const [isWhatappVerified, setIsWhatsAppVerified] = useState<boolean>(false);
   const [whatsappConnectbtn, setWhatsappConnectbtn] = useState<boolean>(false);
   const [onEditClicked, setOnEditClicked] = useState<boolean>(false);
+
+  // WhatsApp QR / Personal states
+  const [isWhatsAppQRModalOpen, setIsWhatsAppQRModalOpen] = useState<boolean>(false);
+  const [isWhatsAppQRConnected, setIsWhatsAppQRConnected] = useState<boolean>(false);
+  const [whatsAppQRPhone, setWhatsAppQRPhone] = useState<string>("");
+  const [whatsAppQRLoader, setWhatsAppQRLoader] = useState<boolean>(false);
+
   const [isSlackModalOpen, setIsSlackModalOpen] = useState<boolean>(false);
   const [isSlackConnected, setIsSlackConnected] = useState<boolean>(false);
   const [loader, setLoader] = useState<boolean>(false);
@@ -151,6 +159,30 @@ function Integration({ isPlanNotification, setIsPlanNotification }: any) {
     setOnEditClicked(true);
   };
 
+  // Fetch WhatsApp QR connection status on mount
+  const fetchWhatsAppQRStatus = async () => {
+    setWhatsAppQRLoader(true);
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_WEBSITE_URL}chatbot/dashboard/whatsapp-qr/session/api?chatbotId=${chatbot.id}&userId=${userId[0].userId}`,
+        { method: "GET", cache: "no-cache" }
+      );
+      if (res.ok) {
+        const data = await res.json();
+        if (data.status === "connected") {
+          setIsWhatsAppQRConnected(true);
+          setWhatsAppQRPhone(data.phoneNumber ?? "");
+        } else {
+          setIsWhatsAppQRConnected(false);
+          setWhatsAppQRPhone("");
+        }
+      }
+    } catch (_) {
+      // silently fail — QR server may not be running
+    }
+    setWhatsAppQRLoader(false);
+  };
+
   useEffect(() => {
     checkTelegramAvailability();
     fetchTelegramDetails();
@@ -159,6 +191,7 @@ function Integration({ isPlanNotification, setIsPlanNotification }: any) {
   useEffect(() => {
     checkWhatsappAvailability();
     fetchWhatsappDetails();
+    fetchWhatsAppQRStatus();
   }, []);
 
   return (
@@ -237,8 +270,47 @@ function Integration({ isPlanNotification, setIsPlanNotification }: any) {
         </div>
       </div>
 
+      {/*------------------------------------------WhatsApp QR / Personal integration----------------------------------------------*/}
+      <div
+        className="integration i-btn"
+        style={{ zIndex: isPlanNotification ? -1 : 0 }}
+      >
+        <div className="name">
+          <Image src={whatsAppIcon} alt="whatsapp-qr-icon" />
+          <span>WhatsApp (QR / Personal)</span>
+          {isWhatsAppQRConnected && (
+            <Image
+              src={editIcon}
+              alt="edit"
+              onClick={() => setIsWhatsAppQRModalOpen(true)}
+              className="whatsapp-edit-icon-s"
+            />
+          )}
+        </div>
+        <>
+          {whatsAppQRLoader ? (
+            <Spin style={{ opacity: isPlanNotification ? 0 : 1 }} />
+          ) : (
+            <>
+              {isWhatsAppQRConnected ? (
+                <div className="action">Connected</div>
+              ) : (
+                <div
+                  className="action"
+                  onClick={() => setIsWhatsAppQRModalOpen(true)}
+                >
+                  Connect
+                </div>
+              )}
+            </>
+          )}
+        </>
+        <div className="telegram-i-btn">
+          <InfoCircleOutlined />
+        </div>
+      </div>
+
       {/*------------------------------------------Telegram-integration----------------------------------------------*/}
-      {/* <div className="telegram-container" > */}
 
       <div
         className="integration i-btn"
@@ -368,6 +440,22 @@ function Integration({ isPlanNotification, setIsPlanNotification }: any) {
         setOnEditClicked={setOnEditClicked}
         setWhatsappConnectbtn={setWhatsappConnectbtn}
       />
+
+      {/* WhatsApp QR / Personal Modal */}
+      {isWhatsAppQRModalOpen && (
+        <WhatsappQRModal
+          isOpen={isWhatsAppQRModalOpen}
+          onClose={() => setIsWhatsAppQRModalOpen(false)}
+          onConnected={(phone) => {
+            setIsWhatsAppQRConnected(true);
+            setWhatsAppQRPhone(phone);
+          }}
+          onDisconnected={() => {
+            setIsWhatsAppQRConnected(false);
+            setWhatsAppQRPhone("");
+          }}
+        />
+      )}
       {/* ----------Telegram modal */}
       {isTelegramModalOpen && (
         <TelegramModal
