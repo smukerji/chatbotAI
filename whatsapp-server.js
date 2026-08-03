@@ -174,8 +174,9 @@ const sessions = new Map();
 const OpenAI = require("openai");
 const openai = new OpenAI.default({
   apiKey: OPENAI_KEY,
-  ...(process.env.NEXT_PUBLIC_OPENAI_PROJ_KEY && { project: process.env.NEXT_PUBLIC_OPENAI_PROJ_KEY }),
-  ...(process.env.NEXT_PUBLIC_OPENAI_ORG_KEY  && { organization: process.env.NEXT_PUBLIC_OPENAI_ORG_KEY }),
+  // Note: do NOT pass project/organization here — the whatsapp server uses the
+  // plain API key only. Scoping to a project ID that doesn't own the key causes
+  // 400 "Invalid project ID" errors on every OpenAI call.
 });
 
 // ─── Fetch with timeout ───────────────────────────────────────────────────────
