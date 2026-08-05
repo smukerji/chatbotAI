@@ -198,12 +198,27 @@ async function sendMessageToWhatsapp(
   }
 }
 
+// Deterministic fallback: strips any HTML tags so raw markup never reaches
+// WhatsApp, even if the LLM conversion below fails or is incomplete.
+function stripHtmlTags(html: string): string {
+  return html
+    .replace(/<\/(p|div|h[1-6])>/gi, "\n")
+    .replace(/<li[^>]*>/gi, "- ")
+    .replace(/<\/li>/gi, "\n")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
 // Format HTML/assistant output into WhatsApp-friendly plain text using OpenAI
 async function formatMessageForWhatsApp(
   htmlMessage: string,
   model = "gpt-3.5-turbo"
 ) {
   if (!htmlMessage || htmlMessage.trim().length === 0) return htmlMessage;
+  // Only bother calling the formatter when the response looks like HTML
+  if (!/<[a-z][\s\S]*>/i.test(htmlMessage)) return htmlMessage;
 
   try {
     const systemPrompt = `Format provided content as pre whatsapp messaging style. Output ONLY the converted text without any extra notes.`;
@@ -237,15 +252,29 @@ async function formatMessageForWhatsApp(
 
     const text = await resp.text();
     const parsed = JSON.parse(text || "{}");
-    const formatted =
+    const formatted = (
       parsed?.choices?.[0]?.message?.content ||
       parsed?.choices?.[0]?.text ||
-      htmlMessage;
+      ""
+    ).trim();
 
-    return (formatted as string).trim();
+    if (!formatted) {
+      logError("Empty response formatting message for WhatsApp, stripping tags instead", new Error("Empty formatter response"));
+      return stripHtmlTags(htmlMessage);
+    }
+
+    // Safety net: the LLM conversion is non-deterministic and can leave stray
+    // tags behind (e.g. <li> in list-heavy replies). Strip anything left over
+    // rather than let raw markup reach WhatsApp.
+    if (/<[a-z][\s\S]*>/i.test(formatted)) {
+      logError("LLM left HTML tags in formatted WhatsApp message, stripping remainder", new Error("Incomplete HTML conversion"));
+      return stripHtmlTags(formatted);
+    }
+
+    return formatted;
   } catch (error: any) {
-    logError("Failed to format message for WhatsApp", error);
-    return htmlMessage; // Fallback to original
+    logError("Failed to format message for WhatsApp, stripping tags instead", error);
+    return stripHtmlTags(htmlMessage); // Deterministic fallback instead of raw HTML
   }
 }
 
