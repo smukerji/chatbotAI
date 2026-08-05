@@ -2745,6 +2745,49 @@ export function getAssistantTools(type: string): FunctionsArray {
       ];
 
     default:
-      return [];
+      // Chatbots with a missing/unrecognized assistantType (e.g. bot-v2
+      // chatbots created before AssistantType existed) would otherwise get
+      // zero tools. Fall back to a safe baseline instead of silently
+      // dropping RAG retrieval entirely.
+      return [
+        {
+          type: "function",
+          function: {
+            name: "get_reference",
+            description:
+              "This function will will help you get the context from which you can answer to user's query.",
+            strict: true,
+            parameters: {
+              type: "object",
+              properties: {
+                userQuery: {
+                  type: "string",
+                  description: "The user latest message",
+                },
+              },
+              additionalProperties: false,
+              required: ["userQuery"],
+            },
+          },
+        },
+        {
+          type: "function",
+          function: {
+            name: "ask_relevant_followup_questions",
+            description: "Ask the user a clarifying follow-up question.",
+            strict: false,
+            parameters: {
+              type: "object",
+              properties: {
+                question: {
+                  type: "string",
+                  description: "The clarifying follow-up question to ask the user",
+                },
+              },
+              required: ["question"],
+            },
+          },
+        },
+      ];
   }
 }

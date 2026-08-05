@@ -174,8 +174,9 @@ const sessions = new Map();
 const OpenAI = require("openai");
 const openai = new OpenAI.default({
   apiKey: OPENAI_KEY,
-  ...(process.env.NEXT_PUBLIC_OPENAI_PROJ_KEY && { project: process.env.NEXT_PUBLIC_OPENAI_PROJ_KEY }),
-  ...(process.env.NEXT_PUBLIC_OPENAI_ORG_KEY  && { organization: process.env.NEXT_PUBLIC_OPENAI_ORG_KEY }),
+  // Note: do NOT pass project/organization here — the whatsapp server uses the
+  // plain API key only. Scoping to a project ID that doesn't own the key causes
+  // 400 "Invalid project ID" errors on every OpenAI call.
 });
 
 // ─── Fetch with timeout ───────────────────────────────────────────────────────
@@ -219,6 +220,19 @@ function cleanMessagesForOpenAI(messages) {
 
 // ─── Format helper (mirrors formatMessageForWhatsApp in route.ts) ─────────────
 
+// Deterministic fallback: strips any HTML tags so raw markup never reaches
+// WhatsApp, even if the LLM conversion below fails or is incomplete.
+function stripHtmlTags(html) {
+  return html
+    .replace(/<\/(p|div|h[1-6])>/gi, "\n")
+    .replace(/<li[^>]*>/gi, "- ")
+    .replace(/<\/li>/gi, "\n")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
 async function formatMessageForWhatsApp(text) {
   if (!text || !text.trim()) return text;
   // Only bother calling the formatter when the response looks like HTML
@@ -247,11 +261,32 @@ async function formatMessageForWhatsApp(text) {
         ],
       }),
     });
+
+    if (!res.ok) {
+      const errBody = await res.text().catch(() => "");
+      console.warn(`[FORMAT] OpenAI returned ${res.status}, stripping tags instead:`, errBody.slice(0, 300));
+      return stripHtmlTags(text);
+    }
+
     const body = await res.json();
-    return body?.choices?.[0]?.message?.content?.trim() || text;
+    const formatted = body?.choices?.[0]?.message?.content?.trim();
+    if (!formatted) {
+      console.warn("[FORMAT] Empty response from OpenAI, stripping tags instead");
+      return stripHtmlTags(text);
+    }
+
+    // Safety net: the LLM conversion is non-deterministic and can leave stray
+    // tags behind (e.g. <li> in list-heavy replies). Strip anything left over
+    // rather than let raw markup reach WhatsApp.
+    if (/<[a-z][\s\S]*>/i.test(formatted)) {
+      console.warn("[FORMAT] LLM left HTML tags in output, stripping remainder");
+      return stripHtmlTags(formatted);
+    }
+
+    return formatted;
   } catch (err) {
-    console.warn("[FORMAT] Could not format for WhatsApp, using raw text:", err.message);
-    return text;
+    console.warn("[FORMAT] Could not format for WhatsApp, stripping tags instead:", err.message);
+    return stripHtmlTags(text);
   }
 }
 

@@ -48,3 +48,4 @@ whatsapp-server.env.local
 
 # VS Code workspace file
 *.code-workspace
+.env*
