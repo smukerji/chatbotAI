@@ -29,7 +29,7 @@
     "@vapi-ai/web": "^2.1.4",
     "@vercel/blob": "^0.20.0",
     "@wavesurfer/react": "^1.0.7",
-    "@whiskeysockets/baileys": "^6.7.18",
+    "@whiskeysockets/baileys": "7.0.0-rc14",
     "ai": "^2.2.20",
     "antd": "^5.10.1",
     "awesome-phonenumber": "^6.9.0",

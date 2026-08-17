@@ -920,6 +920,17 @@
     }
   }
 
+  // WhatsApp manual-mode banner (AI auto-reply off — continue from the app)
+  .whatsapp-manual-mode-banner {
+    margin: 0 16px 16px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    background: #fff3cd;
+    color: #7a5c00;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
   // WhatsApp chat input container
   .whatsapp-chat-input {
     display: flex;
