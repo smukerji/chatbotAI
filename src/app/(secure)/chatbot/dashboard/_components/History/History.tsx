@@ -29,6 +29,7 @@ import closeImage from "../../../../../../../public/svgs/close-icon.svg";
 import noHistory from "../../../../../../../public/svgs/empty-history.svg";
 import dynamic from "next/dynamic";
 import { io, Socket } from "socket.io-client";
+import WhatsappQRHistory from "./WhatsappQRHistory";
 
 const HighlightedInfoPage = dynamic(
   () => import("../Highlighted-Info/highlighted-info"),
@@ -1156,9 +1157,20 @@ function History({ chatbotId }: any) {
               >
                 Whatsapp
               </button>
+
+              <button
+                className={`interval-btn ${
+                  chatHistoryClassifier === "whatsapp-qr" && "active"
+                }`}
+                onClick={() => {
+                  setChatHistoryClassifier("whatsapp-qr");
+                }}
+              >
+                Whatsapp QR
+              </button>
             </div>
 
-            {chatHistoryClassifier !== "whatsapp" && (
+            {chatHistoryClassifier === "normal" && (
               <div className="date-picker-container">
                 <button
                   className={`interval-btn ${
@@ -1324,7 +1336,11 @@ function History({ chatbotId }: any) {
           </div>
         </div>
       </div>
-      {(chatHistoryList?.length !== 0 ||
+      {chatHistoryClassifier === "whatsapp-qr" && (
+        <WhatsappQRHistory chatbotId={chatbotId} />
+      )}
+      {chatHistoryClassifier !== "whatsapp-qr" &&
+        (chatHistoryList?.length !== 0 ||
         chatHistoryClassifier === "whatsapp") && (
         <div
           className={`chatbot-history-parts ${

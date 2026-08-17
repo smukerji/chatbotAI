@@ -22,8 +22,12 @@ require("dotenv").config({ path: ".env.local" });
 
 const express = require("express");
 const { MongoClient, ObjectId } = require("mongodb");
-const {
-  default: makeWASocket,
+// @whiskeysockets/baileys 7.x is published as an ESM-only package ("type":
+// "module"), so it can't be loaded with require() from this CommonJS file.
+// These are populated via dynamic import() in the startup IIFE at the
+// bottom of this file, before anything that references them is invoked
+// (session creation only ever happens after startup completes).
+let makeWASocket,
   DisconnectReason,
   initAuthCreds,
   proto,
@@ -31,8 +35,7 @@ const {
   isJidGroup,
   fetchLatestBaileysVersion,
   makeCacheableSignalKeyStore,
-  Browsers,
-} = require("@whiskeysockets/baileys");
+  Browsers;
 const pino = require("pino");
 const QRCode = require("qrcode");
 
@@ -53,10 +56,10 @@ if (!MONGO_URI) {
 // Safety net: a stray async error from a single WhatsApp socket should never
 // take down the whole multi-tenant server. Log and keep running.
 process.on("uncaughtException", (err) => {
-  console.error("[uncaughtException]", err?.message ?? err);
+  console.error("[uncaughtException]", err?.stack ?? err?.message ?? err);
 });
 process.on("unhandledRejection", (reason) => {
-  console.error("[unhandledRejection]", reason?.message ?? reason);
+  console.error("[unhandledRejection]", reason?.stack ?? reason?.message ?? reason);
 });
 
 // ─── MongoDB ──────────────────────────────────────────────────────────────────
@@ -77,6 +80,9 @@ async function connectDb() {
   await db
     .collection("whatsapp_qr_sessions")
     .createIndex({ chatbotId: 1 }, { unique: true });
+  await db
+    .collection("whatsapp-qr-chat-history")
+    .createIndex({ userId: 1, chatbotId: 1, date: 1 }, { unique: true });
 }
 
 // ─── MongoDB auth state (per chatbotId) ───────────────────────────────────────
@@ -216,6 +222,89 @@ function createMessageWithTimestamp(role, content) {
 
 function cleanMessagesForOpenAI(messages) {
   return messages.map((m) => ({ role: m.role, content: m.content }));
+}
+
+/** Extracts the text body from a Baileys message — works for plain messages,
+ * quoted replies, and image/video captions. Named distinctly from the
+ * extractMessageText() below (which parses OpenAI Assistants API message
+ * content, not Baileys messages) — two same-named function declarations in
+ * one scope silently collapse to just the later one, which is what broke
+ * incoming-message handling here. */
+function extractBaileysMessageText(msg) {
+  return (
+    msg.message?.conversation ||
+    msg.message?.extendedTextMessage?.text ||
+    msg.message?.imageMessage?.caption ||
+    msg.message?.videoMessage?.caption ||
+    ""
+  );
+}
+
+// ─── whatsapp-qr-chat-history helpers ─────────────────────────────────────────
+// Shared write path for every message stored against a QR conversation,
+// whether it originates from an inbound WhatsApp message, an AI-generated
+// reply, or an agent's manual reply sent from the dashboard.
+
+/** Idempotently ensures the {userId,chatbotId,date} doc and chats[phoneKey] entry exist. */
+async function ensureChatEntry(userId, chatbotId, phoneKey, dateKey) {
+  const historyCol = db.collection("whatsapp-qr-chat-history");
+  const existingDoc = await historyCol.findOne({ userId, chatbotId, date: dateKey });
+
+  if (!existingDoc) {
+    const newDoc = {
+      userId,
+      chatbotId,
+      chats: {
+        [phoneKey]: {
+          messages: [],
+          usage: { completion_tokens: 0, prompt_tokens: 0, total_tokens: 0 },
+        },
+      },
+      date: dateKey,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    await historyCol.insertOne(newDoc);
+    return newDoc;
+  }
+
+  if (!existingDoc.chats?.[phoneKey]) {
+    await historyCol.updateOne(
+      { userId, chatbotId, date: dateKey },
+      {
+        $set: {
+          [`chats.${phoneKey}.messages`]: [],
+          [`chats.${phoneKey}.usage`]: { completion_tokens: 0, prompt_tokens: 0, total_tokens: 0 },
+          updatedAt: new Date(),
+        },
+      }
+    );
+    existingDoc.chats = existingDoc.chats || {};
+    existingDoc.chats[phoneKey] = { messages: [], usage: { completion_tokens: 0, prompt_tokens: 0, total_tokens: 0 } };
+  }
+
+  return existingDoc;
+}
+
+/** Ensures the chat entry exists, then appends messageDoc to it. Returns the pre-push doc. */
+async function persistMessage(userId, chatbotId, phoneKey, dateKey, messageDoc) {
+  const existingDoc = await ensureChatEntry(userId, chatbotId, phoneKey, dateKey);
+  await db.collection("whatsapp-qr-chat-history").updateOne(
+    { userId, chatbotId, date: dateKey },
+    {
+      $push: { [`chats.${phoneKey}.messages`]: messageDoc },
+      $set: { updatedAt: new Date() },
+    }
+  );
+  return existingDoc;
+}
+
+/** True if this phone number is currently in manual/human mode (AI auto-reply OFF). */
+async function isManualMode(chatbotId, phoneKey) {
+  const doc = await db
+    .collection("whatsapp_qr_sessions")
+    .findOne({ chatbotId }, { projection: { manualNumbers: 1 } });
+  return Boolean(doc?.manualNumbers?.includes(phoneKey));
 }
 
 // ─── Format helper (mirrors formatMessageForWhatsApp in route.ts) ─────────────
@@ -809,53 +898,14 @@ async function getAIReply(userMessage, chatbotId, userId, senderJid) {
   // Store user message immediately (mirrors route.ts step 5.5)
   const userMsg = createMessageWithTimestamp("user", userMessage);
 
-  let existingDoc = await historyCol.findOne({ userId, chatbotId, date: dateKey });
+  // ── 2a. Ensure the history document + phone-key entry exist, then persist
+  // the inbound user message (single write path shared with the manual-send
+  // and manual-mode-inbound paths — see persistMessage/ensureChatEntry above).
+  const existingDoc = await persistMessage(userId, chatbotId, phoneKey, dateKey, userMsg);
 
-  // ── 2a. Ensure the history document + phone-key entry exist ──────────────
-  if (!existingDoc) {
-    const newDoc = {
-      userId,
-      chatbotId,
-      chats: {
-        [phoneKey]: {
-          messages: [],
-          usage: { completion_tokens: 0, prompt_tokens: 0, total_tokens: 0 },
-        },
-      },
-      date: dateKey,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    await historyCol.insertOne(newDoc);
-    existingDoc = newDoc;
-  } else if (!existingDoc.chats?.[phoneKey]) {
-    await historyCol.updateOne(
-      { userId, chatbotId, date: dateKey },
-      {
-        $set: {
-          [`chats.${phoneKey}.messages`]: [],
-          [`chats.${phoneKey}.usage`]: { completion_tokens: 0, prompt_tokens: 0, total_tokens: 0 },
-          updatedAt: new Date(),
-        },
-      }
-    );
-    existingDoc.chats = existingDoc.chats || {};
-    existingDoc.chats[phoneKey] = { messages: [], usage: { completion_tokens: 0, prompt_tokens: 0, total_tokens: 0 } };
-  }
-
-  // ── 2b. Handle per-path thread wiring for legacy bots ───────────────────
   // bot-v2 uses the Responses API (stateless) — no thread needed.
   // Legacy bots don't use threads either; this variable is kept for compatibility.
   let threadId = null;
-
-  // Persist user message to history
-  await historyCol.updateOne(
-    { userId, chatbotId, date: dateKey },
-    {
-      $push: { [`chats.${phoneKey}.messages`]: userMsg },
-      $set: { updatedAt: new Date() },
-    }
-  );
 
   // ── 3. Generate AI response ───────────────────────────────────────────────
   let aiResponse = "";
@@ -1007,12 +1057,42 @@ async function handleIncomingMessage({ msg, isGroup, userMessage, chatbotId, soc
       return;
     }
 
-    // senderJid: participant JID for groups, remoteJid for 1-1
+    // senderJid: participant JID for groups, remoteJid for 1-1. This is the
+    // PROTOCOL-level address (used below for mentions/quoting) — WhatsApp
+    // increasingly addresses messages by an opaque LID instead of the real
+    // phone number for privacy, so it must stay untouched for actually
+    // routing replies.
     const senderJid = isGroup
       ? (msg.key.participant || msg.key.remoteJid)
       : msg.key.remoteJid;
+    // When Baileys resolves the real phone number behind a LID for this
+    // message (remoteJidAlt / participantAlt), use it as our own storage
+    // key so contacts show up under their real number in the dashboard
+    // instead of an opaque LID. Falls back to the LID when WhatsApp hasn't
+    // supplied the alt address for this particular message.
+    const senderJidAlt = isGroup ? msg.key.participantAlt : msg.key.remoteJidAlt;
+    const identityJid = senderJidAlt || senderJid;
+    const phoneKey = identityJid.split("@")[0];
 
-    const reply = await getAIReply(userMessage, chatbotId, chatbotDoc.userId, senderJid);
+    // Manual mode: an agent has taken this contact over from the dashboard.
+    // Store the inbound message (so it appears on the dashboard's next poll)
+    // but skip AI generation and auto-send entirely.
+    if (await isManualMode(chatbotId, phoneKey)) {
+      const dateKey = new Date().toISOString().slice(0, 10);
+      await persistMessage(
+        chatbotDoc.userId,
+        chatbotId,
+        phoneKey,
+        dateKey,
+        createMessageWithTimestamp("user", userMessage)
+      );
+      await db
+        .collection("whatsapp_qr_sessions")
+        .updateOne({ chatbotId }, { $set: { lastActivity: new Date() } });
+      return;
+    }
+
+    const reply = await getAIReply(userMessage, chatbotId, chatbotDoc.userId, identityJid);
 
     // null means a duplicate active-run was detected — skip sending
     if (reply === null) return;
@@ -1034,10 +1114,15 @@ async function handleIncomingMessage({ msg, isGroup, userMessage, chatbotId, soc
     }
 
     // Remember the message we just sent so it can be re-served to WhatsApp
-    // if the recipient's device requests a re-send (decryption retry).
+    // if the recipient's device requests a re-send (decryption retry), and
+    // mark its id as "ours" so the messages.upsert echo below doesn't
+    // mistake this AI reply for a message typed directly on the phone.
     const session = sessions.get(chatbotId);
     if (sent?.key?.id && sent.message && session?.rememberMessage) {
       session.rememberMessage(sent.key, sent.message);
+    }
+    if (sent?.key?.id && session?.markOwnSent) {
+      session.markOwnSent(sent.key.id);
     }
 
     await db
@@ -1045,7 +1130,38 @@ async function handleIncomingMessage({ msg, isGroup, userMessage, chatbotId, soc
       .updateOne({ chatbotId }, { $set: { lastActivity: new Date() } });
 
   } catch (err) {
-    console.error(`[MSG] Error handling message for ${chatbotId}:`, err.message);
+    console.error(`[MSG] Error handling message for ${chatbotId}:`, err.stack || err.message);
+  }
+}
+
+/**
+ * Logs a message the account owner sent directly from the WhatsApp app on
+ * their phone (not via our AI or the dashboard) so it still shows up in the
+ * Conversation History transcript. Only called for fromMe messages whose id
+ * isn't in session.ownSentIds — i.e. ones we didn't just send ourselves.
+ */
+async function handlePhoneSentMessage({ msg, chatbotId }) {
+  try {
+    if (isJidGroup(msg.key.remoteJid) || isJidBroadcast(msg.key.remoteJid)) return;
+
+    const text = extractBaileysMessageText(msg).trim();
+    if (!text) return;
+
+    const chatbotDoc = await db.collection("user-chatbots").findOne({ chatbotId });
+    if (!chatbotDoc) return;
+
+    // Prefer the real phone number (remoteJidAlt) over an opaque LID, same
+    // reasoning as the inbound path in handleIncomingMessage above.
+    const phoneKey = (msg.key.remoteJidAlt || msg.key.remoteJid).split("@")[0];
+    const dateKey = new Date().toISOString().slice(0, 10);
+    const messageDoc = { ...createMessageWithTimestamp("assistant", text), sentBy: "agent" };
+
+    await persistMessage(chatbotDoc.userId, chatbotId, phoneKey, dateKey, messageDoc);
+    await db
+      .collection("whatsapp_qr_sessions")
+      .updateOne({ chatbotId }, { $set: { lastActivity: new Date() } });
+  } catch (err) {
+    console.error(`[PHONE-SENT] Error handling phone-sent message for ${chatbotId}:`, err.message);
   }
 }
 
@@ -1077,6 +1193,22 @@ async function startSession(chatbotId, userId) {
     messageStore.set(key.id, message);
   };
   session.rememberMessage = rememberMessage;
+
+  // Bounded set of message ids we've sent ourselves (AI auto-replies). Lets
+  // the messages.upsert handler tell "we just sent this" apart from "the
+  // owner typed this directly into the WhatsApp app on their phone" — both
+  // arrive as fromMe:true, but only the latter needs to be freshly logged.
+  const ownSentIds = new Set();
+  const OWN_SENT_LIMIT = 500;
+  const markOwnSent = (id) => {
+    if (!id) return;
+    if (ownSentIds.size >= OWN_SENT_LIMIT) {
+      ownSentIds.delete(ownSentIds.values().next().value);
+    }
+    ownSentIds.add(id);
+  };
+  session.ownSentIds = ownSentIds;
+  session.markOwnSent = markOwnSent;
 
   const logger = pino({ level: "silent" });
   const { state, saveCreds } = await useMongoAuthState(chatbotId);
@@ -1243,23 +1375,31 @@ async function startSession(chatbotId, userId) {
     if (type !== "notify") return;
 
     for (const msg of msgs) {
+      // A single malformed/unexpected message shape must never abort the
+      // whole batch — catch synchronous errors per-message and keep going.
+      try {
       // Remember every inbound message so it can be served back to WhatsApp
       // if a re-send (decryption retry) is requested for it.
       if (msg.key?.id && msg.message) session.rememberMessage(msg.key, msg.message);
 
-      // Skip outbound and broadcast messages
-      if (msg.key.fromMe) continue;
+      // Outbound messages: if it's one we just sent ourselves (AI reply),
+      // there's nothing to do — already logged. Otherwise it was typed
+      // directly into the WhatsApp app on the linked phone — log it so it
+      // still shows up in the dashboard, then skip the AI/inbound pipeline.
+      if (msg.key.fromMe) {
+        if (msg.key?.id && !session.ownSentIds.has(msg.key.id)) {
+          handlePhoneSentMessage({ msg, chatbotId }).catch((err) => {
+            console.error(`[PHONE-SENT] Unhandled error for ${chatbotId}:`, err.stack || err.message);
+          });
+        }
+        continue;
+      }
       if (isJidBroadcast(msg.key.remoteJid)) continue;
 
       const isGroup = isJidGroup(msg.key.remoteJid);
 
       // Extract the text body — works for plain messages and quoted replies
-      const rawText =
-        msg.message?.conversation ||
-        msg.message?.extendedTextMessage?.text ||
-        msg.message?.imageMessage?.caption ||
-        msg.message?.videoMessage?.caption ||
-        "";
+      const rawText = extractBaileysMessageText(msg);
 
       // Debug log for every inbound message so group issues are visible in pm2 logs
       if (isGroup) {
@@ -1324,8 +1464,11 @@ async function startSession(chatbotId, userId) {
       // Awaiting here blocks the Node event loop and prevents Baileys from
       // sending keepalive frames, causing the socket to time out at 60s.
       handleIncomingMessage({ msg, isGroup, userMessage, chatbotId, sock }).catch((err) => {
-        console.error(`[MSG] Unhandled error for ${chatbotId}:`, err.message);
+        console.error(`[MSG] Unhandled error for ${chatbotId}:`, err.stack || err.message);
       });
+      } catch (err) {
+        console.error(`[MSG] Sync error processing message for ${chatbotId}:`, err.stack || err.message);
+      }
     }
   });
 
@@ -1519,6 +1662,18 @@ app.delete("/wa-qr/disconnect/:chatbotId", async (req, res) => {
 
 (async () => {
   try {
+    ({
+      default: makeWASocket,
+      DisconnectReason,
+      initAuthCreds,
+      proto,
+      isJidBroadcast,
+      isJidGroup,
+      fetchLatestBaileysVersion,
+      makeCacheableSignalKeyStore,
+      Browsers,
+    } = await import("@whiskeysockets/baileys"));
+
     await connectDb();
     await restoreSessions();
     app.listen(PORT, () => {
