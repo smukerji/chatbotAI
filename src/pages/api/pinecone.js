@@ -9,6 +9,12 @@ import { PromptTemplate } from "@langchain/core/prompts";
 import { MultiQueryRetriever } from "langchain/retrievers/multi_query";
 import { openai } from "@/app/openai";
 
+/// retrieval does 2 LLM calls + pinecone searches; without this it hits the
+/// default limit and returns FUNCTION_INVOCATION_TIMEOUT (504)
+export const config = {
+  maxDuration: 300,
+};
+
 export default async function handler(req, res) {
   if (req.method === "POST") {
     // await pinecone.init({
