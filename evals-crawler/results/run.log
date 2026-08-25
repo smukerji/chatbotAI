@@ -1,0 +1,60 @@
+floatco        p36 t64 r45 d64  https://floatco.com/pricing
+floatco        p99 t99 r98 d1  https://floatco.com/faq
+floatco        p54 t77 r69 d69  https://floatco.com/membership
+livall         p88 t96 r50 d85  https://mall.livall.com/products/bh51m
+livall         p81 t94 r55 d77  https://mall.livall.com/products/evo21
+livall         p0 t0 r0 d0  https://mall.livall.com/collections/all
+musaffa        p79 t87 r73 d0  https://musaffa.com/halal-investing.php
+musaffa        p79 t87 r73 d0  https://musaffa.com/index.php
+musaffa        p79 t87 r73 d0  https://musaffa.com/terms-conditions.php
+spica          p96 t36 r12 d12  https://marketplace.spica.com/suprema-biometric-readers-fo
+spica          p96 t31 r12 d12  https://marketplace.spica.com/suprema-biometric-readers-fo
+spica          p93 t47 r20 d20  https://marketplace.spica.com/suprema-biometric-readers-fo
+creolestudios  p98 t75 r0 d25  https://www.creolestudios.com/mobile-app-development/
+creolestudios  p17 t33 r0 d33  https://www.creolestudios.com/cloud-application-developmen
+creolestudios  p100 t78 r67 d52  https://www.creolestudios.com/contact-us/
+yumsing        p60 t60 r33 d40  https://www.yumsinghouse.com/sing
+yumsing        p65 t70 r43 d39  https://www.yumsinghouse.com/yum
+yumsing        p40 t60 r60 d20  https://www.yumsinghouse.com/contact-us
+imi-gov-my     p98 t96 r95 d95  https://esd.imi.gov.my/portal/faq/myxpats/
+imi-gov-my     p0 t50 r50 d0  https://esd.imi.gov.my/portal/faq/
+imi-gov-my     p64 t29 r21 d7  https://esd.imi.gov.my/portal/
+  ERROR https://tinhte.vn/thread/cach-thanh-pho-rome-xu-ly-tien-xu-cau-may-man-o-dai-phun-nuoc-trevi.3773772/ :: Navigation timeout of 45000 ms exceeded
+tinhte         p74 t76 r3 d71  https://tinhte.vn/
+tinhte         p33 t100 r67 d67  https://tinhte.vn/forums/khoa-hoc-cong-nghe.72/
+  ERROR https://en.wikipedia.org/wiki/Comparison_of_web_browsers :: Navigation timeout of 45000 ms exceeded
+wikipedia      p89 t67 r53 d55  https://en.wikipedia.org/wiki/List_of_countries_by_GDP_(no
+wikipedia      p82 t74 r72 d72  https://en.wikipedia.org/wiki/Retrieval-augmented_generati
+python-docs    p71 t79 r79 d79  https://docs.python.org/3/library/functions.html
+python-docs    p81 t69 r69 d68  https://docs.python.org/3/library/os.path.html
+python-docs    p64 t77 r66 d60  https://docs.python.org/3/tutorial/introduction.html
+nextjs-docs    p71 t80 r69 d76  https://nextjs.org/docs/app/api-reference/functions/fetch
+nextjs-docs    p62 t83 r67 d66  https://nextjs.org/docs/app/building-your-application/rout
+nextjs-docs    p31 t50 r33 d36  https://nextjs.org/docs/app/api-reference/file-conventions
+vercel-pricing p35 t80 r10 d55  https://vercel.com/pricing
+vercel-pricing p19 t98 r0 d98  https://vercel.com/docs/limits
+vercel-pricing p65 t86 r58 d86  https://vercel.com/docs/functions
+Could not parse CSS stylesheet
+Could not parse CSS stylesheet
+[csstree-match] BREAK after 15000 iterations
+Could not parse CSS stylesheet
+Could not parse CSS stylesheet
+w3schools      p63 t68 r53 d68  https://www.w3schools.com/html/html_tables.asp
+Could not parse CSS stylesheet
+Could not parse CSS stylesheet
+Could not parse CSS stylesheet
+Could not parse CSS stylesheet
+w3schools      p85 t69 r46 d77  https://www.w3schools.com/css/css_table.asp
+Could not parse CSS stylesheet
+Could not parse CSS stylesheet
+Could not parse CSS stylesheet
+Could not parse CSS stylesheet
+w3schools      p80 t87 r60 d20  https://www.w3schools.com/sql/sql_select.asp
+mdn            p54 t42 r39 d41  https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+mdn            p83 t61 r44 d56  https://developer.mozilla.org/en-US/docs/Web/CSS/grid
+mdn            p96 t66 r65 d66  https://developer.mozilla.org/en-US/docs/Web/JavaScript/Re
+gov-uk         p81 t95 r67 d76  https://www.gov.uk/income-tax-rates
+gov-uk         p100 t78 r22 d22  https://www.gov.uk/vat-rates
+gov-uk         p94 t94 r53 d59  https://www.gov.uk/national-minimum-wage-rates
+
+-> C:\torri-new\chatbotAI\evals-crawler\results\broad-bakeoff.json  (174 rows)

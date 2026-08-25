@@ -1,0 +1,32 @@
+{
+  "url": "https://floatco.com/pricing",
+  "rows": [
+    {
+      "label": "A production",
+      "chars": 3789,
+      "chunks": 3,
+      "glued": 49,
+      "midWord": 1,
+      "imageChars": 789,
+      "hasTable": false
+    },
+    {
+      "label": "B turndown",
+      "chars": 5578,
+      "chunks": 10,
+      "glued": 46,
+      "midWord": 0,
+      "imageChars": 0,
+      "hasTable": false
+    },
+    {
+      "label": "C readability+turndown",
+      "chars": 1884,
+      "chunks": 6,
+      "glued": 9,
+      "midWord": 0,
+      "imageChars": 0,
+      "hasTable": false
+    }
+  ]
+}

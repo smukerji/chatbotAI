@@ -1,0 +1,581 @@
+{
+  "results": [
+    {
+      "url": "https://mall.livall.com/collections/all",
+      "storedCharCount": 324564,
+      "loadMs": 8646,
+      "title": "Safest Smart Heltmet For Every Rider – LIVALL RIDING",
+      "bodyInnerTextChars": 1605,
+      "boilerplateChars": 1339,
+      "hasMainLandmark": true,
+      "mainChars": 1158,
+      "imgCount": 102,
+      "linkCount": 231,
+      "prodChars": 11590,
+      "prodChunks": 7,
+      "images": {
+        "count": 0,
+        "chars": 0
+      },
+      "gluedWords": 80,
+      "domGluedWords": 0,
+      "midWord": {
+        "bad": 0,
+        "of": 6
+      }
+    },
+    {
+      "url": "https://mall.livall.com/products/bh60se",
+      "storedCharCount": 46145,
+      "loadMs": 8831,
+      "title": "BH60SE NEO Road/Mountain Helmet — Voice-Control Ready – LIVALL RIDING",
+      "bodyInnerTextChars": 4423,
+      "boilerplateChars": 1202,
+      "hasMainLandmark": true,
+      "mainChars": 3948,
+      "imgCount": 106,
+      "linkCount": 190,
+      "prodChars": 13902,
+      "prodChunks": 8,
+      "images": {
+        "count": 0,
+        "chars": 0
+      },
+      "gluedWords": 70,
+      "domGluedWords": 1,
+      "midWord": {
+        "bad": 1,
+        "of": 7
+      }
+    },
+    {
+      "url": "https://mall.livall.com/cart",
+      "storedCharCount": 7603,
+      "loadMs": 9897,
+      "title": "LIVALL | PikaBoost E-Bike Kit & Bluetooth Helmets with Fall Detection – LIVALL RIDING",
+      "bodyInnerTextChars": 6293,
+      "boilerplateChars": 1149,
+      "hasMainLandmark": true,
+      "mainChars": 5832,
+      "imgCount": 139,
+      "linkCount": 225,
+      "prodChars": 22506,
+      "prodChunks": 13,
+      "images": {
+        "count": 0,
+        "chars": 0
+      },
+      "gluedWords": 95,
+      "domGluedWords": 16,
+      "midWord": {
+        "bad": 1,
+        "of": 12
+      }
+    },
+    {
+      "url": "https://musaffa.com/terms-conditions.php",
+      "storedCharCount": 71717,
+      "loadMs": 3333,
+      "title": "Musaffa - Halal Stock Screening & Investment Platform",
+      "bodyInnerTextChars": 8539,
+      "boilerplateChars": 9154,
+      "hasMainLandmark": true,
+      "mainChars": 133,
+      "imgCount": 13,
+      "linkCount": 193,
+      "prodChars": 11760,
+      "prodChunks": 7,
+      "images": {
+        "count": 0,
+        "chars": 0
+      },
+      "gluedWords": 250,
+      "domGluedWords": 0,
+      "midWord": {
+        "bad": 4,
+        "of": 6
+      }
+    },
+    {
+      "url": "https://musaffa.com/index.php",
+      "storedCharCount": 15789,
+      "loadMs": 3181,
+      "title": "Musaffa - Halal Stock Screening & Investment Platform",
+      "bodyInnerTextChars": 8539,
+      "boilerplateChars": 9154,
+      "hasMainLandmark": true,
+      "mainChars": 133,
+      "imgCount": 13,
+      "linkCount": 193,
+      "prodChars": 11760,
+      "prodChunks": 7,
+      "images": {
+        "count": 0,
+        "chars": 0
+      },
+      "gluedWords": 250,
+      "domGluedWords": 0,
+      "midWord": {
+        "bad": 4,
+        "of": 6
+      }
+    },
+    {
+      "url": "https://musaffa.com/halal-investing.php",
+      "storedCharCount": 5974,
+      "loadMs": 3973,
+      "title": "Musaffa - Halal Stock Screening & Investment Platform",
+      "bodyInnerTextChars": 8539,
+      "boilerplateChars": 9154,
+      "hasMainLandmark": true,
+      "mainChars": 133,
+      "imgCount": 13,
+      "linkCount": 193,
+      "prodChars": 11760,
+      "prodChunks": 7,
+      "images": {
+        "count": 0,
+        "chars": 0
+      },
+      "gluedWords": 250,
+      "domGluedWords": 0,
+      "midWord": {
+        "bad": 4,
+        "of": 6
+      }
+    },
+    {
+      "url": "https://floatco.com/faq",
+      "storedCharCount": 44831,
+      "loadMs": 4201,
+      "title": "FAQ",
+      "bodyInnerTextChars": 43077,
+      "boilerplateChars": 395,
+      "hasMainLandmark": false,
+      "mainChars": null,
+      "imgCount": 7,
+      "linkCount": 48,
+      "prodChars": 44831,
+      "prodChunks": 25,
+      "images": {
+        "count": 0,
+        "chars": 0
+      },
+      "gluedWords": 49,
+      "domGluedWords": 8,
+      "midWord": {
+        "bad": 17,
+        "of": 24
+      }
+    },
+    {
+      "url": "https://floatco.com/",
+      "storedCharCount": 5199,
+      "loadMs": 4315,
+      "title": "Float Therapy and Cold Plunge Therapy in Hong Kong | FLOAT Co",
+      "bodyInnerTextChars": 2715,
+      "boilerplateChars": 293,
+      "hasMainLandmark": false,
+      "mainChars": null,
+      "imgCount": 20,
+      "linkCount": 31,
+      "prodChars": 5167,
+      "prodChunks": 3,
+      "images": {
+        "count": 0,
+        "chars": 0
+      },
+      "gluedWords": 37,
+      "domGluedWords": 1,
+      "midWord": {
+        "bad": 1,
+        "of": 2
+      }
+    },
+    {
+      "url": "https://floatco.com/booking",
+      "storedCharCount": 1504,
+      "error": "Navigation timeout of 60000 ms exceeded"
+    },
+    {
+      "url": "https://marketplace.spica.com/suprema-biometric-readers-for-time-attendance-and-access-control?list_view=1&p=2",
+      "storedCharCount": 38158,
+      "loadMs": 3485,
+      "title": "Suprema Readers : Marketplace.spica.com",
+      "bodyInnerTextChars": 5053,
+      "boilerplateChars": 1942,
+      "hasMainLandmark": false,
+      "mainChars": null,
+      "imgCount": 20,
+      "linkCount": 166,
+      "prodChars": 38158,
+      "prodChunks": 22,
+      "images": {
+        "count": 4,
+        "chars": 343
+      },
+      "gluedWords": 45,
+      "domGluedWords": 39,
+      "midWord": {
+        "bad": 1,
+        "of": 21
+      }
+    },
+    {
+      "url": "https://marketplace.spica.com/suprema-biometric-readers-for-time-attendance-and-access-control?list_view=1&p=1",
+      "storedCharCount": 38001,
+      "loadMs": 1491,
+      "title": "Suprema Readers : Marketplace.spica.com",
+      "bodyInnerTextChars": 5045,
+      "boilerplateChars": 1942,
+      "hasMainLandmark": false,
+      "mainChars": null,
+      "imgCount": 20,
+      "linkCount": 164,
+      "prodChars": 38001,
+      "prodChunks": 22,
+      "images": {
+        "count": 4,
+        "chars": 343
+      },
+      "gluedWords": 56,
+      "domGluedWords": 50,
+      "midWord": {
+        "bad": 1,
+        "of": 21
+      }
+    },
+    {
+      "url": "https://marketplace.spica.com/suprema-biometric-readers-for-time-attendance-and-access-control?list_view=1&p=3",
+      "storedCharCount": 24102,
+      "loadMs": 1377,
+      "title": "Suprema Readers : Marketplace.spica.com",
+      "bodyInnerTextChars": 2919,
+      "boilerplateChars": 1942,
+      "hasMainLandmark": false,
+      "mainChars": null,
+      "imgCount": 10,
+      "linkCount": 124,
+      "prodChars": 24102,
+      "prodChunks": 14,
+      "images": {
+        "count": 4,
+        "chars": 343
+      },
+      "gluedWords": 14,
+      "domGluedWords": 8,
+      "midWord": {
+        "bad": 0,
+        "of": 13
+      }
+    },
+    {
+      "url": "https://www.creolestudios.com/mobile-app-development/",
+      "storedCharCount": 20985,
+      "loadMs": 3371,
+      "title": "Mobile App Development Company | Creole Studios",
+      "bodyInnerTextChars": 9064,
+      "boilerplateChars": 13868,
+      "hasMainLandmark": true,
+      "mainChars": 8473,
+      "imgCount": 163,
+      "linkCount": 65,
+      "prodChars": 25160,
+      "prodChunks": 14,
+      "images": {
+        "count": 0,
+        "chars": 0
+      },
+      "gluedWords": 129,
+      "domGluedWords": 9,
+      "midWord": {
+        "bad": 10,
+        "of": 13
+      }
+    },
+    {
+      "url": "https://www.creolestudios.com/cloud-application-development/",
+      "storedCharCount": 18434,
+      "loadMs": 5459,
+      "title": "Page not found - Creole Studios",
+      "bodyInnerTextChars": 882,
+      "boilerplateChars": 936,
+      "hasMainLandmark": true,
+      "mainChars": 82,
+      "imgCount": 29,
+      "linkCount": 31,
+      "prodChars": 5485,
+      "prodChunks": 4,
+      "images": {
+        "count": 0,
+        "chars": 0
+      },
+      "gluedWords": 43,
+      "domGluedWords": 1,
+      "midWord": {
+        "bad": 3,
+        "of": 3
+      }
+    },
+    {
+      "url": "https://www.creolestudios.com/contact-us/",
+      "storedCharCount": 7905,
+      "loadMs": 1354,
+      "title": "Contact Us - Creole Studios",
+      "bodyInnerTextChars": 3367,
+      "boilerplateChars": 14296,
+      "hasMainLandmark": true,
+      "mainChars": 2776,
+      "imgCount": 89,
+      "linkCount": 34,
+      "prodChars": 14262,
+      "prodChunks": 8,
+      "images": {
+        "count": 1,
+        "chars": 190
+      },
+      "gluedWords": 53,
+      "domGluedWords": 1,
+      "midWord": {
+        "bad": 5,
+        "of": 7
+      }
+    },
+    {
+      "url": "https://tinhte.vn/thread/cach-thanh-pho-rome-xu-ly-tien-xu-cau-may-man-o-dai-phun-nuoc-trevi.3773772/",
+      "storedCharCount": 17566,
+      "loadMs": 45152,
+      "title": "Hình Ảnh: Cách thành phố Rome xử lý tiền xu cầu may mắn ở Đài phun nước Trevi | Viết bởi Nam Air",
+      "bodyInnerTextChars": 10074,
+      "boilerplateChars": 1713,
+      "hasMainLandmark": true,
+      "mainChars": 3750,
+      "imgCount": 55,
+      "linkCount": 165,
+      "prodChars": 15841,
+      "prodChunks": 9,
+      "images": {
+        "count": 0,
+        "chars": 0
+      },
+      "gluedWords": 129,
+      "domGluedWords": 13,
+      "midWord": {
+        "bad": 0,
+        "of": 8
+      }
+    },
+    {
+      "url": "https://esd.imi.gov.my/portal/faq/myxpats/",
+      "storedCharCount": 16814,
+      "loadMs": 3242,
+      "title": "ESD",
+      "bodyInnerTextChars": 22127,
+      "boilerplateChars": 239,
+      "hasMainLandmark": false,
+      "mainChars": null,
+      "imgCount": 2,
+      "linkCount": 53,
+      "prodChars": 26359,
+      "prodChunks": 15,
+      "images": {
+        "count": 0,
+        "chars": 0
+      },
+      "gluedWords": 103,
+      "domGluedWords": 67,
+      "midWord": {
+        "bad": 4,
+        "of": 14
+      }
+    },
+    {
+      "url": "https://www.allrecipes.com/recipes/22992/everyday-cooking/sheet-pan-dinners/",
+      "storedCharCount": 8096,
+      "loadMs": 10679,
+      "title": "Sheet Pan Dinner Recipes",
+      "bodyInnerTextChars": 4834,
+      "boilerplateChars": 33064,
+      "hasMainLandmark": true,
+      "mainChars": 4115,
+      "imgCount": 73,
+      "linkCount": 304,
+      "prodChars": 7601,
+      "prodChunks": 5,
+      "images": {
+        "count": 0,
+        "chars": 0
+      },
+      "gluedWords": 310,
+      "domGluedWords": 0,
+      "midWord": {
+        "bad": 2,
+        "of": 4
+      }
+    },
+    {
+      "url": "https://www.allrecipes.com/recipes/1947/everyday-cooking/quick-and-easy/",
+      "storedCharCount": 7472,
+      "loadMs": 7005,
+      "title": "Quick and Easy Recipes",
+      "bodyInnerTextChars": 5358,
+      "boilerplateChars": 32930,
+      "hasMainLandmark": true,
+      "mainChars": 4639,
+      "imgCount": 73,
+      "linkCount": 313,
+      "prodChars": 7896,
+      "prodChunks": 5,
+      "images": {
+        "count": 0,
+        "chars": 0
+      },
+      "gluedWords": 272,
+      "domGluedWords": 0,
+      "midWord": {
+        "bad": 1,
+        "of": 4
+      }
+    },
+    {
+      "url": "https://www.allrecipes.com/recipes/",
+      "storedCharCount": 6733,
+      "loadMs": 12152,
+      "title": "Recipes",
+      "bodyInnerTextChars": 4346,
+      "boilerplateChars": 34174,
+      "hasMainLandmark": true,
+      "mainChars": 3627,
+      "imgCount": 77,
+      "linkCount": 302,
+      "prodChars": 6667,
+      "prodChunks": 4,
+      "images": {
+        "count": 0,
+        "chars": 0
+      },
+      "gluedWords": 292,
+      "domGluedWords": 0,
+      "midWord": {
+        "bad": 1,
+        "of": 3
+      }
+    },
+    {
+      "url": "https://www.yumsinghouse.com/sing",
+      "storedCharCount": 7651,
+      "loadMs": 5729,
+      "title": "Little LKF Bar and Karaoke | Late Night Karaoke Melbourne CBD",
+      "bodyInnerTextChars": 1714,
+      "boilerplateChars": 680,
+      "hasMainLandmark": true,
+      "mainChars": 1428,
+      "imgCount": 7,
+      "linkCount": 31,
+      "prodChars": 2166,
+      "prodChunks": 2,
+      "images": {
+        "count": 0,
+        "chars": 0
+      },
+      "gluedWords": 42,
+      "domGluedWords": 0,
+      "midWord": {
+        "bad": 0,
+        "of": 1
+      }
+    },
+    {
+      "url": "https://www.yumsinghouse.com/yum",
+      "storedCharCount": 3298,
+      "loadMs": 4001,
+      "title": "Yum Sing House | Contemporary Asian Dining",
+      "bodyInnerTextChars": 2365,
+      "boilerplateChars": 674,
+      "hasMainLandmark": true,
+      "mainChars": 2016,
+      "imgCount": 12,
+      "linkCount": 35,
+      "prodChars": 3107,
+      "prodChunks": 2,
+      "images": {
+        "count": 0,
+        "chars": 0
+      },
+      "gluedWords": 45,
+      "domGluedWords": 0,
+      "midWord": {
+        "bad": 0,
+        "of": 1
+      }
+    },
+    {
+      "url": "https://www.yumsinghouse.com/contact-us",
+      "storedCharCount": 1132,
+      "loadMs": 3285,
+      "title": "Contact Us | Yum Sing House",
+      "bodyInnerTextChars": 777,
+      "boilerplateChars": 404,
+      "hasMainLandmark": true,
+      "mainChars": 538,
+      "imgCount": 5,
+      "linkCount": 30,
+      "prodChars": 1367,
+      "prodChunks": 1,
+      "images": {
+        "count": 0,
+        "chars": 0
+      },
+      "gluedWords": 32,
+      "domGluedWords": 0,
+      "midWord": {
+        "bad": 0,
+        "of": 0
+      }
+    }
+  ],
+  "repetition": [
+    {
+      "host": "mall.livall.com",
+      "pages": 3,
+      "repeatedShingles": 497,
+      "meanRepeatShare": 0.5205490628003911
+    },
+    {
+      "host": "musaffa.com",
+      "pages": 3,
+      "repeatedShingles": 1554,
+      "meanRepeatShare": 1
+    },
+    {
+      "host": "floatco.com",
+      "pages": 2,
+      "repeatedShingles": 76,
+      "meanRepeatShare": 0.09321666129007482
+    },
+    {
+      "host": "marketplace.spica.com",
+      "pages": 3,
+      "repeatedShingles": 432,
+      "meanRepeatShare": 0.6075406292595239
+    },
+    {
+      "host": "www.creolestudios.com",
+      "pages": 3,
+      "repeatedShingles": 350,
+      "meanRepeatShare": 0.2388848089438239
+    },
+    {
+      "host": "www.allrecipes.com",
+      "pages": 3,
+      "repeatedShingles": 201,
+      "meanRepeatShare": 0.28965770237822547
+    },
+    {
+      "host": "www.yumsinghouse.com",
+      "pages": 3,
+      "repeatedShingles": 127,
+      "meanRepeatShare": 0.36631316947099485
+    }
+  ]
+}

@@ -1,0 +1,195 @@
+{
+  "note": "Stratified corpus. 3 pages per site so cross-page boilerplate repetition can be measured. Customer sites are kept because they are the real target; the rest add coverage of stacks and rendering modes the customer set does not have.",
+  "sites": [
+    {
+      "id": "floatco",
+      "stack": "webflow",
+      "rendering": "static",
+      "type": "local-business",
+      "tables": "css-grid",
+      "lang": "en",
+      "customer": true,
+      "urls": ["https://floatco.com/pricing", "https://floatco.com/faq", "https://floatco.com/membership"]
+    },
+    {
+      "id": "livall",
+      "stack": "shopify",
+      "rendering": "hybrid",
+      "type": "ecommerce-product",
+      "tables": "css-grid",
+      "lang": "en",
+      "customer": true,
+      "urls": ["https://mall.livall.com/products/bh51m", "https://mall.livall.com/products/evo21", "https://mall.livall.com/collections/all"]
+    },
+    {
+      "id": "musaffa",
+      "stack": "custom-spa",
+      "rendering": "client-rendered",
+      "type": "fintech-marketing",
+      "tables": "css-grid",
+      "lang": "en",
+      "customer": true,
+      "urls": ["https://musaffa.com/halal-investing.php", "https://musaffa.com/index.php", "https://musaffa.com/terms-conditions.php"]
+    },
+    {
+      "id": "spica",
+      "stack": "custom",
+      "rendering": "static",
+      "type": "marketplace-listing",
+      "tables": "list",
+      "lang": "en",
+      "customer": true,
+      "urls": [
+        "https://marketplace.spica.com/suprema-biometric-readers-for-time-attendance-and-access-control?list_view=1",
+        "https://marketplace.spica.com/suprema-biometric-readers-for-time-attendance-and-access-control?list_view=1&p=2",
+        "https://marketplace.spica.com/suprema-biometric-readers-for-time-attendance-and-access-control?list_view=1&p=3"
+      ]
+    },
+    {
+      "id": "creolestudios",
+      "stack": "wordpress",
+      "rendering": "static",
+      "type": "agency-marketing",
+      "tables": "none",
+      "lang": "en",
+      "customer": true,
+      "urls": [
+        "https://www.creolestudios.com/mobile-app-development/",
+        "https://www.creolestudios.com/cloud-application-development/",
+        "https://www.creolestudios.com/contact-us/"
+      ]
+    },
+    {
+      "id": "yumsing",
+      "stack": "wix-like",
+      "rendering": "client-rendered",
+      "type": "restaurant",
+      "tables": "none",
+      "lang": "en",
+      "customer": true,
+      "urls": ["https://www.yumsinghouse.com/sing", "https://www.yumsinghouse.com/yum", "https://www.yumsinghouse.com/contact-us"]
+    },
+    {
+      "id": "imi-gov-my",
+      "stack": "gov-cms",
+      "rendering": "static",
+      "type": "government-faq",
+      "tables": "html-table",
+      "lang": "en",
+      "customer": true,
+      "urls": [
+        "https://esd.imi.gov.my/portal/faq/myxpats/",
+        "https://esd.imi.gov.my/portal/faq/",
+        "https://esd.imi.gov.my/portal/"
+      ]
+    },
+    {
+      "id": "tinhte",
+      "stack": "xenforo",
+      "rendering": "static",
+      "type": "forum",
+      "tables": "none",
+      "lang": "vi",
+      "customer": true,
+      "urls": [
+        "https://tinhte.vn/thread/cach-thanh-pho-rome-xu-ly-tien-xu-cau-may-man-o-dai-phun-nuoc-trevi.3773772/",
+        "https://tinhte.vn/",
+        "https://tinhte.vn/forums/khoa-hoc-cong-nghe.72/"
+      ]
+    },
+    {
+      "id": "wikipedia",
+      "stack": "mediawiki",
+      "rendering": "static",
+      "type": "reference-article",
+      "tables": "html-table",
+      "lang": "en",
+      "customer": false,
+      "urls": [
+        "https://en.wikipedia.org/wiki/Comparison_of_web_browsers",
+        "https://en.wikipedia.org/wiki/List_of_countries_by_GDP_(nominal)",
+        "https://en.wikipedia.org/wiki/Retrieval-augmented_generation"
+      ]
+    },
+    {
+      "id": "python-docs",
+      "stack": "sphinx",
+      "rendering": "static",
+      "type": "technical-docs",
+      "tables": "html-table",
+      "lang": "en",
+      "customer": false,
+      "urls": [
+        "https://docs.python.org/3/library/functions.html",
+        "https://docs.python.org/3/library/os.path.html",
+        "https://docs.python.org/3/tutorial/introduction.html"
+      ]
+    },
+    {
+      "id": "nextjs-docs",
+      "stack": "nextjs",
+      "rendering": "hybrid",
+      "type": "technical-docs",
+      "tables": "html-table",
+      "lang": "en",
+      "customer": false,
+      "urls": [
+        "https://nextjs.org/docs/app/api-reference/functions/fetch",
+        "https://nextjs.org/docs/app/building-your-application/routing",
+        "https://nextjs.org/docs/app/api-reference/file-conventions/route"
+      ]
+    },
+    {
+      "id": "vercel-pricing",
+      "stack": "nextjs",
+      "rendering": "hybrid",
+      "type": "saas-pricing",
+      "tables": "css-grid",
+      "lang": "en",
+      "customer": false,
+      "urls": ["https://vercel.com/pricing", "https://vercel.com/docs/limits", "https://vercel.com/docs/functions"]
+    },
+    {
+      "id": "w3schools",
+      "stack": "custom",
+      "rendering": "static",
+      "type": "tutorial",
+      "tables": "html-table",
+      "lang": "en",
+      "customer": false,
+      "urls": [
+        "https://www.w3schools.com/html/html_tables.asp",
+        "https://www.w3schools.com/css/css_table.asp",
+        "https://www.w3schools.com/sql/sql_select.asp"
+      ]
+    },
+    {
+      "id": "mdn",
+      "stack": "custom-ssg",
+      "rendering": "static",
+      "type": "technical-docs",
+      "tables": "html-table",
+      "lang": "en",
+      "customer": false,
+      "urls": [
+        "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status",
+        "https://developer.mozilla.org/en-US/docs/Web/CSS/grid",
+        "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array"
+      ]
+    },
+    {
+      "id": "gov-uk",
+      "stack": "gov-uk",
+      "rendering": "static",
+      "type": "government-guidance",
+      "tables": "html-table",
+      "lang": "en",
+      "customer": false,
+      "urls": [
+        "https://www.gov.uk/income-tax-rates",
+        "https://www.gov.uk/vat-rates",
+        "https://www.gov.uk/national-minimum-wage-rates"
+      ]
+    }
+  ]
+}

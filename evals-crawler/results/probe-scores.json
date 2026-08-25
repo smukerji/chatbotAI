@@ -1,0 +1,43 @@
+{
+  "url": "https://floatco.com/pricing",
+  "rows": [
+    {
+      "label": "defuddle",
+      "chars": 3383,
+      "probesKept": "6/6",
+      "missing": [],
+      "glued": 31,
+      "imageChars": 0
+    },
+    {
+      "label": "production",
+      "chars": 3789,
+      "probesKept": "6/6",
+      "missing": [],
+      "glued": 49,
+      "imageChars": 789
+    },
+    {
+      "label": "turndown",
+      "chars": 5578,
+      "probesKept": "6/6",
+      "missing": [],
+      "glued": 46,
+      "imageChars": 0
+    },
+    {
+      "label": "readability",
+      "chars": 1884,
+      "probesKept": "1/6",
+      "missing": [
+        "$500",
+        "$900",
+        "$1,600",
+        "$800",
+        "COLD plunge"
+      ],
+      "glued": 9,
+      "imageChars": 0
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "name": "evals-crawler",
+  "private": true,
+  "description": "Crawler extraction diagnostics and library bake-off. Separate from the app's dependencies on purpose.",
+  "dependencies": {
+    "@mozilla/readability": "^0.5.0",
+    "defuddle": "^0.19.3",
+    "jsdom": "^29.1.1",
+    "turndown": "^7.2.0",
+    "turndown-plugin-gfm": "^1.0.2"
+  }
+}
