@@ -1,0 +1,645 @@
+<title>Choosing Our Eval Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap">
+
+<style>
+  :root {
+    --bg:        #EDF0F1;
+    --surface:   #FFFFFF;
+    --surface-2: #F5F7F7;
+    --ink:       #101A1F;
+    --ink-2:     #33454C;
+    --muted:     #5E7077;
+    --rule:      #D2DADC;
+    --rule-soft: #E3E9EA;
+    --accent:    #14595E;
+    --warn:      #87560A;
+    --stop:      #8C2F2F;
+    --good:      #2C6E52;
+
+    --display: "IBM Plex Sans Condensed", "Helvetica Neue", Arial, sans-serif;
+    --body:    "IBM Plex Serif", Georgia, "Times New Roman", serif;
+    --data:    "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+
+    --measure: 70ch;
+    --wide:    980px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:        #0C1316;
+      --surface:   #131E22;
+      --surface-2: #18262B;
+      --ink:       #DEE8EA;
+      --ink-2:     #B4C4C8;
+      --muted:     #8399A0;
+      --rule:      #26383E;
+      --rule-soft: #1D2C31;
+      --accent:    #58B7BC;
+      --warn:      #D6A34A;
+      --stop:      #DE8080;
+      --good:      #6FBF95;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg:        #0C1316;
+    --surface:   #131E22;
+    --surface-2: #18262B;
+    --ink:       #DEE8EA;
+    --ink-2:     #B4C4C8;
+    --muted:     #8399A0;
+    --rule:      #26383E;
+    --rule-soft: #1D2C31;
+    --accent:    #58B7BC;
+    --warn:      #D6A34A;
+    --stop:      #DE8080;
+    --good:      #6FBF95;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 17px;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0 24px 110px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: var(--wide);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 52px;
+  }
+
+  header.masthead {
+    padding-top: 68px;
+    padding-bottom: 26px;
+    border-bottom: 2px solid var(--ink);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .kicker {
+    font-family: var(--data);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(36px, 5.6vw, 58px);
+    line-height: 1.03;
+    letter-spacing: -0.015em;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .standfirst {
+    font-size: 19px;
+    line-height: 1.5;
+    color: var(--ink-2);
+    max-width: 60ch;
+    margin: 0;
+  }
+
+  .meta {
+    font-family: var(--data);
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 22px;
+  }
+
+  section { display: flex; flex-direction: column; gap: 16px; }
+
+  .eyebrow {
+    font-family: var(--data);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  h2 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(25px, 3.2vw, 32px);
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  h3 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 19px;
+    line-height: 1.25;
+    margin: 12px 0 0;
+  }
+
+  p { margin: 0; max-width: var(--measure); }
+
+  a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-thickness: 1px;
+    text-decoration-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  }
+  a:hover { text-decoration-color: var(--accent); }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+
+  ul, ol {
+    margin: 0;
+    padding-left: 1.15em;
+    max-width: var(--measure);
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+  li::marker { color: var(--accent); }
+
+  strong { font-weight: 600; }
+  em { font-style: italic; }
+
+  code {
+    font-family: var(--data);
+    font-size: 0.86em;
+    background: var(--surface-2);
+    border: 1px solid var(--rule-soft);
+    border-radius: 3px;
+    padding: 1px 5px;
+  }
+
+  .verdict {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-left: 4px solid var(--accent);
+    padding: 28px 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .verdict h2 { font-size: 26px; }
+
+  .tcap {
+    font-family: var(--data);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 -8px;
+    max-width: none;
+  }
+
+  .scroller {
+    overflow-x: auto;
+    border: 1px solid var(--rule);
+    background: var(--surface);
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 560px;
+    font-family: var(--display);
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  th, td {
+    text-align: left;
+    padding: 10px 15px;
+    border-bottom: 1px solid var(--rule-soft);
+    vertical-align: top;
+  }
+
+  thead th {
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--rule);
+    white-space: nowrap;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+
+  td.num { font-family: var(--data); font-size: 14px; white-space: nowrap; }
+  th[scope="row"] { font-weight: 600; }
+
+  .pill {
+    display: inline-block;
+    font-family: var(--data);
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 100px;
+    border: 1px solid currentColor;
+    white-space: nowrap;
+  }
+  .pill.yes  { color: var(--good); }
+  .pill.no   { color: var(--stop); }
+  .pill.part { color: var(--warn); }
+
+  .row-pick td, .row-pick th[scope="row"] {
+    background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+  }
+
+  .note-block {
+    background: var(--surface-2);
+    border: 1px solid var(--rule-soft);
+    padding: 18px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .note-block .label {
+    font-family: var(--data);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--warn);
+  }
+  .note-block p { font-size: 15.5px; max-width: 66ch; }
+
+  .sources {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 10px 32px;
+    font-size: 14.5px;
+  }
+  .sources div { padding-bottom: 8px; border-bottom: 1px solid var(--rule-soft); }
+  .sources .src-label { display: block; color: var(--muted); font-size: 12.5px; font-family: var(--data); }
+
+  footer {
+    border-top: 2px solid var(--ink);
+    padding-top: 18px;
+    font-family: var(--data);
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  @media (max-width: 620px) {
+    body { font-size: 16px; padding: 0 18px 80px; }
+    header.masthead { padding-top: 44px; }
+    .verdict { padding: 22px 20px; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="kicker">Evaluation Programme &middot; Platform Review</div>
+    <h1>Choosing Our Eval Platform</h1>
+    <p class="standfirst">
+      A comparison of three platforms for running evaluation on live production traffic and
+      surfacing the results in the product: Confident AI, LangSmith and Langfuse.
+    </p>
+    <div class="meta">
+      <span>21 August 2026</span>
+      <span>Pricing and feature details verified against vendor pages on this date</span>
+    </div>
+  </header>
+
+  <!-- ============ 1 SCOPE ============ -->
+  <section>
+    <div class="eyebrow">1 &middot; Scope</div>
+    <h2>What this document decides</h2>
+    <ul>
+      <li>Evaluation completed so far is <strong>offline</strong>: a generated test set of questions and multi-turn conversations, run against the chatbots and scored.</li>
+      <li>The next stage is <strong>online evaluation</strong>: scoring a sample of live customer conversations on a continuous basis.</li>
+      <li>Online evaluation requires a platform that traces the running application and stores the scores.</li>
+      <li>This document compares the three candidates and recommends one.</li>
+    </ul>
+
+    <p class="tcap">Offline and online evaluation compared</p>
+    <div class="scroller" style="max-width:var(--measure)">
+      <table>
+        <thead><tr><th>&nbsp;</th><th>Offline</th><th>Online</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Input</th><td>Generated test set</td><td>Live customer conversations</td></tr>
+          <tr><th scope="row">Frequency</th><td>On demand</td><td>Continuous, sampled</td></tr>
+          <tr><th scope="row">Requires</th><td>A test suite</td><td>Tracing in the live application</td></tr>
+          <tr><th scope="row">Status</th><td><span class="pill yes">Complete</span></td><td><span class="pill no">Not started</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ 2 REQUIREMENTS ============ -->
+  <section>
+    <div class="eyebrow">2 &middot; Requirements</div>
+    <h2>Criteria used for the comparison</h2>
+    <ol>
+      <li>Online evaluation on production traffic, with sampling to control cost.</li>
+      <li>Scores readable through an API, so the admin view and the customer evaluation tab can be rendered inside our own product.</li>
+      <li>No cap on the number of chatbots or projects.</li>
+      <li>Pricing that does not scale per user seat.</li>
+      <li>Self-hosting available, in case a customer requires conversation data to stay on our infrastructure.</li>
+      <li>A supported TypeScript SDK, since the application is a TypeScript Next.js codebase.</li>
+    </ol>
+  </section>
+
+  <!-- ============ 3 CONFIDENT AI ============ -->
+  <section>
+    <div class="eyebrow">3 &middot; Platform</div>
+    <h2>Confident AI</h2>
+    <p>Hosted platform built by the makers of <a href="https://deepeval.com/docs">DeepEval</a>, the framework used for our offline suite.</p>
+
+    <h3>Features</h3>
+    <ul>
+      <li>Tracing of each execution as traces, spans and threads.</li>
+      <li>Online evaluation: <em>&ldquo;continuously evaluate production traffic using 50+ metrics&rdquo;</em>, run in real time as traces are ingested or retrospectively.</li>
+      <li>Sampling controls, monitors and alerting on quality, latency and cost.</li>
+      <li>Datasets, prompt versioning, human annotation, CI/CD integration.</li>
+      <li>Instrumentation via an <code>@observe</code> decorator, framework integrations, or OpenTelemetry. Python and TypeScript supported.</li>
+      <li>REST API: <em>&ldquo;Every part of Confident AI is exposed as an API&rdquo;</em>.</li>
+      <li>No self-hosted deployment option.</li>
+    </ul>
+
+    <h3>Pricing</h3>
+    <p class="tcap">Confident AI &middot; verified 21 Aug 2026</p>
+    <div class="scroller">
+      <table>
+        <thead><tr><th>Plan</th><th>Price / month</th><th>Trace spans</th><th>Projects</th><th>Seats</th><th>Online evals</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Free</th><td class="num">$0</td><td class="num">1 GB-month</td><td class="num">1</td><td class="num">2</td><td><span class="pill no">Not included</span></td></tr>
+          <tr><th scope="row">Starter</th><td class="num">$200</td><td class="num">5 GB-months</td><td class="num">5</td><td class="num">Unlimited</td><td><span class="pill yes">Included</span></td></tr>
+          <tr><th scope="row">Team</th><td class="num">$2,000</td><td class="num">75 GB-months</td><td class="num">Unlimited</td><td class="num">Unlimited</td><td><span class="pill yes">Included</span></td></tr>
+          <tr><th scope="row">Enterprise</th><td class="num">Custom</td><td class="num">Unlimited</td><td class="num">Unlimited</td><td class="num">Unlimited</td><td><span class="pill yes">Unlimited runs</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:14px;color:var(--muted);max-width:66ch">
+      Overage: <code>$1 per GB-month ingested or retained</code>. Judge-model tokens billed separately at
+      <code>~$0.05/M input tokens and $0.40/M output tokens</code> on both paid tiers.
+    </p>
+
+    <h3>Assessment against the criteria</h3>
+    <ul>
+      <li>Online evaluation is not available on the Free plan. Entry price is <strong>$200/month</strong>.</li>
+      <li>The Starter plan is limited to <strong>5 projects</strong>. Project is the isolation boundary between customers.</li>
+      <li>Unlimited projects begin at the Team plan, <strong>$2,000/month</strong>.</li>
+      <li>No self-hosting, so conversation data cannot be kept on our infrastructure.</li>
+      <li>API access and TypeScript support: both available.</li>
+    </ul>
+  </section>
+
+  <!-- ============ 4 LANGSMITH ============ -->
+  <section>
+    <div class="eyebrow">4 &middot; Platform</div>
+    <h2>LangSmith</h2>
+    <p>LangChain&rsquo;s hosted observability and evaluation platform. Proprietary; the client SDKs are open source, the platform is not.</p>
+
+    <h3>Features</h3>
+    <ul>
+      <li>Tracing, datasets, experiments, prompt management and online evaluators on production traces.</li>
+      <li>Closest integration with LangChain and LangGraph; tracing for those frameworks enables via a single environment variable.</li>
+      <li>Python and JS/TS SDKs. OpenTelemetry ingestion supported as a secondary path.</li>
+      <li>Self-hosted and hybrid deployment listed on the Enterprise plan only.</li>
+    </ul>
+
+    <h3>Pricing</h3>
+    <p class="tcap">LangSmith &middot; verified 21 Aug 2026</p>
+    <div class="scroller">
+      <table>
+        <thead><tr><th>Plan</th><th>Price</th><th>Seats</th><th>Included traces</th><th>Self-hosting</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Developer</th><td class="num">$0 / seat / month</td><td class="num">1</td><td class="num">5k base traces / month</td><td><span class="pill no">No</span></td></tr>
+          <tr><th scope="row">Plus</th><td class="num">$39 / seat / month</td><td class="num">Unlimited, billed per seat</td><td class="num">10k base traces / month</td><td><span class="pill no">No</span></td></tr>
+          <tr><th scope="row">Enterprise</th><td class="num">Custom</td><td class="num">Custom</td><td class="num">Custom</td><td><span class="pill yes">Included</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:14px;color:var(--muted);max-width:66ch">
+      Usage beyond the allowance is metered as <code>$1.50 / LCU</code> (compute) and
+      <code>$1.00 / LSU</code> (storage) following the July 2026 repricing. Base traces are retained
+      14 days; extended traces 400 days.
+    </p>
+
+    <h3>Assessment against the criteria</h3>
+    <ul>
+      <li>Pricing scales on two axes: per seat and per trace.</li>
+      <li>Self-hosting requires an Enterprise contract.</li>
+      <li>Its principal advantage is depth of LangChain and LangGraph integration. Our conversation path calls the OpenAI Responses API directly, so that advantage applies only partially.</li>
+      <li>API access and TypeScript support: both available.</li>
+    </ul>
+  </section>
+
+  <!-- ============ 5 LANGFUSE ============ -->
+  <section>
+    <div class="eyebrow">5 &middot; Platform</div>
+    <h2>Langfuse</h2>
+    <p>
+      Open-source observability and evaluation platform, MIT licensed. All product features were
+      moved to MIT in June 2025; SCIM, audit logs, project-level access control and UI customisation
+      remain commercial. Acquired by ClickHouse in January 2026, licence unchanged.
+    </p>
+
+    <h3>Features</h3>
+    <ul>
+      <li><strong>Tracing</strong> &mdash; <em>&ldquo;all LLM and non-LLM calls, including retrieval, embedding, API calls&rdquo;</em>, with sessions, user tracking and agent-graph visualisation.</li>
+      <li><strong>Evaluation</strong> &mdash; LLM-as-a-judge, code evaluators, user feedback, manual labelling, custom pipelines. Open source since <code>v3.65.0</code>.</li>
+      <li><strong>Code evaluators</strong> &mdash; TypeScript or Python <code>evaluate</code> functions written in the UI, shipped May 2026. Deterministic checks run without a judge model call.</li>
+      <li><strong>Sampling</strong> &mdash; <em>&ldquo;configure sampling percentage (e.g. 5%) to manage evaluation costs and throughput&rdquo;</em>, applied deterministically per observation.</li>
+      <li><strong>Prompt management</strong> &mdash; versioning and label-based deployment.</li>
+      <li><strong>Datasets and annotation queues</strong> &mdash; existing offline goldens and human review.</li>
+      <li><strong>Public API</strong> &mdash; scores, observations, metrics and dashboard endpoints, typed in the JS/TS SDK.</li>
+      <li><strong>TypeScript SDK v5</strong> &mdash; OpenTelemetry-based. Documented Next.js path: <em>&ldquo;register the LangfuseSpanProcessor via registerOTel from @vercel/otel as long as you are on @vercel/otel v2 or later&rdquo;</em>.</li>
+      <li><strong>Self-hosting</strong> &mdash; free, with all core platform features and APIs.</li>
+    </ul>
+
+    <h3>Pricing</h3>
+    <p class="tcap">Langfuse &middot; verified 21 Aug 2026</p>
+    <div class="scroller">
+      <table>
+        <thead><tr><th>Plan</th><th>Price / month</th><th>Included units</th><th>Retention</th><th>Seats</th><th>Projects</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Hobby</th><td class="num">$0</td><td class="num">50,000</td><td class="num">30 days</td><td class="num">2</td><td class="num">Unlimited</td></tr>
+          <tr class="row-pick"><th scope="row">Core</th><td class="num">$29</td><td class="num">100,000</td><td class="num">90 days</td><td class="num">Unlimited</td><td class="num">Unlimited</td></tr>
+          <tr><th scope="row">Pro</th><td class="num">$199</td><td class="num">100,000</td><td class="num">3 years</td><td class="num">Unlimited</td><td class="num">Unlimited</td></tr>
+          <tr><th scope="row">Enterprise</th><td class="num">$2,499</td><td class="num">100,000</td><td class="num">3 years</td><td class="num">Unlimited</td><td class="num">Unlimited</td></tr>
+          <tr><th scope="row">Self-hosted</th><td class="num">$0</td><td class="num">Unlimited</td><td class="num">Our choice</td><td class="num">Unlimited</td><td class="num">Unlimited</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:14px;color:var(--muted);max-width:66ch">
+      A billable unit is <em>&ldquo;any tracing data point sent to the platform &mdash; including traces,
+      observations, and scores&rdquo;</em>. Overage is <code>$8 per 100k units</code>, on a graduated scale
+      down to <code>$6 per 100k</code> above 50M units. No plan charges per seat.
+    </p>
+
+    <div class="note-block">
+      <span class="label">Self-hosting requirement</span>
+      <p>
+        Self-hosted Langfuse carries no licence cost but requires PostgreSQL, ClickHouse, Redis and
+        object storage to be operated by us. Because the licence is MIT and the API is identical
+        between cloud and self-hosted, moving from cloud to self-hosted later does not require
+        application changes.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 6 COMPARISON ============ -->
+  <section>
+    <div class="eyebrow">6 &middot; Comparison</div>
+    <h2>Side by side</h2>
+
+    <p class="tcap">All three platforms against the criteria in section 2</p>
+    <div class="scroller">
+      <table>
+        <thead><tr><th>Criterion</th><th>Langfuse</th><th>LangSmith</th><th>Confident AI</th></tr></thead>
+        <tbody>
+          <tr>
+            <th scope="row">Entry price, online evals</th>
+            <td class="num">$0 self-hosted / $29 cloud</td>
+            <td class="num">$39 / seat / month</td>
+            <td class="num">$200 / month</td>
+          </tr>
+          <tr>
+            <th scope="row">Per-seat charge</th>
+            <td><span class="pill yes">None</span></td>
+            <td><span class="pill no">$39 per seat</span></td>
+            <td><span class="pill yes">None</span></td>
+          </tr>
+          <tr>
+            <th scope="row">Project cap</th>
+            <td><span class="pill yes">None</span></td>
+            <td><span class="pill yes">None</span></td>
+            <td><span class="pill part">5 on Starter</span></td>
+          </tr>
+          <tr>
+            <th scope="row">Self-hosting</th>
+            <td><span class="pill yes">Free</span></td>
+            <td><span class="pill part">Enterprise only</span></td>
+            <td><span class="pill no">Not offered</span></td>
+          </tr>
+          <tr>
+            <th scope="row">Licence</th>
+            <td>MIT, full platform</td>
+            <td>Proprietary</td>
+            <td>Proprietary</td>
+          </tr>
+          <tr>
+            <th scope="row">API for our own dashboards</th>
+            <td><span class="pill yes">Yes</span></td>
+            <td><span class="pill yes">Yes</span></td>
+            <td><span class="pill yes">Yes</span></td>
+          </tr>
+          <tr>
+            <th scope="row">TypeScript SDK</th>
+            <td>v5, OpenTelemetry-native</td>
+            <td>Yes, OTel secondary</td>
+            <td>Yes</td>
+          </tr>
+          <tr>
+            <th scope="row">Sampling</th>
+            <td><span class="pill yes">Yes</span></td>
+            <td><span class="pill yes">Yes</span></td>
+            <td><span class="pill yes">Yes</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ 7 RECOMMENDATION ============ -->
+  <section>
+    <div class="eyebrow">7 &middot; Recommendation</div>
+    <div class="verdict">
+      <h2>Langfuse, on the $29/month cloud plan</h2>
+      <ul>
+        <li>Lowest entry price for online evaluation of the three.</li>
+        <li>No per-seat charge and no project cap, so cost does not move with team size or chatbot count.</li>
+        <li>Self-hosting available at no licence cost if a customer requires data residency, with no application changes needed to move.</li>
+        <li>MIT licence for the full platform.</li>
+        <li>TypeScript SDK is OpenTelemetry-native with a documented Next.js integration path.</li>
+        <li>Scores are readable through the public API, so the admin view and customer evaluation tab are built inside our own product.</li>
+      </ul>
+    </div>
+    <p>
+      Judge-model tokens are charged by the model provider on top of the platform cost, on whichever
+      platform is chosen. Our completed offline run &mdash; 30 single-turn questions and 10 multi-turn
+      conversations, scored on a small judge model &mdash; cost under $2 in total. Sampling percentage
+      and the use of code evaluators, which require no model call, both reduce this.
+    </p>
+  </section>
+
+  <!-- ============ 8 PROMPT INJECTION ============ -->
+  <section>
+    <div class="eyebrow">8 &middot; Separate requirement</div>
+    <h2>Prompt-injection measure</h2>
+    <ul>
+      <li>DeepEval&rsquo;s core metric set does not include a prompt-injection metric.</li>
+      <li>None of the three platforms above provides one as a standard metric.</li>
+      <li>Injection testing is adversarial &mdash; attacks are constructed and checked for success &mdash; so it runs as a pre-release check rather than as a sample of live traffic.</li>
+      <li><a href="https://www.promptfoo.dev/docs/red-team/">promptfoo&rsquo;s red-team module</a> generates adversarial inputs across prompt injection, jailbreaks, PII leakage and hijacking, and reports which attacks succeeded. Open source.</li>
+      <li><a href="https://www.trydeepteam.com/">DeepTeam</a>, from the DeepEval authors, is the alternative and shares the vocabulary of our existing suite.</li>
+    </ul>
+  </section>
+
+  <!-- ============ 9 NEXT STEPS ============ -->
+  <section>
+    <div class="eyebrow">9 &middot; Next steps</div>
+    <h2>Proposed sequence</h2>
+    <ol>
+      <li><strong>Instrument the application.</strong> Add the Langfuse TypeScript SDK to the chat path so conversations, retrieval steps and tool calls are traced.</li>
+      <li><strong>Enable sampled online evaluation.</strong> Configure the judge model and code evaluators, start at a low sampling percentage, and compare results against the existing offline scores.</li>
+      <li><strong>Build the admin view.</strong> Read scores through the Metrics API into an internal page covering all chatbots.</li>
+      <li><strong>Build the customer evaluation tab.</strong> The same data filtered to a single account.</li>
+      <li><strong>Add the prompt-injection check.</strong> promptfoo red-team run wired into the release process.</li>
+    </ol>
+    <p>Each step is usable on its own, so the sequence can be paused or re-ordered without discarding work.</p>
+  </section>
+
+  <!-- ============ 10 SOURCES ============ -->
+  <section>
+    <div class="eyebrow">10 &middot; Sources</div>
+    <h2>References</h2>
+    <p>All figures and quotations are taken from the vendors&rsquo; published pages, checked on 21 August 2026.</p>
+    <div class="sources">
+      <div><span class="src-label">Langfuse &middot; cloud pricing</span><a href="https://langfuse.com/pricing">langfuse.com/pricing</a></div>
+      <div><span class="src-label">Langfuse &middot; self-host pricing</span><a href="https://langfuse.com/pricing-self-host">langfuse.com/pricing-self-host</a></div>
+      <div><span class="src-label">Langfuse &middot; TypeScript SDK</span><a href="https://langfuse.com/docs/observability/sdk/typescript/overview">SDK overview and Next.js setup</a></div>
+      <div><span class="src-label">Langfuse &middot; LLM-as-a-judge</span><a href="https://langfuse.com/docs/evaluation/evaluation-methods/llm-as-a-judge">Evaluators and sampling</a></div>
+      <div><span class="src-label">Langfuse &middot; public API</span><a href="https://langfuse.com/docs/api-and-data-platform/features/public-api">REST API reference</a></div>
+      <div><span class="src-label">Langfuse &middot; metrics API</span><a href="https://langfuse.com/docs/metrics/features/metrics-api">Querying scores</a></div>
+      <div><span class="src-label">LangSmith &middot; pricing</span><a href="https://www.langchain.com/pricing-langsmith">langchain.com/pricing-langsmith</a></div>
+      <div><span class="src-label">Confident AI &middot; pricing</span><a href="https://www.confident-ai.com/pricing">confident-ai.com/pricing</a></div>
+      <div><span class="src-label">Confident AI &middot; tracing</span><a href="https://www.confident-ai.com/docs/llm-tracing/introduction">LLM tracing introduction</a></div>
+      <div><span class="src-label">DeepEval &middot; documentation</span><a href="https://deepeval.com/docs">deepeval.com/docs</a></div>
+      <div><span class="src-label">promptfoo &middot; red teaming</span><a href="https://www.promptfoo.dev/docs/red-team/">Adversarial testing</a></div>
+      <div><span class="src-label">Independent comparison</span><a href="https://www.datacamp.com/blog/langfuse-vs-langsmith">DataCamp &middot; Langfuse vs LangSmith</a></div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Chatbot quality programme &middot; platform selection</span>
+    <span>21 August 2026 &middot; pricing subject to vendor change; re-verify before contracting</span>
+  </footer>
+
+</div>

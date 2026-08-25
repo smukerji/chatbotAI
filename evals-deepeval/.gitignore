@@ -1,0 +1,5 @@
+.venv/
+goldens/
+results/
+__pycache__/
+*.tmp.*

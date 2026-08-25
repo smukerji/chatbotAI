@@ -1,0 +1,766 @@
+<title>Chatbot Quality Evaluation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,500;1,400&display=swap">
+
+<style>
+  :root {
+    --ground:      #FBFCFC;
+    --surface:     #F1F5F5;
+    --surface-2:   #E6EDEE;
+    --ink:         #12232B;
+    --ink-soft:    #3A4E56;
+    --muted:       #5C6F75;
+    --rule:        #D3DEE0;
+    --accent:      #0F6E6E;
+    --accent-soft: #DCEDEC;
+    --good:        #2F7D5B;
+    --warn:        #B0741F;
+    --poor:        #A63D40;
+    --shadow:      0 1px 2px rgba(18,35,43,.06), 0 8px 24px rgba(18,35,43,.05);
+
+    --f-sans:  "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --f-serif: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+    --f-mono:  "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:      #0E1619;
+      --surface:     #162126;
+      --surface-2:   #1E2C32;
+      --ink:         #E4EEF0;
+      --ink-soft:    #B6C8CC;
+      --muted:       #8AA0A6;
+      --rule:        #2A3A40;
+      --accent:      #5FBDB6;
+      --accent-soft: #16302F;
+      --good:        #5FB98D;
+      --warn:        #D6A055;
+      --poor:        #D97479;
+      --shadow:      0 1px 2px rgba(0,0,0,.4), 0 10px 28px rgba(0,0,0,.32);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:      #0E1619;
+    --surface:     #162126;
+    --surface-2:   #1E2C32;
+    --ink:         #E4EEF0;
+    --ink-soft:    #B6C8CC;
+    --muted:       #8AA0A6;
+    --rule:        #2A3A40;
+    --accent:      #5FBDB6;
+    --accent-soft: #16302F;
+    --good:        #5FB98D;
+    --warn:        #D6A055;
+    --poor:        #D97479;
+    --shadow:      0 1px 2px rgba(0,0,0,.4), 0 10px 28px rgba(0,0,0,.32);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--f-serif);
+    font-size: 17px;
+    line-height: 1.68;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    display: grid;
+    grid-template-columns: 1fr;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 24px 96px;
+  }
+  @media (min-width: 1040px) {
+    .wrap { grid-template-columns: 216px minmax(0, 1fr); gap: 56px; }
+  }
+
+  /* ── masthead ─────────────────────────────────────────── */
+  header.masthead {
+    grid-column: 1 / -1;
+    padding: 72px 0 34px;
+    border-bottom: 2px solid var(--ink);
+    margin-bottom: 44px;
+  }
+  .eyebrow {
+    font-family: var(--f-mono);
+    font-size: 11.5px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 18px;
+  }
+  h1 {
+    font-family: var(--f-sans);
+    font-weight: 600;
+    font-size: clamp(2.1rem, 5vw, 3.15rem);
+    line-height: 1.08;
+    letter-spacing: -.021em;
+    margin: 0 0 22px;
+    text-wrap: balance;
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 30px;
+    font-family: var(--f-mono);
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .meta b { color: var(--ink-soft); font-weight: 500; }
+
+  /* ── side rail ────────────────────────────────────────── */
+  nav.rail { display: none; }
+  @media (min-width: 1040px) {
+    nav.rail {
+      display: block;
+      position: sticky;
+      top: 28px;
+      align-self: start;
+      max-height: calc(100vh - 56px);
+      overflow-y: auto;
+      font-family: var(--f-sans);
+      font-size: 13.2px;
+      line-height: 1.45;
+    }
+    nav.rail p {
+      font-family: var(--f-mono);
+      font-size: 10.5px;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 0 0 14px;
+    }
+    nav.rail a {
+      display: flex;
+      gap: 10px;
+      padding: 5px 0;
+      color: var(--ink-soft);
+      text-decoration: none;
+      border-left: 2px solid transparent;
+      padding-left: 12px;
+      margin-left: -14px;
+    }
+    nav.rail a span { color: var(--muted); font-family: var(--f-mono); font-size: 11px; padding-top: 2px; }
+    nav.rail a:hover { color: var(--accent); border-left-color: var(--accent); }
+  }
+
+  main { min-width: 0; }
+
+  section { margin-bottom: 62px; scroll-margin-top: 24px; }
+
+  h2 {
+    font-family: var(--f-sans);
+    font-weight: 600;
+    font-size: 1.55rem;
+    letter-spacing: -.014em;
+    line-height: 1.24;
+    margin: 0 0 8px;
+    text-wrap: balance;
+  }
+  h2 .num {
+    font-family: var(--f-mono);
+    font-size: .78rem;
+    font-weight: 500;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 9px;
+    letter-spacing: .1em;
+  }
+  h3 {
+    font-family: var(--f-sans);
+    font-weight: 600;
+    font-size: 1.06rem;
+    letter-spacing: -.008em;
+    margin: 34px 0 10px;
+    color: var(--ink);
+  }
+  h2 + p, h3 + p { margin-top: 10px; }
+  p { margin: 0 0 17px; max-width: 68ch; }
+  .lede { font-size: 1.09rem; color: var(--ink-soft); max-width: 66ch; }
+
+  a { color: var(--accent); text-underline-offset: 3px; text-decoration-thickness: 1px; }
+  a:hover { text-decoration-thickness: 2px; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+
+  strong { font-weight: 600; }
+  code {
+    font-family: var(--f-mono);
+    font-size: .855em;
+    background: var(--surface-2);
+    padding: .12em .38em;
+    border-radius: 3px;
+  }
+  ul, ol { max-width: 68ch; padding-left: 20px; margin: 0 0 17px; }
+  li { margin-bottom: 8px; }
+
+  /* ── tables ───────────────────────────────────────────── */
+  .tw { overflow-x: auto; margin: 22px 0 26px; }
+  table { border-collapse: collapse; width: 100%; font-family: var(--f-sans); font-size: 14.4px; }
+  th {
+    text-align: left;
+    font-weight: 600;
+    font-size: 11px;
+    font-family: var(--f-mono);
+    letter-spacing: .11em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0 16px 9px 0;
+    border-bottom: 1px solid var(--ink);
+    white-space: nowrap;
+  }
+  td { padding: 11px 16px 11px 0; border-bottom: 1px solid var(--rule); vertical-align: top; color: var(--ink-soft); }
+  td:first-child { color: var(--ink); }
+  .num-cell { font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-weight: 500; color: var(--ink); white-space: nowrap; }
+
+  /* score bar encodes the 0-1 value against the 0.7 pass threshold */
+  .score { display: flex; align-items: center; gap: 11px; }
+  .bar { position: relative; width: 88px; height: 6px; border-radius: 3px; background: var(--surface-2); overflow: hidden; flex: none; }
+  .bar i { position: absolute; inset: 0 auto 0 0; border-radius: 3px; }
+  .bar.g i { background: var(--good); }
+  .bar.w i { background: var(--warn); }
+  .bar.p i { background: var(--poor); }
+  .val { font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-weight: 600; min-width: 3.6em; }
+  .val.g { color: var(--good); } .val.w { color: var(--warn); } .val.p { color: var(--poor); }
+
+  /* ── Q/A exchange ─────────────────────────────────────── */
+  .qa {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+    padding: 20px 22px;
+    margin: 20px 0;
+    max-width: 72ch;
+  }
+  .qa + .qa { margin-top: 14px; }
+  .qa .turn { display: grid; grid-template-columns: 26px 1fr; gap: 12px; }
+  .qa .turn + .turn { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--rule); }
+  .qa .tag {
+    font-family: var(--f-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    color: var(--accent);
+    padding-top: 4px;
+  }
+  .qa .tag.a { color: var(--muted); }
+  .qa .txt { margin: 0; font-size: 15.6px; line-height: 1.6; max-width: none; }
+  .qa .who {
+    font-family: var(--f-mono);
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 14px;
+  }
+  .qa.bad { border-left-color: var(--poor); }
+  .qa.bad .tag { color: var(--poor); }
+  .qa.good { border-left-color: var(--good); }
+  .qa.good .tag { color: var(--good); }
+
+  /* ── callouts ─────────────────────────────────────────── */
+  .note {
+    border-left: 3px solid var(--rule);
+    padding: 2px 0 2px 18px;
+    margin: 22px 0;
+    color: var(--ink-soft);
+    max-width: 68ch;
+  }
+  .note.key { border-left-color: var(--accent); }
+  .note.key strong { color: var(--ink); }
+
+  pre {
+    font-family: var(--f-mono);
+    font-size: 13px;
+    line-height: 1.62;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    margin: 20px 0;
+    color: var(--ink-soft);
+  }
+  pre code { background: none; padding: 0; font-size: inherit; }
+
+  .refs { display: grid; gap: 26px; }
+  .refs h3 { margin-top: 0; }
+  .refs ul { list-style: none; padding: 0; max-width: 74ch; }
+  .refs li { margin-bottom: 9px; padding-left: 15px; position: relative; font-size: 15.4px; }
+  .refs li::before { content: "→"; position: absolute; left: 0; color: var(--accent); font-family: var(--f-mono); font-size: 12px; }
+  .refs .desc { color: var(--muted); font-size: 14.2px; }
+
+  footer {
+    grid-column: 1 / -1;
+    margin-top: 30px;
+    padding-top: 26px;
+    border-top: 1px solid var(--rule);
+    font-family: var(--f-mono);
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  }
+  html { scroll-behavior: smooth; }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Engineering report</p>
+    <h1>Chatbot Quality Evaluation</h1>
+    <div class="meta">
+      <span><b>20 August 2026</b></span>
+      <span>Scope: <b>RAG retrieval, answer grounding, tool selection, multi-turn behaviour</b></span>
+      <span>Method: <b>DeepEval against live indexed content</b></span>
+    </div>
+  </header>
+
+  <nav class="rail" aria-label="Sections">
+    <p>Contents</p>
+    <a href="#s1"><span>01</span> Summary</a>
+    <a href="#s2"><span>02</span> Manual testing</a>
+    <a href="#s3"><span>03</span> Layered evaluation</a>
+    <a href="#s4"><span>04</span> What is DeepEval</a>
+    <a href="#s5"><span>05</span> Selection &amp; limits</a>
+    <a href="#s6"><span>06</span> Data provided</a>
+    <a href="#s7"><span>07</span> How it runs</a>
+    <a href="#s8"><span>08</span> Component results</a>
+    <a href="#s9"><span>09</span> RAG results</a>
+    <a href="#s10"><span>10</span> Application results</a>
+    <a href="#s11"><span>11</span> Fixes verified</a>
+    <a href="#s12"><span>12</span> Open items</a>
+    <a href="#s13"><span>13</span> Cost</a>
+    <a href="#s14"><span>14</span> References</a>
+    <a href="#s15"><span>15</span> Reproducing</a>
+  </nav>
+
+  <main>
+
+    <!-- 1 ─────────────────────────────────────────────── -->
+    <section id="s1">
+      <h2><span class="num">01</span>Summary</h2>
+      <p class="lede">Manual testing found that chatbots were sometimes answering from the language model's own general knowledge rather than the customer's uploaded content. To measure the problem rather than spot-check it, we introduced automated evaluation using DeepEval, an open-source LLM evaluation framework.</p>
+
+      <h3>Headline results after fixes</h3>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Layer</th><th>Metric</th><th>Score</th></tr></thead>
+          <tbody>
+            <tr><td>Component</td><td>Contextual Recall</td><td><div class="score"><span class="bar g"><i style="width:96.9%"></i></span><span class="val g">0.969</span></div></td></tr>
+            <tr><td>Component</td><td>Contextual Precision</td><td><div class="score"><span class="bar g"><i style="width:95.6%"></i></span><span class="val g">0.956</span></div></td></tr>
+            <tr><td>Component</td><td>Contextual Relevancy</td><td><div class="score"><span class="bar p"><i style="width:62.2%"></i></span><span class="val p">0.622</span></div></td></tr>
+            <tr><td>RAG pipeline</td><td>Faithfulness</td><td><div class="score"><span class="bar g"><i style="width:95.5%"></i></span><span class="val g">0.955</span></div></td></tr>
+            <tr><td>RAG pipeline</td><td>Answer Relevancy</td><td><div class="score"><span class="bar g"><i style="width:94.6%"></i></span><span class="val g">0.946</span></div></td></tr>
+            <tr><td>Application</td><td>Role Adherence</td><td><div class="score"><span class="bar g"><i style="width:98%"></i></span><span class="val g">0.980</span></div></td></tr>
+            <tr><td>Safety</td><td>Toxicity / Bias</td><td><div class="score"><span class="val g">0.000 / 0.037</span></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note key"><p><strong>The clearest remaining issue is content ingestion.</strong> Crawled web pages score 0.467 on relevancy versus 0.845 for clean PDF documents.</p></div>
+    </section>
+
+    <!-- 2 ─────────────────────────────────────────────── -->
+    <section id="s2">
+      <h2><span class="num">02</span>Manual testing and what it found</h2>
+      <p>We tested chatbots by hand across several assistant types, checking whether answers came from the customer's own content. Three problems surfaced.</p>
+
+      <h3>Finding 1 — Answers from general knowledge, not customer data</h3>
+      <div class="qa bad">
+        <p class="who">IT-policy chatbot</p>
+        <div class="turn"><span class="tag">Q</span><p class="txt">How do I reset my Netflix password?</p></div>
+        <div class="turn"><span class="tag a">A</span><p class="txt">To reset your Netflix password, please follow these steps: Visit the Netflix Password Recovery page. Choose how you want to reset your password: via email or text message. Enter your registered email address…</p></div>
+      </div>
+      <div class="qa bad">
+        <p class="who">Float-therapy chatbot</p>
+        <div class="turn"><span class="tag">Q</span><p class="txt">Who won the world cup in 2018?</p></div>
+        <div class="turn"><span class="tag a">A</span><p class="txt">France won the FIFA World Cup in 2018. They defeated Croatia 4-2 in the final.</p></div>
+      </div>
+      <p>Both answered confidently. Neither question relates to the business.</p>
+      <p>A third case was subtler: a chatbot whose indexed content was a climate document answered a question <strong>about that very content</strong> from memory, without searching. The answer was correct, so a human reviewer would have passed it — but it never touched the customer's data.</p>
+
+      <h3>Finding 2 — Wrong tool selected for a core question</h3>
+      <div class="qa bad">
+        <div class="turn"><span class="tag">Q</span><p class="txt">How much is a float session?</p></div>
+        <div class="turn"><span class="tag a">A</span><p class="txt">Routed to an internal <code>get_services</code> function that had no implementation, returning <em>“This functionality will be available soon”</em> — <strong>8 times out of 8</strong>.</p></div>
+      </div>
+      <p>Pricing is among the most common customer questions.</p>
+
+      <h3>Finding 3 — Claiming actions it cannot perform</h3>
+      <div class="qa bad">
+        <div class="turn"><span class="tag">Q</span><p class="txt">Can I book one for tomorrow at 6pm?</p></div>
+        <div class="turn"><span class="tag a">A</span><p class="txt">Great! I'll book you a session for tomorrow, August 20th, at 6 PM. Could you please provide your name, email, and phone number?</p></div>
+      </div>
+      <p>No booking system was connected. Nothing was booked, and personal details were collected for no purpose.</p>
+
+      <h3>Why manual testing was not enough</h3>
+      <p>It does not scale, and it cannot measure. A fluent, plausible answer looks correct to a human reviewer even when it is ungrounded or self-contradictory.</p>
+    </section>
+
+    <!-- 3 ─────────────────────────────────────────────── -->
+    <section id="s3">
+      <h2><span class="num">03</span>Why we moved to layered, measured evaluation</h2>
+      <p>We split evaluation into three layers so a failure can be <strong>located</strong> rather than guessed at.</p>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Layer</th><th>Question it answers</th></tr></thead>
+          <tbody>
+            <tr><td>Component</td><td>Does the retriever find the right content?</td></tr>
+            <tr><td>RAG pipeline</td><td>Is the generated answer grounded in what was retrieved?</td></tr>
+            <tr><td>Application</td><td>Does the assistant behave correctly across a whole conversation?</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Without this separation, a bad answer could be caused by ingestion, retrieval, ranking, the prompt, or the model — with no way to tell which.</p>
+    </section>
+
+    <!-- 4 ─────────────────────────────────────────────── -->
+    <section id="s4">
+      <h2><span class="num">04</span>What is DeepEval</h2>
+      <p><a href="https://deepeval.com/docs">DeepEval</a> is an open-source framework for evaluating LLM applications — essentially Pytest, but specialised for testing model outputs.</p>
+      <div class="tw">
+        <table>
+          <tbody>
+            <tr><td>Maintainer</td><td><a href="https://www.confident-ai.com/frameworks/deepeval">Confident AI</a></td></tr>
+            <tr><td>Licence</td><td>Apache 2.0</td></tr>
+            <tr><td>GitHub</td><td class="num-cell">~17.5k stars</td></tr>
+            <tr><td>Languages</td><td>Python (reference implementation), TypeScript (beta)</td></tr>
+            <tr><td>Install</td><td><code>pip install -U deepeval</code> · <code>npm install --save-dev deepeval</code></td></tr>
+            <tr><td>Version used</td><td class="num-cell">4.1.8 (Python)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Core concepts</h3>
+      <ul>
+        <li><strong>Test case</strong> — a single interaction. <code>LLMTestCase</code> holds <code>input</code>, <code>actual_output</code>, <code>retrieval_context</code> and <code>tools_called</code>. <code>ConversationalTestCase</code> holds a list of turns.</li>
+        <li><strong>Golden</strong> — a test case <em>before</em> execution: the question and expected answer, with no actual output. The application fills that in at run time, which is what makes one set reusable across model versions.</li>
+        <li><strong>Dataset</strong> — a collection of goldens, loadable from JSON, CSV or JSONL.</li>
+        <li><strong>Metric</strong> — a scorer producing 0–1 against a pass threshold. Most are LLM-as-a-judge.</li>
+        <li><strong>Synthesizer</strong> — generates goldens from your own documents or content.</li>
+        <li><strong>ConversationSimulator</strong> — plays the <em>user</em> across multiple turns so an application can be tested conversationally.</li>
+      </ul>
+      <p>It runs entirely locally; the Confident AI cloud platform is optional.</p>
+
+      <h3>Metric families used</h3>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Family</th><th>Metrics</th></tr></thead>
+          <tbody>
+            <tr><td>RAG</td><td>Faithfulness, Answer Relevancy, Contextual Precision, Contextual Recall, Contextual Relevancy</td></tr>
+            <tr><td>Conversational</td><td>Knowledge Retention, Conversation Completeness, Role Adherence, Topic Adherence</td></tr>
+            <tr><td>Safety</td><td>Bias, Toxicity, PII Leakage</td></tr>
+            <tr><td>Agentic</td><td>Tool Correctness, Argument Correctness, Task Completion, Step Efficiency</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 5 ─────────────────────────────────────────────── -->
+    <section id="s5">
+      <h2><span class="num">05</span>Why we selected it, and its limitations</h2>
+      <h3>Why</h3>
+      <ul>
+        <li>It provides the exact metrics this problem needs — particularly <strong>Faithfulness</strong> (is every claim supported by retrieved context?) and <strong>Contextual Relevancy</strong> (how much of what we retrieved was useful?).</li>
+        <li>It can generate test questions from our own indexed content, so tests are grounded in real customer data rather than invented examples.</li>
+        <li>It separates component, RAG and application layers, matching our approach.</li>
+        <li>Open source, Apache 2.0, runs locally, no vendor lock-in.</li>
+      </ul>
+
+      <h3>Limitations we hit, recorded honestly</h3>
+      <ol>
+        <li><strong>Golden generation is Python-only.</strong> The TypeScript package has no synthesizer. Our application is TypeScript, so generation and scoring run in Python while execution runs against the live app.</li>
+        <li><strong>A crash in its caching layer</strong> at batch size 28. Worked around by disabling cache; it only affects repeat-run speed.</li>
+        <li><strong>Judge errors occur.</strong> One case flagged a business's <em>public street address</em> as a PII leak, while the judge's own explanation conceded it was public and not a privacy risk.</li>
+        <li><strong>Some metrics penalise correct behaviour</strong> — see section 10. Judge explanations must be read, not just thresholded.</li>
+        <li><strong>Telemetry is on by default.</strong> Disabled via an environment flag.</li>
+      </ol>
+    </section>
+
+    <!-- 6 ─────────────────────────────────────────────── -->
+    <section id="s6">
+      <h2><span class="num">06</span>What data we gave it</h2>
+      <p>We did <strong>not</strong> hand-write questions or use sample data. DeepEval was given the customers' own indexed content — the exact text chunks stored in the vector database that the chatbot searches at runtime.</p>
+
+      <h3>Chatbots covered</h3>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Chatbot</th><th>Content source</th><th>Format</th><th>Assistant type</th></tr></thead>
+          <tbody>
+            <tr><td>Float-therapy spa</td><td>floatco.com</td><td>Crawled website</td><td>Customer support</td></tr>
+            <tr><td>IT policy</td><td>corporate IT policy</td><td>PDF</td><td>IT support</td></tr>
+            <tr><td>Hong Kong food store</td><td>store description + live Shopify store</td><td>PDF</td><td>E-commerce</td></tr>
+            <tr><td>Developer guide</td><td>technical guide</td><td>Word document</td><td>Sales</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Four content formats and four assistant types, so results are not specific to one customer or one ingestion path.</p>
+
+      <h3>How content was sampled</h3>
+      <p>For each chatbot we ran <strong>four different topic searches</strong> against its vector database, using the returned chunks as generation context. For the spa:</p>
+      <pre><code>1. pricing membership packages cost per session
+2. opening hours location address parking how to get there
+3. what happens during a session, what to bring, preparation
+4. policies, age limits, pregnancy, health restrictions, hygiene</code></pre>
+      <div class="note"><p><strong>Why four and not one:</strong> an initial attempt with a single search produced four questions that were <em>all about pricing</em>, because the top-ranked chunks were all pricing pages. Widening the sampling was necessary for the test set to represent the knowledge base.</p></div>
+
+      <h3>What was generated</h3>
+      <ul>
+        <li><strong>30 single-turn questions</strong>, each with a model answer and the source chunks</li>
+        <li><strong>10 multi-turn conversation scenarios</strong></li>
+      </ul>
+      <p>Questions are deliberately harder than hand-written ones, using DeepEval's evolutions — reasoning, multi-context, comparative, hypothetical:</p>
+      <div class="qa">
+        <div class="turn"><span class="tag">Q</span><p class="txt">How do backup frequency, backup type, and recovery time objective (RTO) affect how backups are scheduled and stored?</p></div>
+        <div class="turn"><span class="tag">Q</span><p class="txt">Can you tell me about the different float therapy membership tiers, their pricing, any weekday discounts, and the billing cycle?</p></div>
+      </div>
+    </section>
+
+    <!-- 7 ─────────────────────────────────────────────── -->
+    <section id="s7">
+      <h2><span class="num">07</span>How the evaluation runs</h2>
+      <p>Three stages. <strong>DeepEval does not run the application</strong> — it generates tests and scores results; execution hits our real endpoints.</p>
+      <pre><code>Stage 1  GENERATE   DeepEval Synthesizer  →  goldens (questions + expected answers)
+Stage 2  EXECUTE    our runner            →  real HTTP calls to the live app
+Stage 3  SCORE      DeepEval metrics      →  scores + written explanations</code></pre>
+      <p>Each question goes through the same path a browser uses:</p>
+      <pre><code>POST /api/assistants/threads/&lt;session&gt;/messages   the model chooses a tool
+POST /api/pinecone                                the retrieval the app requested
+POST /api/assistants/threads/&lt;session&gt;/actions    the final answer</code></pre>
+      <p>Recorded per question: the real answer, the <strong>actual retrieved chunks</strong>, and the tools called. Failed calls are recorded as errors, never skipped or defaulted.</p>
+      <p>For multi-turn, DeepEval's ConversationSimulator plays the customer while our live application plays the assistant, for five turns per conversation.</p>
+    </section>
+
+    <!-- 8 ─────────────────────────────────────────────── -->
+    <section id="s8">
+      <h2><span class="num">08</span>Component results — the retriever</h2>
+      <p>How well does search find the right content? Measured over 27 questions.</p>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Metric</th><th>Score</th><th>Pass</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td>Contextual Recall</td><td><div class="score"><span class="bar g"><i style="width:96.9%"></i></span><span class="val g">0.969</span></div></td><td class="num-cell">25/27</td><td>Almost never misses the right content</td></tr>
+            <tr><td>Contextual Precision</td><td><div class="score"><span class="bar g"><i style="width:95.6%"></i></span><span class="val g">0.956</span></div></td><td class="num-cell">25/27</td><td>Ranks the right content at the top</td></tr>
+            <tr><td>Contextual Relevancy</td><td><div class="score"><span class="bar p"><i style="width:62.2%"></i></span><span class="val p">0.622</span></div></td><td class="num-cell">11/27</td><td>~40% of what it returns is irrelevant</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>The retriever finds and ranks correctly. The problem is what comes attached.</p>
+
+      <h3>Relevancy by content source</h3>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Content source</th><th>Relevancy</th></tr></thead>
+          <tbody>
+            <tr><td>PDF document</td><td><div class="score"><span class="bar g"><i style="width:84.5%"></i></span><span class="val g">0.845</span></div></td></tr>
+            <tr><td>Word document</td><td><div class="score"><span class="bar w"><i style="width:66.2%"></i></span><span class="val w">0.662</span></div></td></tr>
+            <tr><td>Crawled website</td><td><div class="score"><span class="bar p"><i style="width:46.7%"></i></span><span class="val p">0.467</span></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Clean documents score nearly <strong>twice as well</strong> as crawled pages. Crawled pages currently retain navigation menus, tracking scripts and image links alongside real content, so every chunk carries noise.</p>
+      <div class="note key"><p><strong>This is an ingestion issue, not a search issue.</strong> Tuning the retriever will not fix it; cleaning pages at crawl time will.</p></div>
+    </section>
+
+    <!-- 9 ─────────────────────────────────────────────── -->
+    <section id="s9">
+      <h2><span class="num">09</span>RAG pipeline results</h2>
+      <p>Is the generated answer grounded in what was retrieved?</p>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Metric</th><th>Score</th><th>Pass</th></tr></thead>
+          <tbody>
+            <tr><td>Faithfulness</td><td><div class="score"><span class="bar g"><i style="width:95.5%"></i></span><span class="val g">0.955</span></div></td><td class="num-cell">26/27</td></tr>
+            <tr><td>Answer Relevancy</td><td><div class="score"><span class="bar g"><i style="width:94.6%"></i></span><span class="val g">0.946</span></div></td><td class="num-cell">26/27</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Better than the retrieval numbers alone would predict — the model discards most of the noise rather than repeating it. One chatbot scored <strong>1.000 faithfulness</strong> despite having among the noisiest retrieved content.</p>
+
+      <h3>The one failure — and why it matters</h3>
+      <div class="qa bad">
+        <div class="turn"><span class="tag">Q</span><p class="txt">What are your weekday opening hours, including the delayed opening on Tuesday?</p></div>
+        <div class="turn"><span class="tag a">A</span><p class="txt">We operate on weekdays from 09:15 to 22:30, except on Tuesdays when we open later, at 14:30.</p></div>
+      </div>
+      <p>Fluent, contains the correct Tuesday time, and a human reviewer would pass it. But it contradicts itself, because Tuesday <strong>is</strong> a weekday. Scored 0.50 and flagged automatically. This is precisely the class of error manual review misses.</p>
+
+      <h3>Safety</h3>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Metric</th><th>Score</th><th>Result</th></tr></thead>
+          <tbody>
+            <tr><td>Toxicity</td><td class="num-cell">0.000</td><td>Clean, 27/27</td></tr>
+            <tr><td>Bias</td><td class="num-cell">0.037</td><td>26/27</td></tr>
+            <tr><td>PII Leakage</td><td class="num-cell">0.963</td><td>26/27 — the one flag was a false positive</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>The single bias flag was the assistant repeating the customer's own website copy recommending floating without a swimsuit. Correct retrieval behaviour, but worth raising with the customer as a tone question.</p>
+    </section>
+
+    <!-- 10 ────────────────────────────────────────────── -->
+    <section id="s10">
+      <h2><span class="num">10</span>Application results — multi-turn</h2>
+      <p>Ten conversations, five turns each — <strong>50 real turns</strong> against the live application.</p>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Metric</th><th>Score</th><th>Pass</th></tr></thead>
+          <tbody>
+            <tr><td>Role Adherence</td><td><div class="score"><span class="bar g"><i style="width:98%"></i></span><span class="val g">0.980</span></div></td><td class="num-cell">10/10</td></tr>
+            <tr><td>Topic Adherence</td><td><div class="score"><span class="bar g"><i style="width:87.1%"></i></span><span class="val g">0.871</span></div></td><td class="num-cell">9/10</td></tr>
+            <tr><td>Conversation Completeness</td><td><div class="score"><span class="bar g"><i style="width:84.7%"></i></span><span class="val g">0.847</span></div></td><td class="num-cell">7/10</td></tr>
+            <tr><td>Knowledge Retention</td><td><div class="score"><span class="bar g"><i style="width:81.7%"></i></span><span class="val g">0.817</span></div></td><td class="num-cell">7/10</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><strong>Role Adherence 10/10 across 50 turns</strong> is the strongest result: the assistant never broke character, never claimed a capability it lacked, and never disclosed internal instructions — including under deliberate probing.</p>
+
+      <h3>Holding a correction under pressure</h3>
+      <div class="qa good">
+        <div class="turn"><span class="tag">Q</span><p class="txt">I was told a float session costs $500 and that you open at 7am on Tuesdays — can you confirm?</p></div>
+        <div class="turn"><span class="tag a">A</span><p class="txt">Let me clarify: a single float therapy session is priced at $900. We open at 2:30 PM on Tuesdays.</p></div>
+        <div class="turn"><span class="tag">Q</span><p class="txt">I really need to come early on Tuesday — any way to make an exception or get on a waitlist for a 7am slot?</p></div>
+        <div class="turn"><span class="tag a">A</span><p class="txt">Unfortunately, our opening hours are fixed, and we can't make exceptions for a 7 AM booking on Tuesdays.</p></div>
+      </div>
+      <p>Both false figures corrected, and the correction held across four rounds.</p>
+
+      <h3>Important caveat on multi-turn scoring</h3>
+      <p>Reviewing the judge explanations showed <strong>three of five low scores were the metric being wrong, not the application</strong>:</p>
+      <ul>
+        <li>The conversation above scored <strong>0.20</strong> on Knowledge Retention. The metric treats anything the <em>user</em> asserts as ground truth, so correcting a customer is scored as “forgetting”. The application behaved perfectly.</li>
+        <li>Two conversations were penalised on Completeness for honestly declining capabilities that do not exist — checking live availability, cancelling orders.</li>
+        <li>One was a configuration error on our side in the topic list.</li>
+      </ul>
+      <div class="note key"><p><strong>Multi-turn scores should be treated as a prompt to read transcripts, not as pass/fail gates.</strong> Single-turn RAG scores are reliable enough to gate on.</p></div>
+    </section>
+
+    <!-- 11 ────────────────────────────────────────────── -->
+    <section id="s11">
+      <h2><span class="num">11</span>Fixes made and verified</h2>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Issue</th><th>Fix</th><th>Verification</th></tr></thead>
+          <tbody>
+            <tr><td>Answering from general knowledge</td><td>Assistant must search customer content before deciding it cannot help</td><td><strong>0 of 30</strong> questions now skip retrieval, down from 4</td></tr>
+            <tr><td>Off-topic questions answered</td><td>Explicit scope rule</td><td>Weather and sport questions now declined</td></tr>
+            <tr><td>Tools offered that cannot work</td><td>Only expose tools the chatbot is configured for</td><td>Pricing no longer routes to an unimplemented function</td></tr>
+            <tr><td>False booking claims</td><td>Capability limits stated when no booking system connected</td><td>No false confirmations across 50 turns</td></tr>
+            <tr><td>Internal details disclosed</td><td>Non-disclosure rule for prompts, tools and parameters</td><td>Refused on direct request</td></tr>
+            <tr><td>Self-contradictory facts</td><td>State general case and exception together</td><td>Faithfulness 0.937 → 0.955</td></tr>
+            <tr><td>Slow failures on dependency errors</td><td>Timeouts and retry limits on external clients</td><td>Failures now surface in ~10s</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 12 ────────────────────────────────────────────── -->
+    <section id="s12">
+      <h2><span class="num">12</span>Open items</h2>
+      <ol>
+        <li><strong>Crawled content cleaning</strong> — highest impact. The 0.467 versus 0.845 relevancy gap is the evidence. Strip navigation, scripts and repeated boilerplate at crawl time.</li>
+        <li><strong>Two multi-turn cases</strong> worth investigating for genuine memory issues.</li>
+        <li><strong>Broader coverage</strong> — 30 questions is directionally useful; industry guidance suggests 100+ for statistically reliable scoring.</li>
+        <li><strong>CI integration</strong> — gate on single-turn faithfulness and contextual relevancy once thresholds are agreed.</li>
+      </ol>
+    </section>
+
+    <!-- 13 ────────────────────────────────────────────── -->
+    <section id="s13">
+      <h2><span class="num">13</span>Cost</h2>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Stage</th><th>Cost</th></tr></thead>
+          <tbody>
+            <tr><td>Generating 40 test cases</td><td class="num-cell">$0.016</td></tr>
+            <tr><td>Executing against the live app</td><td class="num-cell">~$0.90</td></tr>
+            <tr><td>Scoring with all metrics</td><td class="num-cell">~$0.28</td></tr>
+            <tr><td><strong>Total</strong></td><td class="num-cell"><strong>under $2</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>A smaller judge model was used deliberately for cost control. Re-running the full suite costs roughly $1.</p>
+    </section>
+
+    <!-- 14 ────────────────────────────────────────────── -->
+    <section id="s14">
+      <h2><span class="num">14</span>References</h2>
+      <div class="refs">
+        <div>
+          <h3>DeepEval documentation</h3>
+          <ul>
+            <li><a href="https://deepeval.com/docs">Documentation home</a></li>
+            <li><a href="https://deepeval.com/docs/getting-started">Getting started</a></li>
+            <li><a href="https://deepeval.com/docs/metrics-introduction">Metrics introduction</a> <span class="desc">— metric families and requirements</span></li>
+            <li><a href="https://deepeval.com/docs/evaluation-datasets">Evaluation datasets</a> <span class="desc">— goldens versus test cases</span></li>
+            <li><a href="https://deepeval.com/docs/golden-synthesizer">Golden synthesizer</a> <span class="desc">— generating tests from content</span></li>
+            <li><a href="https://deepeval.com/docs/synthesizer-introduction">Synthesizer introduction</a></li>
+            <li><a href="https://deepeval.com/docs/metrics-contextual-relevancy">Contextual relevancy metric</a></li>
+            <li><a href="https://deepeval.com/docs/metrics-ragas">RAGAS metrics</a></li>
+            <li><a href="https://deepeval.com/docs/metrics-tool-use">Tool use metrics</a></li>
+            <li><a href="https://deepeval.com/blog/introducing-deepeval-typescript">TypeScript announcement</a></li>
+            <li><a href="https://deepeval.com/blog/typescript-in-deepeval-monorepo">TypeScript in the DeepEval monorepo</a> <span class="desc">— states Python is the reference implementation</span></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Project and packages</h3>
+          <ul>
+            <li><a href="https://www.confident-ai.com/frameworks/deepeval">DeepEval on Confident AI</a> <span class="desc">— Apache 2.0, ~17.5k GitHub stars</span></li>
+            <li><a href="https://www.npmjs.com/package/deepeval">deepeval on npm</a> <span class="desc">— TypeScript package</span></li>
+            <li><a href="https://www.npmjs.com/package/deepeval-ts">deepeval-ts on npm</a> <span class="desc">— deprecated, renamed</span></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Evaluation methodology</h3>
+          <ul>
+            <li><a href="https://www.confident-ai.com/blog/rag-evaluation-metrics-answer-relevancy-faithfulness-and-more">RAG evaluation metrics — Confident AI</a></li>
+            <li><a href="https://www.braintrust.dev/articles/rag-evaluation-metrics">RAG evaluation metrics — Braintrust</a></li>
+            <li><a href="https://arize.com/blog/how-to-evaluate-tool-calling-agents/">How to evaluate tool-calling agents — Arize AI</a></li>
+            <li><a href="https://www.confident-ai.com/blog/llm-agent-evaluation-complete-guide">LLM agent evaluation metrics — Confident AI</a></li>
+            <li><a href="https://arxiv.org/pdf/2503.22458">Evaluating LLM-based agents for multi-turn conversations: a survey</a> <span class="desc">— arXiv</span></li>
+            <li><a href="https://arxiv.org/html/2410.11710">MTU-Bench: multi-granularity tool-use benchmark</a> <span class="desc">— arXiv</span></li>
+            <li><a href="https://benchmarkingagents.com/best-benchmarks-for-tool-use/">Tool-use benchmarks compared</a> <span class="desc">— BFCL, τ-Bench, ToolBench</span></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Platform documentation</h3>
+          <ul>
+            <li><a href="https://vercel.com/docs/functions/configuring-functions/duration">Vercel — configuring function duration</a></li>
+            <li><a href="https://vercel.com/docs/project-configuration/vercel-json">Vercel — vercel.json reference</a></li>
+            <li><a href="https://developers.openai.com/api/docs/guides/function-calling">OpenAI — function calling guide</a></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 15 ────────────────────────────────────────────── -->
+    <section id="s15">
+      <h2><span class="num">15</span>Reproducing the run</h2>
+      <pre><code># 1. generate test cases from indexed content
+python evals-deepeval/1-generate/synthesize.py --per-bot 8 --conv-per-bot 2
+
+# 2. execute against the running application
+node evals-deepeval/2-execute/run-single-turn.js
+
+# 3. score
+python evals-deepeval/3-score/evaluate.py
+
+# multi-turn: simulate and score in one step
+python evals-deepeval/2-execute/run-multi-turn.py \
+    --file multi-turn-designed.json --turns 5</code></pre>
+      <p><strong>Outputs:</strong> <code>goldens/</code> holds the test cases; <code>results/</code> holds executed answers, scores with written explanations, and conversation transcripts.</p>
+      <div class="note"><p><strong>Safety:</strong> the runners create one temporary session record per test and delete it on completion. No chatbots are created, modified or deleted, and side-effecting tools such as booking are never executed during evaluation.</p></div>
+    </section>
+
+  </main>
+
+  <footer>Chatbot Quality Evaluation · 20 August 2026 · measured against live indexed content</footer>
+</div>
