@@ -1,5 +1,7 @@
 .venv/
-goldens/
-results/
 __pycache__/
 *.tmp.*
+
+# goldens and results are the evidence behind the reports, so they stay
+# versioned. Only the dev-server capture is excluded - it is noise, not data.
+results/server.log

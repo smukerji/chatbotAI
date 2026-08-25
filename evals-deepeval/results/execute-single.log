@@ -1,0 +1,38 @@
+executing 30 single-turn goldens against http://localhost:3000
+
+[ 1/30] ok    floatco    tools=get_reference chunks=2 23772ms
+[ 2/30] ok    floatco    tools=get_reference chunks=7 13590ms
+[ 3/30] ok    floatco    tools=get_reference chunks=3 15018ms
+[ 4/30] ok    floatco    tools=get_reference chunks=1 12027ms
+[ 5/30] ok    floatco    tools=get_reference chunks=4 13643ms
+[ 6/30] ok    floatco    tools=get_reference chunks=3 12339ms
+[ 7/30] ok    floatco    tools=get_reference chunks=1 12549ms
+[ 8/30] ok    floatco    tools=get_reference chunks=1 12590ms
+[ 9/30] ok    itpolicy   tools=none chunks=0 3561ms
+[10/30] ok    itpolicy   tools=get_reference chunks=1 13932ms
+[11/30] ok    itpolicy   tools=get_reference chunks=1 15175ms
+[12/30] ok    itpolicy   tools=none chunks=0 2539ms
+[13/30] ok    itpolicy   tools=none chunks=0 2751ms
+[14/30] ok    itpolicy   tools=none chunks=0 3201ms
+[15/30] ok    itpolicy   tools=get_reference chunks=3 13160ms
+[16/30] ok    itpolicy   tools=get_reference chunks=3 17515ms
+[17/30] ok    shopify    tools=get_reference chunks=1 14234ms
+[18/30] ok    shopify    tools=get_reference chunks=2 11304ms
+[19/30] ERROR shopify    tools=get_reference chunks=0 21239ms
+         pinecone HTTP 500
+[20/30] ok    shopify    tools=get_reference chunks=1 12355ms
+[21/30] ok    shopify    tools=get_reference chunks=2 11713ms
+[22/30] ok    shopify    tools=get_reference chunks=1 22278ms
+[23/30] ok    ragn8n     tools=get_reference chunks=3 16046ms
+[24/30] ERROR ragn8n     tools=get_reference,get_reference chunks=2 27833ms
+         pinecone HTTP 500
+[25/30] ok    ragn8n     tools=get_reference chunks=1 13473ms
+[26/30] ok    ragn8n     tools=get_reference chunks=1 15405ms
+[27/30] ok    ragn8n     tools=get_reference chunks=2 13451ms
+[28/30] ok    ragn8n     tools=get_reference chunks=3 13756ms
+[29/30] ok    ragn8n     tools=get_reference chunks=5 17311ms
+[30/30] ok    ragn8n     tools=get_reference chunks=6 13901ms
+
+executed: 30   succeeded: 28   with retrieval context: 25
+cleaned 30 test session docs
+-> evals-deepeval/results/single-turn-executed.json

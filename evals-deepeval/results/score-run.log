@@ -1,0 +1,63 @@
+scoring 28 executed goldens  (skipped 2 with execution errors)
+judge model: gpt-4.1-mini
+
+  with retrieval context : 24  -> full RAG + safety metrics
+  without any retrieval  : 4  -> relevancy + safety only
+✨ You're running DeepEval's latest Answer Relevancy Metric! (using 
+gpt-4.1-mini, strict=False, async_mode=True)...
+✨ You're running DeepEval's latest Faithfulness Metric! (using gpt-4.1-mini, 
+strict=False, async_mode=True)...
+✨ You're running DeepEval's latest Contextual Precision Metric! (using 
+gpt-4.1-mini, strict=False, async_mode=True)...
+✨ You're running DeepEval's latest Contextual Recall Metric! (using 
+gpt-4.1-mini, strict=False, async_mode=True)...
+✨ You're running DeepEval's latest Contextual Relevancy Metric! (using 
+gpt-4.1-mini, strict=False, async_mode=True)...
+✨ You're running DeepEval's latest Bias Metric! (using gpt-4.1-mini, 
+strict=False, async_mode=True)...
+✨ You're running DeepEval's latest Toxicity Metric! (using gpt-4.1-mini, 
+strict=False, async_mode=True)...
+✨ You're running DeepEval's latest PII Leakage Metric! (using gpt-4.1-mini, 
+strict=False, async_mode=True)...
+
+
+⚠ WARNING: No hyperparameters logged.
+» Log hyperparameters to attribute prompts and models to your test runs.
+
+===============================================================================
+=
+
+
+✓ Evaluation completed 🎉! (time taken: 124.92s | token cost: 
+0.23256400000000005 USD)
+» Test Results (24 total tests):
+   » Pass Rate: 20.83% | Passed: 5 | Failed: 19
+
+ ==============================================================================
+== 
+
+» Want to share evals with your team, or a place for your test cases to live? 
+❤️ 🏡
+  » Run 'deepeval view' to analyze and save testing results on Confident AI.
+
+
+
+==============================================================
+metric                           avg      pass     n
+==============================================================
+Answer Relevancy               0.927     23/24    24
+Faithfulness                   0.937     23/24    24
+Contextual Precision           0.985     24/24    24
+Contextual Recall              1.000     24/24    24
+Contextual Relevancy           0.516      5/24    24
+Bias                           0.042     23/24    24
+Toxicity                       0.000     24/24    24
+PII Leakage                    0.958     23/24    24
+==============================================================
+
+not scored (execution failed): 2
+  [shopify] pinecone HTTP 500 - How do traditional sauces like XO sauce and shrimp paste compare to th
+  [ragn8n] pinecone HTTP 500 - Are there any security or performance risks when using React Developer
+
+-> C:\torri-new\chatbotAI\evals-deepeval\results\scores.json
+[PostHog] analytics lane flush ran out of budget (1.0s granted) with 2 items pending.

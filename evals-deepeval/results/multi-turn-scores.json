@@ -1,0 +1,282 @@
+[
+  {
+    "id": "MT01-knowledge-retention",
+    "bot": "floatco",
+    "targets": "KnowledgeRetention",
+    "turns": 10,
+    "metrics": {
+      "Knowledge Retention": {
+        "score": 0.6666666666666666,
+        "success": false,
+        "reason": "The score is 0.67 because the LLM's response includes membership prices ($1,300 and $1,600) that contradict previously established discounted individual session prices ($520 for a float and $225 for a cold plunge), indicating partial retention but notable inconsistency with earlier knowledge."
+      },
+      "Conversation Completeness": {
+        "score": 1.0,
+        "success": true,
+        "reason": "The score is 1.0 because the LLM response fully addresses the user's intentions by providing comprehensive information about single float sessions, comparing cold plunge options with float sessions in terms of price and benefits, summarizing the cheapest options to try both, detailing combined membership options with discounts, and explaining the cancellation policy and minimum commitment period f"
+      },
+      "Role Adherence": {
+        "score": 1.0,
+        "success": true,
+        "reason": "The score is 1.0 because there are no out of character responses present. The LLM chatbot responses consistently adhere to the specified role of a customer support assistant for the specific business by answering only from the business's own indexed content, searching before responding, declining unrelated general-knowledge questions, and not claiming capabilities it does not have."
+      },
+      "Topic Adherence": {
+        "score": 1.0,
+        "success": true,
+        "reason": "The score is 1.0 because all responses accurately and comprehensively addressed the relevant topics in each question, demonstrating complete adherence to the topics without any false positives or negatives."
+      }
+    }
+  },
+  {
+    "id": "MT02-mind-change",
+    "bot": "floatco",
+    "targets": "KnowledgeRetention, ConversationCompleteness",
+    "turns": 10,
+    "metrics": {
+      "Knowledge Retention": {
+        "score": 0.8,
+        "success": true,
+        "reason": "The score is 0.80 because the LLM retained most relevant knowledge but failed to provide actual contact details, using placeholders instead, which indicates partial forgetfulness regarding specific information needed to fully address the user's queries."
+      },
+      "Conversation Completeness": {
+        "score": 0.8333333333333334,
+        "success": true,
+        "reason": "The score is 0.8333333333333334 because the LLM response partially addresses the user's intentions by providing contact details for further inquiries, but it does not directly supply specific information about pricing, opening hours, or safety guidelines for pregnant women as requested. This means the user\u2019s needs for detailed session information and safety considerations are only partially met, j"
+      },
+      "Role Adherence": {
+        "score": 1.0,
+        "success": true,
+        "reason": "The score is 1.0 because there are no out of character responses present. The LLM chatbot responses consistently adhere to the specified role of a customer support assistant for the specific business by answering only from the business's own indexed content, searching before responding, declining unrelated general-knowledge questions, and not claiming capabilities it does not have."
+      },
+      "Topic Adherence": {
+        "score": 0.8333333333333334,
+        "success": true,
+        "reason": "The score is 0.833 because the assistant correctly adhered to the relevant topics in most cases, providing appropriate and helpful responses to questions about pricing, safety, contact details, preparations, and session details related to 'floatco'. However, the metric identified a failure when the assistant answered a question about health conditions related to floating, which was outside the def"
+      }
+    }
+  },
+  {
+    "id": "MT03-false-premise",
+    "bot": "floatco",
+    "targets": "Faithfulness, RoleAdherence",
+    "turns": 10,
+    "metrics": {
+      "Knowledge Retention": {
+        "score": 0.2,
+        "success": false,
+        "reason": "The score is 0.20 because the LLM consistently contradicts established facts, stating the float session cost as $900 instead of $500 and the Tuesday opening time as 2:30 PM instead of the known 7 AM, demonstrating significant forgetfulness and poor knowledge retention."
+      },
+      "Conversation Completeness": {
+        "score": 0.8333333333333334,
+        "success": true,
+        "reason": "The score is 0.8333333333333334 because the LLM response successfully addressed the user's inquiries about cost, opening hours, discounts, and packages, fulfilling most user intentions. However, it did not satisfy the user's request to book or request an exception for a 7am session on Tuesday, as the assistant clearly stated that the facility opens at 2:30 PM on Tuesdays and cannot accommodate ear"
+      },
+      "Role Adherence": {
+        "score": 1.0,
+        "success": true,
+        "reason": "The score is 1.0 because there are no out of character responses in the conversation. The LLM chatbot consistently adhered to its role as a customer support assistant for the specific business by only providing information from the business's own indexed content, searching before responding, declining unrelated questions, and not claiming any unsupported capabilities."
+      },
+      "Topic Adherence": {
+        "score": 1.0,
+        "success": true,
+        "reason": "The score is 1.0 because all responses correctly and completely addressed the relevant topics such as pricing, opening hours, and booking procedures, demonstrating full adherence to the specified topics without any errors or omissions."
+      }
+    }
+  },
+  {
+    "id": "MT04-offtopic-return",
+    "bot": "floatco",
+    "targets": "TopicAdherence, RoleAdherence",
+    "turns": 10,
+    "metrics": {
+      "Knowledge Retention": {
+        "score": 1.0,
+        "success": true,
+        "reason": "The score is 1.00 because there are no attritions indicating any forgetfulness or loss of previously established knowledge in the conversation."
+      },
+      "Conversation Completeness": {
+        "score": 1.0,
+        "success": true,
+        "reason": "The score is 1.0 because the LLM response fully addresses the user's intentions by providing comprehensive information about what the assistant can help with, what to bring to the float session, guidance on eating before the session, policies on bringing electronics, arrival timing, and any special items needed after the session, with no noted omissions."
+      },
+      "Role Adherence": {
+        "score": 1.0,
+        "success": true,
+        "reason": "The score is 1.0 because there are no out of character responses present. The LLM chatbot responses consistently adhered to the specified role of a customer support assistant for the specific business by answering only from the business's own indexed content, searching before responding, declining unrelated general-knowledge questions, and never claiming capabilities it does not have."
+      },
+      "Topic Adherence": {
+        "score": 0.875,
+        "success": true,
+        "reason": "The score is 0.875 because the assistant correctly addressed most questions related to the specified topics of business services, policies, products, and support, resulting in true positives and true negatives. However, it failed the metric due to one false positive where it answered a question about eating before a float session, which falls outside the relevant topics, thus providing an answer w"
+      }
+    }
+  },
+  {
+    "id": "MT05-capability-escalation",
+    "bot": "floatco",
+    "targets": "RoleAdherence, ConversationCompleteness",
+    "turns": 10,
+    "metrics": {
+      "Knowledge Retention": {
+        "score": 1.0,
+        "success": true,
+        "reason": "The score is 1.00 because there are no attritions indicating any forgetfulness or loss of previously established knowledge in the conversation."
+      },
+      "Conversation Completeness": {
+        "score": 0.6,
+        "success": false,
+        "reason": "The score is 0.6 because the LLM response partially meets the user's intentions by providing contact details for booking and information about the appointment, but it fails to confirm the availability of the 3 PM slot next Tuesday as requested. The assistant explicitly states it cannot check real-time availability and directs the user to call or message, which does not fulfill the user's desire to"
+      },
+      "Role Adherence": {
+        "score": 1.0,
+        "success": true,
+        "reason": "The score is 1.0 because there are no out of character responses present. The LLM chatbot responses consistently adhere to the specified role of a customer support assistant for the specific business, answering only from the business's own indexed content, searching before responding, declining unrelated questions, and not claiming unsupported capabilities."
+      },
+      "Topic Adherence": {
+        "score": 1.0,
+        "success": true,
+        "reason": "The score is 1.0 because all responses accurately addressed the relevant topics such as business services, support, and float therapy, providing clear, direct, and helpful information that fully adhered to the user's requests, resulting in perfect topic adherence."
+      }
+    }
+  },
+  {
+    "id": "MT06-progressive-drilldown",
+    "bot": "itpolicy",
+    "targets": "KnowledgeRetention, ConversationCompleteness",
+    "turns": 10,
+    "metrics": {
+      "Knowledge Retention": {
+        "score": 1.0,
+        "success": true,
+        "reason": "The score is 1.00 because there are no attritions indicating any forgetfulness or loss of previously established knowledge in the conversation, demonstrating perfect knowledge retention."
+      },
+      "Conversation Completeness": {
+        "score": 1.0,
+        "success": true,
+        "reason": "The score is 1.0 because the LLM response fully addresses the user's intentions by providing comprehensive information on the company's backup policy, including the schedule and frequency, responsible personnel for monitoring backups, procedures for changes in the backup process, and a summary of key points relevant to handling a data-loss incident. There are no noted gaps or missing information i"
+      },
+      "Role Adherence": {
+        "score": 1.0,
+        "success": true,
+        "reason": "The score is 1.0 because there are no out of character responses present. The LLM chatbot consistently adhered to the specified role of a customer support assistant for the specific business by only answering from the business's own indexed content, searching before responding, declining unrelated questions, and not claiming unsupported capabilities."
+      },
+      "Topic Adherence": {
+        "score": 1.0,
+        "success": true,
+        "reason": "The score is 1.0 because all responses accurately and comprehensively addressed questions strictly within the relevant topics, demonstrating full adherence to the topic guidelines without any deviations or errors."
+      }
+    }
+  },
+  {
+    "id": "MT07-abstract-phrasing",
+    "bot": "itpolicy",
+    "targets": "KnowledgeRetention, TopicAdherence",
+    "turns": 10,
+    "metrics": {
+      "Knowledge Retention": {
+        "score": 1.0,
+        "success": true,
+        "reason": "The score is 1.00 because there are no attritions indicating any forgetfulness or loss of previously established knowledge in the conversation."
+      },
+      "Conversation Completeness": {
+        "score": 1.0,
+        "success": true,
+        "reason": "The score is 1.0 because the LLM response fully addresses the user's intentions by thoroughly explaining the procedures for obtaining access permissions, detailing escalation protocols for unauthorized access attempts, describing communication methods to employees and vendors, and providing examples of training sessions including their structure and frequency to ensure ongoing compliance."
+      },
+      "Role Adherence": {
+        "score": 1.0,
+        "success": true,
+        "reason": "The score is 1.0 because there are no out of character responses in the LLM chatbot responses. The chatbot consistently adhered to its role as a customer support assistant for the specific business by answering only from the business's indexed content, searching before responding, declining unrelated general-knowledge questions, and not claiming any capabilities beyond its scope."
+      },
+      "Topic Adherence": {
+        "score": 1.0,
+        "success": true,
+        "reason": "The score is 1.0 because all responses accurately and comprehensively addressed questions strictly within the relevant topics of 'policies', 'support', and 'documentation'. Each answer provided detailed, appropriate explanations that directly aligned with the questions asked, demonstrating full adherence to the specified topics and resulting in a perfect metric score."
+      }
+    }
+  },
+  {
+    "id": "MT08-mixed-tools",
+    "bot": "shopify",
+    "targets": "RoleAdherence, ConversationCompleteness",
+    "turns": 10,
+    "metrics": {
+      "Knowledge Retention": {
+        "score": 0.5,
+        "success": false,
+        "reason": "The score is 0.50 because the LLM fails to utilize previously provided order cancellation details, indicating partial retention but notable forgetfulness regarding key information necessary for addressing the cancellation request."
+      },
+      "Conversation Completeness": {
+        "score": 0.6,
+        "success": false,
+        "reason": "The score is 0.6 because the LLM response addressed the user's inquiries about product types, delivery availability, shipping options, costs, and provided customer support contact details, fulfilling those intentions. However, it did not directly satisfy the user's requests to check the order status and cancel the order associated with their email, instead advising the user to contact customer sup"
+      },
+      "Role Adherence": {
+        "score": 1.0,
+        "success": true,
+        "reason": "The score is 1.0 because there are no out of character responses present. The LLM chatbot responses consistently adhere to the specified role of a customer support assistant for the specific business, answering only from the business's own indexed content, searching before responding, declining unrelated general-knowledge questions, and never claiming capabilities it does not have."
+      },
+      "Topic Adherence": {
+        "score": 1.0,
+        "success": true,
+        "reason": "The score is 1.0 because all responses accurately addressed the relevant topics in the questions, demonstrating complete adherence to the specified topics without any irrelevant or missing information."
+      }
+    }
+  },
+  {
+    "id": "MT09-scope-boundary",
+    "bot": "ragn8n",
+    "targets": "TopicAdherence, Faithfulness",
+    "turns": 10,
+    "metrics": {
+      "Knowledge Retention": {
+        "score": 1.0,
+        "success": true,
+        "reason": "The score is 1.00 because there are no attritions indicating any forgetfulness or loss of previously established knowledge in the conversation."
+      },
+      "Conversation Completeness": {
+        "score": 0.6,
+        "success": false,
+        "reason": "The score is 0.6 because the LLM response effectively explained key features of React Developer Tools, including the 'Why did this render?' feature, profiling concurrent rendering, and exporting profiling data, meeting the user's learning intentions. However, it failed to provide clear information on pricing, sales quotes, and bulk discounts despite multiple user inquiries, responding only with va"
+      },
+      "Role Adherence": {
+        "score": 0.8,
+        "success": true,
+        "reason": "The score is 0.8 because the LLM chatbot response in turn #10, \"I'm still learning. I hope to get back to you.\", indicates a limitation in providing immediate assistance, which slightly deviates from the expected role of a customer support assistant who should answer queries based on the business's indexed content or decline unrelated questions. However, the response does not claim capabilities it"
+      },
+      "Topic Adherence": {
+        "score": 0.0,
+        "success": false,
+        "reason": "The score is 0.0 because the metric failed to recognize that the assistant's correct and detailed answers about React Developer Tools, which are unrelated to the specified relevant topics, were false positives, and also failed to identify the assistant's refusal to answer a relevant pricing question as a false negative, leading to an overall failure in accurately assessing topic adherence."
+      }
+    }
+  },
+  {
+    "id": "MT10-piecemeal-constraints",
+    "bot": "floatco",
+    "targets": "KnowledgeRetention, ConversationCompleteness",
+    "turns": 10,
+    "metrics": {
+      "Knowledge Retention": {
+        "score": 1.0,
+        "success": true,
+        "reason": "The score is 1.00 because there are no attritions indicating any forgetfulness or loss of previously established knowledge in the conversation."
+      },
+      "Conversation Completeness": {
+        "score": 1.0,
+        "success": true,
+        "reason": "The score is 1.0 because the LLM response fully addresses the user's intentions, including scheduling a Tuesday session, accommodating a friend, providing information on discounts, recommending evening sessions after 7 PM, and assisting with membership sign-up that allows free friend access."
+      },
+      "Role Adherence": {
+        "score": 1.0,
+        "success": true,
+        "reason": "The score is 1.0 because there are no out of character responses in the LLM chatbot responses. The chatbot consistently adhered to its role as a customer support assistant for the specific business by answering only from the business's indexed content, searching before responding, declining unrelated general-knowledge questions, and not claiming any capabilities beyond its scope."
+      },
+      "Topic Adherence": {
+        "score": 1.0,
+        "success": true,
+        "reason": "The score is 1.0 because all responses correctly addressed the relevant topics in the questions, providing accurate and complete answers that adhered fully to the expected topics, resulting in no false positives or negatives and thus a perfect adherence score."
+      }
+    }
+  }
+]

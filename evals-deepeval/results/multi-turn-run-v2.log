@@ -1,0 +1,47 @@
+simulating 10 conversations, up to 5 user turns each
+assistant = the real app at http://localhost:3000
+
+
+
+simulated 10 conversations, 50 real app turns
+✨ You're running DeepEval's latest Knowledge Retention Metric! (using 
+gpt-4.1-mini, strict=False, async_mode=True)...
+✨ You're running DeepEval's latest Conversation Completeness Metric! (using 
+gpt-4.1-mini, strict=False, async_mode=True)...
+✨ You're running DeepEval's latest Role Adherence Metric! (using gpt-4.1-mini,
+strict=False, async_mode=True)...
+✨ You're running DeepEval's latest Topic Adherence Metric! (using 
+gpt-4.1-mini, strict=False, async_mode=True)...
+
+
+⚠ WARNING: No hyperparameters logged.
+» Log hyperparameters to attribute prompts and models to your test runs.
+
+===============================================================================
+=
+
+
+✓ Evaluation completed 🎉! (time taken: 141.24s | token cost: 0.1309072 USD)
+» Test Results (10 total tests):
+   » Pass Rate: 50.0% | Passed: 5 | Failed: 5
+
+ ==============================================================================
+== 
+
+» Want to share evals with your team, or a place for your test cases to live? 
+❤️ 🏡
+  » Run 'deepeval view' to analyze and save testing results on Confident AI.
+
+
+
+==========================================================
+multi-turn metric                  avg      pass
+==========================================================
+Knowledge Retention              0.817      7/10
+Conversation Completeness        0.847      7/10
+Role Adherence                   0.980     10/10
+Topic Adherence                  0.871      9/10
+==========================================================
+
+cleaned 10 test session docs
+-> C:\torri-new\chatbotAI\evals-deepeval\results\multi-turn-scores.json

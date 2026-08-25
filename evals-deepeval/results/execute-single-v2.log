@@ -1,0 +1,39 @@
+executing 30 single-turn goldens against http://localhost:3000
+
+[ 1/30] ok    floatco    tools=get_reference chunks=3 17918ms
+[ 2/30] ok    floatco    tools=get_reference chunks=6 15565ms
+[ 3/30] ok    floatco    tools=get_reference chunks=1 20424ms
+[ 4/30] ok    floatco    tools=get_reference chunks=1 14016ms
+[ 5/30] ok    floatco    tools=get_reference chunks=5 15802ms
+[ 6/30] ok    floatco    tools=get_reference chunks=3 17415ms
+[ 7/30] ok    floatco    tools=get_reference chunks=1 14012ms
+[ 8/30] ERROR floatco    tools=get_reference chunks=0 17701ms
+         pinecone HTTP 500
+[ 9/30] ok    itpolicy   tools=get_reference chunks=2 15186ms
+[10/30] ok    itpolicy   tools=get_reference chunks=1 15596ms
+[11/30] ok    itpolicy   tools=get_reference chunks=1 13727ms
+[12/30] ok    itpolicy   tools=get_reference chunks=1 12352ms
+[13/30] ERROR itpolicy   tools=get_reference chunks=0 19809ms
+         pinecone HTTP 500
+[14/30] ok    itpolicy   tools=get_reference chunks=4 18932ms
+[15/30] ok    itpolicy   tools=get_reference chunks=3 16693ms
+[16/30] ok    itpolicy   tools=get_reference chunks=3 18888ms
+[17/30] ok    shopify    tools=get_reference chunks=1 20199ms
+[18/30] ok    shopify    tools=get_reference chunks=2 12999ms
+[19/30] ok    shopify    tools=get_reference chunks=1 15158ms
+[20/30] ok    shopify    tools=get_reference chunks=1 13839ms
+[21/30] ok    shopify    tools=get_reference chunks=2 15140ms
+[22/30] ok    shopify    tools=get_reference chunks=1 12100ms
+[23/30] ok    ragn8n     tools=get_reference chunks=3 15704ms
+[24/30] ok    ragn8n     tools=get_reference chunks=2 14561ms
+[25/30] ok    ragn8n     tools=get_reference chunks=1 15579ms
+[26/30] ok    ragn8n     tools=get_reference chunks=1 19888ms
+[27/30] ok    ragn8n     tools=get_reference chunks=2 31497ms
+[28/30] ERROR ragn8n     tools=get_reference,get_reference chunks=3 33749ms
+         pinecone HTTP 500
+[29/30] ok    ragn8n     tools=get_reference chunks=6 15764ms
+[30/30] ok    ragn8n     tools=get_reference chunks=5 13614ms
+
+executed: 30   succeeded: 27   with retrieval context: 28
+cleaned 30 test session docs
+-> evals-deepeval/results/single-turn-executed.json

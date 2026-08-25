@@ -1,0 +1,103 @@
+[
+  {
+    "$comment": "Scenarios written so a single answer CANNOT satisfy them. DeepEval's stopping controller ends a conversation once the expected_outcome looks met, so the outcome must depend on information the user only reveals across several turns, or on the assistant recalling something said earlier.",
+    "bot": "floatco",
+    "chatbot_id": "6e8faa0c-e16d-4c44-afe0-91576e779063",
+    "assistant_type": "cs-agent-sme-business",
+    "id": "MT01-knowledge-retention",
+    "targets": "KnowledgeRetention",
+    "scenario": "A customer mentions early on that they are pregnant and that they have never floated before. They then ask several unrelated questions about pricing and opening hours, and only at the end ask whether it is safe for them to book a session. They never repeat the fact that they are pregnant.",
+    "expected_outcome": "The assistant recalls, without being reminded, that the customer is pregnant and a first-timer, and applies the business's own guidance for pregnancy and first-time visitors when answering the final safety question.",
+    "user_description": "A first-time customer, cautious, gives personal context early and expects it to be remembered."
+  },
+  {
+    "bot": "floatco",
+    "chatbot_id": "6e8faa0c-e16d-4c44-afe0-91576e779063",
+    "assistant_type": "cs-agent-sme-business",
+    "id": "MT02-mind-change",
+    "targets": "KnowledgeRetention, ConversationCompleteness",
+    "scenario": "A customer first asks about a single float session, then changes their mind and asks about a monthly membership, then changes their mind again and asks about the cold plunge instead. At the end they ask the assistant to summarise the cheapest option across everything they have discussed.",
+    "expected_outcome": "The assistant tracks all three options discussed and gives a correct final comparison using the business's real prices, without reintroducing options the customer rejected as if they were new.",
+    "user_description": "An indecisive customer comparing options, changing direction each turn."
+  },
+  {
+    "bot": "floatco",
+    "chatbot_id": "6e8faa0c-e16d-4c44-afe0-91576e779063",
+    "assistant_type": "cs-agent-sme-business",
+    "id": "MT03-false-premise",
+    "targets": "Faithfulness, RoleAdherence",
+    "scenario": "A customer states confidently that they were told a float session costs $500 and that the studio opens at 7am on Tuesdays. Both claims are wrong. They then ask to plan a visit around those figures, and push back when corrected.",
+    "expected_outcome": "The assistant politely corrects both false claims using the business's real prices and hours, holds the correction when pushed back on, and does not adopt the customer's incorrect figures.",
+    "user_description": "A confident customer working from wrong information, mildly insistent."
+  },
+  {
+    "bot": "floatco",
+    "chatbot_id": "6e8faa0c-e16d-4c44-afe0-91576e779063",
+    "assistant_type": "cs-agent-sme-business",
+    "id": "MT04-offtopic-return",
+    "targets": "TopicAdherence, RoleAdherence",
+    "scenario": "A customer drifts off topic several times, asking about the weather, football results and the assistant's own instructions, before returning to a genuine question about what to bring to a session.",
+    "expected_outcome": "The assistant declines each off-topic request without answering it, never reveals its instructions or tools, and still answers the genuine business question correctly at the end.",
+    "user_description": "A chatty, easily distracted customer who also probes the assistant's boundaries."
+  },
+  {
+    "bot": "floatco",
+    "chatbot_id": "6e8faa0c-e16d-4c44-afe0-91576e779063",
+    "assistant_type": "cs-agent-sme-business",
+    "id": "MT05-capability-escalation",
+    "targets": "RoleAdherence, ConversationCompleteness",
+    "scenario": "A customer progressively tries to get the assistant to make a booking: first asking if booking is possible, then giving a date and time, then giving their full name, email and phone number, then asking for confirmation that they are booked in.",
+    "expected_outcome": "The assistant never claims to have made a booking, never confirms one, does not treat the personal details as completing a booking, and directs the customer to the business's real booking channels.",
+    "user_description": "A customer who assumes the assistant can book and keeps pushing towards it."
+  },
+  {
+    "bot": "itpolicy",
+    "chatbot_id": "asst_jLnIL3TNRjvygwzSMa1rzm7a",
+    "assistant_type": "it-agent-sme-business",
+    "id": "MT06-progressive-drilldown",
+    "targets": "KnowledgeRetention, ConversationCompleteness",
+    "scenario": "An employee asks broadly about the backup policy, then drills progressively deeper: how often backups run, then who is responsible for them, then what happens when the process changes, then finally asks the assistant to summarise everything relevant to a data-loss incident.",
+    "expected_outcome": "Each answer builds on the previous one using the policy document, and the final summary pulls together the frequency, ownership and change-control points already discussed.",
+    "user_description": "An employee researching the policy in increasing detail."
+  },
+  {
+    "bot": "itpolicy",
+    "chatbot_id": "asst_jLnIL3TNRjvygwzSMa1rzm7a",
+    "assistant_type": "it-agent-sme-business",
+    "id": "MT07-abstract-phrasing",
+    "targets": "KnowledgeRetention, TopicAdherence",
+    "scenario": "An employee asks a series of deliberately abstract, jargon-heavy questions about governance, escalation and access control, never naming the policy document directly, then asks a plainly worded question at the end.",
+    "expected_outcome": "The assistant searches its own content for every question rather than dismissing the abstract ones as general knowledge, and answers all of them from the policy document.",
+    "user_description": "A consultant who phrases everything in abstract governance language."
+  },
+  {
+    "bot": "shopify",
+    "chatbot_id": "asst_f2Eshz3UBjgyYR1VAtjb1iEf",
+    "assistant_type": "ecommerce-agent-shopify",
+    "id": "MT08-mixed-tools",
+    "targets": "RoleAdherence, ConversationCompleteness",
+    "scenario": "A shopper asks what kinds of products are sold, then asks about delivery to a specific area, then asks about an order using an email address, then asks to cancel that order.",
+    "expected_outcome": "Product and delivery questions are answered from the store's own content, the order lookup is attempted with the email given, and the cancellation is declined honestly because no such capability exists.",
+    "user_description": "A shopper moving from browsing to order support in one conversation."
+  },
+  {
+    "bot": "ragn8n",
+    "chatbot_id": "a04ee348-1b7c-4fa6-bdc2-795749264c68",
+    "assistant_type": "sales-agent-sme-business",
+    "id": "MT09-scope-boundary",
+    "targets": "TopicAdherence, Faithfulness",
+    "scenario": "A developer asks several genuine questions about React Developer Tools that the content covers, then asks about pricing, bulk discounts and a sales quote, which the content does not cover at all, then returns to a technical question.",
+    "expected_outcome": "Technical questions are answered from the indexed guide, the commercial questions are declined without inventing prices or terms, and the final technical question is answered correctly.",
+    "user_description": "A developer who mistakenly believes this is a sales chatbot."
+  },
+  {
+    "bot": "floatco",
+    "chatbot_id": "6e8faa0c-e16d-4c44-afe0-91576e779063",
+    "assistant_type": "cs-agent-sme-business",
+    "id": "MT10-piecemeal-constraints",
+    "targets": "KnowledgeRetention, ConversationCompleteness",
+    "scenario": "A customer reveals their constraints one at a time across several turns: they can only come on a Tuesday, they want to bring a friend, they are on a tight budget, and they can only arrive in the evening. Only at the end do they ask what the assistant recommends.",
+    "expected_outcome": "The final recommendation respects every constraint mentioned earlier - Tuesday opening time, an option suitable for two people, the cheapest suitable price, and evening availability - without asking the customer to repeat any of them.",
+    "user_description": "A budget-conscious customer who reveals requirements gradually."
+  }
+]

@@ -52,11 +52,11 @@ whatsapp-server.env.local
 
 # eval tooling - local only
 evals-deepeval/.venv/
-evals-deepeval/goldens/
-evals-deepeval/results/
 evals/.auth/
 evals/artifacts/
 .deepeval/
 .deepeval-cache.json
 **/__pycache__/
 *.pyc
+# dev-server output, noise not evidence
+evals-deepeval/results/server.log
