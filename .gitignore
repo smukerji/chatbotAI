@@ -49,3 +49,15 @@ whatsapp-server.env.local
 # VS Code workspace file
 *.code-workspace
 .env*
+
+# eval tooling - local only
+evals-deepeval/.venv/
+evals-deepeval/goldens/
+evals-deepeval/results/
+evals-crawler/results/
+evals/.auth/
+evals/artifacts/
+.deepeval/
+.deepeval-cache.json
+**/__pycache__/
+*.pyc
