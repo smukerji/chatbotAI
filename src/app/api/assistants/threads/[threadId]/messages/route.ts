@@ -1,6 +1,7 @@
 import { openai } from "@/app/openai";
 import clientPromise from "@/db";
 import { getAssistantTools, getSystemInstruction } from "@/app/_helpers/assistant-creation-contants";
+import { buildAssistantTools, buildCapabilityNote, buildGroundingRules } from "@/app/_helpers/server/assistant-tools";
 
 export const runtime = "nodejs";
 
@@ -8,7 +9,7 @@ export const runtime = "nodejs";
  * Build the dynamic context injected into every turn's instructions.
  * Matches the previous additional_instructions content exactly.
  */
-function buildDynamicContext(businessTimezone: string): string {
+function buildDynamicContext(businessTimezone: string, canBook: boolean = true): string {
   const now = new Date();
   const isoNow = now.toISOString();
   const utcDate = now.toUTCString();
@@ -28,7 +29,7 @@ function buildDynamicContext(businessTimezone: string): string {
     }).format(now).replace(",", "");
   } catch { /* invalid tz — fall back to ISO */ }
 
-  return `
+  const dateBlock = `
 ## SYSTEM OVERRIDE — Dynamic Context (HIGHEST PRIORITY — these rules override all previous instructions)
 
 CURRENT_DATETIME_UTC: ${isoNow}
@@ -37,6 +38,16 @@ CURRENT_DATE_HUMAN: ${utcDate}
 TODAY_WEEKDAY: ${todayName}
 TOMORROW_DATE: ${tomorrowISO}
 BUSINESS_TIMEZONE: ${businessTimezone}
+`.trim();
+
+  /// these rules instruct the model to collect booking fields and call
+  /// create_booking. On a chatbot with no calendar connected that tool is not
+  /// offered, and keeping the rules just makes it collect personal details for
+  /// a booking it can never make.
+  if (!canBook) return dateBlock;
+
+  return `
+${dateBlock}
 
 ### CRITICAL BOOKING RULES — MUST follow exactly, no exceptions:
 
@@ -82,9 +93,10 @@ export async function POST(request: any, { params: { threadId } }: any) {
   const db = (await clientPromise!).db();
 
   // ── Fetch chatbot config ──────────────────────────────────────────────────
-  const [settings, chatbotRecord] = await Promise.all([
+  const [settings, chatbotRecord, calendarToken] = await Promise.all([
     db.collection("chatbot-settings").findOne({ chatbotId: assistantId }),
     db.collection("user-chatbots").findOne({ chatbotId: assistantId }),
+    db.collection("google-calendar-tokens").findOne({ chatbotId: assistantId }),
   ]);
 
   const businessTimezone = settings?.bookingTimezone ?? "UTC";
@@ -95,8 +107,8 @@ export async function POST(request: any, { params: { threadId } }: any) {
 
   // Build instructions: base system prompt + dynamic context
   const baseInstruction = settings?.instruction ?? getSystemInstruction(assistantType);
-  const dynamicContext = buildDynamicContext(businessTimezone);
-  const fullInstructions = `${baseInstruction}\n\n${dynamicContext}`;
+  /// booking rules are only injected when a booking tool is actually offered
+  const dynamicContext = buildDynamicContext(businessTimezone, !!calendarToken);
 
   // ── Get schema_info for structured data sources ───────────────────────────
   const assistantData = await db
@@ -120,13 +132,25 @@ export async function POST(request: any, { params: { threadId } }: any) {
   // ── Tool definitions ──────────────────────────────────────────────────────
   // getAssistantTools returns Assistants API shape: { type, function: { name, ... } }
   // Responses API expects the flat shape:           { type, name, description, parameters, strict }
-  const tools = getAssistantTools(assistantType).map((t: any) => ({
-    type: "function" as const,
-    name: t.function.name,
-    description: t.function.description,
-    parameters: t.function.parameters,
-    ...(t.function.strict !== undefined ? { strict: t.function.strict } : {}),
-  }));
+  /// only offer tools this chatbot can actually fulfil — see assistant-tools.ts
+  const { tools, dropped: droppedTools } = buildAssistantTools({
+    assistantType,
+    chatbotRecord,
+    hasCalendar: !!calendarToken,
+  });
+
+  /// the prompt templates tell the assistant to take bookings and look up
+  /// orders regardless of what is connected — without this it happily claims to
+  /// have booked an appointment it has no way to create
+  const capabilityNote = buildCapabilityNote(droppedTools);
+  /// without these the assistant answers general-knowledge questions from its
+  /// own memory and skips retrieval on questions it does hold content for
+  const groundingRules = buildGroundingRules(
+    tools.some((t: any) => t.name === "get_reference")
+  );
+  const fullInstructions = [baseInstruction, dynamicContext, capabilityNote, groundingRules]
+    .filter(Boolean)
+    .join("\n\n");
 
   // ── Responses API call (streaming) ────────────────────────────────────────
   const responseParams: any = {
@@ -149,6 +173,18 @@ export async function POST(request: any, { params: { threadId } }: any) {
   console.log("previousRespId :", previousResponseId ?? "(none — new session)");
   console.log("temperature    :", responseParams.temperature ?? "n/a (reasoning model)");
   console.log("tools          :", tools.map((t: any) => t.name).join(", ") || "(none)");
+  /// tool_choice is never set, so the api defaults to "auto" — the model picks
+  /// whether to retrieve. With temperature 1 that choice varies between runs,
+  /// which is why the same question sometimes skips get_reference entirely.
+  console.log("tool_choice    :", responseParams.tool_choice ?? "auto (default — model decides)");
+  console.log("has_get_reference:", tools.some((t: any) => t.name === "get_reference"));
+  /// if a bot loses a capability unexpectedly, this line says which and why
+  console.log(
+    "tools_dropped  :",
+    Object.keys(droppedTools).length
+      ? Object.entries(droppedTools).map(([n, why]) => `${n} (${why})`).join(", ")
+      : "(none)"
+  );
   console.log("--- instructions (first 600 chars) ---");
   console.log(fullInstructions.slice(0, 600));
   console.log("--- input ---");
@@ -184,6 +220,26 @@ export async function POST(request: any, { params: { threadId } }: any) {
           if (event.type === "response.completed") {
             const output = event.response?.output ?? [];
             console.log("[ResponsesAPI] response.completed  output_items:", output.map((o: any) => o.type).join(", ") || "(empty)");
+
+            /// the decisive line for "why did it not hit pinecone this time":
+            /// with tool_choice=auto the model may answer straight from its own
+            /// knowledge and never call get_reference, which reads as a wrong
+            /// or hallucinated answer rather than an error
+            const fnCalls = output.filter((o: any) => o.type === "function_call");
+            console.log(
+              "[ToolDecision] tools_offered:", tools.map((t: any) => t.name).join(",") || "(none)",
+              "| tool_choice:", responseParams.tool_choice ?? "auto",
+              "| temperature:", responseParams.temperature ?? "n/a",
+              "| functions_called:", fnCalls.length ? fnCalls.map((f: any) => f.name).join(",") : "NONE",
+              "| retrieval_used:", fnCalls.some((f: any) => f.name === "get_reference"),
+              "| chained_from:", previousResponseId ?? "(new session)"
+            );
+            if (!fnCalls.length) {
+              console.warn(
+                "[ToolDecision] model answered WITHOUT calling any tool — reply is from model knowledge, not the chatbot's indexed data"
+              );
+            }
+
             const textItems = output.filter((o: any) => o.type === "message");
             if (textItems.length) {
               const text = textItems[0]?.content?.map((c: any) => c.text ?? "").join("") ?? "";

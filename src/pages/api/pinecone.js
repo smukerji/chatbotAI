@@ -15,6 +15,37 @@ export const config = {
   maxDuration: 300,
 };
 
+/// phase logging - every line is prefixed [rag <id>] so one request can be
+/// followed end to end in the vercel runtime logs
+function ragLogger() {
+  const id = Math.random().toString(36).slice(2, 8);
+  const startedAt = Date.now();
+  let current = "init";
+  return {
+    get phase() {
+      return current;
+    },
+    step(name, data) {
+      current = name;
+      console.log(
+        `[rag ${id}] ${name} +${Date.now() - startedAt}ms`,
+        data ? JSON.stringify(data) : ""
+      );
+    },
+    fail(error) {
+      console.error(
+        `[rag ${id}] FAILED during "${current}" after ${Date.now() - startedAt}ms:`,
+        error?.name,
+        "-",
+        error?.message,
+        error?.cause ? `| cause: ${error.cause?.message ?? error.cause}` : ""
+      );
+      if (error?.stack) console.error(error.stack.split("\n").slice(0, 4).join("\n"));
+    },
+    elapsed: () => Date.now() - startedAt,
+  };
+}
+
 export default async function handler(req, res) {
   if (req.method === "POST") {
     // await pinecone.init({
@@ -43,6 +74,47 @@ export default async function handler(req, res) {
     const chatbotId = body?.chatbotId;
     const userId = body?.userId;
     const messages = body?.messages ? body?.messages : {};
+
+    /// a trailing newline in the env var makes node-fetch reject the auth
+    /// header ("is not a legal HTTP header value"), which langchain retries 7
+    /// times before failing — surfacing as a slow 500 rather than an auth error
+    const openaiKey = process.env.NEXT_PUBLIC_OPENAI_KEY?.trim();
+    const pineconeKey = process.env.NEXT_PUBLIC_PINECONE_KEY?.trim();
+    const pineconeIndexName = process.env.NEXT_PUBLIC_PINECONE_INDEX?.trim();
+
+    const log = ragLogger();
+    log.step("request", {
+      chatbotId,
+      namespace: userId,
+      queryLength: userQuery?.length ?? 0,
+      historyCount: Array.isArray(messages) ? messages.length : 0,
+      hasPineconeKey: !!pineconeKey,
+      pineconeIndex: pineconeIndexName ?? null,
+      hasOpenaiKey: !!openaiKey,
+      /// flags the exact defect above without printing any secret.
+      /// illegalHeaderChar uses node-fetch's own rule, so it catches invisible
+      /// characters that trim() cannot strip (zero-width space and friends)
+      openaiKeyNeededTrim:
+        (process.env.NEXT_PUBLIC_OPENAI_KEY ?? "").length !==
+        (openaiKey ?? "").length,
+      openaiKeyIllegalHeaderChar: /[^\t\x20-\x7e\x80-\xff]/.test(openaiKey ?? ""),
+      pineconeKeyNeededTrim:
+        (process.env.NEXT_PUBLIC_PINECONE_KEY ?? "").length !==
+        (pineconeKey ?? "").length,
+    });
+
+    /// missing ids mean retrieval can never match anything, so fail loudly
+    /// rather than returning an empty context the model will answer blind from
+    if (!userQuery || !chatbotId || !userId) {
+      console.error("[rag] missing required field", {
+        hasUserQuery: !!userQuery,
+        hasChatbotId: !!chatbotId,
+        hasUserId: !!userId,
+      });
+      return res
+        .status(400)
+        .json({ error: "userQuery, chatbotId and userId are required" });
+    }
     // /// create the embedding of user query
     // const embed = await createEmbedding(userQuery);
 
@@ -75,22 +147,38 @@ export default async function handler(req, res) {
       //   return res.status(200).send(error.message);
       // }
 
+      /// no timeouts were set on any client, so a stalled dependency burned the
+      /// whole function budget. Measured: PineconeConnectionError after 10s,
+      /// and langchain retrying an unreachable OpenAI 7 times for ~105s.
       const pinecone = new Pinecone({
-        apiKey: process.env.NEXT_PUBLIC_PINECONE_KEY,
+        apiKey: pineconeKey,
       });
 
-      const pineconeIndex = pinecone.Index(
-        process.env.NEXT_PUBLIC_PINECONE_INDEX
-      );
+      const pineconeIndex = pinecone.Index(pineconeIndexName);
+
+      log.step("pinecone.connect");
+      /// confirms the index is actually reachable from this runtime, and
+      /// whether the caller's namespace holds any vectors at all
+      const stats = await pineconeIndex.describeIndexStats();
+      log.step("pinecone.stats", {
+        dimension: stats?.dimension,
+        totalRecords: stats?.totalRecordCount,
+        namespaceRecords: stats?.namespaces?.[userId]?.recordCount ?? 0,
+        namespaceExists: !!stats?.namespaces?.[userId],
+      });
+
+      log.step("vectorstore.init");
       const vectorStore = await PineconeStore.fromExistingIndex(
-        new OpenAIEmbeddings({ apiKey: process.env.NEXT_PUBLIC_OPENAI_KEY }),
+        new OpenAIEmbeddings({ apiKey: openaiKey, timeout: 20000, maxRetries: 2 }),
         { pineconeIndex, namespace: userId }
       );
 
       /// Custom Multi-Query Retriever with Scores
       const llm = new ChatOpenAI({
-        apiKey: process.env.NEXT_PUBLIC_OPENAI_KEY,
+        apiKey: openaiKey,
         model: "gpt-4o",
+        timeout: 25000,
+        maxRetries: 2,
       });
 
       // Generate multiple query variations
@@ -119,6 +207,7 @@ export default async function handler(req, res) {
       );
 
       // Generate query variations
+      log.step("query-expansion.llm");
       const queryVariationsMsg = await llm.invoke(
         await multiQueryPrompt.format({
           question: userQuery,
@@ -152,13 +241,20 @@ export default async function handler(req, res) {
       };
 
       const queries = extractQueries(queryVariations);
+      log.step("query-expansion.done", {
+        variationsReturned: queries.length,
+        usedFallback: queries.length === 1,
+      });
 
       // Custom multi-query retrieval with scores
       const allResultsWithScores = [];
 
       // Search with each query variation
-      for (const query of queries) {
+      let searchFailures = 0;
+      for (const [i, query] of queries.entries()) {
+        const searchStartedAt = Date.now();
         try {
+          log.step(`search.${i}`, { query: query?.slice(0, 80) });
           const results = await vectorStore.similaritySearchWithScore(
             query,
             10,
@@ -166,15 +262,34 @@ export default async function handler(req, res) {
               chatbotId: chatbotId,
             }
           );
+          log.step(`search.${i}.done`, {
+            matches: results.length,
+            ms: Date.now() - searchStartedAt,
+            topScore: results[0]?.[1],
+          });
 
           // Add query source to each result
           results.forEach(([doc, score]) => {
             allResultsWithScores.push([doc, score, query]);
           });
         } catch (error) {
-          console.error(`Error searching with query "${query}":`, error);
+          /// one failed variation should not sink the request, but it must be
+          /// visible - a silent catch here is why this looked like "no data"
+          searchFailures++;
+          console.error(
+            `[rag] search.${i} failed after ${Date.now() - searchStartedAt}ms for "${query?.slice(0, 80)}":`,
+            error?.name,
+            "-",
+            error?.message,
+            error?.cause ? `| cause: ${error.cause?.message ?? error.cause}` : ""
+          );
         }
       }
+      log.step("search.all-done", {
+        queries: queries.length,
+        failures: searchFailures,
+        rawMatches: allResultsWithScores.length,
+      });
 
       // Remove duplicates and sort by score
       const uniqueResults = new Map();
@@ -230,7 +345,15 @@ export default async function handler(req, res) {
         return { content, source, filename, score, source_url, dimensions };
       });
 
+      log.step("rank.done", {
+        uniqueMatches: uniqueResults.size,
+        kept: similaritySearch.length,
+        topScore: similaritySearch[0]?.score,
+        emptyContent: similaritySearch.filter((c) => !c.content?.trim()).length,
+      });
+
       // --- Filter retrieved chunks using OpenAI to keep only those relevant to the original query ---
+      log.step("relevance-filter.llm", { chunksIn: similaritySearch.length });
       try {
         // Build a compact listing of chunks to avoid hitting token limits
         const maxChunkChars = 1500;
@@ -287,12 +410,30 @@ export default async function handler(req, res) {
         console.error("Error while filtering chunks with OpenAI, returning unfiltered results:", filterError);
       }
 
+      log.step("respond", {
+        chunks: similaritySearch.length,
+        totalMs: log.elapsed(),
+      });
+      /// an empty context here is why the model replies "I couldn't retrieve
+      /// information about X" - make that case obvious in the logs
+      if (similaritySearch.length === 0) {
+        console.error(
+          `[rag] returning EMPTY context for chatbotId=${chatbotId} query="${userQuery?.slice(0, 80)}"`
+        );
+      }
       return res.status(200).send(similaritySearch);
     } catch (error) {
-      console.error("Error initializing Pinecone client:", error);
-      throw new Error(
-        "Failed to initialize Pinecone client while retriving the similarity results"
-      );
+      /// report which phase died and the real cause, instead of rethrowing a
+      /// generic message that produced an opaque 500 html page
+      log.fail(error);
+      return res.status(500).json({
+        error: "similarity search failed",
+        phase: log.phase,
+        name: error?.name,
+        message: error?.message,
+        cause: error?.cause?.message ?? String(error?.cause ?? ""),
+        elapsedMs: log.elapsed(),
+      });
     }
   } else {
     /// deleting the chatbot data from pinecone
