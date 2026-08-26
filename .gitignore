@@ -60,3 +60,7 @@ evals/artifacts/
 *.pyc
 # dev-server output, noise not evidence
 evals-deepeval/results/server.log
+
+# crawler diagnostics live on their own branch; these are the local leftovers
+# that remain after switching away from it - node_modules, caches and run output
+evals-crawler/
