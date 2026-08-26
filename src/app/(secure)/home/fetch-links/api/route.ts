@@ -200,10 +200,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { apiHandler } from "../../../../_helpers/server/api/api-handler";
 // import { chromium } from "playwright";
 import * as puppeteer from "puppeteer";
-import { parse } from "node-html-parser";
 import chromium from "@sparticuz/chromium-min";
 import clientPromise from "../../../../../db";
 import { ObjectId } from "mongodb";
+import {
+  chunkPageText,
+  extractPageText,
+  normalizeUrl,
+  shouldCrawl,
+} from "../../../../_helpers/server/crawl-extract";
 
 module.exports = apiHandler({
   POST: fetchLinks,
@@ -213,34 +218,6 @@ export const maxDuration = 300;
 
 const imageLinkRegex =
   /^https?:\/\/(?:[\w\-]+\.)+[a-zA-Z]{2,20}(?:\/[^\s?]+)*(?:\.(?:jpg|jpeg|png|gif|bmp|svg|webp|tiff))(?:\?.*)?$/i;
-
-function extractTextAndImageSrc(element: any) {
-  if (
-    element.tagName === "SCRIPT" ||
-    element.tagName === "SVG" ||
-    element.tagName === "STYLE"
-  ) {
-    return "";
-  } else if (element.tagName === "IMG") {
-    // If the element is an image, extract its src attribute
-    const imgSrc = element.getAttribute("src");
-
-    if (imageLinkRegex.test(imgSrc))
-      return `      image: ${decodeURI(imgSrc)}          `;
-    return "";
-  } else if (element.childNodes.length === 0) {
-    // If the element has no child nodes, return its text
-    if (element.text === undefined) console.log(element.tagName);
-    return element.text;
-  } else {
-    // If the element has child nodes, recursively extract text and image src links from them
-    let text = "";
-    element.childNodes.forEach((child: any) => {
-      text += extractTextAndImageSrc(child);
-    });
-    return text.replace(/(\r\n|\n|\r|\t|)/gm, "").trim();
-  }
-}
 
 async function fetchLinks(request: NextRequest) {
   /// get the website to crawl
@@ -310,16 +287,33 @@ async function fetchLinks(request: NextRequest) {
     const page = await browser.newPage();
     console.log(" page created !");
 
+    /// Scope the crawl to the host the seed actually lands on. Resolving the
+    /// redirect first is what stops a crawl collapsing to a single page when
+    /// the customer's domain forwards elsewhere.
+    let siteHost = new URL(sourceUrl).hostname.replace(/^www\./, "");
+    try {
+      await page.goto(sourceUrl, { waitUntil: "domcontentloaded", timeout: 60000 });
+      siteHost = new URL(page.url()).hostname.replace(/^www\./, "");
+      if (siteHost !== new URL(sourceUrl).hostname.replace(/^www\./, "")) {
+        console.log(`[crawl] ${sourceUrl} redirects to ${page.url()} - scoping to ${siteHost}`);
+      }
+    } catch (e) {
+      console.warn(`[crawl] could not resolve seed, scoping to ${siteHost}`);
+    }
+
     const visitedUrls = new Map();
     const pendingUrls = [sourceUrl];
     const crawledData = [];
 
     while (pendingUrls.length > 0) {
       const url = pendingUrls.shift();
-      if (!url || visitedUrls.get(url) == true || url.endsWith(".mp4"))
-        continue;
-
-      visitedUrls.set(url, true);
+      if (!url) continue;
+      /// de-duplicate on the canonical form, not the raw string: 18 stored
+      /// pages were the same URL with and without a trailing slash, and each
+      /// one consumed a slot of the customer's crawl allowance
+      const key = normalizeUrl(url);
+      if (!key || visitedUrls.get(key) === true) continue;
+      visitedUrls.set(key, true);
 
       try {
         await page.goto(url, {
@@ -334,22 +328,9 @@ async function fetchLinks(request: NextRequest) {
         const html = await page.$eval("body", (body) => {
           return body.innerHTML;
         });
-        const root = parse(html);
-        const text = extractTextAndImageSrc(root).replace(/<img[^>]*>/g, "");
-        let chunks: any = [];
-        await new Promise((resolve) => {
-          let start = 0;
-          let end = text.length;
-          while (start < end) {
-            const subStr = text.substring(start, start + 2000);
-            chunks.push(subStr);
-            start += 1800;
-          }
+        const text = extractPageText(html);
+        const chunks = chunkPageText(text);
 
-          if (start > end) {
-            resolve(1);
-          }
-        });
         crawledData.push({
           crawlLink: url,
           cleanedText: chunks,
@@ -363,11 +344,12 @@ async function fetchLinks(request: NextRequest) {
         }
 
         const newUrls = await extractUrls(page, sourceUrl);
-        newUrls.forEach((newUrl: any) => {
-          if (!visitedUrls.get(newUrl)) {
-            pendingUrls.push(newUrl);
+        for (const newUrl of newUrls) {
+          const normalized = normalizeUrl(newUrl);
+          if (normalized && !visitedUrls.get(normalized) && shouldCrawl(newUrl, siteHost)) {
+            pendingUrls.push(normalized);
           }
-        });
+        }
 
         console.log(crawledData.length);
       } catch (error) {
@@ -456,9 +438,10 @@ async function extractUrls(page: any, baseUrl: any) {
     baseUrl
   );
 
-  const filteredUrls = hrefs.filter((href: any) => {
-    const domain = new URL(baseUrl).hostname;
-    return href !== null && href.startsWith(baseUrl);
-  });
-  return filteredUrls;
+  /// Scoping happens in the caller via shouldCrawl(), which compares hostnames
+  /// against the host the seed landed on. The previous rule here was
+  /// href.startsWith(baseUrl), which dropped every sibling link whenever the
+  /// customer entered a URL containing a path, or their domain redirected -
+  /// silently reducing the whole crawl to a single page.
+  return hrefs.filter((href: any) => href !== null);
 }
