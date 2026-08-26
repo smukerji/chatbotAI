@@ -3,6 +3,7 @@
   "private": true,
   "description": "Crawler extraction diagnostics and library bake-off. Separate from the app's dependencies on purpose.",
   "dependencies": {
+    "@google/genai": "^2.19.0",
     "@mozilla/readability": "^0.5.0",
     "crawlee": "^3.18.1",
     "defuddle": "^0.19.3",
