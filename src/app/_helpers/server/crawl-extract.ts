@@ -17,7 +17,10 @@
  */
 
 import TurndownService from "turndown";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// turndown-plugin-gfm ships no type declarations and is CommonJS, so it is
+// required rather than imported. No eslint-disable here: the project does not
+// configure @typescript-eslint/no-var-requires, and naming an unconfigured rule
+// in a disable comment is itself a lint error that fails the build.
 const { gfm } = require("turndown-plugin-gfm");
 
 const turndown = new TurndownService({ headingStyle: "atx", codeBlockStyle: "fenced" });
