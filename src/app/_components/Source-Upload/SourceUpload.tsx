@@ -156,8 +156,13 @@ function SourceUpload({
           filesCharCount + response.charLength
         );
         /// add the file
+        // defaultFileList comes from botDetails?.defaultFileList and is
+        // undefined for a chatbot with no files yet, so spreading it threw
+        // "defaultFileList is not iterable" and the very first upload to a new
+        // chatbot always failed. The read above is optional-chained; this use
+        // was not.
         botContext?.handleChange("defaultFileList")([
-          ...defaultFileList,
+          ...(defaultFileList ?? []),
           { name: info.file.name, ...response },
         ]);
         /// add the file to new file list if the chatbot is getting updated
@@ -200,7 +205,9 @@ function SourceUpload({
 
   /// remove the files
   function removeFile(fileToRemove: any) {
-    const newDefaultFileList = defaultFileList.filter((file: any) => {
+    // same guard as the add path: defaultFileList is undefined until the
+    // chatbot has files, and calling .filter on it throws
+    const newDefaultFileList = (defaultFileList ?? []).filter((file: any) => {
       return file !== fileToRemove;
     });
     /// add the file to be deleted while retraining

@@ -22,10 +22,20 @@ export const authOptions: NextAuthOptions = {
       clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
       clientSecret: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET!,
       allowDangerousEmailAccountLinking: true,
+      // next-auth's openid-client defaults to a 3500ms timeout on the provider
+      // discovery request. Google's .well-known/openid-configuration was
+      // measured at 11.6s from a developer machine, so every sign-in failed
+      // with "RPError: outgoing request timed out" and the user landed on
+      // /api/auth/signin?error=OAuthSignin with nothing explaining why.
+      //
+      // The request is a single well-cached document; waiting longer for it
+      // costs nothing, while failing fast here costs the entire login.
+      httpOptions: { timeout: 20000 },
     }),
     GithubProvider({
       clientId: process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID!,
       clientSecret: process.env.NEXT_PUBLIC_GITHUB_CLIENT_SECRET!,
+      httpOptions: { timeout: 20000 }, // same reasoning as above
     }),
   ],
 

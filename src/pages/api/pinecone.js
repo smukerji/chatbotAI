@@ -152,6 +152,38 @@ export default async function handler(req, res) {
       /// and langchain retrying an unreachable OpenAI 7 times for ~105s.
       const pinecone = new Pinecone({
         apiKey: pineconeKey,
+        /// Retry the transport, because the first connection to Pinecone from a
+        /// cold runtime stalls and the SDK gives up before it completes.
+        ///
+        /// Measured over 8 consecutive calls from one process:
+        ///   attempt 1   FAILED at 10702ms
+        ///   attempt 2   FAILED at 10614ms
+        ///   attempt 3       ok at   188ms
+        ///   attempts 4-8    ok at  ~130ms
+        ///
+        /// Once a connection is warm the API answers in about a tenth of a
+        /// second; it is only the first one that hangs. The SDK surfaces that
+        /// as PineconeConnectionError "fetch failed", which reads like an
+        /// outage and is not one - curl reached the same endpoint in 0.36s
+        /// while node fetch was still stalling.
+        ///
+        /// Two retries with a short backoff turn that failure into a warm
+        /// success. Errors are retried, HTTP responses are not: a 4xx or 5xx
+        /// is a real answer and must reach the caller unchanged.
+        fetchApi: async (input, init) => {
+          let lastError;
+          for (let attempt = 1; attempt <= 3; attempt++) {
+            try {
+              return await fetch(input, init);
+            } catch (error) {
+              lastError = error;
+              if (attempt < 3) {
+                await new Promise((r) => setTimeout(r, 300 * attempt));
+              }
+            }
+          }
+          throw lastError;
+        },
       });
 
       const pineconeIndex = pinecone.Index(pineconeIndexName);
