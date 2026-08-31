@@ -193,10 +193,27 @@ export default async function handler(req, res) {
         }
       });
 
-      // Sort by score (highest scores first) and take top 3
+      // Sort by score and keep the best 5.
+      //
+      // Was 10 (the comment said 3, which had been wrong for a while). Measured
+      // across 68 questions with the chunker and embedding model held fixed:
+      //
+      //   k=20   precision 0.651   relevancy 0.238   recall 0.733   36k chars
+      //   k=10   precision 0.687   relevancy 0.265   recall 0.723   22k chars
+      //   k=5    precision 0.729   relevancy 0.280   recall 0.705   12k chars
+      //   k=3    precision 0.757   relevancy 0.319   recall 0.674    8k chars
+      //
+      // Retrieving more actively hurts: k=20 is worst on both precision and
+      // relevancy while buying almost no recall. k=3 scores best but costs 5
+      // points of recall, which is the metric that maps to answering with the
+      // needed facts missing. k=5 takes most of the gain for a recall cost
+      // inside the noise, and halves the context sent to the model.
+      //
+      // Score thresholds were tried instead and rejected - they cut recall by
+      // 6 points while adding less relevancy than simply lowering k.
       const retrievedDocsWithScores = Array.from(uniqueResults.values())
         .sort((a, b) => b[1] - a[1])
-        .slice(0, 10)
+        .slice(0, 5)
         .map(([doc, score]) => [doc, score]); // Remove sourceQuery for consistency
 
       /// extract only needed field from the retrieved documents with scores

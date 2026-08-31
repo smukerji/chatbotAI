@@ -8,6 +8,9 @@
   "functions": {
     "src/pages/api/pinecone.js": {
       "maxDuration": 300
+    },
+    "src/app/(secure)/home/fetch-links/api/route.ts": {
+      "maxDuration": 300
     }
   }
 }
