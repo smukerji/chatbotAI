@@ -1,7 +1,7 @@
 import { openai } from "@/app/openai";
 import clientPromise from "@/db";
 import { getAssistantTools, getSystemInstruction } from "@/app/_helpers/assistant-creation-contants";
-import { buildAssistantTools, buildCapabilityNote, buildGroundingRules } from "@/app/_helpers/server/assistant-tools";
+import { buildAssistantTools, buildFullInstructions } from "@/app/_helpers/server/assistant-tools";
 
 export const runtime = "nodejs";
 
@@ -34,9 +34,12 @@ export async function POST(request: any, { params: { threadId } }: any) {
 
   const assistantType = chatbotRecord?.assistantType ?? "";
   const model: string = settings?.model ?? "gpt-4o";
+  /// must match messages/route.ts — the two turns of one tool call ran at
+  /// different temperatures while this defaulted to 1 and that path did not
   const temperature: number =
-    settings?.temperature !== undefined ? settings.temperature : 1;
+    settings?.temperature !== undefined ? settings.temperature : 0.2;
   const baseInstruction = settings?.instruction ?? getSystemInstruction(assistantType);
+  const businessTimezone = settings?.bookingTimezone ?? "UTC";
 
   // ── Tool definitions ──────────────────────────────────────────────────────
   /// must match messages/route.ts exactly — if the two disagree the toolset
@@ -94,9 +97,23 @@ export async function POST(request: any, { params: { threadId } }: any) {
   console.log("=====================================================\n");
 
   // ── Resume the conversation via Responses API ─────────────────────────────
+  /// THIS is the turn that writes the answer from the tool result, and it was
+  /// sending only the chatbot's stored prompt - no grounding rules, no
+  /// capability note, no dynamic context. A shopify assistant holding 14 real
+  /// products in its function_call_output answered with invented skincare,
+  /// copied from a worked example inside that stored prompt, because the rule
+  /// forbidding exactly that was applied only to the previous turn.
+  const fullInstructions = buildFullInstructions({
+    baseInstruction,
+    businessTimezone,
+    canBook: !!calendarToken,
+    dropped: droppedTools,
+    hasRetrieval: tools.some((t: any) => t.name === "get_reference"),
+  });
+
   const responseParams: any = {
     model,
-    instructions: baseInstruction,
+    instructions: fullInstructions,
     input: functionOutputItems,
     tools,
     stream: true,
@@ -105,16 +122,6 @@ export async function POST(request: any, { params: { threadId } }: any) {
       ? { temperature }
       : { reasoning: { effort: "medium" } }),
   };
-
-  /// the capability limits must hold on the resume turn too, otherwise the
-  /// model drops them the moment it comes back from a tool call
-  responseParams.instructions = [
-    baseInstruction,
-    buildCapabilityNote(droppedTools),
-    buildGroundingRules(tools.some((t: any) => t.name === "get_reference")),
-  ]
-    .filter(Boolean)
-    .join("\n\n");
 
   const stream = await openai.responses.create(responseParams);
 

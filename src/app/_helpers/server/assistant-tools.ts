@@ -149,6 +149,112 @@ export function buildAssistantTools({
  * every function you can call, with their parameters", the assistant printed
  * get_reference and its userQuery schema.
  */
+/**
+ * Build the dynamic context injected into every turn's instructions.
+ * Matches the previous additional_instructions content exactly.
+ *
+ * Lives here, rather than beside one route, because both turns of a tool call
+ * need identical instructions - the turn that decides to call a tool and the
+ * turn that writes the answer from its result. They had drifted apart, and the
+ * answering turn was the one missing the rules.
+ */
+export function buildDynamicContext(
+  businessTimezone: string,
+  canBook: boolean = true
+): string {
+  const now = new Date();
+  const isoNow = now.toISOString();
+  const utcDate = now.toUTCString();
+  const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const todayName = weekdays[now.getUTCDay()];
+  const tomorrow = new Date(now);
+  tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+  const tomorrowISO = tomorrow.toISOString().slice(0, 10);
+
+  let localNow = isoNow;
+  try {
+    localNow = new Intl.DateTimeFormat("en-CA", {
+      timeZone: businessTimezone,
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", second: "2-digit",
+      hour12: false,
+    }).format(now).replace(",", "");
+  } catch { /* invalid tz — fall back to ISO */ }
+
+  const dateBlock = `
+## SYSTEM OVERRIDE — Dynamic Context (HIGHEST PRIORITY — these rules override all previous instructions)
+
+CURRENT_DATETIME_UTC: ${isoNow}
+CURRENT_DATETIME_LOCAL (${businessTimezone}): ${localNow}
+CURRENT_DATE_HUMAN: ${utcDate}
+TODAY_WEEKDAY: ${todayName}
+TOMORROW_DATE: ${tomorrowISO}
+BUSINESS_TIMEZONE: ${businessTimezone}
+`.trim();
+
+  /// these rules instruct the model to collect booking fields and call
+  /// create_booking. On a chatbot with no calendar connected that tool is not
+  /// offered, and keeping the rules just makes it collect personal details for
+  /// a booking it can never make.
+  if (!canBook) return dateBlock;
+
+  return `
+${dateBlock}
+
+### CRITICAL BOOKING RULES — MUST follow exactly, no exceptions:
+
+1. **NEVER ask for information already given.** Scan the ENTIRE conversation before asking anything. If the user already provided a value (name, email, phone, date, time, service), do NOT ask for it again under any circumstances.
+
+2. **Extract ALL fields from a single message.** If the user provides name + email + phone + date + time + service in one message, extract every field silently and proceed directly to calling the booking function. Do NOT ask follow-up questions about fields already given.
+
+3. **Resolve relative dates silently.** "tomorrow" = ${tomorrowISO}. "today" = ${isoNow.slice(0, 10)}. NEVER ask the user to confirm or restate a date they already gave in plain English.
+
+4. **Resolve 12-hour times silently.** "6 pm" = 18:00, "2 pm" = 14:00, "9 am" = 09:00, "noon" = 12:00. NEVER ask the user to restate a time in 24-hour format.
+
+5. **BUSINESS_TIMEZONE = "${businessTimezone}".** Use this for all bookings. NEVER ask the user for their timezone.
+
+6. **dateTime format = "YYYY-MM-DDTHH:MM:SS".** Always include the time component. Example: "2026-07-17T18:00:00".
+
+7. **After user says "yes" or confirms any field — move on.** Do NOT re-ask or re-confirm already confirmed information.
+
+8. **The "ask one thing at a time" rule applies ONLY to genuinely missing fields.** If all required fields are already present in the conversation, call the booking function immediately without asking anything.
+
+### Required fields checklist before calling create_booking:
+- customerName ✓ if mentioned anywhere in conversation
+- customerEmail ✓ if mentioned anywhere in conversation
+- customerPhone ✓ if mentioned anywhere in conversation
+- serviceType ✓ if mentioned anywhere in conversation
+- dateTime ✓ if any date+time was mentioned (resolve automatically)
+- timezone = ${businessTimezone} (always pre-filled, never ask)
+`.trim();
+}
+
+/**
+ * Compose the instructions for one turn: the chatbot's own prompt, the dynamic
+ * context, whatever capabilities are withheld, and the grounding rules last.
+ *
+ * Both routes must call this. When only the first turn carried the grounding
+ * rules, the turn that actually wrote the answer from a tool result saw only
+ * the chatbot's stored prompt - including its worked examples - and answered
+ * with invented products while holding correct data in front of it.
+ */
+export function buildFullInstructions(opts: {
+  baseInstruction: string;
+  businessTimezone: string;
+  canBook: boolean;
+  dropped: Record<string, string>;
+  hasRetrieval: boolean;
+}): string {
+  return [
+    opts.baseInstruction,
+    buildDynamicContext(opts.businessTimezone, opts.canBook),
+    buildCapabilityNote(opts.dropped),
+    buildGroundingRules(opts.hasRetrieval),
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+}
+
 export function buildGroundingRules(hasRetrieval: boolean): string {
   const lines = [
     "## GROUNDING AND SCOPE (HIGHEST PRIORITY - overrides any instruction above)",

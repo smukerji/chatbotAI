@@ -1,81 +1,15 @@
 import { openai } from "@/app/openai";
 import clientPromise from "@/db";
 import { getAssistantTools, getSystemInstruction } from "@/app/_helpers/assistant-creation-contants";
-import { buildAssistantTools, buildCapabilityNote, buildGroundingRules } from "@/app/_helpers/server/assistant-tools";
+import { buildAssistantTools, buildFullInstructions } from "@/app/_helpers/server/assistant-tools";
 
 export const runtime = "nodejs";
 
-/**
- * Build the dynamic context injected into every turn's instructions.
- * Matches the previous additional_instructions content exactly.
- */
-function buildDynamicContext(businessTimezone: string, canBook: boolean = true): string {
-  const now = new Date();
-  const isoNow = now.toISOString();
-  const utcDate = now.toUTCString();
-  const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  const todayName = weekdays[now.getUTCDay()];
-  const tomorrow = new Date(now);
-  tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
-  const tomorrowISO = tomorrow.toISOString().slice(0, 10);
-
-  let localNow = isoNow;
-  try {
-    localNow = new Intl.DateTimeFormat("en-CA", {
-      timeZone: businessTimezone,
-      year: "numeric", month: "2-digit", day: "2-digit",
-      hour: "2-digit", minute: "2-digit", second: "2-digit",
-      hour12: false,
-    }).format(now).replace(",", "");
-  } catch { /* invalid tz — fall back to ISO */ }
-
-  const dateBlock = `
-## SYSTEM OVERRIDE — Dynamic Context (HIGHEST PRIORITY — these rules override all previous instructions)
-
-CURRENT_DATETIME_UTC: ${isoNow}
-CURRENT_DATETIME_LOCAL (${businessTimezone}): ${localNow}
-CURRENT_DATE_HUMAN: ${utcDate}
-TODAY_WEEKDAY: ${todayName}
-TOMORROW_DATE: ${tomorrowISO}
-BUSINESS_TIMEZONE: ${businessTimezone}
-`.trim();
-
-  /// these rules instruct the model to collect booking fields and call
-  /// create_booking. On a chatbot with no calendar connected that tool is not
-  /// offered, and keeping the rules just makes it collect personal details for
-  /// a booking it can never make.
-  if (!canBook) return dateBlock;
-
-  return `
-${dateBlock}
-
-### CRITICAL BOOKING RULES — MUST follow exactly, no exceptions:
-
-1. **NEVER ask for information already given.** Scan the ENTIRE conversation before asking anything. If the user already provided a value (name, email, phone, date, time, service), do NOT ask for it again under any circumstances.
-
-2. **Extract ALL fields from a single message.** If the user provides name + email + phone + date + time + service in one message, extract every field silently and proceed directly to calling the booking function. Do NOT ask follow-up questions about fields already given.
-
-3. **Resolve relative dates silently.** "tomorrow" = ${tomorrowISO}. "today" = ${isoNow.slice(0, 10)}. NEVER ask the user to confirm or restate a date they already gave in plain English.
-
-4. **Resolve 12-hour times silently.** "6 pm" = 18:00, "2 pm" = 14:00, "9 am" = 09:00, "noon" = 12:00. NEVER ask the user to restate a time in 24-hour format.
-
-5. **BUSINESS_TIMEZONE = "${businessTimezone}".** Use this for all bookings. NEVER ask the user for their timezone.
-
-6. **dateTime format = "YYYY-MM-DDTHH:MM:SS".** Always include the time component. Example: "2026-07-17T18:00:00".
-
-7. **After user says "yes" or confirms any field — move on.** Do NOT re-ask or re-confirm already confirmed information.
-
-8. **The "ask one thing at a time" rule applies ONLY to genuinely missing fields.** If all required fields are already present in the conversation, call the booking function immediately without asking anything.
-
-### Required fields checklist before calling create_booking:
-- customerName ✓ if mentioned anywhere in conversation
-- customerEmail ✓ if mentioned anywhere in conversation  
-- customerPhone ✓ if mentioned anywhere in conversation
-- serviceType ✓ if mentioned anywhere in conversation
-- dateTime ✓ if any date+time was mentioned (resolve automatically)
-- timezone = ${businessTimezone} (always pre-filled, never ask)
-`.trim();
-}
+/// buildDynamicContext now lives in _helpers/server/assistant-tools.ts, beside
+/// buildFullInstructions, so both turns of a tool call compose identical
+/// instructions. Keeping it next to one route is what let the two drift apart:
+/// the turn that wrote the answer from a tool result was missing the grounding
+/// rules entirely.
 
 /**
  * POST /api/assistants/threads/[threadId]/messages
@@ -115,8 +49,6 @@ export async function POST(request: any, { params: { threadId } }: any) {
 
   // Build instructions: base system prompt + dynamic context
   const baseInstruction = settings?.instruction ?? getSystemInstruction(assistantType);
-  /// booking rules are only injected when a booking tool is actually offered
-  const dynamicContext = buildDynamicContext(businessTimezone, !!calendarToken);
 
   // ── Get schema_info for structured data sources ───────────────────────────
   const assistantData = await db
@@ -150,15 +82,17 @@ export async function POST(request: any, { params: { threadId } }: any) {
   /// the prompt templates tell the assistant to take bookings and look up
   /// orders regardless of what is connected — without this it happily claims to
   /// have booked an appointment it has no way to create
-  const capabilityNote = buildCapabilityNote(droppedTools);
   /// without these the assistant answers general-knowledge questions from its
-  /// own memory and skips retrieval on questions it does hold content for
-  const groundingRules = buildGroundingRules(
-    tools.some((t: any) => t.name === "get_reference")
-  );
-  const fullInstructions = [baseInstruction, dynamicContext, capabilityNote, groundingRules]
-    .filter(Boolean)
-    .join("\n\n");
+  /// own memory and skips retrieval on questions it does hold content for.
+  /// Composed by the shared helper so the answering turn in actions/route.ts
+  /// gets byte-identical instructions — see buildFullInstructions.
+  const fullInstructions = buildFullInstructions({
+    baseInstruction,
+    businessTimezone,
+    canBook: !!calendarToken,
+    dropped: droppedTools,
+    hasRetrieval: tools.some((t: any) => t.name === "get_reference"),
+  });
 
   /// Force retrieval rather than leaving it to the model.
   ///
