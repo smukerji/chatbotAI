@@ -179,6 +179,24 @@ export function buildGroundingRules(hasRetrieval: boolean): string {
     );
   }
   lines.push(
+    // The per-type prompt templates carry worked examples containing concrete
+    // invented facts - "$50/month membership", "3-bedroom in Marrickville at
+    // $1.45M", "Product 1: Vegan Cleanser". Those templates are shipped to many
+    // businesses at once, so every such fact is wrong for almost every tenant.
+    // Observed: a shopify bot holding 14 real products in its tool output
+    // answered with "Classic White T-Shirt / Denim Jeans / Vegan Leather
+    // Jacket", copying the example's shape and inventing its content, and
+    // fabricated image URLs because the same template says to always include
+    // images. This rule is composed fresh on every request, so unlike the
+    // templates - which each chatbot froze a copy of at creation - it reaches
+    // chatbots that already exist.
+    "- ANYTHING shown in your instructions as an example, a sample response or a",
+    "  demonstration is FORMAT ONLY. Never repeat a price, time, date, address,",
+    "  suburb, product name, company name or person's name that appears in your",
+    "  instructions - they are placeholders, not this business's facts.",
+    "- Every specific detail you state - names, prices, availability, stock, image",
+    "  URLs - must come from a tool result. If a tool did not return it, do not",
+    "  say it. Never construct or complete a URL.",
     "- Decline only questions clearly unrelated to this business and its subject",
     "  matter - news, sport, weather, celebrities, other companies' products.",
     "  Say it is outside what you can help with and redirect.",
