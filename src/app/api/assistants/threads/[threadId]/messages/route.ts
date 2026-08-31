@@ -102,8 +102,16 @@ export async function POST(request: any, { params: { threadId } }: any) {
   const businessTimezone = settings?.bookingTimezone ?? "UTC";
   const assistantType = chatbotRecord?.assistantType ?? "";
   const model: string = settings?.model ?? "gpt-4o";
+  /// These assistants answer from retrieved content and tool results, where
+  /// sampling variance shows up as fabricated facts rather than as pleasant
+  /// variety - the same question answered correctly once and invented the next
+  /// time. Published guidance for grounded RAG is 0.1-0.2; the other channels in
+  /// this codebase already default low (webhook uses ?? 0, others hardcode 0.2 /
+  /// 0.5) while this path used 1, so the same chatbot behaved differently
+  /// depending on where it was asked. Chatbots with a stored temperature keep
+  /// their own value; this only changes the default for those without one.
   const temperature: number =
-    settings?.temperature !== undefined ? settings.temperature : 1;
+    settings?.temperature !== undefined ? settings.temperature : 0.2;
 
   // Build instructions: base system prompt + dynamic context
   const baseInstruction = settings?.instruction ?? getSystemInstruction(assistantType);
