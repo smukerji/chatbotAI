@@ -61,3 +61,14 @@ evals/artifacts/
 .deepeval-cache.json
 **/__pycache__/
 *.pyc
+
+# DeepEval component-evaluation working files.
+# Scripts live on the eval branch; their outputs are never committed.
+# embed-cache.json alone reaches 227MB and git keeps every blob forever, so
+# committing it once would bloat every clone permanently. All of it regenerates.
+evals-deepeval/.venv/
+evals-deepeval/embed-cache*.json
+evals-deepeval/chunks.json
+evals-deepeval/testcases.json
+evals-deepeval/contexts.json
+evals-deepeval/*.log

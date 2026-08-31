@@ -55,7 +55,20 @@ const GET_REFERENCE_DESCRIPTION =
   "Search this business's own knowledge base (its website content, uploaded documents and Q&A). " +
   "Use this FIRST for any question about the business itself - what it does, its services, pricing, " +
   "opening hours, location, policies or company background. " +
-  "Returns relevant excerpts from the business's own content.";
+  "Returns relevant excerpts from the business's own content. " +
+  // The model writes userQuery itself, and it holds the conversation history,
+  // so this is where a follow-up gets turned into something a retriever can
+  // actually match. A vector search for "and what about pricing?" matches
+  // nothing; "pricing for the Pro plan" matches the right passage. This is the
+  // standalone-query rewriting that conversational RAG systems do as a separate
+  // step - done here instead, because the history lives server-side behind
+  // previous_response_id and is not available to rewrite locally.
+  "IMPORTANT: userQuery must be a STANDALONE search query that makes sense on " +
+  "its own, with no pronouns or references to earlier messages. Resolve them " +
+  "from the conversation first: if the user asks \"and what about pricing?\" " +
+  "after discussing the Pro plan, search for \"Pro plan pricing\", not the " +
+  "literal question. Include the specific nouns, product names and section " +
+  "titles the user is asking about.";
 
 export type ToolFilterContext = {
   assistantType: string;

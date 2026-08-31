@@ -152,6 +152,33 @@ export async function POST(request: any, { params: { threadId } }: any) {
     .filter(Boolean)
     .join("\n\n");
 
+  /// Force retrieval rather than leaving it to the model.
+  ///
+  /// tool_choice defaulted to "auto", so whether get_reference ran was sampled
+  /// at the chatbot's temperature - 1 for most of them. Observed: asking "what
+  /// this means in code: Python SDK v2" produced a confident answer built from
+  /// a one-line summary already in the thread, while the uploaded document had
+  /// a section by exactly that name containing the code. No search happened and
+  /// nothing indicated one had been skipped.
+  ///
+  /// Instructions alone do not fix this. buildGroundingRules already says
+  /// "SEARCH BEFORE YOU DECIDE ... call get_reference FIRST" and it was ignored;
+  /// tool_choice is enforced by the API rather than by prompt compliance, which
+  /// is the difference between a fix and a hope.
+  ///
+  /// Small talk is exempted so "hi" does not trigger a vector search. The test
+  /// is deliberately narrow - a short message that is ONLY a greeting - because
+  /// the cost of wrongly forcing a search is one wasted lookup, while wrongly
+  /// skipping one is an ungrounded answer.
+  const isSmallTalk =
+    typeof content === "string" &&
+    content.trim().length <= 40 &&
+    /^\s*(hi|hey|hello|yo|thanks?|thank you|ty|ok(ay)?|cool|great|nice|bye|goodbye|good (morning|afternoon|evening))[\s!.,?]*$/i.test(
+      content.trim()
+    );
+  const hasRetrievalTool = tools.some((t: any) => t.name === "get_reference");
+  const forceRetrieval = hasRetrievalTool && !isSmallTalk;
+
   // ── Responses API call (streaming) ────────────────────────────────────────
   const responseParams: any = {
     model,
@@ -159,6 +186,9 @@ export async function POST(request: any, { params: { threadId } }: any) {
     input: userInput,
     tools,
     stream: true,
+    ...(forceRetrieval
+      ? { tool_choice: { type: "function", name: "get_reference" } }
+      : {}),
     ...(previousResponseId ? { previous_response_id: previousResponseId } : {}),
     // Only set temperature for models that support it (not o1/o3)
     ...(!model.startsWith("o1") && !model.startsWith("o3")
@@ -176,7 +206,14 @@ export async function POST(request: any, { params: { threadId } }: any) {
   /// tool_choice is never set, so the api defaults to "auto" — the model picks
   /// whether to retrieve. With temperature 1 that choice varies between runs,
   /// which is why the same question sometimes skips get_reference entirely.
-  console.log("tool_choice    :", responseParams.tool_choice ?? "auto (default — model decides)");
+  console.log(
+    "tool_choice    :",
+    responseParams.tool_choice
+      ? `FORCED get_reference${isSmallTalk ? "" : " (non-small-talk message)"}`
+      : isSmallTalk
+      ? "auto — small talk, retrieval not forced"
+      : "auto — no get_reference tool available"
+  );
   console.log("has_get_reference:", tools.some((t: any) => t.name === "get_reference"));
   /// if a bot loses a capability unexpectedly, this line says which and why
   console.log(
