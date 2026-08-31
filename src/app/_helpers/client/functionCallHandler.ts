@@ -50,6 +50,22 @@ export const functionCallHandler = async (
         }
       );
 
+      /// without this the branch falls through and returns undefined, which is
+      /// submitted as the tool output - the model then answers as if the store
+      /// simply had no match.
+      if (!response.ok) {
+        const raw = await response.text().catch(() => "");
+        console.error(
+          `[find_product] /api/integrations/shopify/products failed: HTTP ${response.status}`,
+          raw.slice(0, 500)
+        );
+        return JSON.stringify({
+          success: false,
+          message: `product lookup failed (HTTP ${response.status})`,
+          detail: raw.slice(0, 300),
+        });
+      }
+
       if (response.ok) {
         return JSON.stringify({
           success: true,
@@ -74,6 +90,19 @@ export const functionCallHandler = async (
         }
       );
 
+      if (!response.ok) {
+        const raw = await response.text().catch(() => "");
+        console.error(
+          `[get_customer_orders] /api/integrations/shopify/orders failed: HTTP ${response.status}`,
+          raw.slice(0, 500)
+        );
+        return JSON.stringify({
+          success: false,
+          message: `order lookup failed (HTTP ${response.status})`,
+          detail: raw.slice(0, 300),
+        });
+      }
+
       if (response.ok) {
         return JSON.stringify({
           success: true,
@@ -93,6 +122,19 @@ export const functionCallHandler = async (
           method: "GET",
         }
       );
+
+      if (!response.ok) {
+        const raw = await response.text().catch(() => "");
+        console.error(
+          `[get_products] /api/integrations/shopify/products failed: HTTP ${response.status}`,
+          raw.slice(0, 500)
+        );
+        return JSON.stringify({
+          success: false,
+          message: `product listing failed (HTTP ${response.status})`,
+          detail: raw.slice(0, 300),
+        });
+      }
 
       if (response.ok) {
         return JSON.stringify({

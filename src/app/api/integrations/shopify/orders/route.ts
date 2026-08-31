@@ -69,6 +69,24 @@ export async function POST(_request: any) {
 
     const responseData = await response.json();
 
+    /// shopify answers HTTP 200 with an `errors` array for auth failures,
+    /// revoked tokens and missing scopes (read_customers / read_orders are
+    /// separate grants). `data` is null, the chaining below short-circuits, and
+    /// this used to look identical to "that customer has no orders".
+    if (responseData?.errors) {
+      console.error(
+        "[shopify/get_customer_orders] GraphQL errors:",
+        JSON.stringify(responseData.errors).slice(0, 500)
+      );
+      return new Response(
+        JSON.stringify({
+          error: "shopify query failed",
+          detail: responseData.errors,
+        }),
+        { status: 502, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
     /// prepare the data
 
     const orders = responseData?.data?.customers?.edges?.map(
@@ -97,17 +115,19 @@ export async function POST(_request: any) {
       }
     );
 
-    return new Response(JSON.stringify(orders), {
+    return new Response(JSON.stringify(orders ?? []), {
       headers: {
         "Content-Type": "application/json",
       },
     });
   } catch (error) {
-    console.log("error in find products", error);
-    return new Response(JSON.stringify({ error: error }), {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    console.error("[shopify/get_customer_orders] request failed:", error);
+    return new Response(
+      JSON.stringify({
+        error: "shopify request failed",
+        detail: (error as Error)?.message ?? String(error),
+      }),
+      { status: 502, headers: { "Content-Type": "application/json" } }
+    );
   }
 }

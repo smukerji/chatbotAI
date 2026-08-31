@@ -64,6 +64,25 @@ export async function POST(_request: any) {
 
     const responseData = await response.json();
 
+    /// shopify answers HTTP 200 with an `errors` array for auth failures,
+    /// revoked tokens, missing scopes and malformed queries. `data` is null in
+    /// that case, the optional chaining below short-circuits to undefined, and
+    /// this route used to reply with an empty 200 - indistinguishable from
+    /// "the store has no such product". Surface it instead.
+    if (responseData?.errors) {
+      console.error(
+        "[shopify/find_product] GraphQL errors:",
+        JSON.stringify(responseData.errors).slice(0, 500)
+      );
+      return new Response(
+        JSON.stringify({
+          error: "shopify query failed",
+          detail: responseData.errors,
+        }),
+        { status: 502, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
     /// prepare the data
 
     const products = responseData?.data?.products?.edges?.map(
@@ -84,18 +103,24 @@ export async function POST(_request: any) {
       }
     );
 
-    return new Response(JSON.stringify(products), {
+    /// `products` is undefined when the shape is unexpected; an explicit empty
+    /// array keeps "no matches" distinct from "something went wrong".
+    return new Response(JSON.stringify(products ?? []), {
       headers: {
         "Content-Type": "application/json",
       },
     });
   } catch (error) {
-    console.log("error in find products", error);
-    return new Response(JSON.stringify({ error: error }), {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    /// an Error instance serialises to {}, so the old body carried no
+    /// information at all. Send the message, and a status the caller can see.
+    console.error("[shopify/find_product] request failed:", error);
+    return new Response(
+      JSON.stringify({
+        error: "shopify request failed",
+        detail: (error as Error)?.message ?? String(error),
+      }),
+      { status: 502, headers: { "Content-Type": "application/json" } }
+    );
   }
 }
 
@@ -165,6 +190,22 @@ export async function GET(_request: any) {
 
     const responseData = await response.json();
 
+    /// see the note in POST above - a GraphQL error here is HTTP 200 with a
+    /// null `data`, which otherwise reads as "this store sells nothing".
+    if (responseData?.errors) {
+      console.error(
+        "[shopify/get_products] GraphQL errors:",
+        JSON.stringify(responseData.errors).slice(0, 500)
+      );
+      return new Response(
+        JSON.stringify({
+          error: "shopify query failed",
+          detail: responseData.errors,
+        }),
+        { status: 502, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
     /// prepare the data
     const products = responseData?.data?.products?.edges?.map(
       (product: any) => {
@@ -184,17 +225,21 @@ export async function GET(_request: any) {
       }
     );
 
-    return new Response(JSON.stringify(products), {
+    /// `products` is undefined when the shape is unexpected; an explicit empty
+    /// array keeps "no matches" distinct from "something went wrong".
+    return new Response(JSON.stringify(products ?? []), {
       headers: {
         "Content-Type": "application/json",
       },
     });
   } catch (error) {
-    console.log("error in get products", error);
-    return new Response(JSON.stringify({ error: error }), {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    console.error("[shopify/get_products] request failed:", error);
+    return new Response(
+      JSON.stringify({
+        error: "shopify request failed",
+        detail: (error as Error)?.message ?? String(error),
+      }),
+      { status: 502, headers: { "Content-Type": "application/json" } }
+    );
   }
 }
