@@ -1,6 +1,7 @@
 import { openai } from "@/app/openai";
 import clientPromise from "@/db";
 import { getAssistantTools, getSystemInstruction } from "@/app/_helpers/assistant-creation-contants";
+import { buildAssistantTools, buildCapabilityNote, buildGroundingRules } from "@/app/_helpers/server/assistant-tools";
 
 export const runtime = "nodejs";
 
@@ -25,9 +26,10 @@ export async function POST(request: any, { params: { threadId } }: any) {
   const db = (await clientPromise!).db();
 
   // ── Fetch chatbot config ──────────────────────────────────────────────────
-  const [settings, chatbotRecord] = await Promise.all([
+  const [settings, chatbotRecord, calendarToken] = await Promise.all([
     db.collection("chatbot-settings").findOne({ chatbotId: assistantId }),
     db.collection("user-chatbots").findOne({ chatbotId: assistantId }),
+    db.collection("google-calendar-tokens").findOne({ chatbotId: assistantId }),
   ]);
 
   const assistantType = chatbotRecord?.assistantType ?? "";
@@ -36,14 +38,14 @@ export async function POST(request: any, { params: { threadId } }: any) {
     settings?.temperature !== undefined ? settings.temperature : 1;
   const baseInstruction = settings?.instruction ?? getSystemInstruction(assistantType);
 
-  // ── Tool definitions (flatten from Assistants API shape to Responses API shape) ──
-  const tools = getAssistantTools(assistantType).map((t: any) => ({
-    type: "function" as const,
-    name: t.function.name,
-    description: t.function.description,
-    parameters: t.function.parameters,
-    ...(t.function.strict !== undefined ? { strict: t.function.strict } : {}),
-  }));
+  // ── Tool definitions ──────────────────────────────────────────────────────
+  /// must match messages/route.ts exactly — if the two disagree the toolset
+  /// changes midway through a conversation that is chained by response id
+  const { tools, dropped: droppedTools } = buildAssistantTools({
+    assistantType,
+    chatbotRecord,
+    hasCalendar: !!calendarToken,
+  });
 
   // ── Build function_call_output input items ────────────────────────────────
   // Each item tells the model what the function returned
@@ -57,7 +59,38 @@ export async function POST(request: any, { params: { threadId } }: any) {
   console.log("\n========== [Responses API] ACTIONS REQUEST ==========");
   console.log("model             :", model);
   console.log("previousResponseId:", previousResponseId);
+  console.log("tools             :", tools.map((t: any) => t.name).join(", ") || "(none)");
+  console.log(
+    "tools_dropped     :",
+    Object.keys(droppedTools).length
+      ? Object.entries(droppedTools).map(([n, why]) => `${n} (${why})`).join(", ")
+      : "(none)"
+  );
   console.log("tool_outputs      :", functionOutputItems.map((i: any) => `${i.call_id} → ${String(i.output).slice(0, 150)}`).join("\n                    "));
+
+  /// a tool that returned an error still counts as "answered" — the model gets
+  /// the failure text as context and apologises, which looks identical to a
+  /// retrieval miss. Call it out so the two are distinguishable in the logs.
+  const failedOutputs = functionOutputItems.filter((i: any) => {
+    try {
+      const parsed = JSON.parse(String(i.output));
+      return parsed?.success === false || !!parsed?.error;
+    } catch {
+      return false;
+    }
+  });
+  console.log(
+    "[ToolResult] outputs:", functionOutputItems.length,
+    "| failed:", failedOutputs.length,
+    failedOutputs.length
+      ? `| FIRST_FAILURE: ${String(failedOutputs[0].output).slice(0, 300)}`
+      : ""
+  );
+  if (failedOutputs.length) {
+    console.error(
+      "[ToolResult] tool returned an error — the model will answer from this failure, not from retrieved data"
+    );
+  }
   console.log("=====================================================\n");
 
   // ── Resume the conversation via Responses API ─────────────────────────────
@@ -72,6 +105,16 @@ export async function POST(request: any, { params: { threadId } }: any) {
       ? { temperature }
       : { reasoning: { effort: "medium" } }),
   };
+
+  /// the capability limits must hold on the resume turn too, otherwise the
+  /// model drops them the moment it comes back from a tool call
+  responseParams.instructions = [
+    baseInstruction,
+    buildCapabilityNote(droppedTools),
+    buildGroundingRules(tools.some((t: any) => t.name === "get_reference")),
+  ]
+    .filter(Boolean)
+    .join("\n\n");
 
   const stream = await openai.responses.create(responseParams);
 

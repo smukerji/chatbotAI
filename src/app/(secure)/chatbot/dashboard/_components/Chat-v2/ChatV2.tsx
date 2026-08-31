@@ -773,6 +773,14 @@ function ChatV2({
       } else if (isPlanNotification) {
         message.error("Please contact administrator to renew the plan");
         return;
+      } else if (!threadID) {
+        /// the session is created by POST /api/assistants/threads on mount.
+        /// Sending before it resolves produced a request to
+        /// /api/assistants/threads//messages, which 308s to
+        /// /api/assistants/threads/messages and 404s, leaving the UI stuck on
+        /// the typing indicator with no error shown.
+        message.error("Still connecting, please try again in a moment");
+        return;
       }
       setLoading(true);
       const tempUserMessageTime = getDate();
@@ -1839,7 +1847,7 @@ function ChatV2({
                   : messagePlaceholder
               }
               value={userQuery}
-              disabled={loading ? true : false}
+              disabled={loading || !threadID}
             />
             <div className="action-btns">
               {/* <button className="web-search-button">
@@ -1899,7 +1907,7 @@ function ChatV2({
                       ? botSettings?.userMessageColor
                       : userMessageColor,
                   }}
-                  disabled={loading ? true : false}
+                  disabled={loading || !threadID}
                 >
                   <Image src={sendChatIcon} alt="send-chat-icon" />
                 </button>

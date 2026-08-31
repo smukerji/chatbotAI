@@ -109,6 +109,7 @@ export const functionCallHandler = async (
       /// answer user query based on the embedding data
       /// get similarity search
 
+      const startedAt = Date.now();
       const response: any = await fetch(
         `${process.env.NEXT_PUBLIC_WEBSITE_URL}api/pinecone`,
         {
@@ -121,10 +122,43 @@ export const functionCallHandler = async (
           }),
         }
       );
-      /// parse the response and extract the similarity results
-      const respText = await response.json();
+      const elapsedMs = Date.now() - startedAt;
 
-      const similaritySearchResults = respText;
+      /// without this check a non-2xx body (504 html page, or the 500 json the
+      /// route now returns) was parsed and handed back as success:true, so the
+      /// model received an error payload as if it were retrieved context
+      if (!response.ok) {
+        const raw = await response.text().catch(() => "");
+        console.error(
+          `[get_reference] /api/pinecone failed: HTTP ${response.status} after ${elapsedMs}ms`,
+          raw.slice(0, 500)
+        );
+        return JSON.stringify({
+          success: false,
+          message: `retrieval failed (HTTP ${response.status})`,
+          detail: raw.slice(0, 300),
+        });
+      }
+
+      /// parse the response and extract the similarity results
+      const similaritySearchResults = await response.json();
+
+      console.log(
+        `[get_reference] ok in ${elapsedMs}ms — chunks:`,
+        Array.isArray(similaritySearchResults)
+          ? similaritySearchResults.length
+          : typeof similaritySearchResults
+      );
+      /// an empty array is a valid response but means the model gets no
+      /// context, which reads to the user as "I couldn't retrieve information"
+      if (
+        Array.isArray(similaritySearchResults) &&
+        similaritySearchResults.length === 0
+      ) {
+        console.warn(
+          "[get_reference] retrieval returned ZERO chunks — the model will answer without context"
+        );
+      }
 
       return JSON.stringify({
         success: true,
@@ -320,11 +354,22 @@ export const functionCallHandler = async (
         message: "This functionality will be available soon",
       });
     }
-  } catch (error) {
-    console.log("Error while handling function call", error);
+  } catch (error: any) {
+    /// include which function and what actually went wrong — the previous
+    /// generic message made a network failure, a 500 and a json parse error
+    /// all look identical from the model's side
+    console.error(
+      `[functionCallHandler] "${call?.function?.name}" threw:`,
+      error?.name,
+      "-",
+      error?.message,
+      error
+    );
     return JSON.stringify({
       success: false,
+      function: call?.function?.name,
       message: "Error while proccesing your request",
+      detail: `${error?.name ?? "Error"}: ${error?.message ?? String(error)}`,
     });
   }
 };
