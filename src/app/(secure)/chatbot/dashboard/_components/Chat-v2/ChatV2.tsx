@@ -637,7 +637,20 @@ function ChatV2({
 
         if (parsedResult?.data && Array.isArray(parsedResult.data)) {
           return {
-            output: parsedResult.data.map((item: any) => item.content).join("\n"),
+            /// item.content is a string for retrieval (a chunk of text) but an
+            /// ARRAY of objects for the shopify tools - the product list, the
+            /// order list. join() stringified those as "[object Object]", so the
+            /// model was handed fourteen [object Object] in place of the
+            /// catalogue and answered with invented products, taking their shape
+            /// from whatever example its prompt demonstrated. Retrieval was
+            /// unaffected only because its content was already a string.
+            output: parsedResult.data
+              .map((item: any) =>
+                typeof item.content === "string"
+                  ? item.content
+                  : JSON.stringify(item.content)
+              )
+              .join("\n"),
             tool_call_id: toolCall.id,
           };
         }
