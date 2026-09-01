@@ -63,8 +63,10 @@ function Website({
       let count = 0;
       botContext?.handleChange("isLoading")(true);
 
+      /// the bar is a time estimate, not real progress, so it stops short of
+      /// the end - it used to sit at 99% while the request was already dying
       intervalId = setInterval(() => {
-        if (count != 100) setProgress(count++);
+        if (count < 90) setProgress(count++);
       }, 2000);
       /// send the request
       // const response = await fetch(
@@ -73,37 +75,64 @@ function Website({
       //     method: "GET",
       //   }
       // );
-      const options = {
-        method: "POST",
-        headers: {
-          accept: "application/json",
-          cache: "no-store",
-        },
-        body: JSON.stringify({
-          sourceURL: value,
-          chatbotId: chatbotId,
-          userId: userId,
-        }),
-        next: { revalidate: 0 },
-      };
+      /// A crawl cannot always finish inside one serverless invocation. The API
+      /// stops before the function times out and hands back what is still
+      /// queued; we ask for the rest here instead of losing the whole crawl to
+      /// a 504.
+      const MAX_BATCHES = 5;
+      let fetchedLinks: any[] = [];
+      let pendingUrls: string[] = [];
+      let visitedUrls: string[] = [];
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/fetch-links/api`,
-        options
-      );
-      const data = await response.json();
-      if (data?.error) {
-        message.warning(data.error);
-        return;
+      for (let batch = 0; batch < MAX_BATCHES; batch++) {
+        const options = {
+          method: "POST",
+          headers: {
+            accept: "application/json",
+            cache: "no-store",
+          },
+          body: JSON.stringify({
+            sourceURL: value,
+            chatbotId: chatbotId,
+            userId: userId,
+            pendingUrls: pendingUrls,
+            visitedUrls: visitedUrls,
+            crawledCount: fetchedLinks.length,
+          }),
+          next: { revalidate: 0 },
+        };
+
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/fetch-links/api`,
+          options
+        );
+        const data = await response.json();
+        if (data?.error) {
+          /// a limit reached part way through still keeps the earlier batches
+          if (fetchedLinks.length === 0) {
+            message.warning(data.error);
+            return;
+          }
+          break;
+        }
+
+        fetchedLinks = [...fetchedLinks, ...(data?.fetchedLinks ?? [])];
+
+        if (!data?.partial) break;
+
+        pendingUrls = data?.pendingUrls ?? [];
+        visitedUrls = data?.visitedUrls ?? [];
+        if (pendingUrls.length === 0) break;
+
+        message.info(
+          `Crawled ${fetchedLinks.length} pages so far, continuing...`
+        );
       }
-
-      /// if there is any error show error
-      // if (data.error) return alert(data.error);
 
       // Calculate total character count
       let retotalCharCount = 0;
 
-      data?.fetchedLinks?.forEach((item: any) => {
+      fetchedLinks?.forEach((item: any) => {
         retotalCharCount += parseInt(item.charCount);
       });
 
@@ -118,7 +147,7 @@ function Website({
       /// set the fecthed links
       botContext?.handleChange("crawledList")([
         ...crawledList,
-        ...data.fetchedLinks,
+        ...fetchedLinks,
       ]);
       setProgress(100);
     } catch (error) {
