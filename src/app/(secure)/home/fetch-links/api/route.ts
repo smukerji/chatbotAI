@@ -205,6 +205,7 @@ import clientPromise from "../../../../../db";
 import { ObjectId } from "mongodb";
 import {
   chunkPageText,
+  dropRepeatedBlocks,
   extractPageText,
   normalizeUrl,
   shouldCrawl,
@@ -374,7 +375,7 @@ async function fetchLinks(request: NextRequest) {
     }
     const pendingUrls: string[] =
       resumePending.length > 0 ? [...resumePending] : [sourceUrl];
-    const crawledData: any[] = [];
+    const crawledPages: { crawlLink: string; text: string }[] = [];
 
     /// The crawl is bounded by wall-clock time, not only by page count. Running
     /// past the platform's function ceiling returns a 504 and loses every page
@@ -388,7 +389,7 @@ async function fetchLinks(request: NextRequest) {
         if (Date.now() > deadline) {
           outOfBudget = true;
           console.log(
-            `[crawl] time budget spent after ${crawledData.length} pages, ${pendingUrls.length} still queued`
+            `[crawl] time budget spent after ${crawledPages.length} pages, ${pendingUrls.length} still queued`
           );
           break;
         }
@@ -418,16 +419,13 @@ async function fetchLinks(request: NextRequest) {
           const html = await page.$eval("body", (body) => {
             return body.innerHTML;
           });
-          const text = extractPageText(html);
-          const chunks = await chunkPageText(text);
 
-          crawledData.push({
-            crawlLink: url,
-            cleanedText: chunks,
-            charCount: text.length,
-          });
+          /// chunking is deferred until the whole page set is known: repeated
+          /// chrome can only be recognised by comparing pages against each
+          /// other, and it has to go before the text is split
+          crawledPages.push({ crawlLink: url, text: extractPageText(html) });
 
-          if (crawledData.length >= limit) break;
+          if (crawledPages.length >= limit) break;
 
           const newUrls = await extractUrls(page, sourceUrl);
           for (const newUrl of newUrls) {
@@ -437,7 +435,7 @@ async function fetchLinks(request: NextRequest) {
             }
           }
 
-          console.log(crawledData.length);
+          console.log(crawledPages.length);
         } catch (error) {
           console.error(`Error loading ${url}:`, error);
         }
@@ -450,6 +448,24 @@ async function fetchLinks(request: NextRequest) {
       /// frozen costs nothing, a hung close costs the whole response
       await closeQuietly(page);
       await closeQuietly(browser);
+    }
+
+    /// menus, newsletter blocks and footers repeat on every page of a site, so
+    /// they are embedded once per page and then crowd out the page content at
+    /// retrieval time. They can only be spotted by comparing the pages, which
+    /// is why this runs here rather than inside the loop.
+    const deduped = dropRepeatedBlocks(
+      crawledPages.map((p) => ({ text: p.text }))
+    );
+
+    const crawledData = [];
+    for (let i = 0; i < crawledPages.length; i++) {
+      const text = deduped[i] ?? crawledPages[i].text;
+      crawledData.push({
+        crawlLink: crawledPages[i].crawlLink,
+        cleanedText: await chunkPageText(text),
+        charCount: text.length,
+      });
     }
 
     const morePending =

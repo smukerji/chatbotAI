@@ -28,8 +28,30 @@ turndown.use(gfm); // tables and strikethrough
 // NOSCRIPT was not skipped before, so every Google Tag Manager page began with
 // a literal <iframe src="https://www.googletagmanager.com/ns.html?id=..."> in
 // its embedded text.
-// cast: turndown types the list as keyof HTMLElementTagNameMap, which omits svg
-turndown.remove(["script", "style", "noscript", "iframe", "svg"] as any);
+// Chrome boilerplate repeats on every page of a site, so it is embedded once
+// per page and then competes with itself for the top-K slots. Asking Healthline
+// "what health topics does this site cover?" returned five chunks scoring
+// 0.828-0.830, all of them the same newsletter-and-footer block from five
+// different pages, and no page content at all. Header is kept: an article
+// title often lives in one.
+const BOILERPLATE_TAGS = new Set([
+  "script",
+  "style",
+  "noscript",
+  "iframe",
+  "svg",
+  "nav",
+  "footer",
+  "aside",
+  "form",
+]);
+const BOILERPLATE_ROLES = new Set(["navigation", "banner", "contentinfo", "search"]);
+// cast: turndown types tag filters as keyof HTMLElementTagNameMap, which omits svg
+turndown.remove(((node: any) => {
+  if (BOILERPLATE_TAGS.has(node?.nodeName?.toLowerCase())) return true;
+  const role = node?.getAttribute?.("role");
+  return !!role && BOILERPLATE_ROLES.has(role.toLowerCase());
+}) as any);
 // image URLs carry no retrievable meaning and were measured at 18.6% of the
 // text handed to the model
 turndown.addRule("dropImages", { filter: "img", replacement: () => "" });
@@ -43,6 +65,63 @@ export function extractPageText(bodyHtml: string): string {
     // never let a malformed page take the whole crawl down
     return "";
   }
+}
+
+/**
+ * Drop blocks that repeat across the pages of one crawl.
+ *
+ * Removing <nav> and <footer> only catches sites that use those elements. The
+ * menu Healthline renders is a plain list inside a div, so it survived, and a
+ * site's menu is on every page by definition - embedded once per page, then
+ * competing with itself for the top-K slots.
+ *
+ * A block seen on most of the crawled pages is chrome regardless of the tag it
+ * came from. Link targets are ignored when comparing, because the same footer
+ * carries a different tracking id per page - which is also why the retrieval
+ * layer's exact-match de-duplication did not collapse those five near-identical
+ * chunks into one.
+ */
+export function dropRepeatedBlocks(
+  pages: { text: string }[],
+  minPages = 3,
+  threshold = 0.6
+): string[] {
+  const texts = pages.map((p) => p.text || "");
+  if (texts.length < minPages) return texts;
+
+  const key = (block: string) =>
+    block
+      .replace(/\((https?:\/\/[^)]*)\)/g, "()") // tracking ids differ per page
+      .replace(/\s+/g, " ")
+      .trim()
+      .toLowerCase();
+
+  const pageCount = new Map<string, number>();
+  const blocksPerPage = texts.map((text) => text.split(/\n{2,}/));
+
+  for (const blocks of blocksPerPage) {
+    const seenHere = new Set<string>();
+    for (const block of blocks) {
+      const k = key(block);
+      if (!k || seenHere.has(k)) continue;
+      seenHere.add(k);
+      pageCount.set(k, (pageCount.get(k) ?? 0) + 1);
+    }
+  }
+
+  const cutoff = Math.max(2, Math.ceil(texts.length * threshold));
+
+  return blocksPerPage.map((blocks, i) => {
+    const kept = blocks.filter((block) => {
+      const k = key(block);
+      if (!k) return false;
+      return (pageCount.get(k) ?? 0) < cutoff;
+    });
+    const result = kept.join("\n\n").trim();
+    /// a page that is entirely chrome - a bare index, say - keeps what it had
+    /// rather than being indexed as nothing
+    return result.length > 0 ? result : texts[i];
+  });
 }
 
 /**
