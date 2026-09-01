@@ -97,7 +97,11 @@ export function dropRepeatedBlocks(
       .toLowerCase();
 
   const pageCount = new Map<string, number>();
-  const blocksPerPage = texts.map((text) => text.split(/\n{2,}/));
+  /// blank lines in this markdown often carry the indentation of the list they
+  /// sit in, so splitting on "\n\n" alone leaves a site's whole mega-menu as
+  /// one block - and one block that differs by a single entry between pages is
+  /// no longer repeated, so none of it is removed
+  const blocksPerPage = texts.map((text) => text.split(/\n[ \t]*\n/));
 
   for (const blocks of blocksPerPage) {
     const seenHere = new Set<string>();
