@@ -60,6 +60,7 @@ import {
 import Icon from "@/app/_components/Icon/Icon";
 import WebSearchIcon from "@/assets/svg/WebSearchIcon";
 import Sources from "../Sources/Sources";
+import MessageContent from "@/app/_components/MessageContent/MessageContent";
 
 function ChatV2({
   chatbot,
@@ -1476,7 +1477,7 @@ function ChatV2({
                             : "relative",
                       }}
                     >
-                      <div
+                      <MessageContent
                         className="assistant-message"
                         style={{
                           display: "flex",
@@ -1485,10 +1486,8 @@ function ChatV2({
                             botSettings?.theme === "dark" ? "#353945" : "",
                           color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
                         }}
-                        dangerouslySetInnerHTML={{
-                          __html: message.content,
-                        }}
-                      ></div>
+                        content={message.content}
+                      />
                       {messagesTime[index]?.messageType !== "initial" && (
                         <div className="time">
                           {messagesTime[index]?.messageTime}
@@ -1778,7 +1777,7 @@ function ChatV2({
             )}
             {response && (
               <div className="assistant-message-container">
-                <div
+                <MessageContent
                   className="assistant-message"
                   style={{
                     display: "flex",
@@ -1787,9 +1786,9 @@ function ChatV2({
                       botSettings?.theme === "dark" ? "#353945" : "",
                     color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
                   }}
-                  dangerouslySetInnerHTML={{
-                    __html: response.concat("<b> |</b>"),
-                  }}
+                  /// the typing cursor stays HTML - markdown-to-jsx parses inline
+                  /// HTML, so it renders the same as before
+                  content={response.concat("<b> |</b>")}
                 />
               </div>
             )}

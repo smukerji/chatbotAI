@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
+import MessageContent from "@/app/_components/MessageContent/MessageContent";
 import { Pagination, message } from "antd";
 import { useCookies } from "react-cookie";
 import { ChatbotSettingContext } from "@/app/_helpers/client/Context/ChatbotSettingContext";
@@ -411,7 +412,7 @@ function WhatsappQRHistory({ chatbotId }: Props) {
                         className={msg.isFromUser ? "user-message" : "assistant-message"}
                         style={msg.isFromUser ? { backgroundColor: botSettings?.userMessageColor || "#d9fdd3" } : {}}
                       >
-                        {msg.isFromBot ? <div dangerouslySetInnerHTML={{ __html: msg.content }} /> : <div>{msg.content}</div>}
+                        {msg.isFromBot ? <MessageContent content={msg.content} /> : <div>{msg.content}</div>}
                       </div>
                       <div className="time" style={{ display: "flex", alignItems: "center", gap: 6 }}>
                         <span>{formatMessageTime(msg.timestamp)}</span>

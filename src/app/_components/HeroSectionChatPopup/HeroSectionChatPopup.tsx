@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import MessageContent from "@/app/_components/MessageContent/MessageContent";
 import RefreshIcon from "../../../../public/svgs/refreshbtn.svg";
 import CallIcon from "../../../../public/voiceBot/SVG/call-outgoing.svg";
 import CloseIcon from "../../../../public/svgs/close-circle.svg";
@@ -373,16 +374,14 @@ function HeroSectionChatPopup({ onClose, agent, torriAssistantId }: any) {
                         : "relative",
                   }}
                 >
-                  <div
+                  <MessageContent
                     className="assistant-message"
                     style={{
                       display: "flex",
                       flexDirection: "column",
                     }}
-                    dangerouslySetInnerHTML={{
-                      __html: message.content,
-                    }}
-                  ></div>
+                    content={message.content}
+                  />
                   {/* {messagesTime[index]?.messageType !== "initial" && (
                     <div className="time">
                       {messagesTime[index]?.messageTime}
@@ -426,7 +425,7 @@ function HeroSectionChatPopup({ onClose, agent, torriAssistantId }: any) {
         })}
         {response && (
           <div className="assistant-message-container">
-            <div
+            <MessageContent
               className="assistant-message"
               style={{
                 display: "flex",
@@ -434,9 +433,7 @@ function HeroSectionChatPopup({ onClose, agent, torriAssistantId }: any) {
                 backgroundColor: "#353945",
                 color: "#FCFCFD",
               }}
-              dangerouslySetInnerHTML={{
-                __html: response.concat("<b> |</b>"),
-              }}
+              content={response.concat("<b> |</b>")}
             />
           </div>
         )}

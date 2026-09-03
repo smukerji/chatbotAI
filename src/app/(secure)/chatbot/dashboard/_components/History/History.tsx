@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState, useRef } from "react";
 import Image from "next/image";
+import MessageContent from "@/app/_components/MessageContent/MessageContent";
 import exportBtn from "../../../../../../../public/svgs/export-btn.svg";
 import { useCookies } from "react-cookie";
 import likeIcon from "../../../../../../../public/svgs/like.svg";
@@ -1813,11 +1814,7 @@ function History({ chatbotId }: any) {
                                     }}
                                   >
                                     {isFromBot ? (
-                                      <div
-                                        dangerouslySetInnerHTML={{
-                                          __html: message.content,
-                                        }}
-                                      />
+                                      <MessageContent content={message.content} />
                                     ) : (
                                       <div>{message.content}</div>
                                     )}
@@ -1890,16 +1887,14 @@ function History({ chatbotId }: any) {
                                     : "0",
                               }}
                             >
-                              <div
+                              <MessageContent
                                 className="assistant-message"
                                 style={{
                                   display: "flex",
                                   flexDirection: "column",
                                 }}
-                                dangerouslySetInnerHTML={{
-                                  __html: message.content,
-                                }}
-                              ></div>
+                                content={message.content}
+                              />
                               {/* <div className="time">{message?.messageTime}</div> */}
                               {message.messageType !== "initial" && (
                                 <div className="time">

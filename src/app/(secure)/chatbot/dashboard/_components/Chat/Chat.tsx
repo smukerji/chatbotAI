@@ -1,3 +1,4 @@
+import MessageContent from "@/app/_components/MessageContent/MessageContent";
 import React, {
   Suspense,
   useContext,
@@ -1082,7 +1083,7 @@ function Chat({
                           : "relative",
                     }}
                   >
-                    <div
+                    <MessageContent
                       className="assistant-message"
                       style={{
                         display: "flex",
@@ -1091,10 +1092,8 @@ function Chat({
                           botSettings?.theme === "dark" ? "#353945" : "",
                         color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
                       }}
-                      dangerouslySetInnerHTML={{
-                        __html: message.content,
-                      }}
-                    ></div>
+                      content={message.content}
+                    />
                     {messagesTime[index].messageType !== "initial" && (
                       <div className="time">
                         {messagesTime[index]?.messageTime}
@@ -1362,7 +1361,7 @@ function Chat({
           )}
           {response && (
             <div className="assistant-message-container">
-              <div
+              <MessageContent
                 className="assistant-message"
                 style={{
                   display: "flex",
@@ -1371,9 +1370,7 @@ function Chat({
                     botSettings?.theme === "dark" ? "#353945" : "",
                   color: botSettings?.theme === "dark" ? "#FCFCFD" : "",
                 }}
-                dangerouslySetInnerHTML={{
-                  __html: response.concat("<b> |</b>"),
-                }}
+                content={response.concat("<b> |</b>")}
               />
             </div>
           )}
