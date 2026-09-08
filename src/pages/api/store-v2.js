@@ -5,6 +5,7 @@ import {
   generateChunksNEmbeddForLinks,
   generateChunksNEmbeddViaDocling,
 } from "../../app/_helpers/server/embeddings";
+import { collectSiteFactsFromCrawl } from "../../app/_helpers/server/site-facts";
 import clientPromise from "../../db";
 import userSchemaClientPromise from "../../userSchemaDb";
 import { v4 as uuid } from "uuid";
@@ -523,7 +524,12 @@ export default async function handler(req, res) {
             obj.cleanedText?.forEach((element) => {
               const id = uuid();
               /// map the chunks to id
-              tempData.push({ element, id, link: obj?.crawlLink });
+              tempData.push({
+                element,
+                id,
+                link: obj?.crawlLink,
+                pageText: obj?.pageText,
+              });
               tempIds.push(id);
             });
 
@@ -537,12 +543,19 @@ export default async function handler(req, res) {
           });
           crwaledLinkUpsertData = [].concat(...crwaledLinkUpsertData);
 
+          const ingestChunks = crwaledLinkUpsertData.length;
+          console.log(
+            `[store-v2] crawling ingest: ${ingestChunks} chunks from ${crawledList.length} pages, bot=${chatbotId}`
+          );
+
           try {
             await generateChunksNEmbeddForLinks(
               crwaledLinkUpsertData,
               "crawling",
               chatbotId,
-              userId
+              userId,
+              "none",
+              collectSiteFactsFromCrawl(crawledList)
             ).then(() => {
               collection.insertOne({
                 chatbotId,
@@ -551,7 +564,10 @@ export default async function handler(req, res) {
               });
             });
           } catch (err) {
-            return res.status(400).send(err);
+            console.log("Error while processing links", err);
+            return res
+              .status(400)
+              .send(err?.message || String(err) || "Link ingest failed");
           }
         } else if (crawledList.length > 0 && updateChatbot) {
           /// geenrated the ID's for each chunks and storing in DB before upserting in pinecone
@@ -563,7 +579,12 @@ export default async function handler(req, res) {
             obj.cleanedText?.forEach((element) => {
               const id = uuid();
               /// map the chunks to id
-              tempData.push({ element, id, link: obj?.crawlLink });
+              tempData.push({
+                element,
+                id,
+                link: obj?.crawlLink,
+                pageText: obj?.pageText,
+              });
               tempIds.push(id);
             });
 
@@ -579,12 +600,19 @@ export default async function handler(req, res) {
           });
           crwaledLinkUpsertData = [].concat(...crwaledLinkUpsertData);
 
+          const ingestChunks = crwaledLinkUpsertData.length;
+          console.log(
+            `[store-v2] crawling ingest: ${ingestChunks} chunks from ${crawledList.length} pages, bot=${chatbotId}`
+          );
+
           try {
             await generateChunksNEmbeddForLinks(
               crwaledLinkUpsertData,
               "crawling",
               chatbotId,
-              userId
+              userId,
+              "none",
+              collectSiteFactsFromCrawl(crawledList)
             ).then(async () => {
               /// get the previous content
               const previousLinksContent = await collection.findOne({
@@ -606,7 +634,9 @@ export default async function handler(req, res) {
             });
           } catch (err) {
             console.log("Error while processing links", err);
-            return res.status(400).send(err);
+            return res
+              .status(400)
+              .send(err?.message || String(err) || "Link ingest failed");
           }
         }
         /// send the response

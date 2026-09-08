@@ -210,6 +210,15 @@ import {
   normalizeUrl,
   shouldCrawl,
 } from "../../../../_helpers/server/crawl-extract";
+import {
+  dedupeSiteFacts,
+  extractSiteFactsFromHtml,
+  type SiteFact,
+} from "../../../../_helpers/server/site-facts";
+import {
+  isUnlimitedCrawlLimit,
+  remainingCrawlAllowance,
+} from "../../../../_helpers/crawlLimit";
 
 module.exports = apiHandler({
   POST: fetchLinks,
@@ -225,6 +234,10 @@ const NAVIGATION_TIMEOUT_MS = 25000;
 /// Stop crawling well before maxDuration, leaving time to serialise and return
 /// what has been collected. A partial answer is worth far more than a 504.
 const CRAWL_BUDGET_MS = 220000;
+
+/// Unlimited plans still crawl in batches so one request finishes in time and
+/// the browser connection does not die before the client gets a response.
+const UNLIMITED_BATCH_PAGE_CAP = 20;
 
 /// Ceiling on the queue handed back for a follow-up request, so the response
 /// body cannot grow without bound on a large site.
@@ -278,24 +291,19 @@ async function fetchLinks(request: NextRequest) {
       source: "crawling",
     });
 
-    let limit = 0;
-    /// if previousFetches are null then crawl link
-    if (!previousFetches) {
-      limit = userDetails?.websiteCrawlingLimit;
-    } else {
-      limit =
-        userDetails?.websiteCrawlingLimit - previousFetches?.content.length;
+    const previousCount = previousFetches?.content?.length ?? 0;
+    const planLimit = userDetails?.websiteCrawlingLimit;
+    const unlimited = isUnlimitedCrawlLimit(planLimit);
+    let limit = remainingCrawlAllowance(
+      planLimit,
+      previousFetches ? previousCount : 0,
+      alreadyCrawled
+    );
+    if (unlimited) {
+      limit = alreadyCrawled + UNLIMITED_BATCH_PAGE_CAP;
     }
 
-    /// pages collected by earlier batches of this same crawl are not in the
-    /// database yet - they are stored once the user saves - so the allowance
-    /// has to account for them here or a resumed crawl would overshoot it
-    /// websiteCrawlingLimit is written as a string on some accounts, and is
-    /// absent entirely if user-details is missing - both used to leave the page
-    /// cap as NaN, which no comparison stops
-    limit = (Number(limit) || 0) - alreadyCrawled;
-
-    if (limit <= 0) {
+    if (!unlimited && limit <= 0) {
       return {
         error:
           "Oops! You have reached the crawling limit of your plan. Please upgrade to crawl more websites.",
@@ -375,7 +383,11 @@ async function fetchLinks(request: NextRequest) {
     }
     const pendingUrls: string[] =
       resumePending.length > 0 ? [...resumePending] : [sourceUrl];
-    const crawledPages: { crawlLink: string; text: string }[] = [];
+    const crawledPages: {
+      crawlLink: string;
+      text: string;
+      siteFacts?: SiteFact[];
+    }[] = [];
 
     /// The crawl is bounded by wall-clock time, not only by page count. Running
     /// past the platform's function ceiling returns a 504 and loses every page
@@ -406,6 +418,11 @@ async function fetchLinks(request: NextRequest) {
         visitedUrls.set(key, true);
 
         try {
+          if (page.isClosed()) {
+            console.warn("[crawl] page closed, returning partial results");
+            break;
+          }
+
           /// domcontentloaded rather than networkidle2: the text comes out of
           /// the DOM, so waiting for analytics, chat widgets and consent
           /// scripts to fall quiet buys nothing. A page holding an open socket
@@ -420,10 +437,19 @@ async function fetchLinks(request: NextRequest) {
             return body.innerHTML;
           });
 
+          /// Site facts (tel/mailto/JSON-LD/labeled contact) must be taken from
+          /// raw HTML before footer/nav strip — that chrome is dropped from
+          /// page text on purpose so it does not crowd retrieval.
+          const siteFacts = extractSiteFactsFromHtml(html, url);
+
           /// chunking is deferred until the whole page set is known: repeated
           /// chrome can only be recognised by comparing pages against each
           /// other, and it has to go before the text is split
-          crawledPages.push({ crawlLink: url, text: extractPageText(html) });
+          crawledPages.push({
+            crawlLink: url,
+            text: extractPageText(html),
+            siteFacts,
+          });
 
           if (crawledPages.length >= limit) break;
 
@@ -438,6 +464,15 @@ async function fetchLinks(request: NextRequest) {
           console.log(crawledPages.length);
         } catch (error) {
           console.error(`Error loading ${url}:`, error);
+          const msg = String(error?.message || error);
+          if (
+            msg.includes("Session closed") ||
+            msg.includes("Target closed") ||
+            msg.includes("Protocol error")
+          ) {
+            console.warn("[crawl] browser session lost, returning partial results");
+            break;
+          }
         }
       }
     } finally {
@@ -459,20 +494,36 @@ async function fetchLinks(request: NextRequest) {
     );
 
     const crawledData = [];
+    const allSiteFacts: SiteFact[] = [];
     for (let i = 0; i < crawledPages.length; i++) {
       const text = deduped[i] ?? crawledPages[i].text;
+      const pageFacts = crawledPages[i].siteFacts || [];
+      allSiteFacts.push(...pageFacts);
       crawledData.push({
         crawlLink: crawledPages[i].crawlLink,
         cleanedText: await chunkPageText(text),
+        pageText: text,
         charCount: text.length,
+        /// Ride on each page so Website.tsx → store/ingest keeps facts without
+        /// a separate context field; ingest dedupes sitewide.
+        siteFacts: pageFacts,
       });
     }
 
+    const siteFacts = dedupeSiteFacts(allSiteFacts);
+    if (siteFacts.length) {
+      console.log(
+        `[crawl] extracted ${siteFacts.length} unique site facts from ${crawledPages.length} pages`
+      );
+    }
+
     const morePending =
-      outOfBudget && pendingUrls.length > 0 && crawledData.length < limit;
+      pendingUrls.length > 0 &&
+      (outOfBudget || crawledPages.length >= limit);
 
     return {
       fetchedLinks: crawledData,
+      siteFacts,
       /// the client asks for the remainder in a follow-up request rather than
       /// holding one connection open past the function timeout
       partial: morePending,

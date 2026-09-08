@@ -6,8 +6,26 @@ import { deletevectors } from "../../app/_helpers/server/pinecone";
 import { PineconeStore } from "@langchain/pinecone";
 import { ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai";
 import { PromptTemplate } from "@langchain/core/prompts";
-import { MultiQueryRetriever } from "langchain/retrievers/multi_query";
 import { openai } from "@/app/openai";
+import {
+  getHybridAlpha,
+  getPineconeIndexName,
+  getRerankCandidateLimit,
+  getRerankTopN,
+  isHybridSearchEnabled,
+  isRerankEnabled,
+} from "../../app/_helpers/server/hybrid-config";
+import { hybridQuery } from "../../app/_helpers/server/hybrid-search";
+import { generateSparseQueryEmbedding } from "../../app/_helpers/server/sparse-embeddings";
+import { rerankDocuments } from "../../app/_helpers/server/rerank";
+import {
+  boostedRetrievalScore,
+  contactSparseQuery,
+  isContactQuery,
+  isOrgHistoryQuery,
+  orgHistorySparseQuery,
+} from "../../app/_helpers/server/retrieval-boost";
+import { MULTI_QUERY_PROMPT_TEMPLATE } from "../../app/_helpers/server/multi-query-prompt";
 
 /// retrieval does 2 LLM calls + pinecone searches; without this it hits the
 /// default limit and returns FUNCTION_INVOCATION_TIMEOUT (504)
@@ -15,8 +33,6 @@ export const config = {
   maxDuration: 300,
 };
 
-/// phase logging - every line is prefixed [rag <id>] so one request can be
-/// followed end to end in the vercel runtime logs
 function ragLogger() {
   const id = Math.random().toString(36).slice(2, 8);
   const startedAt = Date.now();
@@ -44,6 +60,32 @@ function ragLogger() {
     },
     elapsed: () => Date.now() - startedAt,
   };
+}
+
+/** Keep filter picks first, then backfill from ranked pool up to finalK. */
+function mergeToFinalK(filtered, unfiltered, finalK) {
+  const seen = new Set();
+  const out = [];
+  const keyOf = (doc) => doc?.content ?? doc?.pageContent ?? doc;
+
+  for (const doc of filtered) {
+    const key = keyOf(doc);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(doc);
+    if (out.length >= finalK) break;
+  }
+  if (out.length < finalK) {
+    for (const doc of unfiltered) {
+      const key = keyOf(doc);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push(doc);
+      if (out.length >= finalK) break;
+    }
+  }
+  const result = out.length > 0 ? out : unfiltered.slice(0, finalK);
+  return result.sort((a, b) => (b?.score ?? 0) - (a?.score ?? 0));
 }
 
 export default async function handler(req, res) {
@@ -80,7 +122,8 @@ export default async function handler(req, res) {
     /// times before failing — surfacing as a slow 500 rather than an auth error
     const openaiKey = process.env.NEXT_PUBLIC_OPENAI_KEY?.trim();
     const pineconeKey = process.env.NEXT_PUBLIC_PINECONE_KEY?.trim();
-    const pineconeIndexName = process.env.NEXT_PUBLIC_PINECONE_INDEX?.trim();
+    const pineconeIndexName = getPineconeIndexName();
+    const hybridSearchEnabled = isHybridSearchEnabled();
 
     const log = ragLogger();
     log.step("request", {
@@ -90,6 +133,9 @@ export default async function handler(req, res) {
       historyCount: Array.isArray(messages) ? messages.length : 0,
       hasPineconeKey: !!pineconeKey,
       pineconeIndex: pineconeIndexName ?? null,
+      hybridSearchEnabled,
+      hybridAlpha: hybridSearchEnabled ? getHybridAlpha() : null,
+      rerankEnabled: isRerankEnabled(),
       hasOpenaiKey: !!openaiKey,
       /// flags the exact defect above without printing any secret.
       /// illegalHeaderChar uses node-fetch's own rule, so it catches invisible
@@ -188,7 +234,7 @@ export default async function handler(req, res) {
 
       const pineconeIndex = pinecone.Index(pineconeIndexName);
 
-      log.step("pinecone.connect");
+      log.step("pinecone.connect", { hybridSearchEnabled });
       /// confirms the index is actually reachable from this runtime, and
       /// whether the caller's namespace holds any vectors at all
       const stats = await pineconeIndex.describeIndexStats();
@@ -199,11 +245,16 @@ export default async function handler(req, res) {
         namespaceExists: !!stats?.namespaces?.[userId],
       });
 
-      log.step("vectorstore.init");
-      const vectorStore = await PineconeStore.fromExistingIndex(
-        new OpenAIEmbeddings({ apiKey: openaiKey, timeout: 20000, maxRetries: 2 }),
-        { pineconeIndex, namespace: userId }
-      );
+      let vectorStore = null;
+      if (!hybridSearchEnabled) {
+        log.step("vectorstore.init");
+        vectorStore = await PineconeStore.fromExistingIndex(
+          new OpenAIEmbeddings({ apiKey: openaiKey, timeout: 20000, maxRetries: 2 }),
+          { pineconeIndex, namespace: userId }
+        );
+      } else {
+        log.step("vectorstore.skip", { reason: "hybrid-search-enabled" });
+      }
 
       /// Custom Multi-Query Retriever with Scores
       const llm = new ChatOpenAI({
@@ -213,28 +264,9 @@ export default async function handler(req, res) {
         maxRetries: 2,
       });
 
-      // Generate multiple query variations
+      // Hub base: hwchase17/multi-query-retriever + intent-preservation for KB RAG
       const multiQueryPrompt = PromptTemplate.fromTemplate(
-        `You are an AI language model assistant. Your task is
-        to generate {queryCount} different versions of the given user
-        question corresponding to the Chat History to retrieve relevant documents from a vector database.
-        By generating multiple perspectives on the user question,
-        your goal is to help the user overcome some of the limitations
-        of distance-based similarity search.
-
-        Replace any number or words like it, that, etc according to the user's flow.
-
-        Provide these alternative questions separated by newlines between XML tags. For example:
-
-        <questions>
-        Question 1
-        Question 2
-        Question 3
-        </questions>
-
-        Chat History: {chatHistory}
-
-        Original question: {question}`,
+        MULTI_QUERY_PROMPT_TEMPLATE,
         { partialVariables: { chatHistory: JSON.stringify(messages) } }
       );
 
@@ -278,6 +310,39 @@ export default async function handler(req, res) {
         usedFallback: queries.length === 1,
       });
 
+      const rerankEnabled = isRerankEnabled();
+      const CANDIDATE_K = hybridSearchEnabled
+        ? getRerankCandidateLimit()
+        : 20;
+      const FINAL_K = rerankEnabled ? getRerankTopN() : 5;
+      // When rerank is on, keep hybrid alpha fixed — no query-type routing.
+      const orgHistoryQuery = !rerankEnabled && isOrgHistoryQuery(userQuery);
+      const contactQuery = !rerankEnabled && isContactQuery(userQuery);
+      const hybridAlpha =
+        orgHistoryQuery || contactQuery ? 0.15 : getHybridAlpha();
+
+      async function runHybridSearch(query, alpha, topK = CANDIDATE_K, extraFilter = null) {
+        const [denseVector, sparseVector] = await Promise.all([
+          createEmbedding(query),
+          generateSparseQueryEmbedding(query),
+        ]);
+        const filter = { chatbotId: { $eq: chatbotId }, ...(extraFilter || {}) };
+        const queryResponse = await hybridQuery(pineconeIndex, userId, {
+          denseVector,
+          sparseVector,
+          topK,
+          filter,
+          alpha,
+        });
+        return (queryResponse.matches ?? []).map((match) => [
+          {
+            pageContent: match.metadata?.content ?? "",
+            metadata: match.metadata ?? {},
+          },
+          match.score ?? 0,
+        ]);
+      }
+
       // Custom multi-query retrieval with scores
       const allResultsWithScores = [];
 
@@ -286,18 +351,26 @@ export default async function handler(req, res) {
       for (const [i, query] of queries.entries()) {
         const searchStartedAt = Date.now();
         try {
-          log.step(`search.${i}`, { query: query?.slice(0, 80) });
-          const results = await vectorStore.similaritySearchWithScore(
-            query,
-            10,
-            {
-              chatbotId: chatbotId,
-            }
-          );
+          log.step(`search.${i}`, { query: query?.slice(0, 80), hybrid: hybridSearchEnabled });
+          let results = [];
+
+          if (hybridSearchEnabled) {
+            results = await runHybridSearch(query, hybridAlpha);
+          } else {
+            results = await vectorStore.similaritySearchWithScore(
+              query,
+              CANDIDATE_K,
+              {
+                chatbotId: chatbotId,
+              }
+            );
+          }
+
           log.step(`search.${i}.done`, {
             matches: results.length,
             ms: Date.now() - searchStartedAt,
             topScore: results[0]?.[1],
+            hybrid: hybridSearchEnabled,
           });
 
           // Add query source to each result
@@ -317,6 +390,59 @@ export default async function handler(req, res) {
           );
         }
       }
+
+      if (hybridSearchEnabled && orgHistoryQuery) {
+        try {
+          log.step("search.org-history-sparse", { alpha: 0 });
+          const sparseResults = await runHybridSearch(
+            orgHistorySparseQuery(userQuery),
+            0
+          );
+          sparseResults.forEach(([doc, score]) => {
+            allResultsWithScores.push([doc, score, userQuery]);
+          });
+        } catch (error) {
+          console.error("[rag] org-history sparse search failed:", error?.message);
+        }
+      }
+
+      if (hybridSearchEnabled && contactQuery) {
+        try {
+          log.step("search.contact-sparse", { alpha: 0 });
+          const sparseResults = await runHybridSearch(
+            contactSparseQuery(userQuery),
+            0
+          );
+          sparseResults.forEach(([doc, score]) => {
+            allResultsWithScores.push([doc, score, userQuery]);
+          });
+        } catch (error) {
+          console.error("[rag] contact sparse search failed:", error?.message);
+        }
+      }
+
+      /// Site facts (phones/emails/etc.) are short vectors and lose to long page
+      /// chunks in hybrid top-K. Always merge a dedicated site_fact pool so
+      /// rerank can choose them — general, no contact-query routing.
+      if (hybridSearchEnabled) {
+        try {
+          const SITE_FACT_K = 15;
+          log.step("search.site-facts", { topK: SITE_FACT_K });
+          const factResults = await runHybridSearch(
+            userQuery,
+            hybridAlpha,
+            SITE_FACT_K,
+            { chunk_type: { $eq: "site_fact" } }
+          );
+          factResults.forEach(([doc, score]) => {
+            allResultsWithScores.push([doc, score, userQuery]);
+          });
+          log.step("search.site-facts.done", { matches: factResults.length });
+        } catch (error) {
+          console.error("[rag] site-fact search failed:", error?.message);
+        }
+      }
+
       log.step("search.all-done", {
         queries: queries.length,
         failures: searchFailures,
@@ -340,31 +466,32 @@ export default async function handler(req, res) {
         }
       });
 
-      // Sort by score and keep the best 5.
-      //
-      // Was 10 (the comment said 3, which had been wrong for a while).
-      // Measured across 68 questions, chunker and embedding held fixed:
-      //
-      //   k=20   precision 0.651   relevancy 0.238   recall 0.733   36k chars
-      //   k=10   precision 0.687   relevancy 0.265   recall 0.723   22k chars
-      //   k=5    precision 0.729   relevancy 0.280   recall 0.705   12k chars
-      //   k=3    precision 0.757   relevancy 0.319   recall 0.674    8k chars
-      //
-      // Retrieving more actively hurts: k=20 is worst on precision and
-      // relevancy while buying almost no recall. k=3 scores best but costs 5
-      // points of recall, the metric that maps to answering with facts
-      // missing. k=5 takes most of the gain for a recall cost inside the
-      // noise, and halves the context sent to the model.
-      //
-      // Score thresholds were tried instead and rejected - they cut recall by
-      // 6 points while adding less relevancy than simply lowering k.
-      const retrievedDocsWithScores = Array.from(uniqueResults.values())
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 5)
-        .map(([doc, score]) => [doc, score]); // Remove sourceQuery for consistency
+      // Keep a wide candidate set. Prefer raw hybrid scores when rerank is on;
+      // legacy boosts only apply when rerank is disabled.
+      // Site-fact vectors score much lower than long page chunks in hybrid — reserve
+      // slots so they reach the reranker instead of being sliced away.
+      const rankedUnique = Array.from(uniqueResults.values())
+        .map(([doc, rawScore]) => ({
+          doc,
+          rawScore,
+          sortScore: rerankEnabled
+            ? rawScore
+            : boostedRetrievalScore(userQuery, doc, rawScore),
+          isSiteFact: doc?.metadata?.chunk_type === "site_fact",
+        }))
+        .sort((a, b) => b.sortScore - a.sortScore);
+
+      const SITE_FACT_RESERVE = 15;
+      const siteFactCandidates = rankedUnique
+        .filter((r) => r.isSiteFact)
+        .slice(0, SITE_FACT_RESERVE);
+      const pageCandidates = rankedUnique
+        .filter((r) => !r.isSiteFact)
+        .slice(0, Math.max(1, CANDIDATE_K - siteFactCandidates.length));
+      const retrievedDocsWithScores = [...pageCandidates, ...siteFactCandidates];
 
       /// extract only needed field from the retrieved documents with scores
-      let similaritySearch = retrievedDocsWithScores.map(([doc, score]) => {
+      let similaritySearch = retrievedDocsWithScores.map(({ doc, rawScore }) => {
         let content = doc.metadata.content || "";
         /// if the meta data has image link add it as the reference in similaritysearch
         if (doc?.metadata?.image_path) {
@@ -391,20 +518,54 @@ export default async function handler(req, res) {
           dimensions = JSON.stringify(doc.metadata.dimensions);
         }
 
-        return { content, source, filename, score, source_url, dimensions };
+        return { content, source, filename, score: rawScore, source_url, dimensions };
       });
 
       log.step("rank.done", {
         uniqueMatches: uniqueResults.size,
         kept: similaritySearch.length,
+        candidateK: CANDIDATE_K,
         topScore: similaritySearch[0]?.score,
         emptyContent: similaritySearch.filter((c) => !c.content?.trim()).length,
+        rerankEnabled,
       });
 
-      // --- Filter retrieved chunks using OpenAI to keep only those relevant to the original query ---
+      // --- Cross-encoder rerank (preferred) or legacy LLM filter ---
+      const unfiltered = similaritySearch;
+
+      if (rerankEnabled && similaritySearch.length > 0) {
+        log.step("rerank.start", {
+          chunksIn: similaritySearch.length,
+          topN: FINAL_K,
+        });
+        try {
+          const reranked = await rerankDocuments({
+            query: userQuery,
+            documents: similaritySearch,
+            topN: FINAL_K,
+          });
+          similaritySearch = reranked;
+          log.step("rerank.done", {
+            chunks: similaritySearch.length,
+            topScore: similaritySearch[0]?.score,
+            topPreview: String(similaritySearch[0]?.content || "")
+              .replace(/\s+/g, " ")
+              .slice(0, 120),
+          });
+        } catch (rerankError) {
+          console.error(
+            "[rag] rerank failed, falling back to hybrid top-K:",
+            rerankError?.message || rerankError
+          );
+          similaritySearch = unfiltered.slice(0, FINAL_K);
+          log.step("rerank.fallback", {
+            chunks: similaritySearch.length,
+            reason: rerankError?.message || "unknown",
+          });
+        }
+      } else {
       log.step("relevance-filter.llm", { chunksIn: similaritySearch.length });
       try {
-        // Build a compact listing of chunks to avoid hitting token limits
         const maxChunkChars = 1500;
         const chunksList = similaritySearch
           .map((c, i) => {
@@ -415,9 +576,13 @@ export default async function handler(req, res) {
           })
           .join("\n\n");
 
-        const systemPrompt = "You are a strict filter that decides whether a text chunk is relevant to a user's question. Return a JSON object with a single key \"keep\" whose value is a list of integer indices of the chunks that should be kept (in original order). Do not return any other text.";
+        const systemPrompt = contactQuery
+          ? 'You help select passages for a retrieval-augmented answer about contact details. Prefer keeping passages with WhatsApp, phone, email, address, opening hours, or location. Drop licensing, membership upsell, history-only lines, and unrelated service marketing when the question asks for contact info. Return a JSON object with a single key "keep" whose value is a list of integer indices, in original order. Do not return any other text.'
+          : orgHistoryQuery
+          ? 'You help select passages for a retrieval-augmented answer about an organization or publisher. Prefer keeping passages that mention years of experience, founding, history, readers, reviewers, mission, or company background. Drop passages about specific diseases, medical treatments, symptoms, or clinical articles when the question is about the organization itself. Return a JSON object with a single key "keep" whose value is a list of integer indices, in original order. Do not return any other text.'
+          : 'You help select passages for a retrieval-augmented answer. Prefer keeping useful context over dropping it. A passage should be kept if it might contain facts, names, numbers, steps, definitions, or background that could help answer the question — even if it is only partly on topic. Drop a passage only when it is clearly about a different subject. Return a JSON object with a single key "keep" whose value is a list of integer indices, in original order. Do not return any other text.';
 
-        const userPrompt = `Original question: ${userQuery}\n\nChunks:\n${chunksList}\n\nOnly return valid JSON, for example: {\"keep\": [0,2]}`;
+        const userPrompt = `Original question: ${userQuery}\n\nChunks:\n${chunksList}\n\nSelect up to ${FINAL_K} indices to keep. When in doubt, keep the passage. If several are useful, prefer the earlier indices. Never return an empty list. Only return valid JSON, for example: {"keep": [0,1,2,3,4]}`;
 
         const filterResp = await openai.chat.completions.create({
           model: process.env.NEXT_PUBLIC_OPENAI_MODEL || "gpt-4o",
@@ -436,31 +601,46 @@ export default async function handler(req, res) {
 
         if (raw) {
           try {
-            // Find the first JSON start (either { or [) to avoid non-JSON prefixes
             const jsonStart = raw.search(/[\{\[]/);
             if (jsonStart !== -1) {
               const parsed = JSON.parse(raw.slice(jsonStart));
               if (parsed && Array.isArray(parsed.keep)) {
-                const keepSet = new Set(parsed.keep.map((n) => Number(n)));
-                similaritySearch = similaritySearch.filter((_, i) => keepSet.has(i));
+                const keepSet = new Set(
+                  parsed.keep
+                    .map((n) => Number(n))
+                    .filter((n) => Number.isInteger(n) && n >= 0 && n < unfiltered.length)
+                );
+                const filtered = unfiltered.filter((_, i) => keepSet.has(i));
+                similaritySearch = mergeToFinalK(filtered, unfiltered, FINAL_K);
               } else {
                 console.warn("OpenAI filter returned unexpected JSON, skipping filter.", parsed);
+                similaritySearch = unfiltered.slice(0, FINAL_K);
               }
             } else {
               console.warn("No JSON found in OpenAI filter response, skipping filter.", raw);
+              similaritySearch = unfiltered.slice(0, FINAL_K);
             }
           } catch (parseErr) {
             console.warn("Failed to parse OpenAI filter response, skipping filter.", parseErr, raw);
+            similaritySearch = unfiltered.slice(0, FINAL_K);
           }
         } else {
           console.warn("Empty response from OpenAI filter, returning unfiltered results.");
+          similaritySearch = unfiltered.slice(0, FINAL_K);
         }
       } catch (filterError) {
         console.error("Error while filtering chunks with OpenAI, returning unfiltered results:", filterError);
+        similaritySearch = unfiltered.slice(0, FINAL_K);
+      }
+      }
+
+      if (similaritySearch.length > FINAL_K) {
+        similaritySearch = similaritySearch.slice(0, FINAL_K);
       }
 
       log.step("respond", {
         chunks: similaritySearch.length,
+        candidates: unfiltered.length,
         totalMs: log.elapsed(),
       });
       /// an empty context here is why the model replies "I couldn't retrieve

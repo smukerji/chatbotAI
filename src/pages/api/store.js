@@ -4,6 +4,7 @@ import {
   generateChunksNEmbeddExcel,
   generateChunksNEmbeddForLinks,
 } from "../../app/_helpers/server/embeddings";
+import { collectSiteFactsFromCrawl } from "../../app/_helpers/server/site-facts";
 import clientPromise from "../../db";
 import { v4 as uuid } from "uuid";
 // import { authorize, uploadFile } from "../../app/_services/googleFileUpload";
@@ -496,7 +497,12 @@ export default async function handler(req, res) {
             obj.cleanedText?.forEach((element) => {
               const id = uuid();
               /// map the chunks to id
-              tempData.push({ element, id });
+              tempData.push({
+                element,
+                id,
+                link: obj?.crawlLink,
+                pageText: obj?.pageText,
+              });
               tempIds.push(id);
             });
 
@@ -515,7 +521,9 @@ export default async function handler(req, res) {
               crwaledLinkUpsertData,
               "crawling",
               chatbotId,
-              userId
+              userId,
+              "none",
+              collectSiteFactsFromCrawl(crawledList)
             ).then(() => {
               collection.insertOne({
                 chatbotId,
@@ -538,7 +546,12 @@ export default async function handler(req, res) {
             obj.cleanedText?.forEach((element) => {
               const id = uuid();
               /// map the chunks to id
-              tempData.push({ element, id });
+              tempData.push({
+                element,
+                id,
+                link: obj?.crawlLink,
+                pageText: obj?.pageText,
+              });
               tempIds.push(id);
             });
 
@@ -559,7 +572,9 @@ export default async function handler(req, res) {
               crwaledLinkUpsertData,
               "crawling",
               chatbotId,
-              userId
+              userId,
+              "none",
+              collectSiteFactsFromCrawl(crawledList)
             ).then(async () => {
               /// get the previous content
 

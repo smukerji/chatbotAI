@@ -7,7 +7,12 @@
     "dev:wa": "node --env-file=whatsapp-server.env.local whatsapp-server.js",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:hybrid-rerank": "node scripts/test-hybrid-rerank.mjs",
+    "test:hybrid-query": "node scripts/test-hybrid-query.mjs",
+    "hybrid:create-index": "node scripts/create-hybrid-index.mjs",
+    "hybrid:backfill": "node scripts/backfill-hybrid-vectors.mjs",
+    "hybrid:backfill-site-facts": "node scripts/backfill-site-facts.mjs"
   },
   "dependencies": {
     "@ant-design/icons": "^5.2.6",
@@ -17,7 +22,7 @@
     "@langchain/openai": "^0.2.5",
     "@langchain/pinecone": "^0.0.8",
     "@nextui-org/react": "^2.2.9",
-    "@pinecone-database/pinecone": "^2.0.1",
+    "@pinecone-database/pinecone": "^5.1.0",
     "@slack/web-api": "^7.0.2",
     "@sparticuz/chromium-min": "^119.0.2",
     "@stripe/react-stripe-js": "^2.4.0",
