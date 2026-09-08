@@ -21,6 +21,7 @@ import { useCookies } from "react-cookie";
 import { redirect, useRouter } from "next/navigation";
 import { UserDetailsContext } from "../../_helpers/client/Context/UserDetailsContext";
 import { formatNumber } from "../../_helpers/client/formatNumber";
+import { isCrawlLimitExceeded } from "../../_helpers/crawlLimit";
 import LoaderModal from "../chatbot/dashboard/_components/Modal/LoaderModal";
 import CustomModal from "../chatbot/dashboard/_components/CustomModal/CustomModal";
 import { CreateAssistantFlowContext } from "@/app/_helpers/client/Context/CreateAssistantFlowContext";
@@ -227,7 +228,12 @@ function Home({
     }
 
     /// check if the crawling links are as per user plan
-    if (crawledList?.length > userDetails?.plan?.websiteCrawlingLimit) {
+    if (
+      isCrawlLimitExceeded(
+        crawledList?.length ?? 0,
+        userDetails?.plan?.websiteCrawlingLimit
+      )
+    ) {
       message.warning(
         `Oops! You have reached the crawling limit of your plan. Please delete few links or upgrade the plan.`
       );

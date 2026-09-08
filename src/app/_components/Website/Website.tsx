@@ -79,7 +79,7 @@ function Website({
       /// stops before the function times out and hands back what is still
       /// queued; we ask for the rest here instead of losing the whole crawl to
       /// a 504.
-      const MAX_BATCHES = 5;
+      const MAX_BATCHES = 10;
       let fetchedLinks: any[] = [];
       let pendingUrls: string[] = [];
       let visitedUrls: string[] = [];
@@ -102,10 +102,33 @@ function Website({
           next: { revalidate: 0 },
         };
 
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/fetch-links/api`,
-          options
-        );
+        let response: Response;
+        try {
+          response = await fetch(
+            `${process.env.NEXT_PUBLIC_WEBSITE_URL}home/fetch-links/api`,
+            options
+          );
+        } catch (networkErr) {
+          if (fetchedLinks.length > 0) {
+            message.warning(
+              `Network error after ${fetchedLinks.length} pages — saved partial results. Click Fetch again to continue.`
+            );
+            break;
+          }
+          throw networkErr;
+        }
+
+        if (!response.ok) {
+          const errText = await response.text().catch(() => "");
+          if (fetchedLinks.length > 0) {
+            message.warning(
+              `Crawl interrupted (${response.status}) after ${fetchedLinks.length} pages — partial results saved.`
+            );
+            break;
+          }
+          throw new Error(errText || `HTTP ${response.status}`);
+        }
+
         const data = await response.json();
         if (data?.error) {
           /// a limit reached part way through still keeps the earlier batches
@@ -125,8 +148,13 @@ function Website({
         if (pendingUrls.length === 0) break;
 
         message.info(
-          `Crawled ${fetchedLinks.length} pages so far, continuing...`
+          `Crawled ${fetchedLinks.length} pages so far, continuing (${batch + 1}/${MAX_BATCHES})...`
         );
+      }
+
+      if (fetchedLinks.length === 0) {
+        message.warning("No pages were crawled. Try again or use a smaller site section.");
+        return;
       }
 
       // Calculate total character count
@@ -153,7 +181,9 @@ function Website({
     } catch (error) {
       setProgress(0);
       console.log("Error while fetching ", error);
-      alert(`Error while fetching ${error}`);
+      message.error(
+        `Crawl failed: ${error instanceof Error ? error.message : String(error)}`
+      );
     } finally {
       botContext?.handleChange("isLoading")(false);
       clearInterval(intervalId);
