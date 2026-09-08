@@ -386,7 +386,8 @@ export function collectSiteFactsFromCrawl(
 ): SiteFact[] {
   const all: SiteFact[] = [];
   for (const page of crawledList || []) {
-    if (Array.isArray(page?.siteFacts)) all.push(...page.siteFacts);
+    const facts = page?.siteFacts;
+    if (Array.isArray(facts)) all.push(...facts);
   }
   return dedupeSiteFacts(all);
 }

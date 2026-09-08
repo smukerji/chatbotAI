@@ -45,7 +45,9 @@ export function buildDoclingDocumentAnchor(
     .slice(0, 60);
 
   const earlyBody = chunks.slice(0, 12).join("\n\n");
-  const anchor = [...new Set([...structural, earlyBody])].join("\n\n").trim();
+  const anchor = Array.from(new Set([...structural, earlyBody]))
+    .join("\n\n")
+    .trim();
   return anchor.slice(0, limit);
 }
 

@@ -464,7 +464,7 @@ async function fetchLinks(request: NextRequest) {
           console.log(crawledPages.length);
         } catch (error) {
           console.error(`Error loading ${url}:`, error);
-          const msg = String(error?.message || error);
+          const msg = error instanceof Error ? error.message : String(error);
           if (
             msg.includes("Session closed") ||
             msg.includes("Target closed") ||

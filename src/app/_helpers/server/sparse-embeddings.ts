@@ -38,6 +38,7 @@ function parseSparseEmbedding(record: unknown): SparseVector | null {
   return { indices, values };
 }
 
+/** Always use REST — installed Pinecone SDK typings/runtime may lack inference. */
 async function embedSparseViaRest(
   texts: string[],
   inputType: "passage" | "query"
@@ -80,38 +81,6 @@ async function embedSparseViaRest(
   return results;
 }
 
-async function embedSparseViaSdk(
-  texts: string[],
-  inputType: "passage" | "query"
-): Promise<SparseVector[]> {
-  const { Pinecone } = await import("@pinecone-database/pinecone");
-  const pc = new Pinecone({ apiKey: getPineconeApiKey() });
-
-  if (!pc.inference?.embed) {
-    return embedSparseViaRest(texts, inputType);
-  }
-
-  const response = await pc.inference.embed({
-    model: getSparseModelName(),
-    inputs: texts.map((text) => ({ text })),
-    parameters: {
-      inputType,
-      truncate: "END",
-    },
-  });
-
-  const results: SparseVector[] = [];
-  for (const record of response.data ?? []) {
-    const parsed = parseSparseEmbedding(record);
-    if (!parsed) {
-      throw new Error("Sparse embedding not returned from Pinecone Inference");
-    }
-    results.push(parsed);
-  }
-
-  return results;
-}
-
 export async function generateSparseEmbeddings(
   texts: string[],
   inputType: "passage" | "query" = "passage"
@@ -124,7 +93,7 @@ export async function generateSparseEmbeddings(
 
   for (let i = 0; i < texts.length; i += SPARSE_BATCH_SIZE) {
     const batch = texts.slice(i, i + SPARSE_BATCH_SIZE);
-    const batchResults = await embedSparseViaSdk(batch, inputType);
+    const batchResults = await embedSparseViaRest(batch, inputType);
     results.push(...batchResults);
   }
 

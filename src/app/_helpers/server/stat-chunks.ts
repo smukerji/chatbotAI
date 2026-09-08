@@ -39,8 +39,12 @@ export function extractStatLineChunks(
 
   // Inline matches inside longer lines (e.g. markdown blobs)
   for (const pattern of STAT_LINE_PATTERNS) {
-    const global = new RegExp(pattern.source, pattern.flags.includes("g") ? pattern.flags : pattern.flags + "g");
-    for (const match of pageText.matchAll(global)) {
+    const global = new RegExp(
+      pattern.source,
+      pattern.flags.includes("g") ? pattern.flags : pattern.flags + "g"
+    );
+    const matches = Array.from(pageText.matchAll(global));
+    for (const match of matches) {
       const snippet = match[0].trim();
       if (
         snippet.length >= MIN_STAT_LINE_LEN &&

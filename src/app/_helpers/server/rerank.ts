@@ -34,9 +34,9 @@ function truncateText(text: string, maxChars: number): string {
  * Uses REST so it works even when the installed Pinecone SDK lacks inference.
  * On failure, callers should fall back to the original hybrid ranking.
  */
-export async function rerankDocuments<T extends RerankableDoc>(
-  options: RerankOptions & { documents: T[] }
-): Promise<T[]> {
+export async function rerankDocuments(
+  options: RerankOptions
+): Promise<RerankableDoc[]> {
   const {
     query,
     documents,
@@ -94,7 +94,7 @@ export async function rerankDocuments<T extends RerankableDoc>(
       data?: Array<{ index?: number; score?: number }>;
     };
 
-    const ranked: T[] = [];
+    const ranked: RerankableDoc[] = [];
     for (const item of payload.data ?? []) {
       const idx = Number(item.index);
       if (!Number.isInteger(idx) || idx < 0 || idx >= documents.length) {

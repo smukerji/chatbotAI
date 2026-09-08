@@ -40,8 +40,9 @@ export async function hybridQuery(
   return index.namespace(namespace).query({
     topK: options.topK,
     vector: scaled.vector,
+    // SDK typings lag hybrid sparse support; runtime accepts sparseVector.
     sparseVector: scaled.sparseVector,
     filter: options.filter,
     includeMetadata: true,
-  });
+  } as any);
 }

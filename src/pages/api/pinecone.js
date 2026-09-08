@@ -460,7 +460,7 @@ export default async function handler(req, res) {
 
         if (
           !uniqueResults.has(contentKey) ||
-          uniqueResults.get(contentKey)[1] > score
+          uniqueResults.get(contentKey)[1] < score
         ) {
           uniqueResults.set(contentKey, [doc, score, sourceQuery]);
         }

@@ -252,7 +252,7 @@ export async function generateChunksNEmbeddExcel(
 
       ids,
 
-      metadataList: batch.map((chunk) => ({
+      metadataList: batch.map((chunk: string) => ({
 
         content: chunk,
 
