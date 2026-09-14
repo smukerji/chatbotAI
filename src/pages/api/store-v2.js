@@ -287,24 +287,27 @@ export default async function handler(req, res) {
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
                   file.fileType === "text/csv"
                 ) {
-                  /// generating chunks and embedding
-                  // const chunks = await generateChunksNEmbeddExcel(
-                  //   content,
-                  //   "file",
-                  //   chatbotId,
-                  //   userId,
-                  //   file.name
-                  // );
-                  /// store in the database schema info
+                  /// CSV/XLSX: keep schema_info for structured tools, AND embed
+                  /// full table markdown from process-doc so get_reference can RAG them.
+                  const chunks = await generateChunksNEmbeddViaDocling(
+                    content,
+                    "file",
+                    chatbotId,
+                    userId,
+                    file.name
+                  );
                   await collection.insertOne({
                     chatbotId,
                     fileName: file.name,
                     schema_info: file.schema_info,
-                    contentLength: JSON.stringify(file.schema_info).length,
+                    dataID: chunks?.dataIDs,
+                    contentLength:
+                      chunks?.contentLength ||
+                      JSON.stringify(file.schema_info || {}).length,
                     source: "file",
                   });
 
-                  resolve(1);
+                  resolve(chunks);
                 } else {
                   /// generating chunks and embedding
                   const chunks = await generateChunksNEmbeddViaDocling(

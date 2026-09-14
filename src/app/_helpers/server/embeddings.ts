@@ -2,7 +2,7 @@ import { OpenAI } from "openai";
 
 import { v4 as uuidv4 } from "uuid";
 
-import { upsert } from "./pinecone";
+import { upsert, deleteDocFactsForFile } from "./pinecone";
 
 import { contextualizeChunks, prependContextToCrawlChunks, buildDoclingDocumentAnchor } from "./contextualize-chunks";
 
@@ -17,6 +17,73 @@ import {
   siteFactVectorId,
   type SiteFact,
 } from "./site-facts";
+import {
+  dedupeDocFacts,
+  docFactVectorId,
+  extractDocumentFactsFromChunks,
+  formatDocFactEmbedText,
+  assignSectionRoles,
+  inferSectionRole,
+  isLikelyDocChromeChunk,
+  metaToStampFields,
+  type DocFact,
+  type DocFactType,
+} from "./doc-facts";
+import {
+  buildStructuredTextChunks,
+  type DoclingTextItem,
+} from "./doc-structure";
+import {
+  collectTypedRelationsFromPictures,
+  describePictureForIndex,
+  relationsToFacts,
+  resolvePictureImage,
+  type PictureForRelations,
+} from "./doc-relations";
+
+export async function upsertDocFacts(
+  facts: DocFact[],
+  chatbotId: string,
+  userId: string,
+  source: string = "file",
+  filename: string = "document"
+): Promise<{ upserted: number; ids: string[] }> {
+  const unique = dedupeDocFacts(facts);
+  if (!unique.length) return { upserted: 0, ids: [] };
+
+  const batchSize = 150;
+  let upserted = 0;
+  const allIds: string[] = [];
+
+  for (let i = 0; i < unique.length; i += batchSize) {
+    const batch = unique.slice(i, i + batchSize);
+    const texts = batch.map(formatDocFactEmbedText);
+    const ids = batch.map((f) => docFactVectorId(chatbotId, f));
+    const vectors = await buildIngestVectors({
+      denseTexts: texts,
+      sparseTexts: texts,
+      ids,
+      metadataList: batch.map((fact, index) => ({
+        content: texts[index],
+        source,
+        filename: fact.filename || filename,
+        chatbotId,
+        chunk_type: "doc_fact",
+        fact_type: fact.type,
+        fact_value: fact.value,
+        section_role: "body",
+      })),
+    });
+    await upsert(vectors, userId);
+    upserted += vectors.length;
+    allIds.push(...ids);
+  }
+
+  console.log(
+    `[ingest] upserted ${upserted} doc_fact vectors for chatbot ${chatbotId} file=${filename}`
+  );
+  return { upserted, ids: allIds };
+}
 
 export async function upsertSiteFacts(
   facts: SiteFact[],
@@ -428,9 +495,38 @@ export async function generateChunksNEmbeddViaDocling(
 
 ) {
 
+  /// Enrich empty Docling pictures with vision captions + keep public image URLs
+  if (Array.isArray(content?.pictures) && content.pictures.length) {
+    for (const picture of content.pictures) {
+      if (!picture) continue;
+      const hasText = String(picture.content || picture.caption || "").trim();
+      if (hasText) continue;
+      try {
+        const resolved = await resolvePictureImage({
+          image_path: picture.image_path,
+          source_url: picture.source_url,
+        });
+        if (!resolved) continue;
+        const caption = await describePictureForIndex({
+          ...resolved,
+          filename,
+        });
+        if (caption) {
+          picture.content = caption;
+          picture.caption = caption;
+        }
+      } catch (err) {
+        console.warn(
+          "[ingest] picture caption failed:",
+          (err as Error)?.message || err
+        );
+      }
+    }
+  }
+
   /// extract all the chunks of text / table / image
 
-  const { chunks, chunksMetadata, contentLength }: any = await extractChunks(
+  const extracted: any = await extractChunks(
 
     content,
 
@@ -438,7 +534,84 @@ export async function generateChunksNEmbeddViaDocling(
 
   );
 
+  let chunks: string[] = extracted.chunks || [];
+  let chunksMetadata: any[] = extracted.chunksMetadata || [];
+  let contentLength: number = extracted.contentLength || 0;
 
+  const { meta, facts: identityFacts } = await extractDocumentFactsFromChunks(
+    chunks,
+    filename
+  );
+
+  /// Phase-1 hierarchy: merge gated vision edges into org_* facts (text already in identityFacts)
+  const pictureInputs: PictureForRelations[] = (
+    Array.isArray(content?.pictures) ? content.pictures : []
+  ).map((picture: any) => {
+    const metaRow = chunksMetadata.find(
+      (m) =>
+        m?.element_type === "picture" &&
+        m?.image_path &&
+        m.image_path === picture?.image_path
+    );
+    return {
+      content: picture?.content,
+      caption: picture?.caption || picture?.label,
+      image_path: picture?.image_path,
+      source_url: picture?.source_url,
+      heading_path:
+        metaRow?.heading_path ||
+        picture?.heading_path ||
+        picture?.heading ||
+        (Array.isArray(picture?.headings)
+          ? picture.headings.join(" > ")
+          : picture?.headings) ||
+        "",
+      headings: picture?.headings || picture?.heading,
+    };
+  });
+  let visionOrgFacts: DocFact[] = [];
+  try {
+    const visionRels = await collectTypedRelationsFromPictures(
+      pictureInputs,
+      filename
+    );
+    visionOrgFacts = relationsToFacts(visionRels, filename).map((f) => ({
+      type: f.type as DocFactType,
+      label: f.label,
+      value: f.value,
+      normalized: f.normalized,
+      filename: f.filename,
+    }));
+  } catch (err) {
+    console.warn(
+      "[ingest] vision relation extract failed:",
+      (err as Error)?.message || err
+    );
+  }
+  const facts = dedupeDocFacts([...identityFacts, ...visionOrgFacts]);
+  const stamp = metaToStampFields(meta);
+
+  /// Drop repeating masthead chrome from body index (facts kept via doc_fact)
+  const headingPaths = chunksMetadata.map((m) => String(m?.heading_path || ""));
+  const sectionRoles = assignSectionRoles(chunks, headingPaths);
+  const keptChunks: string[] = [];
+  const keptMeta: any[] = [];
+  for (let i = 0; i < chunks.length; i++) {
+    const raw = chunks[i];
+    const role = sectionRoles[i] || "body";
+    if (role !== "references" && isLikelyDocChromeChunk(raw, meta)) {
+      continue;
+    }
+    keptChunks.push(raw);
+    keptMeta.push({
+      ...chunksMetadata[i],
+      section_role:
+        role === "body" && isLikelyDocChromeChunk(raw, meta) ? "chrome" : role,
+    });
+  }
+  chunks = keptChunks;
+  chunksMetadata = keptMeta;
+  contentLength = chunks.reduce((n, c) => n + (c?.length || 0), 0);
 
   const documentAnchor = buildDoclingDocumentAnchor(chunks);
 
@@ -466,13 +639,23 @@ export async function generateChunksNEmbeddViaDocling(
 
     const tempData = await buildIngestVectors({
 
-      denseTexts: batch.map((item) => item.embed),
+      denseTexts: batch.map((item, index) => {
+        const hp = String(batchMetadata[index]?.heading_path || "").trim();
+        return hp ? `${hp}\n\n${item.embed}` : item.embed;
+      }),
 
-      sparseTexts: batch.map((item) => item.raw),
+      sparseTexts: batch.map((item, index) => {
+        const hp = String(batchMetadata[index]?.heading_path || "").trim();
+        return hp ? `${hp}\n${item.raw}` : item.raw;
+      }),
 
       ids,
 
       metadataList: batch.map((item, index) => {
+
+        const sectionRole =
+          batchMetadata[index]?.section_role ||
+          inferSectionRole(item.raw);
 
         const mergedMetadata = {
 
@@ -489,6 +672,16 @@ export async function generateChunksNEmbeddViaDocling(
           dimensions: batchMetadata[index]?.dimensions || null,
 
           type: batchMetadata[index]?.type || "unknown",
+
+          element_type: batchMetadata[index]?.element_type || batchMetadata[index]?.type || "unknown",
+
+          heading_path: batchMetadata[index]?.heading_path || "",
+
+          chunk_type: "file",
+
+          section_role: sectionRole,
+
+          ...stamp,
 
           ...(batchMetadata[index]?.image_path && {
 
@@ -522,178 +715,157 @@ export async function generateChunksNEmbeddViaDocling(
 
   }
 
+  if (userId) {
+    await deleteDocFactsForFile(userId, filename, chatbotId);
+    if (facts.length) {
+      const factUpsert = await upsertDocFacts(
+        facts,
+        chatbotId,
+        userId,
+        source,
+        filename
+      );
+      dataIDs.push(...factUpsert.ids);
+    }
+  }
 
+  console.log(
+    `[ingest] docling file=${filename} chunks=${contextualized.length} doc_facts=${facts.length} paper_id=${meta.paperId || "-"} publication=${meta.volume && meta.issue ? `Vol ${meta.volume} Issue ${meta.issue} ${meta.year || ""}` : "-"}`
+  );
 
-  return { data, dataIDs, contentLength };
+  return { data, dataIDs, contentLength, meta, facts };
 
 }
 
 
 
 interface DocumentContent {
-
-  texts?: Array<{
-
-    id: number;
-
-    source: string;
-
-    content: string;
-
-    dimensions: any;
-
-    source_url: string;
-
-  }>;
-
+  texts?: DoclingTextItem[];
   tables?: Array<{
-
-    id: number;
-
-    source: string;
-
-    content: string;
-
-    source_url: string;
-
-    dimensions: any;
-
+    id?: number;
+    source?: string;
+    content?: string;
+    source_url?: string;
+    dimensions?: {
+      quarantine?: boolean;
+      quality?: string;
+      [key: string]: unknown;
+    } | null;
+    quality?: string;
+    quarantine?: boolean;
+    type?: string;
+    label?: string;
+    headings?: string[] | string;
+    heading?: string;
   }>;
-
   pictures?: Array<{
-
-    id: number;
-
-    source: string;
-
-    content: string;
-
-    image_path: string;
-
-    dimensions: any;
-
-    source_url: string;
-
+    id?: number;
+    source?: string;
+    content?: string;
+    caption?: string;
+    label?: string;
+    image_path?: string;
+    dimensions?: unknown;
+    source_url?: string;
+    heading?: string;
+    headings?: string[] | string;
+    heading_path?: string;
   }>;
-
 }
-
-
 
 async function extractChunks(content: DocumentContent, contentLength: number) {
-
   const chunks: string[] = [];
-
   const chunksMetadata: any[] = [];
 
-
-
-  // Extract content from texts
-
-  if (content?.texts) {
-
-    content.texts.forEach((text) => {
-
-      if (text.content) {
-
-        chunks.push(text.content);
-
-        chunksMetadata.push({
-
-          source_url: text.source_url || "",
-
-          dimensions: text.dimensions ? JSON.stringify(text.dimensions) : null,
-
-          type: "text",
-
-        });
-
-        contentLength += text.content.length;
-
-      }
-
-    });
-
+  /// Texts: preserve section_header / headings from process-doc when present;
+  /// otherwise infer heading_path from sequential short headers.
+  const structured = buildStructuredTextChunks(content?.texts);
+  for (const row of structured) {
+    chunks.push(row.content);
+    chunksMetadata.push(row.meta);
+    contentLength += row.content.length;
   }
 
+  let lastHeadingPath =
+    chunksMetadata.length > 0
+      ? String(chunksMetadata[chunksMetadata.length - 1].heading_path || "")
+      : "";
 
-
-  // Extract content from tables
-
-  if (content?.tables) {
-
+    if (content?.tables) {
     content.tables.forEach((table) => {
-
-      if (table.content) {
-
-        chunks.push(table.content);
-
-        chunksMetadata.push({
-
-          source_url: table.source_url || "",
-
-          dimensions: table.dimensions
-
-            ? JSON.stringify(table.dimensions)
-
-            : null,
-
-          type: "table",
-
-        });
-
-        contentLength += table.content.length;
-
+      if (!table.content) return;
+      const quarantined =
+        table.quarantine === true ||
+        table.dimensions?.quarantine === true ||
+        table.quality === "empty" ||
+        table.quality === "truncated" ||
+        table.dimensions?.quality === "empty" ||
+        table.dimensions?.quality === "truncated";
+      if (quarantined) {
+        console.warn(
+          "[embeddings] Skipping quarantined table chunk",
+          table.id,
+          table.quality || table.dimensions?.quality
+        );
+        return;
       }
-
+      const path =
+        (Array.isArray(table.headings) && table.headings.length
+          ? table.headings.join(" > ")
+          : typeof table.headings === "string"
+            ? table.headings
+            : table.heading) || lastHeadingPath;
+      chunks.push(table.content);
+      chunksMetadata.push({
+        source_url: table.source_url || "",
+        dimensions: table.dimensions ? JSON.stringify(table.dimensions) : null,
+        type: "table",
+        element_type: "table",
+        heading_path: path,
+        is_section_header: false,
+        quality: table.quality || table.dimensions?.quality || "ok",
+      });
+      contentLength += table.content.length;
     });
-
   }
-
-
-
-  // Extract content from pictures
 
   if (content?.pictures) {
-
     content.pictures.forEach((picture) => {
-
-      if (picture.content) {
-
-        /// add picture content + image path
-
-        chunks.push(picture.content + " image: " + picture?.image_path);
-
-        chunksMetadata.push({
-
-          source_url: picture.source_url || "",
-
-          dimensions: picture.dimensions
-
-            ? JSON.stringify(picture.dimensions)
-
-            : null,
-
-          type: "picture",
-
-          image_path: picture.image_path,
-
-        });
-
-        contentLength += picture.content.length + picture?.image_path.length;
-
-      }
-
+      if (!picture.content && !picture.image_path) return;
+      const picContent = String(picture.content || "");
+      const path =
+        (picture as { heading?: string; headings?: string[] | string })
+          .heading ||
+        (Array.isArray((picture as any).headings) &&
+        (picture as any).headings.length
+          ? (picture as any).headings.join(" > ")
+          : typeof (picture as any).headings === "string"
+            ? (picture as any).headings
+            : "") ||
+        lastHeadingPath;
+      chunks.push(
+        picContent
+          ? picContent + (picture?.image_path ? " image: " + picture.image_path : "")
+          : `image: ${picture?.image_path || ""}`
+      );
+      chunksMetadata.push({
+        source_url: picture.source_url || "",
+        dimensions: picture.dimensions
+          ? JSON.stringify(picture.dimensions)
+          : null,
+        type: "picture",
+        element_type: "picture",
+        heading_path: path,
+        is_section_header: false,
+        image_path: picture.image_path,
+      });
+      contentLength +=
+        picContent.length + (picture?.image_path?.length || 0);
     });
-
   }
 
-
-
   return { chunks, chunksMetadata, contentLength };
-
 }
-
 
 
 export async function createEmbedding(query: string) {
