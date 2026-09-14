@@ -421,11 +421,11 @@ export function extractExplicitRelationsFromText(text: string): TypedRelation[] 
   }
 
   /// Compound subjects: "A and B must escalate ... to C"
-  const compound = [
-    ...window.matchAll(
+  const compound = Array.from(
+    window.matchAll(
       /\b([A-Z][^.\n]{2,50}?)\s+and\s+([A-Z][^.\n]{2,50}?)\s+must\s+escalate[^\n.]{0,100}?to\s+(?:the\s+)?([A-Z][^.\n,]{2,60}?)(?:\.|,|;|\n|$)/gi
-    ),
-  ];
+    )
+  );
   for (const m of compound) {
     pushRelation(out, m[1], m[3], "escalates_to", m[0], 0.9);
     pushRelation(out, m[2], m[3], "escalates_to", m[0], 0.9);
