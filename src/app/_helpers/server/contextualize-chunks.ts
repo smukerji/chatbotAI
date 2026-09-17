@@ -10,8 +10,32 @@ function client() {
 /// cheap; failures fall back to the original chunk so indexing never blocks.
 const CONTEXT_MODEL = "gpt-4o-mini";
 export const DOC_CHAR_LIMIT = 24000;
-const CONCURRENCY = 12;
-const PAGE_GROUP_CONCURRENCY = 5;
+/// Keep low: Vercel store-v2 is capped at 5m; OpenAI 429 storms burn the budget.
+const CONCURRENCY = Math.max(
+  1,
+  Math.min(8, Number(process.env.CONTEXTUALIZE_CONCURRENCY || 3) || 3)
+);
+const PAGE_GROUP_CONCURRENCY = Math.max(
+  1,
+  Math.min(4, Number(process.env.CONTEXTUALIZE_PAGE_CONCURRENCY || 2) || 2)
+);
+const MAX_RETRIES = 3;
+const RATE_LIMIT_ABORT_AFTER = 8;
+
+function isRateLimitError(error: any): boolean {
+  const status = error?.status || error?.response?.status || error?.code;
+  const msg = String(error?.message || "").toLowerCase();
+  return (
+    status === 429 ||
+    msg.includes("429") ||
+    msg.includes("rate limit") ||
+    msg.includes("too many requests")
+  );
+}
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 export function shouldContextualizeAtIngest(chunkCount: number): boolean {
   if (process.env.DISABLE_CONTEXTUAL_INGEST === "1") return false;
@@ -57,6 +81,9 @@ export async function contextualizeChunks(
 ): Promise<ContextualizedChunk[]> {
   if (!chunks.length) return chunks.map((raw) => ({ raw, embed: raw }));
   if (!shouldContextualizeAtIngest(chunks.length)) {
+    console.log(
+      `[contextualize] skipping LLM situate for ${chunks.length} chunks (over CONTEXTUALIZE_MAX_CHUNKS or DISABLE_CONTEXTUAL_INGEST)`
+    );
     return chunks.map((raw) => ({ raw, embed: raw }));
   }
   const document = (documentText || "").trim().slice(0, DOC_CHAR_LIMIT);
@@ -67,16 +94,34 @@ export async function contextualizeChunks(
     embed: raw,
   }));
   let next = 0;
+  let consecutiveRateLimits = 0;
+  let abortedForRateLimit = false;
+
+  console.log(
+    `[contextualize] situating ${chunks.length} chunks concurrency=${CONCURRENCY}`
+  );
 
   const worker = async () => {
     while (next < chunks.length) {
+      if (abortedForRateLimit) return;
       const i = next++;
       const chunk = chunks[i];
       if (!chunk?.trim()) continue;
       try {
         const context = await situateChunk(document, chunk);
+        consecutiveRateLimits = 0;
         if (context) results[i] = { raw: chunk, embed: `${context}\n\n${chunk}` };
       } catch (error: any) {
+        if (isRateLimitError(error)) {
+          consecutiveRateLimits += 1;
+          if (consecutiveRateLimits >= RATE_LIMIT_ABORT_AFTER) {
+            abortedForRateLimit = true;
+            console.warn(
+              `[contextualize] aborting remaining situate after ${RATE_LIMIT_ABORT_AFTER} rate limits; indexing raw chunks`
+            );
+            return;
+          }
+        }
         console.warn(
           "[contextualize] chunk failed, indexing original text:",
           error?.message || error
@@ -88,6 +133,11 @@ export async function contextualizeChunks(
   await Promise.all(
     Array.from({ length: Math.min(CONCURRENCY, chunks.length) }, () => worker())
   );
+  if (abortedForRateLimit) {
+    console.warn(
+      `[contextualize] completed with rate-limit abort; remaining chunks kept raw`
+    );
+  }
   return results;
 }
 
@@ -148,14 +198,17 @@ async function situateChunk(
   document: string,
   chunk: string
 ): Promise<string> {
-    const response = await client().chat.completions.create({
-    model: CONTEXT_MODEL,
-    temperature: 0,
-    max_tokens: 120,
-    messages: [
-      {
-        role: "user",
-        content: `<document>
+  let lastError: any;
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const response = await client().chat.completions.create({
+        model: CONTEXT_MODEL,
+        temperature: 0,
+        max_tokens: 120,
+        messages: [
+          {
+            role: "user",
+            content: `<document>
 ${document}
 </document>
 Here is the chunk we want to situate within the whole document
@@ -163,11 +216,19 @@ Here is the chunk we want to situate within the whole document
 ${chunk}
 </chunk>
 Please give a short succinct context to situate this chunk within the overall document for the purposes of improving search retrieval of the chunk. Answer only with the succinct context and nothing else.`,
-      },
-    ],
-  });
+          },
+        ],
+      });
 
-  const text = response.choices?.[0]?.message?.content?.trim() || "";
-  if (!text || text.length > 600) return "";
-  return text.replace(/^["']|["']$/g, "");
+      const text = response.choices?.[0]?.message?.content?.trim() || "";
+      if (!text || text.length > 600) return "";
+      return text.replace(/^["']|["']$/g, "");
+    } catch (error: any) {
+      lastError = error;
+      if (!isRateLimitError(error) || attempt === MAX_RETRIES) break;
+      const backoffMs = Math.min(8000, 500 * 2 ** attempt);
+      await sleep(backoffMs);
+    }
+  }
+  throw lastError;
 }
